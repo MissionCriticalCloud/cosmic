@@ -75,12 +75,6 @@ public class MessageDispatcher implements MessageSubscriber {
         return dispatcher;
     }
 
-    public static void removeDispatcher(final Object targetObject) {
-        synchronized (s_targetMap) {
-            s_targetMap.remove(targetObject);
-        }
-    }
-
     @Override
     public void onPublishMessage(final String senderAddress, final String subject, final Object args) {
         dispatch(_targetObject, subject, senderAddress, args);

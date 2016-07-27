@@ -13,7 +13,5 @@ public interface MessageBus {
 
     void clearAll();
 
-    void prune();
-
     void publish(String senderAddress, String subject, PublishScope scope, Object args);
 }
