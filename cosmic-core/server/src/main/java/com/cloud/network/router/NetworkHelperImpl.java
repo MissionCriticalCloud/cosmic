@@ -370,7 +370,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         }
         // We would try best to deploy the router to another place
         final int retryIndex = 5;
-        final ExcludeList[] avoids = new ExcludeList[5];
+        final ExcludeList[] avoids = new ExcludeList[retryIndex];
         avoids[0] = new ExcludeList();
         avoids[0].addPod(routerToBeAvoid.getPodIdToDeployIn());
         avoids[1] = new ExcludeList();
