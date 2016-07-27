@@ -1,4 +1,5 @@
 # Import Local Modules
+import logging
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (VirtualMachine,
                              Account,
@@ -22,9 +23,6 @@ from marvin.lib.utils import (cleanup_resources,
                               get_process_status,
                               get_host_credentials)
 from nose.plugins.attrib import attr
-
-# Import System modules
-import logging
 
 
 def check_router_command(virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):
@@ -61,6 +59,12 @@ def find_public_gateway(test_case):
 
 
 class TestRedundantIsolateNetworks(cloudstackTestCase):
+    # TODO: refactor these and others in the same file to super class
+    HTTP_COMMAND = "wget -t 1 -T 5 %s:8080"
+    HTTP_CHECK_STRING = 'HTTP request sent, awaiting response... 200 OK'
+    HTTP_ASSERT_SUCCESS_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should be successful!'
+    HTTP_ASSERT_FAILURE_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should NOT be successful!'
+
     @classmethod
     def setUpClass(cls):
 
@@ -102,9 +106,9 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         cls.services["nw_off_persistent_RVR_egress_false"] = cls.services["nw_off_persistent_RVR"].copy()
         cls.services["nw_off_persistent_RVR_egress_false"]["egress_policy"] = "false"
 
-        cls.services["egress_80"] = {
-            "startport": 80,
-            "endport": 80,
+        cls.services["egress_8080"] = {
+            "startport": 8080,
+            "endport": 8080,
             "protocol": "TCP",
             "cidrlist": ["0.0.0.0/0"]
         }
@@ -277,34 +281,32 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         )
 
         expected = 1
-        ssh_command = "wget -t 1 -T 5 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
+        ssh_command = self.HTTP_COMMAND % gateway
+        check_string = self.HTTP_CHECK_STRING
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should be successful!"
+            self.HTTP_ASSERT_SUCCESS_MESSAGE
         )
 
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_80"]["protocol"],
-            startport=self.services["egress_80"]["startport"],
-            endport=self.services["egress_80"]["endport"],
-            cidrlist=self.services["egress_80"]["cidrlist"]
+            protocol=self.services["egress_8080"]["protocol"],
+            startport=self.services["egress_8080"]["startport"],
+            endport=self.services["egress_8080"]["endport"],
+            cidrlist=self.services["egress_8080"]["cidrlist"]
         )
 
         expected = 0
-        ssh_command = "wget -t 1 -T 1 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
+            self.HTTP_ASSERT_FAILURE_MESSAGE
         )
 
         return
@@ -442,23 +444,23 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        ssh_command = "wget -t 1 -T 1 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
+        ssh_command = self.HTTP_COMMAND % gateway
+        check_string = self.HTTP_CHECK_STRING
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should NOT be successful"
+            self.HTTP_ASSERT_FAILURE_MESSAGE
         )
 
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_80"]["protocol"],
-            startport=self.services["egress_80"]["startport"],
-            endport=self.services["egress_80"]["endport"],
-            cidrlist=self.services["egress_80"]["cidrlist"]
+            protocol=self.services["egress_8080"]["protocol"],
+            startport=self.services["egress_8080"]["startport"],
+            endport=self.services["egress_8080"]["endport"],
+            cidrlist=self.services["egress_8080"]["cidrlist"]
         )
 
         EgressFireWallRule.create(
@@ -471,14 +473,12 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
         )
 
         expected = 1
-        ssh_command = "wget -t 1 -T 5 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should be successful once rule is added!"
+            self.HTTP_ASSERT_SUCCESS_MESSAGE
         )
 
         return
@@ -630,6 +630,12 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
 
 
 class TestIsolatedNetworks(cloudstackTestCase):
+    # TODO: refactor these and others in the same file to super class
+    HTTP_COMMAND = "wget -t 1 -T 5 %s:8080"
+    HTTP_CHECK_STRING = 'HTTP request sent, awaiting response... 200 OK'
+    HTTP_ASSERT_SUCCESS_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should be successful!'
+    HTTP_ASSERT_FAILURE_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should NOT be successful!'
+
     @classmethod
     def setUpClass(cls):
 
@@ -671,9 +677,9 @@ class TestIsolatedNetworks(cloudstackTestCase):
         cls.services["network_offering_egress_false"] = cls.services["network_offering"].copy()
         cls.services["network_offering_egress_false"]["egress_policy"] = "false"
 
-        cls.services["egress_80"] = {
-            "startport": 80,
-            "endport": 80,
+        cls.services["egress_8080"] = {
+            "startport": 8080,
+            "endport": 8080,
             "protocol": "TCP",
             "cidrlist": ["0.0.0.0/0"]
         }
@@ -830,34 +836,32 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 1
-        ssh_command = "wget -t 1 -T 5 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
+        ssh_command = self.HTTP_COMMAND % gateway
+        check_string = self.HTTP_CHECK_STRING
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should be successful!"
+            self.HTTP_ASSERT_SUCCESS_MESSAGE
         )
 
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_80"]["protocol"],
-            startport=self.services["egress_80"]["startport"],
-            endport=self.services["egress_80"]["endport"],
-            cidrlist=self.services["egress_80"]["cidrlist"]
+            protocol=self.services["egress_8080"]["protocol"],
+            startport=self.services["egress_8080"]["startport"],
+            endport=self.services["egress_8080"]["endport"],
+            cidrlist=self.services["egress_8080"]["cidrlist"]
         )
 
         expected = 0
-        ssh_command = "wget -t 1 -T 1 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should NOT be successful once rule is added!"
+            self.HTTP_ASSERT_FAILURE_MESSAGE
         )
 
         return
@@ -986,34 +990,32 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        ssh_command = "wget -t 1 -T 1 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
+        ssh_command = self.HTTP_COMMAND % gateway
+        check_string = self.HTTP_CHECK_STRING
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should NOT be successful"
+            self.HTTP_ASSERT_FAILURE_MESSAGE
         )
 
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_80"]["protocol"],
-            startport=self.services["egress_80"]["startport"],
-            endport=self.services["egress_80"]["endport"],
-            cidrlist=self.services["egress_80"]["cidrlist"]
+            protocol=self.services["egress_8080"]["protocol"],
+            startport=self.services["egress_8080"]["startport"],
+            endport=self.services["egress_8080"]["endport"],
+            cidrlist=self.services["egress_8080"]["cidrlist"]
         )
 
         expected = 1
-        ssh_command = "wget -t 1 -T 5 www.google.com"
-        check_string = "HTTP request sent, awaiting response... 200 OK"
         result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
             expected,
-            "Attempt to retrieve google.com index page should be successful once rule is added!"
+            self.HTTP_ASSERT_SUCCESS_MESSAGE
         )
 
         return
