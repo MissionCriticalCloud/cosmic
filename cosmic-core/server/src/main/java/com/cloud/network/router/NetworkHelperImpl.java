@@ -346,7 +346,6 @@ public class NetworkHelperImpl implements NetworkHelper {
         }
 
         final DataCenterDeployment plan = new DataCenterDeployment(0, null, null, null, null, null);
-        DomainRouterVO result = null;
         assert router.getIsRedundantRouter();
         final List<Long> networkIds = _routerDao.getRouterNetworks(router.getId());
 
@@ -385,6 +384,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         avoids[3].addHost(routerToBeAvoid.getHostId());
         avoids[4] = new ExcludeList();
 
+        DomainRouterVO result = null;
         for (int i = 0; i < retryIndex; i++) {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Try to deploy redundant virtual router:" + router.getHostName() + ", for " + i + " time");
