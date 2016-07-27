@@ -325,17 +325,20 @@ public class NetworkHelperImpl implements NetworkHelper {
 
     @Override
     public DomainRouterVO startVirtualRouter(final DomainRouterVO router, final User user, final Account caller, final Map<Param, Object> params)
-            throws StorageUnavailableException, InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
+        final String instanceName = router.getInstanceName();
+        logger.info("Starting Virtual Router {} ({})", instanceName, router.getUuid());
+
         if (router.getRole() != Role.VIRTUAL_ROUTER || !router.getIsRedundantRouter()) {
+            logger.debug("Will start to deploy router {} without any avoidance rules", instanceName);
             return start(router, user, caller, params, null);
         }
 
         if (router.getState() == State.Running) {
-            logger.debug("Redundant router " + router.getInstanceName() + " is already running!");
+            logger.debug("Redundant router {} is already running!", instanceName);
             return router;
         }
 
-        //
         // If another thread has already requested a VR start, there is a
         // transition period for VR to transit from
         // Starting to Running, there exist a race conditioning window here
@@ -354,7 +357,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             for (final DomainRouterVO rrouter : routerList) {
                 if (rrouter.getHostId() != null && rrouter.getIsRedundantRouter() && rrouter.getState() == State.Running) {
                     if (routerToBeAvoid != null) {
-                        throw new ResourceUnavailableException("Try to start router " + router.getInstanceName() + "(" + router.getId() + ")"
+                        throw new ResourceUnavailableException("Try to start router " + instanceName + "(" + router.getId() + ")"
                                 + ", but there are already two redundant routers with IP " + router.getPublicIpAddress() + ", they are " + rrouter.getInstanceName() + "("
                                 + rrouter.getId() + ") and " + routerToBeAvoid.getInstanceName() + "(" + routerToBeAvoid.getId() + ")", DataCenter.class,
                                 rrouter.getDataCenterId());
@@ -383,13 +386,12 @@ public class NetworkHelperImpl implements NetworkHelper {
         avoids[3].addHost(routerToBeAvoid.getHostId());
         avoids[4] = new ExcludeList();
 
+        logger.debug("Will start to deploy router {} with the most strict avoidance rules first", instanceName);
         DomainRouterVO result = null;
         for (int i = 0; i < retryIndex; i++) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Try to deploy redundant virtual router:" + router.getHostName() + ", for " + i + " time");
-            }
             plan.setAvoids(avoids[i]);
             try {
+                logger.debug("Starting router {} trying to {}", instanceName, avoids[i]);
                 result = start(router, user, caller, params, plan);
             } catch (final InsufficientServerCapacityException ex) {
                 result = null;
