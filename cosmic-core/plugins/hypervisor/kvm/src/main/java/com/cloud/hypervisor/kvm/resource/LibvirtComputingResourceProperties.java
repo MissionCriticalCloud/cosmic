@@ -536,7 +536,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final int DEFAULT_STOP_SCRIPT_TIMEOUT = 120;
         public static final String DEFAULT_STORAGE_SCRIPTS_DIR = "scripts/storage/qcow2";
         public static final int DEFAULT_VM_VIDEO_RAM = 0;
-        public static final String DEFAULT_SYSTEMVM_ISO_PATH = "/usr/share/cosmic-common/vms/systemvm.iso";
+        public static final String DEFAULT_SYSTEMVM_ISO_PATH = "/opt/cosmic/agent/vms/systemvm.iso";
         public static final String DEFAULT_MOUNT_PATH = "/mnt";
         public static final int DEFAULT_VM_MIGRATE_DOWNTIME = -1;
         public static final int DEFAULT_VM_MIGRATE_PAUSEAFTER = -1;

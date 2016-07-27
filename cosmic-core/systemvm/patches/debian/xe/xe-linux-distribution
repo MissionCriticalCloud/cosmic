@@ -1,6 +1,4 @@
-#! /bin/sh
-
-
+#!/bin/sh
 
 # Script to write information about the current distribution to stdout or a file.
 # Information collected:

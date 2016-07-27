@@ -22,6 +22,25 @@
             <version>5.1.0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
+            <version>5.1.0.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-secondary-storage</artifactId>
+            <version>5.1.0.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-console-proxy</artifactId>
+            <version>5.1.0.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -29,87 +48,17 @@
             <groupId>commons-daemon</groupId>
             <artifactId>commons-daemon</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
-            <version>5.1.0.5-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <source>${cs.jdk.version}</source>
-                    <target>${cs.jdk.version}</target>
+                    <executable>true</executable>
+                    <layout>ZIP</layout>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-resource</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <copy todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/conf">
-                                        <include name="agent.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy overwrite="true" todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/conf">
-                                        <include name="*.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                                <copy overwrite="true" todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/bindir">
-                                        <include name="*.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                                <copy todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/conf">
-                                        <include name="cosmic-agent.logrotate" />
-                                    </fileset>
-                                </copy>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
-                            <includeScope>runtime</includeScope>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

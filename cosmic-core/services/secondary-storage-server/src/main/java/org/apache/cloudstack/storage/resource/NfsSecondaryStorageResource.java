@@ -863,7 +863,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     String swiftDownload(final SwiftTO swift, final String container, final String rfilename, final String lFullPath) {
         final Script command = new Script("/bin/bash", s_logger);
         command.add("-c");
-        command.add("/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
+        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
                 swift.getUserName() + " -K " + swift.getKey() + " download " + container + " " + rfilename + " -o " + lFullPath);
         final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
         final String result = command.execute(parser);
@@ -888,7 +888,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     String swiftDownloadContainer(final SwiftTO swift, final String container, final String ldir) {
         final Script command = new Script("/bin/bash", s_logger);
         command.add("-c");
-        command.add("cd " + ldir + ";/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
+        command.add("cd " + ldir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
                 swift.getUserName() + " -K " + swift.getKey() + " download " + container);
         final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
         final String result = command.execute(parser);
@@ -934,10 +934,10 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             final Script command = new Script("/bin/bash", s_logger);
             command.add("-c");
             if (size <= SWIFT_MAX_SIZE) {
-                command.add("cd " + lDir + ";/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
+                command.add("cd " + lDir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
                         swift.getAccount() + ":" + swift.getUserName() + " -K " + swift.getKey() + " upload " + container + " " + file);
             } else {
-                command.add("cd " + lDir + ";/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
+                command.add("cd " + lDir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
                         swift.getAccount() + ":" + swift.getUserName() + " -K " + swift.getKey() + " upload -S " + SWIFT_MAX_SIZE + " " + container + " " + file);
             }
             final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
@@ -965,7 +965,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     String[] swiftList(final SwiftTO swift, final String container, final String rFilename) {
         final Script command = new Script("/bin/bash", s_logger);
         command.add("-c");
-        command.add("/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
+        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
                 swift.getUserName() + " -K " + swift.getKey() + " list " + container + " " + rFilename);
         final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
         final String result = command.execute(parser);
@@ -987,7 +987,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     String swiftDelete(final SwiftTO swift, final String container, final String object) {
         final Script command = new Script("/bin/bash", s_logger);
         command.add("-c");
-        command.add("/usr/bin/python /usr/local/cloud/systemvm/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
+        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
                 swift.getUserName() + " -K " + swift.getKey() + " delete " + container + " " + object);
         final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
         final String result = command.execute(parser);

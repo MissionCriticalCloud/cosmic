@@ -1,9 +1,0 @@
-/var/log/cosmic/agent/cosmic-agent.out
-/var/log/cosmic/agent/cosmic-agent.err
-{
-    copytruncate
-    daily
-    rotate 5
-    compress
-    missingok
-}

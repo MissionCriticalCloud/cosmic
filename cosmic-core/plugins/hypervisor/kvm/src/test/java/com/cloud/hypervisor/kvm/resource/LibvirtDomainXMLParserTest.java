@@ -64,7 +64,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
                 "</disk>" +
                 "<disk type='file' device='cdrom'>" +
                 "<driver name='qemu' type='raw' cache='none'/>" +
-                "<source file='/usr/share/cosmic-common/vms/systemvm.iso'/>" +
+                "<source file='/opt/cosmic/agent/vms/systemvm.iso'/>" +
                 "<target dev='hdc' bus='ide'/>" +
                 "<readonly/>" +
                 "<alias name='ide0-1-0'/>" +

@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
 
-
-
-
-
-
-#_run.sh runs the agent client.
-
-# set -x
 readonly PROGNAME=$(basename "$0")
 readonly LOCKDIR=/tmp
 readonly LOCKFD=500
 
-CLOUDSTACK_HOME="/usr/local/cloud"
-. $CLOUDSTACK_HOME/systemvm/utils.sh
+CLOUDSTACK_HOME="/opt/cosmic/agent"
+. $CLOUDSTACK_HOME/utils.sh
 
 LOCKFILE=$LOCKDIR/$PROGNAME.xlock
 lock $LOCKFILE $LOCKFD
@@ -24,7 +16,7 @@ fi
 while true
 do
   pid=$(get_pids)
-  action=`cat /usr/local/cloud/systemvm/user_request`
+  action=`cat /opt/cosmic/agent/user_request`
   if [ "$pid" == "" ] && [ "$action" == "start" ] ; then
     ./_run.sh "$@" &
     wait
@@ -36,7 +28,7 @@ do
   fi
 
   # user stop agent by service cloud stop
-  grep 'stop' /usr/local/cloud/systemvm/user_request &>/dev/null
+  grep 'stop' /opt/cosmic/agent/user_request &>/dev/null
   if [ $? -eq 0 ]; then
       timestamp=$(date)
       echo "$timestamp User stops cloud.com service" >> /var/log/cloud.log

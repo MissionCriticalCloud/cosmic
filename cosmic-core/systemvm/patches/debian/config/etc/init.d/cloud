@@ -7,22 +7,20 @@
 # Should-Stop:
 # Default-Start:
 # Default-Stop:      0 1 6
-# Short-Description: 	Start up the CloudStack cloud service
+# Short-Description: 	Start up the Cosmic Agent
 ### END INIT INFO
 
 
-#set -x
+set -x
 
 ENABLED=0
 [ -e /etc/default/cloud ] && . /etc/default/cloud
 
 CMDLINE=$(cat /var/cache/cloud/cmdline)
 
-if [ ! -z $CLOUD_DEBUG ];then
-  LOG_FILE=/var/log/cloud/cloud.out
-else
-  LOG_FILE=/dev/null
-fi
+mkdir -p /var/log/cosmic/agent
+
+LOG_FILE=/var/log/cosmic/agent/cloud_init.log
 
 TYPE="router"
 for i in $CMDLINE
@@ -65,29 +63,27 @@ _failure() {
   fi
 }
 RETVAL=$?
-CLOUDSTACK_HOME="/usr/local/cloud"
-if [ -f  $CLOUDSTACK_HOME/systemvm/utils.sh ];
+COSMIC_HOME="/opt/cosmic/agent"
+if [ -f  $COSMIC_HOME/utils.sh ];
 then
-  . $CLOUDSTACK_HOME/systemvm/utils.sh
+  . $COSMIC_HOME/utils.sh
 else
   _failure
 fi
 
-# mkdir -p /var/log/vmops
-
 start() {
    local pid=$(get_pids)
    if [ "$pid" != "" ]; then
-       echo "CloudStack cloud sevice is already running, PID = $pid"
+       echo "Cosmic Agent is already running, PID = $pid"
        return 0
    fi
 
-   echo -n "Starting CloudStack cloud service (type=$TYPE) "
-   if [ -f $CLOUDSTACK_HOME/systemvm/run.sh ];
+   echo -n "Starting Cosmic Agent (type=$TYPE) "
+   if [ -f $COSMIC_HOME/run.sh ];
    then
      if [ "$pid" == "" ]
      then
-       (cd $CLOUDSTACK_HOME/systemvm; nohup ./run.sh > $LOG_FILE 2>&1 & )
+       (cd $COSMIC_HOME; nohup ./run.sh > $LOG_FILE 2>&1 & )
        pid=$(get_pids)
        echo $pid > /var/run/cloud.pid
      fi
@@ -96,29 +92,29 @@ start() {
      _failure
    fi
    echo
-   echo 'start' > $CLOUDSTACK_HOME/systemvm/user_request
+   echo 'start' > $COSMIC_HOME/user_request
 }
 
 stop() {
   local pid
-  echo -n  "Stopping CloudStack cloud service (type=$TYPE): "
+  echo -n  "Stopping Cosmic Agent (type=$TYPE): "
   for pid in $(get_pids)
   do
     kill $pid
   done
   _success
   echo
-  echo 'stop' > $CLOUDSTACK_HOME/systemvm/user_request
+  echo 'stop' > $COSMIC_HOME/user_request
 }
 
 status() {
   local pids=$(get_pids)
   if [ "$pids" == "" ]
   then
-    echo "CloudStack cloud service is not running"
+    echo "Cosmic Agent is not running"
     return 1
   fi
-  echo "CloudStack cloud service (type=$TYPE) is running: process id: $pids"
+  echo "Cosmic Agent (type=$TYPE) is running: process id: $pids"
   return 0
 }
 

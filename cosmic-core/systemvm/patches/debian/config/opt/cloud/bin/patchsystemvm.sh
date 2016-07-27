@@ -1,19 +1,20 @@
-#/bin/bash
+#!/usr/bin/env bash
 
+logfile="/var/log/cosmic/agent/patch_systemvm.log"
 
+mkdir -p /var/log/cosmic/agent
 
-
-# $Id: patchsystemvm.sh 10800 2010-07-16 13:48:39Z edison $ $HeadURL: svn://svn.lab.vmops.com/repos/branches/2.1.x/java/scripts/vm/hypervisor/xenserver/prepsystemvm.sh $
-
-#set -x
-logfile="/var/log/patchsystemvm.log"
-# To use existing console proxy .zip-based package file
-patch_console_proxy() {
+# Extract systemvm.zip package to install_directory.
+patch_systemvm() {
+   local install_directory=/opt/cosmic/agent
    local patchfile=$1
-   rm /usr/local/cloud/systemvm -rf
-   mkdir -p /usr/local/cloud/systemvm
-   echo "All" | unzip $patchfile -d /usr/local/cloud/systemvm >$logfile 2>&1
-   find /usr/local/cloud/systemvm/ -name \*.sh | xargs chmod 555
+   rm -rf $install_directory
+   mkdir -p $install_directory
+
+   echo "All" | unzip $patchfile -d $install_directory >$logfile 2>&1
+
+   find $install_directory -name \*.sh | xargs chmod 555
+
    [ -f /etc/udev/rules.d/70-persistent-net.rules ] && sudo rm -f /etc/udev/rules.d/70-persistent-net.rules
    [ -f /etc/udev/rules.d/75-persistent-net-generator.rules ] && sudo rm -f /etc/udev/rules.d/75-persistent-net-generator.rules
    return 0
@@ -33,7 +34,6 @@ consoleproxy_svcs() {
    chkconfig conntrackd off
    echo "cloud postinit ssh" > /var/cache/cloud/enabled_svcs
    echo "cloud-passwd-srvr haproxy dnsmasq apache2 nfs-common portmap" > /var/cache/cloud/disabled_svcs
-   mkdir -p /var/log/cloud
 }
 
 secstorage_svcs() {
@@ -50,7 +50,6 @@ secstorage_svcs() {
    chkconfig conntrackd off
    echo "cloud postinit ssh nfs-common portmap" > /var/cache/cloud/enabled_svcs
    echo "cloud-passwd-srvr haproxy dnsmasq" > /var/cache/cloud/disabled_svcs
-   mkdir -p /var/log/cloud
 }
 
 routing_svcs() {
@@ -96,31 +95,6 @@ dhcpsrvr_svcs() {
    echo "cloud nfs-common haproxy portmap" > /var/cache/cloud/disabled_svcs
 }
 
-elbvm_svcs() {
-   chkconfig cloud off
-   chkconfig haproxy on ;
-   chkconfig ssh on
-   chkconfig nfs-common off
-   chkconfig portmap off
-   chkconfig keepalived off
-   chkconfig conntrackd off
-   echo "ssh haproxy" > /var/cache/cloud/enabled_svcs
-   echo "cloud dnsmasq cloud-passwd-srvr apache2 nfs-common portmap" > /var/cache/cloud/disabled_svcs
-}
-
-
-ilbvm_svcs() {
-   chkconfig cloud off
-   chkconfig haproxy on ;
-   chkconfig ssh on
-   chkconfig nfs-common off
-   chkconfig portmap off
-   chkconfig keepalived off
-   chkconfig conntrackd off
-   echo "ssh haproxy" > /var/cache/cloud/enabled_svcs
-   echo "cloud dnsmasq cloud-passwd-srvr apache2 nfs-common portmap" > /var/cache/cloud/disabled_svcs
-}
-
 enable_pcihotplug() {
    sed -i -e "/acpiphp/d" /etc/modules
    sed -i -e "/pci_hotplug/d" /etc/modules
@@ -158,9 +132,9 @@ for i in $CMDLINE
     esac
 done
 
-if [ "$TYPE" == "consoleproxy" ] || [ "$TYPE" == "secstorage" ]  && [ -f ${PATCH_MOUNT}/systemvm.zip ]
+if ([ "$TYPE" == "consoleproxy" ] || [ "$TYPE" == "secstorage" ])  && [ -f ${PATCH_MOUNT}/systemvm.zip ]
 then
-  patch_console_proxy ${PATCH_MOUNT}/systemvm.zip
+  patch_systemvm ${PATCH_MOUNT}/systemvm.zip
   if [ $? -gt 0 ]
   then
     printf "Failed to apply patch systemvm\n" >$logfile
@@ -216,26 +190,6 @@ then
   then
     printf "Failed to execute secstorage_svcs\n" >$logfile
     exit 8
-  fi
-fi
-
-if [ "$TYPE" == "elbvm" ]
-then
-  elbvm_svcs
-  if [ $? -gt 0 ]
-  then
-    printf "Failed to execute elbvm svcs\n" >$logfile
-    exit 9
-  fi
-fi
-
-if [ "$TYPE" == "ilbvm" ]
-then
-  ilbvm_svcs
-  if [ $? -gt 0 ]
-  then
-    printf "Failed to execute ilbvm svcs\n" >$logfile
-    exit 9
   fi
 fi
 

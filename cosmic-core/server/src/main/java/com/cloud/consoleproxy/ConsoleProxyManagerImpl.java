@@ -654,6 +654,9 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
 
         final StringBuilder buf = profile.getBootArgsBuilder();
         buf.append(" template=domP type=consoleproxy");
+        buf.append(" resource=com.cloud.agent.resource.consoleproxy.ConsoleProxyResource");
+        buf.append(" instance=ConsoleProxy");
+
         buf.append(" host=").append(ApiServiceConfiguration.ManagementHostIPAdr.value());
         buf.append(" port=").append(_mgmtPort);
         buf.append(" name=").append(profile.getVirtualMachine().getHostName());

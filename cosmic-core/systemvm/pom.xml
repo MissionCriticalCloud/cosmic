@@ -1,34 +1,83 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-systemvm</artifactId>
     <name>Cosmic System VM</name>
+
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
         <version>5.1.0.5-SNAPSHOT</version>
     </parent>
+
     <properties>
         <mkisofs>mkisofs</mkisofs>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
             <version>5.1.0.5-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-secondary-storage</artifactId>
-            <version>5.1.0.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-console-proxy</artifactId>
-            <version>5.1.0.5-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-cloud-scripts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${basedir}/dist" />
+                                <mkdir dir="${basedir}/target/build-patch" />
+                                <mkdir dir="${basedir}/target/build-patch/usr/sbin" />
+
+                                <copy overwrite="true" todir="${basedir}/target/build-patch">
+                                    <fileset dir="${basedir}/patches/debian/config/">
+                                        <include name="**/*" />
+                                    </fileset>
+                                    <fileset dir="${basedir}/patches/debian/vpn/">
+                                        <include name="**/*" />
+                                    </fileset>
+                                </copy>
+
+                                <copy overwrite="true" todir="${basedir}/target/build-patch/usr/sbin/">
+                                    <fileset dir="${basedir}/patches/debian/xe/">
+                                        <include name="**/xe-*" />
+                                    </fileset>
+                                </copy>
+
+                                <tar destfile="${basedir}/target/patch.tar">
+                                    <tarfileset dir="${basedir}/target/build-patch/" filemode="755">
+                                        <include name="**/*" />
+                                        <exclude name="**/.classpath" />
+                                        <exclude name="**/log**" />
+                                        <exclude name="**/logrotate.d" />
+                                        <exclude name="**/.project" />
+                                        <exclude name="**/wscript_build" />
+                                    </tarfileset>
+                                    <tarfileset dir="${basedir}/target/build-patch/" filemode="644">
+                                        <include name="**/log**" />
+                                        <include name="**/logrotate.d/**" />
+                                    </tarfileset>
+                                </tar>
+
+                                <gzip destfile="${basedir}/dist/cloud-scripts.tgz" src="${basedir}/target/patch.tar" />
+                                <delete dir="${basedir}/target/build-patch" />
+                                <delete file="${basedir}/target/patch.tar" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -48,12 +97,12 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -78,61 +127,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>build-cloud-scripts</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <mkdir dir="${basedir}/dist" />
-                                <mkdir dir="${basedir}/target/build-patch" />
-                                <mkdir dir="${basedir}/target/build-patch/usr/sbin" />
-                                <copy overwrite="true" todir="${basedir}/target/build-patch">
-                                    <fileset dir="${basedir}/patches/debian/config/">
-                                        <include name="**/*" />
-                                    </fileset>
-                                    <fileset dir="${basedir}/patches/debian/vpn/">
-                                        <include name="**/*" />
-                                    </fileset>
-                                    <fileset dir="${basedir}/patches/debian/xe/">
-                                        <include name="**/*" />
-                                        <exclude name="**/xe-*" />
-                                        <exclude name="**/xen-*" />
-                                    </fileset>
-                                </copy>
-                                <copy overwrite="true" todir="${basedir}/target/build-patch/usr/sbin/">
-                                    <fileset dir="${basedir}/patches/debian/xe/">
-                                        <include name="**/xe-*" />
-                                        <include name="**/xen-*" />
-                                    </fileset>
-                                </copy>
-                                <tar destfile="${basedir}/target/patch.tar">
-                                    <tarfileset dir="${basedir}/target/build-patch/" filemode="755">
-                                        <include name="**/*" />
-                                        <exclude name="**/.classpath" />
-                                        <exclude name="**/log**" />
-                                        <exclude name="**/logrotate.d" />
-                                        <exclude name="**/.project" />
-                                        <exclude name="**/wscript_build" />
-                                    </tarfileset>
-                                    <tarfileset dir="${basedir}/target/build-patch/" filemode="644">
-                                        <include name="**/log**" />
-                                        <include name="**/logrotate.d/**" />
-                                    </tarfileset>
-                                </tar>
-                                <gzip destfile="${basedir}/dist/cloud-scripts.tgz" src="${basedir}/target/patch.tar" />
-                                <delete dir="${basedir}/target/build-patch" />
-                                <delete file="${basedir}/target/patch.tar" />
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -158,10 +153,19 @@
                     </arguments>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>never</phase>
+                        <configuration>
+                            <finalName>unwanted</finalName>
+                            <classifier>unwanted</classifier>
+                        </configuration>
+                    </execution>
                     <execution>
                         <phase>package</phase>
                         <goals>

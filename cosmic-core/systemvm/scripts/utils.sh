@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-
-
-CLOUDSTACK_HOME="/usr/local/cloud"
+CLOUDSTACK_HOME="/opt/cosmic/agent"
 
 get_pids() {
   local i

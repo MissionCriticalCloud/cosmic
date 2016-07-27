@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-client-ui</artifactId>
     <name>Cosmic Client UI</name>
@@ -52,6 +53,11 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
+            <version>5.1.0.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cosmic-scripts</artifactId>
             <version>5.1.0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -338,8 +344,22 @@
                                 <argument>-xf</argument>
                                 <argument>dependency/cloud-nucleo-${project.version}.jar</argument>
                                 <argument>setup</argument>
-                                <argument>scripts</argument>
                                 <argument>build</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>extract-scripts-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <executable>jar</executable>
+                            <arguments>
+                                <argument>-xf</argument>
+                                <argument>dependency/cosmic-scripts-${project.version}.jar</argument>
                             </arguments>
                         </configuration>
                     </execution>

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 LANG="C"
 export LANG
 
