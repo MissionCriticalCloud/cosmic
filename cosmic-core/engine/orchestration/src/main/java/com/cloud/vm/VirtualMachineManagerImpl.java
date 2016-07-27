@@ -1822,9 +1822,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             if (avoids == null) {
                 avoids = new ExcludeList();
             }
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Deploy avoids pods: " + avoids.getPodsToAvoid() + ", clusters: " + avoids.getClustersToAvoid() + ", hosts: " + avoids.getHostsToAvoid());
-            }
+            s_logger.debug("VM start orchestration will {}", avoids.toString());
 
             boolean planChangedByVolume = false;
             boolean reuseVolume = true;

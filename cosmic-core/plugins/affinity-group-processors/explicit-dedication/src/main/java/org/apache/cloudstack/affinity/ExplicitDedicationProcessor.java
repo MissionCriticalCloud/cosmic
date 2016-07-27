@@ -218,10 +218,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                     }
                 }
 
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("ExplicitDedicationProcessor returns Avoid List as: Deploy avoids pods: " + avoid.getPodsToAvoid() + ", clusters: " +
-                            avoid.getClustersToAvoid() + ", hosts: " + avoid.getHostsToAvoid());
-                }
+                s_logger.debug("ExplicitDedicationProcessor returns Avoid List as: {}", avoid.toString());
             }
         }
     }

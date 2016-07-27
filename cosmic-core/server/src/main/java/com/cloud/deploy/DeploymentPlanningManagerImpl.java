@@ -238,9 +238,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
         if (vm.getType() == VirtualMachine.Type.User || vm.getType() == VirtualMachine.Type.DomainRouter) {
             checkForNonDedicatedResources(vmProfile, dc, avoids);
         }
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Deploy avoids pods: " + avoids.getPodsToAvoid() + ", clusters: " + avoids.getClustersToAvoid() + ", hosts: " + avoids.getHostsToAvoid());
-        }
+        s_logger.debug("Deployment will {}", avoids.toString());
 
         // call planners
         //DataCenter dc = _dcDao.findById(vm.getDataCenterId());

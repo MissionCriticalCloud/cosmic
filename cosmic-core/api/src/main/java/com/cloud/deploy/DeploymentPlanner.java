@@ -267,5 +267,10 @@ public interface DeploymentPlanner extends Adapter {
         public Set<Long> getPoolsToAvoid() {
             return _poolIds;
         }
+
+        @Override
+        public String toString() {
+            return "avoid: dcs " + _dcIds + ", pods " + _podIds + ", clusters " + _clusterIds + ", hosts " + _hostIds + ", pools " + _poolIds;
+        }
     }
 }
