@@ -272,8 +272,8 @@ public class NetworkHelperImpl implements NetworkHelper {
         return runningRouters;
     }
 
-    protected DomainRouterVO start(DomainRouterVO router, final User user, final Account caller, final Map<Param, Object> params, final DeploymentPlan planToDeploy)
-            throws StorageUnavailableException, InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
+    protected DomainRouterVO start(DomainRouterVO router, final Map<Param, Object> params, final DeploymentPlan planToDeploy)
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
         logger.debug("Starting router " + router);
         try {
             _itMgr.advanceStart(router.getUuid(), params, planToDeploy, null);
@@ -331,7 +331,7 @@ public class NetworkHelperImpl implements NetworkHelper {
 
         if (router.getRole() != Role.VIRTUAL_ROUTER || !router.getIsRedundantRouter()) {
             logger.debug("Will start to deploy router {} without any avoidance rules", instanceName);
-            return start(router, user, caller, params, null);
+            return start(router, params, null);
         }
 
         if (router.getState() == State.Running) {
@@ -367,7 +367,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             }
         }
         if (routerToBeAvoid == null) {
-            return start(router, user, caller, params, null);
+            return start(router, params, null);
         }
         // We would try best to deploy the router to another place
         final int retryIndex = 5;
@@ -392,7 +392,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             plan.setAvoids(avoids[i]);
             try {
                 logger.debug("Starting router {} trying to {}", instanceName, avoids[i]);
-                result = start(router, user, caller, params, plan);
+                result = start(router, params, plan);
             } catch (final InsufficientServerCapacityException ex) {
                 result = null;
             }
