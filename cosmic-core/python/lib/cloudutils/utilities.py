@@ -166,9 +166,7 @@ class serviceOpsRedhat(serviceOps):
         return result
 
     def startService(self, servicename, force=False):
-        if not self.isServiceRunning(servicename) or force:
-            return bash("service " + servicename + " start").isSuccess()
-        return True
+        return bash("systemctl start " + servicename).isSuccess()
 
     def enableService(self, servicename, forcestart=False):
         bash("chkconfig --level 2345 " + servicename + " on")

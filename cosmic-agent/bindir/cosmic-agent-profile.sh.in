@@ -1,5 +1,0 @@
-#!/bin/bash
-
-
-# need access to lsmod for adding host as non-root
-PATH=$PATH:/sbin

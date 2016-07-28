@@ -1,6 +1,5 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.agent.Agent.ExitStatus;
 import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthAnswer;
@@ -18,6 +17,7 @@ import com.cloud.agent.api.proxy.CheckConsoleProxyLoadCommand;
 import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
 import com.cloud.agent.api.proxy.StartConsoleProxyAgentHttpHandlerCommand;
 import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
+import com.cloud.agent.service.Agent.ExitStatus;
 import com.cloud.exception.AgentControlChannelException;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;

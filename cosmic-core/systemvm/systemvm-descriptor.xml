@@ -5,35 +5,35 @@
     <formats>
         <format>zip</format>
     </formats>
+
     <includeBaseDirectory>false</includeBaseDirectory>
+
     <dependencySets>
         <dependencySet>
             <outputDirectory></outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <includes>
+                <include>cloud.cosmic:cloud-agent</include>
+            </includes>
         </dependencySet>
     </dependencySets>
+
     <fileSets>
         <fileSet>
-            <directory>../scripts/storage/secondary/</directory>
+            <directory>../scripts/src/main/resources/scripts/storage/secondary/</directory>
             <outputDirectory>scripts/storage/secondary</outputDirectory>
             <directoryMode>555</directoryMode>
             <fileMode>555</fileMode>
         </fileSet>
+
         <fileSet>
             <directory>scripts</directory>
             <outputDirectory></outputDirectory>
             <directoryMode>555</directoryMode>
             <fileMode>555</fileMode>
         </fileSet>
-        <fileSet>
-            <directory>conf</directory>
-            <outputDirectory>conf</outputDirectory>
-            <directoryMode>555</directoryMode>
-            <fileMode>555</fileMode>
-            <includes>
-                <include>consoleproxy.properties</include>
-                <include>agent.properties</include>
-            </includes>
-        </fileSet>
+
         <fileSet>
             <directory>images</directory>
             <outputDirectory>images</outputDirectory>
@@ -46,6 +46,7 @@
                 <include>*.cur</include>
             </includes>
         </fileSet>
+
         <fileSet>
             <directory>js</directory>
             <outputDirectory>js</outputDirectory>
@@ -55,6 +56,7 @@
                 <include>*.js</include>
             </includes>
         </fileSet>
+
         <fileSet>
             <directory>ui</directory>
             <outputDirectory>ui</outputDirectory>
@@ -64,6 +66,7 @@
                 <include>*.ftl</include>
             </includes>
         </fileSet>
+
         <fileSet>
             <directory>css</directory>
             <outputDirectory>css</outputDirectory>
@@ -73,6 +76,7 @@
                 <include>*.css</include>
             </includes>
         </fileSet>
+
         <fileSet>
             <directory>certs</directory>
             <outputDirectory>certs</outputDirectory>

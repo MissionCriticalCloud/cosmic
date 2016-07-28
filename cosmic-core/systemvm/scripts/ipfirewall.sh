@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 BASE_DIR="/var/www/html/copy/"
 HTACCESS="$BASE_DIR/.htaccess"
 

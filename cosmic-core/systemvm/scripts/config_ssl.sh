@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-
-
-
-
 help() {
    printf " -c use customized key/cert\n"
    printf " -k path of private key\n"

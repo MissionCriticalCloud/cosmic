@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh -i /root/.ssh/id_rsa.cloud -p 3922 root@$1

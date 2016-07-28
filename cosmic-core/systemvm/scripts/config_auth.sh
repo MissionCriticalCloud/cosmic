@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-
-
-
-
-
-
 BASE_DIR="/var/www/html/copy/template/"
 HTACCESS="$BASE_DIR/.htaccess"
 

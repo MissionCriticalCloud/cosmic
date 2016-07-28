@@ -2,6 +2,7 @@
 """
 # Import Local Modules
 import telnetlib
+import time
 from marvin.cloudstackAPI import (stopSystemVm,
                                   rebootSystemVm,
                                   destroySystemVm)
@@ -16,9 +17,6 @@ from marvin.lib.utils import (cleanup_resources,
                               get_process_status,
                               get_host_credentials)
 from nose.plugins.attrib import attr
-
-# Import System modules
-import time
 
 _multiprocess_shared_ = True
 
@@ -380,7 +378,7 @@ class TestSSVMs(cloudstackTestCase):
                 self.apiclient.connection.user,
                 self.apiclient.connection.passwd,
                 ssvm.privateip,
-                "/usr/local/cloud/systemvm/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL",
+                "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL",
                 hypervisor=self.hypervisor)
         else:
             try:
@@ -392,7 +390,7 @@ class TestSSVMs(cloudstackTestCase):
                     host.user,
                     host.passwd,
                     ssvm.linklocalip,
-                    "/usr/local/cloud/systemvm/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL")
+                    "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL")
             except KeyError:
                 self.skipTest(
                     "Marvin configuration has no host\

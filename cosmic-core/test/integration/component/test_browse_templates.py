@@ -772,7 +772,7 @@ class TestBrowseUploadVolume(cloudstackTestCase):
                 self.apiclient.connection.user,
                 self.apiclient.connection.passwd,
                 ssvm.privateip,
-                "/usr/local/cloud/systemvm/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL",
+                "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL",
                 hypervisor=self.hypervisor
             )
         else:
@@ -784,7 +784,7 @@ class TestBrowseUploadVolume(cloudstackTestCase):
                     host.user,
                     host.passwd,
                     ssvm.linklocalip,
-                    "/usr/local/cloud/systemvm/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL"
+                    "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL"
                 )
             except KeyError:
                 self.skipTest("Marvin configuration has no host credentials to check router services")

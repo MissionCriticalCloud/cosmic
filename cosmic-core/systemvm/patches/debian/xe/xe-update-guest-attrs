@@ -1,6 +1,4 @@
-#!/bin/sh
-
-
+#!/bin/bash
 
 # Script to write information about the guest to XenStore.
 #
