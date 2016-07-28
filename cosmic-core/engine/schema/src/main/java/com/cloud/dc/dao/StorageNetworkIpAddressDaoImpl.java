@@ -65,16 +65,18 @@ public class StorageNetworkIpAddressDaoImpl extends GenericDaoBase<StorageNetwor
     public StorageNetworkIpAddressVO takeIpAddress(final long rangeId) {
         final SearchCriteria<StorageNetworkIpAddressVO> sc = untakenIp.create();
         sc.setParameters("rangeId", rangeId);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final StorageNetworkIpAddressVO ip = lockOneRandomRow(sc, true);
-        if (ip == null) {
-            txn.rollback();
-            return null;
+        final StorageNetworkIpAddressVO ip;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            ip = lockOneRandomRow(sc, true);
+            if (ip == null) {
+                txn.rollback();
+                return null;
+            }
+            ip.setTakenAt(new Date());
+            update(ip.getId(), ip);
+            txn.commit();
         }
-        ip.setTakenAt(new Date());
-        update(ip.getId(), ip);
-        txn.commit();
         return ip;
     }
 

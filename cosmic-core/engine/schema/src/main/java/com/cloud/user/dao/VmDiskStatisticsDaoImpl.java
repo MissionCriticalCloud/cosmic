@@ -78,10 +78,9 @@ public class VmDiskStatisticsDaoImpl extends GenericDaoBase<VmDiskStatisticsVO, 
             return vmDiskStats;
         }
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = ACTIVE_AND_RECENTLY_DELETED_SEARCH + " LIMIT " + startIndex + "," + limit;
-            PreparedStatement pstmt = null;
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setString(1, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), minRemovedDate));
             final ResultSet rs = pstmt.executeQuery();
@@ -98,9 +97,8 @@ public class VmDiskStatisticsDaoImpl extends GenericDaoBase<VmDiskStatisticsVO, 
     public List<VmDiskStatisticsVO> listUpdatedStats() {
         final List<VmDiskStatisticsVO> vmDiskStats = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement pstmt = null;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(UPDATED_VM_NETWORK_STATS_SEARCH);
             final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {

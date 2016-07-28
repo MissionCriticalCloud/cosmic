@@ -117,8 +117,9 @@ public class StateMachine<S, E> {
             str.append("State: ").append(getStateStr()).append("\n");
             for (final Map.Entry<E, S> nextState : nextStates.entrySet()) {
                 str.append("  --> Event: ");
-                final Formatter format = new Formatter();
-                str.append(format.format("%-30s", nextState.getKey().toString()));
+                try (final Formatter format = new Formatter()) {
+                    str.append(format.format("%-30s", nextState.getKey().toString()));
+                }
                 str.append("----> State: ");
                 str.append(nextState.getValue().toString());
                 str.append("\n");

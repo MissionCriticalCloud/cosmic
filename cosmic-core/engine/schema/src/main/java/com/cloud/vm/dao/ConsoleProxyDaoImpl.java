@@ -178,9 +178,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
     public List<Pair<Long, Integer>> getDatacenterStoragePoolHostInfo(final long dcId, final boolean countAllPoolTypes) {
         final ArrayList<Pair<Long, Integer>> l = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             if (countAllPoolTypes) {
                 pstmt = txn.prepareAutoCloseStatement(STORAGE_POOL_HOST_INFO);
             } else {
@@ -202,9 +201,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
     public List<Pair<Long, Integer>> getProxyLoadMatrix() {
         final ArrayList<Pair<Long, Integer>> l = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(PROXY_ASSIGNMENT_MATRIX);
             final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -218,9 +216,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
 
     @Override
     public int getProxyStaticLoad(final long proxyVmId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(GET_PROXY_LOAD);
             pstmt.setLong(1, proxyVmId);
 
@@ -236,9 +233,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
 
     @Override
     public int getProxyActiveLoad(final long proxyVmId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(GET_PROXY_ACTIVE_LOAD);
             pstmt.setLong(1, proxyVmId);
 
@@ -255,9 +251,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
     @Override
     public List<Long> getRunningProxyListByMsid(final long msid) {
         final List<Long> l = new ArrayList<>();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt =
                     txn.prepareAutoCloseStatement("SELECT c.id FROM console_proxy c, vm_instance v, host h "
                             + "WHERE c.id=v.id AND v.state='Running' AND v.host_id=h.id AND h.mgmt_server_id=?");
@@ -276,9 +271,8 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
     private List<ConsoleProxyLoadInfo> getDatacenterLoadMatrix(final String sql) {
         final ArrayList<ConsoleProxyLoadInfo> l = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             final ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -296,19 +290,20 @@ public class ConsoleProxyDaoImpl extends GenericDaoBase<ConsoleProxyVO, Long> im
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final ConsoleProxyVO proxy = createForUpdate();
-        proxy.setPublicIpAddress(null);
-        proxy.setPrivateIpAddress(null);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final ConsoleProxyVO proxy = createForUpdate();
+            proxy.setPublicIpAddress(null);
+            proxy.setPrivateIpAddress(null);
 
-        final UpdateBuilder ub = getUpdateBuilder(proxy);
-        ub.set(proxy, "state", State.Destroyed);
-        ub.set(proxy, "privateIpAddress", null);
-        update(id, ub, proxy);
+            final UpdateBuilder ub = getUpdateBuilder(proxy);
+            ub.set(proxy, "state", State.Destroyed);
+            ub.set(proxy, "privateIpAddress", null);
+            update(id, ub, proxy);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 }

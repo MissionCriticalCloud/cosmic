@@ -33,9 +33,8 @@ public class SyncQueueDaoImpl extends GenericDaoBase<SyncQueueVO, Long> implemen
         final Date dt = DateUtil.currentGMTTime();
         final String sql = "INSERT IGNORE INTO sync_queue(sync_objtype, sync_objid, created, last_updated)" + " values(?, ?, ?, ?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setString(1, syncObjType);
             pstmt.setLong(2, syncObjId);

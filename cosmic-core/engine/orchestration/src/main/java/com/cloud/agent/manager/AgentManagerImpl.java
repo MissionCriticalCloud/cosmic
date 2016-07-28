@@ -614,8 +614,9 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
 
     @DB
     protected boolean noDbTxn() {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        return !txn.dbTxnStarted();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            return !txn.dbTxnStarted();
+        }
     }
 
     /**

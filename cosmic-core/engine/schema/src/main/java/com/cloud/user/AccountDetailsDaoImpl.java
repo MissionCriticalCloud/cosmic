@@ -48,16 +48,17 @@ public class AccountDetailsDaoImpl extends GenericDaoBase<AccountDetailVO, Long>
 
     @Override
     public void persist(final long accountId, final Map<String, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<AccountDetailVO> sc = accountSearch.create();
-        sc.setParameters("accountId", accountId);
-        expunge(sc);
-        for (final Map.Entry<String, String> detail : details.entrySet()) {
-            final AccountDetailVO vo = new AccountDetailVO(accountId, detail.getKey(), detail.getValue());
-            persist(vo);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<AccountDetailVO> sc = accountSearch.create();
+            sc.setParameters("accountId", accountId);
+            expunge(sc);
+            for (final Map.Entry<String, String> detail : details.entrySet()) {
+                final AccountDetailVO vo = new AccountDetailVO(accountId, detail.getKey(), detail.getValue());
+                persist(vo);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

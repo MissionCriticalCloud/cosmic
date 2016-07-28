@@ -40,15 +40,7 @@ public class VncClient {
         this.clientListener = clientListener;
     }
 
-    public VncClient(final String host, final int port, final String password, final boolean noUI, final ConsoleProxyClientListener clientListener) throws UnknownHostException,
-            IOException {
-
-        this.noUI = noUI;
-        this.clientListener = clientListener;
-        connectTo(host, port, password);
-    }
-
-    public void connectTo(final String host, final int port, final String password) throws UnknownHostException, IOException {
+    public void connectTo(final String host, final int port, final String password) throws IOException {
         // Connect to server
         s_logger.info("Connecting to VNC server " + host + ":" + port + "...");
         socket = new Socket(host, port);

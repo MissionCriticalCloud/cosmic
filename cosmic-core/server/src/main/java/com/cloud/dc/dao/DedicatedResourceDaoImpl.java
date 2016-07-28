@@ -342,13 +342,15 @@ public class DedicatedResourceDaoImpl extends GenericDaoBase<DedicatedResourceVO
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DedicatedResourceVO resource = createForUpdate();
-        update(id, resource);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final DedicatedResourceVO resource = createForUpdate();
+            update(id, resource);
 
-        final boolean result = super.remove(id);
-        txn.commit();
+            result = super.remove(id);
+            txn.commit();
+        }
         return result;
     }
 }

@@ -74,18 +74,20 @@ public class DataCenterIpAddressDaoImpl extends GenericDaoBase<DataCenterIpAddre
         sc.setParameters("pod", podId);
         sc.setParameters("taken", (Date) null);
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DataCenterIpAddressVO vo = lockOneRandomRow(sc, true);
-        if (vo == null) {
-            txn.rollback();
-            return null;
+        final DataCenterIpAddressVO vo;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            vo = lockOneRandomRow(sc, true);
+            if (vo == null) {
+                txn.rollback();
+                return null;
+            }
+            vo.setTakenAt(new Date());
+            vo.setInstanceId(instanceId);
+            vo.setReservationId(reservationId);
+            update(vo.getId(), vo);
+            txn.commit();
         }
-        vo.setTakenAt(new Date());
-        vo.setInstanceId(instanceId);
-        vo.setReservationId(reservationId);
-        update(vo.getId(), vo);
-        txn.commit();
         return vo;
     }
 
@@ -96,24 +98,25 @@ public class DataCenterIpAddressDaoImpl extends GenericDaoBase<DataCenterIpAddre
         sc.setParameters("dc", dcId);
         sc.setParameters("taken", (Date) null);
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DataCenterIpAddressVO vo = lockOneRandomRow(sc, true);
-        if (vo == null) {
-            txn.rollback();
-            return null;
+        final DataCenterIpAddressVO vo;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            vo = lockOneRandomRow(sc, true);
+            if (vo == null) {
+                txn.rollback();
+                return null;
+            }
+            vo.setTakenAt(new Date());
+            vo.setReservationId(reservationId);
+            update(vo.getId(), vo);
+            txn.commit();
         }
-        vo.setTakenAt(new Date());
-        vo.setReservationId(reservationId);
-        update(vo.getId(), vo);
-        txn.commit();
         return vo;
     }
 
     @Override
     @DB
     public void addIpRange(final long dcId, final long podId, final String start, final String end) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final String insertSql = "INSERT INTO `cloud`.`op_dc_ip_address_alloc` (ip_address, data_center_id, pod_id, mac_address) " +
                 "VALUES (?, ?, ?, (select mac_address from `cloud`.`data_center` where id=?))";
         final String updateSql = "UPDATE `cloud`.`data_center` set mac_address = mac_address+1 where id=?";
@@ -121,7 +124,7 @@ public class DataCenterIpAddressDaoImpl extends GenericDaoBase<DataCenterIpAddre
         long startIP = NetUtils.ip2Long(start);
         final long endIP = NetUtils.ip2Long(end);
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
 
             while (startIP <= endIP) {

@@ -265,15 +265,16 @@ public class IPRangeConfig {
             endIPLong = NetUtils.ip2Long(endIP);
         }
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        Vector<String> problemIPs = null;
-        if (type.equals("public")) {
-            problemIPs = deletePublicIPRange(txn, startIPLong, endIPLong, vlanDbId);
-        } else if (type.equals("private")) {
-            problemIPs = deletePrivateIPRange(txn, startIPLong, endIPLong, podId, zoneId);
-        }
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            Vector<String> problemIPs = null;
+            if (type.equals("public")) {
+                problemIPs = deletePublicIPRange(txn, startIPLong, endIPLong, vlanDbId);
+            } else if (type.equals("private")) {
+                problemIPs = deletePrivateIPRange(txn, startIPLong, endIPLong, podId, zoneId);
+            }
 
-        return problemIPs;
+            return problemIPs;
+        }
     }
 
     private String genChangeRangeSuccessString(final List<String> problemIPs, final String op) {

@@ -117,6 +117,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving account to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
@@ -147,6 +149,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving account to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
@@ -188,6 +192,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving user stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
@@ -215,15 +221,16 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving user stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
     @Override
     public Long getLastAccountId() {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final String sql = GET_LAST_ACCOUNT;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -237,10 +244,9 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public Long getLastUserStatsId() {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final String sql = GET_LAST_USER_STATS;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -254,11 +260,10 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public List<Long> listPublicTemplatesByAccount(final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final String sql = GET_PUBLIC_TEMPLATES_BY_ACCOUNTID;
         final List<Long> templateList = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);
             final ResultSet rs = pstmt.executeQuery();
@@ -273,10 +278,9 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
 
     @Override
     public Long getLastVmDiskStatsId() {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final String sql = GET_LAST_VM_DISK_STATS;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             final ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -318,6 +322,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving vm disk stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
@@ -363,6 +369,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving vm disk stats to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 
@@ -429,6 +437,8 @@ public class UsageDaoImpl extends GenericDaoBase<UsageVO, Long> implements Usage
             txn.rollback();
             s_logger.error("error saving usage records to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 

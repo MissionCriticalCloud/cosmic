@@ -230,14 +230,15 @@ public class MessageBusBase implements MessageBus {
     }
 
     private boolean noDbTxn() {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        return !txn.dbTxnStarted();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            return !txn.dbTxnStarted();
+        }
     }
 
     //
     // Support inner classes
     //
-    private static enum ActionType {
+    private enum ActionType {
         Subscribe, Unsubscribe, ClearAll, Prune
     }
 

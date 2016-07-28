@@ -174,8 +174,7 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
     public void add(final long dcId, final long physicalNetworkId, final List<String> vnets) {
         final String insertVnet = "INSERT INTO `cloud`.`op_dc_vnet_alloc` (vnet, data_center_id, physical_network_id) VALUES ( ?, ?, ?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertVnet);
             for (int i = 0; i <= vnets.size() - 1; i++) {
@@ -237,18 +236,21 @@ public class DataCenterVnetDaoImpl extends GenericDaoBase<DataCenterVnetVO, Long
         }
         sc.setParameters("physicalNetworkId", physicalNetworkId);
         final Date now = new Date();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DataCenterVnetVO vo = lockOneRandomRow(sc, true);
-        if (vo == null) {
-            return null;
-        }
 
-        vo.setTakenAt(now);
-        vo.setAccountId(accountId);
-        vo.setReservationId(reservationId);
-        update(vo.getId(), vo);
-        txn.commit();
+        final DataCenterVnetVO vo;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            vo = lockOneRandomRow(sc, true);
+            if (vo == null) {
+                return null;
+            }
+
+            vo.setTakenAt(now);
+            vo.setAccountId(accountId);
+            vo.setReservationId(reservationId);
+            update(vo.getId(), vo);
+            txn.commit();
+        }
         return vo;
     }
 

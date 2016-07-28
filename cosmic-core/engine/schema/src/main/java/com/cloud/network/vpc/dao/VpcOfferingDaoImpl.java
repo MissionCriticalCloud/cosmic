@@ -31,14 +31,15 @@ public class VpcOfferingDaoImpl extends GenericDaoBase<VpcOfferingVO, Long> impl
     @Override
     @DB
     public boolean remove(final Long vpcOffId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VpcOfferingVO offering = findById(vpcOffId);
-        offering.setUniqueName(null);
-        update(vpcOffId, offering);
-        final boolean result = super.remove(vpcOffId);
-        txn.commit();
-        return result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VpcOfferingVO offering = findById(vpcOffId);
+            offering.setUniqueName(null);
+            update(vpcOffId, offering);
+            final boolean result = super.remove(vpcOffId);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override

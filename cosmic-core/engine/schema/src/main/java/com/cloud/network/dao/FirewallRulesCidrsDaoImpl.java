@@ -27,14 +27,15 @@ public class FirewallRulesCidrsDaoImpl extends GenericDaoBase<FirewallRulesCidrs
     @Override
     @DB
     public void persist(final long firewallRuleId, final List<String> sourceCidrs) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        txn.start();
-        for (final String tag : sourceCidrs) {
-            final FirewallRulesCidrsVO vo = new FirewallRulesCidrsVO(firewallRuleId, tag);
-            persist(vo);
+            txn.start();
+            for (final String tag : sourceCidrs) {
+                final FirewallRulesCidrsVO vo = new FirewallRulesCidrsVO(firewallRuleId, tag);
+                persist(vo);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

@@ -62,16 +62,18 @@ public class ClusterVSMMapDaoImpl extends GenericDaoBase<ClusterVSMMapVO, Long> 
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final ClusterVSMMapVO cluster = createForUpdate();
-        //cluster.setClusterId(null);
-        //cluster.setVsmId(null);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final ClusterVSMMapVO cluster = createForUpdate();
+            //cluster.setClusterId(null);
+            //cluster.setVsmId(null);
 
-        update(id, cluster);
+            update(id, cluster);
 
-        final boolean result = super.remove(id);
-        txn.commit();
+            result = super.remove(id);
+            txn.commit();
+        }
         return result;
     }
 }

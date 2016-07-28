@@ -122,10 +122,9 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
 
     @Override
     public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final VMTemplateStoragePoolVO.Status downloadState) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = DOWNLOADS_STATE_DC;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, datacenterId);
@@ -144,10 +143,9 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     @Override
     public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final long podId, final VMTemplateStoragePoolVO.Status
             downloadState) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
         final String sql = DOWNLOADS_STATE_DC_POD;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, datacenterId);
             pstmt.setLong(2, podId);
             pstmt.setLong(3, templateId);
@@ -194,10 +192,9 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     }
 
     public List<VMTemplateStoragePoolVO> listByHostTemplate(final long hostId, final long templateId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
         final String sql = HOST_TEMPLATE_SEARCH;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, hostId);
             pstmt.setLong(2, templateId);
             try (ResultSet rs = pstmt.executeQuery()) {

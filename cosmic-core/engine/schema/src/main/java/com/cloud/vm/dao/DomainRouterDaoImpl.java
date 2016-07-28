@@ -148,17 +148,18 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DomainRouterVO router = createForUpdate();
-        router.setPublicIpAddress(null);
-        final UpdateBuilder ub = getUpdateBuilder(router);
-        ub.set(router, "state", State.Destroyed);
-        update(id, ub, router);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final DomainRouterVO router = createForUpdate();
+            router.setPublicIpAddress(null);
+            final UpdateBuilder ub = getUpdateBuilder(router);
+            ub.set(router, "state", State.Destroyed);
+            update(id, ub, router);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override
@@ -322,21 +323,22 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     @Override
     @DB
     public DomainRouterVO persist(final DomainRouterVO router, final List<Network> guestNetworks) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        // 1) create network
-        final DomainRouterVO newRouter = super.persist(router);
+            // 1) create network
+            final DomainRouterVO newRouter = super.persist(router);
 
-        if (guestNetworks != null && !guestNetworks.isEmpty()) {
-            // 2) add router to the network
-            for (final Network guestNetwork : guestNetworks) {
-                addRouterToGuestNetwork(router, guestNetwork);
+            if (guestNetworks != null && !guestNetworks.isEmpty()) {
+                // 2) add router to the network
+                for (final Network guestNetwork : guestNetworks) {
+                    addRouterToGuestNetwork(router, guestNetwork);
+                }
             }
-        }
 
-        txn.commit();
-        return newRouter;
+            txn.commit();
+            return newRouter;
+        }
     }
 
     @Override
@@ -358,20 +360,21 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
         if (_routerNetworkDao.findByRouterAndNetwork(router.getId(), guestNetwork.getId()) == null) {
             final NetworkOffering off = _offDao.findById(guestNetwork.getNetworkOfferingId());
             if (!off.getName().equalsIgnoreCase(NetworkOffering.SystemPrivateGatewayNetworkOffering)) {
-                final TransactionLegacy txn = TransactionLegacy.currentTxn();
-                txn.start();
-                //1) add router to network
-                final RouterNetworkVO routerNtwkMap = new RouterNetworkVO(router.getId(), guestNetwork.getId(), guestNetwork.getGuestType());
-                _routerNetworkDao.persist(routerNtwkMap);
-                //2) create user stats entry for the network
-                UserStatisticsVO stats =
-                        _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), guestNetwork.getId(), null, router.getId(), router.getType().toString());
-                if (stats == null) {
-                    stats =
-                            new UserStatisticsVO(router.getAccountId(), router.getDataCenterId(), null, router.getId(), router.getType().toString(), guestNetwork.getId());
-                    _userStatsDao.persist(stats);
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+                    txn.start();
+                    //1) add router to network
+                    final RouterNetworkVO routerNtwkMap = new RouterNetworkVO(router.getId(), guestNetwork.getId(), guestNetwork.getGuestType());
+                    _routerNetworkDao.persist(routerNtwkMap);
+                    //2) create user stats entry for the network
+                    UserStatisticsVO stats =
+                            _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), guestNetwork.getId(), null, router.getId(), router.getType().toString());
+                    if (stats == null) {
+                        stats =
+                                new UserStatisticsVO(router.getAccountId(), router.getDataCenterId(), null, router.getId(), router.getType().toString(), guestNetwork.getId());
+                        _userStatsDao.persist(stats);
+                    }
+                    txn.commit();
                 }
-                txn.commit();
             }
         }
     }

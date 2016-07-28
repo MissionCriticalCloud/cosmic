@@ -189,18 +189,20 @@ public class PrimaryDataStoreHelper {
     public boolean deletePrimaryDataStore(final DataStore store) {
         final List<StoragePoolHostVO> hostPoolRecords = this.storagePoolHostDao.listByPoolId(store.getId());
         final StoragePoolVO poolVO = this.dataStoreDao.findById(store.getId());
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        for (final StoragePoolHostVO host : hostPoolRecords) {
-            storagePoolHostDao.deleteStoragePoolHostDetails(host.getHostId(), host.getPoolId());
+
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            for (final StoragePoolHostVO host : hostPoolRecords) {
+                storagePoolHostDao.deleteStoragePoolHostDetails(host.getHostId(), host.getPoolId());
+            }
+            poolVO.setUuid(null);
+            this.dataStoreDao.update(poolVO.getId(), poolVO);
+            dataStoreDao.remove(poolVO.getId());
+            deletePoolStats(poolVO.getId());
+            // Delete op_host_capacity entries
+            this._capacityDao.removeBy(Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED, null, null, null, poolVO.getId());
+            txn.commit();
         }
-        poolVO.setUuid(null);
-        this.dataStoreDao.update(poolVO.getId(), poolVO);
-        dataStoreDao.remove(poolVO.getId());
-        deletePoolStats(poolVO.getId());
-        // Delete op_host_capacity entries
-        this._capacityDao.removeBy(Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED, null, null, null, poolVO.getId());
-        txn.commit();
 
         s_logger.debug("Storage pool id=" + poolVO.getId() + " is removed successfully");
         return true;

@@ -68,10 +68,9 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     @Override
     @DB
     public int increaseAlertCount(final long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         int changedRows = 0;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
 
             pstmt = txn.prepareAutoCloseStatement("update mshost set alert_count=alert_count+1 where id=? and alert_count=0");
@@ -90,9 +89,8 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     @Override
     @DB
     public void update(final long id, final long runid, final String name, final String version, final String serviceIP, final int servicePort, final Date lastUpdate) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
 
             pstmt =
@@ -118,9 +116,8 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     @Override
     @DB
     public void update(final long id, final long runid, final Date lastUpdate) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
 
             pstmt = txn.prepareAutoCloseStatement("update mshost set last_update=?, removed=null, alert_count=0 where id=? and runid=?");
@@ -160,9 +157,8 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
 
     @Override
     public void invalidateRunSession(final long id, final long runid) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement("update mshost set runid=0, state='Down' where id=? and runid=?");
             pstmt.setLong(1, id);
             pstmt.setLong(2, runid);
@@ -175,9 +171,8 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
 
     @Override
     public void update(final long id, final long runId, final State state, final Date lastUpdate) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement("update mshost set state=?, last_update=? where id=? and runid=?");
             pstmt.setString(1, state.toString());
             pstmt.setString(2, DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), lastUpdate));
@@ -209,9 +204,8 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     public List<Long> listOrphanMsids() {
         final List<Long> orphanList = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt =
                     txn.prepareAutoCloseStatement("select t.mgmt_server_id from (select mgmt_server_id, count(*) as count from host group by mgmt_server_id) as t WHERE t.count >" +
                             " 0 AND t.mgmt_server_id NOT IN (select msid from mshost)");
@@ -243,9 +237,7 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
 
             final ManagementServerHostVO msHost = findById(id);

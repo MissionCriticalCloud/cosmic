@@ -201,23 +201,11 @@ public class MacAddress {
 
     public String toString(final String separator) {
         final StringBuilder buff = new StringBuilder();
-        final Formatter formatter = new Formatter(buff);
-        formatter.format("%02x%s%02x%s%02x%s%02x%s%02x%s%02x", _addr >> 40 & 0xff, separator, _addr >> 32 & 0xff, separator, _addr >> 24 & 0xff, separator,
-                _addr >> 16 & 0xff, separator, _addr >> 8 & 0xff, separator, _addr & 0xff);
-        return buff.toString();
-
-        /*
-
-        String str = Long.toHexString(_addr);
-
-        for (int i = str.length() - 1; i >= 0; i--) {
-            buff.append(str.charAt(i));
-            if (separator != null && (str.length() - i) % 2 == 0) {
-                buff.append(separator);
-            }
+        try (final Formatter formatter = new Formatter(buff)) {
+            formatter.format("%02x%s%02x%s%02x%s%02x%s%02x%s%02x", _addr >> 40 & 0xff, separator, _addr >> 32 & 0xff, separator, _addr >> 24 & 0xff, separator,
+                    _addr >> 16 & 0xff, separator, _addr >> 8 & 0xff, separator, _addr & 0xff);
         }
-        return buff.reverse().toString();
-         */
+        return buff.toString();
     }
 
     /**

@@ -48,23 +48,24 @@ public class VMEntityDaoImpl extends GenericDaoBase<VMEntityVO, Long> implements
     @Override
     @DB
     public VMEntityVO persist(final VMEntityVO vm) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final VMEntityVO dbVO = super.persist(vm);
+            final VMEntityVO dbVO = super.persist(vm);
 
-        saveVmNetworks(vm);
-        loadVmNetworks(dbVO);
-        saveVmReservation(vm);
-        loadVmReservation(dbVO);
-        saveComputeTags(vm.getId(), vm.getComputeTags());
-        loadComputeTags(dbVO);
-        saveRootDiskTags(vm.getId(), vm.getRootDiskTags());
-        loadRootDiskTags(dbVO);
+            saveVmNetworks(vm);
+            loadVmNetworks(dbVO);
+            saveVmReservation(vm);
+            loadVmReservation(dbVO);
+            saveComputeTags(vm.getId(), vm.getComputeTags());
+            loadComputeTags(dbVO);
+            saveRootDiskTags(vm.getId(), vm.getRootDiskTags());
+            loadRootDiskTags(dbVO);
 
-        txn.commit();
+            txn.commit();
 
-        return dbVO;
+            return dbVO;
+        }
     }
 
     private void saveVmNetworks(final VMEntityVO vm) {

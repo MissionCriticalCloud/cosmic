@@ -50,8 +50,7 @@ public class VGPUTypesDaoImpl extends GenericDaoBase<VGPUTypesVO, Long> implemen
     @Override
     public List<VgpuTypesInfo> listGPUCapacities(final Long dcId, final Long podId, final Long clusterId) {
         final StringBuilder finalQuery = new StringBuilder();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> resourceIdList = new ArrayList<>();
         final ArrayList<VgpuTypesInfo> result = new ArrayList<>();
 
@@ -69,7 +68,7 @@ public class VGPUTypesDaoImpl extends GenericDaoBase<VGPUTypesVO, Long> implemen
         }
         finalQuery.append(" GROUP BY host_gpu_groups.group_name, vgpu_type");
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(finalQuery.toString());
             for (int i = 0; i < resourceIdList.size(); i++) {
                 pstmt.setLong(1 + i, resourceIdList.get(i));

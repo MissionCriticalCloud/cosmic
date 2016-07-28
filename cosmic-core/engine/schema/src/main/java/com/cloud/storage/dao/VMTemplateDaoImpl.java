@@ -169,34 +169,35 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     @DB
     public long addTemplateToZone(final VMTemplateVO tmplt, final long zoneId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VMTemplateVO tmplt2 = findById(tmplt.getId());
-        if (tmplt2 == null) {
-            if (persist(tmplt) == null) {
-                throw new CloudRuntimeException("Failed to persist the template " + tmplt);
-            }
-
-            if (tmplt.getDetails() != null) {
-                final List<VMTemplateDetailVO> details = new ArrayList<>();
-                for (final String key : tmplt.getDetails().keySet()) {
-                    details.add(new VMTemplateDetailVO(tmplt.getId(), key, tmplt.getDetails().get(key), true));
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VMTemplateVO tmplt2 = findById(tmplt.getId());
+            if (tmplt2 == null) {
+                if (persist(tmplt) == null) {
+                    throw new CloudRuntimeException("Failed to persist the template " + tmplt);
                 }
-                _templateDetailsDao.saveDetails(details);
-            }
-        }
-        VMTemplateZoneVO tmpltZoneVO = _templateZoneDao.findByZoneTemplate(zoneId, tmplt.getId());
-        if (tmpltZoneVO == null) {
-            tmpltZoneVO = new VMTemplateZoneVO(zoneId, tmplt.getId(), new Date());
-            _templateZoneDao.persist(tmpltZoneVO);
-        } else {
-            tmpltZoneVO.setRemoved(null);
-            tmpltZoneVO.setLastUpdated(new Date());
-            _templateZoneDao.update(tmpltZoneVO.getId(), tmpltZoneVO);
-        }
-        txn.commit();
 
-        return tmplt.getId();
+                if (tmplt.getDetails() != null) {
+                    final List<VMTemplateDetailVO> details = new ArrayList<>();
+                    for (final String key : tmplt.getDetails().keySet()) {
+                        details.add(new VMTemplateDetailVO(tmplt.getId(), key, tmplt.getDetails().get(key), true));
+                    }
+                    _templateDetailsDao.saveDetails(details);
+                }
+            }
+            VMTemplateZoneVO tmpltZoneVO = _templateZoneDao.findByZoneTemplate(zoneId, tmplt.getId());
+            if (tmpltZoneVO == null) {
+                tmpltZoneVO = new VMTemplateZoneVO(zoneId, tmplt.getId(), new Date());
+                _templateZoneDao.persist(tmpltZoneVO);
+            } else {
+                tmpltZoneVO.setRemoved(null);
+                tmpltZoneVO.setLastUpdated(new Date());
+                _templateZoneDao.update(tmpltZoneVO.getId(), tmpltZoneVO);
+            }
+            txn.commit();
+
+            return tmplt.getId();
+        }
     }
 
     @Override
@@ -709,10 +710,8 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
 
         final List<Long> l = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, hostId);
             final ResultSet rs = pstmt.executeQuery();
@@ -892,115 +891,25 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VMTemplateVO template = createForUpdate();
-        template.setRemoved(new Date());
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VMTemplateVO template = createForUpdate();
+            template.setRemoved(new Date());
 
-        final VMTemplateVO vo = findById(id);
-        if (vo != null) {
-            if (vo.getFormat() == ImageFormat.ISO) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.ISO);
-            } else {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.Template);
+            final VMTemplateVO vo = findById(id);
+            if (vo != null) {
+                if (vo.getFormat() == ImageFormat.ISO) {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.ISO);
+                } else {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.Template);
+                }
             }
+
+            final boolean result = update(id, template);
+            txn.commit();
+            return result;
         }
-
-        final boolean result = update(id, template);
-        txn.commit();
-        return result;
     }
-
-    /*
-     * @Override public Set<Pair<Long, Long>> searchS3Templates(final String
-     * name, final String keyword, final TemplateFilter templateFilter, final
-     * boolean isIso, final List<HypervisorType> hypers, final Boolean bootable,
-     * final DomainVO domain, final Long pageSize, final Long startIndex, final
-     * Long zoneId, final HypervisorType hyperType, final boolean onlyReady,
-     * final boolean showDomr, final List<Account> permittedAccounts, final
-     * Account caller, final Map<String, String> tags) {
-     *
-     * final String permittedAccountsStr = join(",", permittedAccounts);
-     *
-     * final TransactionLegacy txn = TransactionLegacy.currentTxn(); txn.start();
-     *
-     * Set<Pair<Long, Long>> templateZonePairList = new HashSet<Pair<Long,
-     * Long>>(); PreparedStatement pstmt = null; ResultSet rs = null; try {
-     *
-     * final StringBuilder joinClause = new StringBuilder(); final StringBuilder
-     * whereClause = new StringBuilder(" WHERE t.removed IS NULL");
-     *
-     * if (isIso) { whereClause.append(" AND t.format = 'ISO'"); if
-     * (!hyperType.equals(HypervisorType.None)) { joinClause.append(
-     * " INNER JOIN guest_os guestOS on (guestOS.id = t.guest_os_id) INNER JOIN guest_os_hypervisor goh on ( goh.guest_os_id = guestOS.id) "
-     * ); whereClause.append(" AND goh.hypervisor_type = '");
-     * whereClause.append(hyperType); whereClause.append("'"); } } else {
-     * whereClause.append(" AND t.format <> 'ISO'"); if (hypers.isEmpty()) {
-     * return templateZonePairList; } else { final StringBuilder relatedHypers =
-     * new StringBuilder(); for (HypervisorType hyper : hypers) {
-     * relatedHypers.append("'"); relatedHypers.append(hyper.toString());
-     * relatedHypers.append("'"); relatedHypers.append(","); }
-     * relatedHypers.setLength(relatedHypers.length() - 1);
-     * whereClause.append(" AND t.hypervisor_type IN (");
-     * whereClause.append(relatedHypers); whereClause.append(")"); } }
-     *
-     * joinClause.append(
-     * " INNER JOIN  template_s3_ref tsr on (t.id = tsr.template_id)");
-     *
-     * whereClause.append("AND t.name LIKE \"%"); whereClause.append(keyword ==
-     * null ? keyword : name); whereClause.append("%\"");
-     *
-     * if (bootable != null) { whereClause.append(" AND t.bootable = ");
-     * whereClause.append(bootable); }
-     *
-     * if (!showDomr) { whereClause.append(" AND t.type != '");
-     * whereClause.append(Storage.TemplateType.SYSTEM); whereClause.append("'");
-     * }
-     *
-     * if (templateFilter == TemplateFilter.featured) {
-     * whereClause.append(" AND t.public = 1 AND t.featured = 1"); } else if
-     * ((templateFilter == TemplateFilter.self || templateFilter ==
-     * TemplateFilter.selfexecutable) && caller.getType() !=
-     * Account.ACCOUNT_TYPE_ADMIN) { if (caller.getType() ==
-     * Account.ACCOUNT_TYPE_DOMAIN_ADMIN || caller.getType() ==
-     * Account.ACCOUNT_TYPE_RESOURCE_DOMAIN_ADMIN) { joinClause.append(
-     * " INNER JOIN account a on (t.account_id = a.id) INNER JOIN domain d on (a.domain_id = d.id)"
-     * ); whereClause.append("  AND d.path LIKE '");
-     * whereClause.append(domain.getPath()); whereClause.append("%'"); } else {
-     * whereClause.append(" AND t.account_id IN (");
-     * whereClause.append(permittedAccountsStr); whereClause.append(")"); } }
-     * else if (templateFilter == TemplateFilter.sharedexecutable &&
-     * caller.getType() != Account.ACCOUNT_TYPE_ADMIN) { if (caller.getType() ==
-     * Account.ACCOUNT_TYPE_NORMAL) { joinClause.append(
-     * " LEFT JOIN launch_permission lp ON t.id = lp.template_id WHERE (t.account_id IN ("
-     * ); joinClause.append(permittedAccountsStr);
-     * joinClause.append(") OR lp.account_id IN (");
-     * joinClause.append(permittedAccountsStr); joinClause.append("))"); } else
-     * { joinClause.append(" INNER JOIN account a on (t.account_id = a.id) "); }
-     * } else if (templateFilter == TemplateFilter.executable &&
-     * !permittedAccounts.isEmpty()) {
-     * whereClause.append(" AND (t.public = 1 OR t.account_id IN (");
-     * whereClause.append(permittedAccountsStr); whereClause.append("))"); }
-     * else if (templateFilter == TemplateFilter.community) {
-     * whereClause.append(" AND t.public = 1 AND t.featured = 0"); } else if
-     * (templateFilter == TemplateFilter.all && caller.getType() ==
-     * Account.ACCOUNT_TYPE_ADMIN) { } else if (caller.getType() !=
-     * Account.ACCOUNT_TYPE_ADMIN) { return templateZonePairList; }
-     *
-     * final StringBuilder sql = new StringBuilder(SELECT_TEMPLATE_S3_REF);
-     * sql.append(joinClause); sql.append(whereClause);
-     * sql.append(getOrderByLimit(pageSize, startIndex));
-     *
-     * pstmt = txn.prepareStatement(sql.toString()); rs = pstmt.executeQuery();
-     * while (rs.next()) { final Pair<Long, Long> templateZonePair = new
-     * Pair<Long, Long>( rs.getLong(1), -1L);
-     * templateZonePairList.add(templateZonePair); } txn.commit(); } catch
-     * (Exception e) { s_logger.warn("Error listing S3 templates", e); if (txn
-     * != null) { txn.rollback(); } } finally { closeResources(pstmt, rs); if
-     * (txn != null) { txn.close(); } }
-     *
-     * return templateZonePairList; }
-     */
 
     @Override
     public boolean updateState(

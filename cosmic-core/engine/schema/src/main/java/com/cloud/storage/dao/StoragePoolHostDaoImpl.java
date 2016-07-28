@@ -70,10 +70,9 @@ public class StoragePoolHostDaoImpl extends GenericDaoBase<StoragePoolHostVO, Lo
 
     @Override
     public List<StoragePoolHostVO> listByHostStatus(final long poolId, final Status hostStatus) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final String sql = HOST_FOR_POOL_SEARCH;
         final List<StoragePoolHostVO> result = new ArrayList<>();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, poolId);
             pstmt.setString(2, hostStatus.toString());
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -96,9 +95,8 @@ public class StoragePoolHostDaoImpl extends GenericDaoBase<StoragePoolHostVO, Lo
     public List<Pair<Long, Integer>> getDatacenterStoragePoolHostInfo(final long dcId, final boolean sharedOnly) {
         final ArrayList<Pair<Long, Integer>> l = new ArrayList<>();
         final String sql = sharedOnly ? SHARED_STORAGE_POOL_HOST_INFO : STORAGE_POOL_HOST_INFO;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, dcId);
 
@@ -121,10 +119,11 @@ public class StoragePoolHostDaoImpl extends GenericDaoBase<StoragePoolHostVO, Lo
     public void deletePrimaryRecordsForHost(final long hostId) {
         final SearchCriteria<StoragePoolHostVO> sc = HostSearch.create();
         sc.setParameters("host_id", hostId);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override
@@ -132,10 +131,11 @@ public class StoragePoolHostDaoImpl extends GenericDaoBase<StoragePoolHostVO, Lo
         final SearchCriteria<StoragePoolHostVO> sc = PoolHostSearch.create();
         sc.setParameters("host_id", hostId);
         sc.setParameters("pool_id", poolId);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override

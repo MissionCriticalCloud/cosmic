@@ -92,19 +92,20 @@ public class ResourceCountDaoImpl extends GenericDaoBase<ResourceCountVO, Long> 
     @DB
     public void createResourceCounts(final long ownerId, final ResourceLimit.ResourceOwnerType ownerType) {
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final ResourceType[] resourceTypes = Resource.ResourceType.values();
-        for (final ResourceType resourceType : resourceTypes) {
-            if (!resourceType.supportsOwner(ownerType)) {
-                continue;
+            final ResourceType[] resourceTypes = Resource.ResourceType.values();
+            for (final ResourceType resourceType : resourceTypes) {
+                if (!resourceType.supportsOwner(ownerType)) {
+                    continue;
+                }
+                final ResourceCountVO resourceCountVO = new ResourceCountVO(resourceType, 0, ownerId, ownerType);
+                persist(resourceCountVO);
             }
-            final ResourceCountVO resourceCountVO = new ResourceCountVO(resourceType, 0, ownerId, ownerType);
-            persist(resourceCountVO);
-        }
 
-        txn.commit();
+            txn.commit();
+        }
     }
 
     @Override

@@ -40,19 +40,20 @@ public class VMNetworkMapDaoImpl extends GenericDaoBase<VMNetworkMapVO, Long> im
 
     @Override
     public void persist(final long vmId, final List<Long> networks) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        txn.start();
-        final SearchCriteria<VMNetworkMapVO> sc = VmIdSearch.create();
-        sc.setParameters("vmId", vmId);
-        expunge(sc);
+            txn.start();
+            final SearchCriteria<VMNetworkMapVO> sc = VmIdSearch.create();
+            sc.setParameters("vmId", vmId);
+            expunge(sc);
 
-        for (final Long networkId : networks) {
-            final VMNetworkMapVO vo = new VMNetworkMapVO(vmId, networkId);
-            persist(vo);
+            for (final Long networkId : networks) {
+                final VMNetworkMapVO vo = new VMNetworkMapVO(vmId, networkId);
+                persist(vo);
+            }
+
+            txn.commit();
         }
-
-        txn.commit();
     }
 
     @Override

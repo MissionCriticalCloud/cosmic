@@ -322,11 +322,10 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                final TransactionLegacy txn = TransactionLegacy.currentTxn();
                 // insert system account
                 String insertSql = "INSERT INTO `cloud`.`account` (id, uuid, account_name, type, domain_id, account.default) VALUES (1, UUID(), 'system', '1', '1', 1)";
 
-                try {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
                     stmt.executeUpdate();
                 } catch (final SQLException ex) {
@@ -336,7 +335,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 insertSql = "INSERT INTO `cloud`.`user` (id, uuid, username, password, account_id, firstname, lastname, created, user.default)"
                         + " VALUES (1, UUID(), 'system', RAND(), 1, 'system', 'cloud', now(), 1)";
 
-                try {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
                     stmt.executeUpdate();
                 } catch (final SQLException ex) {
@@ -353,7 +352,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 // create an account for the admin user first
                 insertSql = "INSERT INTO `cloud`.`account` (id, uuid, account_name, type, domain_id, account.default) VALUES (" + id + ", UUID(), '" + username
                         + "', '1', '1', 1)";
-                try {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
                     stmt.executeUpdate();
                 } catch (final SQLException ex) {
@@ -364,14 +363,14 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 insertSql = "INSERT INTO `cloud`.`user` (id, uuid, username, password, account_id, firstname, lastname, created, state, user.default) " + "VALUES (" + id
                         + ", UUID(), '" + username + "', RAND(), 2, '" + firstname + "','" + lastname + "',now(), 'disabled', 1)";
 
-                try {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
                     stmt.executeUpdate();
                 } catch (final SQLException ex) {
                     s_logger.debug("Looks like admin user already exists");
                 }
 
-                try {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     String tableName = "security_group";
                     try {
                         final String checkSql = "SELECT * from network_group";
@@ -891,8 +890,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
         final String already = _configDao.getValue("system.vm.password");
         if (already == null) {
-            final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            try {
+            try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                 final String rpassword = _mgrService.generateRandomPassword();
                 final String wSql = "INSERT INTO `cloud`.`configuration` (category, instance, component, name, value, description) "
                         + "VALUES ('Secure','DEFAULT', 'management-server','system.vm.password', ?,'randmon password generated each management server starts for system vm')";
@@ -922,9 +920,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             Transaction.execute(new TransactionCallbackNoReturn() {
                 @Override
                 public void doInTransactionWithoutResult(final TransactionStatus status) {
-
-                    final TransactionLegacy txn = TransactionLegacy.currentTxn();
-                    try {
+                    try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                         final PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
                         stmt1.executeUpdate();
                         s_logger.debug("secondary storage vm copy password inserted into database");
@@ -949,12 +945,11 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                final TransactionLegacy txn = TransactionLegacy.currentTxn();
                 String pvdriverversion = Config.XenServerPVdriverVersion.getDefaultValue();
-                PreparedStatement pstmt = null;
-                ResultSet rs1 = null;
-                ResultSet rs2 = null;
-                try {
+                PreparedStatement pstmt;
+                final ResultSet rs1;
+                final ResultSet rs2;
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                     final String oldValue = _configDao.getValue(Config.XenServerPVdriverVersion.key());
                     if (oldValue == null) {
                         String sql = "select resource from host where hypervisor_type='XenServer' and removed is null and status not in ('Error', 'Removed') group by resource";
@@ -1186,11 +1181,10 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
     }
 
     private void templateDetailsInitIfNotExist(final long id, final String name, final String value) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement stmt = null;
-        PreparedStatement stmtInsert = null;
+        final PreparedStatement stmt;
+        final PreparedStatement stmtInsert;
         boolean insert = false;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             stmt = txn.prepareAutoCloseStatement("SELECT id FROM vm_template_details WHERE template_id=? and name=?");
             stmt.setLong(1, id);
@@ -1334,28 +1328,28 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             Transaction.execute(new TransactionCallbackNoReturn() {
                 @Override
                 public void doInTransactionWithoutResult(final TransactionStatus status) {
-
-                    final TransactionLegacy txn = TransactionLegacy.currentTxn();
-                    try {
-                        final PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
-                        stmt1.executeUpdate();
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Private key inserted into database");
+                    try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+                        try {
+                            final PreparedStatement stmt1 = txn.prepareAutoCloseStatement(insertSql1);
+                            stmt1.executeUpdate();
+                            if (s_logger.isDebugEnabled()) {
+                                s_logger.debug("Private key inserted into database");
+                            }
+                        } catch (final SQLException ex) {
+                            s_logger.error("SQL of the private key failed", ex);
+                            throw new CloudRuntimeException("SQL of the private key failed");
                         }
-                    } catch (final SQLException ex) {
-                        s_logger.error("SQL of the private key failed", ex);
-                        throw new CloudRuntimeException("SQL of the private key failed");
-                    }
 
-                    try {
-                        final PreparedStatement stmt2 = txn.prepareAutoCloseStatement(insertSql2);
-                        stmt2.executeUpdate();
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Public key inserted into database");
+                        try {
+                            final PreparedStatement stmt2 = txn.prepareAutoCloseStatement(insertSql2);
+                            stmt2.executeUpdate();
+                            if (s_logger.isDebugEnabled()) {
+                                s_logger.debug("Public key inserted into database");
+                            }
+                        } catch (final SQLException ex) {
+                            s_logger.error("SQL of the public key failed", ex);
+                            throw new CloudRuntimeException("SQL of the public key failed");
                         }
-                    } catch (final SQLException ex) {
-                        s_logger.error("SQL of the public key failed", ex);
-                        throw new CloudRuntimeException("SQL of the public key failed");
                     }
                 }
             });

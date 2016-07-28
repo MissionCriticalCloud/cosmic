@@ -53,26 +53,27 @@ public class HostDetailsDaoImpl extends GenericDaoBase<DetailVO, Long> implement
     public void persist(final long hostId, final Map<String, String> details) {
         final String InsertOrUpdateSql = "INSERT INTO `cloud`.`host_details` (host_id, name, value) VALUES (?,?,?) ON DUPLICATE KEY UPDATE value=?";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        for (final Map.Entry<String, String> detail : details.entrySet()) {
-            String value = detail.getValue();
-            if ("password".equals(detail.getKey())) {
-                value = DBEncryptionUtil.encrypt(value);
+            for (final Map.Entry<String, String> detail : details.entrySet()) {
+                String value = detail.getValue();
+                if ("password".equals(detail.getKey())) {
+                    value = DBEncryptionUtil.encrypt(value);
+                }
+                try {
+                    final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertOrUpdateSql);
+                    pstmt.setLong(1, hostId);
+                    pstmt.setString(2, detail.getKey());
+                    pstmt.setString(3, value);
+                    pstmt.setString(4, value);
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Unable to persist the host_details key: " + detail.getKey() + " for host id: " + hostId, e);
+                }
             }
-            try {
-                final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertOrUpdateSql);
-                pstmt.setLong(1, hostId);
-                pstmt.setString(2, detail.getKey());
-                pstmt.setString(3, value);
-                pstmt.setString(4, value);
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Unable to persist the host_details key: " + detail.getKey() + " for host id: " + hostId, e);
-            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

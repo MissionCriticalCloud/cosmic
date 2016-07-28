@@ -24,6 +24,7 @@ public class FtpTemplateUploader implements TemplateUploader {
     private final String sourcePath;
     private final String ftpUrl;
     private final UploadCompleteCallback completionCallback;
+    private FileInputStream fileInputStream = null;
     private BufferedInputStream inputStream = null;
     private BufferedOutputStream outputStream = null;
 
@@ -74,8 +75,9 @@ public class FtpTemplateUploader implements TemplateUploader {
             final File sourceFile = new File(sourcePath);
             entitySizeinBytes = sourceFile.length();
 
+            fileInputStream = new FileInputStream(sourceFile);
             outputStream = new BufferedOutputStream(urlc.getOutputStream());
-            inputStream = new BufferedInputStream(new FileInputStream(sourceFile));
+            inputStream = new BufferedInputStream(fileInputStream);
 
             status = TemplateUploader.Status.IN_PROGRESS;
 
@@ -108,6 +110,9 @@ public class FtpTemplateUploader implements TemplateUploader {
                 if (outputStream != null) {
                     outputStream.close();
                 }
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
             } catch (final IOException ioe) {
                 s_logger.error(" Caught exception while closing the resources");
             }
@@ -129,6 +134,9 @@ public class FtpTemplateUploader implements TemplateUploader {
                     }
                     if (inputStream != null) {
                         inputStream.close();
+                    }
+                    if (fileInputStream != null) {
+                        fileInputStream.close();
                     }
                 } catch (final IOException e) {
                     s_logger.error(" Caught exception while closing the resources");

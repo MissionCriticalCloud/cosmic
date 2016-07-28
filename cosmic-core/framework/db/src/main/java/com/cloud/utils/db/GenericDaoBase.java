@@ -457,22 +457,24 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         }
         final SearchCriteria<T> sc = createSearchCriteria();
         sc.addAnd(_idAttributes.get(_table)[0], SearchCriteria.Op.EQ, id);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
 
-        try {
-            if (ub.getCollectionChanges() != null) {
-                insertElementCollection(entity, _idAttributes.get(_table)[0], id, ub.getCollectionChanges());
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+
+            try {
+                if (ub.getCollectionChanges() != null) {
+                    insertElementCollection(entity, _idAttributes.get(_table)[0], id, ub.getCollectionChanges());
+                }
+            } catch (final SQLException e) {
+                throw new CloudRuntimeException("Unable to persist element collection", e);
             }
-        } catch (final SQLException e) {
-            throw new CloudRuntimeException("Unable to persist element collection", e);
+
+            final int rowsUpdated = update(ub, sc, null);
+
+            txn.commit();
+
+            return rowsUpdated;
         }
-
-        final int rowsUpdated = update(ub, sc, null);
-
-        txn.commit();
-
-        return rowsUpdated;
     }
 
     @Override
@@ -652,10 +654,9 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     }
 
     public int update(final UpdateBuilder ub, final SearchCriteria<?> sc, final Integer rows) {
-        StringBuilder sql = null;
+        final StringBuilder sql;
         PreparedStatement pstmt = null;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String searchClause = sc.getWhereClause();
 
             sql = ub.toSql(_tables);
@@ -718,17 +719,17 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         final List<Object> groupByValues = addGroupBy(str, sc);
         addFilter(str, filter);
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        if (lock != null) {
-            assert (txn.dbTxnStarted() == true) : "As nice as I can here now....how do you lock when there's no DB transaction?  Review your db 101 course from college.";
-            str.append(lock ? FOR_UPDATE_CLAUSE : SHARE_MODE_CLAUSE);
-        }
-
-        final String sql = str.toString();
-
         PreparedStatement pstmt = null;
-        final List<T> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            if (lock != null) {
+                assert (txn.dbTxnStarted() == true) : "As nice as I can here now....how do you lock when there's no DB transaction?  Review your db 101 course from college.";
+                str.append(lock ? FOR_UPDATE_CLAUSE : SHARE_MODE_CLAUSE);
+            }
+
+            final String sql = str.toString();
+
+            final List<T> result = new ArrayList<>();
+
             pstmt = txn.prepareAutoCloseStatement(sql);
             int i = 1;
             if (clause != null) {
@@ -918,9 +919,8 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
 
         final String sql = str.toString();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             int i = 1;
             if (clause != null) {
@@ -966,35 +966,36 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     }
 
     protected void insertElementCollection(final T entity, final Attribute idAttribute, final ID id, final Map<Attribute, Object> ecAttributes) throws SQLException {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        for (final Map.Entry<Attribute, Object> entry : ecAttributes.entrySet()) {
-            final Attribute attr = entry.getKey();
-            final Object obj = entry.getValue();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            for (final Map.Entry<Attribute, Object> entry : ecAttributes.entrySet()) {
+                final Attribute attr = entry.getKey();
+                final Object obj = entry.getValue();
 
-            final EcInfo ec = (EcInfo) attr.attache;
-            Enumeration<?> en = null;
-            if (ec.rawClass == null) {
-                en = Collections.enumeration(Arrays.asList((Object[]) obj));
-            } else {
-                en = Collections.enumeration((Collection) obj);
-            }
-            PreparedStatement pstmt = txn.prepareAutoCloseStatement(ec.clearSql);
-            prepareAttribute(1, pstmt, idAttribute, id);
-            pstmt.executeUpdate();
-
-            while (en.hasMoreElements()) {
-                pstmt = txn.prepareAutoCloseStatement(ec.insertSql);
-                if (ec.targetClass == Date.class) {
-                    pstmt.setString(1, DateUtil.getDateDisplayString(s_gmtTimeZone, (Date) en.nextElement()));
+                final EcInfo ec = (EcInfo) attr.attache;
+                Enumeration<?> en = null;
+                if (ec.rawClass == null) {
+                    en = Collections.enumeration(Arrays.asList((Object[]) obj));
                 } else {
-                    pstmt.setObject(1, en.nextElement());
+                    en = Collections.enumeration((Collection) obj);
                 }
-                prepareAttribute(2, pstmt, idAttribute, id);
+                PreparedStatement pstmt = txn.prepareAutoCloseStatement(ec.clearSql);
+                prepareAttribute(1, pstmt, idAttribute, id);
                 pstmt.executeUpdate();
+
+                while (en.hasMoreElements()) {
+                    pstmt = txn.prepareAutoCloseStatement(ec.insertSql);
+                    if (ec.targetClass == Date.class) {
+                        pstmt.setString(1, DateUtil.getDateDisplayString(s_gmtTimeZone, (Date) en.nextElement()));
+                    } else {
+                        pstmt.setObject(1, en.nextElement());
+                    }
+                    prepareAttribute(2, pstmt, idAttribute, id);
+                    pstmt.executeUpdate();
+                }
             }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @DB()
@@ -1074,8 +1075,7 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     @DB()
     protected void loadCollection(final T entity, final Attribute attr) {
         final EcInfo ec = (EcInfo) attr.attache;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (PreparedStatement pstmt = txn.prepareStatement(ec.selectSql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(ec.selectSql)) {
             pstmt.setObject(1, _idField.get(entity));
             try (ResultSet rs = pstmt.executeQuery()) {
                 final ArrayList lst = new ArrayList();
@@ -1557,13 +1557,15 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
             if (t == null && locked) {
                 txn.release(_table + id.toString());
             }
+            txn.close();
         }
     }
 
     @Override
     public boolean releaseFromLockTable(final ID id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        return txn.release(_table + id);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            return txn.release(_table + id);
+        }
     }
 
     @Override
@@ -1574,14 +1576,16 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
 
     @Override
     public boolean lockInLockTable(final String id, final int seconds) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        return txn.lock(_table + id, seconds);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            return txn.lock(_table + id, seconds);
+        }
     }
 
     @Override
     public boolean unlockFromLockTable(final String id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        return txn.release(_table + id);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            return txn.release(_table + id);
+        }
     }
 
     @Override
@@ -1616,10 +1620,9 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
     }
 
     protected List<T> executeList(final String sql, final Object... params) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final List<T> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             int i = 0;
             for (final Object param : params) {
@@ -1658,10 +1661,9 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
 
     @Override
     public boolean expunge(final ID id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        String sql = null;
-        try {
+        String sql;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             for (final Pair<String, Attribute[]> deletSql : _deleteSqls) {
                 sql = deletSql.first();
@@ -1702,9 +1704,8 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
 
         final String sql = str.toString();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             int i = 0;
             for (final Pair<Attribute, Object> value : sc.getValues()) {
@@ -1779,10 +1780,9 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         }
 
         ID id = null;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         String sql = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             for (final Pair<String, Attribute[]> pair : _insertSqls) {
                 sql = pair.first();
@@ -1865,9 +1865,8 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
         }
         final StringBuilder sql = new StringBuilder("DELETE FROM ");
         sql.append(_table).append(" WHERE ").append(_removed.first()).append(" IS NOT NULL");
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             pstmt = txn.prepareAutoCloseStatement(sql.toString());
 
@@ -1884,9 +1883,8 @@ public abstract class GenericDaoBase<T, ID extends Serializable> extends Compone
             return expunge(id);
         }
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
             txn.start();
             pstmt = txn.prepareAutoCloseStatement(_removeSql.first());

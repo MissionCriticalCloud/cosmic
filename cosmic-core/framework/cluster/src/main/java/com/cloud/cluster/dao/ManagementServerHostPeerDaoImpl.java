@@ -71,6 +71,8 @@ public class ManagementServerHostPeerDaoImpl extends GenericDaoBase<ManagementSe
         } catch (final Exception e) {
             s_logger.warn("Unexpected exception, ", e);
             txn.rollback();
+        } finally {
+            txn.close();
         }
     }
 

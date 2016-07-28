@@ -27,118 +27,119 @@ public class DatabaseCreator {
 
     public static void main(final String[] args) {
 
-        final ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[]{"/com/cloud/upgrade/databaseCreatorContext.xml"});
-        appContext.getBean(ComponentContext.class);
+        try (final ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[]{"/com/cloud/upgrade/databaseCreatorContext.xml"})) {
+            appContext.getBean(ComponentContext.class);
 
-        String dbPropsFile = "";
-        final List<String> sqlFiles = new ArrayList<>();
-        final List<String> upgradeClasses = new ArrayList<>();
-        String[] databases = new String[]{};
-        String rootPassword = "";
-        boolean verbosity = false;
-        boolean dryRun = false;
+            String dbPropsFile = "";
+            final List<String> sqlFiles = new ArrayList<>();
+            final List<String> upgradeClasses = new ArrayList<>();
+            String[] databases = new String[]{};
+            String rootPassword = "";
+            boolean verbosity = false;
+            boolean dryRun = false;
 
-        // Process opts
-        for (final String arg : args) {
-            if (arg.equals("--help") || arg.equals("-h")) {
-                printHelp("DatabaseCreator");
-                System.exit(0);
-            } else if (arg.equals("--verbose") || arg.equals("-v")) {
-                verbosity = true;
-            } else if (arg.equals("--dry") || arg.equals("-d")) {
-                dryRun = true;
-            } else if (arg.startsWith("--rootpassword=")) {
-                rootPassword = arg.substring(arg.lastIndexOf("=") + 1, arg.length());
-            } else if (arg.startsWith("--database=")) {
-                databases = arg.substring(arg.lastIndexOf("=") + 1, arg.length()).split(",");
-            } else if (arg.endsWith(".sql")) {
-                sqlFiles.add(arg);
-            } else if (arg.endsWith(".sql.override")) {
-                if (fileExists(arg)) {
-                    final int index = arg.lastIndexOf(".override");
-                    final String fileToOverride = arg.substring(0, index);
-                    sqlFiles.remove(fileToOverride);
+            // Process opts
+            for (final String arg : args) {
+                if (arg.equals("--help") || arg.equals("-h")) {
+                    printHelp("DatabaseCreator");
+                    System.exit(0);
+                } else if (arg.equals("--verbose") || arg.equals("-v")) {
+                    verbosity = true;
+                } else if (arg.equals("--dry") || arg.equals("-d")) {
+                    dryRun = true;
+                } else if (arg.startsWith("--rootpassword=")) {
+                    rootPassword = arg.substring(arg.lastIndexOf("=") + 1, arg.length());
+                } else if (arg.startsWith("--database=")) {
+                    databases = arg.substring(arg.lastIndexOf("=") + 1, arg.length()).split(",");
+                } else if (arg.endsWith(".sql")) {
                     sqlFiles.add(arg);
+                } else if (arg.endsWith(".sql.override")) {
+                    if (fileExists(arg)) {
+                        final int index = arg.lastIndexOf(".override");
+                        final String fileToOverride = arg.substring(0, index);
+                        sqlFiles.remove(fileToOverride);
+                        sqlFiles.add(arg);
+                    }
+                } else if (arg.endsWith(".properties")) {
+                    if (!dbPropsFile.endsWith("properties.override") && fileExists(arg)) {
+                        dbPropsFile = arg;
+                    }
+                } else if (arg.endsWith("properties.override")) {
+                    if (fileExists(arg)) {
+                        dbPropsFile = arg;
+                    }
+                } else {
+                    upgradeClasses.add(arg);
                 }
-            } else if (arg.endsWith(".properties")) {
-                if (!dbPropsFile.endsWith("properties.override") && fileExists(arg)) {
-                    dbPropsFile = arg;
-                }
-            } else if (arg.endsWith("properties.override")) {
-                if (fileExists(arg)) {
-                    dbPropsFile = arg;
-                }
-            } else {
-                upgradeClasses.add(arg);
             }
-        }
 
-        if ((dbPropsFile.isEmpty()) || (sqlFiles.size() == 0) && upgradeClasses.size() == 0) {
-            printHelp("DatabaseCreator");
-            System.exit(1);
-        }
-
-        try {
-            TransactionLegacy.initDataSource(dbPropsFile);
-        } catch (final IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        initDB(dbPropsFile, rootPassword, databases, dryRun);
-
-        // Process sql files
-        for (final String sqlFile : sqlFiles) {
-            final File sqlScript = PropertiesUtil.findConfigFile(sqlFile);
-            if (sqlScript == null) {
-                System.err.println("Unable to find " + sqlFile);
+            if ((dbPropsFile.isEmpty()) || (sqlFiles.size() == 0) && upgradeClasses.size() == 0) {
                 printHelp("DatabaseCreator");
                 System.exit(1);
             }
 
-            System.out.println("========> Processing SQL file at " + sqlScript.getAbsolutePath());
-
-            try (Connection conn = TransactionLegacy.getStandaloneConnection();
-                 FileReader reader = new FileReader(sqlScript)
-            ) {
-                if (!dryRun) {
-                    runScript(conn, reader, sqlFile, verbosity);
-                }
-            } catch (final SQLException e) {
-                System.err.println("Sql Exception:" + e.getMessage());
-                System.exit(1);
+            try {
+                TransactionLegacy.initDataSource(dbPropsFile);
             } catch (final IOException e) {
-                System.err.println("File IO Exception : " + e.getMessage());
+                e.printStackTrace();
                 System.exit(1);
             }
-        }
+            initDB(dbPropsFile, rootPassword, databases, dryRun);
 
-        final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
-        try {
-            // Process db upgrade classes
-            for (final String upgradeClass : upgradeClasses) {
-                System.out.println("========> Processing upgrade: " + upgradeClass);
-                Class<?> clazz = null;
-                try {
-                    clazz = Class.forName(upgradeClass);
-                    if (!SystemIntegrityChecker.class.isAssignableFrom(clazz)) {
-                        System.err.println("The class must be of SystemIntegrityChecker: " + clazz.getName());
+            // Process sql files
+            for (final String sqlFile : sqlFiles) {
+                final File sqlScript = PropertiesUtil.findConfigFile(sqlFile);
+                if (sqlScript == null) {
+                    System.err.println("Unable to find " + sqlFile);
+                    printHelp("DatabaseCreator");
+                    System.exit(1);
+                }
+
+                System.out.println("========> Processing SQL file at " + sqlScript.getAbsolutePath());
+
+                try (Connection conn = TransactionLegacy.getStandaloneConnection();
+                     FileReader reader = new FileReader(sqlScript)
+                ) {
+                    if (!dryRun) {
+                        runScript(conn, reader, sqlFile, verbosity);
+                    }
+                } catch (final SQLException e) {
+                    System.err.println("Sql Exception:" + e.getMessage());
+                    System.exit(1);
+                } catch (final IOException e) {
+                    System.err.println("File IO Exception : " + e.getMessage());
+                    System.exit(1);
+                }
+            }
+
+            final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
+            try {
+                // Process db upgrade classes
+                for (final String upgradeClass : upgradeClasses) {
+                    System.out.println("========> Processing upgrade: " + upgradeClass);
+                    Class<?> clazz = null;
+                    try {
+                        clazz = Class.forName(upgradeClass);
+                        if (!SystemIntegrityChecker.class.isAssignableFrom(clazz)) {
+                            System.err.println("The class must be of SystemIntegrityChecker: " + clazz.getName());
+                            System.exit(1);
+                        }
+                        final SystemIntegrityChecker checker = (SystemIntegrityChecker) clazz.newInstance();
+                        checker.check();
+                    } catch (final ClassNotFoundException e) {
+                        System.err.println("Unable to find " + upgradeClass + ": " + e.getMessage());
+                        System.exit(1);
+                    } catch (final InstantiationException e) {
+                        System.err.println("Unable to instantiate " + upgradeClass + ": " + e.getMessage());
+                        System.exit(1);
+                    } catch (final IllegalAccessException e) {
+                        System.err.println("Unable to access " + upgradeClass + ": " + e.getMessage());
                         System.exit(1);
                     }
-                    final SystemIntegrityChecker checker = (SystemIntegrityChecker) clazz.newInstance();
-                    checker.check();
-                } catch (final ClassNotFoundException e) {
-                    System.err.println("Unable to find " + upgradeClass + ": " + e.getMessage());
-                    System.exit(1);
-                } catch (final InstantiationException e) {
-                    System.err.println("Unable to instantiate " + upgradeClass + ": " + e.getMessage());
-                    System.exit(1);
-                } catch (final IllegalAccessException e) {
-                    System.err.println("Unable to access " + upgradeClass + ": " + e.getMessage());
-                    System.exit(1);
                 }
+            } finally {
+                txn.close();
             }
-        } finally {
-            txn.close();
         }
     }
 

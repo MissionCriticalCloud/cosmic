@@ -71,9 +71,10 @@ public class VMTemplateZoneDaoImpl extends GenericDaoBase<VMTemplateZoneVO, Long
     public void deletePrimaryRecordsForTemplate(final long templateId) {
         final SearchCriteria<VMTemplateZoneVO> sc = TemplateSearch.create();
         sc.setParameters("template_id", templateId);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 }

@@ -29,17 +29,18 @@ public class ImageStoreDetailsDaoImpl extends GenericDaoBase<ImageStoreDetailVO,
 
     @Override
     public void update(final long storeId, final Map<String, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        final SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
-        sc.setParameters("store", storeId);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            final SearchCriteria<ImageStoreDetailVO> sc = storeSearch.create();
+            sc.setParameters("store", storeId);
 
-        txn.start();
-        expunge(sc);
-        for (final Map.Entry<String, String> entry : details.entrySet()) {
-            final ImageStoreDetailVO detail = new ImageStoreDetailVO(storeId, entry.getKey(), entry.getValue());
-            persist(detail);
+            txn.start();
+            expunge(sc);
+            for (final Map.Entry<String, String> entry : details.entrySet()) {
+                final ImageStoreDetailVO detail = new ImageStoreDetailVO(storeId, entry.getKey(), entry.getValue());
+                persist(detail);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

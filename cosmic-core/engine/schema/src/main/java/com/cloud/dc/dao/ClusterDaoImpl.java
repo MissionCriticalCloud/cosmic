@@ -135,11 +135,10 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
 
     @Override
     public Map<Long, List<Long>> getPodClusterIdMap(final List<Long> clusterIds) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final Map<Long, List<Long>> result = new HashMap<>();
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final StringBuilder sql = new StringBuilder(GET_POD_CLUSTER_MAP_PREFIX);
             if (clusterIds.size() > 0) {
                 for (final Long clusterId : clusterIds) {
@@ -227,16 +226,18 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final ClusterVO cluster = createForUpdate();
-        cluster.setName(null);
-        cluster.setGuid(null);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final ClusterVO cluster = createForUpdate();
+            cluster.setName(null);
+            cluster.setGuid(null);
 
-        update(id, cluster);
+            update(id, cluster);
 
-        final boolean result = super.remove(id);
-        txn.commit();
+            result = super.remove(id);
+            txn.commit();
+        }
         return result;
     }
 }

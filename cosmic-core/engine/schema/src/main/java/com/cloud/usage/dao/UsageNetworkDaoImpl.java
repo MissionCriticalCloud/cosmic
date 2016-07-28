@@ -83,6 +83,8 @@ public class UsageNetworkDaoImpl extends GenericDaoBase<UsageNetworkVO, Long> im
         } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error deleting old usage network stats", ex);
+        } finally {
+            txn.close();
         }
     }
 
@@ -113,6 +115,8 @@ public class UsageNetworkDaoImpl extends GenericDaoBase<UsageNetworkVO, Long> im
             txn.rollback();
             s_logger.error("error saving usage_network to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 }

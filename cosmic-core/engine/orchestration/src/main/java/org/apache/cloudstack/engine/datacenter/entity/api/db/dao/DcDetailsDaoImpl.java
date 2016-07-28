@@ -43,17 +43,18 @@ public class DcDetailsDaoImpl extends GenericDaoBase<DcDetailVO, Long> implement
 
     @Override
     public void persist(final long dcId, final Map<String, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<DcDetailVO> sc = DcSearch.create();
-        sc.setParameters("dcId", dcId);
-        expunge(sc);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<DcDetailVO> sc = DcSearch.create();
+            sc.setParameters("dcId", dcId);
+            expunge(sc);
 
-        for (final Map.Entry<String, String> detail : details.entrySet()) {
-            final DcDetailVO vo = new DcDetailVO(dcId, detail.getKey(), detail.getValue());
-            persist(vo);
+            for (final Map.Entry<String, String> detail : details.entrySet()) {
+                final DcDetailVO vo = new DcDetailVO(dcId, detail.getKey(), detail.getValue());
+                persist(vo);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

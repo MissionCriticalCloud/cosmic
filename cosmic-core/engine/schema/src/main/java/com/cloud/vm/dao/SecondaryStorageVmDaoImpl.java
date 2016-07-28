@@ -85,20 +85,21 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SecondaryStorageVmVO proxy = createForUpdate();
-        proxy.setPublicIpAddress(null);
-        proxy.setPrivateIpAddress(null);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SecondaryStorageVmVO proxy = createForUpdate();
+            proxy.setPublicIpAddress(null);
+            proxy.setPrivateIpAddress(null);
 
-        final UpdateBuilder ub = getUpdateBuilder(proxy);
-        ub.set(proxy, "state", State.Destroyed);
-        ub.set(proxy, "privateIpAddress", null);
-        update(id, ub, proxy);
+            final UpdateBuilder ub = getUpdateBuilder(proxy);
+            ub.set(proxy, "state", State.Destroyed);
+            ub.set(proxy, "privateIpAddress", null);
+            update(id, ub, proxy);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override
@@ -169,9 +170,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     @Override
     public List<Long> getRunningSecStorageVmListByMsid(final SecondaryStorageVm.Role role, final long msid) {
         final List<Long> l = new ArrayList<>();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql;
             if (role == null) {
                 sql =
@@ -205,9 +205,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     public List<Long> listRunningSecStorageOrderByLoad(final SecondaryStorageVm.Role role, final long zoneId) {
 
         final List<Long> l = new ArrayList<>();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql;
             if (role == null) {
                 sql =

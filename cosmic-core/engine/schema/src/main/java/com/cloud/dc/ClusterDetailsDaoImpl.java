@@ -47,35 +47,37 @@ public class ClusterDetailsDaoImpl extends GenericDaoBase<ClusterDetailsVO, Long
 
     @Override
     public void persist(final long clusterId, final Map<String, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<ClusterDetailsVO> sc = ClusterSearch.create();
-        sc.setParameters("clusterId", clusterId);
-        expunge(sc);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<ClusterDetailsVO> sc = ClusterSearch.create();
+            sc.setParameters("clusterId", clusterId);
+            expunge(sc);
 
-        for (final Map.Entry<String, String> detail : details.entrySet()) {
-            String value = detail.getValue();
-            if ("password".equals(detail.getKey())) {
-                value = DBEncryptionUtil.encrypt(value);
+            for (final Map.Entry<String, String> detail : details.entrySet()) {
+                String value = detail.getValue();
+                if ("password".equals(detail.getKey())) {
+                    value = DBEncryptionUtil.encrypt(value);
+                }
+                final ClusterDetailsVO vo = new ClusterDetailsVO(clusterId, detail.getKey(), value);
+                persist(vo);
             }
-            final ClusterDetailsVO vo = new ClusterDetailsVO(clusterId, detail.getKey(), value);
-            persist(vo);
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override
     public void persist(final long clusterId, final String name, final String value) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<ClusterDetailsVO> sc = DetailSearch.create();
-        sc.setParameters("clusterId", clusterId);
-        sc.setParameters("name", name);
-        expunge(sc);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<ClusterDetailsVO> sc = DetailSearch.create();
+            sc.setParameters("clusterId", clusterId);
+            sc.setParameters("name", name);
+            expunge(sc);
 
-        final ClusterDetailsVO vo = new ClusterDetailsVO(clusterId, name, value);
-        persist(vo);
-        txn.commit();
+            final ClusterDetailsVO vo = new ClusterDetailsVO(clusterId, name, value);
+            persist(vo);
+            txn.commit();
+        }
     }
 
     @Override

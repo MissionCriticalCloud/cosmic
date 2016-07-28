@@ -34,17 +34,18 @@ public class UsageEventDetailsDaoImpl extends GenericDaoBase<UsageEventDetailsVO
 
     @Override
     public void persist(final long eventId, final Map<String, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<UsageEventDetailsVO> sc = EventDetailsSearch.create();
-        sc.setParameters("eventId", eventId);
-        expunge(sc);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<UsageEventDetailsVO> sc = EventDetailsSearch.create();
+            sc.setParameters("eventId", eventId);
+            expunge(sc);
 
-        for (final Map.Entry<String, String> detail : details.entrySet()) {
-            final UsageEventDetailsVO vo = new UsageEventDetailsVO(eventId, detail.getKey(), detail.getValue());
-            persist(vo);
+            for (final Map.Entry<String, String> detail : details.entrySet()) {
+                final UsageEventDetailsVO vo = new UsageEventDetailsVO(eventId, detail.getKey(), detail.getValue());
+                persist(vo);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

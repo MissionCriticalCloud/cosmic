@@ -386,11 +386,10 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     @Override
     @DB
     public HypervisorType getHypervisorType(final long volumeId) {
-    /* lookup from cluster of pool */
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        /* lookup from cluster of pool */
+        final PreparedStatement pstmt;
         String sql = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final ScopeType scope = getVolumeStoragePoolScope(volumeId);
             if (scope != null) {
                 if (scope == ScopeType.CLUSTER || scope == ScopeType.HOST) {
@@ -457,10 +456,9 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
 
     @Override
     public List<Long> listPoolIdsByVolumeCount(final long dcId, final Long podId, final Long clusterId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = ORDER_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);
@@ -480,11 +478,9 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
 
     @Override
     public List<Long> listZoneWidePoolIdsByVolumeCount(final long dcId, final long accountId) {
-
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = ORDER_ZONE_WIDE_POOLS_NUMBER_OF_VOLUMES_FOR_ACCOUNT;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);
@@ -536,10 +532,9 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     @Override
     public ScopeType getVolumeStoragePoolScope(final long volumeId) {
         // finding the storage scope where the volume is present
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = SELECT_POOLSCOPE;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
@@ -563,9 +558,9 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     @Override
     @DB
     public boolean updateUuid(final long srcVolId, final long destVolId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+
             final VolumeVO srcVol = findById(srcVolId);
             final VolumeVO destVol = findById(destVolId);
             final String uuid = srcVol.getUuid();
@@ -577,10 +572,11 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
             update(srcVolId, srcVol);
             update(destVolId, destVol);
             _tagsDao.updateResourceId(srcVolId, destVolId, ResourceObjectType.Volume);
+
+            txn.commit();
         } catch (final Exception e) {
             throw new CloudRuntimeException("Unable to persist the sequence number for this host");
         }
-        txn.commit();
         return true;
     }
 
@@ -645,15 +641,16 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VolumeVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.Volume);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VolumeVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.Volume);
+            }
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
         }
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
     }
 
     public static class SumCount {

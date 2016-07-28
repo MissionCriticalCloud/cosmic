@@ -85,10 +85,9 @@ public class SnapshotDaoImpl extends GenericDaoBase<SnapshotVO, Long> implements
 
     @Override
     public long getLastSnapshot(final long volumeId, final DataStoreRole role) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final String sql = GET_LAST_SNAPSHOT;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
             pstmt.setString(2, role.toString());
@@ -123,10 +122,9 @@ public class SnapshotDaoImpl extends GenericDaoBase<SnapshotVO, Long> implements
 
     @Override
     public long updateSnapshotVersion(final long volumeId, final String from, final String to) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final String sql = UPDATE_SNAPSHOT_VERSION;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setString(1, to);
             pstmt.setLong(2, volumeId);
@@ -153,11 +151,9 @@ public class SnapshotDaoImpl extends GenericDaoBase<SnapshotVO, Long> implements
 
     @Override
     public Long getSecHostId(final long volumeId) {
-
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final String sql = GET_SECHOST_ID;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
             final ResultSet rs = pstmt.executeQuery();
@@ -173,10 +169,9 @@ public class SnapshotDaoImpl extends GenericDaoBase<SnapshotVO, Long> implements
 
     @Override
     public long updateSnapshotSecHost(final long dcId, final long secHostId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final String sql = UPDATE_SECHOST_ID;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, secHostId);
             pstmt.setLong(2, dcId);
@@ -300,25 +295,27 @@ public class SnapshotDaoImpl extends GenericDaoBase<SnapshotVO, Long> implements
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SnapshotVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.Snapshot);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SnapshotVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.Snapshot);
+            }
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
         }
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
     }
 
     @Override
     public boolean updateState(final State currentState, final Event event, final State nextState, final SnapshotVO snapshot, final Object data) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SnapshotVO snapshotVO = snapshot;
-        snapshotVO.setState(nextState);
-        super.update(snapshotVO.getId(), snapshotVO);
-        txn.commit();
-        return true;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SnapshotVO snapshotVO = snapshot;
+            snapshotVO.setState(nextState);
+            super.update(snapshotVO.getId(), snapshotVO);
+            txn.commit();
+            return true;
+        }
     }
 }

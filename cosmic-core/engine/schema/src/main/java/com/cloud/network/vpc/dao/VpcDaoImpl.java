@@ -96,39 +96,44 @@ public class VpcDaoImpl extends GenericDaoBase<VpcVO, Long> implements VpcDao {
     @Override
     @DB
     public VpcVO persist(final VpcVO vpc, final Map<String, List<String>> serviceProviderMap) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VpcVO newVpc = super.persist(vpc);
-        persistVpcServiceProviders(vpc.getId(), serviceProviderMap);
-        txn.commit();
+        final VpcVO newVpc;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            newVpc = super.persist(vpc);
+            persistVpcServiceProviders(vpc.getId(), serviceProviderMap);
+            txn.commit();
+        }
         return newVpc;
     }
 
     @Override
     @DB
     public void persistVpcServiceProviders(final long vpcId, final Map<String, List<String>> serviceProviderMap) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        for (final String service : serviceProviderMap.keySet()) {
-            for (final String provider : serviceProviderMap.get(service)) {
-                final VpcServiceMapVO serviceMap = new VpcServiceMapVO(vpcId, Network.Service.getService(service), Network.Provider.getProvider(provider));
-                _vpcSvcMap.persist(serviceMap);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            for (final String service : serviceProviderMap.keySet()) {
+                for (final String provider : serviceProviderMap.get(service)) {
+                    final VpcServiceMapVO serviceMap = new VpcServiceMapVO(vpcId, Network.Service.getService(service), Network.Provider.getProvider(provider));
+                    _vpcSvcMap.persist(serviceMap);
+                }
             }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VpcVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.Vpc);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VpcVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.Vpc);
+            }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 }

@@ -934,7 +934,6 @@ public class Upgrade410to420 implements DbUpgrade {
     // Corrects upgrade for deployment with F5 and SRX devices (pre 3.0) to network offering &
     // network service provider paradigm
     private void correctExternalNetworkDevicesSetup(final Connection conn) {
-        PreparedStatement pNetworkStmt = null, f5DevicesStmt = null, srxDevicesStmt = null;
         ResultSet pNetworksResults = null, f5DevicesResult = null, srxDevicesResult = null;
 
         try (
@@ -949,9 +948,10 @@ public class Upgrade410to420 implements DbUpgrade {
                     continue;
                 }
 
-                pNetworkStmt = conn.prepareStatement("SELECT id FROM `cloud`.`physical_network` where data_center_id=?");
-                pNetworkStmt.setLong(1, zoneId);
-                pNetworksResults = pNetworkStmt.executeQuery();
+                try (PreparedStatement pNetworkStmt = conn.prepareStatement("SELECT id FROM `cloud`.`physical_network` where data_center_id=?")) {
+                    pNetworkStmt.setLong(1, zoneId);
+                    pNetworksResults = pNetworkStmt.executeQuery();
+                }
                 while (pNetworksResults.next()) {
                     final long physicalNetworkId = pNetworksResults.getLong(1);
                     final PreparedStatement fetchF5NspStmt =
@@ -964,9 +964,11 @@ public class Upgrade410to420 implements DbUpgrade {
                     // if there is no 'F5BigIP' physical network service provider added into physical network then
                     // add 'F5BigIP' as network service provider and add the entry in 'external_load_balancer_devices'
                     if (!hasF5Nsp) {
-                        f5DevicesStmt = conn.prepareStatement("SELECT id FROM host WHERE data_center_id=? AND type = 'ExternalLoadBalancer' AND removed IS NULL");
-                        f5DevicesStmt.setLong(1, zoneId);
-                        f5DevicesResult = f5DevicesStmt.executeQuery();
+                        try (PreparedStatement f5DevicesStmt = conn.prepareStatement("SELECT id FROM host WHERE data_center_id=? AND type = 'ExternalLoadBalancer' AND removed IS" +
+                                " NULL")) {
+                            f5DevicesStmt.setLong(1, zoneId);
+                            f5DevicesResult = f5DevicesStmt.executeQuery();
+                        }
                         // add F5BigIP provider and provider instance to physical network if there are any external load
                         // balancers added in the zone
                         while (f5DevicesResult.next()) {
@@ -987,9 +989,11 @@ public class Upgrade410to420 implements DbUpgrade {
                     // if there is no 'JuniperSRX' physical network service provider added into physical network then
                     // add 'JuniperSRX' as network service provider and add the entry in 'external_firewall_devices'
                     if (!hasSrxNsp) {
-                        srxDevicesStmt = conn.prepareStatement("SELECT id FROM host WHERE data_center_id=? AND type = 'ExternalFirewall' AND removed IS NULL");
-                        srxDevicesStmt.setLong(1, zoneId);
-                        srxDevicesResult = srxDevicesStmt.executeQuery();
+                        try (PreparedStatement srxDevicesStmt = conn.prepareStatement("SELECT id FROM host WHERE data_center_id=? AND type = 'ExternalFirewall' AND removed IS " +
+                                "NULL")) {
+                            srxDevicesStmt.setLong(1, zoneId);
+                            srxDevicesResult = srxDevicesStmt.executeQuery();
+                        }
                         // add JuniperSRX provider and provider instance to physical network if there are any external
                         // firewall instances added in to the zone
                         while (srxDevicesResult.next()) {

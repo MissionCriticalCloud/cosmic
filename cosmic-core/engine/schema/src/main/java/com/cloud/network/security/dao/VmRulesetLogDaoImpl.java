@@ -67,13 +67,11 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
     }
 
     protected int createOrUpdateUsingMultiInsert(final Set<Long> workItems) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-
         final int size = workItems.size();
         int count = 0;
         final Iterator<Long> workIter = workItems.iterator();
         int remaining = size;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             for (final int stmtSize : cacheStringSizes) {
                 final int numStmts = remaining / stmtSize;
                 if (numStmts > 0) {
@@ -133,47 +131,5 @@ public class VmRulesetLogDaoImpl extends GenericDaoBase<VmRulesetLogVO, Long> im
             s_logger.trace("Inserted or updated " + numUpdated + " rows");
         }
         return numUpdated;
-    }
-
-    protected int createOrUpdateUsingBatch(final Set<Long> workItems) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement stmtInsert = null;
-        int[] queryResult = null;
-        int count = 0;
-        boolean success = true;
-        try {
-            stmtInsert = txn.prepareAutoCloseStatement(InsertOrUpdateSQl);
-
-            txn.start();
-            for (final Long vmId : workItems) {
-                stmtInsert.setLong(1, vmId);
-                stmtInsert.addBatch();
-                count++;
-                if (count % 16 == 0) {
-                    queryResult = stmtInsert.executeBatch();
-                    stmtInsert.clearBatch();
-                }
-            }
-            queryResult = stmtInsert.executeBatch();
-
-            txn.commit();
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Updated or inserted " + workItems.size() + " log items");
-            }
-        } catch (final SQLException e) {
-            s_logger.warn("Failed to execute batch update statement for ruleset log: ", e);
-            txn.rollback();
-            success = false;
-        }
-        if (!success && queryResult != null) {
-            final Long[] arrayItems = new Long[workItems.size()];
-            workItems.toArray(arrayItems);
-            for (int i = 0; i < queryResult.length; i++) {
-                if (queryResult[i] < 0) {
-                    s_logger.debug("Batch query update failed for vm " + arrayItems[i]);
-                }
-            }
-        }
-        return count;
     }
 }

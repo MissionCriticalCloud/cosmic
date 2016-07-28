@@ -139,7 +139,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -619,16 +619,8 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         return Answer.createUnsupportedCommandAnswer(cmd);
     }
 
-    protected String determineS3TemplateDirectory(final Long accountId, final Long templateId, final String templateUniqueName) {
-        return join(asList(TEMPLATE_ROOT_DIR, accountId, templateId, templateUniqueName), S3Utils.SEPARATOR);
-    }
-
     private String determineS3TemplateNameFromKey(final String key) {
         return StringUtils.substringAfterLast(StringUtils.substringBeforeLast(key, S3Utils.SEPARATOR), S3Utils.SEPARATOR);
-    }
-
-    protected String determineS3VolumeDirectory(final Long accountId, final Long volId) {
-        return join(asList(VOLUME_ROOT_DIR, accountId, volId), S3Utils.SEPARATOR);
     }
 
     protected Long determineS3VolumeIdFromKey(final String key) {
@@ -640,7 +632,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     }
 
     protected File downloadFromUrlToNfs(final String url, final NfsTO nfs, final String path, final String name) {
-        final HttpClient client = new DefaultHttpClient();
+        final HttpClient client = HttpClientBuilder.create().build();
         final HttpGet get = new HttpGet(url);
         try {
             final HttpResponse response = client.execute(get);
@@ -1105,16 +1097,15 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         final MessageDigest digest;
         String checksum = null;
         final File f = new File(absoluteTemplatePath);
-        InputStream is = null;
         final byte[] buffer = new byte[8192];
         int read = 0;
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("parent path " + parent + " relative template path " + relativeTemplatePath);
         }
 
-        try {
+        try (InputStream is = new FileInputStream(f)) {
             digest = MessageDigest.getInstance("MD5");
-            is = new FileInputStream(f);
+
             while ((read = is.read(buffer)) > 0) {
                 digest.update(buffer, 0, read);
             }
@@ -1130,17 +1121,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             return new Answer(cmd, false, checksum);
         } catch (final NoSuchAlgorithmException e) {
             return new Answer(cmd, false, checksum);
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (final IOException e) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Could not close the file " + absoluteTemplatePath);
-                }
-                return new Answer(cmd, false, checksum);
-            }
         }
 
         return new Answer(cmd, true, checksum);

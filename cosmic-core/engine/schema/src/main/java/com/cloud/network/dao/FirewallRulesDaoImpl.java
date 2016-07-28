@@ -303,14 +303,16 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     @Override
     @DB
     public FirewallRuleVO persist(final FirewallRuleVO firewallRule) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        final FirewallRuleVO dbfirewallRule;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final FirewallRuleVO dbfirewallRule = super.persist(firewallRule);
-        saveSourceCidrs(firewallRule, firewallRule.getSourceCidrList());
-        loadSourceCidrs(dbfirewallRule);
+            dbfirewallRule = super.persist(firewallRule);
+            saveSourceCidrs(firewallRule, firewallRule.getSourceCidrList());
+            loadSourceCidrs(dbfirewallRule);
 
-        txn.commit();
+            txn.commit();
+        }
         return dbfirewallRule;
     }
 
@@ -324,22 +326,24 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final FirewallRuleVO entry = findById(id);
-        if (entry != null) {
-            if (entry.getPurpose() == Purpose.LoadBalancing) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.LoadBalancer);
-            } else if (entry.getPurpose() == Purpose.PortForwarding) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.PortForwardingRule);
-            } else if (entry.getPurpose() == Purpose.Firewall) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.FirewallRule);
-            } else if (entry.getPurpose() == Purpose.NetworkACL) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.NetworkACL);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final FirewallRuleVO entry = findById(id);
+            if (entry != null) {
+                if (entry.getPurpose() == Purpose.LoadBalancing) {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.LoadBalancer);
+                } else if (entry.getPurpose() == Purpose.PortForwarding) {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.PortForwardingRule);
+                } else if (entry.getPurpose() == Purpose.Firewall) {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.FirewallRule);
+                } else if (entry.getPurpose() == Purpose.NetworkACL) {
+                    _tagsDao.removeByIdAndType(id, ResourceObjectType.NetworkACL);
+                }
             }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 }

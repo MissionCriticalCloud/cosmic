@@ -114,29 +114,31 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
     @Override
     @DB
     public boolean update(final Long zoneId, final EngineDataCenterVO zone) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final boolean persisted = super.update(zoneId, zone);
-        if (!persisted) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final boolean persisted = super.update(zoneId, zone);
+            if (!persisted) {
+                return persisted;
+            }
+            saveDetails(zone);
+            txn.commit();
             return persisted;
         }
-        saveDetails(zone);
-        txn.commit();
-        return persisted;
     }
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final EngineDataCenterVO zone = createForUpdate();
-        zone.setName(null);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final EngineDataCenterVO zone = createForUpdate();
+            zone.setName(null);
 
-        update(id, zone);
+            update(id, zone);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override

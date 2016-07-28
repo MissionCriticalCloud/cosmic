@@ -3398,92 +3398,93 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Execute all updates in a single transaction
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        if (!_configDao.update(name, category, value)) {
-            s_logger.error("Failed to update configuration option, name: " + name + ", value:" + value);
-            throw new CloudRuntimeException("Failed to update configuration value. Please contact Cloud Support.");
+            if (!_configDao.update(name, category, value)) {
+                s_logger.error("Failed to update configuration option, name: " + name + ", value:" + value);
+                throw new CloudRuntimeException("Failed to update configuration value. Please contact Cloud Support.");
+            }
+
+            PreparedStatement pstmt = null;
+            if (Config.XenServerGuestNetwork.key().equalsIgnoreCase(name)) {
+                final String sql = "update host_details set value=? where name=?";
+                try {
+                    pstmt = txn.prepareAutoCloseStatement(sql);
+                    pstmt.setString(1, value);
+                    pstmt.setString(2, "guest.network.device");
+
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to update guest.network.device in host_details due to exception ", e);
+                }
+            } else if (Config.XenServerPrivateNetwork.key().equalsIgnoreCase(name)) {
+                final String sql = "update host_details set value=? where name=?";
+                try {
+                    pstmt = txn.prepareAutoCloseStatement(sql);
+                    pstmt.setString(1, value);
+                    pstmt.setString(2, "private.network.device");
+
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to update private.network.device in host_details due to exception ", e);
+                }
+            } else if (Config.XenServerPublicNetwork.key().equalsIgnoreCase(name)) {
+                final String sql = "update host_details set value=? where name=?";
+                try {
+                    pstmt = txn.prepareAutoCloseStatement(sql);
+                    pstmt.setString(1, value);
+                    pstmt.setString(2, "public.network.device");
+
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to update public.network.device in host_details due to exception ", e);
+                }
+            } else if (Config.XenServerStorageNetwork1.key().equalsIgnoreCase(name)) {
+                final String sql = "update host_details set value=? where name=?";
+                try {
+                    pstmt = txn.prepareAutoCloseStatement(sql);
+                    pstmt.setString(1, value);
+                    pstmt.setString(2, "storage.network.device1");
+
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to update storage.network.device1 in host_details due to exception ", e);
+                }
+            } else if (Config.XenServerStorageNetwork2.key().equals(name)) {
+                final String sql = "update host_details set value=? where name=?";
+                try {
+                    pstmt = txn.prepareAutoCloseStatement(sql);
+                    pstmt.setString(1, value);
+                    pstmt.setString(2, "storage.network.device2");
+
+                    pstmt.executeUpdate();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to update storage.network.device2 in host_details due to exception ", e);
+                }
+            } else if (Config.SecStorageSecureCopyCert.key().equalsIgnoreCase(name)) {
+                //FIXME - Ideally there should be a listener model to listen to global config changes and be able to take action gracefully.
+                //Expire the download urls
+                final String sqlTemplate = "update template_store_ref set download_url_created=?";
+                final String sqlVolume = "update volume_store_ref set download_url_created=?";
+                try {
+                    // Change for templates
+                    pstmt = txn.prepareAutoCloseStatement(sqlTemplate);
+                    pstmt.setDate(1, new Date(-1l));// Set the time before the epoch time.
+                    pstmt.executeUpdate();
+                    // Change for volumes
+                    pstmt = txn.prepareAutoCloseStatement(sqlVolume);
+                    pstmt.setDate(1, new Date(-1l));// Set the time before the epoch time.
+                    pstmt.executeUpdate();
+                    // Cleanup the download urls
+                    _storageManager.cleanupDownloadUrls();
+                } catch (final SQLException e) {
+                    throw new CloudRuntimeException("Failed to clean up download URLs in template_store_ref or volume_store_ref due to exception ", e);
+                }
+            }
+
+            txn.commit();
         }
-
-        PreparedStatement pstmt = null;
-        if (Config.XenServerGuestNetwork.key().equalsIgnoreCase(name)) {
-            final String sql = "update host_details set value=? where name=?";
-            try {
-                pstmt = txn.prepareAutoCloseStatement(sql);
-                pstmt.setString(1, value);
-                pstmt.setString(2, "guest.network.device");
-
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to update guest.network.device in host_details due to exception ", e);
-            }
-        } else if (Config.XenServerPrivateNetwork.key().equalsIgnoreCase(name)) {
-            final String sql = "update host_details set value=? where name=?";
-            try {
-                pstmt = txn.prepareAutoCloseStatement(sql);
-                pstmt.setString(1, value);
-                pstmt.setString(2, "private.network.device");
-
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to update private.network.device in host_details due to exception ", e);
-            }
-        } else if (Config.XenServerPublicNetwork.key().equalsIgnoreCase(name)) {
-            final String sql = "update host_details set value=? where name=?";
-            try {
-                pstmt = txn.prepareAutoCloseStatement(sql);
-                pstmt.setString(1, value);
-                pstmt.setString(2, "public.network.device");
-
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to update public.network.device in host_details due to exception ", e);
-            }
-        } else if (Config.XenServerStorageNetwork1.key().equalsIgnoreCase(name)) {
-            final String sql = "update host_details set value=? where name=?";
-            try {
-                pstmt = txn.prepareAutoCloseStatement(sql);
-                pstmt.setString(1, value);
-                pstmt.setString(2, "storage.network.device1");
-
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to update storage.network.device1 in host_details due to exception ", e);
-            }
-        } else if (Config.XenServerStorageNetwork2.key().equals(name)) {
-            final String sql = "update host_details set value=? where name=?";
-            try {
-                pstmt = txn.prepareAutoCloseStatement(sql);
-                pstmt.setString(1, value);
-                pstmt.setString(2, "storage.network.device2");
-
-                pstmt.executeUpdate();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to update storage.network.device2 in host_details due to exception ", e);
-            }
-        } else if (Config.SecStorageSecureCopyCert.key().equalsIgnoreCase(name)) {
-            //FIXME - Ideally there should be a listener model to listen to global config changes and be able to take action gracefully.
-            //Expire the download urls
-            final String sqlTemplate = "update template_store_ref set download_url_created=?";
-            final String sqlVolume = "update volume_store_ref set download_url_created=?";
-            try {
-                // Change for templates
-                pstmt = txn.prepareAutoCloseStatement(sqlTemplate);
-                pstmt.setDate(1, new Date(-1l));// Set the time before the epoch time.
-                pstmt.executeUpdate();
-                // Change for volumes
-                pstmt = txn.prepareAutoCloseStatement(sqlVolume);
-                pstmt.setDate(1, new Date(-1l));// Set the time before the epoch time.
-                pstmt.executeUpdate();
-                // Cleanup the download urls
-                _storageManager.cleanupDownloadUrls();
-            } catch (final SQLException e) {
-                throw new CloudRuntimeException("Failed to clean up download URLs in template_store_ref or volume_store_ref due to exception ", e);
-            }
-        }
-
-        txn.commit();
         return _configDao.getValue(name);
     }
 
