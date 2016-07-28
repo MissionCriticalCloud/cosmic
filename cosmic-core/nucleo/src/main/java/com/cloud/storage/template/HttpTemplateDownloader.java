@@ -133,9 +133,9 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     protected void runInContext() {
         try {
             download(resume, completionCallback);
-        } catch (final Throwable t) {
-            s_logger.warn("Caught exception during download " + t.getMessage(), t);
-            errorString = "Failed to install: " + t.getMessage();
+        } catch (final Exception e) {
+            s_logger.warn("Caught exception during download " + e.getMessage(), e);
+            errorString = "Failed to install: " + e.getMessage();
             status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
         }
     }
