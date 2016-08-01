@@ -1,5 +1,7 @@
 package com.cloud.systemvm;
 
+import static com.cloud.utils.CloudConstants.PROPERTY_LIST_SEPARATOR;
+
 import com.cloud.cluster.ClusterManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -9,6 +11,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.info.RunningHostCountInfo;
 import com.cloud.info.RunningHostInfoAgregator;
 import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
+import com.cloud.managementserver.ManagementServerService;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -25,6 +28,7 @@ import org.apache.cloudstack.context.CallContext;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -121,5 +125,10 @@ public abstract class SystemVmManagerBase extends ManagerBase {
         }
 
         return defaultNetworks.get(0);
+    }
+
+    protected String computeManagementServerIpList(final ManagementServerService managementServerService) {
+        return managementServerService.discoverManagementServerIps()
+                                      .collect(Collectors.joining(PROPERTY_LIST_SEPARATOR));
     }
 }

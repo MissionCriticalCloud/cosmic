@@ -37,6 +37,7 @@ import com.cloud.info.ConsoleProxyLoadInfo;
 import com.cloud.info.ConsoleProxyStatus;
 import com.cloud.info.RunningHostInfoAgregator;
 import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
+import com.cloud.managementserver.ManagementServerService;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
@@ -91,7 +92,6 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.config.ApiServiceConfiguration;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.security.keys.KeysManager;
@@ -118,6 +118,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 //
 // Possible console proxy state transition cases
@@ -209,8 +210,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
     @Inject
     private KeystoreManager _ksMgr;
 
-    protected ConsoleProxyManagerImpl() {
-    }
+    @Autowired
+    private ManagementServerService managementServerService;
 
     @Override
     public ConsoleProxyInfo assignProxy(final long dataCenterId, final long vmId) {
@@ -596,7 +597,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         buf.append(" resource=com.cloud.agent.resource.consoleproxy.ConsoleProxyResource");
         buf.append(" instance=ConsoleProxy");
 
-        buf.append(" host=").append(ApiServiceConfiguration.ManagementHostIPAdr.value());
+        buf.append(" host=").append(computeManagementServerIpList(managementServerService));
         buf.append(" port=").append(_mgmtPort);
         buf.append(" name=").append(profile.getVirtualMachine().getHostName());
         if (_sslEnabled) {
