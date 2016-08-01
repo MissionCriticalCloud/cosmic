@@ -16,4 +16,6 @@ public abstract class CloudConstants {
     public static final String DEFAULT_ZONE = "default";
     public static final String DEFAULT_POD = "default";
     public static final String DEFAULT_HOST = "localhost";
+
+    public static final String PROPERTY_LIST_SEPARATOR = ",";
 }
