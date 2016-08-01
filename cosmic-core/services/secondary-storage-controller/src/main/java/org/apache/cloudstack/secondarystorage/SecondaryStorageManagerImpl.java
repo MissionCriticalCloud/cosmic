@@ -202,7 +202,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     private StoragePoolHostDao _storagePoolHostDao;
     @Inject
     private AgentManager _agentMgr;
-    private SecondaryStorageListener _listener;
     private ServiceOfferingVO _serviceOffering;
     @Inject
     private ServiceOfferingDao _offeringDao;
@@ -210,11 +209,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     private AccountService _accountMgr;
     @Inject
     private VirtualMachineManager _itMgr;
-    private long _capacityScanInterval = DEFAULT_CAPACITY_SCAN_INTERVAL;
     private int _secStorageVmMtuSize;
     private String _instance;
     private boolean _useSSlCopy;
-    private String _httpProxy;
     private String _allowedInternalSites;
     private SystemVmLoadScanner<Long> _loadScanner;
     private Map<Long, ZoneHostInfo> _zoneHostInfoMap; // map <zone id, info about running host in zone>
@@ -252,7 +249,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
 
         String value = configs.get("secstorage.capacityscan.interval");
-        _capacityScanInterval = NumbersUtil.parseLong(value, DEFAULT_CAPACITY_SCAN_INTERVAL);
+        final long _capacityScanInterval = NumbersUtil.parseLong(value, DEFAULT_CAPACITY_SCAN_INTERVAL);
 
         _instance = configs.get("instance.name");
         if (_instance == null) {
@@ -264,7 +261,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         value = agentMgrConfigs.get("port");
         _mgmtPort = NumbersUtil.parseInt(value, 8250);
 
-        _listener = new SecondaryStorageListener(this);
+        final SecondaryStorageListener _listener = new SecondaryStorageListener(this);
         _agentMgr.registerForHostEvents(_listener, true, false, true);
 
         _itMgr.registerGuru(VirtualMachine.Type.SecondaryStorageVm, this);
@@ -304,7 +301,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             _loadScanner.initScan(STARTUP_DELAY, _capacityScanInterval);
         }
 
-        _httpProxy = configs.get(Config.SecStorageProxy.key());
+        String _httpProxy = configs.get(Config.SecStorageProxy.key());
         if (_httpProxy != null) {
             boolean valid = true;
             String errMsg = null;
