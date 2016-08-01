@@ -193,10 +193,6 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     private VirtualMachineManager _itMgr;
     private ConsoleProxyListener _listener;
     private ServiceOfferingVO _serviceOffering;
-    /*
-     * private final ExecutorService _requestHandlerScheduler = Executors.newCachedThreadPool(new
-     * NamedThreadFactory("Request-handler"));
-     */
     private long _capacityScanInterval = DEFAULT_CAPACITY_SCAN_INTERVAL;
     private int _capacityPerProxy = ConsoleProxyManager.DEFAULT_PROXY_CAPACITY;
     private int _standbyCapacity = ConsoleProxyManager.DEFAULT_STANDBY_CAPACITY;
@@ -1582,34 +1578,11 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
                         }
 
                         final ConsoleProxyVO proxy = _consoleProxyDao.findById(proxyVmId);
-                        if (proxy != null) {
-
-                            // Disable this feature for now, as it conflicts
-                            // with
-                            // the case of allowing user to reboot console proxy
-                            // when rebooting happens, we will receive
-                            // disconnect
-                            // here and we can't enter into stopping process,
-                            // as when the rebooted one comes up, it will kick
-                            // off a
-                            // newly started one and trigger the process
-                            // continue on forever
-
-                            /*
-                             * _capacityScanScheduler.execute(new Runnable() {
-                             * public void run() { if(s_logger.isInfoEnabled())
-                             * s_logger.info("Stop console proxy " +
-                             * proxy.getName() +
-                             * " VM because of that the agent running inside it has disconnected"
-                             * ); stopProxy(proxy.getId()); } });
-                             */
-                        } else {
-                            if (s_logger.isInfoEnabled()) {
-                                s_logger.info("Console proxy agent disconnected but corresponding console proxy VM no longer exists in DB, proxy: " + name);
-                            }
+                        if (proxy == null) {
+                            s_logger.info("Console proxy agent disconnected but corresponding console proxy VM no longer exists in DB, proxy: " + name);
                         }
                     } else {
-                        assert (false) : "Invalid console proxy name: " + name;
+                        s_logger.debug("Invalid console proxy name: {}", name);
                     }
                 }
             }

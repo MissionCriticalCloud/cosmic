@@ -830,8 +830,6 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
         }
 
         final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
-        // SecondaryStorageVmVO secStorageVm =
-        // allocSecStorageVmStorage(dataCenterId, secStorageVmId);
         if (secStorageVm != null) {
             SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                     new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_CREATED, dataCenterId, secStorageVmId, secStorageVm, null));
@@ -1125,27 +1123,6 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
                 }
             }
         }
-        /* After removing SecondaryStorage entries from host table, control should never come here!!
-        else if( cssHost.getType() == Host.Type.SecondaryStorage ) {
-            List<SecondaryStorageVmVO> alreadyRunning = _secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVm.Role.templateProcessor, zoneId, State.Running);
-            String secUrl = cssHost.getStorageUrl();
-            SecStorageSetupCommand setupCmd = new SecStorageSetupCommand(secUrl, null);
-            for ( SecondaryStorageVmVO ssVm : alreadyRunning ) {
-                HostVO host = _resourceMgr.findHostByName(ssVm.getInstanceName());
-                Answer answer = _agentMgr.easySend(host.getId(), setupCmd);
-                if (answer != null && answer.getResult()) {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Successfully programmed secondary storage " + host.getName() + " in secondary storage VM " + ssVm.getInstanceName());
-                    }
-                } else {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Successfully programmed secondary storage " + host.getName() + " in secondary storage VM " + ssVm.getInstanceName());
-                    }
-                    return false;
-                }
-            }
-        }
-         */
         return true;
     }
 
@@ -1342,51 +1319,8 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     }
 
     @Override
-    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details, final
-    List<String> hostTags) {
-        // Used to be Called when add secondary storage on UI through DummySecondaryStorageResource to update that host entry for Secondary Storage.
-        // Now since we move secondary storage from host table, this code is not needed to be invoked anymore.
-        /*
-        StartupCommand firstCmd = startup[0];
-        if (!(firstCmd instanceof StartupStorageCommand)) {
-            return null;
-        }
-
-        com.cloud.host.Host.Type type = null;
-        StartupStorageCommand ssCmd = ((StartupStorageCommand) firstCmd);
-        if (ssCmd.getHostType() == Host.Type.SecondaryStorageCmdExecutor) {
-            type = ssCmd.getHostType();
-        } else {
-            if (ssCmd.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE) {
-                type = Host.Type.SecondaryStorage;
-                if (resource != null && resource instanceof DummySecondaryStorageResource) {
-                    host.setResource(null);
-                }
-            } else if (ssCmd.getResourceType() == Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE) {
-                type = Host.Type.LocalSecondaryStorage;
-            } else {
-                type = Host.Type.Storage;
-            }
-
-            final Map<String, String> hostDetails = ssCmd.getHostDetails();
-            if (hostDetails != null) {
-                if (details != null) {
-                    details.putAll(hostDetails);
-                } else {
-                    details = hostDetails;
-                }
-            }
-
-            host.setDetails(details);
-            host.setParent(ssCmd.getParent());
-            host.setTotalSize(ssCmd.getTotalSize());
-            host.setHypervisorType(HypervisorType.None);
-            host.setType(type);
-            if (ssCmd.getNfsShare() != null) {
-                host.setStorageUrl(ssCmd.getNfsShare());
-            }
-        }
-         */
+    public HostVO createHostVOForDirectConnectAgent(final HostVO host, final StartupCommand[] startup, final ServerResource resource, final Map<String, String> details,
+                                                    final List<String> hostTags) {
         return null; // no need to handle this event anymore since secondary storage is not in host table anymore.
     }
 
