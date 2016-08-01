@@ -2022,15 +2022,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Account caller = getCaller();
         final List<Long> ids = cmd.getIds();
         boolean result = true;
-        List<Long> permittedAccountIds = new ArrayList<>();
-
-        if (_accountService.isNormalUser(caller.getId()) || caller.getType() == Account.ACCOUNT_TYPE_PROJECT) {
-            permittedAccountIds.add(caller.getId());
-        } else {
-            final DomainVO domain = _domainDao.findById(caller.getDomainId());
-            final List<Long> permittedDomainIds = _domainDao.getDomainChildrenIds(domain.getPath());
-            permittedAccountIds = _accountDao.getAccountIdsForDomains(permittedDomainIds);
-        }
+        final List<Long> permittedAccountIds = computePermitedAccounts(caller);
 
         final List<EventVO> events = _eventDao.listToArchiveOrDeleteEvents(ids, cmd.getType(), cmd.getStartDate(), cmd.getEndDate(), permittedAccountIds);
         final ControlledEntity[] sameOwnerEvents = events.toArray(new ControlledEntity[events.size()]);
@@ -2049,15 +2041,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Account caller = getCaller();
         final List<Long> ids = cmd.getIds();
         boolean result = true;
-        List<Long> permittedAccountIds = new ArrayList<>();
-
-        if (_accountMgr.isNormalUser(caller.getId()) || caller.getType() == Account.ACCOUNT_TYPE_PROJECT) {
-            permittedAccountIds.add(caller.getId());
-        } else {
-            final DomainVO domain = _domainDao.findById(caller.getDomainId());
-            final List<Long> permittedDomainIds = _domainDao.getDomainChildrenIds(domain.getPath());
-            permittedAccountIds = _accountDao.getAccountIdsForDomains(permittedDomainIds);
-        }
+        final List<Long> permittedAccountIds = computePermitedAccounts(caller);
 
         final List<EventVO> events = _eventDao.listToArchiveOrDeleteEvents(ids, cmd.getType(), cmd.getStartDate(), cmd.getEndDate(), permittedAccountIds);
         final ControlledEntity[] sameOwnerEvents = events.toArray(new ControlledEntity[events.size()]);
@@ -2071,6 +2055,18 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             _eventDao.remove(event.getId());
         }
         return result;
+    }
+
+    private List<Long> computePermitedAccounts(final Account caller) {
+        List<Long> permittedAccountIds = new ArrayList<>();
+        if (_accountService.isNormalUser(caller.getId()) || caller.getType() == Account.ACCOUNT_TYPE_PROJECT) {
+            permittedAccountIds.add(caller.getId());
+        } else {
+            final DomainVO domain = _domainDao.findById(caller.getDomainId());
+            final List<Long> permittedDomainIds = _domainDao.getDomainChildrenIds(domain.getPath());
+            permittedAccountIds = _accountDao.getAccountIdsForDomains(permittedDomainIds);
+        }
+        return permittedAccountIds;
     }
 
     @Override

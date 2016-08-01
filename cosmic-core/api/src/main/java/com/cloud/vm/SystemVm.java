@@ -3,11 +3,21 @@ package com.cloud.vm;
 import java.util.Date;
 
 public interface SystemVm extends VirtualMachine {
-    public String getPublicIpAddress();
+    String getPublicIpAddress();
 
-    public String getPublicNetmask();
+    String getPublicNetmask();
 
-    public String getPublicMacAddress();
+    String getPublicMacAddress();
 
-    public Date getLastUpdateTime();
+    void setPublicIpAddress(String ipAddress);
+
+    void setPublicNetmask(String netmask);
+
+    void setPublicMacAddress(String macAddress);
+
+    void setPrivateIpAddress(String ipAddress);
+
+    void setPrivateMacAddress(String macAddress);
+
+    Date getLastUpdateTime();
 }

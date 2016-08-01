@@ -21,7 +21,6 @@ import java.util.Date;
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue(value = "ConsoleProxy")
 public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
-
     @Column(name = "public_ip_address", nullable = false)
     private String publicIpAddress;
 
@@ -50,9 +49,8 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
     /**
      * Correct constructor to use.
      */
-    public ConsoleProxyVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId, final
-    long dataCenterId, final long domainId,
-                          final long accountId, final long userId, final int activeSession, final boolean haEnabled) {
+    public ConsoleProxyVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
+                          final long dataCenterId, final long domainId, final long accountId, final long userId, final int activeSession, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, Type.ConsoleProxy, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.activeSession = activeSession;
         this.dataCenterId = dataCenterId;
@@ -81,6 +79,7 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
     }
 
     @Override
+
     public String getPublicMacAddress() {
         return publicMacAddress;
     }

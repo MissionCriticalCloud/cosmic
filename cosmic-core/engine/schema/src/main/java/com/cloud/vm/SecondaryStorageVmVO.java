@@ -22,7 +22,6 @@ import java.util.Date;
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue(value = "SecondaryStorageVm")
 public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStorageVm {
-
     @Column(name = "public_ip_address", nullable = false)
     private String publicIpAddress;
 
@@ -59,7 +58,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicIpAddress() {
-        return this.publicIpAddress;
+        return publicIpAddress;
     }
 
     public void setPublicIpAddress(final String publicIpAddress) {
@@ -68,7 +67,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicNetmask() {
-        return this.publicNetmask;
+        return publicNetmask;
     }
 
     public void setPublicNetmask(final String publicNetmask) {
@@ -76,8 +75,9 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     }
 
     @Override
+
     public String getPublicMacAddress() {
-        return this.publicMacAddress;
+        return publicMacAddress;
     }
 
     public void setPublicMacAddress(final String publicMacAddress) {

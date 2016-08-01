@@ -72,17 +72,6 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
                             .build();
     }
 
-    @Override
-    protected void initMocks() {
-        when(mockDestination.getDataCenter()).thenReturn(mockDataCenter);
-        when(mockDataCenter.getId()).thenReturn(DATA_CENTER_ID);
-        when(mockPod.getId()).thenReturn(POD_ID1);
-        when(mockHostPodVO1.getId()).thenReturn(POD_ID1);
-        when(mockHostPodVO2.getId()).thenReturn(POD_ID2);
-        when(mockHostPodVO3.getId()).thenReturn(POD_ID3);
-        when(mockNw.getId()).thenReturn(NW_ID_1);
-    }
-
     @Test
     public void testRedundancyProperty() {
         // Set and confirm is redundant

@@ -15,7 +15,6 @@ import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.dao.CapacityDao;
-import com.cloud.cluster.ClusterManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
@@ -35,7 +34,6 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.info.RunningHostCountInfo;
 import com.cloud.info.RunningHostInfoAgregator;
 import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
 import com.cloud.network.Network;
@@ -68,13 +66,12 @@ import com.cloud.storage.secondary.SecondaryStorageListener;
 import com.cloud.storage.secondary.SecondaryStorageVmAllocator;
 import com.cloud.storage.secondary.SecondaryStorageVmManager;
 import com.cloud.storage.template.TemplateConstants;
+import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
-import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
-import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
@@ -98,7 +95,6 @@ import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.config.ApiServiceConfiguration;
-import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
@@ -117,13 +113,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,8 +139,7 @@ import org.slf4j.LoggerFactory;
 // Starting, HA, Migrating, Creating and Running state are all counted as "Open" for available capacity calculation
 // because sooner or later, it will be driven into Running state
 //
-public class SecondaryStorageManagerImpl extends ManagerBase implements SecondaryStorageVmManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>,
-        ResourceStateAdapter {
+public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements SecondaryStorageVmManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
     private static final Logger s_logger = LoggerFactory.getLogger(SecondaryStorageManagerImpl.class);
 
     private static final int DEFAULT_CAPACITY_SCAN_INTERVAL = 30000; // 30
@@ -469,17 +462,7 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
         final SecondaryStorageVmVO secVm = _secStorageVmDao.findById(profile.getId());
         final DataCenter dc = dest.getDataCenter();
         final List<NicProfile> nics = profile.getNics();
-        for (final NicProfile nic : nics) {
-            if ((nic.getTrafficType() == TrafficType.Public && dc.getNetworkType() == NetworkType.Advanced) ||
-                    (nic.getTrafficType() == TrafficType.Guest && (dc.getNetworkType() == NetworkType.Basic || dc.isSecurityGroupEnabled()))) {
-                secVm.setPublicIpAddress(nic.getIPv4Address());
-                secVm.setPublicNetmask(nic.getIPv4Netmask());
-                secVm.setPublicMacAddress(nic.getMacAddress());
-            } else if (nic.getTrafficType() == TrafficType.Management) {
-                secVm.setPrivateIpAddress(nic.getIPv4Address());
-                secVm.setPrivateMacAddress(nic.getMacAddress());
-            }
-        }
+        computeVmIps(secVm, dc, nics);
         _secStorageVmDao.update(secVm.getId(), secVm);
         return true;
     }
@@ -540,16 +523,7 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     @Override
     public void finalizeStop(final VirtualMachineProfile profile, final Answer answer) {
         //release elastic IP here
-        final IPAddressVO ip = _ipAddressDao.findByAssociatedVmId(profile.getId());
-        if (ip != null && ip.getSystem()) {
-            final CallContext ctx = CallContext.current();
-            try {
-                _rulesMgr.disableStaticNat(ip.getId(), ctx.getCallingAccount(), ctx.getCallingUserId(), true);
-            } catch (final Exception ex) {
-                s_logger.warn("Failed to disable static nat and release system ip " + ip + " as a part of vm " + profile.getVirtualMachine() + " stop due to exception ",
-                        ex);
-            }
-        }
+        finalizeStop(profile, _ipAddressDao.findByAssociatedVmId(profile.getId()), _rulesMgr);
     }
 
     @Override
@@ -583,30 +557,12 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     }
 
     private synchronized Map<Long, ZoneHostInfo> getZoneHostInfo() {
-        final Date cutTime = DateUtil.currentGMTTime();
-        final List<RunningHostCountInfo> l = _hostDao.getRunningHostCounts(new Date(cutTime.getTime() - ClusterManager.HeartbeatThreshold.value()));
-
-        final RunningHostInfoAgregator aggregator = new RunningHostInfoAgregator();
-        if (l.size() > 0) {
-            for (final RunningHostCountInfo countInfo : l) {
-                aggregator.aggregate(countInfo);
-            }
-        }
-
-        return aggregator.getZoneHostInfoMap();
+        return getLongZoneHostInfoMap(_hostDao);
     }
 
     @Override
     public Long[] getScannablePools() {
-        final List<DataCenterVO> zones = _dcDao.listEnabledZones();
-
-        final Long[] dcIdList = new Long[zones.size()];
-        int i = 0;
-        for (final DataCenterVO dc : zones) {
-            dcIdList[i++] = dc.getId();
-        }
-
-        return dcIdList;
+        return getLongs(_dcDao);
     }
 
     @Override
@@ -1252,27 +1208,7 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForAdvancedZone(final DataCenter dc) {
-        if (dc.getNetworkType() != NetworkType.Advanced) {
-            throw new CloudRuntimeException("Zone " + dc + " is not advanced.");
-        }
-
-        if (dc.isSecurityGroupEnabled()) {
-            final List<NetworkVO> networks = _networkDao.listByZoneSecurityGroup(dc.getId());
-            if (CollectionUtils.isEmpty(networks)) {
-                throw new CloudRuntimeException("Can not found security enabled network in SG Zone " + dc);
-            }
-
-            return networks.get(0);
-        } else {
-            final TrafficType defaultTrafficType = TrafficType.Public;
-            final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
-            // api should never allow this situation to happen
-            if (defaultNetworks.size() != 1) {
-                throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");
-            }
-
-            return defaultNetworks.get(0);
-        }
+        return getNetworkForAdvancedZone(dc, _networkDao);
     }
 
     /**
@@ -1284,18 +1220,7 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForBasicZone(final DataCenter dc) {
-        if (dc.getNetworkType() != NetworkType.Basic) {
-            throw new CloudRuntimeException("Zone " + dc + "is not basic.");
-        }
-
-        final TrafficType defaultTrafficType = TrafficType.Guest;
-        final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
-        // api should never allow this situation to happen
-        if (defaultNetworks.size() != 1) {
-            throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");
-        }
-
-        return defaultNetworks.get(0);
+        return getNetworkForBasicZone(dc, _networkDao);
     }
 
     @Override
