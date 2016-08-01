@@ -29,7 +29,7 @@ public interface ManagementServerHostDao extends GenericDao<ManagementServerHost
 
     List<ManagementServerHostVO> listBy(ManagementServerHost.State... states);
 
-    public List<Long> listOrphanMsids();
+    List<Long> listOrphanMsids();
 
     ManagementServerHostVO findOneInUpState(Filter filter);
 }
