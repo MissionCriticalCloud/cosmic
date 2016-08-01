@@ -36,7 +36,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RouterDeploymentDefinitionTestBase {
+public abstract class RouterDeploymentDefinitionTestBase {
 
     protected static final String LOCK_NOT_CORRECTLY_GOT = "Lock not correctly got";
     protected static final String NUMBER_OF_ROUTERS_TO_DEPLOY_IS_NOT_THE_EXPECTED = "Number of routers to deploy is not the expected";
