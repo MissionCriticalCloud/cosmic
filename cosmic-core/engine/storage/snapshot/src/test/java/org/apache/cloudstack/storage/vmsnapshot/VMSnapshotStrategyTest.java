@@ -1,4 +1,4 @@
-package src;
+package org.apache.cloudstack.storage.vmsnapshot;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Command;
@@ -28,8 +28,6 @@ import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.storage.vmsnapshot.DefaultVMSnapshotStrategy;
-import org.apache.cloudstack.storage.vmsnapshot.VMSnapshotHelper;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;
