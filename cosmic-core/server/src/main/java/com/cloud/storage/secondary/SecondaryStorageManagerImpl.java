@@ -1,4 +1,4 @@
-package org.apache.cloudstack.secondarystorage;
+package com.cloud.storage.secondary;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -61,10 +61,6 @@ import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.dao.VMTemplateDao;
-import com.cloud.storage.secondary.SecStorageVmAlertEventArgs;
-import com.cloud.storage.secondary.SecondaryStorageListener;
-import com.cloud.storage.secondary.SecondaryStorageVmAllocator;
-import com.cloud.storage.secondary.SecondaryStorageVmManager;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;

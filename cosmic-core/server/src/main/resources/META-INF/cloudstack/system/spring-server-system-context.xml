@@ -33,4 +33,10 @@
         </constructor-arg>
     </bean>
 
+    <bean class="com.cloud.managementserver.ManagementServerService">
+        <constructor-arg>
+            <bean class="com.cloud.cluster.dao.ManagementServerHostDaoImpl" />
+        </constructor-arg>
+    </bean>
+
 </beans>

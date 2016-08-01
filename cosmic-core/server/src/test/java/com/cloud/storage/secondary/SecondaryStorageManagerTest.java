@@ -1,4 +1,4 @@
-package org.apache.cloudstack.secondarystorage;
+package com.cloud.storage.secondary;
 
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.any;
