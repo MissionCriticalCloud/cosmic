@@ -90,9 +90,7 @@ public class RouterDeploymentDefinition {
     protected boolean isPublicNetwork;
     protected PublicIp sourceNatIp;
 
-    protected RouterDeploymentDefinition(final Network guestNetwork, final DeployDestination dest,
-                                         final Account owner, final Map<Param, Object> params) {
-
+    protected RouterDeploymentDefinition(final Network guestNetwork, final DeployDestination dest, final Account owner, final Map<Param, Object> params) {
         this.guestNetwork = guestNetwork;
         this.dest = dest;
         this.owner = owner;
