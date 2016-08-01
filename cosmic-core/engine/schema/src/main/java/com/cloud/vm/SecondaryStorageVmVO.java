@@ -47,8 +47,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     private Date lastUpdateTime;
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
-                                final long dataCenterId,
-                                final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
+                                final long dataCenterId, final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
@@ -90,24 +89,12 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
         return this.lastUpdateTime;
     }
 
-    public void setLastUpdateTime(final Date time) {
-        this.lastUpdateTime = time;
-    }
-
     public String getGuid() {
         return guid;
     }
 
     public void setGuid(final String guid) {
         this.guid = guid;
-    }
-
-    public String getNfsShare() {
-        return nfsShare;
-    }
-
-    public void setNfsShare(final String nfsShare) {
-        this.nfsShare = nfsShare;
     }
 
     public Role getRole() {

@@ -25,8 +25,6 @@ public interface ManagementServerHostDao extends GenericDao<ManagementServerHost
 
     List<ManagementServerHostVO> getInactiveList(Date cutTime);
 
-    void invalidateRunSession(long id, long runid);
-
     void update(long id, long runId, State state, Date lastUpdate);
 
     List<ManagementServerHostVO> listBy(ManagementServerHost.State... states);

@@ -109,7 +109,6 @@ import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -179,7 +178,6 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     protected IPAddressDao _ipAddressDao = null;
     @Inject
     protected RulesManager _rulesMgr;
-    protected long _nodeId = ManagementServerNode.getManagementServerId();
     @Inject
     UserVmDetailsDao _vmDetailsDao;
     @Inject
@@ -201,7 +199,6 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     @Inject
     VolumeDataStoreDao _volumeStoreDao;
     private int _mgmtPort = 8250;
-    private List<SecondaryStorageVmAllocator> _ssVmAllocators;
     @Inject
     private DataCenterDao _dcDao;
     @Inject
@@ -230,55 +227,6 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
     private Map<Long, ZoneHostInfo> _zoneHostInfoMap; // map <zone id, info about running host in zone>
 
     public SecondaryStorageManagerImpl() {
-    }
-
-    SecondaryStorageVmVO getSSVMfromHost(final HostVO ssAHost) {
-        if (ssAHost.getType() == Host.Type.SecondaryStorageVM) {
-            return _secStorageVmDao.findByInstanceName(ssAHost.getName());
-        }
-        return null;
-    }
-
-    protected String connect(final String ipAddress, final int port) {
-        return null;
-    }
-
-    public SecondaryStorageVmVO assignSecStorageVmFromRunningPool(final long dataCenterId, final SecondaryStorageVm.Role role) {
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Assign  secondary storage vm from running pool for request from data center : " + dataCenterId);
-        }
-
-        final SecondaryStorageVmAllocator allocator = getCurrentAllocator();
-        assert (allocator != null);
-        final List<SecondaryStorageVmVO> runningList = _secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, State.Running);
-        if (runningList != null && runningList.size() > 0) {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Running secondary storage vm pool size : " + runningList.size());
-                for (final SecondaryStorageVmVO secStorageVm : runningList) {
-                    s_logger.trace("Running secStorageVm instance : " + secStorageVm.getHostName());
-                }
-            }
-
-            final Map<Long, Integer> loadInfo = new HashMap<>();
-
-            return allocator.allocSecondaryStorageVm(runningList, loadInfo, dataCenterId);
-        } else {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Empty running secStorageVm pool for now in data center : " + dataCenterId);
-            }
-        }
-        return null;
-    }
-
-    private SecondaryStorageVmAllocator getCurrentAllocator() {
-
-        // for now, only one adapter is supported
-        if (_ssVmAllocators.size() > 0) {
-            return _ssVmAllocators.get(0);
-        }
-
-        return null;
     }
 
     @Override
@@ -1448,12 +1396,7 @@ public class SecondaryStorageManagerImpl extends ManagerBase implements Secondar
         return null;
     }
 
-    public List<SecondaryStorageVmAllocator> getSecondaryStorageVmAllocators() {
-        return _ssVmAllocators;
-    }
-
     @Inject
     public void setSecondaryStorageVmAllocators(final List<SecondaryStorageVmAllocator> ssVmAllocators) {
-        _ssVmAllocators = ssVmAllocators;
     }
 }

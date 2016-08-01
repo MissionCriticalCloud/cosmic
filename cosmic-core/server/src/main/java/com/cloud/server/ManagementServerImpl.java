@@ -788,40 +788,20 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         setRunLevel(ComponentLifecycle.RUN_LEVEL_APPLICATION_MAINLOOP);
     }
 
-    public List<DeploymentPlanner> getPlanners() {
-        return _planners;
-    }
-
     public void setPlanners(final List<DeploymentPlanner> planners) {
         _planners = planners;
-    }
-
-    public List<AffinityGroupProcessor> getAffinityGroupProcessors() {
-        return _affinityProcessors;
     }
 
     public void setAffinityGroupProcessors(final List<AffinityGroupProcessor> affinityProcessors) {
         _affinityProcessors = affinityProcessors;
     }
 
-    public List<UserAuthenticator> getUserAuthenticators() {
-        return _userAuthenticators;
-    }
-
     public void setUserAuthenticators(final List<UserAuthenticator> authenticators) {
         _userAuthenticators = authenticators;
     }
 
-    public List<UserAuthenticator> getUserPasswordEncoders() {
-        return _userPasswordEncoders;
-    }
-
     public void setUserPasswordEncoders(final List<UserAuthenticator> encoders) {
         _userPasswordEncoders = encoders;
-    }
-
-    public List<HostAllocator> getHostAllocators() {
-        return hostAllocators;
     }
 
     public void setHostAllocators(final List<HostAllocator> hostAllocators) {
@@ -981,20 +961,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         final CapacityVO capacity = _capacityDao.findByHostIdType(hostId, capacityType);
         return capacity == null ? 0 : capacity.getReservedCapacity() + capacity.getUsedCapacity();
-    }
-
-    protected void checkPortParameters(final String publicPort, final String privatePort, final String privateIp, final String proto) {
-
-        if (!NetUtils.isValidPort(publicPort)) {
-            throw new InvalidParameterValueException("publicPort is an invalid value");
-        }
-        if (!NetUtils.isValidPort(privatePort)) {
-            throw new InvalidParameterValueException("privatePort is an invalid value");
-        }
-
-        if (!NetUtils.isValidProto(proto)) {
-            throw new InvalidParameterValueException("Invalid protocol");
-        }
     }
 
     @Override
@@ -3911,17 +3877,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         return new ConfigKey<?>[]{vmPasswordLength};
     }
 
-    public List<StoragePoolAllocator> getStoragePoolAllocators() {
-        return _storagePoolAllocators;
-    }
-
     @Inject
     public void setStoragePoolAllocators(final List<StoragePoolAllocator> storagePoolAllocators) {
         _storagePoolAllocators = storagePoolAllocators;
-    }
-
-    public LockMasterListener getLockMasterListener() {
-        return _lockMasterListener;
     }
 
     public void setLockMasterListener(final LockMasterListener lockMasterListener) {
