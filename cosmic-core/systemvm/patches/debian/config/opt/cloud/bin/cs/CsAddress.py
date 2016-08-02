@@ -439,11 +439,9 @@ class CsIP:
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(["mangle", "",
-                            "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s/32 -j ACL_OUTBOUND_%s" %
-                            (self.dev, self.address[
-                                'network'], self.address['gateway'], self.dev)
-                            ])
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s/32 -j ACL_OUTBOUND_%s" % (
+                self.dev, self.address['network'], self.address['gateway'], self.dev)])
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s/32 -j DROP" % (self.dev, self.address['network'], self.address['gateway'])])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -s %s" %
                             ("eth1", "eth1", self.address['network'])])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -d %s" %
