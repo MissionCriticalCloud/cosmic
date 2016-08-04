@@ -62,7 +62,7 @@ class cloudManagementConfig(serviceCfgBase):
             keyPath = "/var/cloudstack/management/web.keystore"
             if not os.path.exists(keyPath):
                 cmd = bash(
-                    "keytool -genkey -keystore %s -storepass \"cloud.com\" -keypass \"cloud.com\" -validity 3650 -dname cn=\"Cloudstack User\",ou=\"mycloud.cloud.com\",o=\"mycloud.cloud.com\",c=\"Unknown\"" % keyPath)
+                    "keytool -genkeypair -keystore %s -storepass \"cloud.com\" -keypass \"cloud.com\" -validity 3650 -dname cn=\"Cloudstack User\",ou=\"mycloud.cloud.com\",o=\"mycloud.cloud.com\",c=\"Unknown\"" % keyPath)
 
                 if not cmd.isSuccess():
                     raise CloudInternalException(cmd.getErrMsg())
