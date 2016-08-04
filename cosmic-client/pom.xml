@@ -339,6 +339,10 @@
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <configuration>
+                            <excludeTransitive>false</excludeTransitive>
+                            <includeArtifactIds>cosmic-scripts,cloud-systemvm,cloud-nucleo</includeArtifactIds>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
