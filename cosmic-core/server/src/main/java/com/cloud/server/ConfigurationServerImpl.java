@@ -1101,7 +1101,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         final String c = "Unknown";
         final String dname = "cn=\"" + cn + "\",ou=\"" + ou + "\",o=\"" + o + "\",c=\"" + c + "\"";
         final Script script = new Script(true, "keytool", 5000, null);
-        script.add("-genkey");
+        script.add("-genkeypair");
         script.add("-keystore", keystorePath);
         script.add("-storepass", "vmops.com");
         script.add("-keypass", "vmops.com");
