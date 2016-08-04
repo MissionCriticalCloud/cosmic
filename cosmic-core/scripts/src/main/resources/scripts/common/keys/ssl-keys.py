@@ -1,17 +1,9 @@
-#! /bin/bash
-
-
-# Copies keys that enable SSH communication with system vms
-# $1 = new public key
-# $2 = new private key
-'''
-All imports go here...
-'''
 import os
 import socket
 import subprocess
-import sys
 import traceback
+
+import sys
 
 
 def generateSSLKey(outputPath):
@@ -25,7 +17,8 @@ def generateSSLKey(outputPath):
     logf.flush()
     try:
         return_code = subprocess.Popen(
-            ["keytool", "-genkey", "-keystore", keyFile, "-storepass", "vmops.com", "-keypass", "vmops.com", "-keyalg", "RSA", "-validity", "3650", "-dname", dname], shell=True,
+            ["keytool", "-genkeypair", "-keystore", keyFile, "-storepass", "vmops.com", "-keypass", "vmops.com", "-keyalg", "RSA", "-validity", "3650", "-dname", dname],
+            shell=True,
             stdout=logf, stderr=logf)
         return_code.wait()
     except OSError as e:
