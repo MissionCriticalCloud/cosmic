@@ -77,14 +77,16 @@ public class StaticRouteDaoImpl extends GenericDaoBase<StaticRouteVO, Long> impl
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final StaticRouteVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.StaticRoute);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final StaticRouteVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.StaticRoute);
+            }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 }

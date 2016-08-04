@@ -301,20 +301,22 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     @Override
     @DB
     public NetworkVO persist(final NetworkVO network, final boolean gc, final Map<String, String> serviceProviderMap) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        final NetworkVO newNetwork;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        // 1) create network
-        final NetworkVO newNetwork = super.persist(network);
-        // 2) add account to the network
-        addAccountToNetwork(network.getId(), network.getAccountId(), true);
-        // 3) add network to gc monitor table
-        final NetworkOpVO op = new NetworkOpVO(network.getId(), gc);
-        _opDao.persist(op);
-        // 4) add services/providers for the network
-        persistNetworkServiceProviders(newNetwork.getId(), serviceProviderMap);
+            // 1) create network
+            newNetwork = super.persist(network);
+            // 2) add account to the network
+            addAccountToNetwork(network.getId(), network.getAccountId(), true);
+            // 3) add network to gc monitor table
+            final NetworkOpVO op = new NetworkOpVO(network.getId(), gc);
+            _opDao.persist(op);
+            // 4) add services/providers for the network
+            persistNetworkServiceProviders(newNetwork.getId(), serviceProviderMap);
 
-        txn.commit();
+            txn.commit();
+        }
         return newNetwork;
     }
 
@@ -478,28 +480,30 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     @Override
     @DB
     public void persistNetworkServiceProviders(final long networkId, final Map<String, String> serviceProviderMap) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        for (final String service : serviceProviderMap.keySet()) {
-            final NetworkServiceMapVO serviceMap = new NetworkServiceMapVO(networkId, Service.getService(service), Provider.getProvider(serviceProviderMap.get(service)));
-            _ntwkSvcMap.persist(serviceMap);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            for (final String service : serviceProviderMap.keySet()) {
+                final NetworkServiceMapVO serviceMap = new NetworkServiceMapVO(networkId, Service.getService(service), Provider.getProvider(serviceProviderMap.get(service)));
+                _ntwkSvcMap.persist(serviceMap);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override
     @DB
     public boolean update(final Long networkId, final NetworkVO network, final Map<String, String> serviceProviderMap) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        super.update(networkId, network);
-        if (serviceProviderMap != null) {
-            _ntwkSvcMap.deleteByNetworkId(networkId);
-            persistNetworkServiceProviders(networkId, serviceProviderMap);
+            super.update(networkId, network);
+            if (serviceProviderMap != null) {
+                _ntwkSvcMap.deleteByNetworkId(networkId);
+                persistNetworkServiceProviders(networkId, serviceProviderMap);
+            }
+
+            txn.commit();
         }
-
-        txn.commit();
         return true;
     }
 
@@ -634,28 +638,31 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final NetworkVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.Network);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final NetworkVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.Network);
+            }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 
     @Override
     public boolean updateState(final State currentState, final Event event, final State nextState, final Network vo, final Object data) {
         // TODO: ensure this update is correct
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final NetworkVO networkVo = (NetworkVO) vo;
-        networkVo.setState(nextState);
-        super.update(networkVo.getId(), networkVo);
+            final NetworkVO networkVo = (NetworkVO) vo;
+            networkVo.setState(nextState);
+            super.update(networkVo.getId(), networkVo);
 
-        txn.commit();
+            txn.commit();
+        }
         return true;
     }
 }

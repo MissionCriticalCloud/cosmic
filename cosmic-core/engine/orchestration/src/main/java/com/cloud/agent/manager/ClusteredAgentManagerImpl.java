@@ -709,9 +709,8 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                 } catch (final UnknownHostException e) {
                     throw new CloudRuntimeException("Unable to resolve " + ip);
                 }
-                SocketChannel ch1 = null;
-                try {
-                    ch1 = SocketChannel.open(new InetSocketAddress(addr, Port.value()));
+
+                try (SocketChannel ch1 = SocketChannel.open(new InetSocketAddress(addr, Port.value()))) {
                     ch1.configureBlocking(true); // make sure we are working at blocking mode
                     ch1.socket().setKeepAlive(true);
                     ch1.socket().setSoTimeout(60 * 1000);
@@ -734,11 +733,6 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                     _sslEngines.put(peerName, sslEngine);
                     return ch1;
                 } catch (final IOException e) {
-                    try {
-                        ch1.close();
-                    } catch (final IOException ex) {
-                        s_logger.error("failed to close failed peer socket: " + ex);
-                    }
                     s_logger.warn("Unable to connect to peer management server: " + peerName + ", ip: " + ip + " due to " + e.getMessage(), e);
                     return null;
                 }

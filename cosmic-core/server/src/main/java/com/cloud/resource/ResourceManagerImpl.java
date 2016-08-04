@@ -987,11 +987,12 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     @Override
     public void updateGPUDetails(final long hostId, final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails) {
         // Update GPU group capacity
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        _hostGpuGroupsDao.persist(hostId, new ArrayList<>(groupDetails.keySet()));
-        _vgpuTypesDao.persist(hostId, groupDetails);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            _hostGpuGroupsDao.persist(hostId, new ArrayList<>(groupDetails.keySet()));
+            _vgpuTypesDao.persist(hostId, groupDetails);
+            txn.commit();
+        }
     }
 
     @Override

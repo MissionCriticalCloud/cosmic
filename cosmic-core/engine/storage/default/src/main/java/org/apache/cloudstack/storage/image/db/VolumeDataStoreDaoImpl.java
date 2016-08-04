@@ -184,10 +184,11 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
     public void deletePrimaryRecordsForStore(final long id) {
         final SearchCriteria<VolumeDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override
@@ -319,6 +320,8 @@ public class VolumeDataStoreDaoImpl extends GenericDaoBase<VolumeDataStoreVO, Lo
         } catch (final Exception e) {
             txn.rollback();
             s_logger.warn("Failed expiring download urls for dcId: " + dcId, e);
+        } finally {
+            txn.close();
         }
     }
 

@@ -91,8 +91,7 @@ public class PodZoneConfig {
         final Vector<Long> allZoneIDs = new Vector<>();
 
         final String selectSql = "SELECT id FROM data_center";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
             final ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -113,8 +112,7 @@ public class PodZoneConfig {
         final HashMap<Long, Vector<Object>> currentPodCidrSubnets = new HashMap<>();
 
         final String selectSql = "SELECT id, cidr_address, cidr_size FROM host_pod_ref WHERE data_center_id=" + dcId;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
             final ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -240,11 +238,6 @@ public class PodZoneConfig {
                 "Unable to start DB connection to read pod name. Please contact Cloud Support.");
     }
 
-    public void deletePod(final String name, final long dcId) {
-        final String sql = "DELETE FROM `cloud`.`host_pod_ref` WHERE name=\"" + name + "\" AND data_center_id=\"" + dcId + "\"";
-        DatabaseConfig.saveSQL(sql, "Failed to delete pod due to exception. Please contact Cloud Support.");
-    }
-
     public List<String> modifyVlan(final String zone, final boolean add, final String vlanId, final String vlanGateway, final String vlanNetmask, final String pod, final String
             vlanType, final String ipRange,
                                    final long networkId, final long physicalNetworkId) {
@@ -300,8 +293,7 @@ public class PodZoneConfig {
                 final long vlanDbId = getVlanDbId(zone, vlanId);
                 final String sql = "INSERT INTO `cloud`.`pod_vlan_map` (pod_id, vlan_db_id) " + "VALUES (?,?)";
                 final String errorMsg = "Failed to save pod_vlan_map due to exception vlanDbId=" + vlanDbId + ", podId=" + podId + ". Please contact Cloud Support.";
-                final TransactionLegacy txn = TransactionLegacy.open("saveSQL");
-                try (PreparedStatement stmt = txn.prepareAutoCloseStatement(sql)) {
+                try (final TransactionLegacy txn = TransactionLegacy.open("saveSQL"); PreparedStatement stmt = txn.prepareAutoCloseStatement(sql)) {
                     stmt.setString(1, podId.toString());
                     stmt.setString(2, String.valueOf(vlanDbId));
                     stmt.executeUpdate();
@@ -479,8 +471,7 @@ public class PodZoneConfig {
 
         final String insertVnet = "INSERT INTO `cloud`.`op_dc_vnet_alloc` (vnet, data_center_id, physical_network_id) VALUES ( ?, ?, ?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertVnet);
             for (int i = begin; i <= end; i++) {
                 stmt.setString(1, Integer.toString(i));
@@ -503,7 +494,7 @@ public class PodZoneConfig {
 
         final String insertTraficType = "INSERT INTO `cloud`.`physical_network_traffic_types` " + "(physical_network_id, traffic_type, xenserver_network_label) VALUES ( ?, ?, ?)";
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertTraficType);
             for (final TrafficType traffic : TrafficType.values()) {
                 if (traffic.equals(TrafficType.Control) || traffic.equals(TrafficType.Vpn) || traffic.equals(TrafficType.None)) {
@@ -560,10 +551,5 @@ public class PodZoneConfig {
     public static String getConfiguredValue(final String configName) {
         return DatabaseConfig.getDatabaseValueString("SELECT value FROM `cloud`.`configuration` where name = \"" + configName + "\"", "value",
                 "Unable to start DB connection to read configuration. Please contact Cloud Support.");
-    }
-
-    public void deleteZone(final String name) {
-        final String sql = "DELETE FROM `cloud`.`data_center` WHERE name=\"" + name + "\"";
-        DatabaseConfig.saveSQL(sql, "Failed to delete zone due to exception. Please contact Cloud Support.");
     }
 }

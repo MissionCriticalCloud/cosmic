@@ -86,7 +86,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
-import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VMInstanceVO;
@@ -150,8 +149,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -2022,47 +2019,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         _templateStoreDao.duplicateCacheRecordsOnRegionStore(storeId);
         _snapshotStoreDao.duplicateCacheRecordsOnRegionStore(storeId);
         _volumeStoreDao.duplicateCacheRecordsOnRegionStore(storeId);
-    }
-
-    @DB
-    List<Long> findAllVolumeIdInSnapshotTable(final Long storeId) {
-        final String sql = "SELECT volume_id from snapshots, snapshot_store_ref WHERE snapshots.id = snapshot_store_ref.snapshot_id and store_id=? GROUP BY volume_id";
-        final List<Long> list = new ArrayList<>();
-        try {
-            final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs = null;
-            PreparedStatement pstmt = null;
-            pstmt = txn.prepareAutoCloseStatement(sql);
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                list.add(rs.getLong(1));
-            }
-            return list;
-        } catch (final Exception e) {
-            s_logger.debug("failed to get all volumes who has snapshots in secondary storage " + storeId + " due to " + e.getMessage());
-            return null;
-        }
-    }
-
-    List<String> findAllSnapshotForVolume(final Long volumeId) {
-        final String sql = "SELECT backup_snap_id FROM snapshots WHERE volume_id=? and backup_snap_id is not NULL";
-        try {
-            final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs = null;
-            PreparedStatement pstmt = null;
-            pstmt = txn.prepareAutoCloseStatement(sql);
-            pstmt.setLong(1, volumeId);
-            rs = pstmt.executeQuery();
-            final List<String> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(rs.getString(1));
-            }
-            return list;
-        } catch (final Exception e) {
-            s_logger.debug("failed to get all snapshots for a volume " + volumeId + " due to " + e.getMessage());
-            return null;
-        }
     }
 
     @Override

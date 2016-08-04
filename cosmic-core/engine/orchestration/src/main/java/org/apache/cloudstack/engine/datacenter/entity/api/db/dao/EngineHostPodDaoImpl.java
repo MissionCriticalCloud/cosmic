@@ -76,8 +76,7 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
         final HashMap<Long, List<Object>> currentPodCidrSubnets = new HashMap<>();
 
         final String selectSql = "SELECT id, cidr_address, cidr_size FROM host_pod_ref WHERE data_center_id=" + zoneId + " and removed IS NULL";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
             final ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -116,16 +115,17 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final EngineHostPodVO pod = createForUpdate();
-        pod.setName(null);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final EngineHostPodVO pod = createForUpdate();
+            pod.setName(null);
 
-        update(id, pod);
+            update(id, pod);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override

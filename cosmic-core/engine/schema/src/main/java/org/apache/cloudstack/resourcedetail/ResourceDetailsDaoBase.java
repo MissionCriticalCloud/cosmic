@@ -83,17 +83,18 @@ public abstract class ResourceDetailsDaoBase<R extends ResourceDetail> extends G
         if (details.isEmpty()) {
             return;
         }
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SearchCriteria<R> sc = AllFieldsSearch.create();
-        sc.setParameters("resourceId", details.get(0).getResourceId());
-        expunge(sc);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<R> sc = AllFieldsSearch.create();
+            sc.setParameters("resourceId", details.get(0).getResourceId());
+            expunge(sc);
 
-        for (final R detail : details) {
-            persist(detail);
+            for (final R detail : details) {
+                persist(detail);
+            }
+
+            txn.commit();
         }
-
-        txn.commit();
     }
 
     protected void addDetail(final R detail) {

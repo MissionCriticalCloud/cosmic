@@ -334,11 +334,10 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
 
     @Override
     public List<Long> listPodIdsHavingVmsforAccount(final long zoneId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<Long> result = new ArrayList<>();
         final String sql = LIST_PODS_HAVING_VMS_FOR_ACCOUNT;
 
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, zoneId);
             pstmt.setLong(2, accountId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -354,14 +353,6 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         } catch (final Exception e) {
             s_logger.error("listPodIdsHavingVmsforAccount:Exception : " + e.getMessage());
             throw new CloudRuntimeException("listPodIdsHavingVmsforAccount:Exception: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (txn != null) {
-                    txn.close();
-                }
-            } catch (final Exception e) {
-                s_logger.error("listVmDetails:Exception:" + e.getMessage());
-            }
         }
     }
 
@@ -377,8 +368,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
 
     @Override
     public Hashtable<Long, UserVmData> listVmDetails(final Hashtable<Long, UserVmData> userVmDataHash) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             int curr_index = 0;
             final List<UserVmData> userVmDataList = new ArrayList(userVmDataHash.values());
             if (userVmDataList.size() > VM_DETAILS_BATCH_SIZE) {
@@ -445,14 +435,6 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         } catch (final Exception e) {
             s_logger.error("listVmDetails:Exception:" + e.getMessage());
             throw new CloudRuntimeException("listVmDetails:Exception : ", e);
-        } finally {
-            try {
-                if (txn != null) {
-                    txn.close();
-                }
-            } catch (final Exception e) {
-                s_logger.error("listVmDetails:Exception:" + e.getMessage());
-            }
         }
     }
 
@@ -465,10 +447,10 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
 
     @Override
     public List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> getVmsDetailByNames(final Set<String> vmNames, final String detail) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> vmsDetailByNames = new ArrayList<>();
 
-        try (PreparedStatement pstmt = txn.prepareStatement(VMS_DETAIL_BY_NAME + getQueryBatchAppender(vmNames.size()))) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(VMS_DETAIL_BY_NAME + getQueryBatchAppender(vmNames.size
+                ()))) {
             pstmt.setString(1, detail);
             int i = 2;
             for (final String name : vmNames) {
@@ -608,11 +590,12 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 }

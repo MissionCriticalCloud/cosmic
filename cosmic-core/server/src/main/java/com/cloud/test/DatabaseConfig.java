@@ -464,37 +464,12 @@ public class DatabaseConfig {
     @DB
     protected void saveRootDomain() {
         final String insertSql = "insert into `cloud`.`domain` (id, name, parent, owner, path, level) values (1, 'ROOT', NULL, 2, '/', 0)";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
             stmt.executeUpdate();
         } catch (final SQLException ex) {
             s_logger.error("error creating ROOT domain", ex);
         }
-
-        /*
-        String updateSql = "update account set domain_id = 1 where id = 2";
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareStatement(updateSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error updating admin user", ex);
-        } finally {
-            txn.close();
-        }
-
-        updateSql = "update account set domain_id = 1 where id = 1";
-        Transaction txn = Transaction.currentTxn();
-        try {
-            PreparedStatement stmt = txn.prepareStatement(updateSql);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            s_logger.error("error updating system user", ex);
-        } finally {
-            txn.close();
-        }
-         */
     }
 
     private void saveDefaultConfiguations() {
@@ -537,8 +512,7 @@ public class DatabaseConfig {
                         "VALUES (?,?,?,?,?,?)";
         final String selectSql = "SELECT name FROM cloud.configuration WHERE name = ?";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
             stmt.setString(1, name);
             final ResultSet result = stmt.executeQuery();
@@ -982,8 +956,8 @@ public class DatabaseConfig {
     protected void saveUser() {
         // insert system account
         final String insertSystemAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (1, 'system', '1', '1')";
-        TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+
+        try (TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemAccount);
             stmt.executeUpdate();
         } catch (final SQLException ex) {
@@ -994,8 +968,8 @@ public class DatabaseConfig {
         final String insertSystemUser =
                 "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, created)"
                         + " VALUES (1, 'system', RAND(), 1, 'system', 'cloud', now())";
-        txn = TransactionLegacy.currentTxn();
-        try {
+
+        try (TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSystemUser);
             stmt.executeUpdate();
         } catch (final SQLException ex) {
@@ -1033,8 +1007,8 @@ public class DatabaseConfig {
 
         // create an account for the admin user first
         final String insertAdminAccount = "INSERT INTO `cloud`.`account` (id, account_name, type, domain_id) VALUES (?, ?, '1', '1')";
-        txn = TransactionLegacy.currentTxn();
-        try {
+
+        try (TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertAdminAccount);
             stmt.setLong(1, id);
             stmt.setString(2, username);
@@ -1046,8 +1020,8 @@ public class DatabaseConfig {
         // now insert the user
         final String insertUser =
                 "INSERT INTO `cloud`.`user` (id, username, password, account_id, firstname, lastname, email, created) " + "VALUES (?,?,?, 2, ?,?,?,now())";
-        txn = TransactionLegacy.currentTxn();
-        try {
+
+        try (TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertUser);
             stmt.setLong(1, id);
             stmt.setString(2, username);
@@ -1083,10 +1057,8 @@ public class DatabaseConfig {
         final String insertSql1 =
                 "INSERT INTO `storage_pool` (`id`, `name`, `uuid` , `pool_type` , `port`, `data_center_id` ,`available_bytes` , `capacity_bytes` ,`host_address`, `path`, " +
                         "`created`, `pod_id`,`status` , `cluster_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        // String insertSql2 = "INSERT INTO `netfs_storage_pool` VALUES (?,?,?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
             stmt.setLong(1, id);
             stmt.setString(2, name);
@@ -1130,8 +1102,7 @@ public class DatabaseConfig {
                         "?,?,?,?,?)";
         final String insertSqlHostDetails = "INSERT INTO `host_details` (`id`, `host_id`, `name`, `value`) VALUES(?,?,?,?)";
         final String insertSql2 = "INSERT INTO `op_host` (`id`, `sequence`) VALUES(?, ?)";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
             stmt.setLong(1, 0);
             stmt.setString(2, url);
@@ -1208,8 +1179,7 @@ public class DatabaseConfig {
         final String insertSql1 =
                 "INSERT INTO `cluster` (`id`, `name`, `data_center_id` , `pod_id`, `hypervisor_type` , `cluster_type`, `allocation_state`) VALUES (?,?,?,?,?,?,?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
             stmt.setLong(1, id);
             stmt.setString(2, name);
@@ -1251,8 +1221,7 @@ public class DatabaseConfig {
                         + "`firewall_service_provided`, `source_nat_service_provided`, `load_balance_service_provided`, `static_nat_service_provided`,"
                         + "`port_forwarding_service_provided`, `user_data_service_provided`, `security_group_service_provided`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
             stmt.setLong(1, id);
             stmt.setString(2, uuid);
@@ -1287,8 +1256,7 @@ public class DatabaseConfig {
 
         final String insertSql1 = "INSERT INTO `virtual_router_providers` (`id`, `nsp_id`, `uuid` , `type` , `enabled`) " + "VALUES (?,?,?,?,?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql1);
             stmt.setLong(1, id);
             stmt.setLong(2, nspId);
@@ -1327,39 +1295,6 @@ public class DatabaseConfig {
         }
 
         return true;
-    }
-
-    @DB
-    protected void saveThrottlingRates() {
-        final boolean saveNetworkThrottlingRate = (_networkThrottlingRate != null);
-        final boolean saveMulticastThrottlingRate = (_multicastThrottlingRate != null);
-
-        if (!saveNetworkThrottlingRate && !saveMulticastThrottlingRate) {
-            return;
-        }
-
-        final String insertNWRateSql = "UPDATE `cloud`.`service_offering` SET `nw_rate` = ?";
-        final String insertMCRateSql = "UPDATE `cloud`.`service_offering` SET `mc_rate` = ?";
-
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
-            PreparedStatement stmt;
-
-            if (saveNetworkThrottlingRate) {
-                stmt = txn.prepareAutoCloseStatement(insertNWRateSql);
-                stmt.setString(1, _networkThrottlingRate);
-                stmt.executeUpdate();
-            }
-
-            if (saveMulticastThrottlingRate) {
-                stmt = txn.prepareAutoCloseStatement(insertMCRateSql);
-                stmt.setString(1, _multicastThrottlingRate);
-                stmt.executeUpdate();
-            }
-        } catch (final SQLException ex) {
-            s_logger.error("error saving network and multicast throttling rates to all service offerings", ex);
-            return;
-        }
     }
 
     class DbConfigXMLHandler extends DefaultHandler {

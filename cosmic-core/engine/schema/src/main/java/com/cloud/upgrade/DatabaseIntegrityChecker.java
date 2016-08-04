@@ -70,9 +70,7 @@ public class DatabaseIntegrityChecker extends AdapterBase implements SystemInteg
     }
 
     private Boolean checkDuplicateHostWithTheSameLocalStorage() {
-
-        final TransactionLegacy txn = TransactionLegacy.open("Integrity");
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.open("Integrity")) {
             txn.start();
             final Connection conn = txn.getConnection();
             try (PreparedStatement pstmt =
@@ -121,20 +119,11 @@ public class DatabaseIntegrityChecker extends AdapterBase implements SystemInteg
         } catch (final Exception e) {
             s_logger.error("checkDuplicateHostWithTheSameLocalStorage: Exception :" + e.getMessage());
             throw new CloudRuntimeException("checkDuplicateHostWithTheSameLocalStorage: Exception :" + e.getMessage(), e);
-        } finally {
-            try {
-                if (txn != null) {
-                    txn.close();
-                }
-            } catch (final Exception e) {
-                s_logger.error("checkDuplicateHostWithTheSameLocalStorage: Exception:" + e.getMessage());
-            }
         }
     }
 
     private boolean checkMissedPremiumUpgradeFor228() {
-        final TransactionLegacy txn = TransactionLegacy.open("Integrity");
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.open("Integrity")) {
             txn.start();
             final Connection conn = txn.getConnection();
             try (
@@ -188,14 +177,6 @@ public class DatabaseIntegrityChecker extends AdapterBase implements SystemInteg
         } catch (final Exception e) {
             s_logger.error("checkMissedPremiumUpgradeFor228: Exception:" + e.getMessage());
             throw new CloudRuntimeException("checkMissedPremiumUpgradeFor228: Exception:" + e.getMessage(), e);
-        } finally {
-            try {
-                if (txn != null) {
-                    txn.close();
-                }
-            } catch (final Exception e) {
-                s_logger.error("checkMissedPremiumUpgradeFor228: Exception:" + e.getMessage());
-            }
         }
     }
 

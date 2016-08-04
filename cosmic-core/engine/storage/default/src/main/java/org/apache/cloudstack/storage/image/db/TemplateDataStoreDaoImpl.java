@@ -227,20 +227,22 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
     public void deletePrimaryRecordsForStore(final long id) {
         final SearchCriteria<TemplateDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override
     public void deletePrimaryRecordsForTemplate(final long templateId) {
         final SearchCriteria<TemplateDataStoreVO> sc = templateSearch.create();
         sc.setParameters("template_id", templateId);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        expunge(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            expunge(sc);
+            txn.commit();
+        }
     }
 
     @Override
@@ -520,6 +522,8 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
         } catch (final Exception e) {
             txn.rollback();
             s_logger.warn("Failed expiring download urls for dcId: " + dcId, e);
+        } finally {
+            txn.close();
         }
     }
 

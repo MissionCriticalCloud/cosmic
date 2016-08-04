@@ -85,20 +85,20 @@ public class ProjectDaoImpl extends GenericDaoBase<ProjectVO, Long> implements P
     @Override
     @DB
     public boolean remove(final Long projectId) {
-        boolean result = false;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final ProjectVO projectToRemove = findById(projectId);
-        projectToRemove.setName(null);
-        if (!update(projectId, projectToRemove)) {
-            s_logger.warn("Failed to reset name for the project id=" + projectId + " as a part of project remove");
-            return false;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final ProjectVO projectToRemove = findById(projectId);
+            projectToRemove.setName(null);
+            if (!update(projectId, projectToRemove)) {
+                s_logger.warn("Failed to reset name for the project id=" + projectId + " as a part of project remove");
+                return false;
+            }
+
+            _tagsDao.removeByIdAndType(projectId, ResourceObjectType.Project);
+            final boolean result = super.remove(projectId);
+            txn.commit();
+
+            return result;
         }
-
-        _tagsDao.removeByIdAndType(projectId, ResourceObjectType.Project);
-        result = super.remove(projectId);
-        txn.commit();
-
-        return result;
     }
 }

@@ -155,9 +155,8 @@ public class AsyncJobDaoImpl extends GenericDaoBase<AsyncJobVO, Long> implements
     public void resetJobProcess(final long msid, final int jobResultCode, final String jobResultMessage) {
         final String sql = "UPDATE async_job SET job_status=?, job_result_code=?, job_result=? where job_status=? AND (job_executing_msid=? OR (job_executing_msid IS NULL AND " +
                 "job_init_msid=?))";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setInt(1, JobInfo.Status.FAILED.ordinal());
             pstmt.setInt(2, jobResultCode);

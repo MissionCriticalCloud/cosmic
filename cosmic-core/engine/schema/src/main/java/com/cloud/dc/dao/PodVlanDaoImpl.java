@@ -54,8 +54,7 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
     public void add(final long podId, final int start, final int end) {
         final String insertVnet = "INSERT INTO `cloud`.`op_pod_vlan_alloc` (vlan, pod_id) VALUES ( ?, ?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(insertVnet);
             for (int i = start; i < end; i++) {
@@ -74,8 +73,7 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
     public void delete(final long podId) {
         final String deleteVnet = "DELETE FROM `cloud`.`op_pod_vlan_alloc` WHERE pod_id = ?";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(deleteVnet);
             stmt.setLong(1, podId);
             stmt.executeUpdate();
@@ -89,8 +87,7 @@ public class PodVlanDaoImpl extends GenericDaoBase<PodVlanVO, Long> implements P
         final SearchCriteria<PodVlanVO> sc = FreeVlanSearch.create();
         sc.setParameters("podId", podId);
         final Date now = new Date();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             txn.start();
             final PodVlanVO vo = lockOneRandomRow(sc, true);
             if (vo == null) {

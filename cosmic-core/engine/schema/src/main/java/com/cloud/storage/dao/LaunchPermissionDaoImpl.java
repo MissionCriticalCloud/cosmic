@@ -51,7 +51,7 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
     @Override
     public void removePermissions(final long templateId, final List<Long> accountIds) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         try {
             txn.start();
             final String sql = REMOVE_LAUNCH_PERMISSION;
@@ -67,6 +67,8 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
             txn.rollback();
             s_logger.warn("Error removing launch permissions", e);
             throw new CloudRuntimeException("Error removing launch permissions", e);
+        } finally {
+            txn.close();
         }
     }
 
@@ -94,10 +96,9 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
 
     @Override
     public List<VMTemplateVO> listPermittedTemplates(final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateVO> permittedTemplates = new ArrayList<>();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = LIST_PERMITTED_TEMPLATES;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);

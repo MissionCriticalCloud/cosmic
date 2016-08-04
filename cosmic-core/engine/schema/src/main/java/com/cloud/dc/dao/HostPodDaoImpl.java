@@ -67,8 +67,7 @@ public class HostPodDaoImpl extends GenericDaoBase<HostPodVO, Long> implements H
         final HashMap<Long, List<Object>> currentPodCidrSubnets = new HashMap<>();
 
         final String selectSql = "SELECT id, cidr_address, cidr_size FROM host_pod_ref WHERE data_center_id=" + zoneId + " and removed IS NULL";
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
             final ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -108,15 +107,17 @@ public class HostPodDaoImpl extends GenericDaoBase<HostPodVO, Long> implements H
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final HostPodVO pod = createForUpdate();
-        pod.setName(null);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final HostPodVO pod = createForUpdate();
+            pod.setName(null);
 
-        update(id, pod);
+            update(id, pod);
 
-        final boolean result = super.remove(id);
-        txn.commit();
+            result = super.remove(id);
+            txn.commit();
+        }
         return result;
     }
 }

@@ -99,25 +99,27 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
 
     @Override
     public HaWorkVO take(final long serverId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final SearchCriteria<HaWorkVO> sc = TBASearch.create();
         sc.setParameters("time", System.currentTimeMillis() >> 10);
         sc.setParameters("step", Step.Done, Step.Cancelled);
 
         final Filter filter = new Filter(HaWorkVO.class, null, true, 0l, 1l);
 
-        txn.start();
-        final List<HaWorkVO> vos = lockRows(sc, filter, true);
-        if (vos.size() == 0) {
-            txn.commit();
-            return null;
-        }
+        final HaWorkVO work;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final List<HaWorkVO> vos = lockRows(sc, filter, true);
+            if (vos.size() == 0) {
+                txn.commit();
+                return null;
+            }
 
-        final HaWorkVO work = vos.get(0);
-        work.setServerId(serverId);
-        work.setDateTaken(new Date());
-        update(work.getId(), work);
-        txn.commit();
+            work = vos.get(0);
+            work.setServerId(serverId);
+            work.setDateTaken(new Date());
+            update(work.getId(), work);
+            txn.commit();
+        }
 
         return work;
     }

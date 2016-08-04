@@ -116,6 +116,8 @@ public class DomainDaoImpl extends GenericDaoBase<DomainVO, Long> implements Dom
             s_logger.error("Unable to create domain due to " + e.getMessage(), e);
             txn.rollback();
             return null;
+        } finally {
+            txn.close();
         }
     }
 

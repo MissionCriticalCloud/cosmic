@@ -164,14 +164,16 @@ public class SecurityGroupRuleDaoImpl extends GenericDaoBase<SecurityGroupRuleVO
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final SecurityGroupRuleVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroupRule);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SecurityGroupRuleVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroupRule);
+            }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 }

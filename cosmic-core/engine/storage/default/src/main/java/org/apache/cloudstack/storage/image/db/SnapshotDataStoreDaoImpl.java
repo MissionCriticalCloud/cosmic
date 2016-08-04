@@ -191,10 +191,11 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
         final SearchCriteria<SnapshotDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_id", id);
         sc.setParameters("store_role", role);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override
@@ -209,10 +210,7 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     @Override
     @DB
     public SnapshotDataStoreVO findParent(final DataStoreRole role, final Long storeId, final Long volumeId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(parentSearch)
-        ) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(parentSearch)) {
             pstmt.setLong(1, storeId);
             pstmt.setString(2, role.toString());
             pstmt.setLong(3, volumeId);
@@ -292,10 +290,11 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     public void deleteSnapshotRecordsOnPrimary() {
         final SearchCriteria<SnapshotDataStoreVO> sc = storeSearch.create();
         sc.setParameters("store_role", DataStoreRole.Primary);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        remove(sc);
-        txn.commit();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            remove(sc);
+            txn.commit();
+        }
     }
 
     @Override
@@ -332,10 +331,7 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
 
     @Override
     public SnapshotDataStoreVO findLatestSnapshotForVolume(final Long volumeId, final DataStoreRole role) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(findLatestSnapshot)
-        ) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(findLatestSnapshot)) {
             pstmt.setString(1, role.toString());
             pstmt.setLong(2, volumeId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -353,10 +349,7 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
 
     @Override
     public SnapshotDataStoreVO findOldestSnapshotForVolume(final Long volumeId, final DataStoreRole role) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(findOldestSnapshot)
-        ) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(findOldestSnapshot)) {
             pstmt.setString(1, role.toString());
             pstmt.setLong(2, volumeId);
             try (ResultSet rs = pstmt.executeQuery()) {

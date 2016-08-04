@@ -29,23 +29,24 @@ public class VMRootDiskTagDaoImpl extends GenericDaoBase<VMRootDiskTagVO, Long> 
 
     @Override
     public void persist(final long vmId, final List<String> rootDiskTags) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        txn.start();
-        final SearchCriteria<VMRootDiskTagVO> sc = VmIdSearch.create();
-        sc.setParameters("vmId", vmId);
-        expunge(sc);
+            txn.start();
+            final SearchCriteria<VMRootDiskTagVO> sc = VmIdSearch.create();
+            sc.setParameters("vmId", vmId);
+            expunge(sc);
 
-        for (String tag : rootDiskTags) {
-            if (tag != null) {
-                tag = tag.trim();
-                if (tag.length() > 0) {
-                    final VMRootDiskTagVO vo = new VMRootDiskTagVO(vmId, tag);
-                    persist(vo);
+            for (String tag : rootDiskTags) {
+                if (tag != null) {
+                    tag = tag.trim();
+                    if (tag.length() > 0) {
+                        final VMRootDiskTagVO vo = new VMRootDiskTagVO(vmId, tag);
+                        persist(vo);
+                    }
                 }
             }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

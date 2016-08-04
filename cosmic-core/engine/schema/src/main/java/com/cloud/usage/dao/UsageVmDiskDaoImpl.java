@@ -76,7 +76,7 @@ public class UsageVmDiskDaoImpl extends GenericDaoBase<UsageVmDiskVO, Long> impl
     public void deleteOldStats(final long maxEventTime) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final String sql = DELETE_OLD_STATS;
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         try {
             txn.start();
             pstmt = txn.prepareAutoCloseStatement(sql);
@@ -86,6 +86,8 @@ public class UsageVmDiskDaoImpl extends GenericDaoBase<UsageVmDiskVO, Long> impl
         } catch (final Exception ex) {
             txn.rollback();
             s_logger.error("error deleting old usage disk stats", ex);
+        } finally {
+            txn.close();
         }
     }
 
@@ -119,6 +121,8 @@ public class UsageVmDiskDaoImpl extends GenericDaoBase<UsageVmDiskVO, Long> impl
             txn.rollback();
             s_logger.error("error saving usage_vm_disk to cloud_usage db", ex);
             throw new CloudRuntimeException(ex.getMessage());
+        } finally {
+            txn.close();
         }
     }
 }

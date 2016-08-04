@@ -1805,6 +1805,8 @@ public class UsageManagerImpl extends ManagerBase implements UsageManager, Runna
             } catch (final Exception dbEx) {
                 txn.rollback();
                 s_logger.error("error updating usage job", dbEx);
+            } finally {
+                txn.close();
             }
             return changeOwner;
         }

@@ -70,14 +70,15 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
     @Override
     @DB
     public boolean remove(final Long networkOfferingId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final NetworkOfferingVO offering = findById(networkOfferingId);
-        offering.setUniqueName(null);
-        update(networkOfferingId, offering);
-        final boolean result = super.remove(networkOfferingId);
-        txn.commit();
-        return result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final NetworkOfferingVO offering = findById(networkOfferingId);
+            offering.setUniqueName(null);
+            update(networkOfferingId, offering);
+            final boolean result = super.remove(networkOfferingId);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override
@@ -155,19 +156,20 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
     @Override
     @DB
     public NetworkOfferingVO persist(final NetworkOfferingVO off, final Map<Detail, String> details) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        //1) persist the offering
-        final NetworkOfferingVO vo = super.persist(off);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            //1) persist the offering
+            final NetworkOfferingVO vo = super.persist(off);
 
-        //2) persist the details
-        if (details != null && !details.isEmpty()) {
-            for (final NetworkOffering.Detail detail : details.keySet()) {
-                _detailsDao.persist(new NetworkOfferingDetailsVO(off.getId(), detail, details.get(detail)));
+            //2) persist the details
+            if (details != null && !details.isEmpty()) {
+                for (final NetworkOffering.Detail detail : details.keySet()) {
+                    _detailsDao.persist(new NetworkOfferingDetailsVO(off.getId(), detail, details.get(detail)));
+                }
             }
-        }
 
-        txn.commit();
-        return vo;
+            txn.commit();
+            return vo;
+        }
     }
 }

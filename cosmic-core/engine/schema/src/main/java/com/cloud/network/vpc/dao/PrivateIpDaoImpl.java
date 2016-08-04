@@ -59,16 +59,18 @@ public class PrivateIpDaoImpl extends GenericDaoBase<PrivateIpVO, Long> implemen
             sc.setParameters("ipAddress", requestedIp);
         }
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final PrivateIpVO vo = lockOneRandomRow(sc, true);
-        if (vo == null) {
-            txn.rollback();
-            return null;
+        final PrivateIpVO vo;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            vo = lockOneRandomRow(sc, true);
+            if (vo == null) {
+                txn.rollback();
+                return null;
+            }
+            vo.setTakenAt(new Date());
+            update(vo.getId(), vo);
+            txn.commit();
         }
-        vo.setTakenAt(new Date());
-        update(vo.getId(), vo);
-        txn.commit();
         return vo;
     }
 

@@ -84,9 +84,8 @@ public class SyncQueueItemDaoImpl extends GenericDaoBase<SyncQueueItemVO, Long> 
                 " ORDER BY i.id " +
                 " LIMIT 0, ?";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setInt(1, maxItems);
             final ResultSet rs = pstmt.executeQuery();

@@ -124,14 +124,16 @@ public class DataCenterDaoImpl extends GenericDaoBase<DataCenterVO, Long> implem
     @Override
     @DB
     public boolean update(final Long zoneId, final DataCenterVO zone) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final boolean persisted = super.update(zoneId, zone);
-        if (!persisted) {
-            return persisted;
+        final boolean persisted;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            persisted = super.update(zoneId, zone);
+            if (!persisted) {
+                return persisted;
+            }
+            saveDetails(zone);
+            txn.commit();
         }
-        saveDetails(zone);
-        txn.commit();
         return persisted;
     }
 
@@ -144,15 +146,17 @@ public class DataCenterDaoImpl extends GenericDaoBase<DataCenterVO, Long> implem
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final DataCenterVO zone = createForUpdate();
-        zone.setName(null);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final DataCenterVO zone = createForUpdate();
+            zone.setName(null);
 
-        update(id, zone);
+            update(id, zone);
 
-        final boolean result = super.remove(id);
-        txn.commit();
+            result = super.remove(id);
+            txn.commit();
+        }
         return result;
     }
 

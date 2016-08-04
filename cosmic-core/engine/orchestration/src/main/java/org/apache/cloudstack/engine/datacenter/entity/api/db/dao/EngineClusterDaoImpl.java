@@ -142,11 +142,10 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
 
     @Override
     public Map<Long, List<Long>> getPodClusterIdMap(final List<Long> clusterIds) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final Map<Long, List<Long>> result = new HashMap<>();
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final StringBuilder sql = new StringBuilder(GET_POD_CLUSTER_MAP_PREFIX);
             if (clusterIds.size() > 0) {
                 for (final Long clusterId : clusterIds) {
@@ -220,17 +219,18 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
 
     @Override
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final EngineClusterVO cluster = createForUpdate();
-        cluster.setName(null);
-        cluster.setGuid(null);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final EngineClusterVO cluster = createForUpdate();
+            cluster.setName(null);
+            cluster.setGuid(null);
 
-        update(id, cluster);
+            update(id, cluster);
 
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
+        }
     }
 
     @Override

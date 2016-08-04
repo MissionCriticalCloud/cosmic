@@ -84,10 +84,9 @@ public class AccountDaoImpl extends GenericDaoBase<AccountVO, Long> implements A
 
     @Override
     public Pair<User, Account> findUserAccountByApiKey(final String apiKey) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         Pair<User, Account> userAcctPair = null;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = FIND_USER_ACCOUNT_BY_API_KEY;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setString(1, apiKey);

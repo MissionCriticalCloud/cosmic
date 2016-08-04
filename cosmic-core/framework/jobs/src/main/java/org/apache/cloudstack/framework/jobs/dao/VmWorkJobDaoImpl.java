@@ -113,15 +113,6 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
 
     @Override
     public void expungeCompletedWorkJobs(final Date cutDate) {
-        // current DAO machenism does not support following usage
-        /*
-                SearchCriteria<VmWorkJobVO> sc = ExpungeWorkJobSearch.create();
-                sc.setParameters("lastUpdated",cutDate);
-                sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
-
-                expunge(sc);
-        */
-
         // loop at application level to avoid mysql deadlock issues
         final SearchCriteria<VmWorkJobVO> sc = ExpungingWorkJobSearch.create();
         sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
@@ -139,24 +130,11 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
 
     @Override
     public void expungeLeftoverWorkJobs(final long msid) {
-        // current DAO machenism does not support following usage
-        /*
-                SearchCriteria<VmWorkJobVO> sc = ExpungePlaceHolderWorkJobSearch.create();
-                sc.setParameters("dispatcher", "VmWorkJobPlaceHolder");
-                sc.setParameters("msid", msid);
-
-                expunge(sc);
-        */
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                final TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-                try (
-                        PreparedStatement pstmt = txn
-                                .prepareAutoCloseStatement(
-                                        "DELETE FROM vm_work_job WHERE id IN (SELECT id FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR " +
-                                                "job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?)")
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareAutoCloseStatement("DELETE FROM vm_work_job WHERE id IN " +
+                        "(SELECT id FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR " + "job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?)")
                 ) {
                     pstmt.setLong(1, msid);
                     pstmt.execute();
@@ -164,10 +142,8 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
                     s_logger.info("[ignored] SQL failed to delete vm work job: " + e.getLocalizedMessage());
                 }
 
-                try (
-                        PreparedStatement pstmt = txn.prepareAutoCloseStatement(
-                                "DELETE FROM async_job WHERE (job_dispatcher='VmWorkJobPlaceHolder' OR job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?")
-                ) {
+                try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareAutoCloseStatement("DELETE FROM async_job WHERE " +
+                        "(job_dispatcher='VmWorkJobPlaceHolder' OR job_dispatcher='VmWorkJobDispatcher') AND job_init_msid=?")) {
                     pstmt.setLong(1, msid);
 
                     pstmt.execute();

@@ -129,19 +129,20 @@ public class AffinityGroupVMMapDaoImpl extends GenericDaoBase<AffinityGroupVMMap
 
     @Override
     public void updateMap(final Long vmId, final List<Long> affinityGroupIds) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final SearchCriteria<AffinityGroupVMMapVO> sc = createSearchCriteria();
-        sc.addAnd("instanceId", SearchCriteria.Op.EQ, vmId);
-        expunge(sc);
+            final SearchCriteria<AffinityGroupVMMapVO> sc = createSearchCriteria();
+            sc.addAnd("instanceId", SearchCriteria.Op.EQ, vmId);
+            expunge(sc);
 
-        for (final Long groupId : affinityGroupIds) {
-            final AffinityGroupVMMapVO vo = new AffinityGroupVMMapVO(groupId, vmId);
-            persist(vo);
+            for (final Long groupId : affinityGroupIds) {
+                final AffinityGroupVMMapVO vo = new AffinityGroupVMMapVO(groupId, vmId);
+                persist(vo);
+            }
+
+            txn.commit();
         }
-
-        txn.commit();
     }
 
     @Override

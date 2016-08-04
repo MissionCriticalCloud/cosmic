@@ -2193,8 +2193,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 selectSql += " AND taken IS NOT NULL";
             }
 
-            final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            try {
+            try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
                 final PreparedStatement stmt = txn.prepareAutoCloseStatement(selectSql);
                 stmt.setLong(1, physicalNetworkId);
                 final ResultSet rs = stmt.executeQuery();

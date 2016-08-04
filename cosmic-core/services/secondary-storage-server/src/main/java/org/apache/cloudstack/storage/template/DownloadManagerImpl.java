@@ -344,30 +344,16 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         final byte[] buffer = new byte[8192];
         int read = 0;
         final MessageDigest digest;
-        String checksum = null;
-        InputStream is = null;
-        try {
+        try (InputStream is = new FileInputStream(f)) {
             digest = MessageDigest.getInstance("MD5");
-            is = new FileInputStream(f);
             while ((read = is.read(buffer)) > 0) {
                 digest.update(buffer, 0, read);
             }
             final byte[] md5sum = digest.digest();
             final BigInteger bigInt = new BigInteger(1, md5sum);
-            checksum = String.format("%032x", bigInt);
-            return checksum;
-        } catch (final IOException e) {
+            return String.format("%032x", bigInt);
+        } catch (final IOException | NoSuchAlgorithmException e) {
             return null;
-        } catch (final NoSuchAlgorithmException e) {
-            return null;
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (final IOException e) {
-                return null;
-            }
         }
     }
 

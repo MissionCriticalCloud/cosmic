@@ -3,11 +3,9 @@ package com.cloud.dc.dao;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.DomainVlanMapVO;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.network.dao.IPAddressDao;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder;
@@ -183,9 +181,8 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
     @DB
     public List<VlanVO> searchForZoneWideVlans(final long dcId, final String vlanType, final String vlanId) {
         final StringBuilder sql = new StringBuilder(FindZoneWideVlans);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VlanVO> zoneWideVlans = new ArrayList<>();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
             if (pstmt != null) {
                 pstmt.setLong(1, dcId);
                 pstmt.setString(2, vlanType);
@@ -288,64 +285,5 @@ public class VlanDaoImpl extends GenericDaoBase<VlanVO, Long> implements VlanDao
         AccountVlanMapSearch.done();
 
         return result;
-    }
-
-    private VlanVO findNextVlan(final long zoneId, final Vlan.VlanType vlanType) {
-        final List<VlanVO> allVlans = listByZoneAndType(zoneId, vlanType);
-        final List<VlanVO> emptyVlans = new ArrayList<>();
-        final List<VlanVO> fullVlans = new ArrayList<>();
-
-        // Try to find a VLAN that is partially allocated
-        for (final VlanVO vlan : allVlans) {
-            final long vlanDbId = vlan.getId();
-
-            final int countOfAllocatedIps = _ipAddressDao.countIPs(zoneId, vlanDbId, true);
-            final int countOfAllIps = _ipAddressDao.countIPs(zoneId, vlanDbId, false);
-
-            if ((countOfAllocatedIps > 0) && (countOfAllocatedIps < countOfAllIps)) {
-                return vlan;
-            } else if (countOfAllocatedIps == 0) {
-                emptyVlans.add(vlan);
-            } else if (countOfAllocatedIps == countOfAllIps) {
-                fullVlans.add(vlan);
-            }
-        }
-
-        if (emptyVlans.isEmpty()) {
-            return null;
-        }
-
-        // Try to find an empty VLAN with the same tag/subnet as a VLAN that is full
-        for (final VlanVO fullVlan : fullVlans) {
-            for (final VlanVO emptyVlan : emptyVlans) {
-                if (fullVlan.getVlanTag().equals(emptyVlan.getVlanTag()) && fullVlan.getVlanGateway().equals(emptyVlan.getVlanGateway()) &&
-                        fullVlan.getVlanNetmask().equals(emptyVlan.getVlanNetmask())) {
-                    return emptyVlan;
-                }
-            }
-        }
-
-        // Return a random empty VLAN
-        return emptyVlans.get(0);
-    }
-
-    public Pair<String, VlanVO> assignPodDirectAttachIpAddress(final long zoneId, final long podId, final long accountId, final long domainId) {
-        final SearchCriteria<VlanVO> sc = ZoneTypePodSearch.create();
-        sc.setParameters("zoneId", zoneId);
-        sc.setParameters("vlanType", VlanType.DirectAttached);
-        sc.setJoinParameters("vlan", "podId", podId);
-
-        final VlanVO vlan = findOneIncludingRemovedBy(sc);
-        if (vlan == null) {
-            return null;
-        }
-
-        return null;
-        //        String ipAddress = _ipAddressDao.assignIpAddress(accountId, domainId, vlan.getId(), false).getAddress();
-        //        if (ipAddress == null) {
-        //            return null;
-        //        }
-        //        return new Pair<String, VlanVO>(ipAddress, vlan);
-
     }
 }

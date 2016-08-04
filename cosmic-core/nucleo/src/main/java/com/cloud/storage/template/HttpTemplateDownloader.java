@@ -151,7 +151,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         }
         int bytes = 0;
         final File file = new File(toFile);
-        try {
+        try (final RandomAccessFile out = new RandomAccessFile(file, "rw")) {
 
             long localFileSize = 0;
             if (file.exists() && resume) {
@@ -218,7 +218,6 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             final URL url = new URL(getDownloadUrl());
             final InputStream in = url.openStream();
 
-            final RandomAccessFile out = new RandomAccessFile(file, "rw");
             out.seek(localFileSize);
 
             s_logger.info("Starting download from " + getDownloadUrl() + " to " + toFile + " remoteSize=" + remoteSize + " , max size=" + maxTemplateSizeInBytes);

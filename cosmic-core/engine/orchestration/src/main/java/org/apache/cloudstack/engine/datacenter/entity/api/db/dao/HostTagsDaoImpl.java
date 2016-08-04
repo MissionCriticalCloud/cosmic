@@ -23,21 +23,22 @@ public class HostTagsDaoImpl extends GenericDaoBase<HostTagVO, Long> implements 
 
     @Override
     public void persist(final long hostId, final List<String> hostTags) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        txn.start();
-        final SearchCriteria<HostTagVO> sc = HostSearch.create();
-        sc.setParameters("hostId", hostId);
-        expunge(sc);
+            txn.start();
+            final SearchCriteria<HostTagVO> sc = HostSearch.create();
+            sc.setParameters("hostId", hostId);
+            expunge(sc);
 
-        for (String tag : hostTags) {
-            tag = tag.trim();
-            if (tag.length() > 0) {
-                final HostTagVO vo = new HostTagVO(hostId, tag);
-                persist(vo);
+            for (String tag : hostTags) {
+                tag = tag.trim();
+                if (tag.length() > 0) {
+                    final HostTagVO vo = new HostTagVO(hostId, tag);
+                    persist(vo);
+                }
             }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

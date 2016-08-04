@@ -98,8 +98,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
         sbuilder.append(" ORDER by rand() limit 1");
         final String sql = sbuilder.toString();
         HostVO host = null;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, poolId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -326,12 +325,8 @@ public class DefaultEndPointSelector implements EndPointSelector {
 
         final String sql = sbuilder.toString();
         HostVO host = null;
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
 
-        try (
-                PreparedStatement pstmt = txn.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery()
-        ) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 final long id = rs.getLong(1);
                 host = hostDao.findById(id);

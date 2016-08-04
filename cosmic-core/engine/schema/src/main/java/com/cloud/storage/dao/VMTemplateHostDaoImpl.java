@@ -189,9 +189,8 @@ public class VMTemplateHostDaoImpl extends GenericDaoBase<VMTemplateHostVO, Long
 
     @Override
     public void update(final VMTemplateHostVO instance) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final Date now = new Date();
             final String sql = UPDATE_TEMPLATE_HOST_REF;
             pstmt = txn.prepareAutoCloseStatement(sql);
@@ -260,10 +259,9 @@ public class VMTemplateHostDaoImpl extends GenericDaoBase<VMTemplateHostVO, Long
 
     @Override
     public List<VMTemplateHostVO> listByTemplateStatus(final long templateId, final long datacenterId, final VMTemplateHostVO.Status downloadState) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<VMTemplateHostVO> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = DOWNLOADS_STATE_DC;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, datacenterId);
@@ -290,10 +288,9 @@ public class VMTemplateHostDaoImpl extends GenericDaoBase<VMTemplateHostVO, Long
 
     @Override
     public List<VMTemplateHostVO> listByTemplateStatus(final long templateId, final long datacenterId, final long podId, final VMTemplateHostVO.Status downloadState) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateHostVO> result = new ArrayList<>();
         final String sql = DOWNLOADS_STATE_DC_POD;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, datacenterId);
             pstmt.setLong(2, podId);
             pstmt.setLong(3, templateId);

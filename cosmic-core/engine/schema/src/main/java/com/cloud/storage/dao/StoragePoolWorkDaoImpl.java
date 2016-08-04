@@ -97,9 +97,8 @@ public class StoragePoolWorkDaoImpl extends GenericDaoBase<StoragePoolWorkVO, Lo
     @DB
     public List<Long> searchForPoolIdsForPendingWorkJobs(final long msId) {
         final StringBuilder sql = new StringBuilder(FindPoolIds);
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<Long> poolIds = new ArrayList<>();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
             if (pstmt != null) {
                 pstmt.setLong(1, msId);
                 try (ResultSet rs = pstmt.executeQuery()) {

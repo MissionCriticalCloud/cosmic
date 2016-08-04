@@ -65,17 +65,18 @@ public class VMReservationDaoImpl extends GenericDaoBase<VMReservationVO, Long> 
     @Override
     @DB
     public VMReservationVO persist(final VMReservationVO reservation) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final VMReservationVO dbVO = super.persist(reservation);
+            final VMReservationVO dbVO = super.persist(reservation);
 
-        saveVolumeReservation(reservation);
-        loadVolumeReservation(dbVO);
+            saveVolumeReservation(reservation);
+            loadVolumeReservation(dbVO);
 
-        txn.commit();
+            txn.commit();
 
-        return dbVO;
+            return dbVO;
+        }
     }
 
     private void saveVolumeReservation(final VMReservationVO reservation) {

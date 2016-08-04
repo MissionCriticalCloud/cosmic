@@ -33,14 +33,15 @@ public class NetworkACLItemCidrsDaoImpl extends GenericDaoBase<NetworkACLItemCid
      */
     @Override
     public void persist(final long networkACLItemId, final List<String> cidrs) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        txn.start();
-        for (final String cidr : cidrs) {
-            final NetworkACLItemCidrsVO vo = new NetworkACLItemCidrsVO(networkACLItemId, cidr);
-            persist(vo);
+            txn.start();
+            for (final String cidr : cidrs) {
+                final NetworkACLItemCidrsVO vo = new NetworkACLItemCidrsVO(networkACLItemId, cidr);
+                persist(vo);
+            }
+            txn.commit();
         }
-        txn.commit();
     }
 
     @Override

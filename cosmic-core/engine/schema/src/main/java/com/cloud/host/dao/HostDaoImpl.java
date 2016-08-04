@@ -442,99 +442,100 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     @Override
     @DB
     public List<HostVO> findAndUpdateDirectAgentToLoad(final long lastPingSecondsAfter, final Long limit, final long managementServerId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-
-        txn.start();
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Resetting hosts suitable for reconnect");
-        }
-        // reset hosts that are suitable candidates for reconnect
-        resetHosts(managementServerId, lastPingSecondsAfter);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Completed resetting hosts suitable for reconnect");
-        }
-
         final List<HostVO> assignedHosts = new ArrayList<>();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Acquiring hosts for clusters already owned by this management server");
-        }
-        List<Long> clusters = findClustersOwnedByManagementServer(managementServerId);
-        if (clusters.size() > 0) {
-            // handle clusters already owned by @managementServerId
-            final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
-            sc.setParameters("lastPinged", lastPingSecondsAfter);
-            sc.setJoinParameters("ClusterManagedSearch", "managed", Managed.ManagedState.Managed);
-            sc.setParameters("clusterIn", clusters.toArray());
-            final List<HostVO> unmanagedHosts = lockRows(sc, new Filter(HostVO.class, "clusterId", true, 0L, limit), true); // host belongs to clusters owned by @managementServerId
-            final StringBuilder sb = new StringBuilder();
-            for (final HostVO host : unmanagedHosts) {
-                host.setManagementServerId(managementServerId);
-                update(host.getId(), host);
-                assignedHosts.add(host);
-                sb.append(host.getId());
-                sb.append(" ");
-            }
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Following hosts got acquired for clusters already owned: " + sb.toString());
-            }
-        }
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Completed acquiring hosts for clusters already owned by this management server");
-        }
-
-        if (assignedHosts.size() < limit) {
+            txn.start();
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Acquiring hosts for clusters not owned by any management server");
+                s_logger.debug("Resetting hosts suitable for reconnect");
             }
-            // for remaining hosts not owned by any MS check if they can be owned (by owning full cluster)
-            clusters = findClustersForHostsNotOwnedByAnyManagementServer();
-            List<Long> updatedClusters = clusters;
-            if (clusters.size() > limit) {
-                updatedClusters = clusters.subList(0, limit.intValue());
+            // reset hosts that are suitable candidates for reconnect
+            resetHosts(managementServerId, lastPingSecondsAfter);
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Completed resetting hosts suitable for reconnect");
             }
-            if (updatedClusters.size() > 0) {
+
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Acquiring hosts for clusters already owned by this management server");
+            }
+            List<Long> clusters = findClustersOwnedByManagementServer(managementServerId);
+            if (clusters.size() > 0) {
+                // handle clusters already owned by @managementServerId
                 final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
                 sc.setParameters("lastPinged", lastPingSecondsAfter);
                 sc.setJoinParameters("ClusterManagedSearch", "managed", Managed.ManagedState.Managed);
-                sc.setParameters("clusterIn", updatedClusters.toArray());
-                final List<HostVO> unmanagedHosts = lockRows(sc, null, true);
-
-                // group hosts based on cluster
-                final Map<Long, List<HostVO>> hostMap = new HashMap<>();
-                for (final HostVO host : unmanagedHosts) {
-                    if (hostMap.get(host.getClusterId()) == null) {
-                        hostMap.put(host.getClusterId(), new ArrayList<>());
-                    }
-                    hostMap.get(host.getClusterId()).add(host);
-                }
+                sc.setParameters("clusterIn", clusters.toArray());
+                final List<HostVO> unmanagedHosts = lockRows(sc, new Filter(HostVO.class, "clusterId", true, 0L, limit), true); // host belongs to clusters owned by
+                // @managementServerId
 
                 final StringBuilder sb = new StringBuilder();
-                for (final Long clusterId : hostMap.keySet()) {
-                    if (canOwnCluster(clusterId)) { // cluster is not owned by any other MS, so @managementServerId can own it
-                        final List<HostVO> hostList = hostMap.get(clusterId);
-                        for (final HostVO host : hostList) {
-                            host.setManagementServerId(managementServerId);
-                            update(host.getId(), host);
-                            assignedHosts.add(host);
-                            sb.append(host.getId());
-                            sb.append(" ");
-                        }
-                    }
-                    if (assignedHosts.size() > limit) {
-                        break;
-                    }
+                for (final HostVO host : unmanagedHosts) {
+                    host.setManagementServerId(managementServerId);
+                    update(host.getId(), host);
+                    assignedHosts.add(host);
+                    sb.append(host.getId());
+                    sb.append(" ");
                 }
                 if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Following hosts got acquired from newly owned clusters: " + sb.toString());
+                    s_logger.trace("Following hosts got acquired for clusters already owned: " + sb.toString());
                 }
             }
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Completed acquiring hosts for clusters not owned by any management server");
+                s_logger.debug("Completed acquiring hosts for clusters already owned by this management server");
             }
-        }
-        txn.commit();
 
+            if (assignedHosts.size() < limit) {
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Acquiring hosts for clusters not owned by any management server");
+                }
+                // for remaining hosts not owned by any MS check if they can be owned (by owning full cluster)
+                clusters = findClustersForHostsNotOwnedByAnyManagementServer();
+                List<Long> updatedClusters = clusters;
+                if (clusters.size() > limit) {
+                    updatedClusters = clusters.subList(0, limit.intValue());
+                }
+                if (updatedClusters.size() > 0) {
+                    final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
+                    sc.setParameters("lastPinged", lastPingSecondsAfter);
+                    sc.setJoinParameters("ClusterManagedSearch", "managed", Managed.ManagedState.Managed);
+                    sc.setParameters("clusterIn", updatedClusters.toArray());
+                    final List<HostVO> unmanagedHosts = lockRows(sc, null, true);
+
+                    // group hosts based on cluster
+                    final Map<Long, List<HostVO>> hostMap = new HashMap<>();
+                    for (final HostVO host : unmanagedHosts) {
+                        if (hostMap.get(host.getClusterId()) == null) {
+                            hostMap.put(host.getClusterId(), new ArrayList<>());
+                        }
+                        hostMap.get(host.getClusterId()).add(host);
+                    }
+
+                    final StringBuilder sb = new StringBuilder();
+                    for (final Long clusterId : hostMap.keySet()) {
+                        if (canOwnCluster(clusterId)) { // cluster is not owned by any other MS, so @managementServerId can own it
+                            final List<HostVO> hostList = hostMap.get(clusterId);
+                            for (final HostVO host : hostList) {
+                                host.setManagementServerId(managementServerId);
+                                update(host.getId(), host);
+                                assignedHosts.add(host);
+                                sb.append(host.getId());
+                                sb.append(" ");
+                            }
+                        }
+                        if (assignedHosts.size() > limit) {
+                            break;
+                        }
+                    }
+                    if (s_logger.isTraceEnabled()) {
+                        s_logger.trace("Following hosts got acquired from newly owned clusters: " + sb.toString());
+                    }
+                }
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Completed acquiring hosts for clusters not owned by any management server");
+                }
+            }
+            txn.commit();
+        }
         return assignedHosts;
     }
 
@@ -549,9 +550,8 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
         final ArrayList<RunningHostCountInfo> l = new ArrayList<>();
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
+        final PreparedStatement pstmt;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql);
             final String gmtCutTime = DateUtil.getDateDisplayString(TimeZone.getTimeZone("GMT"), cutTime);
             pstmt.setString(1, gmtCutTime);
@@ -651,21 +651,22 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     @Override
     @DB
     public List<HostVO> findAndUpdateApplianceToLoad(final long lastPingSecondsAfter, final long managementServerId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
+        final List<HostVO> hosts;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final SearchCriteria<HostVO> sc = UnmanagedApplianceSearch.create();
+            sc.setParameters("lastPinged", lastPingSecondsAfter);
+            sc.setParameters("types", Type.ExternalDhcp, Type.ExternalFirewall, Type.ExternalLoadBalancer, Type.TrafficMonitor,
+                    Type.L2Networking);
+            hosts = lockRows(sc, null, true);
 
-        txn.start();
-        final SearchCriteria<HostVO> sc = UnmanagedApplianceSearch.create();
-        sc.setParameters("lastPinged", lastPingSecondsAfter);
-        sc.setParameters("types", Type.ExternalDhcp, Type.ExternalFirewall, Type.ExternalLoadBalancer, Type.TrafficMonitor,
-                Type.L2Networking);
-        final List<HostVO> hosts = lockRows(sc, null, true);
+            for (final HostVO host : hosts) {
+                host.setManagementServerId(managementServerId);
+                update(host.getId(), host);
+            }
 
-        for (final HostVO host : hosts) {
-            host.setManagementServerId(managementServerId);
-            update(host.getId(), host);
+            txn.commit();
         }
-
-        txn.commit();
 
         return hosts;
     }
@@ -673,20 +674,21 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     @Override
     @DB
     public boolean update(final Long hostId, final HostVO host) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        final boolean persisted;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final boolean persisted = super.update(hostId, host);
-        if (!persisted) {
-            return persisted;
+            persisted = super.update(hostId, host);
+            if (!persisted) {
+                return persisted;
+            }
+
+            saveDetails(host);
+            saveHostTags(host);
+            saveGpuRecords(host);
+
+            txn.commit();
         }
-
-        saveDetails(host);
-        saveHostTags(host);
-        saveGpuRecords(host);
-
-        txn.commit();
-
         return persisted;
     }
 
@@ -713,26 +715,24 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     public HostVO persist(final HostVO host) {
         final String InsertSequenceSql = "INSERT INTO op_host(id) VALUES(?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-
         final HostVO dbHost = super.persist(host);
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
             final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertSequenceSql);
             pstmt.setLong(1, dbHost.getId());
             pstmt.executeUpdate();
+
+            saveDetails(host);
+            loadDetails(dbHost);
+            saveHostTags(host);
+            loadHostTags(dbHost);
+            saveGpuRecords(host);
+
+            txn.commit();
         } catch (final SQLException e) {
             throw new CloudRuntimeException("Unable to persist the sequence number for this host");
         }
-
-        saveDetails(host);
-        loadDetails(dbHost);
-        saveHostTags(host);
-        loadHostTags(dbHost);
-        saveGpuRecords(host);
-
-        txn.commit();
 
         return dbHost;
     }

@@ -83,14 +83,16 @@ public class NetworkACLItemDaoImpl extends GenericDaoBase<NetworkACLItemVO, Long
     @Override
     @DB
     public NetworkACLItemVO persist(final NetworkACLItemVO networkAclItem) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        final NetworkACLItemVO dbNetworkACLItem;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final NetworkACLItemVO dbNetworkACLItem = super.persist(networkAclItem);
-        saveCidrs(networkAclItem, networkAclItem.getSourceCidrList());
-        loadCidrs(dbNetworkACLItem);
+            dbNetworkACLItem = super.persist(networkAclItem);
+            saveCidrs(networkAclItem, networkAclItem.getSourceCidrList());
+            loadCidrs(dbNetworkACLItem);
 
-        txn.commit();
+            txn.commit();
+        }
         return dbNetworkACLItem;
     }
 

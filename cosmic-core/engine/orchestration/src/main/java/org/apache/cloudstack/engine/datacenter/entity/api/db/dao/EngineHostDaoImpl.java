@@ -380,20 +380,21 @@ public class EngineHostDaoImpl extends GenericDaoBase<EngineHostVO, Long> implem
     @Override
     @DB
     public boolean update(final Long hostId, final EngineHostVO host) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final boolean persisted = super.update(hostId, host);
-        if (!persisted) {
+            final boolean persisted = super.update(hostId, host);
+            if (!persisted) {
+                return persisted;
+            }
+
+            saveDetails(host);
+            saveHostTags(host);
+
+            txn.commit();
+
             return persisted;
         }
-
-        saveDetails(host);
-        saveHostTags(host);
-
-        txn.commit();
-
-        return persisted;
     }
 
     @Override
@@ -401,27 +402,28 @@ public class EngineHostDaoImpl extends GenericDaoBase<EngineHostVO, Long> implem
     public EngineHostVO persist(final EngineHostVO host) {
         final String InsertSequenceSql = "INSERT INTO op_host(id) VALUES(?)";
 
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
 
-        final EngineHostVO dbHost = super.persist(host);
+            final EngineHostVO dbHost = super.persist(host);
 
-        try {
-            final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertSequenceSql);
-            pstmt.setLong(1, dbHost.getId());
-            pstmt.executeUpdate();
-        } catch (final SQLException e) {
-            throw new CloudRuntimeException("Unable to persist the sequence number for this host");
+            try {
+                final PreparedStatement pstmt = txn.prepareAutoCloseStatement(InsertSequenceSql);
+                pstmt.setLong(1, dbHost.getId());
+                pstmt.executeUpdate();
+            } catch (final SQLException e) {
+                throw new CloudRuntimeException("Unable to persist the sequence number for this host");
+            }
+
+            saveDetails(host);
+            loadDetails(dbHost);
+            saveHostTags(host);
+            loadHostTags(dbHost);
+
+            txn.commit();
+
+            return dbHost;
         }
-
-        saveDetails(host);
-        loadDetails(dbHost);
-        saveHostTags(host);
-        loadHostTags(dbHost);
-
-        txn.commit();
-
-        return dbHost;
     }
 
     @Override

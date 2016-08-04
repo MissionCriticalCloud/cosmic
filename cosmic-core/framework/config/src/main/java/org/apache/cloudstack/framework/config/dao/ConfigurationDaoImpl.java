@@ -122,8 +122,7 @@ public class ConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, String
     @Override
     @Deprecated
     public boolean update(final String name, final String value) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (PreparedStatement stmt = txn.prepareStatement(UPDATE_CONFIGURATION_SQL)) {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn(); PreparedStatement stmt = txn.prepareStatement(UPDATE_CONFIGURATION_SQL)) {
             stmt.setString(1, value);
             stmt.setString(2, name);
             stmt.executeUpdate();
@@ -136,8 +135,7 @@ public class ConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, String
 
     @Override
     public boolean update(final String name, final String category, String value) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             value = ("Hidden".equals(category) || "Secure".equals(category)) ? DBEncryptionUtil.encrypt(value) : value;
             try (PreparedStatement stmt = txn.prepareStatement(UPDATE_CONFIGURATION_SQL)) {
                 stmt.setString(1, value);

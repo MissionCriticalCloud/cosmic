@@ -437,15 +437,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public Pair<List<Long>, Map<Long, Double>> listClusterIdsInZoneByVmCount(final long zoneId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> result = new ArrayList<>();
         final Map<Long, Double> clusterVmCountMap = new HashMap<>();
 
         final StringBuilder sql = new StringBuilder(ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART1);
         sql.append("host.data_center_id = ?");
         sql.append(ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART2);
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql.toString());
             pstmt.setLong(1, accountId);
             pstmt.setLong(2, zoneId);
@@ -464,15 +463,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public Pair<List<Long>, Map<Long, Double>> listClusterIdsInPodByVmCount(final long podId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> result = new ArrayList<>();
         final Map<Long, Double> clusterVmCountMap = new HashMap<>();
 
         final StringBuilder sql = new StringBuilder(ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART1);
         sql.append("host.pod_id = ?");
         sql.append(ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART2);
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(sql.toString());
             pstmt.setLong(1, accountId);
             pstmt.setLong(2, podId);
@@ -491,11 +489,10 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public Pair<List<Long>, Map<Long, Double>> listPodIdsInZoneByVmCount(final long dataCenterId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
+        final PreparedStatement pstmt;
         final List<Long> result = new ArrayList<>();
         final Map<Long, Double> podVmCountMap = new HashMap<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql = ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, accountId);
@@ -515,10 +512,9 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<Long> listHostIdsByVmCount(final long dcId, final Long podId, final Long clusterId, final long accountId) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final List<Long> result = new ArrayList<>();
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             String sql = ORDER_HOSTS_NUMBER_OF_VMS_FOR_ACCOUNT;
             if (podId != null) {
                 sql = sql + " AND host.pod_id = ? ";
@@ -675,7 +671,6 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     @Override
     public HashMap<String, Long> countVgpuVMs(final Long dcId, final Long podId, final Long clusterId) {
         final StringBuilder finalQuery = new StringBuilder();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final List<Long> resourceIdList = new ArrayList<>();
         final HashMap<String, Long> result = new HashMap<>();
@@ -694,7 +689,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
         }
         finalQuery.append(COUNT_VMS_BASED_ON_VGPU_TYPES2);
 
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             pstmt = txn.prepareAutoCloseStatement(finalQuery.toString());
             for (int i = 0; i < resourceIdList.size(); i++) {
                 pstmt.setLong(1 + i, resourceIdList.get(i));
@@ -796,14 +791,15 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final VMInstanceVO vm = findById(id);
-        if (vm != null && vm.getType() == Type.User) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final VMInstanceVO vm = findById(id);
+            if (vm != null && vm.getType() == Type.User) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
+            }
+            final boolean result = super.remove(id);
+            txn.commit();
+            return result;
         }
-        final boolean result = super.remove(id);
-        txn.commit();
-        return result;
     }
 }

@@ -240,9 +240,8 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     @Override
     @DB
     public int countIPs(final long dcId, final Long accountId, final String vlanId, final String vlanGateway, final String vlanNetmask) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
         int ipCount = 0;
-        try {
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
             final String sql =
                     "SELECT count(*) FROM user_ip_address u INNER JOIN vlan v on (u.vlan_db_id = v.id AND v.data_center_id = ? AND v.vlan_id = ? AND v.vlan_gateway = ? AND v" +
                             ".vlan_netmask = ? AND u.account_id = ?)";
@@ -444,14 +443,16 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     @Override
     @DB
     public boolean remove(final Long id) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        txn.start();
-        final IPAddressVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
+        final boolean result;
+        try (final TransactionLegacy txn = TransactionLegacy.currentTxn()) {
+            txn.start();
+            final IPAddressVO entry = findById(id);
+            if (entry != null) {
+                _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
+            }
+            result = super.remove(id);
+            txn.commit();
         }
-        final boolean result = super.remove(id);
-        txn.commit();
         return result;
     }
 }
