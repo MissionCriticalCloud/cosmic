@@ -25,6 +25,7 @@
     </distributionManagement>
 
     <properties>
+        <filter.properties.file>production.properties</filter.properties.file>
         <cs.replace.properties>build/replace.properties</cs.replace.properties>
     </properties>
     <dependencies>
@@ -249,7 +250,26 @@
     </dependencies>
 
     <build>
+        <filters>
+            <filter>${filter.properties.file}</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <delimiters>
+                        <delimiter>${*}</delimiter>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -459,22 +479,6 @@
                                 <copy todir="${basedir}/target/generated-webapp">
                                     <fileset dir="${basedir}/cosmic-ui" />
                                 </copy>
-                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
-                                    <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                                <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes">
-                                    <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in" />
-                                    </fileset>
-                                </copy>
                                 <copy overwrite="true" todir="${basedir}/target/generated-webapp/WEB-INF/classes/bin">
                                     <fileset dir="${project.build.directory}/setup/bindir">
                                         <include name="*.in" />
@@ -496,22 +500,6 @@
                                         </filterreader>
                                     </filterchain>
                                 </copy>
-                                <copy overwrite="true" todir="${basedir}/target/conf">
-                                    <fileset dir="${basedir}/tomcatconf">
-                                        <include name="*.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${project.build.directory}/${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                                <copy overwrite="true" todir="${basedir}/target/conf">
-                                    <fileset dir="${basedir}/tomcatconf">
-                                        <exclude name="*.in" />
-                                    </fileset>
-                                </copy>
                             </target>
                         </configuration>
                     </execution>
@@ -520,6 +508,19 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>developer</id>
+            <properties>
+                <filter.properties.file>development.properties</filter.properties.file>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
         <profile>
             <id>systemvm</id>
             <activation>
