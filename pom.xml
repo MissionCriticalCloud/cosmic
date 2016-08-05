@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cloud.cosmic</groupId>
@@ -50,7 +51,7 @@
 
         <coverage.reports.dir>${cosmic.dir}/target/coverage-reports</coverage.reports.dir>
         <unit.tests.report>${coverage.reports.dir}/jacoco-ut.exec</unit.tests.report>
-        <integration.tests.report>${coverage.reports.dir}/jacoco-it.exec</integration.tests.report>
+        <integration.tests.report>${coverage.reports.dir}/jacoco-it-merged.exec</integration.tests.report>
 
         <!-- Pinned older version than Spring 4 dependency management -->
         <cs.gson.version>1.7.2</cs.gson.version>
@@ -745,8 +746,7 @@
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <executions>
-                            <!-- Prepares the property pointing to the JaCoCo runtime agent which is passed as VM argument when unit tests
-                              run. -->
+                            <!-- Prepares the property pointing to the JaCoCo runtime agent which is passed as VM argument when unit tests run. -->
                             <execution>
                                 <id>setup-unit-tests-javaagent</id>
                                 <phase>test-compile</phase>
@@ -758,6 +758,24 @@
                                     <destFile>${unit.tests.report}</destFile>
                                     <!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
                                     <propertyName>surefireArgLine</propertyName>
+                                </configuration>
+                            </execution>
+                            <!-- Merge integration tests coverage reports. -->
+                            <execution>
+                                <id>merge-integration-test-coverage</id>
+                                <goals>
+                                    <goal>merge</goal>
+                                </goals>
+                                <configuration>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>${coverage.reports.dir}</directory>
+                                            <includes>
+                                                <include>jacoco-it-*.exec</include>
+                                            </includes>
+                                        </fileSet>
+                                    </fileSets>
+                                    <destFile>${integration.tests.report}</destFile>
                                 </configuration>
                             </execution>
                         </executions>
