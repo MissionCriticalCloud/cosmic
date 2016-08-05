@@ -67,6 +67,8 @@
         <module>server</module>
         <module>services/console-proxy-server</module>
         <module>services/secondary-storage-server</module>
+        <module>db-scripts</module>
+        <module>admin-scripts</module>
     </modules>
 
     <dependencies>

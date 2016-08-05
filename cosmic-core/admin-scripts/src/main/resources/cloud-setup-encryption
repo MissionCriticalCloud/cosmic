@@ -8,10 +8,8 @@ import os
 import shutil
 import subprocess
 import sys
-from optparse import OptionParser
-
-# squelch mysqldb spurious warnings
 import warnings
+from optparse import OptionParser
 
 warnings.simplefilter('ignore')
 # ---- This snippet of code adds the sources path and the waf configured PYTHONDIR to the Python path ----
@@ -20,7 +18,7 @@ warnings.simplefilter('ignore')
 # ---- 2) waf configured PYTHONDIR
 # ---- 3) System Python path
 for pythonpath in (
-        "@PYTHONDIR@",
+        "${system.python.packages.dir}",
         os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, "python", "lib"),
 ):
     if os.path.isdir(pythonpath): sys.path.insert(0, pythonpath)
@@ -45,11 +43,11 @@ class DBDeployer(object):
     dbsecretkey = None
     keyStorePassphrase = "vmops.com"
     encryptiontype = None
-    dbConfPath = r"@MSCONF@"
+    dbConfPath = r"${management.server.config.dir=/etc/cosmic/management }"
     dbDotProperties = { }
     dbDotPropertiesIndex = 0
-    encryptionKeyFile = '@MSCONF@/key'
-    encryptionJarPath = '@COMMONLIBDIR@/lib/jasypt-1.9.2.jar'
+    encryptionKeyFile = '${management.server.config.dir=/etc/cosmic/management }/key'
+    encryptionJarPath = '${common.libs.dir}/lib/jasypt-1.9.2.jar'
     success = False
     magicString = 'This_is_a_magic_string_i_think_no_one_will_duplicate'
 
