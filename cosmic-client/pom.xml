@@ -281,6 +281,24 @@
                         <delimiter>@</delimiter>
                     </delimiters>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-static-webapp-to-generated-webapp</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${project.build.directory}/generated-webapp/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp/</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -359,8 +377,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <webXml>${project.build.directory}/generated-webapp/WEB-INF/web.xml</webXml>
-                    <warSourceDirectory>./target/generated-webapp</warSourceDirectory>
+                    <warSourceDirectory>${project.build.directory}/generated-webapp</warSourceDirectory>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
