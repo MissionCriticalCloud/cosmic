@@ -45,7 +45,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <cs.replace.properties>build/replace.properties</cs.replace.properties>
         <cs.target.dir>target</cs.target.dir>
 
         <coverage.reports.dir>${cosmic.dir}/target/coverage-reports</coverage.reports.dir>

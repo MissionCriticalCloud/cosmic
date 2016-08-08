@@ -26,7 +26,6 @@
 
     <properties>
         <filter.properties.file>production.properties</filter.properties.file>
-        <cs.replace.properties>build/replace.properties</cs.replace.properties>
     </properties>
     <dependencies>
         <dependency>
