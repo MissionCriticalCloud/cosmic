@@ -50,6 +50,11 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -77,47 +82,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-resource</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <copy overwrite="true" todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/../client/tomcatconf">
-                                        <include name="**/db.properties.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                            </target>
-                            <target>
-                                <copy overwrite="true" todir="${basedir}/target/transformed">
-                                    <fileset dir="${basedir}/conf">
-                                        <include name="*.in" />
-                                    </fileset>
-                                    <globmapper from="*.in" to="*" />
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
-                                            <param type="propertiesfile" value="${cs.replace.properties}" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -136,7 +100,7 @@
                         <dependencies>
                             <dependency>
                                 <groupId>cloud.cosmic</groupId>
-                                <artifactId>cloud-usage</artifactId>
+                                <artifactId>cosmic-usage</artifactId>
                                 <version>5.1.0.5-SNAPSHOT</version>
                             </dependency>
                         </dependencies>
@@ -154,7 +118,7 @@
                             <includePluginDependencies>true</includePluginDependencies>
                             <executableDependency>
                                 <groupId>cloud.cosmic</groupId>
-                                <artifactId>cloud-usage</artifactId>
+                                <artifactId>cosmic-usage</artifactId>
                             </executableDependency>
                             <mainClass>com.cloud.usage.UsageServer</mainClass>
                             <arguments />
@@ -186,6 +150,19 @@
                         </executions>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>developer</id>
+            <properties>
+                <filter.properties.file>development.properties</filter.properties.file>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                    </resource>
+                </resources>
             </build>
         </profile>
     </profiles>
