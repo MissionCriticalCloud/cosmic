@@ -17,6 +17,7 @@
 
     <modules>
         <module>api</module>
+        <module>apidoc</module>
         <module>engine/api</module>
         <module>engine/components-api</module>
         <module>engine/network</module>
@@ -204,12 +205,6 @@
             </activation>
             <modules>
                 <module>systemvm</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>developer</id>
-            <modules>
-                <module>apidoc</module>
             </modules>
         </profile>
     </profiles>
