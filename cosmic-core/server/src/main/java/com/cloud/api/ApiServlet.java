@@ -142,11 +142,7 @@ public class ApiServlet extends HttpServlet {
                         session = req.getSession(true);
                         if (ApiServer.isSecureSessionCookieEnabled()) {
                             resp.setHeader("SET-COOKIE", String.format("JSESSIONID=%s;Secure;HttpOnly;Path=/client", session.getId()));
-                            if (s_logger.isDebugEnabled()) {
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug("Session cookie is marked secure!");
-                                }
-                            }
+                            s_logger.debug("Session cookie is marked secure!");
                         }
                     }
 
