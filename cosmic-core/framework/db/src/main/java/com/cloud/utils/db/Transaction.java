@@ -2,15 +2,10 @@ package com.cloud.utils.db;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Transaction {
     private final static AtomicLong counter = new AtomicLong(0);
     private final static TransactionStatus STATUS = new TransactionStatus() {
     };
-
-    private static final Logger s_logger = LoggerFactory.getLogger(Transaction.class);
 
     public static <T> T execute(final TransactionCallback<T> callback) {
         return execute(new TransactionCallbackWithException<T, RuntimeException>() {
