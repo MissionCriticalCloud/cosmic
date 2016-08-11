@@ -379,10 +379,7 @@ public class TransactionLegacy implements Closeable {
         } catch (final Exception e) {
             s_ds = getDefaultDataSource("cloud");
             s_usageDS = getDefaultDataSource("cloud_usage");
-            logger.warn(
-                    "Unable to load db configuration, using defaults with 5 connections. Falling back on assumed datasource on localhost:3306 using username:password=cloud:cloud" +
-                            ". Please check your configuration",
-                    e);
+            logger.warn("Unable to load db configuration, using defaults:  5 connections to localhost:3306 using cloud:cloud", e);
         }
     }
 
