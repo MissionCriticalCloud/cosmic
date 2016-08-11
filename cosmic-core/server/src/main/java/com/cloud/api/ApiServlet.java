@@ -6,6 +6,7 @@ import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.StringUtils;
+import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiServerService;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -133,7 +135,8 @@ public class ApiServlet extends HttpServlet {
                         if (session != null) {
                             try {
                                 session.invalidate();
-                            } catch (final IllegalStateException ise) {
+                            } catch (final IllegalStateException e) {
+                                s_logger.warn("Previously ignored exception", e);
                             }
                         }
                         session = req.getSession(true);
@@ -156,6 +159,10 @@ public class ApiServlet extends HttpServlet {
                         httpResponseCode = e.getErrorCode().getHttpCode();
                         responseString = e.getMessage();
                         s_logger.debug("Authentication failure: " + e.getMessage());
+                    } catch (final UnknownHostException e) {
+                        httpResponseCode = 400;
+                        responseString = e.getMessage();
+                        s_logger.debug("Authentication failure: " + e.getMessage());
                     }
 
                     if (apiAuthenticator.getAPIType() == APIAuthenticationType.LOGOUT_API) {
@@ -172,7 +179,8 @@ public class ApiServlet extends HttpServlet {
                             }
                             try {
                                 session.invalidate();
-                            } catch (final IllegalStateException ignored) {
+                            } catch (final IllegalStateException e) {
+                                s_logger.warn("Previously ignored exception", e);
                             }
                         }
                         final Cookie sessionKeyCookie = new Cookie(ApiConstants.SESSIONKEY, "");
@@ -234,14 +242,14 @@ public class ApiServlet extends HttpServlet {
                 if (session != null) {
                     try {
                         session.invalidate();
-                    } catch (final IllegalStateException ise) {
+                    } catch (final IllegalStateException e) {
+                        s_logger.warn("Previously ignored exception", e);
                     }
                 }
 
                 auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials and/or request signature");
                 final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params,
-                                responseType);
+                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params, responseType);
                 HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
             }
         } catch (final ServerApiException se) {
@@ -249,9 +257,9 @@ public class ApiServlet extends HttpServlet {
             resp.setHeader("X-Description", se.getDescription());
             HttpUtils.writeHttpResponse(resp, serializedResponseText, se.getErrorCode().getHttpCode(), responseType, ApiServer.getJSONContentType());
             auditTrailSb.append(" " + se.getErrorCode() + " " + se.getDescription());
-        } catch (final Exception ex) {
-            s_logger.error("unknown exception writing api response", ex);
-            auditTrailSb.append(" unknown exception writing api response");
+        } catch (final CloudRuntimeException e) {
+            s_logger.error("Caught runtime exception while writing api response", e);
+            auditTrailSb.append("Caught runtime exception while writing api response");
         } finally {
             s_accessLogger.info(auditTrailSb.toString());
             if (s_logger.isDebugEnabled()) {
