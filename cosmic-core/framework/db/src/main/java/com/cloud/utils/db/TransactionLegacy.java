@@ -365,7 +365,7 @@ public class TransactionLegacy implements Closeable {
                     GenericObjectPool.DEFAULT_WHEN_EXHAUSTED_ACTION, usageMaxWait, usageMaxIdle);
 
             final ConnectionFactory usageConnectionFactory = new DriverManagerConnectionFactory(DB_CONNECTION_SCHEME + "://" + usageHost
-                    + (s_dbHAEnabled ? "," + dbProps.getProperty("db.cloud.slaves") : "") + ":" + usagePort +
+                    + (s_dbHAEnabled ? "," + cloudSlaves : "") + ":" + usagePort +
                     "/" + usageDbName + "?autoReconnect=" + usageAutoReconnect + (usageUrl != null ? "&" + usageUrl : "") +
                     (s_dbHAEnabled ? "&" + getDBHAParams("usage", dbProps) : "")
                     + (s_dbHAEnabled ? "&loadBalanceStrategy=" + loadBalanceStrategy : ""), usageUsername,
