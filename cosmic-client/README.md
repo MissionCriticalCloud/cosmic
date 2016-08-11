@@ -14,11 +14,14 @@ The one explained here configures the container to add an extra directory to the
 
 For DB access, the following properties need to be available to the JVM.
 ```properties
+# Cluster config
 cluster.node.IP=
 cluster.servlet.port=9090
+
+# Cloud DB config
 db.cloud.username=cloud
-db.cloud.password=
-db.cloud.host=
+db.cloud.password=cloud
+db.cloud.host=localhost
 db.cloud.port=3306
 db.cloud.name=cloud
 db.cloud.maxActive=250
@@ -31,14 +34,7 @@ db.cloud.timeBetweenEvictionRunsMillis=40000
 db.cloud.minEvictableIdleTimeMillis=240000
 db.cloud.poolPreparedStatements=false
 db.cloud.url.params=prepStmtCacheSize=517&cachePrepStmts=true
-db.cloud.slaves=
 db.cloud.autoReconnect=true
-db.cloud.failOverReadOnly=false
-db.cloud.reconnectAtTxEnd=true
-db.cloud.autoReconnectForPools=true
-db.cloud.secondsBeforeRetryMaster=3600
-db.cloud.queriesBeforeRetryMaster=5000
-db.cloud.initialTimeout=3600
 db.cloud.useSSL=false
 db.cloud.keyStore=
 db.cloud.keyStorePassword=
@@ -47,17 +43,41 @@ db.cloud.trustStorePassword=
 db.cloud.keyStorePassphrase=vmops.com
 db.cloud.encryption.type=none
 db.cloud.encrypt.secret=
+
+# Usage DB config
+db.usage.username=cloud
+db.usage.password=cloud
+db.usage.host=localhost
+db.usage.port=3306
+db.usage.name=cloud_usage
+db.usage.maxActive=100
+db.usage.maxIdle=30
+db.usage.maxWait=10000
+db.usage.url.params=
+db.usage.autoReconnect=true
+
+# HA Config
 db.ha.enabled=false
 db.ha.loadBalanceStrategy=com.cloud.utils.db.StaticStrategy
+db.cloud.slaves=
+db.cloud.failOverReadOnly=false
+db.cloud.reconnectAtTxEnd=true
+db.cloud.autoReconnectForPools=true
+db.cloud.secondsBeforeRetryMaster=3600
+db.cloud.queriesBeforeRetryMaster=5000
+db.cloud.initialTimeout=3600
+db.usage.slaves=
+db.usage.failOverReadOnly=false
+db.usage.reconnectAtTxEnd=true
+db.usage.autoReconnectForPools=true
+db.usage.secondsBeforeRetryMaster=3600
+db.usage.queriesBeforeRetryMaster=5000
+db.usage.initialTimeout=3600
 ```
 
-The properties already filled in the example above are default values, and mandatory are:
+The properties already filled in the example above are default values, the two mandatory property that is missing (and there is no default for) is:
 * `cluster.node.IP`:
 The IP (or hostname if resolvable) of the management server node (there can be several for HA). This IP is used by system vm agents to reach the management server and for clustered management servers to rebalance agents between them.
-* `db.cloud.host`:
-The IP (or hostname if resolvable) of the DB host.
-* `db.cloud.password`:
-The password for the DB user `cloud`.
  
 To enable encryption of sensitive data (currently using `PBEWithMD5AndDES`), set `db.cloud.encryption.type` to something other than `none`. 
 Possibilities are:
@@ -65,7 +85,9 @@ Possibilities are:
 * `env`: This option expects an environment variable named `CLOUD_SECRET_KEY`, containing the encryption key, to be defined and available
 * `web`: This options expects the key to be delivered via socket on port `8097`
 
-By default the management server will assume that it operates in region 1 (the deault region in a single region setup).
+For configuring high-availability at the data base level, the property `db.ha.enabled` must be set to true, and the remaining properties in that section must be set accordingly.
+
+By default the management server will assume that it operates in region 1 (the default region in a single region setup).
 To enable multiple regions, set the property `region.id` to the correct value.
 
 ### Tomcat configuration
