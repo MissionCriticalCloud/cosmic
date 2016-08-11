@@ -202,14 +202,7 @@ public class ApiServlet extends HttpServlet {
                 final String account = (String) session.getAttribute("account");
                 final Object accountObj = session.getAttribute("accountobj");
                 if (!HttpUtils.validateSessionKey(session, params, req.getCookies(), ApiConstants.SESSIONKEY)) {
-                    try {
-                        session.invalidate();
-                    } catch (final IllegalStateException ise) {
-                    }
-                    auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
-                    final String serializedResponse =
-                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
-                    HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
+                    denyAuthenticationRequest(resp, auditTrailSb, responseType, params, session);
                     return;
                 }
 
@@ -228,16 +221,7 @@ public class ApiServlet extends HttpServlet {
                 } else {
                     // Invalidate the session to ensure we won't allow a request across management server
                     // restarts if the userId was serialized to the stored session
-                    try {
-                        session.invalidate();
-                    } catch (final IllegalStateException ise) {
-                    }
-
-                    auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
-                    final String serializedResponse =
-                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
-                    HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
-                    return;
+                    denyAuthenticationRequest(resp, auditTrailSb, responseType, params, session);
                 }
             } else {
                 CallContext.register(_accountMgr.getSystemUser(), _accountMgr.getSystemAccount());
@@ -281,6 +265,19 @@ public class ApiServlet extends HttpServlet {
             // cleanup user context to prevent from being peeked in other request context
             CallContext.unregister();
         }
+    }
+
+    private void denyAuthenticationRequest(final HttpServletResponse resp, final StringBuilder auditTrailSb, final String responseType, final Map<String, Object[]> params, final
+    HttpSession session) {
+        try {
+            session.invalidate();
+        } catch (final IllegalStateException ise) {
+        }
+        auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
+        final String serializedResponse =
+                _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
+        HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
+        return;
     }
 
     //This method will try to get login IP of user even if servlet is behind reverseProxy or loadBalancer
