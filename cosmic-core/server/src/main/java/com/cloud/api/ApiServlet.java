@@ -76,12 +76,7 @@ public class ApiServlet extends HttpServlet {
     }
 
     private void processRequest(final HttpServletRequest req, final HttpServletResponse resp) {
-        _managedContext.runWithContext(new Runnable() {
-            @Override
-            public void run() {
-                processRequestInContext(req, resp);
-            }
-        });
+        _managedContext.runWithContext(() -> processRequestInContext(req, resp));
     }
 
     void processRequestInContext(final HttpServletRequest req, final HttpServletResponse resp) {
