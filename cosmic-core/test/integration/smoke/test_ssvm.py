@@ -670,6 +670,7 @@ class TestSSVMs(cloudstackTestCase):
         self.apiclient.stopSystemVm(cmd)
 
         timeout = self.services["timeout"]
+        sleep_interval = self.services["sleep"]
         while True:
             list_ssvm_response = list_ssvms(
                 self.apiclient,
@@ -681,8 +682,8 @@ class TestSSVMs(cloudstackTestCase):
             if timeout == 0:
                 raise Exception("List SSVM call failed!")
 
-            time.sleep(self.services["sleep"])
-            timeout = timeout - 1
+            time.sleep(sleep_interval)
+            timeout -= sleep_interval
 
         self.assertEqual(
             isinstance(list_ssvm_response, list),
