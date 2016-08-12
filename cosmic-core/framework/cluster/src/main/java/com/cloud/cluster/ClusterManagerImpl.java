@@ -373,9 +373,9 @@ public class ClusterManagerImpl extends ManagerBase implements ClusterManager, C
                 } catch (final RemoteException e) {
                     s_logger.error("Unable to get cluster service on peer : " + pdu.getDestPeer());
                 }
-                s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
 
                 if (peerService != null) {
+                    s_logger.debug("Popped a PDU from the outgoing cluster pdu queue: " + pdu);
                     try {
                         if (s_logger.isDebugEnabled()) {
                             s_logger.debug("Cluster PDU " + getSelfPeerName() + " -> " + pdu.getDestPeer() + ". agent: " + pdu.getAgentId() + ", pdu seq: " +
