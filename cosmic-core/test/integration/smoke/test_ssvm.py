@@ -7,7 +7,6 @@ from marvin.cloudstackAPI import (stopSystemVm,
                                   rebootSystemVm,
                                   destroySystemVm)
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.base import (PhysicalNetwork)
 from marvin.lib.common import (get_zone,
                                list_hosts,
                                list_ssvms,
@@ -160,12 +159,6 @@ class TestSSVMs(cloudstackTestCase):
             )
             iprange = ipranges_response[0]
 
-            # Fetch corresponding Physical Network of SSVM's Zone
-            listphyntwk = PhysicalNetwork.list(
-                self.apiclient,
-                zoneid=ssvm.zoneid
-            )
-
             # Execute the following assertion in all zones except basic Zones
             if not (self.zone.networktype.lower() == 'basic'):
                 self.assertEqual(
@@ -290,12 +283,6 @@ class TestSSVMs(cloudstackTestCase):
                 "Check list response returns a valid list"
             )
             iprange = ipranges_response[0]
-
-            # Fetch corresponding Physical Network of SSVM's Zone
-            listphyntwk = PhysicalNetwork.list(
-                self.apiclient,
-                zoneid=cpvm.zoneid
-            )
 
             # Execute the following assertion in all zones except basic Zones
             if not (self.zone.networktype.lower() == 'basic'):
