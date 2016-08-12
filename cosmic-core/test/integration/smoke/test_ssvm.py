@@ -357,31 +357,20 @@ class TestSSVMs(cloudstackTestCase):
 
         self.debug("Running SSVM check script")
 
-        if self.hypervisor.lower() in ('vmware'):
-            # SSH into SSVMs is done via management server for Vmware and
+        try:
+            host.user, host.passwd = get_host_credentials(
+                self.config, host.ipaddress)
             result = get_process_status(
-                self.apiclient.connection.mgtSvr,
+                host.ipaddress,
                 22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                ssvm.privateip,
-                "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL",
-                hypervisor=self.hypervisor)
-        else:
-            try:
-                host.user, host.passwd = get_host_credentials(
-                    self.config, host.ipaddress)
-                result = get_process_status(
-                    host.ipaddress,
-                    22,
-                    host.user,
-                    host.passwd,
-                    ssvm.linklocalip,
-                    "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL")
-            except KeyError:
-                self.skipTest(
-                    "Marvin configuration has no host\
-                            credentials to check router services")
+                host.user,
+                host.passwd,
+                ssvm.linklocalip,
+                "/opt/cosmic/agent/ssvm-check.sh |grep -e ERROR -e WARNING -e FAIL")
+        except KeyError:
+            self.skipTest(
+                "Marvin configuration has no host credentials to check router services")
+
         res = str(result)
         self.debug("SSVM script output: %s" % res)
 
@@ -398,33 +387,20 @@ class TestSSVMs(cloudstackTestCase):
         )
 
         # Check status of cloud service
-        if self.hypervisor.lower() in ('vmware'):
-            # SSH into SSVMs is done via management server for Vmware and
+        try:
+            host.user, host.passwd = get_host_credentials(
+                self.config, host.ipaddress)
             result = get_process_status(
-                self.apiclient.connection.mgtSvr,
+                host.ipaddress,
                 22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                ssvm.privateip,
-                "service cloud status",
-                hypervisor=self.hypervisor
+                host.user,
+                host.passwd,
+                ssvm.linklocalip,
+                "service cloud status"
             )
-        else:
-            try:
-                host.user, host.passwd = get_host_credentials(
-                    self.config, host.ipaddress)
-                result = get_process_status(
-                    host.ipaddress,
-                    22,
-                    host.user,
-                    host.passwd,
-                    ssvm.linklocalip,
-                    "service cloud status"
-                )
-            except KeyError:
-                self.skipTest(
-                    "Marvin configuration has no host\
-                            credentials to check router services")
+        except KeyError:
+            self.skipTest(
+                "Marvin configuration has no host credentials to check router services")
         res = str(result)
         self.debug("Cloud Process status: %s" % res)
         # cloud.com service (type=secstorage) is running: process id: 2346
@@ -436,36 +412,21 @@ class TestSSVMs(cloudstackTestCase):
 
         linklocal_ip = None
         # Check status of cloud service
-        if self.hypervisor.lower() in ('vmware'):
-            # SSH into SSVMs is done via management server for Vmware and
-            # Hyper-V
-            linklocal_ip = ssvm.privateip
+        try:
+            linklocal_ip = ssvm.linklocalip
+            host.user, host.passwd = get_host_credentials(
+                self.config, host.ipaddress)
             result = get_process_status(
-                self.apiclient.connection.mgtSvr,
+                host.ipaddress,
                 22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                ssvm.privateip,
-                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth1ip= | sed \"s/\=/ /g\" | awk '{print $2}'",
-                hypervisor=self.hypervisor
+                host.user,
+                host.passwd,
+                ssvm.linklocalip,
+                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
             )
-        else:
-            try:
-                linklocal_ip = ssvm.linklocalip
-                host.user, host.passwd = get_host_credentials(
-                    self.config, host.ipaddress)
-                result = get_process_status(
-                    host.ipaddress,
-                    22,
-                    host.user,
-                    host.passwd,
-                    ssvm.linklocalip,
-                    "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
-                )
-            except KeyError:
-                self.skipTest(
-                    "Marvin configuration has no host\
-                            credentials to check router services")
+        except KeyError:
+            self.skipTest(
+                "Marvin configuration has no host credentials to check router services")
         res = result[0]
         self.debug("Cached Link Local IP: %s" % res)
         self.assertEqual(
@@ -533,33 +494,20 @@ class TestSSVMs(cloudstackTestCase):
 
         self.debug("Checking cloud process status")
 
-        if self.hypervisor.lower() in ('vmware'):
-            # SSH into SSVMs is done via management server for Vmware and
+        try:
+            host.user, host.passwd = get_host_credentials(
+                self.config, host.ipaddress)
             result = get_process_status(
-                self.apiclient.connection.mgtSvr,
+                host.ipaddress,
                 22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                cpvm.privateip,
-                "service cloud status",
-                hypervisor=self.hypervisor
+                host.user,
+                host.passwd,
+                cpvm.linklocalip,
+                "service cloud status"
             )
-        else:
-            try:
-                host.user, host.passwd = get_host_credentials(
-                    self.config, host.ipaddress)
-                result = get_process_status(
-                    host.ipaddress,
-                    22,
-                    host.user,
-                    host.passwd,
-                    cpvm.linklocalip,
-                    "service cloud status"
-                )
-            except KeyError:
-                self.skipTest(
-                    "Marvin configuration has no host\
-                            credentials to check router services")
+        except KeyError:
+            self.skipTest(
+                "Marvin configuration has no host credentials to check router services")
         res = str(result)
         self.debug("Cloud Process status: %s" % res)
         self.assertEqual(
@@ -570,35 +518,22 @@ class TestSSVMs(cloudstackTestCase):
 
         linklocal_ip = None
         # Check status of cloud service
-        if self.hypervisor.lower() in ('vmware'):
-            # SSH into SSVMs is done via management server for Vmware and
-            linklocal_ip = cpvm.privateip
+        try:
+            linklocal_ip = cpvm.linklocalip
+            host.user, host.passwd = get_host_credentials(
+                self.config, host.ipaddress)
             result = get_process_status(
-                self.apiclient.connection.mgtSvr,
+                host.ipaddress,
                 22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                cpvm.privateip,
-                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth1ip= | sed \"s/\=/ /g\" | awk '{print $2}'",
-                hypervisor=self.hypervisor
+                host.user,
+                host.passwd,
+                cpvm.linklocalip,
+                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
             )
-        else:
-            try:
-                linklocal_ip = cpvm.linklocalip
-                host.user, host.passwd = get_host_credentials(
-                    self.config, host.ipaddress)
-                result = get_process_status(
-                    host.ipaddress,
-                    22,
-                    host.user,
-                    host.passwd,
-                    cpvm.linklocalip,
-                    "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
-                )
-            except KeyError:
-                self.skipTest(
-                    "Marvin configuration has no host\
-                            credentials to check router services")
+        except KeyError:
+            self.skipTest(
+                "Marvin configuration has no host\
+                        credentials to check router services")
         res = result[0]
         self.debug("Cached Link Local IP: %s" % res)
         self.assertEqual(
