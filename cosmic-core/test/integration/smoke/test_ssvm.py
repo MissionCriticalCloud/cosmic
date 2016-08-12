@@ -71,20 +71,20 @@ class TestSSVMs(cloudstackTestCase):
             timeout = timeout - sleep_interval
 
         if timeout <= 0 and list_host_response[0].state != 'Up':
-            self.fail("Timed out waiting for SSVM agent to be Up")
+            self.fail("Timed out waiting for SVM agent to be Up")
 
-    def wait_for_ssvm_state(self, vmid, state, timeout, sleep_interval):
+    def wait_for_svm_state(self, vmid, state, timeout, sleep_interval):
         while timeout > 0:
-            list_ssvm_response = list_ssvms(self.apiclient, id=vmid)
-            if isinstance(list_ssvm_response, list) and list_ssvm_response[0].state == state:
-                self.logger.debug("SSVM %s %" % (vmid, state))
+            list_svm_response = list_ssvms(self.apiclient, id=vmid)
+            if isinstance(list_svm_response, list) and list_svm_response[0].state == state:
+                self.logger.debug("SVM %s %s" % (vmid, state))
                 break
 
             time.sleep(sleep_interval)
             timeout -= sleep_interval
 
-        if timeout <= 0 and isinstance(list_ssvm_response, list) and list_ssvm_response[0].state != state:
-            self.fail("Timeout reached while waiting for system VM to be %s, actual state is %s" % (state, list_ssvm_response[0].state))
+        if timeout <= 0 and isinstance(list_svm_response, list) and list_svm_response[0].state != state:
+            self.fail("Timeout reached while waiting for system VM to be %s, actual state is %s" % (state, list_svm_response[0].state))
 
     def test_list_svm_vm(self, svm_type):
         # Validate the following:
@@ -427,39 +427,28 @@ class TestSSVMs(cloudstackTestCase):
 
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"],
-        required_hardware="true")
-    def test_05_stop_ssvm(self):
-        """Test stop SSVM
-        """
-
+    def test_stop_svm(self, svm_type):
         # Validate the following
-        # 1. The SSVM should go to stop state
-        # 2. The SSVM should be restarted and return to Running state with the checks of the previous two test cases still passing
+        # 1. The SVM should go to stop state
+        # 2. The SVM should be restarted and return to Running state with the checks of the previous two test cases still passing
         # 3. If either of the two above steps fail the test is a failure
 
-        list_ssvm_response = list_ssvms(
+        list_svm_response = list_ssvms(
             self.apiclient,
-            systemvmtype='secondarystoragevm',
+            systemvmtype=svm_type,
             state='Running',
             zoneid=self.zone.id
         )
         self.assertEqual(
-            isinstance(list_ssvm_response, list),
+            isinstance(list_svm_response, list),
             True,
             "Check list response returns a valid list"
         )
-        ssvm = list_ssvm_response[0]
+        svm = list_svm_response[0]
 
         hosts = list_hosts(
             self.apiclient,
-            id=ssvm.hostid
+            id=svm.hostid
         )
         self.assertEqual(
             isinstance(hosts, list),
@@ -467,33 +456,24 @@ class TestSSVMs(cloudstackTestCase):
             "Check list response returns a valid list"
         )
 
-        self.logger.debug("Stopping SSVM: %s" % ssvm.id)
+        self.logger.debug("Stopping System VM: %s" % svm.id)
         cmd = stopSystemVm.stopSystemVmCmd()
-        cmd.id = ssvm.id
+        cmd.id = svm.id
         self.apiclient.stopSystemVm(cmd)
-        self.wait_for_ssvm_state(ssvm.id, 'Stopped', self.services["timeout"], self.services["sleep"])
+        self.wait_for_svm_state(svm.id, 'Stopped', self.services["timeout"], self.services["sleep"])
 
-        self.logger.debug("Starting SSVM: %s" % ssvm.id)
+        self.logger.debug("Starting System VM: %s" % svm.id)
         cmd = startSystemVm.startSystemVmCmd()
-        cmd.id = ssvm.id
+        cmd.id = svm.id
         self.apiclient.startSystemVm(cmd)
-        self.wait_for_ssvm_state(ssvm.id, 'Running', self.services["timeout"], self.services["sleep"])
-        self.wait_for_system_vm_agent(list_ssvm_response[0].name)
+        self.wait_for_svm_state(svm.id, 'Running', self.services["timeout"], self.services["sleep"])
+        self.wait_for_system_vm_agent(svm.name)
 
-        self.assertEqual(
-            isinstance(list_ssvm_response, list),
-            True,
-            "Check list response returns a valid list"
-        )
-        ssvm_response = list_ssvm_response[0]
-        self.logger.debug("SSVM state after debug: %s" % ssvm_response.state)
-        self.assertEqual(
-            ssvm_response.state,
-            'Running',
-            "Check whether SSVM is running or not"
-        )
-        # Wait for the agent to be up
-        self.wait_for_system_vm_agent(ssvm_response.name)
+        return
+
+    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
+    def test_05_stop_ssvm(self):
+        self.test_stop_svm('secondarystoragevm')
 
         # Call above tests to ensure SSVM is properly running
         self.test_01_list_sec_storage_vm()
@@ -503,82 +483,12 @@ class TestSSVMs(cloudstackTestCase):
         time.sleep(int(self.services["configurableData"]["systemVmDelay"]))
 
         self.test_03_ssvm_internals()
+
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"],
-        required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
     def test_06_stop_cpvm(self):
-        """Test stop CPVM
-        """
-
-        # Validate the following
-        # 1. The CPVM should go to stop state
-        # 2. After a brief delay of say one minute, the SSVM should be
-        #    restarted once again and return to Running state with previous
-        #    two test cases still passing
-        # 3. If either of the two above steps fail the test is a failure
-
-        list_cpvm_response = list_ssvms(
-            self.apiclient,
-            systemvmtype='consoleproxy',
-            state='Running',
-            zoneid=self.zone.id
-        )
-        self.assertEqual(
-            isinstance(list_cpvm_response, list),
-            True,
-            "Check list response returns a valid list"
-        )
-        cpvm = list_cpvm_response[0]
-
-        hosts = list_hosts(
-            self.apiclient,
-            id=cpvm.hostid
-        )
-        self.assertEqual(
-            isinstance(hosts, list),
-            True,
-            "Check list response returns a valid list"
-        )
-
-        self.logger.debug("Stopping CPVM: %s" % cpvm.id)
-        cmd = stopSystemVm.stopSystemVmCmd()
-        cmd.id = cpvm.id
-        self.apiclient.stopSystemVm(cmd)
-
-        timeout = self.services["timeout"]
-        while True:
-            list_cpvm_response = list_ssvms(
-                self.apiclient,
-                id=cpvm.id
-            )
-            if isinstance(list_cpvm_response, list):
-                if list_cpvm_response[0].state == 'Running':
-                    break
-            if timeout == 0:
-                raise Exception("List CPVM call failed!")
-
-            time.sleep(self.services["sleep"])
-            timeout = timeout - 1
-
-        cpvm_response = list_cpvm_response[0]
-
-        self.logger.debug("CPVM state after debug: %s" % cpvm_response.state)
-
-        self.assertEqual(
-            cpvm_response.state,
-            'Running',
-            "Check whether CPVM is running or not"
-        )
-
-        # Wait for the agent to be up
-        self.wait_for_system_vm_agent(cpvm_response.name)
+        self.test_stop_svm('consoleproxy')
 
         # Call above tests to ensure CPVM is properly running
         self.test_02_list_cpvm_vm()
