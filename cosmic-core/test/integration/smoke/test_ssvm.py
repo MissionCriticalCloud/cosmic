@@ -209,14 +209,7 @@ class TestSSVMs(cloudstackTestCase):
     def test_02_list_cpvm_vm(self):
         self.test_list_svm_vm('consoleproxy')
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"],
-        required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
     def test_03_ssvm_internals(self):
         """Test SSVM Internals"""
 
@@ -335,14 +328,7 @@ class TestSSVMs(cloudstackTestCase):
 
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"],
-        required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
     def test_04_cpvm_internals(self):
         """Test CPVM Internals"""
 
@@ -430,8 +416,7 @@ class TestSSVMs(cloudstackTestCase):
             )
         except KeyError:
             self.skipTest(
-                "Marvin configuration has no host\
-                        credentials to check router services")
+                "Marvin configuration has no host credentials to check router services")
         res = result[0]
         self.logger.debug("Cached Link Local IP: %s" % res)
         self.assertEqual(
