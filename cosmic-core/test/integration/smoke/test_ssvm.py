@@ -38,7 +38,7 @@ class TestSSVMs(cloudstackTestCase):
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
 
         self.services["sleep"] = 2
-        self.services["timeout"] = 120
+        self.services["timeout"] = 240
         # Default value is 120 seconds. That's just too much.
         self.services["configurableData"]["systemVmDelay"] = 60
 
