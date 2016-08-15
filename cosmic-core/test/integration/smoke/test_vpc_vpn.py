@@ -649,11 +649,10 @@ class TestVpcVpn(cloudstackTestCase):
         vpc_offering = self._create_vpc_offering('vpc_offering')
         self.assertIsNotNone(vpc_offering, "Failed to create VPC Offering")
         vpc_offering.update(self.apiclient, state='Enabled')
+        self.cleanup.append(vpc_offering)
 
         # Set up 1 VPNs; needs 2 VPCs
         self._test_vpc_site2site_vpn(vpc_offering, 2)
-
-        self.cleanup.append(vpc_offering)
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_03_redundant_vpc_site2site_vpn(self):
@@ -662,11 +661,10 @@ class TestVpcVpn(cloudstackTestCase):
         redundant_vpc_offering = self._create_vpc_offering('redundant_vpc_offering')
         self.assertIsNotNone(redundant_vpc_offering, 'Failed to create redundant VPC Offering')
         redundant_vpc_offering.update(self.apiclient, state='Enabled')
+        self.cleanup.append(redundant_vpc_offering)
 
         # Set up 1 VPNs; needs 2 VPCs
         self._test_vpc_site2site_vpn(redundant_vpc_offering, 2)
-
-        self.cleanup.append(redundant_vpc_offering)
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_04_vpc_site2site_multiple_vpn(self):
@@ -675,8 +673,7 @@ class TestVpcVpn(cloudstackTestCase):
         vpc_offering = self._create_vpc_offering('vpc_offering')
         self.assertIsNotNone(vpc_offering, "Failed to create VPC Offering")
         vpc_offering.update(self.apiclient, state='Enabled')
+        self.cleanup.append(vpc_offering)
 
         # Set up 3 VPNs; needs 4 VPCs
         self._test_vpc_site2site_vpn(vpc_offering, 4)
-
-        self.cleanup.append(vpc_offering)
