@@ -229,20 +229,18 @@ class TestVpcVpn(cloudstackTestCase):
         return
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
         self.cleanup = []
 
-    def tearDown(cls):
+    def tearDown(self):
         try:
-            cls.logger.debug("Cleaning up resources")
-            cleanup_resources(cls.apiclient, cls.cleanup)
-        except Exception, e:
+            self.logger.debug("Cleaning up resources")
+            cleanup_resources(self.apiclient, self.cleanup)
+        except Exception as e:
             raise Exception("Cleanup failed with %s" % e)
 
     @classmethod
     def tearDownClass(cls):
         try:
-            cls.apiclient = super(TestVpcRemoteAccessVpn, cls).getClsTestClient().getApiClient()
             cleanup_resources(cls.apiclient, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
