@@ -447,7 +447,7 @@ class TestVpcVpn(cloudstackTestCase):
             ip = src_nat_list[0]
 
             customer_response = VpnCustomerGateway.create(self.apiclient, services, "Peer VPC" + `i`, ip.ipaddress, vpc_list[i].cidr, self.account.name, self.domain.id)
-            self.cleanup.append(customer_response)
+            self.cleanup.insert(0, customer_response)  # this has to be cleaned up after the VPCs have been destroyed (due to client connectionsonections)
             vpn_cust_gw_list.append(customer_response)
             self.logger.debug("VPN customer gateway added for VPC%d %s enabled" % (i, vpc_list[i].id))
 
