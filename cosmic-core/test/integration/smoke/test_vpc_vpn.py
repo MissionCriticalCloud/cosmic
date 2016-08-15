@@ -242,7 +242,7 @@ class TestVpcVpn(cloudstackTestCase):
     @classmethod
     def tearDownClass(cls):
         try:
-            cleanup_resources(cls.apiclient, cls._cleanup)
+            cleanup_resources(cls.apiclient, cls._cleanup, cls.logger)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
