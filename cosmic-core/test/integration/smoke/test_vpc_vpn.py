@@ -2,31 +2,36 @@
 """
 # Import Local Modules
 import copy
-import logging
 import time
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import PASS, FAILED
-from marvin.lib.base import (Account,
-                             VPC,
-                             VpcOffering,
-                             ServiceOffering,
-                             NetworkOffering,
-                             Network,
-                             PublicIPAddress,
-                             NetworkACLList,
-                             VirtualMachine,
-                             Template,
-                             Vpn,
-                             VpnCustomerGateway,
-                             VpnUser
-                             )
-from marvin.lib.common import (get_zone,
-                               get_domain,
-                               list_hosts,
-                               list_routers)
-from marvin.lib.utils import (validateList,
-                              cleanup_resources,
-                              get_process_status)
+from marvin.lib.base import (
+    Account,
+    VPC,
+    VpcOffering,
+    ServiceOffering,
+    NetworkOffering,
+    Network,
+    PublicIPAddress,
+    NetworkACLList,
+    VirtualMachine,
+    Template,
+    Vpn,
+    VpnCustomerGateway,
+    VpnUser
+)
+from marvin.lib.common import (
+    get_zone,
+    get_domain,
+    list_hosts,
+    list_routers
+)
+from marvin.lib.utils import (
+    validateList,
+    cleanup_resources,
+    get_process_status
+)
+from marvin.marvinLog import MarvinLog
 from nose.plugins.attrib import attr
 
 
@@ -196,10 +201,7 @@ class Services:
 class TestVpcRemoteAccessVpn(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = logging.getLogger('TestVPCRemoteAccessVPN')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
+        cls.logger = MarvinLog('test').getLogger()
 
         test_client = super(TestVpcRemoteAccessVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()
@@ -338,7 +340,7 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
                                       domainid=self.account.domainid,
                                       username=self.services["vpn"]["vpn_user"],
                                       password=self.services["vpn"]["vpn_pass"]
-            )
+                                      )
         except Exception as e:
             self.fail(e)
         finally:
@@ -378,10 +380,7 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
 class TestVpcSite2SiteVpn(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = logging.getLogger('TestVPCSite2SiteVPN')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
+        cls.logger = MarvinLog('test').getLogger()
 
         testClient = super(TestVpcSite2SiteVpn, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
