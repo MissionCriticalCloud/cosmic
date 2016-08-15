@@ -198,12 +198,12 @@ class Services:
         }
 
 
-class TestVpcRemoteAccessVpn(cloudstackTestCase):
+class TestVpcVpn(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog('test').getLogger()
 
-        test_client = super(TestVpcRemoteAccessVpn, cls).getClsTestClient()
+        test_client = super(TestVpcVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()
         cls.services = Services().services
 
@@ -232,134 +232,6 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
         self.apiclient = self.testClient.getApiClient()
         self.cleanup = []
 
-    @attr(tags=["advanced"], required_hardware="true")
-    def test_01_vpc_remote_access_vpn(self):
-        """Test Remote Access VPN in VPC"""
-
-        self.logger.debug("Starting test: test_01_vpc_remote_access_vpn")
-
-        # 0) Get the default network offering for VPC
-        self.logger.debug("Retrieving default VPC offering")
-        network_offering = NetworkOffering.list(self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
-        self.assertTrue(network_offering is not None and len(network_offering) > 0, "No VPC based network offering")
-
-        # 1) Create VPC
-        vpc_offering = VpcOffering.list(self.apiclient, isdefault=True)
-        self.assertTrue(vpc_offering is not None and len(vpc_offering) > 0, "No VPC offerings found")
-
-        try:
-            vpc = VPC.create(
-                apiclient=self.apiclient,
-                services=self.services["vpc"],
-                networkDomain="vpc.vpn",
-                vpcofferingid=vpc_offering[0].id,
-                zoneid=self.zone.id,
-                account=self.account.name,
-                domainid=self.domain.id
-            )
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.assertTrue(vpc is not None, "VPC creation failed")
-            self.logger.debug("VPC %s created" % (vpc.id))
-        self.cleanup.append(vpc)
-
-        try:
-            # 2) Create network in VPC
-            ntwk = Network.create(
-                apiclient=self.apiclient,
-                services=self.services["network_1"],
-                accountid=self.account.name,
-                domainid=self.domain.id,
-                networkofferingid=network_offering[0].id,
-                zoneid=self.zone.id,
-                vpcid=vpc.id
-            )
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.assertIsNotNone(ntwk, "Network failed to create")
-            self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
-        self.cleanup.append(ntwk)
-
-        try:
-            # 3) Deploy a vm
-            vm = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
-                                       templateid=self.template.id,
-                                       zoneid=self.zone.id,
-                                       accountid=self.account.name,
-                                       domainid=self.domain.id,
-                                       serviceofferingid=self.compute_offering.id,
-                                       networkids=ntwk.id,
-                                       hypervisor=self.hypervisor
-                                       )
-            self.assertTrue(vm is not None, "VM failed to deploy")
-            self.assertTrue(vm.state == 'Running', "VM is not running")
-            self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.logger.debug("Deployed virtual machine: OK")
-        self.cleanup.append(vm)
-
-        try:
-            # 4) Enable VPN for VPC
-            src_nat_list = PublicIPAddress.list(
-                self.apiclient,
-                account=self.account.name,
-                domainid=self.account.domainid,
-                listall=True,
-                issourcenat=True,
-                vpcid=vpc.id
-            )
-            ip = src_nat_list[0]
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.logger.debug("Acquired public ip address: OK")
-
-        try:
-            vpn = Vpn.create(self.apiclient,
-                             publicipid=ip.id,
-                             account=self.account.name,
-                             domainid=self.account.domainid,
-                             iprange=self.services["vpn"]["iprange"],
-                             fordisplay=self.services["vpn"]["fordisplay"]
-                             )
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
-            self.logger.debug("Created Remote Access VPN: OK")
-
-        vpn_user = None
-        # 5) Add VPN user for VPC
-        try:
-            vpn_user = VpnUser.create(self.apiclient,
-                                      account=self.account.name,
-                                      domainid=self.account.domainid,
-                                      username=self.services["vpn"]["vpn_user"],
-                                      password=self.services["vpn"]["vpn_pass"]
-                                      )
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.assertIsNotNone(
-                vpn_user, "Failed to create Remote Access VPN User")
-            self.logger.debug("Created VPN User: OK")
-
-        # TODO: Add an actual remote vpn connection test from a remote vpc
-
-        try:
-            # 9) Disable VPN for VPC
-            vpn.delete(self.apiclient)
-        except Exception as e:
-            self.fail(e)
-        finally:
-            self.logger.debug("Deleted the Remote Access VPN: OK")
-
-        self.cleanup.reverse()
-
     def tearDown(cls):
         try:
             cls.logger.debug("Cleaning up resources")
@@ -371,63 +243,6 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
     def tearDownClass(cls):
         try:
             cls.apiclient = super(TestVpcRemoteAccessVpn, cls).getClsTestClient().getApiClient()
-            cleanup_resources(cls.apiclient, cls._cleanup)
-        except Exception as e:
-            raise Exception("Warning: Exception during cleanup : %s" % e)
-        return
-
-
-class TestVpcSite2SiteVpn(cloudstackTestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.logger = MarvinLog('test').getLogger()
-
-        testClient = super(TestVpcSite2SiteVpn, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
-        cls.services = Services().services
-
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
-        cls.domain = get_domain(cls.apiclient)
-
-        cls.compute_offering = ServiceOffering.create(
-            cls.apiclient,
-            cls.services["compute_offering"]
-        )
-
-        cls.account = Account.create(cls.apiclient, services=cls.services["account"])
-        cls.logger.debug("Successfully created account: %s, id: %s" % (cls.account.name, cls.account.id))
-
-        cls.hypervisor = testClient.getHypervisorInfo()
-
-        template = cls.services["template"][cls.hypervisor.lower()]
-        cls.logger.debug("Downloading Template: %s from: %s" % (template, template["url"]))
-        cls.template = Template.register(cls.apiclient, template, cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
-        cls.template.download(cls.apiclient)
-
-        if cls.template == FAILED:
-            cls.fail("Failed to register template")
-
-        cls.network_offering = NetworkOffering.list(cls.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
-        cls.assertTrue(cls.network_offering is not None and len(cls.network_offering) > 0, "No VPC based network offering")
-
-        cls._cleanup = [cls.template, cls.account, cls.compute_offering]
-        return
-
-    def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
-        self.cleanup = []
-
-    def tearDown(cls):
-        try:
-            cls.logger.debug("Cleaning up resources")
-            cleanup_resources(cls.apiclient, cls.cleanup)
-        except Exception, e:
-            raise Exception("Cleanup failed with %s" % e)
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            cls.apiclient = super(TestVpcSite2SiteVpn, cls).getClsTestClient().getApiClient()
             cleanup_resources(cls.apiclient, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -708,7 +523,135 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
         return
 
     @attr(tags=["advanced"], required_hardware="true")
-    def test_01_vpc_site2site_vpn(self):
+    def test_01_vpc_remote_access_vpn(self):
+        """Test Remote Access VPN in VPC"""
+
+        self.logger.debug("Starting test: test_01_vpc_remote_access_vpn")
+
+        # 0) Get the default network offering for VPC
+        self.logger.debug("Retrieving default VPC offering")
+        network_offering = NetworkOffering.list(self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
+        self.assertTrue(network_offering is not None and len(network_offering) > 0, "No VPC based network offering")
+
+        # 1) Create VPC
+        vpc_offering = VpcOffering.list(self.apiclient, isdefault=True)
+        self.assertTrue(vpc_offering is not None and len(vpc_offering) > 0, "No VPC offerings found")
+
+        try:
+            vpc = VPC.create(
+                apiclient=self.apiclient,
+                services=self.services["vpc"],
+                networkDomain="vpc.vpn",
+                vpcofferingid=vpc_offering[0].id,
+                zoneid=self.zone.id,
+                account=self.account.name,
+                domainid=self.domain.id
+            )
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.assertTrue(vpc is not None, "VPC creation failed")
+            self.logger.debug("VPC %s created" % (vpc.id))
+        self.cleanup.append(vpc)
+
+        try:
+            # 2) Create network in VPC
+            ntwk = Network.create(
+                apiclient=self.apiclient,
+                services=self.services["network_1"],
+                accountid=self.account.name,
+                domainid=self.domain.id,
+                networkofferingid=network_offering[0].id,
+                zoneid=self.zone.id,
+                vpcid=vpc.id
+            )
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.assertIsNotNone(ntwk, "Network failed to create")
+            self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
+        self.cleanup.append(ntwk)
+
+        try:
+            # 3) Deploy a vm
+            vm = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
+                                       templateid=self.template.id,
+                                       zoneid=self.zone.id,
+                                       accountid=self.account.name,
+                                       domainid=self.domain.id,
+                                       serviceofferingid=self.compute_offering.id,
+                                       networkids=ntwk.id,
+                                       hypervisor=self.hypervisor
+                                       )
+            self.assertTrue(vm is not None, "VM failed to deploy")
+            self.assertTrue(vm.state == 'Running', "VM is not running")
+            self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.logger.debug("Deployed virtual machine: OK")
+        self.cleanup.append(vm)
+
+        try:
+            # 4) Enable VPN for VPC
+            src_nat_list = PublicIPAddress.list(
+                self.apiclient,
+                account=self.account.name,
+                domainid=self.account.domainid,
+                listall=True,
+                issourcenat=True,
+                vpcid=vpc.id
+            )
+            ip = src_nat_list[0]
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.logger.debug("Acquired public ip address: OK")
+
+        try:
+            vpn = Vpn.create(self.apiclient,
+                             publicipid=ip.id,
+                             account=self.account.name,
+                             domainid=self.account.domainid,
+                             iprange=self.services["vpn"]["iprange"],
+                             fordisplay=self.services["vpn"]["fordisplay"]
+                             )
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
+            self.logger.debug("Created Remote Access VPN: OK")
+
+        vpn_user = None
+        # 5) Add VPN user for VPC
+        try:
+            vpn_user = VpnUser.create(self.apiclient,
+                                      account=self.account.name,
+                                      domainid=self.account.domainid,
+                                      username=self.services["vpn"]["vpn_user"],
+                                      password=self.services["vpn"]["vpn_pass"]
+                                      )
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.assertIsNotNone(
+                vpn_user, "Failed to create Remote Access VPN User")
+            self.logger.debug("Created VPN User: OK")
+
+        # TODO: Add an actual remote vpn connection test from a remote vpc
+
+        try:
+            # 9) Disable VPN for VPC
+            vpn.delete(self.apiclient)
+        except Exception as e:
+            self.fail(e)
+        finally:
+            self.logger.debug("Deleted the Remote Access VPN: OK")
+
+        self.cleanup.reverse()
+
+    @attr(tags=["advanced"], required_hardware="true")
+    def test_02_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across VPCs"""
         self.logger.debug("Starting test: test_01_vpc_site2site_vpn")
 
@@ -723,7 +666,7 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
         self.cleanup.append(vpc_offering)
 
     @attr(tags=["advanced"], required_hardware="true")
-    def test_02_redundant_vpc_site2site_vpn(self):
+    def test_03_redundant_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across redundant VPCs"""
         self.logger.debug("Starting test: test_02_redundant_vpc_site2site_vpn")
 
@@ -740,7 +683,7 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
         self.cleanup.append(redundant_vpc_offering)
 
     @attr(tags=["advanced"], required_hardware="true")
-    def test_03_vpc_site2site_multiple_vpn(self):
+    def test_04_vpc_site2site_multiple_vpn(self):
         """Test Site 2 Site multiple VPNs Across VPCs"""
         self.logger.debug("Starting test: test_03_vpc_site2site_multiple_vpn")
 
