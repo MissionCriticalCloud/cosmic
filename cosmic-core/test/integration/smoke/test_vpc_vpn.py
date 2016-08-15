@@ -234,7 +234,8 @@ class TestVpcVpn(cloudstackTestCase):
     def tearDown(self):
         try:
             self.logger.debug("Cleaning up resources")
-            cleanup_resources(self.apiclient, self.cleanup)
+            self.cleanup.reverse()
+            cleanup_resources(self.apiclient, self.cleanup, self.logger)
         except Exception as e:
             raise Exception("Cleanup failed with %s" % e)
 
@@ -373,7 +374,7 @@ class TestVpcVpn(cloudstackTestCase):
             finally:
                 self.assert_(vpc_n is not None, "VPC%d creation failed" % i)
 
-            self.cleanup.insert(0, vpc_n)
+            self.cleanup.append(vpc_n)
             vpc_list.append(vpc_n)
 
             self.logger.debug("VPC%d %s created" % (i, vpc_list[i].id))
@@ -432,7 +433,7 @@ class TestVpcVpn(cloudstackTestCase):
                 self.assert_(vm_n is not None, "VM%d failed to deploy" % i)
                 self.assert_(vm_n.state == 'Running', "VM%d is not running" % i)
 
-            self.cleanup.insert(0, vm_n)
+            self.cleanup.append(vm_n)
             vm_list.append(vm_n)
             self.logger.debug("VM%d %s deployed in VPC %s" % (i, vm_list[i].id, vpc_list[i].id))
 
@@ -645,8 +646,6 @@ class TestVpcVpn(cloudstackTestCase):
             self.fail(e)
         finally:
             self.logger.debug("Deleted the Remote Access VPN: OK")
-
-        self.cleanup.reverse()
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_02_vpc_site2site_vpn(self):
