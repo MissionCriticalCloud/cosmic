@@ -180,44 +180,13 @@ class Services:
                 "protocol": 'TCP',
             },
             "template": {
-
                 "kvm": {
                     "name": "tiny-kvm",
-                    "displaytext": "macchinina kvm",
+                    "displaytext": "new tiny kvm",
                     "format": "qcow2",
                     "hypervisor": "kvm",
                     "ostype": "Other PV (64-bit)",
                     "url": "http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-kvm.qcow2.bz2",
-                    "requireshvm": "True",
-                },
-
-                "xenserver": {
-                    "name": "tiny-xen",
-                    "displaytext": "macchinina xen",
-                    "format": "vhd",
-                    "hypervisor": "xen",
-                    "ostype": "Other PV (64-bit)",
-                    "url": "http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2",
-                    "requireshvm": "True",
-                },
-
-                "hyperv": {
-                    "name": "tiny-hyperv",
-                    "displaytext": "macchinina xen",
-                    "format": "vhd",
-                    "hypervisor": "hyperv",
-                    "ostype": "Other PV (64-bit)",
-                    "url": "http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-hyperv.vhd.zip",
-                    "requireshvm": "True",
-                },
-
-                "vmware": {
-                    "name": "tiny-vmware",
-                    "displaytext": "macchinina vmware",
-                    "format": "ova",
-                    "hypervisor": "vmware",
-                    "ostype": "Other PV (64-bit)",
-                    "url": "http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-vmware.vmdk.bz2",
                     "requireshvm": "True",
                 }
             }
