@@ -372,7 +372,7 @@ class TestVpcVpn(cloudstackTestCase):
             except Exception as e:
                 self.fail(e)
 
-            self.assert_(vpc_n is not None, "VPC%d creation failed" % i)
+            self.assertIsNotNone(vpc_n, "VPC%d creation failed" % i)
 
             self.cleanup.append(vpc_n)
             vpc_list.append(vpc_n)
@@ -429,8 +429,8 @@ class TestVpcVpn(cloudstackTestCase):
             except Exception as e:
                 self.fail(e)
 
-            self.assert_(vm_n is not None, "VM%d failed to deploy" % i)
-            self.assert_(vm_n.state == 'Running', "VM%d is not running" % i)
+            self.assertIsNotNone(vm_n, "VM%d failed to deploy" % i)
+            self.assertEquals(vm_n.state, 'Running', "VM%d is not running" % i)
 
             self.cleanup.append(vm_n)
             vm_list.append(vm_n)
@@ -441,8 +441,7 @@ class TestVpcVpn(cloudstackTestCase):
         for i in range(num_VPCs):
             vpn_response = None
             vpn_response = Vpn.createVpnGateway(self.apiclient, vpc_list[i].id)
-            self.assert_(
-                vpn_response is not None, "Failed to enable VPN Gateway %d" % i)
+            self.assertIsNotNone(vpn_response, "Failed to enable VPN Gateway %d" % i)
             self.logger.debug("VPN gateway for VPC%d %s enabled" % (i, vpc_list[i].id))
             vpn_response_list.append(vpn_response)
 
@@ -496,7 +495,7 @@ class TestVpcVpn(cloudstackTestCase):
         except Exception as e:
             self.fail(e)
 
-        self.assert_(ssh_max_client is not None, "Failed to setup SSH to last VM created (%d)" % maxnumVM)
+        self.assertIsNotNone(ssh_max_client, "Failed to setup SSH to last VM created (%d)" % maxnumVM)
 
         self.logger.debug("Setup SSH connection to first VM created (0) to ensure availability for ping tests")
         try:
@@ -504,14 +503,14 @@ class TestVpcVpn(cloudstackTestCase):
         except Exception as e:
             self.fail(e)
 
-        self.assert_(ssh_client is not None, "Failed to setup SSH to VM0")
+        self.assertIsNotNone(ssh_client, "Failed to setup SSH to VM0")
 
         if ssh_client:
             # run ping test
             for i in range(num_VPCs)[1:]:
                 packet_loss = ssh_client.execute(
                     "/bin/ping -c 3 -t 10 " + vm_list[i].nic[0].ipaddress + " |grep packet|cut -d ' ' -f 7| cut -f1 -d'%'")[0]
-                self.assert_(int(packet_loss) == 0, "Ping towards vm" + `i` + "did not succeed")
+                self.assertEquals(int(packet_loss), 0, "Ping towards vm" + `i` + "did not succeed")
                 self.logger.debug("Ping from vm0 to vm%d did succeed" % i)
         else:
             self.fail("Failed to setup ssh connection to %s" % vm_list[0].public_ip)
@@ -521,9 +520,6 @@ class TestVpcVpn(cloudstackTestCase):
     @attr(tags=["advanced"], required_hardware="true")
     def test_01_vpc_remote_access_vpn(self):
         """Test Remote Access VPN in VPC"""
-
-        self.logger.debug("Starting test: test_01_vpc_remote_access_vpn")
-
         # 0) Get the default network offering for VPC
         self.logger.debug("Retrieving default VPC offering")
         network_offering = NetworkOffering.list(self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
@@ -546,7 +542,7 @@ class TestVpcVpn(cloudstackTestCase):
         except Exception as e:
             self.fail(e)
 
-        self.assertTrue(vpc is not None, "VPC creation failed")
+        self.assertIsNotNone(vpc, "VPC creation failed")
         self.logger.debug("VPC %s created" % (vpc.id))
 
         self.cleanup.append(vpc)
@@ -581,8 +577,8 @@ class TestVpcVpn(cloudstackTestCase):
                                        networkids=ntwk.id,
                                        hypervisor=self.hypervisor
                                        )
-            self.assertTrue(vm is not None, "VM failed to deploy")
-            self.assertTrue(vm.state == 'Running', "VM is not running")
+            self.assertIsNotNone(vm, "VM failed to deploy")
+            self.assertEquals(vm.state, 'Running', "VM is not running")
             self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
         except Exception as e:
             self.fail(e)
@@ -648,11 +644,9 @@ class TestVpcVpn(cloudstackTestCase):
     @attr(tags=["advanced"], required_hardware="true")
     def test_02_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across VPCs"""
-        self.logger.debug("Starting test: test_01_vpc_site2site_vpn")
-
         # Create and Enable VPC offering
         vpc_offering = self._create_vpc_offering('vpc_offering')
-        self.assert_(vpc_offering is not None, "Failed to create VPC Offering")
+        self.assertIsNotNone(vpc_offering, "Failed to create VPC Offering")
         vpc_offering.update(self.apiclient, state='Enabled')
 
         # Set up 1 VPNs; needs 2 VPCs
@@ -663,13 +657,9 @@ class TestVpcVpn(cloudstackTestCase):
     @attr(tags=["advanced"], required_hardware="true")
     def test_03_redundant_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across redundant VPCs"""
-        self.logger.debug("Starting test: test_02_redundant_vpc_site2site_vpn")
-
         # Create and enable redundant VPC offering
-        redundant_vpc_offering = self._create_vpc_offering(
-            'redundant_vpc_offering')
-        self.assert_(redundant_vpc_offering is not None,
-                     "Failed to create redundant VPC Offering")
+        redundant_vpc_offering = self._create_vpc_offering('redundant_vpc_offering')
+        self.assertIsNotNone(redundant_vpc_offering, 'Failed to create redundant VPC Offering')
         redundant_vpc_offering.update(self.apiclient, state='Enabled')
 
         # Set up 1 VPNs; needs 2 VPCs
@@ -680,11 +670,9 @@ class TestVpcVpn(cloudstackTestCase):
     @attr(tags=["advanced"], required_hardware="true")
     def test_04_vpc_site2site_multiple_vpn(self):
         """Test Site 2 Site multiple VPNs Across VPCs"""
-        self.logger.debug("Starting test: test_03_vpc_site2site_multiple_vpn")
-
         # Create and Enable VPC offering
         vpc_offering = self._create_vpc_offering('vpc_offering')
-        self.assert_(vpc_offering is not None, "Failed to create VPC Offering")
+        self.assertIsNotNone(vpc_offering, "Failed to create VPC Offering")
         vpc_offering.update(self.apiclient, state='Enabled')
 
         # Set up 3 VPNs; needs 4 VPCs
