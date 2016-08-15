@@ -371,16 +371,15 @@ class TestVpcVpn(cloudstackTestCase):
                 )
             except Exception as e:
                 self.fail(e)
-            finally:
-                self.assert_(vpc_n is not None, "VPC%d creation failed" % i)
+
+            self.assert_(vpc_n is not None, "VPC%d creation failed" % i)
 
             self.cleanup.append(vpc_n)
             vpc_list.append(vpc_n)
 
             self.logger.debug("VPC%d %s created" % (i, vpc_list[i].id))
 
-        default_acl = NetworkACLList.list(
-            self.apiclient, name="default_allow")[0]
+        default_acl = NetworkACLList.list(self.apiclient, name="default_allow")[0]
 
         # Create network in VPC i
         ntwk_list = []
@@ -404,8 +403,8 @@ class TestVpcVpn(cloudstackTestCase):
                 )
             except Exception as e:
                 self.fail(e)
-            finally:
-                self.assertIsNotNone(ntwk_n, "Network%d failed to create" % i)
+
+            self.assertIsNotNone(ntwk_n, "Network%d failed to create" % i)
 
             self.cleanup.insert(0, ntwk_n)
             ntwk_list.append(ntwk_n)
@@ -429,9 +428,9 @@ class TestVpcVpn(cloudstackTestCase):
                                              )
             except Exception as e:
                 self.fail(e)
-            finally:
-                self.assert_(vm_n is not None, "VM%d failed to deploy" % i)
-                self.assert_(vm_n.state == 'Running', "VM%d is not running" % i)
+
+            self.assert_(vm_n is not None, "VM%d failed to deploy" % i)
+            self.assert_(vm_n.state == 'Running', "VM%d is not running" % i)
 
             self.cleanup.append(vm_n)
             vm_list.append(vm_n)
@@ -496,18 +495,16 @@ class TestVpcVpn(cloudstackTestCase):
             ssh_max_client = vm_list[maxnumVM].get_ssh_client(retries=20)
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assert_(
-                ssh_max_client is not None, "Failed to setup SSH to last VM created (%d)" % maxnumVM)
+
+        self.assert_(ssh_max_client is not None, "Failed to setup SSH to last VM created (%d)" % maxnumVM)
 
         self.logger.debug("Setup SSH connection to first VM created (0) to ensure availability for ping tests")
         try:
             ssh_client = vm_list[0].get_ssh_client(retries=10)
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assert_(
-                ssh_client is not None, "Failed to setup SSH to VM0")
+
+        self.assert_(ssh_client is not None, "Failed to setup SSH to VM0")
 
         if ssh_client:
             # run ping test
@@ -548,9 +545,10 @@ class TestVpcVpn(cloudstackTestCase):
             )
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assertTrue(vpc is not None, "VPC creation failed")
-            self.logger.debug("VPC %s created" % (vpc.id))
+
+        self.assertTrue(vpc is not None, "VPC creation failed")
+        self.logger.debug("VPC %s created" % (vpc.id))
+
         self.cleanup.append(vpc)
 
         try:
@@ -566,9 +564,10 @@ class TestVpcVpn(cloudstackTestCase):
             )
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assertIsNotNone(ntwk, "Network failed to create")
-            self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
+
+        self.assertIsNotNone(ntwk, "Network failed to create")
+        self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
+
         self.cleanup.append(ntwk)
 
         try:
@@ -587,8 +586,8 @@ class TestVpcVpn(cloudstackTestCase):
             self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
         except Exception as e:
             self.fail(e)
-        finally:
-            self.logger.debug("Deployed virtual machine: OK")
+
+        self.logger.debug("Deployed virtual machine: OK")
         self.cleanup.append(vm)
 
         try:
@@ -604,8 +603,8 @@ class TestVpcVpn(cloudstackTestCase):
             ip = src_nat_list[0]
         except Exception as e:
             self.fail(e)
-        finally:
-            self.logger.debug("Acquired public ip address: OK")
+
+        self.logger.debug("Acquired public ip address: OK")
 
         try:
             vpn = Vpn.create(self.apiclient,
@@ -617,9 +616,9 @@ class TestVpcVpn(cloudstackTestCase):
                              )
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
-            self.logger.debug("Created Remote Access VPN: OK")
+
+        self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
+        self.logger.debug("Created Remote Access VPN: OK")
 
         vpn_user = None
         # 5) Add VPN user for VPC
@@ -632,10 +631,9 @@ class TestVpcVpn(cloudstackTestCase):
                                       )
         except Exception as e:
             self.fail(e)
-        finally:
-            self.assertIsNotNone(
-                vpn_user, "Failed to create Remote Access VPN User")
-            self.logger.debug("Created VPN User: OK")
+
+        self.assertIsNotNone(vpn_user, "Failed to create Remote Access VPN User")
+        self.logger.debug("Created VPN User: OK")
 
         # TODO: Add an actual remote vpn connection test from a remote vpc
 
@@ -644,8 +642,8 @@ class TestVpcVpn(cloudstackTestCase):
             vpn.delete(self.apiclient)
         except Exception as e:
             self.fail(e)
-        finally:
-            self.logger.debug("Deleted the Remote Access VPN: OK")
+
+        self.logger.debug("Deleted the Remote Access VPN: OK")
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_02_vpc_site2site_vpn(self):
