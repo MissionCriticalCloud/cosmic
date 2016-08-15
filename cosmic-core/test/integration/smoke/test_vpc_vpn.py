@@ -222,10 +222,16 @@ class TestVpcVpn(cloudstackTestCase):
         cls.template = Template.register(cls.apiclient, template, cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
         cls.template.download(cls.apiclient)
 
-        if cls.template == FAILED:
-            cls.fail("Failed to register template")
-
         cls._cleanup = [cls.template, cls.account, cls.compute_offering]
+
+        if cls.template == FAILED:
+            raise Exception("Failed to register template")
+
+        cls.logger.debug("Retrieving default Network offering for VPCs")
+        cls.network_offerings = NetworkOffering.list(cls.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
+        if cls.network_offerings is None or len(cls.network_offerings) <= 0:
+            raise Exception("No VPC based network offering")
+
         return
 
     def setUp(self):
@@ -396,7 +402,7 @@ class TestVpcVpn(cloudstackTestCase):
                     services=ntwk_info_n,
                     accountid=self.account.name,
                     domainid=self.account.domainid,
-                    networkofferingid=self.network_offering[0].id,
+                    networkofferingid=self.network_offerings[0].id,
                     zoneid=self.zone.id,
                     vpcid=vpc_list[i].id,
                     aclid=default_acl.id
@@ -520,11 +526,6 @@ class TestVpcVpn(cloudstackTestCase):
     @attr(tags=["advanced"], required_hardware="true")
     def test_01_vpc_remote_access_vpn(self):
         """Test Remote Access VPN in VPC"""
-        # 0) Get the default network offering for VPC
-        self.logger.debug("Retrieving default VPC offering")
-        network_offering = NetworkOffering.list(self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
-        self.assertTrue(network_offering is not None and len(network_offering) > 0, "No VPC based network offering")
-
         # 1) Create VPC
         vpc_offering = VpcOffering.list(self.apiclient, isdefault=True)
         self.assertTrue(vpc_offering is not None and len(vpc_offering) > 0, "No VPC offerings found")
@@ -554,7 +555,7 @@ class TestVpcVpn(cloudstackTestCase):
                 services=self.services["network_1"],
                 accountid=self.account.name,
                 domainid=self.domain.id,
-                networkofferingid=network_offering[0].id,
+                networkofferingid=self.network_offerings[0].id,
                 zoneid=self.zone.id,
                 vpcid=vpc.id
             )
