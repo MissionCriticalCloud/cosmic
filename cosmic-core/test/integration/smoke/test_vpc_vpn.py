@@ -196,40 +196,32 @@ class Services:
 class TestVpcRemoteAccessVpn(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-
         cls.logger = logging.getLogger('TestVPCRemoteAccessVPN')
         cls.stream_handler = logging.StreamHandler()
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(cls.stream_handler)
 
-        testClient = super(TestVpcRemoteAccessVpn, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
+        test_client = super(TestVpcRemoteAccessVpn, cls).getClsTestClient()
+        cls.apiclient = test_client.getApiClient()
         cls.services = Services().services
 
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
+        cls.zone = get_zone(cls.apiclient, test_client.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
 
-        cls.compute_offering = ServiceOffering.create(
-            cls.apiclient,
-            cls.services["compute_offering"]
-        )
-        cls.account = Account.create(
-            cls.apiclient, services=cls.services["account"])
+        cls.compute_offering = ServiceOffering.create(cls.apiclient, cls.services["compute_offering"])
 
-        cls.hypervisor = testClient.getHypervisorInfo()
+        cls.account = Account.create(cls.apiclient, services=cls.services["account"])
+        cls.logger.debug("Successfully created account: %s, id: %s" % (cls.account.name, cls.account.id))
 
-        cls.logger.debug("Downloading Template: %s from: %s" % (cls.services["template"][
-                                                                    cls.hypervisor.lower()], cls.services["template"][cls.hypervisor.lower()]["url"]))
-        cls.template = Template.register(cls.apiclient, cls.services["template"][cls.hypervisor.lower(
-        )], cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
+        cls.hypervisor = test_client.getHypervisorInfo()
+
+        template = cls.services["template"][cls.hypervisor.lower()]
+        cls.logger.debug("Downloading Template: %s from: %s" % (template, template["url"]))
+        cls.template = Template.register(cls.apiclient, template, cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
         cls.template.download(cls.apiclient)
 
         if cls.template == FAILED:
-            assert False, "get_template() failed to return template"
-
-        cls.logger.debug("Successfully created account: %s, id: \
-                   %s" % (cls.account.name,
-                          cls.account.id))
+            cls.fail("Failed to register template")
 
         cls._cleanup = [cls.template, cls.account, cls.compute_offering]
         return
@@ -246,22 +238,19 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
 
         # 0) Get the default network offering for VPC
         self.logger.debug("Retrieving default VPC offering")
-        networkOffering = NetworkOffering.list(
-            self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
-        self.assert_(networkOffering is not None and len(
-            networkOffering) > 0, "No VPC based network offering")
+        network_offering = NetworkOffering.list(self.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
+        self.assertTrue(network_offering is not None and len(network_offering) > 0, "No VPC based network offering")
 
         # 1) Create VPC
-        vpcOffering = VpcOffering.list(self.apiclient, isdefault=True)
-        self.assert_(vpcOffering is not None and len(
-            vpcOffering) > 0, "No VPC offerings found")
+        vpc_offering = VpcOffering.list(self.apiclient, isdefault=True)
+        self.assertTrue(vpc_offering is not None and len(vpc_offering) > 0, "No VPC offerings found")
 
         try:
             vpc = VPC.create(
                 apiclient=self.apiclient,
                 services=self.services["vpc"],
                 networkDomain="vpc.vpn",
-                vpcofferingid=vpcOffering[0].id,
+                vpcofferingid=vpc_offering[0].id,
                 zoneid=self.zone.id,
                 account=self.account.name,
                 domainid=self.domain.id
@@ -269,7 +258,7 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
         except Exception as e:
             self.fail(e)
         finally:
-            self.assert_(vpc is not None, "VPC creation failed")
+            self.assertTrue(vpc is not None, "VPC creation failed")
             self.logger.debug("VPC %s created" % (vpc.id))
         self.cleanup.append(vpc)
 
@@ -280,7 +269,7 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
                 services=self.services["network_1"],
                 accountid=self.account.name,
                 domainid=self.domain.id,
-                networkofferingid=networkOffering[0].id,
+                networkofferingid=network_offering[0].id,
                 zoneid=self.zone.id,
                 vpcid=vpc.id
             )
@@ -288,8 +277,7 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
             self.fail(e)
         finally:
             self.assertIsNotNone(ntwk, "Network failed to create")
-            self.logger.debug(
-                "Network %s created in VPC %s" % (ntwk.id, vpc.id))
+            self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
         self.cleanup.append(ntwk)
 
         try:
@@ -303,8 +291,8 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
                                        networkids=ntwk.id,
                                        hypervisor=self.hypervisor
                                        )
-            self.assert_(vm is not None, "VM failed to deploy")
-            self.assert_(vm.state == 'Running', "VM is not running")
+            self.assertTrue(vm is not None, "VM failed to deploy")
+            self.assertTrue(vm.state == 'Running', "VM is not running")
             self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
         except Exception as e:
             self.fail(e)
@@ -342,20 +330,20 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
             self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
             self.logger.debug("Created Remote Access VPN: OK")
 
-        vpnUser = None
+        vpn_user = None
         # 5) Add VPN user for VPC
         try:
-            vpnUser = VpnUser.create(self.apiclient,
-                                     account=self.account.name,
-                                     domainid=self.account.domainid,
-                                     username=self.services["vpn"]["vpn_user"],
-                                     password=self.services["vpn"]["vpn_pass"]
-                                     )
+            vpn_user = VpnUser.create(self.apiclient,
+                                      account=self.account.name,
+                                      domainid=self.account.domainid,
+                                      username=self.services["vpn"]["vpn_user"],
+                                      password=self.services["vpn"]["vpn_pass"]
+            )
         except Exception as e:
             self.fail(e)
         finally:
             self.assertIsNotNone(
-                vpnUser, "Failed to create Remote Access VPN User")
+                vpn_user, "Failed to create Remote Access VPN User")
             self.logger.debug("Created VPN User: OK")
 
         # TODO: Add an actual remote vpn connection test from a remote vpc
@@ -407,28 +395,21 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
             cls.services["compute_offering"]
         )
 
-        cls.account = Account.create(
-            cls.apiclient, services=cls.services["account"])
+        cls.account = Account.create(cls.apiclient, services=cls.services["account"])
+        cls.logger.debug("Successfully created account: %s, id: %s" % (cls.account.name, cls.account.id))
 
         cls.hypervisor = testClient.getHypervisorInfo()
 
-        cls.logger.debug("Downloading Template: %s from: %s" % (cls.services["template"][
-                                                                    cls.hypervisor.lower()], cls.services["template"][cls.hypervisor.lower()]["url"]))
-        cls.template = Template.register(cls.apiclient, cls.services["template"][cls.hypervisor.lower(
-        )], cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
+        template = cls.services["template"][cls.hypervisor.lower()]
+        cls.logger.debug("Downloading Template: %s from: %s" % (template, template["url"]))
+        cls.template = Template.register(cls.apiclient, template, cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
         cls.template.download(cls.apiclient)
 
         if cls.template == FAILED:
-            assert False, "get_template() failed to return template"
+            cls.fail("Failed to register template")
 
-        cls.logger.debug("Successfully created account: %s, id: \
-                   %s" % (cls.account.name,
-                          cls.account.id))
-
-        cls.networkoffering = NetworkOffering.list(
-            cls.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
-        assert cls.networkoffering is not None and len(
-            cls.networkoffering) > 0, "No VPC based network offering"
+        cls.network_offering = NetworkOffering.list(cls.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
+        cls.assertTrue(cls.network_offering is not None and len(cls.network_offering) > 0, "No VPC based network offering")
 
         cls._cleanup = [cls.template, cls.account, cls.compute_offering]
         return
@@ -603,7 +584,7 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
                     services=ntwk_info_n,
                     accountid=self.account.name,
                     domainid=self.account.domainid,
-                    networkofferingid=self.networkoffering[0].id,
+                    networkofferingid=self.network_offering[0].id,
                     zoneid=self.zone.id,
                     vpcid=vpc_list[i].id,
                     aclid=default_acl.id
