@@ -1,7 +1,5 @@
 package com.cloud.consoleproxy;
 
-import org.apache.cloudstack.utils.security.SSLUtils;
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -51,7 +49,7 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                 tmf.init(ks);
                 s_logger.info("Trust manager factory is initialized");
 
-                sslContext = SSLUtils.getSSLContext();
+                sslContext = SSLContext.getInstance("TLSv1.2");
                 sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
                 s_logger.info("SSL context is initialized");
             } catch (final Exception e) {
@@ -67,9 +65,6 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
             server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
                 @Override
                 public void configure(final HttpsParameters params) {
-
-                    // get the remote address if needed
-                    final InetSocketAddress remote = params.getClientAddress();
                     final SSLContext c = getSSLContext();
 
                     // get the default parameters
@@ -92,10 +87,8 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
     @Override
     public SSLServerSocket createSSLServerSocket(final int port) throws IOException {
         try {
-            SSLServerSocket srvSock = null;
             final SSLServerSocketFactory ssf = sslContext.getServerSocketFactory();
-            srvSock = (SSLServerSocket) ssf.createServerSocket(port);
-            srvSock.setEnabledProtocols(SSLUtils.getSupportedProtocols(srvSock.getEnabledProtocols()));
+            final SSLServerSocket srvSock = (SSLServerSocket) ssf.createServerSocket(port);
 
             s_logger.info("create SSL server socket on port: " + port);
             return srvSock;
