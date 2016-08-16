@@ -13,7 +13,7 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_DHCP_HOST;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_VM;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_TUNNEL;
-import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_PATCH_VIA_SOCKET;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_RESIZE_VOLUME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
@@ -74,7 +74,6 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.SerialDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.TermPolicy;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.VideoDef;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.VirtioSerialDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogAction;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogModel;
@@ -227,7 +226,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             "^p\\d+p\\d+"
     };
     private String versionstringpath;
-    private String patchViaSocketPath;
+    private String sendConfigPropertiesPath;
     private String manageSnapshotPath;
     private String resizeVolumePath;
     private String createTmplPath;
@@ -907,7 +906,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         updateHostPasswdPath = findScriptPath(kvmScriptsDir, VRScripts.UPDATE_HOST_PASSWD);
         final String modifyVlanPath = findScriptPath(networkScriptsDir, SCRIPT_MODIFY_VLAN);
         versionstringpath = findScriptPath(kvmScriptsDir, SCRIPT_VERSIONS);
-        patchViaSocketPath = findScriptPath(kvmScriptsDir, PATH_PATCH_DIR, SCRIPT_PATCH_VIA_SOCKET);
+        sendConfigPropertiesPath = findScriptPath(kvmScriptsDir, PATH_PATCH_DIR, SCRIPT_SEND_CONFIG_PROPERTIES);
         heartBeatPath = findScriptPath(kvmScriptsDir, SCRIPT_KVM_HEART_BEAT);
         final String createVmPath = findScriptPath(storageScriptsDir, SCRIPT_CREATE_VM);
         manageSnapshotPath = findScriptPath(storageScriptsDir, SCRIPT_MANAGE_SNAPSHOT);
@@ -1360,7 +1359,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     public boolean passCmdLine(final String vmName, final String cmdLine) throws InternalErrorException {
-        final Script command = new Script(patchViaSocketPath, 5 * 1000, logger);
+        final Script command = new Script(sendConfigPropertiesPath, 5 * 1000, logger);
         final String result;
         command.add("-n", vmName);
         command.add("-p", cmdLine.replaceAll(" ", "%"));
@@ -1769,11 +1768,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         final SerialDef serial = new SerialDef("pty", null, (short) 0);
         devices.addDevice(serial);
-
-        if (vmTo.getType() != VirtualMachine.Type.User) {
-            final VirtioSerialDef vserial = new VirtioSerialDef(vmTo.getName(), null);
-            devices.addDevice(vserial);
-        }
 
         final QemuGuestAgentDef guestagent = new QemuGuestAgentDef();
         devices.addDevice(guestagent);

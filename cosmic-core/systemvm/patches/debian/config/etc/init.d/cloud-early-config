@@ -99,40 +99,57 @@ get_boot_params() {
           sed -i "s/%/ /g" /var/cache/cloud/cmdline
           ;;
      kvm)
-          VPORT=$(find /dev/virtio-ports -type l -name '*.vport' 2>/dev/null|head -1)
-          if [ ! -e "$VPORT" ]; then
-            log_it "/dev/virtio-ports not loaded, perhaps guest kernel is too old." && exit 2
-          fi
+        log_it "Getting cmdline config and ssh keys in place."
+        if [ ! -s /etc/init.d/qemu-guest-agent ]; then
+            log_it "Error! Qemu guest agent not found! Incompatible template! Bailing out.."
+            return true
+        fi
 
-		  for i in {1..120}
-		  do
-	        while read line; do
-	          if [[ $line == cmdline:* ]]; then
-	            cmd=${line//cmdline:/}
-                echo $cmd > /var/cache/cloud/cmdline
-	          elif [[ $line == pubkey:* ]]; then
-	            pubkey=${line//pubkey:/}
-	            echo $pubkey > /var/cache/cloud/authorized_keys
-	            echo $pubkey > /root/.ssh/authorized_keys
-              fi
-            done < $VPORT
-            # In case of reboot of secstoragevm or consoleproxyvm we do not send the boot args again.
-            # So, no need to wait for them, as the boot args are already set at startup
-            # Routers and VPC do get new boot args (new linklocal address) so we should wait for it
-            # or else we'll reuse the old linklocal address and prevent the mgt server to control it.
-            if [ -s /var/cache/cloud/cmdline  ]
-            then
-              systemvm_type=$(cat /var/cache/cloud/cmdline | tr ' ' '\n' | grep type | cut -d\= -f2)
-              if [[ "${systemvm_type}" == "secstorage" || "${systemvm_type}" == "consoleproxy" ]];
-              then
-                log_it "Found a non empty cmdline file for type = ${systemvm_type}. Will now exit the loop and proceed with configuration."
-                break;
-              fi
+        # Make sure the Qemu guest agent is running, or else we will be waiting forever
+        ps aux | grep qemu | grep -v grep > /dev/null 2>&1
+        if [ $? -gt 0 ]; then
+            log_it "Starting Qemu guest agent"
+            /etc/init.d/qemu-guest-agent start
+        else
+            log_it "Good! Qemu guest agent already running."
+        fi
+
+        log_it "Qemu Guest Agent will receive the public SSH key and the cmd_line info from the Cosmic Agent."
+        CMDLINE_FILE=/var/cache/cloud/cmdline
+        CMDLINE_FILE_INCOMING=/var/cache/cloud/cmdline_incoming
+
+        log_it "Waiting for a new ${CMDLINE_FILE_INCOMING} file to arrive.. (dots show progress)"
+        rm -f ${CMDLINE_FILE_INCOMING} >/dev/null 2>&1
+        sleep 1
+
+        sleep_times=0
+        while [ ! -f ${CMDLINE_FILE_INCOMING} ]; do
+            sleep 1
+            echo -n "."
+            sleep_times=$((sleep_times + 1))
+            if [ "${sleep_times}" -gt "60" ]; then
+                # In case of reboot of secstoragevm or consoleproxyvm we do not send the boot args again.
+                # So, no need to wait for them, as the boot args are already set at startup
+                # Routers and VPC do get new boot args (new linklocal address) so we should wait for it
+                # or else we'll reuse the old linklocal address and prevent the mgt server to control it.
+                if [ -s ${CMDLINE_FILE} ]
+                then
+                    systemvm_type=$(cat ${CMDLINE_FILE} | tr ' ' '\n' | grep type | cut -d\= -f2)
+                    if [[ "${systemvm_type}" == "secstorage" || "${systemvm_type}" == "consoleproxy" ]];
+                    then
+                        log_it "Waited 60s without new config. Found a non empty cmdline file for type = ${systemvm_type}, so reusing that config."
+                        break;
+                    fi
+                fi
             fi
-            sleep 0.5s
-		  done
-          chmod go-rwx /root/.ssh/authorized_keys
+        done
+        echo
+        log_it "Config was written successfully, proceeding."
+        log_it "Fixing permissions on root's authorized_keys file"
+        chmod go-rwx /root/.ssh/authorized_keys
+        log_it "Proceeding with the rest of cloud-early-config"
           ;;
+
      vmware)
           vmtoolsd --cmd 'machine.id.get' > /var/cache/cloud/cmdline
           ;;

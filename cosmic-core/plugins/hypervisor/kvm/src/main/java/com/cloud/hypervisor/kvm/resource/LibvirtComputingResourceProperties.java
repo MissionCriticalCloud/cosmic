@@ -545,7 +545,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String DEFAULT_VM_RNG_PATH = "/dev/random";
         public static final String SCRIPT_MODIFY_VLAN = "modifyvlan.sh";
         public static final String SCRIPT_VERSIONS = "versions.sh";
-        public static final String SCRIPT_PATCH_VIA_SOCKET = "patchviasocket.py";
+        public static final String SCRIPT_SEND_CONFIG_PROPERTIES = "send_config_properties_to_systemvm.py";
         public static final String SCRIPT_KVM_HEART_BEAT = "kvmheartbeat.sh";
         public static final String SCRIPT_CREATE_VM = "createvm.sh";
         public static final String SCRIPT_MANAGE_SNAPSHOT = "managesnapshot.sh";
