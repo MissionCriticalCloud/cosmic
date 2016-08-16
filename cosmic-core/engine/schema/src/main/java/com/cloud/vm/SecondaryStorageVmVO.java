@@ -22,7 +22,6 @@ import java.util.Date;
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue(value = "SecondaryStorageVm")
 public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStorageVm {
-
     @Column(name = "public_ip_address", nullable = false)
     private String publicIpAddress;
 
@@ -47,8 +46,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     private Date lastUpdateTime;
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
-                                final long dataCenterId,
-                                final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
+                                final long dataCenterId, final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
@@ -60,7 +58,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicIpAddress() {
-        return this.publicIpAddress;
+        return publicIpAddress;
     }
 
     public void setPublicIpAddress(final String publicIpAddress) {
@@ -69,7 +67,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicNetmask() {
-        return this.publicNetmask;
+        return publicNetmask;
     }
 
     public void setPublicNetmask(final String publicNetmask) {
@@ -77,8 +75,9 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     }
 
     @Override
+
     public String getPublicMacAddress() {
-        return this.publicMacAddress;
+        return publicMacAddress;
     }
 
     public void setPublicMacAddress(final String publicMacAddress) {
@@ -90,24 +89,12 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
         return this.lastUpdateTime;
     }
 
-    public void setLastUpdateTime(final Date time) {
-        this.lastUpdateTime = time;
-    }
-
     public String getGuid() {
         return guid;
     }
 
     public void setGuid(final String guid) {
         this.guid = guid;
-    }
-
-    public String getNfsShare() {
-        return nfsShare;
-    }
-
-    public void setNfsShare(final String nfsShare) {
-        this.nfsShare = nfsShare;
     }
 
     public Role getRole() {

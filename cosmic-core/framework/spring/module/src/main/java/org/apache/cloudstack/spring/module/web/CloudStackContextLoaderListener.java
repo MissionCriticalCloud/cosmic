@@ -5,6 +5,10 @@ import org.apache.cloudstack.spring.module.factory.CloudStackSpringContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import java.io.IOException;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,22 @@ public class CloudStackContextLoaderListener extends ContextLoaderListener {
         }
 
         super.contextInitialized(event);
+    }
+
+    @Override
+    public void contextDestroyed(final ServletContextEvent servletContextEvent) {
+        final Enumeration<Driver> drivers = DriverManager.getDrivers();
+
+        Driver driver = null;
+
+        while (drivers.hasMoreElements()) {
+            try {
+                driver = drivers.nextElement();
+                DriverManager.deregisterDriver(driver);
+            } catch (final SQLException e) {
+                log.warn("Deregistration of driver failed.", e);
+            }
+        }
     }
 
     @Override

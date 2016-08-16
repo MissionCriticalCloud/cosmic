@@ -159,21 +159,6 @@ public class ManagementServerHostDaoImpl extends GenericDaoBase<ManagementServer
     }
 
     @Override
-    public void invalidateRunSession(final long id, final long runid) {
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = txn.prepareAutoCloseStatement("update mshost set runid=0, state='Down' where id=? and runid=?");
-            pstmt.setLong(1, id);
-            pstmt.setLong(2, runid);
-
-            pstmt.executeUpdate();
-        } catch (final SQLException e) {
-            throw new CloudRuntimeException("DB exception: ", e);
-        }
-    }
-
-    @Override
     public void update(final long id, final long runId, final State state, final Date lastUpdate) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;

@@ -10,7 +10,6 @@ import com.cloud.agent.api.check.CheckSshAnswer;
 import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
 import com.cloud.agent.manager.Commands;
-import com.cloud.cluster.ClusterManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
@@ -36,9 +35,9 @@ import com.cloud.info.ConsoleProxyConnectionInfo;
 import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.info.ConsoleProxyLoadInfo;
 import com.cloud.info.ConsoleProxyStatus;
-import com.cloud.info.RunningHostCountInfo;
 import com.cloud.info.RunningHostInfoAgregator;
 import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
+import com.cloud.managementserver.ManagementServerService;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
@@ -61,12 +60,12 @@ import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
+import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
-import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
@@ -93,8 +92,6 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.config.ApiServiceConfiguration;
-import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.security.keys.KeysManager;
@@ -111,7 +108,6 @@ import javax.naming.ConfigurationException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -120,9 +116,9 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 //
 // Possible console proxy state transition cases
@@ -136,7 +132,7 @@ import org.slf4j.LoggerFactory;
 // Starting, HA, Migrating, Running state are all counted as "Open" for available capacity calculation
 // because sooner or later, it will be driven into Running state
 //
-public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxyManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
+public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements ConsoleProxyManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
     private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyManagerImpl.class);
 
     private static final int DEFAULT_CAPACITY_SCAN_INTERVAL = 30000; // 30 seconds
@@ -193,10 +189,6 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     private VirtualMachineManager _itMgr;
     private ConsoleProxyListener _listener;
     private ServiceOfferingVO _serviceOffering;
-    /*
-     * private final ExecutorService _requestHandlerScheduler = Executors.newCachedThreadPool(new
-     * NamedThreadFactory("Request-handler"));
-     */
     private long _capacityScanInterval = DEFAULT_CAPACITY_SCAN_INTERVAL;
     private int _capacityPerProxy = ConsoleProxyManager.DEFAULT_PROXY_CAPACITY;
     private int _standbyCapacity = ConsoleProxyManager.DEFAULT_STANDBY_CAPACITY;
@@ -218,8 +210,8 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     @Inject
     private KeystoreManager _ksMgr;
 
-    protected ConsoleProxyManagerImpl() {
-    }
+    @Autowired
+    private ManagementServerService managementServerService;
 
     @Override
     public ConsoleProxyInfo assignProxy(final long dataCenterId, final long vmId) {
@@ -461,58 +453,6 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
         }
     }
 
-    public void handleAgentDisconnect(final long agentId, final com.cloud.host.Status state) {
-        if (state == com.cloud.host.Status.Alert || state == com.cloud.host.Status.Disconnected) {
-            // be it either in alert or in disconnected state, the agent process
-            // may be gone in the VM,
-            // we will be reacting to stop the corresponding VM and let the scan
-            // process to
-            final HostVO host = _hostDao.findById(agentId);
-            if (host.getType() == Type.ConsoleProxy) {
-                final String name = host.getName();
-                if (s_logger.isInfoEnabled()) {
-                    s_logger.info("Console proxy agent disconnected, proxy: " + name);
-                }
-                if (name != null && name.startsWith("v-")) {
-                    final String[] tokens = name.split("-");
-                    long proxyVmId = 0;
-                    try {
-                        proxyVmId = Long.parseLong(tokens[1]);
-                    } catch (final NumberFormatException e) {
-                        s_logger.error("Unexpected exception " + e.getMessage(), e);
-                        return;
-                    }
-
-                    final ConsoleProxyVO proxy = _consoleProxyDao.findById(proxyVmId);
-                    if (proxy != null) {
-
-                        // Disable this feature for now, as it conflicts with
-                        // the case of allowing user to reboot console proxy
-                        // when rebooting happens, we will receive disconnect
-                        // here and we can't enter into stopping process,
-                        // as when the rebooted one comes up, it will kick off a
-                        // newly started one and trigger the process
-                        // continue on forever
-
-                        /*
-                         * _capacityScanScheduler.execute(new Runnable() { public void run() {
-                         * if(s_logger.isInfoEnabled())
-                         * s_logger.info("Stop console proxy " + proxy.getName() +
-                         * " VM because of that the agent running inside it has disconnected" );
-                         * stopProxy(proxy.getId()); } });
-                         */
-                    } else {
-                        if (s_logger.isInfoEnabled()) {
-                            s_logger.info("Console proxy agent disconnected but corresponding console proxy VM no longer exists in DB, proxy: " + name);
-                        }
-                    }
-                } else {
-                    assert (false) : "Invalid console proxy name: " + name;
-                }
-            }
-        }
-    }
-
     private String getAllocProxyLockName() {
         return "consoleproxy.alloc";
     }
@@ -657,7 +597,7 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
         buf.append(" resource=com.cloud.agent.resource.consoleproxy.ConsoleProxyResource");
         buf.append(" instance=ConsoleProxy");
 
-        buf.append(" host=").append(ApiServiceConfiguration.ManagementHostIPAdr.value());
+        buf.append(" host=").append(computeManagementServerIpList(managementServerService));
         buf.append(" port=").append(_mgmtPort);
         buf.append(" name=").append(profile.getVirtualMachine().getHostName());
         if (_sslEnabled) {
@@ -728,23 +668,11 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
 
     @Override
     public boolean finalizeDeployment(final Commands cmds, final VirtualMachineProfile profile, final DeployDestination dest, final ReservationContext context) {
-
         finalizeCommandsOnStart(cmds, profile);
-
         final ConsoleProxyVO proxy = _consoleProxyDao.findById(profile.getId());
         final DataCenter dc = dest.getDataCenter();
         final List<NicProfile> nics = profile.getNics();
-        for (final NicProfile nic : nics) {
-            if ((nic.getTrafficType() == TrafficType.Public && dc.getNetworkType() == NetworkType.Advanced) ||
-                    (nic.getTrafficType() == TrafficType.Guest && (dc.getNetworkType() == NetworkType.Basic || dc.isSecurityGroupEnabled()))) {
-                proxy.setPublicIpAddress(nic.getIPv4Address());
-                proxy.setPublicNetmask(nic.getIPv4Netmask());
-                proxy.setPublicMacAddress(nic.getMacAddress());
-            } else if (nic.getTrafficType() == TrafficType.Management) {
-                proxy.setPrivateIpAddress(nic.getIPv4Address());
-                proxy.setPrivateMacAddress(nic.getMacAddress());
-            }
-        }
+        computeVmIps(proxy, dc, nics);
         _consoleProxyDao.update(proxy.getId(), proxy);
         return true;
     }
@@ -809,16 +737,7 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     @Override
     public void finalizeStop(final VirtualMachineProfile profile, final Answer answer) {
         //release elastic IP here if assigned
-        final IPAddressVO ip = _ipAddressDao.findByAssociatedVmId(profile.getId());
-        if (ip != null && ip.getSystem()) {
-            final CallContext ctx = CallContext.current();
-            try {
-                _rulesMgr.disableStaticNat(ip.getId(), ctx.getCallingAccount(), ctx.getCallingUserId(), true);
-            } catch (final Exception ex) {
-                s_logger.warn("Failed to disable static nat and release system ip " + ip + " as a part of vm " + profile.getVirtualMachine() + " stop due to exception ",
-                        ex);
-            }
-        }
+        finalizeStop(profile, _ipAddressDao.findByAssociatedVmId(profile.getId()), _rulesMgr);
     }
 
     @Override
@@ -882,30 +801,12 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     }
 
     private synchronized Map<Long, ZoneHostInfo> getZoneHostInfo() {
-        final Date cutTime = DateUtil.currentGMTTime();
-        final List<RunningHostCountInfo> l = _hostDao.getRunningHostCounts(new Date(cutTime.getTime() - ClusterManager.HeartbeatThreshold.value()));
-
-        final RunningHostInfoAgregator aggregator = new RunningHostInfoAgregator();
-        if (l.size() > 0) {
-            for (final RunningHostCountInfo countInfo : l) {
-                aggregator.aggregate(countInfo);
-            }
-        }
-
-        return aggregator.getZoneHostInfoMap();
+        return getLongZoneHostInfoMap(_hostDao);
     }
 
     @Override
     public Long[] getScannablePools() {
-        final List<DataCenterVO> zones = _dcDao.listEnabledZones();
-
-        final Long[] dcIdList = new Long[zones.size()];
-        int i = 0;
-        for (final DataCenterVO dc : zones) {
-            dcIdList[i++] = dc.getId();
-        }
-
-        return dcIdList;
+        return getLongs(_dcDao);
     }
 
     @Override
@@ -1246,28 +1147,7 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForAdvancedZone(final DataCenter dc) {
-        if (dc.getNetworkType() != NetworkType.Advanced) {
-            throw new CloudRuntimeException("Zone " + dc + " is not advanced.");
-        }
-
-        if (dc.isSecurityGroupEnabled()) {
-            final List<NetworkVO> networks = _networkDao.listByZoneSecurityGroup(dc.getId());
-            if (CollectionUtils.isEmpty(networks)) {
-                throw new CloudRuntimeException("Can not found security enabled network in SG Zone " + dc);
-            }
-
-            return networks.get(0);
-        } else {
-            final TrafficType defaultTrafficType = TrafficType.Public;
-            final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
-
-            // api should never allow this situation to happen
-            if (defaultNetworks.size() != 1) {
-                throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");
-            }
-
-            return defaultNetworks.get(0);
-        }
+        return getNetworkForAdvancedZone(dc, _networkDao);
     }
 
     /**
@@ -1279,19 +1159,7 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForBasicZone(final DataCenter dc) {
-        if (dc.getNetworkType() != NetworkType.Basic) {
-            throw new CloudRuntimeException("Zone " + dc + "is not basic.");
-        }
-
-        final TrafficType defaultTrafficType = TrafficType.Guest;
-        final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
-
-        // api should never allow this situation to happen
-        if (defaultNetworks.size() != 1) {
-            throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");
-        }
-
-        return defaultNetworks.get(0);
+        return getNetworkForBasicZone(dc, _networkDao);
     }
 
     @Override
@@ -1332,18 +1200,8 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
 
     @Override
     public ConsoleProxyManagementState getManagementState() {
-        final String value = _configDao.getValue(Config.ConsoleProxyManagementState.key());
-        if (value != null) {
-            final ConsoleProxyManagementState state = ConsoleProxyManagementState.valueOf(value);
-
-            if (state == null) {
-                s_logger.error("Invalid console proxy management state: " + value);
-            }
-            return state;
-        }
-
-        s_logger.error("Invalid console proxy management state: " + value);
-        return null;
+        final String curentState = _configDao.getValue(Config.ConsoleProxyManagementState.key());
+        return getConsoleProxyManagementState(curentState);
     }
 
     @Override
@@ -1521,7 +1379,11 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
     }
 
     private ConsoleProxyManagementState getLastManagementState() {
-        final String value = _configDao.getValue(Config.ConsoleProxyManagementLastState.key());
+        final String lastState = _configDao.getValue(Config.ConsoleProxyManagementLastState.key());
+        return getConsoleProxyManagementState(lastState);
+    }
+
+    private ConsoleProxyManagementState getConsoleProxyManagementState(final String value) {
         if (value != null) {
             final ConsoleProxyManagementState state = ConsoleProxyManagementState.valueOf(value);
 
@@ -1530,8 +1392,6 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
             }
             return state;
         }
-
-        s_logger.error("Invalid console proxy management state: " + value);
         return null;
     }
 
@@ -1561,10 +1421,6 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
         sc.and(sc.entity().getType(), Op.EQ, Host.Type.ConsoleProxy);
         sc.and(sc.entity().getName(), Op.EQ, name);
         return sc.find();
-    }
-
-    public List<ConsoleProxyAllocator> getConsoleProxyAllocators() {
-        return _consoleProxyAllocators;
     }
 
     @Inject
@@ -1638,34 +1494,11 @@ public class ConsoleProxyManagerImpl extends ManagerBase implements ConsoleProxy
                         }
 
                         final ConsoleProxyVO proxy = _consoleProxyDao.findById(proxyVmId);
-                        if (proxy != null) {
-
-                            // Disable this feature for now, as it conflicts
-                            // with
-                            // the case of allowing user to reboot console proxy
-                            // when rebooting happens, we will receive
-                            // disconnect
-                            // here and we can't enter into stopping process,
-                            // as when the rebooted one comes up, it will kick
-                            // off a
-                            // newly started one and trigger the process
-                            // continue on forever
-
-                            /*
-                             * _capacityScanScheduler.execute(new Runnable() {
-                             * public void run() { if(s_logger.isInfoEnabled())
-                             * s_logger.info("Stop console proxy " +
-                             * proxy.getName() +
-                             * " VM because of that the agent running inside it has disconnected"
-                             * ); stopProxy(proxy.getId()); } });
-                             */
-                        } else {
-                            if (s_logger.isInfoEnabled()) {
-                                s_logger.info("Console proxy agent disconnected but corresponding console proxy VM no longer exists in DB, proxy: " + name);
-                            }
+                        if (proxy == null) {
+                            s_logger.info("Console proxy agent disconnected but corresponding console proxy VM no longer exists in DB, proxy: " + name);
                         }
                     } else {
-                        assert (false) : "Invalid console proxy name: " + name;
+                        s_logger.debug("Invalid console proxy name: {}", name);
                     }
                 }
             }

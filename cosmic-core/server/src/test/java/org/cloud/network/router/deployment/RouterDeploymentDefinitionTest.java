@@ -72,17 +72,6 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
                             .build();
     }
 
-    @Override
-    protected void initMocks() {
-        when(mockDestination.getDataCenter()).thenReturn(mockDataCenter);
-        when(mockDataCenter.getId()).thenReturn(DATA_CENTER_ID);
-        when(mockPod.getId()).thenReturn(POD_ID1);
-        when(mockHostPodVO1.getId()).thenReturn(POD_ID1);
-        when(mockHostPodVO2.getId()).thenReturn(POD_ID2);
-        when(mockHostPodVO3.getId()).thenReturn(POD_ID3);
-        when(mockNw.getId()).thenReturn(NW_ID_1);
-    }
-
     @Test
     public void testRedundancyProperty() {
         // Set and confirm is redundant
@@ -122,8 +111,8 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testLock() {
         // Prepare
-        when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value()))
-                .thenReturn(mockNw);
+        when(mockNw.getId()).thenReturn(NW_ID_1);
+        when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value())).thenReturn(mockNw);
 
         // Execute
         deployment.lock();
@@ -137,8 +126,8 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test(expected = ConcurrentOperationException.class)
     public void testLockFails() {
         // Prepare
-        when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value()))
-                .thenReturn(null);
+        when(mockNw.getId()).thenReturn(NW_ID_1);
+        when(mockNwDao.acquireInLockTable(NW_ID_1, NetworkOrchestrationService.NetworkLockTimeout.value())).thenReturn(null);
 
         // Execute
         try {
@@ -616,8 +605,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testFindSourceNatIPPublicNw() throws InsufficientAddressCapacityException, ConcurrentOperationException {
         // Prepare
         final PublicIp sourceNatIp = mock(PublicIp.class);
-        when(mockIpAddrMgr.assignSourceNatIpAddressToGuestNetwork(
-                mockOwner, mockNw)).thenReturn(sourceNatIp);
+        when(mockIpAddrMgr.assignSourceNatIpAddressToGuestNetwork(mockOwner, mockNw)).thenReturn(sourceNatIp);
         deployment.isPublicNetwork = true;
 
         // It should be null until this method finds it
@@ -633,8 +621,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testFindSourceNatIPNonPublicNw() throws InsufficientAddressCapacityException, ConcurrentOperationException {
         // Prepare
         final PublicIp sourceNatIp = mock(PublicIp.class);
-        when(mockIpAddrMgr.assignSourceNatIpAddressToGuestNetwork(
-                mockOwner, mockNw)).thenReturn(sourceNatIp);
+        when(mockIpAddrMgr.assignSourceNatIpAddressToGuestNetwork(mockOwner, mockNw)).thenReturn(sourceNatIp);
         deployment.isPublicNetwork = false;
 
         // It should be null until this method finds it
@@ -682,8 +669,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     }
 
     @Test
-    public void testDeployAllVirtualRouters()
-            throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
+    public void testDeployAllVirtualRouters() throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
 
         // Prepare
         deployment.routers = new ArrayList<>();
@@ -753,9 +739,10 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
     protected void driveTestPrepareDeployment(final boolean isRedundant, final boolean isPublicNw) {
         // Prepare
+        when(mockNw.getId()).thenReturn(NW_ID_1);
         when(mockNw.isRedundant()).thenReturn(isRedundant);
-        when(mockNetworkModel.isProviderSupportServiceInNetwork(
-                NW_ID_1, Service.SourceNat, Provider.VirtualRouter)).thenReturn(isPublicNw);
+        when(mockNetworkModel.isProviderSupportServiceInNetwork(NW_ID_1, Service.SourceNat, Provider.VirtualRouter)).thenReturn(isPublicNw);
+
         // Execute
         final boolean canProceedDeployment = deployment.prepareDeployment();
         // Assert

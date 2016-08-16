@@ -1,5 +1,0 @@
-# management server compile-time environment parameters
-
-paths.script=@COMMONLIBDIR@
-mount.parent=@MSMNTDIR@
-cloud-stack-components-specification=components.xml

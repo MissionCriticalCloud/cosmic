@@ -226,8 +226,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     VolumeDao _volumeDao;
     @Inject
     VMInstanceDao _vmInstanceDao;
-    //@Inject
-    //VmwareDatacenterZoneMapDao _vmwareDatacenterZoneMapDao;
     @Inject
     AccountVlanMapDao _accountVlanMapDao;
     @Inject
@@ -268,7 +266,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     ClusterDao _clusterDao;
     @Inject
     AlertManager _alertMgr;
-    // @com.cloud.utils.component.Inject(adapter = SecurityChecker.class)
     List<SecurityChecker> _secChecker;
     @Inject
     CapacityDao _capacityDao;
@@ -998,30 +995,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             offering.setSortKey(sortKey);
         }
 
-        // Note: tag editing commented out for now; keeping the code intact,
-        // might need to re-enable in next releases
-        // if (tags != null)
-        // {
-        // if (tags.trim().isEmpty() && offeringHandle.getTags() == null)
-        // {
-        // //no new tags; no existing tags
-        // offering.setTagsArray(csvTagsToList(null));
-        // }
-        // else if (!tags.trim().isEmpty() && offeringHandle.getTags() != null)
-        // {
-        // //new tags + existing tags
-        // List<String> oldTags = csvTagsToList(offeringHandle.getTags());
-        // List<String> newTags = csvTagsToList(tags);
-        // oldTags.addAll(newTags);
-        // offering.setTagsArray(oldTags);
-        // }
-        // else if(!tags.trim().isEmpty())
-        // {
-        // //new tags; NO existing tags
-        // offering.setTagsArray(csvTagsToList(tags));
-        // }
-        // }
-
         if (_serviceOfferingDao.update(id, offering)) {
             offering = _serviceOfferingDao.findById(id);
             CallContext.current().setEventDetails("Service offering id=" + offering.getId());
@@ -1135,31 +1108,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (displayDiskOffering != null) {
             diskOffering.setDisplayOffering(displayDiskOffering);
         }
-
-        // Note: tag editing commented out for now;keeping the code intact,
-        // might need to re-enable in next releases
-        // if (tags != null)
-        // {
-        // if (tags.trim().isEmpty() && diskOfferingHandle.getTags() == null)
-        // {
-        // //no new tags; no existing tags
-        // diskOffering.setTagsArray(csvTagsToList(null));
-        // }
-        // else if (!tags.trim().isEmpty() && diskOfferingHandle.getTags() !=
-        // null)
-        // {
-        // //new tags + existing tags
-        // List<String> oldTags = csvTagsToList(diskOfferingHandle.getTags());
-        // List<String> newTags = csvTagsToList(tags);
-        // oldTags.addAll(newTags);
-        // diskOffering.setTagsArray(oldTags);
-        // }
-        // else if(!tags.trim().isEmpty())
-        // {
-        // //new tags; NO existing tags
-        // diskOffering.setTagsArray(csvTagsToList(tags));
-        // }
-        // }
 
         if (_diskOfferingDao.update(diskOfferingId, diskOffering)) {
             CallContext.current().setEventDetails("Disk offering id=" + diskOffering.getId());
@@ -1438,12 +1386,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     throw new InvalidParameterValueException(
                             "Invalid Zone Detail specified, fields 'key' and 'value' cannot be null, please specify details in the form:  details[0].key=XXX&details[0].value=YYY");
                 }
-                // validate the zone detail keys are known keys
-        /*
-         * if(!ZoneConfig.doesKeyExist(key)){ throw new
-         * InvalidParameterValueException
-         * ("Invalid Zone Detail parameter: "+ key); }
-         */
                 newDetails.put(key, value);
             }
         }
@@ -4964,12 +4906,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final String checkPodCIDRs = _configDao.getValue("check.pod.cidrs");
         if (checkPodCIDRs == null || checkPodCIDRs.trim().isEmpty() || Boolean.parseBoolean(checkPodCIDRs)) {
             checkPodCidrSubnets(zoneId, podId, cidr);
-      /*
-       * Commenting out due to Bug 11593 - CIDR conflicts with zone when
-       * extending pod but not when creating it
-       *
-       * checkCidrVlanOverlap(zoneId, cidr);
-       */
         }
 
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {

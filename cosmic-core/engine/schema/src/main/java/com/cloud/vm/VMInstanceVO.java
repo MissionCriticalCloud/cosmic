@@ -154,17 +154,16 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     @Column(name = "limit_cpu_use", updatable = true, nullable = true)
     private boolean limitCpuUse;
 
-    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
-            hypervisorType, final long guestOSId,
-                        final long domainId, final long accountId, final long userId, final boolean haEnabled, final boolean limitResourceUse, final Long diskOfferingId) {
+    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
+                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
+                        final boolean limitResourceUse, final Long diskOfferingId) {
         this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         limitCpuUse = limitResourceUse;
         this.diskOfferingId = diskOfferingId;
     }
 
-    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
-            hypervisorType, final long guestOSId,
-                        final long domainId, final long accountId, final long userId, final boolean haEnabled) {
+    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
+                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
         this.id = id;
         hostName = name != null ? name : uuid;
         if (vmTemplateId != null) {

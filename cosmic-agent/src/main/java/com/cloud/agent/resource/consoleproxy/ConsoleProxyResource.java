@@ -1,13 +1,9 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthAnswer;
 import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.agent.api.Command;
-import com.cloud.agent.api.ConsoleAccessAuthenticationAnswer;
-import com.cloud.agent.api.ConsoleAccessAuthenticationCommand;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.ReadyAnswer;
 import com.cloud.agent.api.ReadyCommand;
@@ -18,7 +14,6 @@ import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
 import com.cloud.agent.api.proxy.StartConsoleProxyAgentHttpHandlerCommand;
 import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
 import com.cloud.agent.service.Agent.ExitStatus;
-import com.cloud.exception.AgentControlChannelException;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.resource.ServerResource;
@@ -43,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -382,61 +376,5 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     @Override
     public void setRunLevel(final int level) {
-    }
-
-    public String authenticateConsoleAccess(final String host, final String port, final String vmId, final String sid, final String ticket, final Boolean isReauthentication) {
-
-        final ConsoleAccessAuthenticationCommand cmd = new ConsoleAccessAuthenticationCommand(host, port, vmId, sid, ticket);
-        cmd.setReauthenticating(isReauthentication);
-
-        final ConsoleProxyAuthenticationResult result = new ConsoleProxyAuthenticationResult();
-        result.setSuccess(false);
-        result.setReauthentication(isReauthentication);
-
-        try {
-            final AgentControlAnswer answer = getAgentControl().sendRequest(cmd, 10000);
-
-            if (answer != null) {
-                final ConsoleAccessAuthenticationAnswer authAnswer = (ConsoleAccessAuthenticationAnswer) answer;
-                result.setSuccess(authAnswer.succeeded());
-                result.setHost(authAnswer.getHost());
-                result.setPort(authAnswer.getPort());
-                result.setTunnelUrl(authAnswer.getTunnelUrl());
-                result.setTunnelSession(authAnswer.getTunnelSession());
-            } else {
-                s_logger.error("Authentication failed for vm: " + vmId + " with sid: " + sid);
-            }
-        } catch (final AgentControlChannelException e) {
-            s_logger.error("Unable to send out console access authentication request due to " + e.getMessage(), e);
-        }
-
-        return new Gson().toJson(result);
-    }
-
-    public void reportLoadInfo(final String gsonLoadInfo) {
-        final ConsoleProxyLoadReportCommand cmd = new ConsoleProxyLoadReportCommand(_proxyVmId, gsonLoadInfo);
-        try {
-            getAgentControl().postRequest(cmd);
-
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Report proxy load info, proxy : " + _proxyVmId + ", load: " + gsonLoadInfo);
-            }
-        } catch (final AgentControlChannelException e) {
-            s_logger.error("Unable to send out load info due to " + e.getMessage(), e);
-        }
-    }
-
-    public void ensureRoute(final String address) {
-        if (_localgw != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Ensure route for " + address + " via " + _localgw);
-            }
-
-            // this method won't be called in high frequency, serialize access
-            // to script execution
-            synchronized (this) {
-                addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, address);
-            }
-        }
     }
 }

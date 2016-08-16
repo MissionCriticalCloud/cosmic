@@ -6,6 +6,7 @@ import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.StringUtils;
+import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiServerService;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,12 +78,7 @@ public class ApiServlet extends HttpServlet {
     }
 
     private void processRequest(final HttpServletRequest req, final HttpServletResponse resp) {
-        _managedContext.runWithContext(new Runnable() {
-            @Override
-            public void run() {
-                processRequestInContext(req, resp);
-            }
-        });
+        _managedContext.runWithContext(() -> processRequestInContext(req, resp));
     }
 
     void processRequestInContext(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -138,17 +135,14 @@ public class ApiServlet extends HttpServlet {
                         if (session != null) {
                             try {
                                 session.invalidate();
-                            } catch (final IllegalStateException ise) {
+                            } catch (final IllegalStateException e) {
+                                s_logger.warn("Previously ignored exception", e);
                             }
                         }
                         session = req.getSession(true);
                         if (ApiServer.isSecureSessionCookieEnabled()) {
                             resp.setHeader("SET-COOKIE", String.format("JSESSIONID=%s;Secure;HttpOnly;Path=/client", session.getId()));
-                            if (s_logger.isDebugEnabled()) {
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug("Session cookie is marked secure!");
-                                }
-                            }
+                            s_logger.debug("Session cookie is marked secure!");
                         }
                     }
 
@@ -159,6 +153,10 @@ public class ApiServlet extends HttpServlet {
                         }
                     } catch (final ServerApiException e) {
                         httpResponseCode = e.getErrorCode().getHttpCode();
+                        responseString = e.getMessage();
+                        s_logger.debug("Authentication failure: " + e.getMessage());
+                    } catch (final UnknownHostException e) {
+                        httpResponseCode = 400;
                         responseString = e.getMessage();
                         s_logger.debug("Authentication failure: " + e.getMessage());
                     }
@@ -177,7 +175,8 @@ public class ApiServlet extends HttpServlet {
                             }
                             try {
                                 session.invalidate();
-                            } catch (final IllegalStateException ignored) {
+                            } catch (final IllegalStateException e) {
+                                s_logger.warn("Previously ignored exception", e);
                             }
                         }
                         final Cookie sessionKeyCookie = new Cookie(ApiConstants.SESSIONKEY, "");
@@ -202,14 +201,7 @@ public class ApiServlet extends HttpServlet {
                 final String account = (String) session.getAttribute("account");
                 final Object accountObj = session.getAttribute("accountobj");
                 if (!HttpUtils.validateSessionKey(session, params, req.getCookies(), ApiConstants.SESSIONKEY)) {
-                    try {
-                        session.invalidate();
-                    } catch (final IllegalStateException ise) {
-                    }
-                    auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
-                    final String serializedResponse =
-                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
-                    HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
+                    denyAuthenticationRequest(resp, auditTrailSb, responseType, params, session);
                     return;
                 }
 
@@ -228,16 +220,7 @@ public class ApiServlet extends HttpServlet {
                 } else {
                     // Invalidate the session to ensure we won't allow a request across management server
                     // restarts if the userId was serialized to the stored session
-                    try {
-                        session.invalidate();
-                    } catch (final IllegalStateException ise) {
-                    }
-
-                    auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
-                    final String serializedResponse =
-                            _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
-                    HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
-                    return;
+                    denyAuthenticationRequest(resp, auditTrailSb, responseType, params, session);
                 }
             } else {
                 CallContext.register(_accountMgr.getSystemUser(), _accountMgr.getSystemAccount());
@@ -255,14 +238,14 @@ public class ApiServlet extends HttpServlet {
                 if (session != null) {
                     try {
                         session.invalidate();
-                    } catch (final IllegalStateException ise) {
+                    } catch (final IllegalStateException e) {
+                        s_logger.warn("Previously ignored exception", e);
                     }
                 }
 
                 auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials and/or request signature");
                 final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params,
-                                responseType);
+                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params, responseType);
                 HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
             }
         } catch (final ServerApiException se) {
@@ -270,9 +253,9 @@ public class ApiServlet extends HttpServlet {
             resp.setHeader("X-Description", se.getDescription());
             HttpUtils.writeHttpResponse(resp, serializedResponseText, se.getErrorCode().getHttpCode(), responseType, ApiServer.getJSONContentType());
             auditTrailSb.append(" " + se.getErrorCode() + " " + se.getDescription());
-        } catch (final Exception ex) {
-            s_logger.error("unknown exception writing api response", ex);
-            auditTrailSb.append(" unknown exception writing api response");
+        } catch (final CloudRuntimeException e) {
+            s_logger.error("Caught runtime exception while writing api response", e);
+            auditTrailSb.append("Caught runtime exception while writing api response");
         } finally {
             s_accessLogger.info(auditTrailSb.toString());
             if (s_logger.isDebugEnabled()) {
@@ -281,6 +264,19 @@ public class ApiServlet extends HttpServlet {
             // cleanup user context to prevent from being peeked in other request context
             CallContext.unregister();
         }
+    }
+
+    private void denyAuthenticationRequest(final HttpServletResponse resp, final StringBuilder auditTrailSb, final String responseType, final Map<String, Object[]> params, final
+    HttpSession session) {
+        try {
+            session.invalidate();
+        } catch (final IllegalStateException ise) {
+        }
+        auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials");
+        final String serializedResponse =
+                _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials", params, responseType);
+        HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
+        return;
     }
 
     //This method will try to get login IP of user even if servlet is behind reverseProxy or loadBalancer

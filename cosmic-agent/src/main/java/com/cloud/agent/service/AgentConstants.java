@@ -17,6 +17,4 @@ public class AgentConstants extends CloudConstants {
     public static final boolean DEFAULT_IPV6_DISABLED = false;
     public static final boolean DEFAULT_IPV6_PREFERRED = false;
     public static final String DEFAULT_PID_DIR = "/var/run";
-
-    public static final String PROPERTY_LIST_SEPARATOR = ",";
 }

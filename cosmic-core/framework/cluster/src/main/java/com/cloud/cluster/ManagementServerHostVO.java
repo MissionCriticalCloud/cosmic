@@ -151,10 +151,6 @@ public class ManagementServerHostVO implements ManagementServerHost {
         removed = removedTime;
     }
 
-    public int getAlertCount() {
-        return alertCount;
-    }
-
     public void setAlertCount(final int count) {
         alertCount = count;
     }

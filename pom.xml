@@ -45,7 +45,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <cs.replace.properties>build/replace.properties</cs.replace.properties>
         <cs.target.dir>target</cs.target.dir>
 
         <coverage.reports.dir>${cosmic.dir}/target/coverage-reports</coverage.reports.dir>
@@ -135,6 +134,7 @@
         <cs.maven-release-plugin.version>2.5.3</cs.maven-release-plugin.version>
         <cs.maven-surefire-plugin.version>2.18.1</cs.maven-surefire-plugin.version>
         <cs.maven-war-plugin.version>2.5</cs.maven-war-plugin.version>
+        <cs.maven-resources-plugin.version>3.0.1</cs.maven-resources-plugin.version>
         <cs.properties-maven-plugin.version>1.0-alpha-2</cs.properties-maven-plugin.version>
         <cs.sonar-maven-plugin.version>3.0.2</cs.sonar-maven-plugin.version>
         <cs.tomcat7-maven-plugin.version>2.2</cs.tomcat7-maven-plugin.version>
@@ -674,12 +674,6 @@
 
     <profiles>
         <profile>
-            <id>development</id>
-            <modules>
-                <module>cosmic-core</module>
-            </modules>
-        </profile>
-        <profile>
             <id>sonar-ci-cosmic</id>
             <properties>
                 <maven.test.failure.ignore>true</maven.test.failure.ignore>
@@ -733,6 +727,11 @@
                             <groupId>org.jacoco</groupId>
                             <artifactId>jacoco-maven-plugin</artifactId>
                             <version>${cs.jacoco-maven-plugin.version}</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-resources-plugin</artifactId>
+                            <version>${cs.maven-resources-plugin.version}</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>

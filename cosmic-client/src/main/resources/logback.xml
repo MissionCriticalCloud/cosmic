@@ -1,10 +1,10 @@
 <configuration>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/cosmic/management/management.log</file>
+        <file>${log.file.management.server}</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>/var/log/cosmic/management/management-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>${log.rotation.management.server}</fileNamePattern>
 
             <!-- keep 30 days' worth of history capped at 3GB total size -->
             <maxHistory>30</maxHistory>
@@ -14,6 +14,8 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%c{3}]%X{logcontextid}%X{ctx}%X{job}%X{workid} %m%n</pattern>
         </encoder>
     </appender>
+
+    <logger name="org.springframework.beans" level="WARN" />
 
     <root level="debug">
         <appender-ref ref="FILE" />
