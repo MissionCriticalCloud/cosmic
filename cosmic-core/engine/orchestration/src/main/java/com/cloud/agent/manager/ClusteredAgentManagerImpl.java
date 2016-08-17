@@ -725,7 +725,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                         s_logger.info("SSL: Handshake done");
                     } catch (final Exception e) {
                         ch1.close();
-                        throw new IOException("SSL: Fail to init SSL! " + e);
+                        throw new IOException("SSL: Fail to init SSL!", e);
                     }
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Connection to peer opened: " + peerName + ", ip: " + ip);
@@ -737,7 +737,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                     try {
                         ch1.close();
                     } catch (final IOException ex) {
-                        s_logger.error("failed to close failed peer socket: " + ex);
+                        s_logger.error("failed to close failed peer socket", ex);
                     }
                     s_logger.warn("Unable to connect to peer management server: " + peerName + ", ip: " + ip + " due to " + e.getMessage(), e);
                     return null;
