@@ -317,8 +317,8 @@ public class Agent implements HandlerFactory, IAgentControl {
             backOffAlgorithm.waitBeforeRetry();
         }
 
-        createNioClient(agentProperties);
         do {
+            createNioClient(agentProperties);
             logger.info("Reconnecting...");
             try {
                 _connection.start();
