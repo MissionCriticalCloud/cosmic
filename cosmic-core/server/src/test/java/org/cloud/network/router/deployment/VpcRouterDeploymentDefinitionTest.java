@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,6 +31,8 @@ import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpc.dao.VpcOfferingDao;
 import com.cloud.vm.DomainRouterVO;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -262,7 +265,34 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
     }
 
     @Test
-    public void testFindSourceNatIP() throws InsufficientAddressCapacityException, ConcurrentOperationException {
+    public void testWithSourceNatIP() throws InsufficientAddressCapacityException, ConcurrentOperationException {
+        // Prepare
+        final PublicIp publicIp = mock(PublicIp.class);
+        when(vpcMgr.assignSourceNatIpAddressToVpc(mockOwner, mockVpc)).thenReturn(publicIp);
+
+        Set<Network.Provider> providers = new HashSet<>();
+        providers.add(Network.Provider.VPCVirtualRouter);
+
+        Map<Network.Service, Set<Network.Provider>> serviceSetMap = new HashMap<>();
+        serviceSetMap.put(Network.Service.SourceNat, providers);
+
+        when(vpcMgr.getVpcOffSvcProvidersMap(mockVpc.getVpcOfferingId())).thenReturn(serviceSetMap);
+
+        // Execute
+        deployment.findSourceNatIP();
+
+        final VpcRouterDeploymentDefinition vpcDeployment = (VpcRouterDeploymentDefinition) deployment;
+        if (vpcDeployment.hasSourceNatService()) {
+            // Assert an ip address when we do have sourceNat service
+            assertEquals("SourceNatIp returned by the VpcManager was not correctly set", publicIp, deployment.sourceNatIp);
+        } else {
+            // Assert null when we have no sourceNat service
+            fail(String.format("SourceNatIp should be present, but got '%s'", deployment.sourceNatIp));
+        }
+    }
+
+    @Test
+    public void testWithoutSourceNatIP() throws InsufficientAddressCapacityException, ConcurrentOperationException {
         // Prepare
         final PublicIp publicIp = mock(PublicIp.class);
         when(vpcMgr.assignSourceNatIpAddressToVpc(mockOwner, mockVpc)).thenReturn(publicIp);
@@ -273,7 +303,7 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
         final VpcRouterDeploymentDefinition vpcDeployment = (VpcRouterDeploymentDefinition) deployment;
         if (vpcDeployment.hasSourceNatService()) {
             // Assert an ip address when we do have sourceNat service
-            assertEquals("SourceNatIp returned by the VpcManager was not correctly set", publicIp, deployment.sourceNatIp);
+            fail(String.format("SourceNatIp should not be present, but got '%s'", deployment.sourceNatIp));
         } else {
             // Assert null when we have no sourceNat service
             assertEquals("SourceNatIp returned by the VpcManager was not correctly set", null, deployment.sourceNatIp);
