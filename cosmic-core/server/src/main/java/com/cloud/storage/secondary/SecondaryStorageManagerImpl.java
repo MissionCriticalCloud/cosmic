@@ -137,7 +137,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 // because sooner or later, it will be driven into Running state
 //
 public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements SecondaryStorageVmManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
-    private static final Logger s_logger = LoggerFactory.getLogger(SecondaryStorageManagerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SecondaryStorageManagerImpl.class);
 
     private static final int DEFAULT_CAPACITY_SCAN_INTERVAL = 30000; // 30
     // seconds
@@ -218,9 +218,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        if (s_logger.isInfoEnabled()) {
-            s_logger.info("Start configuring secondary storage vm manager : " + name);
-        }
+        logger.info("Start configuring secondary storage vm manager : " + name);
 
         final Map<String, String> configs = _configDao.getConfiguration("management-server", params);
 
@@ -239,7 +237,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         //default to HTTP in case of missing domain
         final String ssvmUrlDomain = _configDao.getValue("secstorage.ssl.cert.domain");
         if (_useSSlCopy && (ssvmUrlDomain == null || ssvmUrlDomain.isEmpty())) {
-            s_logger.warn("Empty secondary storage url domain, explicitly disabling SSL");
+            logger.warn("Empty secondary storage url domain, explicitly disabling SSL");
             _useSSlCopy = false;
         }
 
@@ -271,11 +269,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 try {
                     _serviceOffering = _offeringDao.findById(Long.parseLong(ssvmSrvcOffIdStr));
                 } catch (final NumberFormatException ex) {
-                    s_logger.debug("The system service offering specified by global config is not id, but uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
+                    logger.debug("The system service offering specified by global config is not id, but uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
                 }
             }
             if (_serviceOffering == null) {
-                s_logger.warn("Can't find system service offering specified by global config, uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
+                logger.warn("Can't find system service offering specified by global config, uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
             }
         }
 
@@ -288,7 +286,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {
                 final String msg = "Data integrity problem : System Offering For Secondary Storage VM has been removed?";
-                s_logger.error(msg);
+                logger.error(msg);
                 throw new ConfigurationException(msg);
             }
         }
@@ -317,23 +315,19 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 errMsg = e.toString();
             } finally {
                 if (!valid) {
-                    s_logger.debug("ssvm http proxy " + _httpProxy + " is invalid: " + errMsg);
+                    logger.debug("ssvm http proxy " + _httpProxy + " is invalid: " + errMsg);
                     throw new ConfigurationException("ssvm http proxy " + _httpProxy + "is invalid: " + errMsg);
                 }
             }
         }
-        if (s_logger.isInfoEnabled()) {
-            s_logger.info("Secondary storage vm Manager is configured.");
-        }
+        logger.info("Secondary storage vm Manager is configured.");
         _resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
         return true;
     }
 
     @Override
     public boolean start() {
-        if (s_logger.isInfoEnabled()) {
-            s_logger.info("Start secondary storage vm manager");
-        }
+        logger.info("Start secondary storage vm manager");
 
         return true;
     }
@@ -436,9 +430,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         final String bootArgs = buf.toString();
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Boot Args for " + profile + ": " + bootArgs);
-        }
+        logger.debug("Boot Args for " + profile + ": " + bootArgs);
 
         return true;
     }
@@ -460,7 +452,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public boolean finalizeStart(final VirtualMachineProfile profile, final long hostId, final Commands cmds, final ReservationContext context) {
         final CheckSshAnswer answer = (CheckSshAnswer) cmds.getAnswer("checkSsh");
         if (!answer.getResult()) {
-            s_logger.warn("Unable to ssh to the VM: " + answer.getDetails());
+            logger.warn("Unable to ssh to the VM: " + answer.getDetails());
             return false;
         }
 
@@ -475,7 +467,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 _secStorageVmDao.update(secVm.getId(), secVm);
             }
         } catch (final Exception ex) {
-            s_logger.warn("Failed to get system ip and enable static nat for the vm " + profile.getVirtualMachine() + " due to exception ", ex);
+            logger.warn("Failed to get system ip and enable static nat for the vm " + profile.getVirtualMachine() + " due to exception ", ex);
             return false;
         }
 
@@ -497,7 +489,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         if (controlNic == null) {
             if (managementNic == null) {
-                s_logger.error("Management network doesn't exist for the secondaryStorageVm " + profile.getVirtualMachine());
+                logger.error("Management network doesn't exist for the secondaryStorageVm " + profile.getVirtualMachine());
                 return false;
             }
             controlNic = managementNic;
@@ -560,15 +552,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final long dataCenterId = pool.longValue();
 
         if (!isZoneReady(_zoneHostInfoMap, dataCenterId)) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Zone " + dataCenterId + " is not ready to launch secondary storage VM yet");
-            }
+            logger.debug("Zone " + dataCenterId + " is not ready to launch secondary storage VM yet");
             return false;
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Zone " + dataCenterId + " is ready to launch secondary storage VM");
-        }
+        logger.debug("Zone " + dataCenterId + " is ready to launch secondary storage VM");
         return true;
     }
 
@@ -577,23 +565,19 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (zoneHostInfo != null && (zoneHostInfo.getFlags() & RunningHostInfoAgregator.ZoneHostInfo.ROUTING_HOST_MASK) != 0) {
             final VMTemplateVO template = _templateDao.findSystemVMReadyTemplate(dataCenterId, HypervisorType.Any);
             if (template == null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("System vm template is not ready at data center " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
-                }
+                logger.debug("System vm template is not ready at data center " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
             }
 
             final List<DataStore> stores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
             if (stores.size() < 1) {
-                s_logger.debug("No image store added  in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
+                logger.debug("No image store added  in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
             }
 
             final DataStore store = templateMgr.getImageStore(dataCenterId, template.getId());
             if (store == null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("No secondary storage available in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
-                }
+                logger.debug("No secondary storage available in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
             }
 
@@ -606,11 +590,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (l != null && l.size() > 0 && l.get(0).second().intValue() > 0) {
                 return true;
             } else {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Primary storage is not ready, wait until it is ready to launch secondary storage vm. dcId: " + dataCenterId +
-                            ", " + ConfigurationManagerImpl.SystemVMUseLocalStorage.key() + ": " + useLocalStorage + ". " +
-                            "If you want to use local storage to start SSVM, need to set " + ConfigurationManagerImpl.SystemVMUseLocalStorage.key() + " to true");
-                }
+                logger.debug("Primary storage is not ready, wait until it is ready to launch secondary storage vm. dcId: " + dataCenterId +
+                        ", " + ConfigurationManagerImpl.SystemVMUseLocalStorage.key() + ": " + useLocalStorage + ". " +
+                        "If you want to use local storage to start SSVM, need to set " + ConfigurationManagerImpl.SystemVMUseLocalStorage.key() + " to true");
             }
         }
         return false;
@@ -627,7 +609,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final List<DataStore> ssStores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
         final int storeSize = (ssStores == null) ? 0 : ssStores.size();
         if (storeSize > vmSize) {
-            s_logger.info("No secondary storage vms found in datacenter id=" + dataCenterId + ", starting a new one");
+            logger.info("No secondary storage vms found in datacenter id=" + dataCenterId + ", starting a new one");
             return new Pair<>(AfterScanAction.expand, SecondaryStorageVm.Role.templateProcessor);
         }
 
@@ -641,14 +623,10 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     }
 
     private void allocCapacity(final long dataCenterId, final SecondaryStorageVm.Role role) {
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Allocate secondary storage vm standby capacity for data center : " + dataCenterId);
-        }
+        logger.trace("Allocate secondary storage vm standby capacity for data center : " + dataCenterId);
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Secondary storage vm not required in zone " + dataCenterId + " according to zone config");
-            }
+            logger.debug("Secondary storage vm not required in zone " + dataCenterId + " according to zone config");
             return;
         }
         SecondaryStorageVmVO secStorageVm = null;
@@ -657,9 +635,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             boolean secStorageVmFromStoppedPool = false;
             secStorageVm = assignSecStorageVmFromStoppedPool(dataCenterId, role);
             if (secStorageVm == null) {
-                if (s_logger.isInfoEnabled()) {
-                    s_logger.info("No stopped secondary storage vm is available, need to allocate a new secondary storage vm");
-                }
+                logger.info("No stopped secondary storage vm is available, need to allocate a new secondary storage vm");
 
                 if (_allocLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_SYNC)) {
                     try {
@@ -671,15 +647,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                         _allocLock.unlock();
                     }
                 } else {
-                    if (s_logger.isInfoEnabled()) {
-                        s_logger.info("Unable to acquire synchronization lock for secondary storage vm allocation, wait for next scan");
-                    }
+                    logger.info("Unable to acquire synchronization lock for secondary storage vm allocation, wait for next scan");
                     return;
                 }
             } else {
-                if (s_logger.isInfoEnabled()) {
-                    s_logger.info("Found a stopped secondary storage vm, starting it. Vm id : " + secStorageVm.getId());
-                }
+                logger.info("Found a stopped secondary storage vm, starting it. Vm id : " + secStorageVm.getId());
                 secStorageVmFromStoppedPool = true;
             }
 
@@ -694,9 +666,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                             secStorageVmLock.unlock();
                         }
                     } else {
-                        if (s_logger.isInfoEnabled()) {
-                            s_logger.info("Unable to acquire synchronization lock for starting secondary storage vm id : " + secStorageVm.getId());
-                        }
+                        logger.info("Unable to acquire synchronization lock for starting secondary storage vm id : " + secStorageVm.getId());
                         return;
                     }
                 } finally {
@@ -704,9 +674,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 }
 
                 if (secStorageVm == null) {
-                    if (s_logger.isInfoEnabled()) {
-                        s_logger.info("Unable to start secondary storage vm for standby capacity, vm id : " + secStorageVmId + ", will recycle it and start a new one");
-                    }
+                    logger.info("Unable to start secondary storage vm for standby capacity, vm id : " + secStorageVmId + ", will recycle it and start a new one");
 
                     if (secStorageVmFromStoppedPool) {
                         destroySecStorageVm(secStorageVmId);
@@ -714,9 +682,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 } else {
                     SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                             new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_UP, dataCenterId, secStorageVmId, secStorageVm, null));
-                    if (s_logger.isInfoEnabled()) {
-                        s_logger.info("Secondary storage vm " + secStorageVm.getHostName() + " is started");
-                    }
+                    logger.info("Secondary storage vm " + secStorageVm.getHostName() + " is started");
                 }
             }
         } catch (final Exception e) {
@@ -754,22 +720,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public SecondaryStorageVmVO startNew(final long dataCenterId, final SecondaryStorageVm.Role role) {
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Secondary storage vm not required in zone " + dataCenterId + " acc. to zone config");
-            }
+            logger.debug("Secondary storage vm not required in zone " + dataCenterId + " acc. to zone config");
             return null;
         }
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Assign secondary storage vm from a newly started instance for request from data center : " + dataCenterId);
-        }
+        logger.debug("Assign secondary storage vm from a newly started instance for request from data center : " + dataCenterId);
 
         final Map<String, Object> context = createSecStorageVmInstance(dataCenterId, role);
 
         final long secStorageVmId = (Long) context.get("secStorageVmId");
         if (secStorageVmId == 0) {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Creating secondary storage vm instance failed, data center id : " + dataCenterId);
-            }
+            logger.trace("Creating secondary storage vm instance failed, data center id : " + dataCenterId);
 
             return null;
         }
@@ -780,14 +740,15 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                     new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_CREATED, dataCenterId, secStorageVmId, secStorageVm, null));
             return secStorageVm;
         } else {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to allocate secondary storage vm storage, remove the secondary storage vm record from DB, secondary storage vm id: " +
-                        secStorageVmId);
-            }
+            logger.debug("Unable to allocate secondary storage vm storage, remove the secondary storage vm record from DB, secondary storage vm id: " + secStorageVmId);
             SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                     new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_CREATE_FAILURE, dataCenterId, secStorageVmId, null, "Unable to allocate storage"));
         }
         return null;
+    }
+
+    private String getSecStorageVmLockName(final long id) {
+        return "secStorageVm." + id;
     }
 
     @Override
@@ -797,16 +758,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             _itMgr.advanceStart(secStorageVm.getUuid(), null, null);
             return _secStorageVmDao.findById(secStorageVm.getId());
         } catch (final StorageUnavailableException e) {
-            s_logger.warn("Exception while trying to start secondary storage vm", e);
+            logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
         } catch (final InsufficientCapacityException e) {
-            s_logger.warn("Exception while trying to start secondary storage vm", e);
+            logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
         } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Exception while trying to start secondary storage vm", e);
+            logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
         } catch (final Exception e) {
-            s_logger.warn("Exception while trying to start secondary storage vm", e);
+            logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
         }
     }
@@ -816,9 +777,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
         if (secStorageVm == null) {
             final String msg = "Stopping secondary storage vm failed: secondary storage vm " + secStorageVmId + " no longer exists";
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(msg);
-            }
+            logger.debug(msg);
             return false;
         }
         try {
@@ -834,7 +793,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                         }
                     } else {
                         final String msg = "Unable to acquire secondary storage vm lock : " + secStorageVm.toString();
-                        s_logger.debug(msg);
+                        logger.debug(msg);
                         return false;
                     }
                 } finally {
@@ -845,9 +804,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             // vm was already stopped, return true
             return true;
         } catch (final ResourceUnavailableException e) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Stopping secondary storage vm " + secStorageVm.getHostName() + " faled : exception " + e.toString());
-            }
+            logger.debug("Stopping secondary storage vm " + secStorageVm.getHostName() + " faled : exception " + e.toString());
             return false;
         }
     }
@@ -865,9 +822,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             final Answer answer = _agentMgr.easySend(secStorageVm.getHostId(), cmd);
 
             if (answer != null && answer.getResult()) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Successfully reboot secondary storage vm " + secStorageVm.getHostName());
-                }
+                logger.debug("Successfully reboot secondary storage vm " + secStorageVm.getHostName());
 
                 SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                         new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_REBOOTED, secStorageVm.getDataCenterId(), secStorageVm.getId(), secStorageVm, null));
@@ -875,9 +830,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 return true;
             } else {
                 final String msg = "Rebooting Secondary Storage VM failed - " + secStorageVm.getHostName();
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug(msg);
-                }
+                logger.debug(msg);
                 return false;
             }
         } else {
@@ -894,7 +847,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             _secStorageVmDao.remove(ssvm.getId());
             final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), Host.Type.SecondaryStorageVM);
             if (host != null) {
-                s_logger.debug("Removing host entry for ssvm id=" + vmId);
+                logger.debug("Removing host entry for ssvm id=" + vmId);
                 _hostDao.remove(host.getId());
                 //Expire the download urls in the entire zone for templates and volumes.
                 _tmplStoreDao.expireDnldUrlsForZone(host.getDataCenterId());
@@ -903,7 +856,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             }
             return false;
         } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to expunge " + ssvm, e);
+            logger.warn("Unable to expunge " + ssvm, e);
             return false;
         }
     }
@@ -921,7 +874,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecondaryStorageVmVO thisSecStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
 
         if (thisSecStorageVm == null) {
-            s_logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
+            logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
             return false;
         }
 
@@ -939,13 +892,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             }
             final Answer answer = _agentMgr.easySend(ssvm.getId(), thiscpc);
             if (answer != null && answer.getResult()) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Successfully programmed firewall rules into SSVM " + ssvm.getName());
-                }
+                logger.debug("Successfully programmed firewall rules into SSVM " + ssvm.getName());
             } else {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("failed to program firewall rules into secondary storage vm : " + ssvm.getName());
-                }
+                logger.debug("failed to program firewall rules into secondary storage vm : " + ssvm.getName());
                 return false;
             }
         }
@@ -960,13 +909,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         final Answer answer = _agentMgr.easySend(ssAHostId, allSSVMIpList);
         if (answer != null && answer.getResult()) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Successfully programmed firewall rules into " + thisSecStorageVm.getHostName());
-            }
+            logger.debug("Successfully programmed firewall rules into " + thisSecStorageVm.getHostName());
         } else {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("failed to program firewall rules into secondary storage vm : " + thisSecStorageVm.getHostName());
-            }
+            logger.debug("failed to program firewall rules into secondary storage vm : " + thisSecStorageVm.getHostName());
             return false;
         }
 
@@ -981,7 +926,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
         final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
         if (secStorageVm == null) {
-            s_logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
+            logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
             return false;
         }
 
@@ -1001,14 +946,10 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         setupCmd.setCopyUserName(TemplateConstants.DEFAULT_HTTP_AUTH_USER);
         final Answer answer = _agentMgr.easySend(ssAHostId, setupCmd);
         if (answer != null && answer.getResult()) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Successfully programmed http auth into " + secStorageVm.getHostName());
-            }
+            logger.debug("Successfully programmed http auth into " + secStorageVm.getHostName());
             return true;
         } else {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("failed to program http auth into secondary storage vm : " + secStorageVm.getHostName());
-            }
+            logger.debug("failed to program http auth into secondary storage vm : " + secStorageVm.getHostName());
             return false;
         }
     }
@@ -1026,7 +967,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
             final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(cssHost.getName());
             if (secStorageVm == null) {
-                s_logger.warn("secondary storage VM " + cssHost.getName() + " doesn't exist");
+                logger.warn("secondary storage VM " + cssHost.getName() + " doesn't exist");
                 return false;
             }
 
@@ -1057,13 +998,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                         svo.setParent(an.get_dir());
                         _imageStoreDao.update(ssStore.getId(), svo);
                     }
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Successfully programmed secondary storage " + ssStore.getName() + " in secondary storage VM " + secStorageVm.getInstanceName());
-                    }
+                    logger.debug("Successfully programmed secondary storage " + ssStore.getName() + " in secondary storage VM " + secStorageVm.getInstanceName());
                 } else {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Successfully programmed secondary storage " + ssStore.getName() + " in secondary storage VM " + secStorageVm.getInstanceName());
-                    }
+                    logger.debug("Successfully programmed secondary storage " + ssStore.getName() + " in secondary storage VM " + secStorageVm.getInstanceName());
                     return false;
                 }
             }
@@ -1098,15 +1035,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return null;
     }
 
-    private String getSecStorageVmLockName(final long id) {
-        return "secStorageVm." + id;
-    }
-
     protected Map<String, Object> createSecStorageVmInstance(final long dataCenterId, final SecondaryStorageVm.Role role) {
         final DataStore secStore = _dataStoreMgr.getImageStore(dataCenterId);
         if (secStore == null) {
             final String msg = "No secondary storage available in zone " + dataCenterId + ", cannot create secondary storage vm";
-            s_logger.warn(msg);
+            logger.warn(msg);
             throw new CloudRuntimeException(msg);
         }
 
@@ -1137,7 +1070,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 networks.put(_networkMgr.setupNetwork(systemAcct, offering, plan, null, null, false).get(0), new ArrayList<>());
             }
         } catch (final ConcurrentOperationException e) {
-            s_logger.info("Unable to setup due to concurrent operation. " + e);
+            logger.info("Unable to setup due to concurrent operation. " + e);
             return new HashMap<>();
         }
 
@@ -1162,7 +1095,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             _itMgr.allocate(name, template, serviceOffering, networks, plan, null);
             secStorageVm = _secStorageVmDao.findById(secStorageVm.getId());
         } catch (final InsufficientCapacityException e) {
-            s_logger.warn("InsufficientCapacity", e);
+            logger.warn("InsufficientCapacity", e);
             throw new CloudRuntimeException("Insufficient capacity exception", e);
         }
 
