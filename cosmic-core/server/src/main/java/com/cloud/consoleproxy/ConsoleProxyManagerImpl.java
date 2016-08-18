@@ -75,12 +75,11 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.events.SubscriptionMgr;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
+import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.SystemVmLoadScanHandler;
 import com.cloud.vm.SystemVmLoadScanner;
-import com.cloud.vm.SystemVmLoadScanner.AfterScanAction;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -131,7 +130,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 // Starting, HA, Migrating, Running state are all counted as "Open" for available capacity calculation
 // because sooner or later, it will be driven into Running state
 //
-public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements ConsoleProxyManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
+public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements ConsoleProxyManager, VirtualMachineGuru, ResourceStateAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleProxyManagerImpl.class);
 
     private static final int DEFAULT_CAPACITY_SCAN_INTERVAL = 30000; // 30 seconds
@@ -845,7 +844,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
         final ConsoleProxyLoadInfo proxyInfo = _zoneProxyCountMap.get(dataCenterId);
         if (proxyInfo == null) {
-            return new Pair<>(AfterScanAction.nop, null);
+            return new Pair<>(AfterScanAction.nop(), null);
         }
 
         ConsoleProxyLoadInfo vmInfo = _zoneVmCountMap.get(dataCenterId);
@@ -856,10 +855,10 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (!checkCapacity(proxyInfo, vmInfo)) {
             logger.debug("Expand console proxy standby capacity for zone " + proxyInfo.getName());
 
-            return new Pair<>(AfterScanAction.expand, null);
+            return new Pair<>(AfterScanAction.expand(), null);
         }
 
-        return new Pair<>(AfterScanAction.nop, null);
+        return new Pair<>(AfterScanAction.nop(), null);
     }
 
     private boolean checkCapacity(final ConsoleProxyLoadInfo proxyCountInfo, final ConsoleProxyLoadInfo vmCountInfo) {
@@ -1055,14 +1054,6 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         return true;
     }
 
-    /**
-     * Get the default network for the console proxy VM, based on the zone it is in. Delegates to
-     * either {@link #getDefaultNetworkForZone(DataCenter)} or {@link #getDefaultNetworkForAdvancedSGZone(DataCenter)},
-     * depending on the zone network type and whether or not security groups are enabled in the zone.
-     *
-     * @param dc - The zone (DataCenter) of the console proxy VM.
-     * @return The default network for use with the console proxy VM.
-     */
     protected NetworkVO getDefaultNetworkForCreation(final DataCenter dc) {
         if (dc.getNetworkType() == NetworkType.Advanced) {
             return getDefaultNetworkForAdvancedZone(dc);

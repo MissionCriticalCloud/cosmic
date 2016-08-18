@@ -1,5 +1,11 @@
 package com.cloud.storage.secondary;
 
+import static com.cloud.vm.VirtualMachine.State.Migrating;
+import static com.cloud.vm.VirtualMachine.State.Running;
+import static com.cloud.vm.VirtualMachine.State.Starting;
+import static com.cloud.vm.VirtualMachine.State.Stopped;
+import static com.cloud.vm.VirtualMachine.State.Stopping;
+
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -75,13 +81,12 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.events.SubscriptionMgr;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
+import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
-import com.cloud.vm.SystemVmLoadScanHandler;
 import com.cloud.vm.SystemVmLoadScanner;
-import com.cloud.vm.SystemVmLoadScanner.AfterScanAction;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineGuru;
@@ -136,7 +141,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 // Starting, HA, Migrating, Creating and Running state are all counted as "Open" for available capacity calculation
 // because sooner or later, it will be driven into Running state
 //
-public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements SecondaryStorageVmManager, VirtualMachineGuru, SystemVmLoadScanHandler<Long>, ResourceStateAdapter {
+public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements SecondaryStorageVmManager, VirtualMachineGuru, ResourceStateAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SecondaryStorageManagerImpl.class);
 
     private static final int DEFAULT_CAPACITY_SCAN_INTERVAL = 30000; // 30
@@ -520,7 +525,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public void prepareStop(final VirtualMachineProfile profile) {
-
     }
 
     @Override
@@ -601,20 +605,21 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public Pair<AfterScanAction, Object> scanPool(final Long pool) {
+        logger.info("Scanning secondary storage pool {}", pool.toString());
         final long dataCenterId = pool.longValue();
 
         final List<SecondaryStorageVmVO> ssVms =
-                _secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVm.Role.templateProcessor, dataCenterId, State.Running, State.Migrating, State.Starting,
-                        State.Stopped, State.Stopping);
+                _secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVm.Role.templateProcessor, dataCenterId, Running, Migrating, Starting, Stopped, Stopping);
         final int vmSize = (ssVms == null) ? 0 : ssVms.size();
         final List<DataStore> ssStores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
         final int storeSize = (ssStores == null) ? 0 : ssStores.size();
         if (storeSize > vmSize) {
-            logger.info("No secondary storage vms found in datacenter id=" + dataCenterId + ", starting a new one");
-            return new Pair<>(AfterScanAction.expand, SecondaryStorageVm.Role.templateProcessor);
+            final int requiredVMs = storeSize - vmSize;
+            logger.info("Found less ({}) secondary storage VMs than image stores ({}) in datacenter id={}, starting {} new VMs", vmSize, storeSize, dataCenterId, requiredVMs);
+            return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
         }
 
-        return new Pair<>(AfterScanAction.nop, SecondaryStorageVm.Role.templateProcessor);
+        return new Pair<>(AfterScanAction.nop(), SecondaryStorageVm.Role.templateProcessor);
     }
 
     @Override
@@ -692,7 +697,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         } finally {
             // TODO - For now put all the alerts as creation failure. Distinguish between creation vs start failure in future.
             // Also add failure reason since startvm masks some of them.
-            if (secStorageVm == null || secStorageVm.getState() != State.Running) {
+            if (secStorageVm == null || secStorageVm.getState() != Running) {
                 SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                         new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_CREATE_FAILURE, dataCenterId, 0l, null, errorString));
             }
@@ -710,7 +715,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     }
 
     public SecondaryStorageVmVO assignSecStorageVmFromStoppedPool(final long dataCenterId, final SecondaryStorageVm.Role role) {
-        final List<SecondaryStorageVmVO> l = _secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, State.Starting, State.Stopped, State.Migrating);
+        final List<SecondaryStorageVmVO> l = _secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, Starting, Stopped, Migrating);
         if (l != null && l.size() > 0) {
             return l.get(0);
         }
@@ -809,7 +814,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return false;
         }
 
-        if (secStorageVm.getState() == State.Running && secStorageVm.getHostId() != null) {
+        if (secStorageVm.getState() == Running && secStorageVm.getHostId() != null) {
             final RebootCommand cmd = new RebootCommand(secStorageVm.getInstanceName());
             final Answer answer = _agentMgr.easySend(secStorageVm.getHostId(), cmd);
 
@@ -1096,14 +1101,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return context;
     }
 
-    /**
-     * Get the default network for the secondary storage VM, based on the zone it is in. Delegates to
-     * either {@link #getDefaultNetworkForZone(DataCenter)} or {@link #getDefaultNetworkForAdvancedSGZone(DataCenter)},
-     * depending on the zone network type and whether or not security groups are enabled in the zone.
-     *
-     * @param dc - The zone (DataCenter) of the secondary storage VM.
-     * @return The default network for use with the secondary storage VM.
-     */
     protected NetworkVO getDefaultNetworkForCreation(final DataCenter dc) {
         if (dc.getNetworkType() == NetworkType.Advanced) {
             return getDefaultNetworkForAdvancedZone(dc);
@@ -1139,6 +1136,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public void shrinkPool(final Long pool, final Object actionArgs) {
+        logger.warn("Shrink pool is not implemented!");
     }
 
     @Override

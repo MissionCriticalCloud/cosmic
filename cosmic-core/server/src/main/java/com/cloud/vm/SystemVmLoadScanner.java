@@ -71,18 +71,7 @@ public class SystemVmLoadScanner<T> {
                 if (_scanHandler.isPoolReadyForScan(p)) {
                     final Pair<AfterScanAction, Object> actionInfo = _scanHandler.scanPool(p);
 
-                    switch (actionInfo.first()) {
-                        case nop:
-                            break;
-
-                        case expand:
-                            _scanHandler.expandPool(p, actionInfo.second());
-                            break;
-
-                        case shrink:
-                            _scanHandler.shrinkPool(p, actionInfo.second());
-                            break;
-                    }
+                    _scanHandler.resizePool(p, actionInfo.first(), actionInfo.second());
                 }
             }
 
@@ -102,9 +91,5 @@ public class SystemVmLoadScanner<T> {
         }
 
         _capacityScanLock.releaseRef();
-    }
-
-    public enum AfterScanAction {
-        nop, expand, shrink
     }
 }

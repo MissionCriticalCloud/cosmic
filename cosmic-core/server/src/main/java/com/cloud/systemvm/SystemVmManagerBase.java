@@ -20,8 +20,10 @@ import com.cloud.network.rules.RulesManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.SystemVm;
+import com.cloud.vm.SystemVmLoadScanHandler;
 import com.cloud.vm.VirtualMachineProfile;
 import org.apache.cloudstack.context.CallContext;
 
@@ -29,12 +31,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class SystemVmManagerBase extends ManagerBase {
+public abstract class SystemVmManagerBase extends ManagerBase implements SystemVmLoadScanHandler<Long> {
     private static final Logger logger = LoggerFactory.getLogger(SystemVmManagerBase.class);
 
     protected void computeVmIps(final SystemVm vmVO, final DataCenter dc, final List<NicProfile> nics) {
@@ -130,5 +134,28 @@ public abstract class SystemVmManagerBase extends ManagerBase {
     protected String computeManagementServerIpList(final ManagementServerService managementServerService) {
         return managementServerService.discoverManagementServerIps()
                                       .collect(Collectors.joining(PROPERTY_LIST_SEPARATOR));
+    }
+
+    public void resizePool(final Long pool, final AfterScanAction action, final Object actionArgs) {
+        logger.info("Resizing pool (dcId={}) with action {}", pool, action);
+        final int count = action.getValue();
+        final Stream<Integer> iterations = IntStream.range(0, count).boxed();
+        switch (action.getAction()) {
+            case EXPAND:
+                iterations.forEach(i -> {
+                    logger.debug("Expanding pool [iteration {}/{}]", i + 1, count);
+                    expandPool(pool, actionArgs);
+                });
+                break;
+            case SHRINK:
+                iterations.forEach(i -> {
+                    logger.debug("Shrinking pool [iteration {}/{}]", i + 1, count);
+                    shrinkPool(pool, actionArgs);
+                });
+                break;
+            case NOP:
+                logger.debug("Breaking off resizing pool because no action was selected");
+                return;
+        }
     }
 }
