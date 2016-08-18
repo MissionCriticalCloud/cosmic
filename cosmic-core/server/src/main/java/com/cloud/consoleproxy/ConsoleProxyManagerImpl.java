@@ -871,6 +871,12 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
     }
 
     @Override
+    public void resizePool(final Long pool, final AfterScanAction action, final Object actionArgs) {
+        logger.info("Resizing console proxy (dcId={}) with action {}", pool, action);
+        super.resizePool(pool, action, actionArgs);
+    }
+
+    @Override
     public void expandPool(final Long pool, final Object actionArgs) {
         final long dataCenterId = pool.longValue();
         allocCapacity(dataCenterId);

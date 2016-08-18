@@ -137,7 +137,6 @@ public abstract class SystemVmManagerBase extends ManagerBase implements SystemV
     }
 
     public void resizePool(final Long pool, final AfterScanAction action, final Object actionArgs) {
-        logger.info("Resizing pool (dcId={}) with action {}", pool, action);
         final int count = action.getValue();
         final Stream<Integer> iterations = IntStream.range(0, count).boxed();
         switch (action.getAction()) {

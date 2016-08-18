@@ -615,11 +615,26 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final int storeSize = (ssStores == null) ? 0 : ssStores.size();
         if (storeSize > vmSize) {
             final int requiredVMs = storeSize - vmSize;
-            logger.info("Found less ({}) secondary storage VMs than image stores ({}) in datacenter id={}, starting {} new VMs", vmSize, storeSize, dataCenterId, requiredVMs);
+            logger.info("Found less ({}) secondary storage VMs than image stores ({}) in dcId={}, starting {} new VMs", vmSize, storeSize, dataCenterId, requiredVMs);
             return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+        } else {
+            final String standByCapacity = _configDao.getValue(Config.SecStorageCapacityStandby.toString());
+            final String maxPerVm = _configDao.getValue(Config.SecStorageSessionMax.toString());
+            final int requiredCapacity = new SecondaryStorageCapacityCalculator().calculateRequiredCapacity(Integer.parseInt(standByCapacity), Integer.parseInt(maxPerVm));
+            if (requiredCapacity > vmSize) {
+                final int requiredVMs = requiredCapacity - vmSize;
+                logger.info("Found less ({}) secondary storage VMs than required ({}) in dcId={}, starting {} new VMs", vmSize, requiredCapacity, dataCenterId, requiredVMs);
+                return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+            }
         }
 
         return new Pair<>(AfterScanAction.nop(), SecondaryStorageVm.Role.templateProcessor);
+    }
+
+    @Override
+    public void resizePool(final Long pool, final AfterScanAction action, final Object actionArgs) {
+        logger.info("Resizing secondary storage pool (dcId={}) with action {}", pool, action);
+        super.resizePool(pool, action, actionArgs);
     }
 
     @Override
