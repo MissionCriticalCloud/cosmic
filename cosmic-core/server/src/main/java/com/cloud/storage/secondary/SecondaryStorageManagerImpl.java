@@ -27,8 +27,8 @@ import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -268,8 +268,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (_serviceOffering == null) {
                 try {
                     _serviceOffering = _offeringDao.findById(Long.parseLong(ssvmSrvcOffIdStr));
-                } catch (final NumberFormatException ex) {
-                    logger.debug("The system service offering specified by global config is not id, but uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
+                } catch (final NumberFormatException e) {
+                    logger.debug("The system service offering specified by global config is not id, but uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm", e);
                 }
             }
             if (_serviceOffering == null) {
@@ -313,9 +313,10 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 }
             } catch (final URISyntaxException e) {
                 errMsg = e.toString();
+                logger.debug("Caught exception paring ssvm proxy uri.");
             } finally {
                 if (!valid) {
-                    logger.debug("ssvm http proxy " + _httpProxy + " is invalid: " + errMsg);
+                    logger.warn("ssvm http proxy " + _httpProxy + " is invalid: " + errMsg);
                     throw new ConfigurationException("ssvm http proxy " + _httpProxy + "is invalid: " + errMsg);
                 }
             }
@@ -466,8 +467,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 secVm.setPublicIpAddress(ipaddr.getAddress().addr());
                 _secStorageVmDao.update(secVm.getId(), secVm);
             }
-        } catch (final Exception ex) {
-            logger.warn("Failed to get system ip and enable static nat for the vm " + profile.getVirtualMachine() + " due to exception ", ex);
+        } catch (final Exception e) {
+            logger.warn("Failed to get system ip and enable static nat for the vm " + profile.getVirtualMachine() + " due to exception ", e);
             return false;
         }
 
@@ -757,16 +758,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
             _itMgr.advanceStart(secStorageVm.getUuid(), null, null);
             return _secStorageVmDao.findById(secStorageVm.getId());
-        } catch (final StorageUnavailableException e) {
-            logger.warn("Exception while trying to start secondary storage vm", e);
-            return null;
-        } catch (final InsufficientCapacityException e) {
-            logger.warn("Exception while trying to start secondary storage vm", e);
-            return null;
-        } catch (final ResourceUnavailableException e) {
-            logger.warn("Exception while trying to start secondary storage vm", e);
-            return null;
-        } catch (final Exception e) {
+        } catch (final InsufficientCapacityException | ResourceUnavailableException | OperationTimedoutException e) {
             logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
         }
@@ -804,7 +796,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             // vm was already stopped, return true
             return true;
         } catch (final ResourceUnavailableException e) {
-            logger.debug("Stopping secondary storage vm " + secStorageVm.getHostName() + " faled : exception " + e.toString());
+            logger.debug("Stopping secondary storage vm " + secStorageVm.getHostName() + " faled : exception " + e.toString(), e);
             return false;
         }
     }
@@ -1070,7 +1062,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 networks.put(_networkMgr.setupNetwork(systemAcct, offering, plan, null, null, false).get(0), new ArrayList<>());
             }
         } catch (final ConcurrentOperationException e) {
-            logger.info("Unable to setup due to concurrent operation. " + e);
+            logger.info("Unable to setup due to concurrent operation.", e);
             return new HashMap<>();
         }
 

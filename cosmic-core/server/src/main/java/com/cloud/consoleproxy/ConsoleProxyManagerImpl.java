@@ -25,7 +25,6 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
@@ -506,8 +505,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             if (_serviceOffering == null) {
                 try {
                     _serviceOffering = _offeringDao.findById(Long.parseLong(cpvmSrvcOffIdStr));
-                } catch (final NumberFormatException ex) {
-                    logger.debug("The system service offering specified by global config is not id, but uuid=" + cpvmSrvcOffIdStr + " for console proxy vm");
+                } catch (final NumberFormatException e) {
+                    logger.debug("The system service offering specified by global config is not id, but uuid=" + cpvmSrvcOffIdStr + " for console proxy vm", e);
                 }
             }
             if (_serviceOffering == null) {
@@ -893,7 +892,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
                     try {
                         proxy = startNew(dataCenterId);
                     } catch (final ConcurrentOperationException e) {
-                        logger.info("Concurrent operation exception caught " + e);
+                        logger.info("Concurrent operation exception caught ", e);
                     } finally {
                         _allocProxyLock.unlock();
                     }
@@ -1196,23 +1195,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             // to Stopped to allow Starting of it
             logger.warn("Console proxy is not in correct state to be started: " + proxy.getState());
             return null;
-        } catch (final StorageUnavailableException e) {
+        } catch (final InsufficientCapacityException | ResourceUnavailableException | CloudRuntimeException | OperationTimedoutException e) {
             logger.warn("Exception while trying to start console proxy", e);
-            return null;
-        } catch (final InsufficientCapacityException e) {
-            logger.warn("Exception while trying to start console proxy", e);
-            return null;
-        } catch (final ResourceUnavailableException e) {
-            logger.warn("Exception while trying to start console proxy", e);
-            return null;
-        } catch (final ConcurrentOperationException e) {
-            logger.warn("Runtime Exception while trying to start console proxy", e);
-            return null;
-        } catch (final CloudRuntimeException e) {
-            logger.warn("Runtime Exception while trying to start console proxy", e);
-            return null;
-        } catch (final OperationTimedoutException e) {
-            logger.warn("Runtime Exception while trying to start console proxy", e);
             return null;
         }
     }
