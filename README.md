@@ -15,7 +15,7 @@ resource accounting, and a first-class User Interface (UI).
 
 Cosmic currently supports the following hypervisors:
 KVM and XenServer.
-Support for other hypervisors can be added if contributors can provide the infrastructure to test agains.
+Support for other hypervisors can be added if contributors can provide the infrastructure to test against.
 
 Users can manage their cloud via Web interface, command line
 tools, and/or a full-featured query based API.
