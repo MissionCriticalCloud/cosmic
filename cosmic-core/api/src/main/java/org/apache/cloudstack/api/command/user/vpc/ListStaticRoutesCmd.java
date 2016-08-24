@@ -15,6 +15,7 @@ import org.apache.cloudstack.api.response.VpcResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @APICommand(name = "listStaticRoutes", description = "Lists all static routes", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -67,18 +68,15 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
 
         // Compatibility with pre 5.1
         // If gatewayId was passed, lookup its CIDR and match static routes to it
-        String GatewayCidr = "0.0.0.0/0";
-        if (gatewayId != null) {
-            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
-            GatewayCidr = NetUtils.ipAndNetMaskToCidr(gateway.getGateway(), gateway.getNetmask());
-        }
-        for (final StaticRoute route : result.first()) {
-            if (!NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), GatewayCidr)) {
-                continue;
-            }
-            final StaticRouteResponse ruleData = _responseGenerator.createStaticRouteResponse(route);
-            routeResponses.add(ruleData);
-        }
+        final Optional<String> gatewayCidr = retrieveGateway();
+
+        result.first().stream()
+              .filter(route -> NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), gatewayCidr.get()))
+              .forEach(route -> {
+                  final StaticRouteResponse ruleData = _responseGenerator.createStaticRouteResponse(route);
+                  routeResponses.add(ruleData);
+              });
+
         response.setResponses(routeResponses, result.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
@@ -90,5 +88,14 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
     @Override
     public String getCommandName() {
         return s_name;
+    }
+
+    private Optional<String> retrieveGateway() {
+        final Optional<String> gatewayCidr = Optional.of("0.0.0.0/0");
+        if (gatewayId != null) {
+            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
+            gatewayCidr.of(NetUtils.ipAndNetMaskToCidr(gateway.getGateway(), gateway.getNetmask()));
+        }
+        return gatewayCidr;
     }
 }
