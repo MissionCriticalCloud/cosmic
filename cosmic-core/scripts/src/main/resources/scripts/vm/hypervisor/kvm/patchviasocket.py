@@ -25,6 +25,7 @@
 import argparse
 import os
 import socket
+import time
 
 SOCK_FILE = "/var/lib/libvirt/qemu/{name}.agent"
 PUB_KEY_FILE = "/root/.ssh/id_rsa.pub.cloud"
@@ -56,6 +57,9 @@ def send_to_socket(sock_file, key_file, cmdline):
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         s.connect(sock_file)
         s.sendall(msg)
+        # We need this otherwise it terminates too fast and nothing is sent.
+        # It'd be better to figure out a way to wait for the sending to complete.
+        time.sleep(1)
         s.close()
     except IOError as e:
         print("ERROR: unable to connect to {0} - {1}".format(sock_file, e.strerror))
