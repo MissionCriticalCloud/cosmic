@@ -152,7 +152,9 @@ class CsAcl(CsDataBag):
             # rule below moved from CsAddress to replicate default behaviour
             # default behaviour is that only if one or more egress rules exist
             # we will drop everything else, otherwise we will allow all egress traffic
+            # now also with logging
             if len(self.egress) > 0:
+                self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [egress] \" --log-level 7" % self.device])
                 self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -j DROP" % self.device])
 
         def process(self, direction, rule_list, base):
