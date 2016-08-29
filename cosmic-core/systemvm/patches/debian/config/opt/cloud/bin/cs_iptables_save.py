@@ -183,7 +183,7 @@ class Tables(UserDict):
                             print(elem, file=f)
                         # not really the correct place for this, but for now it is the only working place.
                         if key == "filter" and elem.startswith("INPUT",3):
-                            print("-A INPUT -m limit --limit 2/second -j LOG --log-prefix \"iptables denied: [input]\" --log-level 7", file=f)
+                            print("-A INPUT -m limit --limit 2/second -j LOG --log-prefix \"iptables denied: [input]\" --log-level 4", file=f)
                     print("COMMIT", file=f)
 
     def put_into_tables(self, line):
