@@ -2,6 +2,7 @@ package com.cloud.hypervisor;
 
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.to.DataObjectType;
+import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -33,8 +34,14 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
 
     @Override
     public Pair<Boolean, Long> getCommandHostDelegation(final long hostId, final Command cmd) {
+
+        if (cmd instanceof StorageSubSystemCommand) {
+            final StorageSubSystemCommand c = (StorageSubSystemCommand) cmd;
+            c.setExecuteInSequence(false);
+        }
         if (cmd instanceof CopyCommand) {
             final CopyCommand c = (CopyCommand) cmd;
+            final DataTO srcData = c.getSrcTO();
             boolean inSeq = true;
             if (c.getSrcTO().getObjectType() == DataObjectType.SNAPSHOT ||
                     c.getDestTO().getObjectType() == DataObjectType.SNAPSHOT) {
@@ -44,11 +51,11 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
                 inSeq = false;
             }
             c.setExecuteInSequence(inSeq);
+            if (srcData.getHypervisorType() == HypervisorType.KVM) {
+                return new Pair<>(true, new Long(hostId));
+            }
         }
-        if (cmd instanceof StorageSubSystemCommand) {
-            final StorageSubSystemCommand c = (StorageSubSystemCommand) cmd;
-            c.setExecuteInSequence(false);
-        }
+
         return new Pair<>(false, new Long(hostId));
     }
 
