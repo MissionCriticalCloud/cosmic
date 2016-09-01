@@ -372,12 +372,15 @@ class CsIP:
         self.fw.append(["filter", "", "-A INPUT -i lo -j ACCEPT"])
 
         if self.get_type() in ["guest"]:
+            guestNetworkCidr = self.address['network']
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
             self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -j ACCEPT" % self.dev])
+                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" %
+                 (self.dev, guestNetworkCidr)])
             self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -j ACCEPT" % self.dev])
+                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" %
+                 (self.dev, guestNetworkCidr)])
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(
@@ -418,8 +421,9 @@ class CsIP:
         self.fw.append(["filter", "", "-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"])
 
         if self.get_type() in ["guest"]:
+            guestNetworkCidr = self.address['network']
             self.fw.append(["filter", "", "-A FORWARD -d %s -o %s -j ACL_INBOUND_%s" %
-                            (self.address['network'], self.dev, self.dev)])
+                            (guestNetworkCidr, self.dev, self.dev)])
             self.fw.append(
                 ["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
             self.fw.append(
@@ -431,9 +435,11 @@ class CsIP:
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
             self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -j ACCEPT" % self.dev])
+                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" % (
+                    self.dev, guestNetworkCidr)])
             self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -j ACCEPT" % self.dev])
+                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (
+                    self.dev, guestNetworkCidr)])
 
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
@@ -445,14 +451,12 @@ class CsIP:
                                 'network'], self.address['gateway'], self.dev)
                             ])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -s %s" %
-                            ("eth1", "eth1", self.address['network'])])
+                            ("eth1", "eth1", guestNetworkCidr)])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -d %s" %
-                            ("eth1", "eth1", self.address['network'])])
+                            ("eth1", "eth1", guestNetworkCidr)])
             self.fw.append(["nat", "front",
                             "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" %
-                            (self.address['network'], self.dev,
-                             self.address['public_ip'])
-                            ])
+                            (guestNetworkCidr, self.dev, self.address['public_ip'])])
 
         if self.get_type() in ["public"]:
             self.fw.append(
