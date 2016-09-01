@@ -133,7 +133,7 @@ class CsAcl(CsDataBag):
         FIXED_RULES_EGRESS = 3
 
         def __init__(self, obj, config):
-            self.ingess = []
+            self.ingress = []
             self.egress = []
             self.device = obj['device']
             self.ip = obj['nic_ip']
@@ -149,6 +149,14 @@ class CsAcl(CsDataBag):
         def create(self):
             self.process("ingress", self.ingress, self.FIXED_RULES_INGRESS)
             self.process("egress", self.egress, self.FIXED_RULES_EGRESS)
+            # rule below moved from CsAddress to replicate default behaviour
+            # default behaviour is that only if one or more egress rules exist
+            # we will drop everything else, otherwise we will allow all egress traffic
+            # now also with logging
+            if len(self.egress) > 0:
+                self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [egress] \" --log-level 4" % self.device])
+                # intermediate deploy will not DROP because this is the current configuration. First only adding logging.
+                #self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -j DROP" % self.device])
 
         def process(self, direction, rule_list, base):
             count = base

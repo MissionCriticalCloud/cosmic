@@ -439,11 +439,8 @@ class CsIP:
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(
                 ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(["mangle", "",
-                            "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s/32 -j ACL_OUTBOUND_%s" %
-                            (self.dev, self.address[
-                                'network'], self.address['gateway'], self.dev)
-                            ])
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s -s %s ! -d %s -j ACL_OUTBOUND_%s" % (
+                self.dev, self.address['network'], self.address['network'], self.dev)])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -s %s" %
                             ("eth1", "eth1", self.address['network'])])
             self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -d %s" %
@@ -516,6 +513,9 @@ class CsIP:
                 vpccidr = cmdline.get_vpccidr()
                 self.fw.append(
                     ["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
+                # adding logging here for all ingress traffic at once
+                self.fw.append(
+                    ["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
                 self.fw.append(
                     ["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
 
