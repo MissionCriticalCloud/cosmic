@@ -4,7 +4,6 @@ import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.vm.VirtualMachine;
 
 public class StopCommand extends RebootCommand {
-    boolean executeInSequence = false;
     boolean checkBeforeCleanup = false;
     private boolean isProxy = false;
     private String urlPort = null;
@@ -16,33 +15,30 @@ public class StopCommand extends RebootCommand {
 
     public StopCommand(final VirtualMachine vm, final boolean isProxy, final String urlPort, final String publicConsoleProxyIpAddress, final boolean executeInSequence, final
     boolean checkBeforeCleanup) {
-        super(vm);
+        super(vm.getInstanceName(), executeInSequence);
         this.isProxy = isProxy;
         this.urlPort = urlPort;
         this.publicConsoleProxyIpAddress = publicConsoleProxyIpAddress;
-        this.executeInSequence = executeInSequence;
         this.checkBeforeCleanup = checkBeforeCleanup;
     }
 
     public StopCommand(final VirtualMachine vm, final boolean executeInSequence, final boolean checkBeforeCleanup) {
-        super(vm);
-        this.executeInSequence = executeInSequence;
+        super(vm.getInstanceName(), executeInSequence);
         this.checkBeforeCleanup = checkBeforeCleanup;
     }
 
     public StopCommand(final String vmName, final boolean executeInSequence, final boolean checkBeforeCleanup) {
-        super(vmName);
-        this.executeInSequence = executeInSequence;
+        super(vmName, executeInSequence);
         this.checkBeforeCleanup = checkBeforeCleanup;
     }
 
     @Override
     public boolean executeInSequence() {
         //VR stop doesn't go through queue
-        if (vmName != null && vmName.startsWith("r-")) {
+        if (this.vmName != null && this.vmName.startsWith("r-")) {
             return false;
         }
-        return executeInSequence;
+        return this.executeInSequence;
     }
 
     public boolean isProxy() {

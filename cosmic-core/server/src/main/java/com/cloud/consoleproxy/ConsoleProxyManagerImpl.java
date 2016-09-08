@@ -1227,7 +1227,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         }
 
         if (proxy.getState() == State.Running && proxy.getHostId() != null) {
-            final RebootCommand cmd = new RebootCommand(proxy.getInstanceName());
+            final RebootCommand cmd = new RebootCommand(proxy.getInstanceName(), _itMgr.getExecuteInSequence(proxy.getHypervisorType()));
             final Answer answer = _agentMgr.easySend(proxy.getHostId(), cmd);
 
             if (answer != null && answer.getResult()) {

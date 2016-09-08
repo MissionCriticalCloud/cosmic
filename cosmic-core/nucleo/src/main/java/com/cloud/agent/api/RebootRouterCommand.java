@@ -8,7 +8,7 @@ public class RebootRouterCommand extends RebootCommand {
     }
 
     public RebootRouterCommand(final String vmName, final String privateIp) {
-        super(vmName);
+        super(vmName, true);
         this.privateIp = privateIp;
     }
 

@@ -144,7 +144,7 @@ public class Ovm3HypervisorResourceTest {
         con.removeMethodResponse("list_vms");
         con.addResult(xen.getMultipleVmsListXML());
         con.addResult(xen.getMultipleVmsListXML());
-        final RebootCommand cmd = new RebootCommand(name);
+        final RebootCommand cmd = new RebootCommand(name, true);
         final Answer ra = hypervisor.executeRequest(cmd);
         return ra.getResult();
     }

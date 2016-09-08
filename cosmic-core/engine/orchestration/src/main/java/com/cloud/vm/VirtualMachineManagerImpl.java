@@ -2632,7 +2632,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         return new Pair<>(JobInfo.Status.SUCCEEDED, null);
     }
 
-    protected boolean getExecuteInSequence(final HypervisorType hypervisorType) {
+    public boolean getExecuteInSequence(final HypervisorType hypervisorType) {
         if (HypervisorType.KVM == hypervisorType || HypervisorType.XenServer == hypervisorType) {
             return false;
         } else {
@@ -2657,7 +2657,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         try {
 
             final Commands cmds = new Commands(Command.OnError.Stop);
-            cmds.addCommand(new RebootCommand(vm.getInstanceName()));
+            cmds.addCommand(new RebootCommand(vm.getInstanceName(), getExecuteInSequence(vm.getHypervisorType())));
             _agentMgr.send(host.getId(), cmds);
 
             final Answer rebootAnswer = cmds.getAnswer(RebootAnswer.class);

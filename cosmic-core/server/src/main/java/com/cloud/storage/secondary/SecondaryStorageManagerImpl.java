@@ -830,7 +830,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         if (secStorageVm.getState() == Running && secStorageVm.getHostId() != null) {
-            final RebootCommand cmd = new RebootCommand(secStorageVm.getInstanceName());
+            final RebootCommand cmd = new RebootCommand(secStorageVm.getInstanceName(), _itMgr.getExecuteInSequence(secStorageVm.getHypervisorType()));
             final Answer answer = _agentMgr.easySend(secStorageVm.getHostId(), cmd);
 
             if (answer != null && answer.getResult()) {
