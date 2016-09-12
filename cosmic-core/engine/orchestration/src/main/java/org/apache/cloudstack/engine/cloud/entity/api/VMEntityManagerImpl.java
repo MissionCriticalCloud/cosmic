@@ -250,6 +250,12 @@ public class VMEntityManagerImpl implements VMEntityManager {
     }
 
     @Override
+    public boolean stopvirtualmachine(VMEntityVO vmEntityVO, String caller, boolean forced) throws ResourceUnavailableException {
+        _itMgr.stop(vmEntityVO.getUuid(), forced);
+        return true;
+    }
+
+    @Override
     public boolean destroyVirtualMachine(final VMEntityVO vmEntityVO, final String caller) throws AgentUnavailableException, OperationTimedoutException,
             ConcurrentOperationException {
 
