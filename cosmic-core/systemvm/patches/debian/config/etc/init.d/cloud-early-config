@@ -103,9 +103,7 @@ get_boot_params() {
             log_it "/dev/vport0p1 not loaded, perhaps guest kernel is too old." && exit 2
           fi
 
-	      local factor=2
-	      local progress=1
-		  for i in {1..5}
+		  for i in {1..120}
 		  do
 	        while read line; do
 	          if [[ $line == cmdline:* ]]; then
@@ -130,8 +128,7 @@ get_boot_params() {
                 break;
               fi
             fi
-            sleep ${progress}s
-            progress=$[ progress * factor ]
+            sleep 0.5s
 		  done
           chmod go-rwx /root/.ssh/authorized_keys
           ;;
