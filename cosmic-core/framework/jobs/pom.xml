@@ -5,49 +5,49 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.10-SNAPSHOT</version>
+        <version>5.1.0.10</version>
         <relativePath>../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-db</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-cluster</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-events</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>5.1.0.10-SNAPSHOT</version>
+            <version>5.1.0.10</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
