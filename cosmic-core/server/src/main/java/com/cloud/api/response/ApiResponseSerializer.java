@@ -158,9 +158,9 @@ public class ApiResponseSerializer {
         if (result != null && log != null) {
             final StringBuilder sb = new StringBuilder();
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            sb.append("<").append(result.getResponseName()).append(" cloud-stack-version=\"").append(ApiDBUtils.getVersion()).append("\">");
+            sb.append("<").append(result.getResponseName()).append(" cosmic-version=\"").append(ApiDBUtils.getVersion()).append("\">");
             log.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            log.append("<").append(result.getResponseName()).append(" cloud-stack-version=\"").append(ApiDBUtils.getVersion()).append("\">");
+            log.append("<").append(result.getResponseName()).append(" cosmic-version=\"").append(ApiDBUtils.getVersion()).append("\">");
 
             if (result instanceof ListResponse) {
                 final Integer count = ((ListResponse) result).getCount();
