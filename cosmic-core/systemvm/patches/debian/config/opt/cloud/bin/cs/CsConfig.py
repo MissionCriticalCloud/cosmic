@@ -16,6 +16,7 @@ class CsConfig(object):
 
     def __init__(self):
         self.fw = []
+        self.ingress_rules = {}
 
     def set_address(self):
         self.ips = CsAddress("ips", self)
@@ -34,6 +35,12 @@ class CsConfig(object):
 
     def get_fw(self):
         return self.fw
+
+    def get_ingress_rules(self, key):
+        return self.ingress_rules[key]
+
+    def set_ingress_rules(self, key, ingress_rules):
+        self.ingress_rules[key] = ingress_rules
 
     def get_logger(self):
         return self.__LOG_FILE
