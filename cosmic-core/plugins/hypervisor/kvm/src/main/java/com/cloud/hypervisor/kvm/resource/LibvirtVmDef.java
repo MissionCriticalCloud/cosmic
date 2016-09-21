@@ -1247,31 +1247,6 @@ public class LibvirtVmDef {
         }
     }
 
-    public static class VirtioSerialDef {
-        private final String name;
-        private String path;
-
-        public VirtioSerialDef(final String name, final String path) {
-            this.name = name;
-            this.path = path;
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder virtioSerialBuilder = new StringBuilder();
-            if (path == null) {
-                path = "/var/lib/libvirt/qemu";
-            }
-            // Used by patchviasocket.pl
-            virtioSerialBuilder.append("<channel type='unix'>\n");
-            virtioSerialBuilder.append("<source mode='bind' path='" + path + "/" + name + ".agent'/>\n");
-            virtioSerialBuilder.append("<target type='virtio' name='" + name + ".vport'/>\n");
-            virtioSerialBuilder.append("<address type='virtio-serial'/>\n");
-            virtioSerialBuilder.append("</channel>\n");
-            return virtioSerialBuilder.toString();
-        }
-    }
-
     public static class QemuGuestAgentDef {
         @Override
         public String toString() {
