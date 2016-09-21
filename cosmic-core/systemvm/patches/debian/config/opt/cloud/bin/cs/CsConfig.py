@@ -37,7 +37,9 @@ class CsConfig(object):
         return self.fw
 
     def get_ingress_rules(self, key):
-        return self.ingress_rules[key]
+        if self.ingress_rules.has_key(key):
+            return self.ingress_rules[key]
+        return None
 
     def set_ingress_rules(self, key, ingress_rules):
         self.ingress_rules[key] = ingress_rules
