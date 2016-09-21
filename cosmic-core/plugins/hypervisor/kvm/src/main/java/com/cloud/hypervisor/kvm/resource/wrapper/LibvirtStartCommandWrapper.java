@@ -80,9 +80,18 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
                 }
             }
 
-            // pass cmdline info to system vms
+            // system vms
             if (vmSpec.getType() != VirtualMachine.Type.User) {
-                // wait and try passCmdLine for 5 minutes at most for CLOUDSTACK-2823
+
+                // pass cmdline with config for the systemvm to configure itself
+                if (libvirtComputingResource.passCmdLine(vmName, vmSpec.getBootArgs())) {
+                    s_logger.debug("Passing cmdline succeeded");
+                } else {
+                    String errorMessage = "Passing cmdline failed, aborting.";
+                    s_logger.debug(errorMessage);
+                    return new StartAnswer(command, errorMessage);
+                }
+
                 String controlIp = null;
                 for (final NicTO nic : nics) {
                     if (nic.getType() == TrafficType.Control) {
@@ -90,15 +99,18 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
                         break;
                     }
                 }
-                for (int count = 0; count < 30; count++) {
-                    libvirtComputingResource.passCmdLine(vmName, vmSpec.getBootArgs());
-                    // check router is up?
-                    final VirtualRoutingResource virtRouterResource = libvirtComputingResource.getVirtRouterResource();
-                    final boolean result = virtRouterResource.connect(controlIp, 1, 5000);
-                    if (result) {
-                        break;
-                    }
+
+                // connect to the router by using its linklocal address (that should now be configured)
+                s_logger.debug("Starting ssh attempts to " + controlIp);
+                final VirtualRoutingResource virtRouterResource = libvirtComputingResource.getVirtRouterResource();
+
+                if (! virtRouterResource.connect(controlIp, 30, 5000)) {
+                    String errorMessage = "Unable to login to router via linklocal address " + controlIp +
+                            " after 30 tries, aborting.";
+                    s_logger.debug(errorMessage);
+                    return new StartAnswer(command, errorMessage);
                 }
+                s_logger.debug("Successfully completed ssh attempts to " + controlIp);
             }
 
             state = DomainState.VIR_DOMAIN_RUNNING;

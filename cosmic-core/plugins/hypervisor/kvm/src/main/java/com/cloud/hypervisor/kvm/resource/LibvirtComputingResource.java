@@ -1147,11 +1147,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public Answer executeRequest(final Command cmd) {
+        logger.debug("Processing cmd " + cmd.toString());
 
         final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
         try {
             return wrapper.execute(cmd, this);
         } catch (final Exception e) {
+            logger.debug("Exception was " + e.getMessage());
             return Answer.createUnsupportedCommandAnswer(cmd);
         }
     }
@@ -1360,13 +1362,18 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     public boolean passCmdLine(final String vmName, final String cmdLine) throws InternalErrorException {
         final Script command = new Script(sendConfigPropertiesPath, 5 * 1000, logger);
-        final String result;
+        Integer commandretries = 0;
         command.add("-n", vmName);
         command.add("-p", cmdLine.replaceAll(" ", "%"));
-        result = command.execute();
-        if (result != null) {
-            logger.debug("passcmd failed:" + result);
-            return false;
+
+        // Since we return null on success (really!) we will just wait for that to happen
+        while (command.execute() != null) {
+            logger.debug("Got a timeout or an error, will try again.");
+            commandretries++;
+            if (commandretries > 100) {
+                logger.debug("Giving up on cmdline passing after 100 times, aborting.");
+                return false;
+            }
         }
         return true;
     }
