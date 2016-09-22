@@ -106,10 +106,13 @@ get_boot_params() {
         fi
 
         # Make sure the Qemu guest agent is running, or else we will be waiting forever
-        ps aux | grep qemu | grep -v grep > /dev/null 2>&1
-        if [ $? -gt 0 ]; then
+        if ! /etc/init.d/qemu-guest-agent status &>/dev/null; then
             log_it "Starting Qemu guest agent"
             /etc/init.d/qemu-guest-agent start
+            if [ $? -gt 0 ]; then
+                log_it "Starting Qemu Guest Agent failed!"
+                return false
+            fi
         else
             log_it "Good! Qemu guest agent already running."
         fi
