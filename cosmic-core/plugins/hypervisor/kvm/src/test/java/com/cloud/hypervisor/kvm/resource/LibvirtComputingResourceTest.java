@@ -4470,7 +4470,7 @@ public class LibvirtComputingResourceTest {
             when(nic.getIp()).thenReturn(controlIp);
             when(nic.getType()).thenReturn(TrafficType.Control);
             when(libvirtComputingResource.getVirtRouterResource()).thenReturn(virtRouterResource);
-            when(virtRouterResource.connect(controlIp, 1, 5000)).thenReturn(true);
+            when(virtRouterResource.connect(controlIp, 30, 5000)).thenReturn(true);
         } catch (final InternalErrorException e) {
             fail(e.getMessage());
         } catch (final LibvirtException e) {
@@ -4545,7 +4545,7 @@ public class LibvirtComputingResourceTest {
             when(nic.getIp()).thenReturn(controlIp);
             when(nic.getType()).thenReturn(TrafficType.Control);
             when(libvirtComputingResource.getVirtRouterResource()).thenReturn(virtRouterResource);
-            when(virtRouterResource.connect(controlIp, 1, 5000)).thenReturn(true);
+            when(virtRouterResource.connect(controlIp, 30, 5000)).thenReturn(true);
         } catch (final InternalErrorException e) {
             fail(e.getMessage());
         } catch (final LibvirtException e) {
