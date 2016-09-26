@@ -465,6 +465,10 @@ class CsIP:
             self.fw.append(
                 ["", "front", "-A FORWARD -j NETWORK_STATS_eth1"])
 
+            guestNetworkCidr = self.address['network']
+            self.fw.append(["filter", "", "-A FORWARD -d %s -o %s -j ACL_INBOUND_%s" %
+                            (guestNetworkCidr, self.dev, self.dev)])
+
         self.fw.append(["", "", "-A NETWORK_STATS -i eth0 -o eth2 -p tcp"])
         self.fw.append(["", "", "-A NETWORK_STATS -i eth2 -o eth0 -p tcp"])
         self.fw.append(["", "", "-A NETWORK_STATS ! -i eth0 -o eth2 -p tcp"])
