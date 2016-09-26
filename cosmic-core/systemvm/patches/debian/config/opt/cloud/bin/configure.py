@@ -27,8 +27,8 @@ class CsAcl(CsDataBag):
     class AclIP():
         """ For type Virtual Router """
 
-        def __init__(self, obj, fw):
-            self.fw = fw.get_fw()
+        def __init__(self, obj, config):
+            self.fw = config.get_fw()
             self.direction = 'egress'
             if obj['traffic_type'] == 'Ingress':
                 self.direction = 'ingress'
@@ -142,6 +142,7 @@ class CsAcl(CsDataBag):
             self.cidr = "%s/%s" % (self.ip, self.netmask)
             if "ingress_rules" in obj.keys():
                 self.ingress = obj['ingress_rules']
+                config.set_ingress_rules(self.ip, obj['ingress_rules'])
             if "egress_rules" in obj.keys():
                 self.egress = obj['egress_rules']
             self.fw = config.get_fw()

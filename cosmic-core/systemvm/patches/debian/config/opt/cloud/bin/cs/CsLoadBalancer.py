@@ -43,6 +43,7 @@ class CsLoadBalancer(CsDataBag):
 
     def _configure_firewall(self, add_rules, remove_rules, stat_rules):
         firewall = self.config.get_fw()
+        ingress_rules = self.config.get_ingress_rules(self.dbag['config'][0]['router_ip'])
 
         logging.debug("CsLoadBalancer:: configuring firewall. Add rules ==> %s" % add_rules)
         logging.debug("CsLoadBalancer:: configuring firewall. Remove rules ==> %s" % remove_rules)
@@ -52,13 +53,23 @@ class CsLoadBalancer(CsDataBag):
             path = rules.split(':')
             ip = path[0]
             port = path[1]
-            firewall.append(["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+            if ingress_rules is None:
+                firewall.append(["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+            else:
+                for ingress_rule in ingress_rules:
+                    if 'first_port' in ingress_rule.keys() and ingress_rule['first_port'] == int(port):
+                        firewall.append(["filter", "", "-A INPUT -i eth1 -s %s -p %s -m %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (ingress_rule['cidr'], ingress_rule['type'], ingress_rule['type'], ip, port)])
 
         for rules in stat_rules:
             path = rules.split(':')
             ip = path[0]
             port = path[1]
-            firewall.append(["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+            if ingress_rules is None:
+                firewall.append(["filter", "", "-A INPUT -p tcp -m tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+            else:
+                for ingress_rule in ingress_rules:
+                    if 'first_port' in ingress_rule.keys() and ingress_rule['first_port'] == int(port):
+                        firewall.append(["filter", "", "-A INPUT -i eth1 -s %s -p %s -m %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (ingress_rule['cidr'], ingress_rule['type'], ingress_rule['type'], ip, port)])
 
         for rules in remove_rules:
             path = rules.split(':')
