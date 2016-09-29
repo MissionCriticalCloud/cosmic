@@ -5,7 +5,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.1.0.12-SNAPSHOT</version>
+        <version>5.1.0.12</version>
         <relativePath>../../</relativePath>
     </parent>
     <dependencies>
@@ -36,12 +36,12 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.1.0.12-SNAPSHOT</version>
+            <version>5.1.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-managed-context</artifactId>
-            <version>5.1.0.12-SNAPSHOT</version>
+            <version>5.1.0.12</version>
         </dependency>
     </dependencies>
     <build>
