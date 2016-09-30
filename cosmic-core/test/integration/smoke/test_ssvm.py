@@ -459,6 +459,7 @@ class TestSSVMs(cloudstackTestCase):
         self.logger.debug("Stopping System VM: %s" % svm.id)
         cmd = stopSystemVm.stopSystemVmCmd()
         cmd.id = svm.id
+        cmd.forced = "true"
         self.apiclient.stopSystemVm(cmd)
         self.wait_for_svm_state(svm.id, 'Stopped', self.services["timeout"], self.services["sleep"])
 
