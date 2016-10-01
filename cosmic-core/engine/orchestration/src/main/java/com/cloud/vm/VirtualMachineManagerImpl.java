@@ -2608,13 +2608,19 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     @Override
     public void stop(final String vmUuid) throws ResourceUnavailableException {
-        stop(vmUuid, false);
+        try {
+            advanceStop(vmUuid, false);
+        } catch (final OperationTimedoutException e) {
+            throw new AgentUnavailableException("Unable to stop vm because the operation to stop timed out", e.getAgentId(), e);
+        } catch (final ConcurrentOperationException e) {
+            throw new CloudRuntimeException("Unable to stop vm because of a concurrent operation", e);
+        }
     }
 
     @Override
-    public void stop(String vmUuid, boolean forced) throws ResourceUnavailableException {
+    public void stopForced(String vmUuid) throws ResourceUnavailableException {
         try {
-            advanceStop(vmUuid, forced);
+            advanceStop(vmUuid, true);
         } catch (final OperationTimedoutException e) {
             throw new AgentUnavailableException("Unable to stop vm because the operation to stop timed out", e.getAgentId(), e);
         } catch (final ConcurrentOperationException e) {

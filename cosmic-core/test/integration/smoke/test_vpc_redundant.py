@@ -394,6 +394,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.logger.debug('Stopping router %s' % router.id)
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
+        cmd.forced = "true"
         self.apiclient.stopRouter(cmd)
 
     def reboot_router(self, router):

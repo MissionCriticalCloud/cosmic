@@ -606,6 +606,7 @@ class EntityManager(object):
         for router in self.routers:
             self.stop_router(router)
             cmd = destroyRouter.destroyRouterCmd()
+            cmd.forced = "true"
             cmd.id = router.id
             self.apiclient.destroyRouter(cmd)
         self.routers = []

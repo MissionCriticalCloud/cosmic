@@ -424,6 +424,7 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.logger.debug('Stopping router %s' % router.id)
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
+        cmd.forced = "true"
         self.apiclient.stopRouter(cmd)
 
     def start_routers(self, routers):

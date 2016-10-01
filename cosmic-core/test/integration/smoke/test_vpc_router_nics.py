@@ -269,6 +269,7 @@ class TestVPCNics(cloudstackTestCase):
         self.logger.debug('Stopping router')
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
+        cmd.forced = "true"
         self.apiclient.stopRouter(cmd)
 
     def destroy_routers(self):

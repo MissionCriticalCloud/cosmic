@@ -135,8 +135,8 @@ public class VirtualMachineEntityImpl implements VirtualMachineEntity {
     }
 
     @Override
-    public boolean stop(String caller, boolean forced) throws ResourceUnavailableException {
-        return manager.stopvirtualmachine(this.vmEntityVO, caller, forced);
+    public boolean stopForced(String caller) throws ResourceUnavailableException {
+        return manager.stopvirtualmachineforced(this.vmEntityVO, caller);
     }
 
     @Override

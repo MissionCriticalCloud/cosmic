@@ -67,9 +67,9 @@ public interface VirtualMachineEntity extends CloudStackEntity {
     boolean stop(String caller) throws CloudException;
 
     /**
-     * Stop the virtual machine, optionally force
+     * Stop the virtual machine, by force if necessary
      */
-    boolean stop(String caller, boolean forced) throws ResourceUnavailableException, CloudException;
+    boolean stopForced(String caller) throws ResourceUnavailableException, CloudException;
 
     /**
      * Cleans up after any botched starts.  CloudStack Orchestration Platform

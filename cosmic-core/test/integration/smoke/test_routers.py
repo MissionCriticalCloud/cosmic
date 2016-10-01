@@ -663,6 +663,7 @@ class TestRouterServices(cloudstackTestCase):
         # Stop the router
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
+        cmd.forced = "true"
         self.apiclient.stopRouter(cmd)
 
         # List routers to check state of router
