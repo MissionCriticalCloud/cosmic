@@ -23,6 +23,7 @@ public class ListCapabilitiesCmd extends BaseCmd {
         final CapabilitiesResponse response = new CapabilitiesResponse();
         response.setSecurityGroupsEnabled((Boolean) capabilities.get("securityGroupsEnabled"));
         response.setCloudStackVersion((String) capabilities.get("cloudStackVersion"));
+        response.setCosmic((Boolean) true);
         response.setUserPublicTemplateEnabled((Boolean) capabilities.get("userPublicTemplateEnabled"));
         response.setSupportELB((String) capabilities.get("supportELB"));
         response.setProjectInviteRequired((Boolean) capabilities.get("projectInviteRequired"));
