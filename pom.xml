@@ -35,7 +35,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.6.RELEASE</version>
+        <version>1.4.1.RELEASE</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
@@ -59,36 +59,34 @@
         <cs.aws-java-sdk.version>1.10.34</cs.aws-java-sdk.version>
         <cs.axis-jaxrpc.version>1.4</cs.axis-jaxrpc.version>
         <cs.axis.version>1.4</cs.axis.version>
+        <cs.batik-css.version>1.8</cs.batik-css.version>
         <cs.bcprov-jdk16.version>1.46</cs.bcprov-jdk16.version>
         <cs.cglib-nodep.version>3.2.2</cs.cglib-nodep.version>
+        <cs.commons-beanutils-core.version>1.8.3</cs.commons-beanutils-core.version>
         <cs.commons-codec.version>1.10</cs.commons-codec.version>
         <cs.commons-configuration.version>1.10</cs.commons-configuration.version>
         <cs.commons-daemon.version>1.0.15</cs.commons-daemon.version>
+        <cs.commons-fileupload.version>1.3.2</cs.commons-fileupload.version>
         <cs.commons-httpclient.version>3.1</cs.commons-httpclient.version>
         <cs.commons-io.version>2.4</cs.commons-io.version>
         <cs.commons-lang3.version>3.4</cs.commons-lang3.version>
         <cs.commons-net.version>3.3</cs.commons-net.version>
         <cs.commons-validator.version>1.5.0</cs.commons-validator.version>
-        <cs.cxf-bundle-jaxrs.version>2.7.13</cs.cxf-bundle-jaxrs.version>
+        <cs.cxf-bundle-jaxrs.version>2.7.18</cs.cxf-bundle-jaxrs.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
-        <cs.esapi.version>2.1.0</cs.esapi.version>
+        <cs.esapi.version>2.1.0.1</cs.esapi.version>
         <cs.gmaven-runtime-1.7.version>1.3</cs.gmaven-runtime-1.7.version>
         <cs.groovy-all.version>2.0.5</cs.groovy-all.version>
         <cs.guava-testlib.version>18.0</cs.guava-testlib.version>
         <cs.guava.version>18.0</cs.guava.version>
         <cs.hamcrest-all.version>1.3</cs.hamcrest-all.version>
-        <cs.jackson-annotations.version>2.6.3</cs.jackson-annotations.version>
-        <cs.jackson-core.version>2.6.3</cs.jackson-core.version>
-        <cs.jackson-databind.version>2.6.3</cs.jackson-databind.version>
-        <cs.jackson-jaxrs-json-provider.version>2.6.3</cs.jackson-jaxrs-json-provider.version>
-        <cs.jackson-module-jaxb-annotations.version>2.6.3</cs.jackson-module-jaxb-annotations.version>
         <cs.jasypt.version>1.9.2</cs.jasypt.version>
         <cs.java-ipv6.version>0.15</cs.java-ipv6.version>
         <cs.javax.inject.version>1</cs.javax.inject.version>
         <cs.javax.persistence.version>2.1.0</cs.javax.persistence.version>
-        <cs.jna.version>4.0.0</cs.jna.version>
+        <cs.jna.version>4.2.2</cs.jna.version>
         <cs.jsch.version>0.1.51</cs.jsch.version>
         <cs.jstl.version>1.2</cs.jstl.version>
         <cs.libvirt.version>0.5.1</cs.libvirt.version>
@@ -105,12 +103,13 @@
         <cs.selenium-server.version>1.0-20081010.060147</cs.selenium-server.version>
         <cs.spock-core.version>0.7-groovy-2.0</cs.spock-core.version>
         <cs.trilead-ssh2.version>1.0.0-build217</cs.trilead-ssh2.version>
+        <cs.xalan.version>2.7.2</cs.xalan.version>
         <cs.xen-api.version>6.2.0-3.1</cs.xen-api.version>
         <cs.xercesimpl.version>2.11.0</cs.xercesimpl.version>
         <cs.xml-apis.version>1.4.01</cs.xml-apis.version>
         <cs.xmlrpc-client.version>3.1.3</cs.xmlrpc-client.version>
         <cs.xmlrpc-common.version>3.1.3</cs.xmlrpc-common.version>
-        <cs.xstream.version>1.4.7</cs.xstream.version>
+        <cs.xstream.version>1.4.9</cs.xstream.version>
 
         <!-- MySQL is also used in the plugin section -->
         <cs.mysql.version>5.1.34</cs.mysql.version>
@@ -170,6 +169,16 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils-core</artifactId>
+                <version>${cs.commons-beanutils-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${cs.commons-fileupload.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${cs.netty-all.version}</version>
@@ -193,31 +202,6 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-bundle-jaxrs</artifactId>
                 <version>${cs.cxf-bundle-jaxrs.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
-                <version>${cs.jackson-jaxrs-json-provider.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>${cs.jackson-module-jaxb-annotations.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${cs.jackson-annotations.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${cs.jackson-core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${cs.jackson-databind.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -414,6 +398,11 @@
                 <version>${cs.xen-api.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-css</artifactId>
+                <version>${cs.batik-css.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.xmlrpc</groupId>
                 <artifactId>xmlrpc-client</artifactId>
                 <version>${cs.xmlrpc-client.version}</version>
@@ -447,6 +436,11 @@
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
                 <version>${cs.xml-apis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>${cs.xalan.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
