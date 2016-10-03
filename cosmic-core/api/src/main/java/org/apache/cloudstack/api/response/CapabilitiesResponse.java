@@ -15,6 +15,10 @@ public class CapabilitiesResponse extends BaseResponse {
     @Param(description = "version of the cloud stack")
     private String cloudStackVersion;
 
+    @SerializedName("cosmic")
+    @Param(description = "Cosmic or not")
+    private Boolean cosmic;
+
     @SerializedName("userpublictemplateenabled")
     @Param(description = "true if user and domain admins can set templates to be shared, false otherwise")
     private boolean userPublicTemplateEnabled;
@@ -69,6 +73,10 @@ public class CapabilitiesResponse extends BaseResponse {
 
     public void setCloudStackVersion(final String cloudStackVersion) {
         this.cloudStackVersion = cloudStackVersion;
+    }
+
+    public void setCosmic(final Boolean cosmic) {
+        this.cosmic = cosmic;
     }
 
     public void setUserPublicTemplateEnabled(final boolean userPublicTemplateEnabled) {
