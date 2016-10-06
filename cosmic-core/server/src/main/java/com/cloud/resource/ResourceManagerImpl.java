@@ -1397,7 +1397,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     /*
      * ResourceStateAdapter is responsible for throwing Exception if Pod is
      * null and non-null is required. for example, XcpServerDiscoever.
-     * Others, like ExternalFireware don't require Pod
      */
         final Long podId = p == null ? null : p.getId();
 

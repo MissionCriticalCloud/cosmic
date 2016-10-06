@@ -13,7 +13,6 @@ import com.cloud.framework.jobs.AsyncJobExecutionContext;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.dao.AsyncJobDao;
 import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
-import com.cloud.framework.jobs.dao.AsyncJobJournalDao;
 import com.cloud.framework.jobs.dao.SyncQueueItemDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDetector;
@@ -91,8 +90,6 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
     private SyncQueueManager _queueMgr;
     @Inject
     private AsyncJobDao _jobDao;
-    @Inject
-    private AsyncJobJournalDao _journalDao;
     @Inject
     private AsyncJobJoinMapDao _joinMapDao;
     @Inject
@@ -577,46 +574,8 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     @DB
-    public void joinJob(final long jobId, final long joinJobId, final String wakeupHandler, final String wakeupDispatcher, final String[] wakeupTopcisOnMessageBus, final long
-            wakeupIntervalInMilliSeconds,
-                        final long timeoutInMilliSeconds) {
-
-        Long syncSourceId = null;
-        final AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrentExecutionContext();
-        assert (context.getJob() != null);
-        if (context.getJob().getSyncSource() != null) {
-            syncSourceId = context.getJob().getSyncSource().getQueueId();
-        }
-
-        _joinMapDao.joinJob(jobId, joinJobId, getMsid(), wakeupIntervalInMilliSeconds, timeoutInMilliSeconds, syncSourceId, wakeupHandler, wakeupDispatcher);
-    }
-
-    @Override
-    @DB
     public void disjoinJob(final long jobId, final long joinedJobId) {
         _joinMapDao.disjoinJob(jobId, joinedJobId);
-    }
-
-    @Override
-    @DB
-    public void completeJoin(final long joinJobId, final JobInfo.Status joinStatus, final String joinResult) {
-        _joinMapDao.completeJoin(joinJobId, joinStatus, joinResult, getMsid());
-    }
-
-    @Override
-    public void releaseSyncSource() {
-        final AsyncJobExecutionContext executionContext = AsyncJobExecutionContext.getCurrentExecutionContext();
-        assert (executionContext != null);
-
-        if (executionContext.getSyncSource() != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Release sync source for job-" + executionContext.getJob().getId() + " sync source: " + executionContext.getSyncSource().getContentType() +
-                        "-" + executionContext.getSyncSource().getContentId());
-            }
-
-            _queueMgr.purgeItem(executionContext.getSyncSource().getId());
-            checkQueue(executionContext.getSyncSource().getQueueId());
-        }
     }
 
     @Override

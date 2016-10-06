@@ -1575,14 +1575,6 @@ public enum Config {
             "50",
             "default number of networks permitted per external load balancer device",
             null),
-    DefaultExternalFirewallCapacity(
-            "Advanced",
-            ManagementServer.class,
-            String.class,
-            "external.firewall.default.capacity",
-            "50",
-            "default number of networks permitted per external load firewall device",
-            null),
     ConsoleProxyServiceOffering(
             "Advanced",
             ManagementServer.class,

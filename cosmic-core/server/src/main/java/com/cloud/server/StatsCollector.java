@@ -370,7 +370,6 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalFirewall.toString());
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalLoadBalancer.toString());
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.L2Networking.toString());
             final ConcurrentHashMap<Long, HostStats> hostStats = new ConcurrentHashMap<>();

@@ -164,7 +164,7 @@ public interface Host extends StateObject<Status>, Identity, InternalIdentity {
     ResourceState getResourceState();
 
     enum Type {
-        Storage(false), Routing(false), SecondaryStorage(false), SecondaryStorageCmdExecutor(false), ConsoleProxy(true), ExternalFirewall(false), ExternalLoadBalancer(
+        Storage(false), Routing(false), SecondaryStorage(false), SecondaryStorageCmdExecutor(false), ConsoleProxy(true), ExternalLoadBalancer(
                 false), ExternalVirtualSwitchSupervisor(false), TrafficMonitor(false),
 
         ExternalDhcp(false), SecondaryStorageVM(true), LocalSecondaryStorage(false), L2Networking(false);

@@ -39,7 +39,6 @@ import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.dao.ExternalFirewallDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO.LBDeviceAllocationState;
@@ -50,7 +49,6 @@ import com.cloud.network.dao.InlineLoadBalancerNicMapDao;
 import com.cloud.network.dao.InlineLoadBalancerNicMapVO;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkExternalFirewallDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerVO;
 import com.cloud.network.dao.NetworkServiceMapDao;
@@ -169,10 +167,6 @@ public abstract class ExternalLoadBalancerDeviceManagerImpl extends AdapterBase 
     NetworkExternalLoadBalancerDao _networkLBDao;
     @Inject
     NetworkServiceMapDao _ntwkSrvcProviderDao;
-    @Inject
-    NetworkExternalFirewallDao _networkExternalFirewallDao;
-    @Inject
-    ExternalFirewallDeviceDao _externalFirewallDeviceDao;
     @Inject
     IpAddressManager _ipAddrMgr;
     private long _defaultLbCapacity;

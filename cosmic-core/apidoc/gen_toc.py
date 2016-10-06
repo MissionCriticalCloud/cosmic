@@ -100,7 +100,6 @@ known_categories = {
     'Capacity': 'System Capacity',
     'NetworkDevice': 'Network Device',
     'ExternalLoadBalancer': 'Ext Load Balancer',
-    'ExternalFirewall': 'Ext Firewall',
     'Usage': 'Usage',
     'TrafficMonitor': 'Usage',
     'TrafficType': 'Usage',
