@@ -36,6 +36,7 @@ public class CreateUserCmd extends BaseCmd {
     @Parameter(name = ApiConstants.DOMAIN_ID,
             type = CommandType.UUID,
             entityType = DomainResponse.class,
+            required = true,
             description = "Creates the user under the specified domain. Has to be accompanied with the account parameter")
     private Long domainId;
 
