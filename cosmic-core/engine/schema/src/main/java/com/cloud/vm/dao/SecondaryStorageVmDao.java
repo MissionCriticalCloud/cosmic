@@ -9,21 +9,17 @@ import java.util.List;
 
 public interface SecondaryStorageVmDao extends GenericDao<SecondaryStorageVmVO, Long> {
 
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, long dataCenterId, State... states);
+    List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, long dataCenterId, State... states);
 
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, State... states);
+    List<SecondaryStorageVmVO> getSecStorageVmListInStates(SecondaryStorageVm.Role role, State... states);
 
-    public List<SecondaryStorageVmVO> listByHostId(SecondaryStorageVm.Role role, long hostId);
+    List<SecondaryStorageVmVO> listByHostId(SecondaryStorageVm.Role role, long hostId);
 
-    public List<SecondaryStorageVmVO> listByLastHostId(SecondaryStorageVm.Role role, long hostId);
+    List<SecondaryStorageVmVO> listByLastHostId(SecondaryStorageVm.Role role, long hostId);
 
-    public List<SecondaryStorageVmVO> listUpByHostId(SecondaryStorageVm.Role role, long hostId);
+    List<SecondaryStorageVmVO> listUpByHostId(SecondaryStorageVm.Role role, long hostId);
 
-    public List<SecondaryStorageVmVO> listByZoneId(SecondaryStorageVm.Role role, long zoneId);
-
-    public List<Long> getRunningSecStorageVmListByMsid(SecondaryStorageVm.Role role, long msid);
-
-    public List<Long> listRunningSecStorageOrderByLoad(SecondaryStorageVm.Role role, long zoneId);
+    List<SecondaryStorageVmVO> listByZoneId(SecondaryStorageVm.Role role, long zoneId);
 
     SecondaryStorageVmVO findByInstanceName(String instanceName);
 }

@@ -10,19 +10,12 @@ import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.VirtualMachine.State;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVmVO, Long> implements SecondaryStorageVmDao {
-    private static final Logger s_logger = LoggerFactory.getLogger(SecondaryStorageVmDaoImpl.class);
     protected final Attribute _updateTimeAttr;
     protected SearchBuilder<SecondaryStorageVmVO> DataCenterStatusSearch;
     protected SearchBuilder<SecondaryStorageVmVO> StateSearch;
@@ -164,79 +157,6 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
             sc.setParameters("role", role);
         }
         return listBy(sc);
-    }
-
-    @Override
-    public List<Long> getRunningSecStorageVmListByMsid(final SecondaryStorageVm.Role role, final long msid) {
-        final List<Long> l = new ArrayList<>();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
-            final String sql;
-            if (role == null) {
-                sql =
-                        "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h " + "WHERE s.id=v.id AND v.state='Running' AND v.host_id=h.id AND h.mgmt_server_id=?";
-            } else {
-                sql =
-                        "SELECT s.id FROM secondary_storage_vm s, vm_instance v, host h "
-                                + "WHERE s.id=v.id AND v.state='Running' AND s.role=? AND v.host_id=h.id AND h.mgmt_server_id=?";
-            }
-
-            pstmt = txn.prepareAutoCloseStatement(sql);
-
-            if (role == null) {
-                pstmt.setLong(1, msid);
-            } else {
-                pstmt.setString(1, role.toString());
-                pstmt.setLong(2, msid);
-            }
-
-            final ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                l.add(rs.getLong(1));
-            }
-        } catch (final SQLException e) {
-            s_logger.debug("Caught SQLException: ", e);
-        }
-        return l;
-    }
-
-    @Override
-    public List<Long> listRunningSecStorageOrderByLoad(final SecondaryStorageVm.Role role, final long zoneId) {
-
-        final List<Long> l = new ArrayList<>();
-        final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        PreparedStatement pstmt = null;
-        try {
-            final String sql;
-            if (role == null) {
-                sql =
-                        "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE" +
-                                " v.state='Running' AND v.data_center_id=? GROUP BY s.id ORDER BY count";
-            } else {
-                sql =
-                        "SELECT s.id, count(l.id) as count FROM secondary_storage_vm s INNER JOIN vm_instance v ON s.id=v.id LEFT JOIN cmd_exec_log l ON s.id=l.instance_id WHERE" +
-                                " v.state='Running' AND v.data_center_id=? AND s.role=? GROUP BY s.id ORDER BY count";
-            }
-
-            pstmt = txn.prepareAutoCloseStatement(sql);
-
-            if (role == null) {
-                pstmt.setLong(1, zoneId);
-            } else {
-                pstmt.setLong(1, zoneId);
-                pstmt.setString(2, role.toString());
-            }
-
-            final ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                l.add(rs.getLong(1));
-            }
-        } catch (final SQLException e) {
-            s_logger.error("Unexpected exception ", e);
-        }
-
-        return l;
     }
 
     @Override
