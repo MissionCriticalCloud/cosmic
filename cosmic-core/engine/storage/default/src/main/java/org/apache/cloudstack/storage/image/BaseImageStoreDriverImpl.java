@@ -132,7 +132,6 @@ public abstract class BaseImageStoreDriverImpl implements ImageStoreDriver {
             result.setResult(answer.getErrorString());
             caller.complete(result);
             final String msg = "Failed to register template: " + obj.getUuid() + " with error: " + answer.getErrorString();
-            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_UPLOAD_FAILED, _vmTemplateZoneDao.listByTemplateId(obj.getId()).get(0).getZoneId(), null, msg, msg);
             s_logger.error(msg);
         } else if (answer.getDownloadStatus() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
             if (answer.getCheckSum() != null) {
