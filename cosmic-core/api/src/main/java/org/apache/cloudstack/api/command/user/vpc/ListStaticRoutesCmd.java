@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
@@ -62,13 +63,18 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
 
     @Override
     public void execute() {
+        // When we specify a gateway id, limit the search to the corresponding vpcId
+        if (vpcId == null) {
+            vpcId = retrieveVpcId();
+        }
+
         final Pair<List<? extends StaticRoute>, Integer> result = _vpcService.listStaticRoutes(this);
         final ListResponse<StaticRouteResponse> response = new ListResponse<>();
         final List<StaticRouteResponse> routeResponses = new ArrayList<>();
 
         // Compatibility with pre 5.1
         // If gatewayId was passed, lookup its CIDR and match static routes to it
-        final Optional<String> gatewayCidr = retrieveGateway();
+        final Optional<String> gatewayCidr = retrieveGatewayCidr();
 
         result.first().stream()
               .filter(route -> NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), gatewayCidr.get()))
@@ -90,12 +96,23 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
         return s_name;
     }
 
-    private Optional<String> retrieveGateway() {
+    private Optional<String> retrieveGatewayCidr() {
         final Optional<String> gatewayCidr = Optional.of("0.0.0.0/0");
         if (gatewayId != null) {
             final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
             gatewayCidr.of(NetUtils.ipAndNetMaskToCidr(gateway.getGateway(), gateway.getNetmask()));
         }
         return gatewayCidr;
+    }
+
+    private Long retrieveVpcId() {
+        if (gatewayId != null) {
+            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
+            if (gateway == null) {
+                throw new InvalidParameterValueException("Private gateway with id " + gatewayId + " cannot be found");
+            }
+            return gateway.getVpcId();
+        }
+        return null;
     }
 }
