@@ -10,3 +10,6 @@ DROP TABLE IF EXISTS `cloud`.`cluster_vsm_map`;
 
 -- Remove unused table cmd_exec_log
 DROP TABLE IF EXISTS `cloud`.`cmd_exec_log`;
+
+-- Remove unused table elastic_lb_vm_map
+DROP TABLE IF EXISTS `cloud`.`elastic_lb_vm_map`;
