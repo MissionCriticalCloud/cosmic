@@ -109,11 +109,6 @@ public class AsyncJobExecutionContext {
         return false;
     }
 
-    public void log(final Logger logger, final String journalText) {
-        s_jobMgr.logJobJournal(_job.getId(), AsyncJob.JournalType.SUCCESS, journalText, null);
-        logger.debug(journalText);
-    }
-
     public void joinJob(final long joinJobId) {
         assert (_job != null);
         s_jobMgr.joinJob(_job.getId(), joinJobId);

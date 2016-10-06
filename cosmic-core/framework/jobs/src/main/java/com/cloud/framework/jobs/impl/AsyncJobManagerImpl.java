@@ -554,18 +554,6 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     @DB
-    public void logJobJournal(final long jobId, final AsyncJob.JournalType journalType, final String journalText, final String journalObjJson) {
-        final AsyncJobJournalVO journal = new AsyncJobJournalVO();
-        journal.setJobId(jobId);
-        journal.setJournalType(journalType);
-        journal.setJournalText(journalText);
-        journal.setJournalObjJsonString(journalObjJson);
-
-        _journalDao.persist(journal);
-    }
-
-    @Override
-    @DB
     public AsyncJob getPseudoJob(final long accountId, final long userId) {
         AsyncJobVO job = _jobDao.findPseudoJob(Thread.currentThread().getId(), getMsid());
         if (job == null) {

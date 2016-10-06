@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface AsyncJobManager extends Manager {
 
-    public static final String API_JOB_POOL_THREAD_PREFIX = "API-Job-Executor";
-    public static final String WORK_JOB_POOL_THREAD_PREFIX = "Work-Job-Executor";
+    String API_JOB_POOL_THREAD_PREFIX = "API-Job-Executor";
+    String WORK_JOB_POOL_THREAD_PREFIX = "Work-Job-Executor";
 
     AsyncJobVO getAsyncJob(long jobId);
 
@@ -26,9 +26,6 @@ public interface AsyncJobManager extends Manager {
     void updateAsyncJobStatus(long jobId, int processStatus, String resultObject);
 
     void updateAsyncJobAttachment(long jobId, String instanceType, Long instanceId);
-
-    void logJobJournal(long jobId, AsyncJob.JournalType journalType, String
-            journalText, String journalObjJson);
 
     /**
      * A running thread inside management server can have a 1:1 linked pseudo job.
@@ -54,43 +51,12 @@ public interface AsyncJobManager extends Manager {
     void joinJob(long jobId, long joinJobId);
 
     /**
-     * Used by upper level job to wait for completion of a down-level job (usually VmWork jobs)
-     * in asynchronous way, it will cause upper job to cease current execution, upper job will be
-     * rescheduled to execute periodically or on wakeup events detected from message bus
-     *
-     * @param jobId                        upper job that is going to wait the completion of a down-level job
-     * @param joinJobId                    down-level job
-     * @param wakeupTopicsOnMessageBus
-     * @param wakeupIntervalInMilliSeconds
-     * @param timeoutInMilliSeconds
-     * @Param wakeupHandler    wake-up handler
-     * @Param wakeupDispatcher wake-up dispatcher
-     */
-    void joinJob(long jobId, long joinJobId, String wakeupHandler, String wakupDispatcher,
-                 String[] wakeupTopicsOnMessageBus, long wakeupIntervalInMilliSeconds, long timeoutInMilliSeconds);
-
-    /**
      * Dis-join two related jobs
      *
      * @param jobId
      * @param joinedJobId
      */
     void disjoinJob(long jobId, long joinedJobId);
-
-    /**
-     * Used by down-level job to notify its completion to upper level jobs
-     *
-     * @param joinJobId  down-level job for upper level job to join with
-     * @param joinStatus AsyncJobConstants status code to indicate success or failure of the
-     *                   down-level job
-     * @param joinResult object-stream serialized result object
-     *                   this is primarily used by down-level job to pass error exception objects
-     *                   for legacy code to work. To help pass exception object easier, we use
-     *                   object-stream based serialization instead of GSON
-     */
-    void completeJoin(long joinJobId, JobInfo.Status joinStatus, String joinResult);
-
-    void releaseSyncSource();
 
     void syncAsyncJobExecution(AsyncJob job, String syncObjType, long syncObjId, long queueSizeLimit);
 
