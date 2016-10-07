@@ -512,14 +512,16 @@ class CsIP:
             # Or else make sure it's stopped
             CsPasswdSvc(self.address['public_ip']).stop()
 
+        if self.config.is_vpc():
+            vpccidr = cmdline.get_vpccidr()
+            self.fw.append(
+                ["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
+            # adding logging here for all ingress traffic at once
+            self.fw.append(
+                ["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
+
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:
-                vpccidr = cmdline.get_vpccidr()
-                self.fw.append(
-                    ["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
-                # adding logging here for all ingress traffic at once
-                self.fw.append(
-                    ["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
                 self.fw.append(
                     ["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
 
