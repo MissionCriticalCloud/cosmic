@@ -43,8 +43,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -206,30 +204,10 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
             throw new CloudRuntimeException("There is no upgrade path from " + dbVersion + " to " + currentVersion);
         }
 
-        if (Version.compare(trimmedCurrentVersion, upgrades[upgrades.length - 1].getUpgradedVersion()) != 0) {
-            final String errorMessage = "The end upgrade version is actually at " + upgrades[upgrades.length - 1].getUpgradedVersion() +
-                    " but our management server code version is at " + currentVersion;
-            s_logger.error(errorMessage);
-            throw new CloudRuntimeException(errorMessage);
-        }
-
-        boolean supportsRollingUpgrade = true;
         for (final DbUpgrade upgrade : upgrades) {
-            if (!upgrade.supportsRollingUpgrade()) {
-                supportsRollingUpgrade = false;
+            if (Version.compare(upgrade.getUpgradedVersion(), trimmedCurrentVersion) > 0) {
                 break;
             }
-        }
-
-        if (!supportsRollingUpgrade && false) { // FIXME: Needs to detect if there are management servers running
-            // ClusterManagerImpl.arePeersRunning(null)) {
-            final String errorMessage =
-                    "Unable to run upgrade because the upgrade sequence does not support rolling update and there are other management server nodes running";
-            s_logger.error(errorMessage);
-            throw new CloudRuntimeException(errorMessage);
-        }
-
-        for (final DbUpgrade upgrade : upgrades) {
             s_logger.debug("Running upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
                     upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
             final TransactionLegacy txn = TransactionLegacy.open("Upgrade");
@@ -251,22 +229,7 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
                 }
 
                 upgrade.performDataMigration(conn);
-                boolean upgradeVersion = true;
-
-                if (upgrade.getUpgradedVersion().equals("2.1.8")) {
-                    // we don't have VersionDao in 2.1.x
-                    upgradeVersion = false;
-                } else if (upgrade.getUpgradedVersion().equals("2.2.4")) {
-                    try (PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM version WHERE version='2.2.4'");
-                         ResultSet rs = pstmt.executeQuery()) {
-                        // specifically for domain vlan update from 2.1.8 to 2.2.4
-                        if (rs.next()) {
-                            upgradeVersion = false;
-                        }
-                    } catch (final SQLException e) {
-                        throw new CloudRuntimeException("Unable to update the version table", e);
-                    }
-                }
+                final boolean upgradeVersion = true;
 
                 if (upgradeVersion) {
                     final VersionVO version = new VersionVO(upgrade.getUpgradedVersion());
@@ -283,64 +246,64 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
             }
         }
 
-        if (true) { // FIXME Needs to detect if management servers are running
-            // !ClusterManagerImpl.arePeersRunning(trimmedCurrentVersion)) {
-            s_logger.info("Cleaning upgrades because all management server are now at the same version");
-            final TreeMap<String, List<DbUpgrade>> upgradedVersions = new TreeMap<>();
+        s_logger.info("Cleaning upgrades because all management server are now at the same version");
+        final TreeMap<String, List<DbUpgrade>> upgradedVersions = new TreeMap<>();
 
-            for (final DbUpgrade upgrade : upgrades) {
-                final String upgradedVerson = upgrade.getUpgradedVersion();
-                List<DbUpgrade> upgradeList = upgradedVersions.get(upgradedVerson);
-                if (upgradeList == null) {
-                    upgradeList = new ArrayList<>();
-                }
-                upgradeList.add(upgrade);
-                upgradedVersions.put(upgradedVerson, upgradeList);
+        for (final DbUpgrade upgrade : upgrades) {
+            if (Version.compare(upgrade.getUpgradedVersion(), trimmedCurrentVersion) > 0) {
+                break;
             }
+            final String upgradedVerson = upgrade.getUpgradedVersion();
+            List<DbUpgrade> upgradeList = upgradedVersions.get(upgradedVerson);
+            if (upgradeList == null) {
+                upgradeList = new ArrayList<>();
+            }
+            upgradeList.add(upgrade);
+            upgradedVersions.put(upgradedVerson, upgradeList);
+        }
 
-            for (final String upgradedVersion : upgradedVersions.keySet()) {
-                final List<DbUpgrade> versionUpgrades = upgradedVersions.get(upgradedVersion);
-                final VersionVO version = _dao.findByVersion(upgradedVersion, Step.Upgrade);
-                s_logger.debug("Upgrading to version " + upgradedVersion + "...");
+        for (final String upgradedVersion : upgradedVersions.keySet()) {
+            final List<DbUpgrade> versionUpgrades = upgradedVersions.get(upgradedVersion);
+            final VersionVO version = _dao.findByVersion(upgradedVersion, Step.Upgrade);
+            s_logger.debug("Upgrading to version " + upgradedVersion + "...");
 
-                final TransactionLegacy txn = TransactionLegacy.open("Cleanup");
-                try {
-                    if (version != null) {
-                        for (final DbUpgrade upgrade : versionUpgrades) {
-                            s_logger.info("Cleanup upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
-                                    upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
-
-                            txn.start();
-
-                            final Connection conn;
-                            try {
-                                conn = txn.getConnection();
-                            } catch (final SQLException e) {
-                                final String errorMessage = "Unable to cleanup the database";
-                                s_logger.error(errorMessage, e);
-                                throw new CloudRuntimeException(errorMessage, e);
-                            }
-
-                            final File[] scripts = upgrade.getCleanupScripts();
-                            if (scripts != null) {
-                                for (final File script : scripts) {
-                                    runScript(conn, script);
-                                    s_logger.debug("Cleanup script " + script.getAbsolutePath() + " is executed successfully");
-                                }
-                            }
-                            txn.commit();
-                        }
+            final TransactionLegacy txn = TransactionLegacy.open("Cleanup");
+            try {
+                if (version != null) {
+                    for (final DbUpgrade upgrade : versionUpgrades) {
+                        s_logger.info("Cleanup upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
+                                upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
 
                         txn.start();
-                        version.setStep(Step.Complete);
-                        s_logger.debug("Upgrade completed for version " + upgradedVersion);
-                        version.setUpdated(new Date());
-                        _dao.update(version.getId(), version);
+
+                        final Connection conn;
+                        try {
+                            conn = txn.getConnection();
+                        } catch (final SQLException e) {
+                            final String errorMessage = "Unable to cleanup the database";
+                            s_logger.error(errorMessage, e);
+                            throw new CloudRuntimeException(errorMessage, e);
+                        }
+
+                        final File[] scripts = upgrade.getCleanupScripts();
+                        if (scripts != null) {
+                            for (final File script : scripts) {
+                                runScript(conn, script);
+                                s_logger.debug("Cleanup script " + script.getAbsolutePath() + " is executed successfully");
+                            }
+                        }
                         txn.commit();
                     }
-                } finally {
-                    txn.close();
+
+                    txn.start();
+                    version.setStep(Step.Complete);
+                    s_logger.debug("Upgrade completed for version " + upgradedVersion);
+                    version.setUpdated(new Date());
+                    _dao.update(version.getId(), version);
+                    txn.commit();
                 }
+            } finally {
+                txn.close();
             }
         }
     }
