@@ -74,6 +74,7 @@
         <cs.commons-validator.version>1.5.0</cs.commons-validator.version>
         <cs.cxf-bundle-jaxrs.version>2.7.18</cs.cxf-bundle-jaxrs.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
+        <cs.dependency-check-maven.version>1.4.3</cs.dependency-check-maven.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.esapi.version>2.1.0.1</cs.esapi.version>
@@ -807,6 +808,33 @@
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>dependency-check-maven</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.owasp</groupId>
+                            <artifactId>dependency-check-maven</artifactId>
+                            <version>${cs.dependency-check-maven.version}</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
