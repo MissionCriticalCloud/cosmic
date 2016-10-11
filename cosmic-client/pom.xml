@@ -30,7 +30,7 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-systemvm</artifactId>
-            <version>5.1.0.14-SNAPSHOT</version>
+            <version>5.1.1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
