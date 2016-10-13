@@ -98,7 +98,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
                 volResponse.setHypervisor(ApiDBUtils.getHypervisorTypeFromFormat(volume.getDataCenterId(), volume.getFormat()).toString());
             }
             if (volume.getDownloadState() != Status.DOWNLOADED) {
-                String volumeStatus = "Processing";
+                String volumeStatus;
                 if (volume.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
                     if (volume.getDownloadPercent() == 100) {
                         volumeStatus = "Checking Volume";

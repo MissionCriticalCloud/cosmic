@@ -243,7 +243,7 @@ public class CommandSetupHelper {
         final NicProfile nicProfile = new NicProfile(nic, guestNetwork, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(guestNetwork.getId(),
                 router.getId()), _networkModel.isSecurityGroupSupportedInNetwork(guestNetwork), _networkModel.getNetworkTag(router.getHypervisorType(), guestNetwork));
         final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
-        String maxconn = null;
+        String maxconn;
         if (offering.getConcurrentConnections() == null) {
             maxconn = _configDao.getValue(Config.NetworkLBHaproxyMaxConn.key());
         } else {
@@ -276,7 +276,7 @@ public class CommandSetupHelper {
             }
         }
 
-        SetPortForwardingRulesCommand cmd = null;
+        SetPortForwardingRulesCommand cmd;
 
         if (router.getVpcId() != null) {
             cmd = new SetPortForwardingRulesVpcCommand(rulesTO);
@@ -464,7 +464,7 @@ public class CommandSetupHelper {
                 final String vlanId = ipAddr.getVlanTag();
                 final String vlanGateway = ipAddr.getGateway();
                 final String vlanNetmask = ipAddr.getNetmask();
-                String vifMacAddress = null;
+                String vifMacAddress;
                 // For non-source nat IP, set the mac to be something based on
                 // first public nic's MAC
                 // We cannot depend on first ip because we need to deal with

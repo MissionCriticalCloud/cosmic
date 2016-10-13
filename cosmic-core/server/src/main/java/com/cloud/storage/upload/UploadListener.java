@@ -109,7 +109,7 @@ public class UploadListener implements Listener {
         this.eventId = eventId;
         this.asyncJobId = asyncJobId;
         this.asyncMgr = asyncMgr;
-        String extractId = null;
+        String extractId;
         if (type == Type.VOLUME) {
             extractId = ApiDBUtils.findVolumeById(uploadObj.getTypeId()).getUuid();
         } else {

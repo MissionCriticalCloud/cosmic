@@ -129,7 +129,7 @@ public class ApiServlet extends HttpServlet {
                     auditTrailSb.append(command);
 
                     int httpResponseCode = HttpServletResponse.SC_OK;
-                    String responseString = null;
+                    String responseString;
 
                     if (apiAuthenticator.getAPIType() == APIAuthenticationType.LOGIN_API) {
                         if (session != null) {

@@ -367,7 +367,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw new InvalidParameterValueException("Unable to find template with id");
         }
 
-        DataStore srcSecStore = null;
+        final DataStore srcSecStore;
         if (sourceZoneId != null) {
             // template is on zone-wide secondary storage
             srcSecStore = getImageStore(sourceZoneId, templateId);
@@ -487,8 +487,8 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         final long poolId = pool.getId();
         final long templateId = template.getId();
-        VMTemplateStoragePoolVO templateStoragePoolRef = null;
-        TemplateDataStoreVO templateStoreRef = null;
+        VMTemplateStoragePoolVO templateStoragePoolRef;
+        TemplateDataStoreVO templateStoreRef;
 
         templateStoragePoolRef = _tmpltPoolDao.findByPoolTemplate(poolId, templateId);
         if (templateStoragePoolRef != null) {
@@ -814,7 +814,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
     @Override
     public DataStore getImageStore(final String storeUuid, final Long zoneId) {
-        DataStore imageStore = null;
+        DataStore imageStore;
         if (storeUuid != null) {
             imageStore = _dataStoreMgr.getDataStore(storeUuid, DataStoreRole.Image);
         } else {
@@ -831,7 +831,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     public String getChecksum(final DataStore store, final String templatePath) {
         final EndPoint ep = _epSelector.select(store);
         final ComputeChecksumCommand cmd = new ComputeChecksumCommand(store.getTO(), templatePath);
-        Answer answer = null;
+        Answer answer;
         if (ep == null) {
             final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
             s_logger.error(errMsg);
@@ -1357,9 +1357,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         final HypervisorType hyperType;
-        VolumeVO volume = null;
+        VolumeVO volume;
         SnapshotVO snapshot = null;
-        VMTemplateVO privateTemplate = null;
+        VMTemplateVO privateTemplate;
         if (volumeId != null) { // create template from volume
             volume = _volumeDao.findById(volumeId);
             if (volume == null) {
@@ -1518,7 +1518,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             if (store == null) {
                 throw new CloudRuntimeException("cannot find an image store for zone " + zoneId);
             }
-            AsyncCallFuture<TemplateApiResult> future = null;
+            AsyncCallFuture<TemplateApiResult> future;
 
             if (snapshotId != null) {
                 final DataStoreRole dataStoreRole = ApiResponseHelper.getDataStoreRole(snapshot, _snapshotStoreDao, _dataStoreMgr);
@@ -1541,7 +1541,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 throw new CloudRuntimeException("Creating private Template need to specify snapshotId or volumeId");
             }
 
-            CommandResult result = null;
+            CommandResult result;
             try {
                 result = future.get();
                 if (result.isFailed()) {
@@ -1688,7 +1688,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             template.setSortKey(sortKey);
         }
 
-        ImageFormat imageFormat = null;
+        ImageFormat imageFormat;
         if (format != null) {
             try {
                 imageFormat = ImageFormat.valueOf(format.toUpperCase());
@@ -1880,7 +1880,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         final DataTO isoTO = tmplt.getTO();
         final DiskTO disk = new DiskTO(isoTO, null, null, Volume.Type.ISO);
-        Command cmd = null;
+        Command cmd;
         if (attach) {
             cmd = new AttachCommand(disk, vmName);
         } else {

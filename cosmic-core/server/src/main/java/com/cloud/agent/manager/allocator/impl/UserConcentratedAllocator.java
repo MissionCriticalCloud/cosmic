@@ -155,7 +155,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
     }
 
     private boolean dataCenterAndPodHasEnoughCapacity(final long dataCenterId, final long podId, final long capacityNeeded, final short capacityType, final long[] hostCandidate) {
-        List<CapacityVO> capacities = null;
+        List<CapacityVO> capacities;
 
         final SearchCriteria<CapacityVO> sc = _capacityDao.createSearchCriteria();
         sc.addAnd("capacityType", SearchCriteria.Op.EQ, capacityType);
@@ -208,7 +208,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
                     continue;
                 }
 
-                ServiceOffering so = null;
+                ServiceOffering so;
 
                 if (vm.getType() == VirtualMachine.Type.User) {
                     final UserVmVO userVm = _vmDao.findById(vm.getId());

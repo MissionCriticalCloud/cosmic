@@ -35,7 +35,7 @@ public class ApiSerializerHelper {
                 }
                 final String clzName = serializedParts[0];
                 String nameField = null;
-                String content = null;
+                String content;
                 if (serializedParts.length == 2) {
                     content = serializedParts[1];
                 } else {

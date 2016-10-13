@@ -46,7 +46,7 @@ public class VpcIpAssociationRules extends RuleApplier {
             final String broadcastURI = BroadcastDomainType.Vlan.toUri(ipAddr.getVlanTag()).toString();
             final Nic nic = nicDao.findByNetworkIdInstanceIdAndBroadcastUri(ipAddr.getNetworkId(), _router.getId(), broadcastURI);
 
-            String macAddress = null;
+            String macAddress;
             if (nic == null) {
                 if (ipAddr.getState() != IpAddress.State.Releasing) {
                     throw new CloudRuntimeException("Unable to find the nic in network " + ipAddr.getNetworkId() + "  to apply the ip address " + ipAddr + " for");

@@ -240,7 +240,7 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
 
         revokeRule(rule);
 
-        boolean success = false;
+        boolean success;
 
         try {
             applyNetworkACL(rule.getAclId());
@@ -470,7 +470,7 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     private boolean applyACLToPrivateGw(final PrivateGateway gateway, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
-        List<VpcProvider> vpcElements = null;
+        List<VpcProvider> vpcElements;
         vpcElements = new ArrayList<>();
         vpcElements.add((VpcProvider) _ntwkModel.getElementImplementingProvider(Network.Provider.VPCVirtualRouter.getName()));
 

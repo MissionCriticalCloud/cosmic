@@ -53,7 +53,7 @@ public class PodZoneConfig {
         final String cidrAddress = cidrPair[0];
         final String cidrSize = cidrPair[1];
 
-        String sql = null;
+        String sql;
         if (id != -1) {
             sql =
                     "INSERT INTO `cloud`.`host_pod_ref` (id, name, data_center_id, gateway, cidr_address, cidr_size) " + "VALUES ('" + id + "','" + name + "','" + dcId +
@@ -173,7 +173,7 @@ public class PodZoneConfig {
             final String cidrAddress = (String) cidrPair.get(0);
             final long cidrSize = ((Long) cidrPair.get(1)).longValue();
 
-            long cidrSizeToUse = -1;
+            long cidrSizeToUse;
             if (cidrSize < guestCidrSize) {
                 cidrSizeToUse = cidrSize;
             } else {
@@ -375,8 +375,8 @@ public class PodZoneConfig {
             System.out.println("Saving zone, please wait...");
         }
 
-        String columns = null;
-        String values = null;
+        String columns;
+        String values;
 
         if (id != -1) {
             columns = "(id, name";
@@ -438,8 +438,8 @@ public class PodZoneConfig {
             System.out.println("Saving physical network, please wait...");
         }
 
-        String columns = null;
-        String values = null;
+        String columns;
+        String values;
 
         columns = "(id ";
         values = "('" + id + "'";

@@ -441,7 +441,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         CallContext.current().setEventDetails(" Name: " + name + " New Value: " + (name.toLowerCase().contains("password") ? "*****" : value == null ? "" : value));
         // check if config value exists
         final ConfigurationVO config = _configDao.findByName(name);
-        String catergory = null;
+        String catergory;
 
         // FIX ME - All configuration parameters are not moved from config.java to configKey
         if (config == null) {
@@ -516,7 +516,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 return "Invalid scope id provided for the parameter " + name;
             }
         }
-        Class<?> type = null;
+        Class<?> type;
         final Config c = Config.getConfig(name);
         if (c == null) {
             s_logger.warn("Did not find configuration " + name + " in Config.java. Perhaps moved to ConfigDepot");
@@ -1544,7 +1544,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                     // release the dedication for this zone
                     final DedicatedResourceVO resource = _dedicatedDao.findByZoneId(zoneId);
-                    Long resourceId = null;
+                    Long resourceId;
                     if (resource != null) {
                         resourceId = resource.getId();
                         if (!_dedicatedDao.remove(resourceId)) {
@@ -1763,7 +1763,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
         // verify that physical network exists
-        PhysicalNetworkVO pNtwk = null;
+        PhysicalNetworkVO pNtwk;
         if (physicalNetworkId != null) {
             pNtwk = _physicalNetworkDao.findById(physicalNetworkId);
             if (pNtwk == null) {
@@ -1948,7 +1948,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (newVlanGateway == null && newVlanNetmask == null && sameSubnet == false) {
             throw new InvalidParameterValueException("The ip range dose not belong to any of the existing subnets, Provide the netmask and gateway if you want to add new subnet");
         }
-        Pair<String, String> vlanDetails = null;
+        Pair<String, String> vlanDetails;
 
         if (sameSubnet) {
             vlanDetails = new Pair<>(vlanGateway, vlanNetmask);
@@ -2593,7 +2593,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                         providers.add(provider);
 
-                        Set<Service> serviceSet = null;
+                        Set<Service> serviceSet;
                         if (providerCombinationToVerify.get(provider) == null) {
                             serviceSet = new HashSet<>();
                         } else {
@@ -3142,7 +3142,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
             for (final NetworkOfferingVO offering : offerings) {
                 boolean addOffering = true;
-                List<Service> checkForProviders = new ArrayList<>();
+                List<Service> checkForProviders;
 
                 if (checkForTags) {
                     if (!pNtwkTags.contains(offering.getTags())) {
@@ -3348,7 +3348,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new CloudRuntimeException("Failed to update configuration value. Please contact Cloud Support.");
         }
 
-        PreparedStatement pstmt = null;
+        PreparedStatement pstmt;
         if (Config.XenServerGuestNetwork.key().equalsIgnoreCase(name)) {
             final String sql = "update host_details set value=? where name=?";
             try {
@@ -3472,7 +3472,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         final HostPodVO podFinal = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
 
-        Grouping.AllocationState allocationState = null;
+        Grouping.AllocationState allocationState;
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             allocationState = Grouping.AllocationState.valueOf(allocationStateStr);
             podFinal.setAllocationState(allocationState);
@@ -4338,7 +4338,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                     final String ipRange = startIp + "-" + endIp;
                     pod.setDescription(ipRange);
-                    Grouping.AllocationState allocationState = null;
+                    Grouping.AllocationState allocationState;
                     if (allocationStateStrFinal != null && !allocationStateStrFinal.isEmpty()) {
                         allocationState = Grouping.AllocationState.valueOf(allocationStateStrFinal);
                         pod.setAllocationState(allocationState);
@@ -4398,7 +4398,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             final String cidrAddress = (String) cidrPair.get(0);
             final long cidrSize = ((Long) cidrPair.get(1)).longValue();
 
-            long cidrSizeToUse = -1;
+            long cidrSizeToUse;
             if (guestCidrSize == null || cidrSize < guestCidrSize) {
                 cidrSizeToUse = cidrSize;
             } else {
@@ -4782,7 +4782,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             affinityGroupName = "ZoneDedicatedGrp-domain-" + domainId + (accountId != null ? "-acct-" + accountId : "");
         }
 
-        AffinityGroup group = null;
+        AffinityGroup group;
         String accountName = null;
 
         if (accountId != null) {

@@ -567,7 +567,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         final DataCenterVO dcVO = _dcDao.findById(vpc.getZoneId());
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
 
-        String[] result = null;
+        String[] result;
         final List<String> combinedResults = new ArrayList<>();
         for (final DomainRouterVO domainRouterVO : routers) {
             result = networkTopology.applyVpnUsers(vpn, users, domainRouterVO);

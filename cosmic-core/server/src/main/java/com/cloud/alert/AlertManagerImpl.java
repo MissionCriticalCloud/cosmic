@@ -344,7 +344,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         // Generate Alerts for Zone Level capacities
         for (final DataCenterVO dc : dataCenterList) {
             for (final Short capacityType : dataCenterCapacityTypes) {
-                List<SummedCapacity> capacity = new ArrayList<>();
+                List<SummedCapacity> capacity;
                 capacity = _capacityDao.findCapacityBy(capacityType.intValue(), dc.getId(), null, null);
 
                 if (capacityType == Capacity.CAPACITY_TYPE_SECONDARY_STORAGE) {
@@ -379,11 +379,11 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         // Generate Alerts for Cluster Level capacities
         for (final ClusterVO cluster : clusterList) {
             for (final Short capacityType : clusterCapacityTypes) {
-                List<SummedCapacity> capacity = new ArrayList<>();
+                List<SummedCapacity> capacity;
                 capacity = _capacityDao.findCapacityBy(capacityType.intValue(), cluster.getDataCenterId(), null, cluster.getId());
 
                 // cpu and memory allocated capacity notification threshold can be defined at cluster level, so getting the value if they are defined at cluster level
-                double threshold = 0;
+                double threshold;
                 switch (capacityType) {
                     case Capacity.CAPACITY_TYPE_STORAGE:
                         capacity.add(getUsedStats(capacityType, cluster.getDataCenterId(), cluster.getPodId(), cluster.getId()));
@@ -793,7 +793,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 msg.setContent(content, "text/plain");
                 msg.saveChanges();
 
-                SMTPTransport smtpTrans = null;
+                SMTPTransport smtpTrans;
                 if (_smtpUseAuth) {
                     smtpTrans = new SMTPSSLTransport(_smtpSession, new URLName("smtp", _smtpHost, _smtpPort, null, _smtpUsername, _smtpPassword));
                 } else {

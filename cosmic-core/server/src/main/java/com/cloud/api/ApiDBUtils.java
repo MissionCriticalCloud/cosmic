@@ -1767,7 +1767,7 @@ public class ApiDBUtils {
     }
 
     public static Map<String, String> getResourceDetails(final long resourceId, final ResourceObjectType resourceType) {
-        Map<String, String> details = null;
+        Map<String, String> details;
         if (isAdmin(CallContext.current().getCallingAccount())) {
             details = s_resourceDetailsService.getDetailsMap(resourceId, resourceType, null);
         } else {

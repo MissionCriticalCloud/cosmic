@@ -306,7 +306,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
             }
 
-            String eventType = "";
+            String eventType;
             if (template.getFormat().equals(ImageFormat.ISO)) {
                 eventType = EventTypes.EVENT_ISO_DELETE;
             } else {

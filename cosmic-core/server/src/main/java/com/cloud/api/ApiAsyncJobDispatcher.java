@@ -61,7 +61,7 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
             final String acctIdStr = params.get("ctxAccountId");
             final String contextDetails = params.get("ctxDetails");
 
-            Long userId = null;
+            Long userId;
             Account accountObject = null;
 
             if (cmdObj instanceof BaseAsyncCreateCmd) {
@@ -99,7 +99,7 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
                 CallContext.unregister();
             }
         } catch (IllegalAccessException | InstantiationException | ClassNotFoundException | ServerApiException e) {
-            String errorMsg = null;
+            String errorMsg;
             int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
             if (!(e instanceof ServerApiException)) {
                 s_logger.error("Unexpected exception while executing " + job.getCmd(), e);

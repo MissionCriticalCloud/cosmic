@@ -722,7 +722,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Filter searchFilter = new Filter(UserVmJoinVO.class, "id", true, cmd.getStartIndex(),
                 cmd.getPageSizeVal());
 
-        List<Long> ids = null;
+        List<Long> ids;
         if (cmd.getId() != null) {
             if (cmd.getIds() != null && !cmd.getIds().isEmpty()) {
                 throw new InvalidParameterValueException("Specify either id or ids but not both parameters");
@@ -2248,7 +2248,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        List<Long> domainIds = null;
+        List<Long> domainIds;
         // For non-root users, only return all offerings for the user's domain,
         // and everything above till root
         if (_accountMgr.isNormalUser(account.getId()) || _accountMgr.isDomainAdmin(account.getId())
@@ -2384,7 +2384,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Long domainId = cmd.getDomainId();
         final Boolean isSystem = cmd.getIsSystem();
         final String vmTypeStr = cmd.getSystemVmType();
-        ServiceOfferingVO currentVmOffering = null;
+        ServiceOfferingVO currentVmOffering;
         final Boolean isRecursive = cmd.isRecursive();
 
         final SearchCriteria<ServiceOfferingJoinVO> sc = _srvOfferingJoinDao.createSearchCriteria();
@@ -2784,7 +2784,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        VMTemplateVO template = null;
+        VMTemplateVO template;
 
         Boolean isAscending = Boolean.parseBoolean(_configDao.getValue("sortkey.algorithm"));
         isAscending = isAscending == null ? Boolean.TRUE : isAscending;
@@ -2826,7 +2826,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             sc.addAnd("id", SearchCriteria.Op.EQ, templateId);
         } else {
 
-            DomainVO domain = null;
+            DomainVO domain;
             if (!permittedAccounts.isEmpty()) {
                 domain = _domainDao.findById(permittedAccounts.get(0).getDomainId());
             } else {
@@ -2859,7 +2859,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                     final boolean publicTemplates = templateFilter == TemplateFilter.featured || templateFilter == TemplateFilter.community;
 
                     // get all parent domain ID's all the way till root domain
-                    DomainVO domainTreeNode = null;
+                    DomainVO domainTreeNode;
                     //if template filter is featured, or community, all child domains should be included in search
                     if (publicTemplates) {
                         domainTreeNode = _domainDao.findById(Domain.ROOT_DOMAIN);
@@ -2995,7 +2995,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         // sc.addAnd("removed", SearchCriteria.Op.NULL);
 
         // search unique templates and find details by Ids
-        Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair = null;
+        Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair;
         if (showRemovedTmpl) {
             uniqueTmplPair = _templateJoinDao.searchIncludingRemovedAndCount(sc, searchFilter);
         } else {

@@ -852,7 +852,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                         "Provider " + provider + " should be enabled in at least one physical network of the zone specified");
             }
 
-            List<String> providers = null;
+            List<String> providers;
             if (svcProviders.get(service) == null) {
                 providers = new ArrayList<>();
             } else {
@@ -1349,7 +1349,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final Long physicalNetworkIdFinal = physicalNetworkId;
         final PhysicalNetwork physNetFinal = physNet;
-        VpcGatewayVO gatewayVO = null;
+        VpcGatewayVO gatewayVO;
         try {
             gatewayVO = Transaction.execute(new TransactionCallbackWithException<VpcGatewayVO, Exception>() {
                 @Override
@@ -1902,7 +1902,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throws ResourceAllocationException, ResourceUnavailableException, InsufficientAddressCapacityException,
             ConcurrentOperationException {
         final Account caller = CallContext.current().getCallingAccount();
-        Account owner = null;
+        Account owner;
 
         final IpAddress ipToAssoc = _ntwkModel.getIp(ipId);
         if (ipToAssoc != null) {
@@ -2391,7 +2391,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         s_logger.debug("Releasing VPC ip address " + ip + " from vpc network id=" + networkId);
 
         final long vpcId = ip.getVpcId();
-        boolean success = false;
+        boolean success;
         try {
             // unassign ip from the VPC router
             success = _ipAddrMgr.applyIpAssociations(_ntwkModel.getNetwork(networkId), true);
@@ -2465,7 +2465,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final IPAddressVO sourceNatIp = getExistingSourceNatInVpc(owner.getId(), vpc.getId());
 
-        PublicIp ipToReturn = null;
+        PublicIp ipToReturn;
 
         if (sourceNatIp != null) {
             ipToReturn = PublicIp.createFromAddrAndVlan(sourceNatIp, _vlanDao.findById(sourceNatIp.getVlanId()));

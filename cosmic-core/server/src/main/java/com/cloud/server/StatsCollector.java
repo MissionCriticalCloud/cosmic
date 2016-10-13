@@ -280,7 +280,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
         final TimeZone usageTimezone = TimeZone.getTimeZone(_usageTimeZone);
         final Calendar cal = Calendar.getInstance(usageTimezone);
         cal.setTime(new Date());
-        long endDate = 0;
+        long endDate;
         final int HOURLY_TIME = 60;
         final int DAILY_TIME = 60 * 24;
         if (_usageAggregationRange == DAILY_TIME) {
@@ -436,7 +436,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                 final HashMap<Long, VmStatsEntry> vmStatsById = _userVmMgr.getVirtualMachineStatistics(host.getId(), host.getName(), vmIds);
 
                 if (vmStatsById != null) {
-                    VmStatsEntry statsInMemory = null;
+                    VmStatsEntry statsInMemory;
 
                     final Set<Long> vmIdSet = vmStatsById.keySet();
                     for (final Long vmId : vmIdSet) {

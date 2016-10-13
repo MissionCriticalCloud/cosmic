@@ -153,7 +153,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
             if (details.contains(HostDetails.all) || details.contains(HostDetails.stats)) {
                 // set CPU/RAM/Network stats
-                String cpuUsed = null;
+                String cpuUsed;
                 final HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
                     final float cpuUtil = (float) hostStats.getCpuUtilization();
@@ -297,7 +297,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
             if (details.contains(HostDetails.all) || details.contains(HostDetails.stats)) {
                 // set CPU/RAM/Network stats
-                String cpuUsed = null;
+                String cpuUsed;
                 final HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
                     final float cpuUtil = (float) hostStats.getCpuUtilization();

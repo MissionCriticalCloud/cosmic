@@ -748,7 +748,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
 
     @Override
     public long getAllocatedPoolCapacity(final StoragePoolVO pool, final VMTemplateVO templateForVmCreation) {
-        long totalAllocatedSize = 0;
+        long totalAllocatedSize;
 
         // if the storage pool is managed, the used bytes can be larger than the sum of the sizes of all of the non-destroyed volumes
         // in this case, call getUsedBytes(StoragePoolVO)
@@ -846,7 +846,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     @Override
     public float getClusterOverProvisioningFactor(final Long clusterId, final short capacityType) {
 
-        String capacityOverProvisioningName = "";
+        String capacityOverProvisioningName;
         if (capacityType == Capacity.CAPACITY_TYPE_CPU) {
             capacityOverProvisioningName = "cpuOvercommitRatio";
         } else if (capacityType == Capacity.CAPACITY_TYPE_MEMORY) {

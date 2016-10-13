@@ -304,7 +304,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             s_logger.trace("Handle asyjob publish event " + jobEvent);
         }
 
-        EventBus eventBus = null;
+        EventBus eventBus;
         try {
             eventBus = ComponentContext.getComponent(EventBus.class);
         } catch (final NoSuchBeanDefinitionException nbe) {
@@ -504,7 +504,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         // BaseAsyncCmd: cmd is processed and submitted as an AsyncJob, job related info is serialized and returned.
         if (cmdObj instanceof BaseAsyncCmd) {
             Long objectId = null;
-            String objectUuid = null;
+            String objectUuid;
             if (cmdObj instanceof BaseAsyncCreateCmd) {
                 final BaseAsyncCreateCmd createCmd = (BaseAsyncCreateCmd) cmdObj;
                 _dispatcher.dispatchCreateCmd(createCmd, params);
@@ -645,7 +645,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     private void buildAsyncListResponse(final BaseListCmd command, final Account account) {
         final List<ResponseObject> responses = ((ListResponse) command.getResponseObject()).getResponses();
         if (responses != null && responses.size() > 0) {
-            List<? extends AsyncJob> jobs = null;
+            List<? extends AsyncJob> jobs;
 
             // list all jobs for ROOT admin
             if (_accountMgr.isRootAdmin(account.getId())) {
@@ -681,7 +681,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId) throws ServerApiException {
         try {
             String apiKey = null;
-            String secretKey = null;
+            String secretKey;
             String signature = null;
             String unsignedRequest = null;
 
@@ -757,7 +757,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 return false; // no signature, bad request
             }
 
-            Date expiresTS = null;
+            Date expiresTS;
             // FIXME: Hard coded signature, why not have an enum
             if ("3".equals(signatureVersion)) {
                 // New signature authentication. Check for expire parameter and its validity
@@ -782,7 +782,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
 
             final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
             txn.close();
-            User user = null;
+            User user;
             // verify there is a user with this api key
             final Pair<User, Account> userAcctPair = _accountMgr.findUserByApiKey(apiKey);
             if (userAcctPair == null) {
@@ -1004,7 +1004,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     @Override
     public String getSerializedApiError(final int errorCode, final String errorText, final Map<String, Object[]> apiCommandParams, final String responseType) {
         String responseName = null;
-        Class<?> cmdClass = null;
+        Class<?> cmdClass;
         String responseText = null;
 
         try {
@@ -1038,7 +1038,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     @Override
     public String getSerializedApiError(final ServerApiException ex, final Map<String, Object[]> apiCommandParams, final String responseType) {
         String responseName = null;
-        Class<?> cmdClass = null;
+        Class<?> cmdClass;
         String responseText = null;
 
         if (ex == null) {
@@ -1088,7 +1088,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     public String handleRequest(final Map params, final String responseType, final StringBuilder auditTrailSb) throws ServerApiException {
         checkCharacterInkParams(params);
 
-        String response = null;
+        String response;
         String[] command = null;
 
         try {

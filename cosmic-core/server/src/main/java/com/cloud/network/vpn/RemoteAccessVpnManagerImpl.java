@@ -121,7 +121,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
 
-        Long networkId = null;
+        Long networkId;
 
         // make sure ip address exists
         final PublicIpAddress ipAddr = _networkMgr.getPublicIpAddress(publicIpId);
@@ -181,7 +181,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             throw new InvalidParameterValueException("Invalid ip range " + ipRange);
         }
 
-        Pair<String, Integer> cidr = null;
+        Pair<String, Integer> cidr;
 
         // TODO: assumes one virtual network / domr per account per zone
         if (networkId != null) {

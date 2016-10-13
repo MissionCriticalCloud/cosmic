@@ -91,7 +91,7 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         }
 
         final Pod pod = dest.getPod();
-        Integer vlan = null;
+        Integer vlan;
 
         final StorageNetworkIpAddressVO ip = _sNwMgr.acquireIpAddress(pod.getId());
         if (ip == null) {

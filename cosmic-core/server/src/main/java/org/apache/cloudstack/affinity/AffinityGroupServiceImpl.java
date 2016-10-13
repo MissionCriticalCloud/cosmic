@@ -136,8 +136,8 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
             throw new PermissionDeniedException("Cannot create the affinity group");
         }
 
-        ControlledEntity.ACLType aclType = null;
-        Account owner = null;
+        ControlledEntity.ACLType aclType;
+        Account owner;
         boolean domainLevel = false;
 
         if (projectId == null && domainId != null && accountName == null) {
@@ -254,7 +254,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     }
 
     private AffinityGroupVO getAffinityGroup(final Long affinityGroupId, final String account, final Long projectId, final Long domainId, final String affinityGroupName) {
-        AffinityGroupVO group = null;
+        AffinityGroupVO group;
         if (affinityGroupId != null) {
             group = _affinityGroupDao.findById(affinityGroupId);
         } else if (affinityGroupName != null) {
@@ -269,7 +269,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     }
 
     private AffinityGroupVO getAffinityGroupByName(final String account, final Long projectId, final Long domainId, final String affinityGroupName) {
-        AffinityGroupVO group = null;
+        AffinityGroupVO group;
         if (account == null && domainId != null) {
             group = _affinityGroupDao.findDomainLevelGroupByName(domainId, affinityGroupName);
         } else {
@@ -433,7 +433,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
 
     @Override
     public boolean isAffinityGroupAvailableInDomain(final long affinityGroupId, final long domainId) {
-        Long groupDomainId = null;
+        Long groupDomainId;
 
         final AffinityGroupDomainMapVO domainMap = _affinityGroupDomainMapDao.findByAffinityGroup(affinityGroupId);
         if (domainMap == null) {

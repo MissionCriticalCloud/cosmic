@@ -989,7 +989,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                     continue; // only do this for Nfs
                 }
                 final String secUrl = ssStore.getUri();
-                SecStorageSetupCommand setupCmd = null;
+                SecStorageSetupCommand setupCmd;
                 if (!_useSSlCopy) {
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, null);
                 } else {
@@ -1064,7 +1064,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         final NetworkVO defaultNetwork = getDefaultNetworkForCreation(dc);
 
-        List<? extends NetworkOffering> offerings = null;
+        List<? extends NetworkOffering> offerings;
         if (_sNwMgr.isStorageIpRangeAvailable(dataCenterId)) {
             offerings = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork, NetworkOffering
                     .SystemStorageNetwork);
@@ -1086,7 +1086,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return new HashMap<>();
         }
 
-        VMTemplateVO template = null;
+        VMTemplateVO template;
         final HypervisorType availableHypervisor = _resourceMgr.getAvailableHypervisor(dataCenterId);
         template = _templateDao.findSystemVMReadyTemplate(dataCenterId, availableHypervisor);
         if (template == null) {

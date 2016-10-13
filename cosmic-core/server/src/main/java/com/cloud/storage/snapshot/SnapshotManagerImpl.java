@@ -592,7 +592,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
             snapshotName = vmDisplayName + "_" + volume.getName() + "_" + timeString;
         }
 
-        HypervisorType hypervisorType = HypervisorType.None;
+        HypervisorType hypervisorType;
         final StoragePoolVO storagePool = _storagePoolDao.findById(volume.getDataStore().getId());
         if (storagePool.getScope() == ScopeType.ZONE) {
             hypervisorType = storagePool.getHypervisor();
@@ -951,7 +951,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
                 final String snapshotDir = TemplateConstants.DEFAULT_SNAPSHOT_ROOT_DIR + "/" + accountId + "/" + volumeId;
                 final DeleteSnapshotsDirCommand cmd = new DeleteSnapshotsDirCommand(ssHost.getTO(), snapshotDir);
                 final EndPoint ep = _epSelector.select(ssHost);
-                Answer answer = null;
+                Answer answer;
                 if (ep == null) {
                     final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
                     s_logger.error(errMsg);
