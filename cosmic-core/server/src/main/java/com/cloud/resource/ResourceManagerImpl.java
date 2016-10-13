@@ -1372,7 +1372,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        long dcId = -1;
+        long dcId;
         DataCenterVO dc = _dcDao.findByName(dataCenter);
         if (dc == null) {
             try {
@@ -1651,7 +1651,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         return null;
                     }
 
-                    HostVO host = null;
+                    HostVO host;
                     if (deferAgentCreation) {
                         host = (HostVO) createHostAndAgentDeferred(resource, entry.getValue(), true, hostTags, false);
                     } else {
@@ -1892,7 +1892,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             url = URLDecoder.decode(url);
         }
 
-        URI uri = null;
+        URI uri;
 
         final DataCenterVO zone = resourceChecker.checkIfDataCenterExists(dcId);
         final Account account = CallContext.current().getCallingAccount();
@@ -2021,7 +2021,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
 
             final List<HostVO> hosts = new ArrayList<>();
-            Map<? extends ServerResource, Map<String, String>> resources = null;
+            Map<? extends ServerResource, Map<String, String>> resources;
             resources = discoverer.find(dcId, podId, cluster.getId(), uri, username, password, null);
 
             if (resources != null) {
@@ -2115,7 +2115,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Cluster.ClusterType newClusterType = null;
+        Cluster.ClusterType newClusterType;
         if (clusterType != null && !clusterType.isEmpty()) {
             try {
                 newClusterType = Cluster.ClusterType.valueOf(clusterType);
@@ -2131,7 +2131,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Grouping.AllocationState newAllocationState = null;
+        Grouping.AllocationState newAllocationState;
         if (allocationState != null && !allocationState.isEmpty()) {
             try {
                 newAllocationState = Grouping.AllocationState.valueOf(allocationState);
@@ -2188,7 +2188,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         }
                     }
                     final int retry = 40;
-                    boolean lsuccess = true;
+                    boolean lsuccess;
                     for (int i = 0; i < retry; i++) {
                         lsuccess = true;
                         try {
@@ -2363,7 +2363,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     public List<HypervisorType> getSupportedHypervisorTypes(final long zoneId, final boolean forVirtualRouter, final Long podId) {
         final List<HypervisorType> hypervisorTypes = new ArrayList<>();
 
-        List<ClusterVO> clustersForZone = new ArrayList<>();
+        List<ClusterVO> clustersForZone;
         if (podId != null) {
             clustersForZone = _clusterDao.listByPodId(podId);
         } else {

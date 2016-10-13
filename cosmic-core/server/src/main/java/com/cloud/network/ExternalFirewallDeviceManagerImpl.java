@@ -173,7 +173,7 @@ public abstract class ExternalFirewallDeviceManagerImpl extends AdapterBase impl
     public ExternalFirewallDeviceVO addExternalFirewall(final long physicalNetworkId, final String url, final String username, final String password, final String deviceName,
                                                         final ServerResource resource) {
         final String guid;
-        PhysicalNetworkVO pNetwork = null;
+        PhysicalNetworkVO pNetwork;
         final NetworkDevice ntwkDevice = NetworkDevice.getNetworkDevice(deviceName);
         final long zoneId;
 
@@ -294,7 +294,7 @@ public abstract class ExternalFirewallDeviceManagerImpl extends AdapterBase impl
     public List<Host> listExternalFirewalls(final long physicalNetworkId, final String deviceName) {
         final List<Host> firewallHosts = new ArrayList<>();
         final NetworkDevice fwNetworkDevice = NetworkDevice.getNetworkDevice(deviceName);
-        PhysicalNetworkVO pNetwork = null;
+        PhysicalNetworkVO pNetwork;
 
         pNetwork = _physicalNetworkDao.findById(physicalNetworkId);
         if (pNetwork == null) {

@@ -1217,7 +1217,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         sb.and("hypervisorVersion", sb.entity().getHypervisorVersion(), SearchCriteria.Op.EQ);
 
         final String haTag = _haMgr.getHaTag();
-        SearchBuilder<HostTagVO> hostTagSearch = null;
+        SearchBuilder<HostTagVO> hostTagSearch;
         if (haHosts != null && haTag != null && !haTag.isEmpty()) {
             hostTagSearch = _hostTagsDao.createSearchBuilder();
             if ((Boolean) haHosts) {
@@ -1370,7 +1370,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             sb.and("allocated", sb.entity().getAllocatedTime(), SearchCriteria.Op.NNULL);
         }
 
-        VlanType vlanType = null;
+        VlanType vlanType;
         if (forVirtualNetwork != null) {
             vlanType = forVirtualNetwork ? VlanType.VirtualNetwork : VlanType.DirectAttached;
         } else {
@@ -2346,8 +2346,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         final Account caller = getCaller();
         boolean securityGroupsEnabled = false;
-        boolean elasticLoadBalancerEnabled = false;
-        boolean KVMSnapshotEnabled = false;
+        boolean elasticLoadBalancerEnabled;
+        boolean KVMSnapshotEnabled;
         String supportELB = "false";
         final List<NetworkVO> networks = _networkDao.listSecurityGroupEnabledNetworks();
         if (networks != null && !networks.isEmpty()) {
@@ -2825,10 +2825,10 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
 
         final Type hostType = srcHost.getType();
-        Pair<List<HostVO>, Integer> allHostsPair = null;
-        List<HostVO> allHosts = null;
+        Pair<List<HostVO>, Integer> allHostsPair;
+        List<HostVO> allHosts;
         final Map<Host, Boolean> requiresStorageMotion = new HashMap<>();
-        DataCenterDeployment plan = null;
+        DataCenterDeployment plan;
 
         if (canMigrateWithStorage) {
             allHostsPair = searchForServers(startIndex, pageSize, null, hostType, null, srcHost.getDataCenterId(), null, null, null, null, null, null,
@@ -2990,7 +2990,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final StoragePoolVO srcVolumePool = _poolDao.findById(volume.getPoolId());
         // Get all the pools available. Only shared pools are considered because only a volume on a shared pools
         // can be live migrated while the virtual machine stays on the same host.
-        List<StoragePoolVO> storagePools = null;
+        List<StoragePoolVO> storagePools;
         if (srcVolumePool.getClusterId() == null) {
             storagePools = _poolDao.findZoneWideStoragePoolsByTags(volume.getDataCenterId(), null);
         } else {
@@ -3164,7 +3164,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         final List<CapacityVO> capacities = new ArrayList<>();
 
-        Integer pageSize = null;
+        Integer pageSize;
         try {
             pageSize = Integer.valueOf(cmd.getPageSizeVal().toString());
         } catch (final IllegalArgumentException e) {

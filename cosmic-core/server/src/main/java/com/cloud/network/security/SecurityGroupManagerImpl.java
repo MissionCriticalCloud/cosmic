@@ -308,7 +308,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         //create command for the to add ip in ipset and arptables rules
         final NetworkRulesVmSecondaryIpCommand cmd = new NetworkRulesVmSecondaryIpCommand(vmName, vmMac, secondaryIp, ruleAction);
         s_logger.debug("Asking agent to configure rules for vm secondary ip");
-        Commands cmds = null;
+        Commands cmds;
 
         cmds = new Commands(cmd);
         try {
@@ -324,8 +324,8 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
 
     private List<SecurityGroupRuleVO> authorizeSecurityGroupRule(final Long securityGroupId, String protocol, final Integer startPort, Integer endPort, final Integer icmpType,
                                                                  final Integer icmpCode, final List<String> cidrList, final Map groupList, final SecurityRuleType ruleType) {
-        Integer startPortOrType = null;
-        Integer endPortOrCode = null;
+        Integer startPortOrType;
+        Integer endPortOrCode;
 
         // Validate parameters
         final SecurityGroup securityGroup = _securityGroupDao.findById(securityGroupId);
@@ -610,8 +610,8 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
                         if (s_logger.isTraceEnabled()) {
                             s_logger.trace("Security Group Mgr: scheduling ruleset update for " + vmId);
                         }
-                        VmRulesetLogVO log = null;
-                        SecurityGroupWorkVO work = null;
+                        VmRulesetLogVO log;
+                        SecurityGroupWorkVO work;
 
                         log = _rulesetLogDao.findByVmId(vmId);
                         if (log == null) {
@@ -768,7 +768,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
     public String getSecurityGroupsNamesForVm(final long vmId) {
         try {
             final List<SecurityGroupVMMapVO> networkGroupsToVmMap = _securityGroupVMMapDao.listByInstanceId(vmId);
-            int size = 0;
+            int size;
             int j = 0;
             final StringBuilder networkGroupNames = new StringBuilder();
 
@@ -916,8 +916,8 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                UserVm vm = null;
-                Long seqnum = null;
+                UserVm vm;
+                Long seqnum;
 
                 boolean locked = false;
                 try {
@@ -933,7 +933,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
                         return;
                     }
                     locked = true;
-                    Long agentId = null;
+                    Long agentId;
                     final VmRulesetLogVO log = _rulesetLogDao.findByVmId(userVmId);
                     if (log == null) {
                         s_logger.warn("Cannot find log record for vm id=" + userVmId);
@@ -1154,7 +1154,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
             return;
         }
         if (vm.getType() != VirtualMachine.Type.User) {
-            Commands cmds = null;
+            Commands cmds;
             final NetworkRulesSystemVmCommand nrc = new NetworkRulesSystemVmCommand(vm.getInstanceName(), vm.getType());
             cmds = new Commands(nrc);
             try {

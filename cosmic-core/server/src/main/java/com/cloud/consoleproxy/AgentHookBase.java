@@ -186,7 +186,7 @@ public abstract class AgentHookBase implements AgentHook {
 
     @Override
     public void startAgentHttpHandlerInVM(final StartupProxyCommand startupCmd) {
-        StartConsoleProxyAgentHttpHandlerCommand cmd = null;
+        StartConsoleProxyAgentHttpHandlerCommand cmd;
 
         try {
             final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");

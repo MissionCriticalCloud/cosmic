@@ -836,7 +836,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
         final String oldUrl = secHost.getStorageUrl();
 
-        URI oldUri = null;
+        URI oldUri;
         try {
             oldUri = new URI(UriUtils.encodeURIComponent(oldUrl));
             if (!oldUri.getScheme().equalsIgnoreCase(uri.getScheme())) {
@@ -1498,7 +1498,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         params.put("role", DataStoreRole.ImageCache);
 
         final DataStoreLifeCycle lifeCycle = storeProvider.getDataStoreLifeCycle();
-        DataStore store = null;
+        DataStore store;
         try {
             store = lifeCycle.initialize(params);
         } catch (final Exception e) {
@@ -1579,7 +1579,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @Override
     @DB
     public PrimaryDataStoreInfo preparePrimaryStorageForMaintenance(final Long primaryStorageId) throws ResourceUnavailableException, InsufficientCapacityException {
-        StoragePoolVO primaryStorage = null;
+        StoragePoolVO primaryStorage;
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
         if (primaryStorage == null) {
@@ -1605,7 +1605,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @DB
     public PrimaryDataStoreInfo cancelPrimaryStorageForMaintenance(final CancelPrimaryStorageMaintenanceCmd cmd) throws ResourceUnavailableException {
         final Long primaryStorageId = cmd.getId();
-        StoragePoolVO primaryStorage = null;
+        StoragePoolVO primaryStorage;
 
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
@@ -2030,8 +2030,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final List<Long> list = new ArrayList<>();
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs = null;
-            PreparedStatement pstmt = null;
+            ResultSet rs;
+            PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, storeId);
             rs = pstmt.executeQuery();
@@ -2049,8 +2049,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final String sql = "SELECT backup_snap_id FROM snapshots WHERE volume_id=? and backup_snap_id is not NULL";
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs = null;
-            PreparedStatement pstmt = null;
+            ResultSet rs;
+            PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
             rs = pstmt.executeQuery();

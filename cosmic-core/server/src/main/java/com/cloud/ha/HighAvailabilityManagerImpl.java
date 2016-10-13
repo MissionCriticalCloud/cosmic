@@ -421,7 +421,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     private void processWork(final HaWorkVO work) {
         final WorkType wt = work.getWorkType();
         try {
-            Long nextTime = null;
+            Long nextTime;
             if (wt == WorkType.Migration) {
                 nextTime = migrate(work);
             } else if (wt == WorkType.HA) {
@@ -799,7 +799,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     public boolean configure(final String name, final Map<String, Object> xmlParams) throws ConfigurationException {
         _serverId = _msServer.getId();
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params;
         params = _configDao.getConfiguration(Long.toHexString(_serverId), xmlParams);
 
         String value = params.get(Config.HAWorkers.key());

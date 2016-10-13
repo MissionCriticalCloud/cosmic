@@ -464,7 +464,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         // make sure the account is enabled too
         // if the user is either locked already or disabled already, don't change state...only lock currently enabled
         // users
-        boolean success = true;
+        boolean success;
         if (user.getState().equals(State.locked)) {
             // already locked...no-op
             return _userAccountDao.findById(userId);
@@ -556,7 +556,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         if (!_userAccountDao.validateUsernameInDomain(userName, domainId)) {
             throw new CloudRuntimeException("The user " + userName + " already exists in domain " + domainId);
         }
-        UserVO user = null;
+        final UserVO user;
         user = createUser(account.getId(), userName, password, firstName, lastName, email, timeZone, userUUID, source);
         return user;
     }
@@ -892,7 +892,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             Transaction.execute(new TransactionCallbackNoReturn() {
                 @Override
                 public void doInTransactionWithoutResult(final TransactionStatus status) {
-                    UserAccountVO user = null;
+                    final UserAccountVO user;
                     user = _userAccountDao.lockRow(id, true);
                     user.setLoginAttempts(attempts);
                     if (toDisable) {
@@ -931,12 +931,16 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_REGISTER_FOR_SECRET_API_KEY, eventDescription = "register for the developer API keys")
     public String[] createApiKeyAndSecretKey(final RegisterCmd cmd) {
+        final Account caller = CallContext.current().getCallingAccount();
         final Long userId = cmd.getId();
 
         final User user = getUserIncludingRemoved(userId);
         if (user == null) {
             throw new InvalidParameterValueException("unable to find user by id");
         }
+
+        final Account account = _accountDao.findById(user.getAccountId());
+        checkAccess(caller, null, true, account);
 
         // don't allow updating system user
         if (user.getId() == User.UID_SYSTEM) {
@@ -958,7 +962,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
 
     @Override
     public boolean enableAccount(final long accountId) {
-        boolean success = false;
+        final boolean success;
         final AccountVO acctForUpdate = _accountDao.createForUpdate();
         acctForUpdate.setState(State.enabled);
         acctForUpdate.setNeedsCleanup(false);
@@ -1339,7 +1343,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
 
     @Override
     public boolean disableAccount(final long accountId) throws ConcurrentOperationException, ResourceUnavailableException {
-        boolean success = false;
+        final boolean success;
         if (accountId <= 2) {
             if (s_logger.isInfoEnabled()) {
                 s_logger.info("disableAccount -- invalid account id: " + accountId);
@@ -1538,8 +1542,8 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         try {
             final UserVO updatedUser = _userDao.createForUpdate();
 
-            String encodedKey = null;
-            Pair<User, Account> userAcct = null;
+            String encodedKey;
+            Pair<User, Account> userAcct;
             int retryLimit = 10;
             do {
                 // FIXME: what algorithm should we use for API keys?
@@ -1565,9 +1569,9 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     private String createUserSecretKey(final long userId) {
         try {
             final UserVO updatedUser = _userDao.createForUpdate();
-            String encodedKey = null;
+            String encodedKey;
             int retryLimit = 10;
-            UserVO userBySecretKey = null;
+            UserVO userBySecretKey;
             do {
                 final KeyGenerator generator = KeyGenerator.getInstance("HmacSHA1");
                 final SecretKey key = generator.generateKey();
@@ -1894,7 +1898,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     public AccountVO enableAccount(final String accountName, final Long domainId, final Long accountId) {
 
         // Check if account exists
-        Account account = null;
+        final Account account;
         if (accountId != null) {
             account = _accountDao.findById(accountId);
         } else {
@@ -1929,7 +1933,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     public AccountVO lockAccount(final String accountName, final Long domainId, final Long accountId) {
         final Account caller = CallContext.current().getCallingAccount();
 
-        Account account = null;
+        final Account account;
         if (accountId != null) {
             account = _accountDao.findById(accountId);
         } else {
@@ -1960,7 +1964,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     public AccountVO disableAccount(final String accountName, final Long domainId, final Long accountId) throws ConcurrentOperationException, ResourceUnavailableException {
         final Account caller = CallContext.current().getCallingAccount();
 
-        Account account = null;
+        final Account account;
         if (accountId != null) {
             account = _accountDao.findById(accountId);
         } else {
@@ -1996,8 +2000,8 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         final String networkDomain = cmd.getNetworkDomain();
         final Map<String, String> details = cmd.getDetails();
 
-        boolean success = false;
-        Account account = null;
+        final boolean success;
+        final Account account;
         if (accountId != null) {
             account = _accountDao.findById(accountId);
         } else {
@@ -2203,7 +2207,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             final long tolerance = Long.parseLong(singleSignOnTolerance);
             String signature = null;
             long timestamp = 0L;
-            String unsignedRequest = null;
+            final String unsignedRequest;
             final StringBuffer unsignedRequestBuffer = new StringBuffer();
 
             // - build a request string with sorted params, make sure it's all lowercase
@@ -2475,8 +2479,8 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 throw new InvalidParameterValueException("Account and projectId can't be specified together");
             }
 
-            Account userAccount = null;
-            Domain domain = null;
+            final Account userAccount;
+            final Domain domain;
             if (domainId != null) {
                 userAccount = _accountDao.findActiveAccount(accountName, domainId);
                 domain = _domainDao.findById(domainId);

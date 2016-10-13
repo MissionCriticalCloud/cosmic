@@ -107,7 +107,7 @@ public abstract class APITest {
 
             if (command.equals("login")) {
                 // if it is login call, store cookie
-                String headerName = null;
+                String headerName;
                 for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
                     if (headerName.equals("Set-Cookie")) {
                         String cookie = conn.getHeaderField(i);

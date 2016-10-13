@@ -101,7 +101,7 @@ public class ApiDispatcher {
 
             // Synchronise job on the object if needed
             if (asyncCmd.getJob() != null && asyncCmd.getSyncObjId() != null && asyncCmd.getSyncObjType() != null) {
-                Long queueSizeLimit = null;
+                Long queueSizeLimit;
                 if (asyncCmd.getSyncObjType() != null && asyncCmd.getSyncObjType().equalsIgnoreCase(BaseAsyncCmd.snapshotHostSyncObject)) {
                     queueSizeLimit = _createSnapshotQueueSizeLimit;
                 } else {

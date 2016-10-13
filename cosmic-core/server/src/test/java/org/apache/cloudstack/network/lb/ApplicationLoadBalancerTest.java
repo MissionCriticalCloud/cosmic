@@ -179,7 +179,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
     //Negative test - try to retrieve non-existing lb
     public void searchForNonExistingLoadBalancer() {
         boolean notFound = false;
-        ApplicationLoadBalancerRule rule = null;
+        ApplicationLoadBalancerRule rule;
         try {
             rule = _appLbSvc.getApplicationLoadBalancer(nonExistingLbId);
             if (rule != null) {

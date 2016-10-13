@@ -515,7 +515,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         snapshotResponse.setIntervalType(ApiDBUtils.getSnapshotIntervalTypes(snapshot.getId()));
         snapshotResponse.setState(snapshot.getState());
 
-        SnapshotInfo snapshotInfo = null;
+        SnapshotInfo snapshotInfo;
 
         if (snapshot instanceof SnapshotInfo) {
             snapshotInfo = (SnapshotInfo) snapshot;
@@ -1599,7 +1599,7 @@ public class ApiResponseHelper implements ResponseGenerator {
 
     @Override
     public List<TemplateResponse> createTemplateResponses(final ResponseView view, final VirtualMachineTemplate result, final Long zoneId, final boolean readyOnly) {
-        List<TemplateJoinVO> tvo = null;
+        List<TemplateJoinVO> tvo;
         if (zoneId == null || zoneId == -1 || result.isCrossZones()) {
             tvo = ApiDBUtils.newTemplateView(result);
         } else {
@@ -1801,7 +1801,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setEgressDefaultPolicy(offering.getEgressDefaultPolicy());
         response.setConcurrentConnections(offering.getConcurrentConnections());
         response.setSupportsStrechedL2Subnet(offering.getSupportsStrechedL2());
-        Long so = null;
+        Long so;
         if (offering.getServiceOfferingId() != null) {
             so = offering.getServiceOfferingId();
         } else {
@@ -2149,7 +2149,7 @@ public class ApiResponseHelper implements ResponseGenerator {
 
     @Override
     public List<TemplateResponse> createIsoResponses(final ResponseView view, final VirtualMachineTemplate result, final Long zoneId, final boolean readyOnly) {
-        List<TemplateJoinVO> tvo = null;
+        List<TemplateJoinVO> tvo;
         if (zoneId == null || zoneId == -1) {
             tvo = ApiDBUtils.newTemplateView(result);
         } else {

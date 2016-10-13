@@ -196,7 +196,7 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
                 final UploadStatusCommand cmd = new UploadStatusCommand(volume.getUuid(), EntityType.Volume);
                 if (host != null && host.getManagementServerId() != null) {
                     if (_nodeId == host.getManagementServerId().longValue()) {
-                        Answer answer = null;
+                        Answer answer;
                         try {
                             answer = ep.sendMessage(cmd);
                         } catch (final CloudRuntimeException e) {
@@ -234,7 +234,7 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
                 final UploadStatusCommand cmd = new UploadStatusCommand(template.getUuid(), EntityType.Template);
                 if (host != null && host.getManagementServerId() != null) {
                     if (_nodeId == host.getManagementServerId().longValue()) {
-                        Answer answer = null;
+                        Answer answer;
                         try {
                             answer = ep.sendMessage(cmd);
                         } catch (final CloudRuntimeException e) {

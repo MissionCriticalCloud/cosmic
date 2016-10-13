@@ -37,7 +37,7 @@ public class ParamUnpackWorker implements DispatchWorker {
 
                 // Now that we have an array object, check for a field name in the case of a complex object
                 final int fieldIndex = key.indexOf('.');
-                String fieldName = null;
+                String fieldName;
                 if (fieldIndex < arrayEndIndex) {
                     throw new ServerApiException(ApiErrorCode.MALFORMED_PARAMETER_ERROR, "Unable to decode parameter " + key +
                             "; if specifying an object array, please use parameter[index].field=XXX, e.g. userGroupList[0].group=httpGroup");

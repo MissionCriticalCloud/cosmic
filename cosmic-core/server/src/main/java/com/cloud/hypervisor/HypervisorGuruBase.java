@@ -96,7 +96,7 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         }
 
         // Set GPU details
-        ServiceOfferingDetailsVO offeringDetail = null;
+        ServiceOfferingDetailsVO offeringDetail;
         if ((offeringDetail = _serviceOfferingDetailsDao.findDetail(offering.getId(), GPU.Keys.vgpuType.toString())) != null) {
             final ServiceOfferingDetailsVO groupName = _serviceOfferingDetailsDao.findDetail(offering.getId(), GPU.Keys.pciDevice.toString());
             to.setGpuDevice(_resourceMgr.getGPUDevice(vm.getHostId(), groupName.getValue(), offeringDetail.getValue()));

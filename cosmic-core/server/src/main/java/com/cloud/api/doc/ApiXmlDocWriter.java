@@ -265,8 +265,8 @@ public class ApiXmlDocWriter {
 
     private static void writeCommand(final ObjectOutputStream out, final String command) throws ClassNotFoundException, IOException {
         final Class<?> clas = Class.forName(s_allApiCommands.get(command));
-        ArrayList<Argument> request = new ArrayList<>();
-        ArrayList<Argument> response = new ArrayList<>();
+        ArrayList<Argument> request;
+        ArrayList<Argument> response;
 
         // Create a new command, set name/description/usage
         final Command apiCommand = new Command();
@@ -399,7 +399,7 @@ public class ApiXmlDocWriter {
                         if (superClass != null) {
                             final String superName = superClass.getName();
                             if (superName.equals(BaseResponse.class.getName())) {
-                                ArrayList<Argument> fieldArguments = new ArrayList<>();
+                                ArrayList<Argument> fieldArguments;
                                 final Field[] fields = fieldClass.getDeclaredFields();
                                 fieldArguments = setResponseFields(fields, fieldClass);
                                 respArg.setArguments(fieldArguments);

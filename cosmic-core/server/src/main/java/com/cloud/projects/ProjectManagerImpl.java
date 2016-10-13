@@ -502,8 +502,8 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
     @ActionEvent(eventType = EventTypes.EVENT_PROJECT_INVITATION_UPDATE, eventDescription = "updating project invitation", async = true)
     public boolean updateInvitation(final long projectId, String accountName, final String token, final boolean accept) {
         final Account caller = CallContext.current().getCallingAccount();
-        Long accountId = null;
-        boolean result = true;
+        Long accountId;
+        boolean result;
 
         //if accountname and token are null, default accountname to caller's account name
         if (accountName == null && token == null) {
@@ -533,7 +533,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
         }
 
         //check that invitation exists
-        ProjectInvitationVO invite = null;
+        ProjectInvitationVO invite;
         if (token == null) {
             invite = _projectInvitationDao.findByAccountIdProjectId(accountId, projectId, ProjectInvitation.State.Pending);
         } else {
@@ -552,7 +552,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
                 result = Transaction.execute(new TransactionCallback<Boolean>() {
                     @Override
                     public Boolean doInTransaction(final TransactionStatus status) {
-                        boolean result = true;
+                        boolean result;
 
                         final ProjectInvitation.State newState = accept ? ProjectInvitation.State.Completed : ProjectInvitation.State.Declined;
 
@@ -760,7 +760,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
         return Transaction.execute(new TransactionCallback<Boolean>() {
             @Override
             public Boolean doInTransaction(final TransactionStatus status) {
-                boolean success = true;
+                boolean success;
 
                 //remove account
                 final ProjectAccountVO projectAccount = _projectAccountDao.findByProjectIdAccountId(projectId, accountId);
@@ -995,7 +995,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
                 msg.setContent(content, "text/plain");
                 msg.saveChanges();
 
-                SMTPTransport smtpTrans = null;
+                SMTPTransport smtpTrans;
                 if (_smtpUseAuth) {
                     smtpTrans = new SMTPSSLTransport(_smtpSession, new URLName("smtp", _smtpHost, _smtpPort, null, _smtpUsername, _smtpPassword));
                 } else {

@@ -228,7 +228,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
 
                         //unassign nic secondary ip address
                         s_logger.debug("remove nic " + nic.getId() + " secondary ip ");
-                        List<String> nicSecIps = null;
+                        List<String> nicSecIps;
                         nicSecIps = _nicSecondaryIpDao.getSecondaryIpAddressesForNic(nic.getId());
                         for (final String secIp : nicSecIps) {
                             final IPAddressVO pubIp = _ipAddressDao.findByIpAndSourceNetworkId(nic.getNetworkId(), secIp);

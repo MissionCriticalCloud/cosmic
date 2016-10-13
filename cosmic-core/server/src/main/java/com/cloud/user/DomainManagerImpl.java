@@ -616,7 +616,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         }
 
         // don't remove the domain if there are accounts required cleanup
-        boolean deleteDomainSuccess = true;
+        final boolean deleteDomainSuccess;
         final List<AccountVO> accountsForCleanup = _accountDao.findCleanupsForRemovedAccounts(domainId);
         if (accountsForCleanup.isEmpty()) {
             //release dedication if any, before deleting the domain

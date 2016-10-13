@@ -76,7 +76,7 @@ public class ResourceLimitManagerImplTest extends TestCase {
 
     private void resourceLimitServiceCall(final Long accountId, final Long domainId, final Integer resourceType, final Long max) {
         final String msg = "Update Resource Limit: TEST FAILED";
-        ResourceLimit result = null;
+        ResourceLimit result;
         try {
             result = _resourceLimitService.updateResourceLimit(accountId, domainId, resourceType, max);
             assertFalse(msg, (result != null || (result == null && max != null && max.longValue() == -1L)));

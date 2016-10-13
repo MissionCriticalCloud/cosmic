@@ -341,7 +341,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
             CloudRuntimeException,
             PermissionDeniedException {
         final Account callerAccount = CallContext.current().getCallingAccount();
-        long count = 0;
+        long count;
         final List<ResourceCountVO> counts = new ArrayList<>();
         List<ResourceType> resourceTypes = new ArrayList<>();
 
@@ -391,7 +391,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
     public List<ResourceLimitVO> searchForLimits(final Long id, Long accountId, Long domainId, final Integer type, final Long startIndex, final Long pageSizeVal) {
         final Account caller = CallContext.current().getCallingAccount();
         final List<ResourceLimitVO> limits = new ArrayList<>();
-        boolean isAccount = true;
+        boolean isAccount;
 
         if (!_accountMgr.isAdmin(caller.getId())) {
             accountId = caller.getId();
@@ -551,7 +551,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
             max = limit.getMax().longValue();
         } else {
             // If the account has an no limit set, then return global default account limits
-            Long value = null;
+            Long value;
             if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
                 value = projectResourceLimitMap.get(type);
             } else {
@@ -592,7 +592,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
             max = limit.longValue();
         } else {
             // If the account has an no limit set, then return global default account limits
-            Long value = null;
+            Long value;
             if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
                 value = projectResourceLimitMap.get(type);
             } else {
@@ -640,7 +640,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
             if (limit != null) {
                 max = limit.getMax().longValue();
             } else {
-                Long value = null;
+                Long value;
                 value = domainResourceLimitMap.get(type);
                 if (value != null) {
                     if (value < 0) { // return unlimit if value is set to negative
@@ -733,7 +733,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
                 }
 
                 // check all domains in the account's domain hierarchy
-                Long domainId = null;
+                Long domainId;
                 if (projectFinal != null) {
                     domainId = projectFinal.getDomainId();
                 } else {
@@ -893,7 +893,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
         final Long newCount = Transaction.execute(new TransactionCallback<Long>() {
             @Override
             public Long doInTransaction(final TransactionStatus status) {
-                Long newCount = null;
+                Long newCount;
 
                 // this lock guards against the updates to user_vm, volume, snapshot, public _ip and template table
                 // as any resource creation precedes with the resourceLimitExceeded check which needs this lock too
@@ -1028,7 +1028,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
 
     private long calculatePublicIpForAccount(final long accountId) {
         Long dedicatedCount = 0L;
-        Long allocatedCount = 0L;
+        Long allocatedCount;
 
         final List<VlanVO> dedicatedVlans = _vlanDao.listDedicatedVlans(accountId);
         for (final VlanVO dedicatedVlan : dedicatedVlans) {

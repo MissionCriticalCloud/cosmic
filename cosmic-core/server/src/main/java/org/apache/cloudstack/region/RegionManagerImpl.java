@@ -182,7 +182,7 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
     @Override
     public Account disableAccount(final String accountName, final Long domainId, final Long accountId, final Boolean lockRequested) throws ConcurrentOperationException,
             ResourceUnavailableException {
-        Account account = null;
+        Account account;
         if (lockRequested) {
             account = _accountMgr.lockAccount(accountName, domainId, accountId);
         } else {

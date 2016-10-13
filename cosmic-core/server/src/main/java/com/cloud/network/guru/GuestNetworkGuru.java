@@ -264,7 +264,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             nic.setIsolationUri(network.getBroadcastUri());
             nic.setIPv4Gateway(network.getGateway());
 
-            String guestIp = null;
+            String guestIp;
             if (network.getSpecifyIpRanges()) {
                 _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, nic.getRequestedIPv4(), null);
             } else {

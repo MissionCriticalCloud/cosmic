@@ -326,7 +326,7 @@ public class ApplicationLoadBalancerManagerImpl extends ManagerBase implements A
      * @return
      */
     protected String allocateSourceIpForLbRule(final Scheme scheme, final Network sourceIpNtwk, final String requestedIp) {
-        String sourceIp = null;
+        String sourceIp;
         if (scheme != Scheme.Internal) {
             throw new InvalidParameterValueException("Only scheme " + Scheme.Internal + " is supported");
         } else {

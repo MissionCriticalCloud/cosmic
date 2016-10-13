@@ -496,7 +496,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     public boolean stopVirtualMachine(final long userId, final long vmId) {
-        boolean status = false;
+        boolean status;
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Stopping vm=" + vmId);
         }
@@ -907,7 +907,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final Host host = _hostDao.findById(hostId);
         final String networkTag = _networkModel.getNetworkTag(host.getHypervisorType(), network);
         final PvlanSetupCommand cmd = PvlanSetupCommand.createVmSetup(op, nic.getBroadCastUri(), networkTag, nic.getMacAddress());
-        Answer answer = null;
+        final Answer answer;
         try {
             answer = _agentMgr.send(hostId, cmd);
         } catch (final OperationTimedoutException e) {
@@ -937,7 +937,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         vmNames.add(userVm.getInstanceName());
         final HostVO host = _hostDao.findById(hostId);
 
-        GetVmDiskStatsAnswer diskStatsAnswer = null;
+        final GetVmDiskStatsAnswer diskStatsAnswer;
         try {
             diskStatsAnswer = (GetVmDiskStatsAnswer) _agentMgr.easySend(hostId, new GetVmDiskStatsCommand(vmNames, host.getGuid(), host.getName()));
         } catch (final Exception e) {
@@ -1987,7 +1987,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     "Static NAT rules.");
         }
 
-        boolean nicremoved = false;
+        final boolean nicremoved;
         try {
             nicremoved = _itMgr.removeNicFromVm(vmInstance, nic);
         } catch (final ResourceUnavailableException e) {
@@ -2069,7 +2069,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new CloudRuntimeException("Failed to find a nic profile for the existing default network. This is bad and probably means some sort of configuration corruption");
         }
 
-        Network oldDefaultNetwork = null;
+        final Network oldDefaultNetwork;
         oldDefaultNetwork = _networkModel.getDefaultNetworkForVm(vmId);
         final String oldNicIdString = Long.toString(_networkModel.getDefaultNic(vmId).getId());
         long oldNetworkOfferingId = -1L;
@@ -2089,7 +2089,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         nic = _nicDao.persist(nic);
         existingVO = _nicDao.persist(existingVO);
 
-        Network newdefault = null;
+        Network newdefault;
         newdefault = _networkModel.getDefaultNetworkForVm(vmId);
 
         if (newdefault == null) {
@@ -2783,11 +2783,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         _userDao.findById(userId);
-        boolean status = false;
+        final boolean status;
         try {
             final VirtualMachineEntity vmEntity = _orchSrvc.getVirtualMachine(vm.getUuid());
 
-            if(forced) {
+            if (forced) {
                 status = vmEntity.stopForced(Long.toString(userId));
             } else {
                 status = vmEntity.stop(Long.toString(userId));
@@ -3032,7 +3032,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             final List<PlannerHostReservationVO> reservedHosts = _plannerHostReservationDao.listAllDedicatedHosts();
             boolean srcImplDedicated = false;
             boolean destImplDedicated = false;
-            String msg = null;
+            final String msg;
             for (final PlannerHostReservationVO reservedHost : reservedHosts) {
                 if (reservedHost.getHostId() == srcHostId) {
                     srcImplDedicated = true;
@@ -3554,7 +3554,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                         applicableNetworks.add(network);
                     }
                 } else {
-                    NetworkVO defaultNetwork = null;
+                    final NetworkVO defaultNetwork;
                     final List<NetworkOfferingVO> requiredOfferings = _networkOfferingDao.listByAvailability(Availability.Required, false);
                     if (requiredOfferings.size() < 1) {
                         throw new InvalidParameterValueException("Unable to find network offering with availability=" + Availability.Required
@@ -4052,7 +4052,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 throw new InvalidParameterValueException("Unable to restore VM, please remove VM snapshots before restoring VM");
             }
 
-            VMTemplateVO template = null;
+            final VMTemplateVO template;
             //newTemplateId can be either template or ISO id. In the following snippet based on the vm deployment (from template or ISO) it is handled accordingly
             if (newTemplateId != null) {
                 template = _templateDao.findById(newTemplateId);
@@ -4095,7 +4095,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
 
       /* If new template/ISO is provided allocate a new volume from new template/ISO otherwise allocate new volume from original template/ISO */
-            Volume newVol = null;
+            final Volume newVol;
             if (newTemplateId != null) {
                 if (isISO) {
                     newVol = volumeMgr.allocateDuplicateVolume(root, null);
@@ -4439,7 +4439,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
-        HypervisorType hypervisorType = null;
+        final HypervisorType hypervisorType;
         if (template.getHypervisorType() == null || template.getHypervisorType() == HypervisorType.None) {
             if (hypervisor == null || hypervisor == HypervisorType.None) {
                 throw new InvalidParameterValueException("hypervisor parameter is needed to deploy VM or the hypervisor parameter value passed is invalid");
@@ -4604,7 +4604,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             checkNameForRFCCompliance(hostName);
         }
 
-        String instanceName = null;
+        final String instanceName;
         final String uuidName = _uuidMgr.generateUuid(UserVm.class, customId);
         if (hostName == null) {
             //Generate name using uuid and instance.name global config
@@ -5001,7 +5001,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final List<VolumeVO> volumes = _volsDao.findByInstance(userVm.getId());
-        VmDiskStatisticsVO diskstats = null;
+        VmDiskStatisticsVO diskstats;
         for (final VolumeVO volume : volumes) {
             diskstats = _vmDiskStatsDao.findBy(userVm.getAccountId(), userVm.getDataCenterId(), userVm.getId(), volume.getId());
             if (diskstats == null) {

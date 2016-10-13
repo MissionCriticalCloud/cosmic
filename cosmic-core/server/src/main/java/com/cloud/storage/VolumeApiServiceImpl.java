@@ -264,10 +264,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.volume, displayVolume);
 
         Long zoneId = cmd.getZoneId();
-        Long diskOfferingId = null;
-        DiskOfferingVO diskOffering = null;
+        Long diskOfferingId;
+        DiskOfferingVO diskOffering;
         final Storage.ProvisioningType provisioningType;
-        Long size = null;
+        Long size;
         Long minIops = null;
         Long maxIops = null;
         // Volume VO used for extracting the source template id
@@ -563,7 +563,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     protected VolumeVO createVolumeFromSnapshot(final VolumeVO volume, final long snapshotId, final Long vmId) throws StorageUnavailableException {
-        VolumeInfo createdVolume = null;
+        VolumeInfo createdVolume;
         final SnapshotVO snapshot = _snapshotDao.findById(snapshotId);
         snapshot.getVolumeId();
 
@@ -708,7 +708,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
 
-            VmWorkJobVO placeHolder = null;
+            VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId);
@@ -1130,9 +1130,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_RESIZE, eventDescription = "resizing volume", async = true)
     public VolumeVO resizeVolume(final ResizeVolumeCmd cmd) throws ResourceAllocationException {
-        Long newSize = null;
-        Long newMinIops = null;
-        Long newMaxIops = null;
+        Long newSize;
+        Long newMinIops;
+        Long newMaxIops;
         final boolean shrinkOk = cmd.getShrinkOk();
 
         final VolumeVO volume = _volsDao.findById(cmd.getEntityId());
@@ -1321,7 +1321,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder = null;
+                VmWorkJobVO placeHolder;
 
                 placeHolder = createPlaceHolderWork(userVm.getId());
 
@@ -1619,7 +1619,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder = null;
+                VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateMigrateVolume(vol.getId(), destPool.getId(), liveMigrateVolume);
@@ -1869,7 +1869,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         final Long volumeId = cmmd.getId();
-        VolumeVO volume = null;
+        VolumeVO volume;
 
         if (volumeId != null) {
             volume = _volsDao.findById(volumeId);
@@ -1882,7 +1882,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw new InvalidParameterValueException("Unable to find volume with ID: " + volumeId);
         }
 
-        Long vmId = null;
+        Long vmId;
 
         if (cmmd.getVirtualMachineId() == null) {
             vmId = volume.getInstanceId();
@@ -1934,7 +1934,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
+            VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateDetachVolumeFromVM(vmId, volumeId);
@@ -2092,7 +2092,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder = null;
+                VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateTakeVolumeSnapshot(volumeId, policyId, snapshotId, account, quiescevm);
@@ -2392,7 +2392,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder = null;
+                VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateExtractVolume(volume.getId(), zoneId);
@@ -2447,7 +2447,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final VolumeInfo srcVol = volFactory.getVolume(volumeId);
         final AsyncCallFuture<VolumeApiResult> cvAnswer = volService.copyVolume(srcVol, secStore);
         // Check if you got a valid answer.
-        VolumeApiResult cvResult = null;
+        VolumeApiResult cvResult;
         try {
             cvResult = cvAnswer.get();
         } catch (final InterruptedException e1) {
@@ -2645,7 +2645,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final StoragePool destPool = (StoragePool) dataStoreMgr.getDataStore(destPoolId, DataStoreRole.Primary);
         assert destPool != null;
 
-        Volume newVol = null;
+        Volume newVol;
         try {
             if (liveMigrateVolume) {
                 newVol = liveMigrateVolume(vol, destPool);

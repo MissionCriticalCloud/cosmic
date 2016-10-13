@@ -233,7 +233,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateCreateVMSnapshot(vmId, vmSnapshotId, quiescevm);
@@ -243,7 +243,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         } else {
             final Outcome<VMSnapshot> outcome = createVMSnapshotThroughJobQueue(vmId, vmSnapshotId, quiescevm);
 
-            VMSnapshot result = null;
+            final VMSnapshot result;
             try {
                 result = outcome.get();
             } catch (final InterruptedException e) {
@@ -398,7 +398,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmSnapshot.getVmId());
             try {
                 return orchestrateDeleteVMSnapshot(vmSnapshotId);
@@ -553,7 +553,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
 
-            VmWorkJobVO placeHolder = null;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmSnapshotVo.getVmId());
             try {
                 return orchestrateRevertToVMSnapshot(vmSnapshotId);
@@ -624,7 +624,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("VM Snapshot reverting failed due to vm snapshot is not in the state of Created.");
         }
 
-        UserVmVO vm = null;
+        final UserVmVO vm;
         Long hostId = null;
 
         // start or stop VM first, if revert from stopped state to running state, or from running to stopped
@@ -836,7 +836,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder = null;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateDeleteAllVMSnapshots(vmId, type);

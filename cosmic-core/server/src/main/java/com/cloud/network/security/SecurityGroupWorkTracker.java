@@ -29,7 +29,7 @@ public class SecurityGroupWorkTracker {
     }
 
     public boolean canSend(final long agentId) {
-        int currLength = 0;
+        int currLength;
         synchronized (this) {
             Integer outstanding = _unackedMessages.get(agentId);
             if (outstanding == null) {

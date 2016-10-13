@@ -262,7 +262,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
         return Transaction.execute(new TransactionCallback<Boolean>() {
             @Override
             public Boolean doInTransaction(final TransactionStatus status) {
-                boolean success = true;
+                boolean success;
                 success = _autoScalePolicyDao.remove(id);
                 if (!success) {
                     s_logger.warn("Failed to remove AutoScale Policy db object");
@@ -857,7 +857,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
             throw new InvalidParameterValueException("The Source " + source + " does not exist; Unable to create Counter");
         }
 
-        CounterVO counter = null;
+        CounterVO counter;
 
         s_logger.debug("Adding Counter " + name);
         counter = _counterDao.persist(new CounterVO(src, name, cmd.getValue()));
@@ -928,7 +928,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
         if (counter == null) {
             throw new InvalidParameterValueException("Unable to find counter");
         }
-        ConditionVO condition = null;
+        ConditionVO condition;
 
         condition = _conditionDao.persist(new ConditionVO(cid, threshold, cmd.getEntityOwnerId(), cmd.getDomainId(), op));
         s_logger.info("Successfully created condition with Id: " + condition.getId());
@@ -1183,7 +1183,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
     @Override
     public void cleanUpAutoScaleResources(final Long accountId) {
         // cleans Autoscale VmProfiles, AutoScale Policies and Conditions belonging to an account
-        int count = 0;
+        int count;
         count = _autoScaleVmProfileDao.removeByAccountId(accountId);
         if (count > 0) {
             s_logger.debug("Deleted " + count + " AutoScale Vm Profile for account Id: " + accountId);
@@ -1290,7 +1290,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
                 }
             }
 
-            UserVm vm = null;
+            UserVm vm;
             final IpAddresses addrs = new IpAddresses(null, null);
             if (zone.getNetworkType() == NetworkType.Basic) {
                 vm = _userVmService.createBasicSecurityGroupVirtualMachine(zone, serviceOffering, template, null, owner, "autoScaleVm-" + asGroup.getId() + "-" +

@@ -252,7 +252,7 @@ public class ApiResponseSerializer {
             }
 
             field.setAccessible(true);
-            Object fieldValue = null;
+            Object fieldValue;
             try {
                 fieldValue = field.get(obj);
             } catch (final IllegalArgumentException e) {

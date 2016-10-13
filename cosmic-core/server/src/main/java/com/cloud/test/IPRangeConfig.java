@@ -324,7 +324,7 @@ public class IPRangeConfig {
         final String updateSql = "UPDATE `cloud`.`data_center` set mac_address = mac_address+1 where id=?";
         final Vector<String> problemIPs = new Vector<>();
 
-        Connection conn = null;
+        Connection conn;
         try {
             conn = txn.getConnection();
         } catch (final SQLException e) {
@@ -423,7 +423,7 @@ public class IPRangeConfig {
         final String isPublicIPAllocatedSelectSql = "SELECT * FROM `cloud`.`user_ip_address` WHERE public_ip_address = ? AND vlan_id = ?";
 
         final Vector<String> problemIPs = new Vector<>();
-        Connection conn = null;
+        Connection conn;
         try {
             conn = txn.getConnection();
         } catch (final SQLException e) {
@@ -548,7 +548,7 @@ public class IPRangeConfig {
         if (!validIP(cidrAddress)) {
             return false;
         }
-        int cidrSizeNum = -1;
+        int cidrSizeNum;
 
         try {
             cidrSizeNum = Integer.parseInt(cidrSize);
