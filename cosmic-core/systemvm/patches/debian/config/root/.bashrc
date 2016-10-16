@@ -19,7 +19,21 @@
 
 
 jsoncat() {
-  zcat $1 | python -m json.tool
+  if [ $# -ne 1 ];
+  then
+    echo "usage: jsoncat <file>|list"
+    echo "list will show all files in /var/cache/cloud/processed"
+    echo "<file> is a file in /var/cache/cloud/processed to show"
+    return 1
+  fi
+
+  if [ "$1" == "list" ]
+  then
+    ls -ltr /var/cache/cloud/processed
+    return 0
+  fi
+
+  zcat /var/cache/cloud/processed/$1 | python -m json.tool
 }
 
 replay() {
