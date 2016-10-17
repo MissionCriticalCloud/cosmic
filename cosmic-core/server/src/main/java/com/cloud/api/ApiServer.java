@@ -169,7 +169,6 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
      */
     public static final String CONTROL_CHARACTERS = "[\000-\011\013-\014\016-\037\177]";
     private static final Logger s_logger = LoggerFactory.getLogger(ApiServer.class.getName());
-    private static final Logger s_accessLogger = LoggerFactory.getLogger("apiserver." + ApiServer.class.getName());
     private static final DateFormat DateFormatToUse = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     private static final Map<String, List<Class<?>>> s_apiNameCmdClassMap = new HashMap<>();
     private static final ExecutorService s_executor = new ThreadPoolExecutor(10, 150, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NamedThreadFactory(
@@ -304,7 +303,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             s_logger.trace("Handle asyjob publish event " + jobEvent);
         }
 
-        EventBus eventBus;
+        final EventBus eventBus;
         try {
             eventBus = ComponentContext.getComponent(EventBus.class);
         } catch (final NoSuchBeanDefinitionException nbe) {
@@ -439,7 +438,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 throw e;
             }
         } finally {
-            s_accessLogger.info(sb.toString());
+            s_logger.info(sb.toString());
             CallContext.unregister();
         }
     }
@@ -504,7 +503,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         // BaseAsyncCmd: cmd is processed and submitted as an AsyncJob, job related info is serialized and returned.
         if (cmdObj instanceof BaseAsyncCmd) {
             Long objectId = null;
-            String objectUuid;
+            final String objectUuid;
             if (cmdObj instanceof BaseAsyncCreateCmd) {
                 final BaseAsyncCreateCmd createCmd = (BaseAsyncCreateCmd) cmdObj;
                 _dispatcher.dispatchCreateCmd(createCmd, params);
@@ -645,7 +644,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     private void buildAsyncListResponse(final BaseListCmd command, final Account account) {
         final List<ResponseObject> responses = ((ListResponse) command.getResponseObject()).getResponses();
         if (responses != null && responses.size() > 0) {
-            List<? extends AsyncJob> jobs;
+            final List<? extends AsyncJob> jobs;
 
             // list all jobs for ROOT admin
             if (_accountMgr.isRootAdmin(account.getId())) {
@@ -681,7 +680,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId) throws ServerApiException {
         try {
             String apiKey = null;
-            String secretKey;
+            final String secretKey;
             String signature = null;
             String unsignedRequest = null;
 
@@ -757,7 +756,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 return false; // no signature, bad request
             }
 
-            Date expiresTS;
+            final Date expiresTS;
             // FIXME: Hard coded signature, why not have an enum
             if ("3".equals(signatureVersion)) {
                 // New signature authentication. Check for expire parameter and its validity
@@ -782,7 +781,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
 
             final TransactionLegacy txn = TransactionLegacy.open(TransactionLegacy.CLOUD_DB);
             txn.close();
-            User user;
+            final User user;
             // verify there is a user with this api key
             final Pair<User, Account> userAcctPair = _accountMgr.findUserByApiKey(apiKey);
             if (userAcctPair == null) {
@@ -1004,7 +1003,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     @Override
     public String getSerializedApiError(final int errorCode, final String errorText, final Map<String, Object[]> apiCommandParams, final String responseType) {
         String responseName = null;
-        Class<?> cmdClass;
+        final Class<?> cmdClass;
         String responseText = null;
 
         try {
@@ -1038,7 +1037,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     @Override
     public String getSerializedApiError(final ServerApiException ex, final Map<String, Object[]> apiCommandParams, final String responseType) {
         String responseName = null;
-        Class<?> cmdClass;
+        final Class<?> cmdClass;
         String responseText = null;
 
         if (ex == null) {
@@ -1088,7 +1087,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     public String handleRequest(final Map params, final String responseType, final StringBuilder auditTrailSb) throws ServerApiException {
         checkCharacterInkParams(params);
 
-        String response;
+        final String response;
         String[] command = null;
 
         try {
