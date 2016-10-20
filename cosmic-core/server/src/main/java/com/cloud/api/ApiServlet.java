@@ -43,7 +43,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @Component("apiServlet")
 public class ApiServlet extends HttpServlet {
     public static final Logger s_logger = LoggerFactory.getLogger(ApiServlet.class.getName());
-    private static final Logger s_accessLogger = LoggerFactory.getLogger("apiserver." + ApiServer.class.getName());
     private final static List<String> s_clientAddressHeaders = Collections
             .unmodifiableList(Arrays.asList("X-Forwarded-For",
                     "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR", "Remote_Addr"));
@@ -257,7 +256,7 @@ public class ApiServlet extends HttpServlet {
             s_logger.error("Caught runtime exception while writing api response", e);
             auditTrailSb.append("Caught runtime exception while writing api response");
         } finally {
-            s_accessLogger.info(auditTrailSb.toString());
+            s_logger.info(auditTrailSb.toString());
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("===END=== " + reqStr);
             }
