@@ -50,7 +50,10 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
     private static String virtualHost;
     private static String useSsl;
     // AMQP exchange name where all CloudStack events will be published
-    private static String amqpExchangeName;
+    private static String amqpExchangeType = "topic";
+    private static String amqpExchangeName = "";
+    private static String amqpQueueName = "";
+
     private static Integer retryInterval;
     // hashmap to book keep the registered subscribers
     private static ConcurrentHashMap<String, Ternary<String, Channel, EventSubscriber>> s_subscribers;
@@ -84,6 +87,14 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         RabbitMQEventBus.amqpExchangeName = exchange;
     }
 
+    public static void setQueue(final String amqpQueueName) {
+        RabbitMQEventBus.amqpQueueName = amqpQueueName;
+    }
+
+    public static void setExchangetype(final String amqpExchangeType) {
+        RabbitMQEventBus.amqpExchangeType = amqpExchangeType;
+    }
+
     public static void setRetryInterval(final Integer retryInterval) {
         RabbitMQEventBus.retryInterval = retryInterval;
     }
@@ -100,13 +111,18 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
     @Override
     public void publish(final Event event) throws EventBusException {
 
-        final String routingKey = createRoutingKey(event);
+        String routingKey = createRoutingKey(event);
         final String eventDescription = event.getDescription();
 
         try {
             final Connection connection = getConnection();
             final Channel channel = createChannel(connection);
             createExchange(channel, amqpExchangeName);
+            if(!amqpQueueName.isEmpty()) {
+                createQueue(channel, amqpQueueName);
+                bindQueue(channel, amqpQueueName, amqpExchangeName);
+                routingKey = amqpQueueName;
+            }
             publishEventToExchange(channel, amqpExchangeName, routingKey, eventDescription);
             channel.close();
         } catch (final AlreadyClosedException e) {
@@ -282,9 +298,27 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     private void createExchange(final Channel channel, final String exchangeName) throws IOException {
         try {
-            channel.exchangeDeclare(exchangeName, "topic", true);
+            channel.exchangeDeclare(exchangeName, amqpExchangeType, true);
         } catch (final IOException e) {
             s_logger.warn("Failed to create exchange" + e + " on RabbitMQ server");
+            throw e;
+        }
+    }
+
+    private void createQueue(final Channel channel, final String queueName) throws IOException {
+        try {
+            channel.queueDeclare(queueName, true, false, false, null);
+        } catch (final IOException e) {
+            s_logger.warn("Failed to create queue" + e + " on RabbitMQ server");
+            throw e;
+        }
+    }
+
+    private void bindQueue(final Channel channel, final String queueName, final String exchangeName) throws IOException {
+        try {
+            channel.queueBind(queueName,exchangeName,queueName);
+        } catch (final IOException e) {
+            s_logger.warn("Failed to bind queue" + e + " on RabbitMQ server");
             throw e;
         }
     }
