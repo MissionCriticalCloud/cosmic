@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     private static final Logger s_logger = LoggerFactory.getLogger(RabbitMQEventBus.class);
-    private static final String secureProtocol = "TLSv1";
+    private static String secureProtocol = "TLSv1";
     // AMQP server should consider messages acknowledged once delivered if _autoAck is true
     private static final boolean s_autoAck = true;
     // details of AMQP server
@@ -74,6 +74,26 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     public static void setPort(final Integer port) {
         RabbitMQEventBus.port = port;
+    }
+
+    public static void setSecureProtocol(final String protocol) {
+        RabbitMQEventBus.secureProtocol = protocol;
+    }
+
+    public static void setExchange(final String exchange) {
+        RabbitMQEventBus.amqpExchangeName = exchange;
+    }
+
+    public static void setRetryInterval(final Integer retryInterval) {
+        RabbitMQEventBus.retryInterval = retryInterval;
+    }
+
+    public synchronized static void setVirtualHost(final String virtualHost) {
+        RabbitMQEventBus.virtualHost = virtualHost;
+    }
+
+    public static void setUseSsl(final String useSsl) {
+        RabbitMQEventBus.useSsl = useSsl;
     }
 
     // publish event on to the exchange created on AMQP server
