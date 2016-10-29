@@ -54,8 +54,12 @@ class CsLoadBalancer(CsDataBag):
             ip = path[0]
             port = path[1]
             protocol = path[2]
-            dstport = path[4]
-            if ingress_rules is None:
+            if len(path) > 4:
+                dstport = path[4]
+            else:
+                dstport = None
+
+            if ingress_rules is None or dstport is None:
                 firewall.append(["filter", "", "-A INPUT -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (protocol, ip, port)])
             else:
                 for ingress_rule in ingress_rules:
