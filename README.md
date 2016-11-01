@@ -120,6 +120,12 @@ If you've found an issue that you believe is a security vulnerability in a
 released version of Cosmic, please report it to `int-cloud@schubergphilis.com` with details about the vulnerability, how it
 might be exploited, and any additional information that might be useful.
 
+## Sponsors
+
+The Cosmic team would like to recognize and thank the contributions of the following entities to the success of this project and resulting system:
+* [Schuberg Philis](https://www.schubergphilis.com): who is responsible for the birth of the Cosmic project (and all other related projects, see [vagrant-cloudstack](https://github.com/MissionCriticalCloud/vagrant-cloudstack) or [bubble-blueprint](https://github.com/MissionCriticalCloud/bubble-blueprint) for some examples) and resulting systems, and is relentlessly supporting all the development costs of Cosmic.
+* [JetBrains](https://www.jetbrains.com): who's motto is "Create anything" and by providing our team with free access to their amazing development environment suite (IntelliJ IDEA - Ultimate edition) allows us to create Cosmic.
+
 ## License
 
 Licensed to the Apache Software Foundation (ASF) under one
@@ -141,28 +147,3 @@ under the License.
 
 Please see the [LICENSE](LICENSE) file included in the root directory
 of the source tree for extended license details.
-
-## Notice of Cryptographic Software
-
-This distribution includes cryptographic software. The country in which you currently
-reside may have restrictions on the import, possession, use, and/or re-export to another
-country, of encryption software. BEFORE using any encryption software, please check your
-country's laws, regulations and policies concerning the import, possession, or use, and
-re-export of encryption software, to see if this is permitted. See http://www.wassenaar.org/
-for more information.
-
-The U.S. Government Department of Commerce, Bureau of Industry and Security (BIS), has
-classified this software as Export Commodity Control Number (ECCN) 5D002.C.1, which
-includes information security software using or performing cryptographic functions with
-asymmetric algorithms. The form and manner of this Apache Software Foundation distribution
-makes it eligible for export under the License Exception ENC Technology Software
-Unrestricted (TSU) exception (see the BIS Export Administration Regulations, Section
-740.13) for both object code and source code.
-
-The following provides more details on the included cryptographic software:
-
-* Cosmic makes use of JaSypt cryptographic libraries
-* Cosmic has a system requirement of MySQL, and uses native database encryption functionality.
-* Cosmic makes use of the Bouncy Castle general-purpose encryption library.
-* Cosmic can optionally interacts with and controls OpenSwan-based VPNs.
-* Cosmic has a dependency on and makes use of JSch - a java SSH2 implementation.
