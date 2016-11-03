@@ -412,6 +412,763 @@
             label: 'label.select-view'
         },
         sections: {
+            vpc: {
+                type: 'select',
+                title: 'label.vpc',
+                id: 'vpc',
+                listView: {
+                    id: 'vpc',
+                    label: 'label.vpc',
+                    fields: {
+                        name: {
+                            label: 'label.name'
+                        },
+                        displaytext: {
+                            label: 'label.description',
+                            truncate: true
+                        },
+                        zonename: {
+                            label: 'label.zone',
+                            truncate: true
+                        },
+                        cidr: {
+                            label: 'label.cidr'
+                        },
+                        state: {
+                            label: 'label.state',
+                            indicator: {
+                                'Enabled': 'on',
+                                'Disabled': 'off'
+                            }
+                        }
+                    },
+
+                    advSearchFields: {
+                        name: {
+                            label: 'label.name'
+                        },
+                        zoneid: {
+                            label: 'label.zone',
+                            select: function (args) {
+                                $.ajax({
+                                    url: createURL('listZones'),
+                                    data: {
+                                        listAll: true
+                                    },
+                                    success: function (json) {
+                                        var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
+
+                                        args.response.success({
+                                            data: $.map(zones, function (zone) {
+                                                return {
+                                                    id: zone.id,
+                                                    description: zone.name
+                                                };
+                                            })
+                                        });
+                                    }
+                                });
+                            }
+                        },
+
+                        domainid: {
+                            label: 'label.domain',
+                            select: function (args) {
+                                if (isAdmin() || isDomainAdmin()) {
+                                    $.ajax({
+                                        url: createURL('listDomains'),
+                                        data: {
+                                            listAll: true,
+                                            details: 'min'
+                                        },
+                                        success: function (json) {
+                                            var array1 = [{
+                                                id: '',
+                                                description: ''
+                                            }];
+                                            var domains = json.listdomainsresponse.domain;
+                                            if (domains != null && domains.length > 0) {
+                                                for (var i = 0; i < domains.length; i++) {
+                                                    array1.push({
+                                                        id: domains[i].id,
+                                                        description: domains[i].path
+                                                    });
+                                                }
+                                            }
+                                            array1.sort(function (a, b) {
+                                                return a.description.localeCompare(b.description);
+                                            });
+                                            args.response.success({
+                                                data: array1
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    args.response.success({
+                                        data: null
+                                    });
+                                }
+                            },
+                            isHidden: function (args) {
+                                if (isAdmin() || isDomainAdmin())
+                                    return false;
+                                else
+                                    return true;
+                            }
+                        },
+
+                        account: {
+                            label: 'label.account',
+                            isHidden: function (args) {
+                                if (isAdmin() || isDomainAdmin())
+                                    return false;
+                                else
+                                    return true;
+                            }
+                        },
+                        tagKey: {
+                            label: 'label.tag.key'
+                        },
+                        tagValue: {
+                            label: 'label.tag.value'
+                        }
+                    },
+
+                    dataProvider: function (args) {
+                        var data = {};
+                        listViewDataProvider(args, data);
+
+                        $.ajax({
+                            url: createURL('listVPCs'),
+                            data: data,
+                            success: function (json) {
+                                var items = json.listvpcsresponse.vpc ? json.listvpcsresponse.vpc : {};
+
+                                //If we are coming from Home > Regions, show only regional vpcs
+                                if (args.context.regions)
+                                    items = $.grep(
+                                        items,
+                                        function (vpc, i) {
+                                            return vpc.regionlevelvpc;
+                                        });
+
+                                args.response.success({
+                                    data: items
+                                });
+                            },
+                            error: function (XMLHttpResponse) {
+                                cloudStack.dialog.notice({
+                                    message: parseXMLHttpResponse(XMLHttpResponse)
+                                });
+                                args.response.error();
+                            }
+                        });
+                    },
+                    actions: {
+                        add: {
+                            label: 'label.add.vpc',
+                            messages: {
+                                notification: function (args) {
+                                    return 'label.add.vpc';
+                                }
+                            },
+                            createForm: {
+                                title: 'label.add.vpc',
+                                messages: {
+                                    notification: function (args) {
+                                        return 'label.add.vpc';
+                                    }
+                                },
+                                fields: {
+                                    name: {
+                                        label: 'label.name',
+                                        docID: 'helpVPCName',
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    displaytext: {
+                                        label: 'label.description',
+                                        docID: 'helpVPCDescription',
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    zoneid: {
+                                        label: 'label.zone',
+                                        docID: 'helpVPCZone',
+                                        validation: {
+                                            required: true
+                                        },
+                                        select: function (args) {
+                                            var data = {};
+                                            $.ajax({
+                                                url: createURL('listZones'),
+                                                data: data,
+                                                success: function (json) {
+                                                    var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
+                                                    var advZones = $.grep(zones, function (zone) {
+                                                        return zone.networktype == 'Advanced' && !zone.securitygroupsenabled;
+                                                    });
+                                                    args.response.success({
+                                                        data: $.map(advZones, function (zone) {
+                                                            return {
+                                                                id: zone.id,
+                                                                description: zone.name
+                                                            };
+                                                        })
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    },
+                                    cidr: {
+                                        label: 'label.super.cidr.for.guest.networks',
+                                        docID: 'helpVPCSuperCIDR',
+                                        validation: {
+                                            required: true,
+                                            ipv4cidr: true
+                                        }
+                                    },
+                                    networkdomain: {
+                                        docID: 'helpVPCDomain',
+                                        label: 'label.DNS.domain.for.guest.networks'
+                                        //format: FQDN
+                                    },
+                                    publicLoadBalancerProvider: {
+                                        label: 'label.public.load.balancer.provider',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: 'VpcVirtualRouter',
+                                                description: 'VpcVirtualRouter'
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+                                    vpcoffering: {
+                                        label: 'label.vpc.offering',
+                                        validation: {
+                                            required: true
+                                        },
+
+                                        select: function (args) {
+                                            var data = {};
+                                            $.ajax({
+                                                url: createURL('listVPCOfferings'),
+                                                data: {},
+                                                success: function (json) {
+                                                    var offerings = json.listvpcofferingsresponse.vpcoffering ? json.listvpcofferingsresponse.vpcoffering : [];
+                                                    var filteredofferings = $.grep(offerings, function (offering) {
+                                                        return offering.state == 'Enabled';
+                                                    });
+                                                    args.response.success({
+                                                        data: $.map(filteredofferings, function (vpco) {
+                                                            return {
+                                                                id: vpco.id,
+                                                                description: vpco.name
+                                                            };
+                                                        })
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            },
+                            action: function (args) {
+                                var vpcOfferingName = args.data.vpcoffering
+                                var dataObj = {
+                                    name: args.data.name,
+                                    displaytext: args.data.displaytext,
+                                    zoneid: args.data.zoneid,
+                                    cidr: args.data.cidr,
+                                    vpcofferingid: args.data.vpcoffering
+                                };
+
+                                if (args.data.networkdomain != null && args.data.networkdomain.length > 0)
+                                    $.extend(dataObj, {
+                                        networkdomain: args.data.networkdomain
+                                    });
+
+                                $.ajax({
+                                    url: createURL("createVPC"),
+                                    dataType: "json",
+                                    data: dataObj,
+                                    async: true,
+                                    success: function (json) {
+                                        var jid = json.createvpcresponse.jobid;
+                                        args.response.success({
+                                            _custom: {
+                                                jobId: jid,
+                                                getUpdatedItem: function (json) {
+                                                    return json.queryasyncjobresultresponse.jobresult.vpc;
+                                                }
+                                            }
+                                        });
+                                    },
+                                    error: function (data) {
+                                        args.response.error(parseXMLHttpResponse(data));
+                                    }
+                                });
+
+                            },
+                            notification: {
+                                poll: pollAsyncJobResult
+                            }
+
+                        },
+                        configureVpc: {
+                            label: 'label.configure.vpc',
+                            textLabel: 'label.configure',
+                            action: {
+                                custom: cloudStack.uiCustom.vpc(cloudStack.vpc)
+                            }
+                        }
+                    },
+
+                    detailView: {
+                        name: 'label.details',
+                        actions: {
+                            configureVpc: {
+                                label: 'label.configure',
+                                textLabel: 'label.configure',
+                                action: {
+                                    custom: cloudStack.uiCustom.vpc(cloudStack.vpc)
+                                },
+                                messages: {
+                                    notification: function () {
+                                        return '';
+                                    }
+                                }
+                            },
+
+                            edit: {
+                                label: 'label.edit',
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL('updateVPC'),
+                                        data: {
+                                            id: args.context.vpc[0].id,
+                                            name: args.data.name,
+                                            displaytext: args.data.displaytext
+                                        },
+                                        success: function (json) {
+                                            var jid = json.updatevpcresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        return json.queryasyncjobresultresponse.jobresult.vpc;
+                                                    }
+                                                }
+                                            });
+                                        },
+                                        error: function (data) {
+                                            args.response.error(parseXMLHttpResponse(data));
+                                        }
+                                    });
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                }
+                            },
+
+                            restart: {
+                                label: 'label.restart.vpc',
+                                createForm: {
+                                    title: 'label.restart.vpc',
+                                    desc: function (args) {
+                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
+                                            return 'message.restart.vpc';
+                                        } else {
+                                            return 'message.restart.vpc.remark';
+                                        }
+                                    },
+
+                                    preFilter: function (args) {
+                                        var zoneObj;
+                                        $.ajax({
+                                            url: createURL("listZones&id=" + args.context.vpc[0].zoneid),
+                                            dataType: "json",
+                                            async: false,
+                                            success: function (json) {
+                                                zoneObj = json.listzonesresponse.zone[0];
+                                            }
+                                        });
+
+
+                                        args.$form.find('.form-item[rel=cleanup]').find('input').attr('checked', 'checked'); //checked
+                                        args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
+                                        args.$form.find('.form-item[rel=makeredundant]').find('input').attr('checked', 'checked'); //checked
+                                        args.$form.find('.form-item[rel=makeredundant]').css('display', 'inline-block'); //shown
+
+                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
+                                            args.$form.find('.form-item[rel=makeredundant]').hide();
+                                        } else {
+                                            args.$form.find('.form-item[rel=makeredundant]').show();
+                                        }
+                                    },
+                                    fields: {
+                                        cleanup: {
+                                            label: 'label.clean.up',
+                                            isBoolean: true
+                                        },
+                                        makeredundant: {
+                                            label: 'label.make.redundant',
+                                            isBoolean: true
+                                        }
+                                    }
+                                },
+                                messages: {
+                                    confirm: function (args) {
+                                        return 'message.restart.vpc';
+                                    },
+                                    notification: function (args) {
+                                        return 'label.restart.vpc';
+                                    }
+                                },
+
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL("restartVPC"),
+                                        data: {
+                                            id: args.context.vpc[0].id,
+                                            cleanup: (args.data.cleanup == "on"),
+                                            makeredundant: (args.data.makeredundant == "on")
+                                        },
+                                        success: function (json) {
+                                            var jid = json.restartvpcresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        return json.queryasyncjobresultresponse.jobresult.vpc;
+                                                    }
+                                                }
+                                            });
+                                        },
+                                        error: function (data) {
+                                            args.response.error(parseXMLHttpResponse(data));
+                                        }
+                                    });
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                }
+                            },
+
+                            remove: {
+                                label: 'label.remove.vpc',
+                                messages: {
+                                    confirm: function (args) {
+                                        return 'message.remove.vpc';
+                                    },
+                                    notification: function (args) {
+                                        return 'label.remove.vpc';
+                                    }
+                                },
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL("deleteVPC"),
+                                        data: {
+                                            id: args.context.vpc[0].id
+                                        },
+                                        success: function (json) {
+                                            var jid = json.deletevpcresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid
+                                                }
+                                            });
+                                        },
+                                        error: function (data) {
+                                            args.response.error(parseXMLHttpResponse(data));
+                                        }
+                                    });
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                }
+                            }
+                        },
+
+                        tabFilter: function (args) {
+                            var hiddenTabs = [];
+                            var isRouterOwner = isAdmin();
+                            if (!isRouterOwner)
+                                hiddenTabs.push("router");
+                            return hiddenTabs;
+                        },
+
+                        tabs: {
+                            details: {
+                                title: 'label.details',
+                                fields: [{
+                                    name: {
+                                        label: 'label.name',
+                                        isEditable: true
+                                    }
+                                }, {
+                                    displaytext: {
+                                        label: 'label.description',
+                                        isEditable: true
+                                    },
+                                    account: {
+                                        label: 'label.account'
+                                    },
+                                    domain: {
+                                        label: 'label.domain'
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
+                                    },
+                                    cidr: {
+                                        label: 'label.cidr'
+                                    },
+                                    networkdomain: {
+                                        label: 'label.network.domain'
+                                    },
+                                    state: {
+                                        label: 'label.state'
+                                    },
+                                    ispersistent: {
+                                        label: 'label.persistent',
+                                        converter: function (booleanValue) {
+                                            if (booleanValue == true) {
+                                                return "Yes";
+                                            }
+
+                                            return "No";
+                                        }
+                                    },
+                                    redundantvpcrouter: {
+                                        label: 'label.redundant.vpc',
+                                        converter: function (booleanValue) {
+                                            if (booleanValue == true) {
+                                                return "Yes";
+                                            }
+
+                                            return "No";
+                                        }
+                                    },
+                                    restartrequired: {
+                                        label: 'label.restart.required',
+                                        converter: function (booleanValue) {
+                                            if (booleanValue == true) {
+                                                return "Yes";
+                                            }
+
+                                            return "No";
+                                        }
+                                    },
+                                    id: {
+                                        label: 'label.id'
+                                    }
+                                }],
+
+                                tags: cloudStack.api.tags({
+                                    resourceType: 'Vpc',
+                                    contextId: 'vpc'
+                                }),
+
+                                dataProvider: function (args) {
+                                    $.ajax({
+                                        url: createURL("listVPCs"),
+                                        dataType: "json",
+                                        data: {
+                                            id: args.context.vpc[0].id
+                                        },
+                                        async: true,
+                                        success: function (json) {
+                                            var item = json.listvpcsresponse.vpc[0];
+                                            args.response.success({
+                                                data: item
+                                            });
+                                        }
+                                    });
+                                }
+                            },
+                            router: {
+                                title: 'label.vpc.router.details',
+                                fields: [{
+                                    name: {
+                                        label: 'label.name'
+                                    }
+                                }, {
+                                    state: {
+                                        label: 'label.state'
+                                    },
+                                    hostname: {
+                                        label: 'label.host'
+                                    },
+                                    linklocalip: {
+                                        label: 'label.linklocal.ip'
+                                    },
+                                    isredundantrouter: {
+                                        label: 'label.redundant.router',
+                                        converter: function (booleanValue) {
+                                            if (booleanValue == true) {
+                                                return "Yes";
+                                            }
+                                            return "No";
+                                        }
+                                    },
+                                    redundantstate: {
+                                        label: 'label.redundant.state'
+                                    },
+                                    id: {
+                                        label: 'label.id'
+                                    },
+                                    serviceofferingname: {
+                                        label: 'label.service.offering'
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
+                                    },
+                                    gateway: {
+                                        label: 'label.gateway'
+                                    },
+                                    publicip: {
+                                        label: 'label.public.ip'
+                                    },
+                                    guestipaddress: {
+                                        label: 'label.guest.ip'
+                                    },
+                                    dns1: {
+                                        label: 'label.dns'
+                                    },
+                                    account: {
+                                        label: 'label.account'
+                                    },
+                                    domain: {
+                                        label: 'label.domain'
+                                    }
+                                }],
+
+                                dataProvider: function (args) {
+                                    $.ajax({
+                                        url: createURL("listRouters&listAll=true&vpcid=" + args.context.vpc[0].id),
+                                        dataType: "json",
+                                        async: true,
+                                        success: function (json) {
+                                            for (var i = 0; i < json.listroutersresponse.router.length; i++) {
+                                                var item = json.listroutersresponse.router[i];
+
+                                                args.response.success({
+                                                    actionFilter: cloudStack.sections.system.routerActionFilter,
+                                                    data: item
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            },
+                            staticRoutes: {
+                                title: 'label.static.routes',
+                                custom: function (args) {
+                                    return $('<div>').multiEdit({
+                                        noSelect: true,
+                                        context: args.context,
+                                        fields: {
+                                            cidr: {
+                                                edit: true,
+                                                label: 'label.CIDR.of.destination.network'
+                                            },
+                                            nexthop: {
+                                                edit: true,
+                                                label: 'label.nexthop'
+                                            },
+                                            'add-rule': {
+                                                label: 'label.add.route',
+                                                addButton: true
+                                            }
+                                        },
+
+                                        tags: cloudStack.api.tags({
+                                            resourceType: 'StaticRoute',
+                                            contextId: 'multiRule'
+                                        }),
+
+                                        add: {
+                                            label: 'label.add',
+                                            action: function (args) {
+                                                $.ajax({
+                                                    url: createURL('createStaticRoute'),
+                                                    data: {
+                                                        vpcid: args.context.vpc[0].id,
+                                                        cidr: args.data.cidr,
+                                                        nexthop: args.data.nexthop
+                                                    },
+                                                    success: function (data) {
+                                                        args.response.success({
+                                                            _custom: {
+                                                                jobId: data.createstaticrouteresponse.jobid
+                                                            },
+                                                            notification: {
+                                                                label: 'label.add.static.route',
+                                                                poll: pollAsyncJobResult
+                                                            }
+                                                        });
+                                                    },
+                                                    error: function (data) {
+                                                        args.response.error(parseXMLHttpResponse(data));
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        actions: {
+                                            destroy: {
+                                                label: 'label.remove.static.route',
+                                                action: function (args) {
+                                                    $.ajax({
+                                                        url: createURL('deleteStaticRoute'),
+                                                        data: {
+                                                            id: args.context.multiRule[0].id
+                                                        },
+                                                        dataType: 'json',
+                                                        async: true,
+                                                        success: function (data) {
+                                                            var jobID = data.deletestaticrouteresponse.jobid;
+
+                                                            args.response.success({
+                                                                _custom: {
+                                                                    jobId: jobID
+                                                                },
+                                                                notification: {
+                                                                    label: 'label.remove.static.route',
+                                                                    poll: pollAsyncJobResult
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        },
+                                        dataProvider: function (args) {
+                                            $.ajax({
+                                                url: createURL('listStaticRoutes'),
+                                                data: {
+                                                    vpcid: args.context.vpc[0].id,
+                                                    listAll: true
+                                                },
+                                                success: function (json) {
+                                                    var items = json.liststaticroutesresponse.staticroute;
+                                                    args.response.success({
+                                                        data: items
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             networks: {
                 id: 'networks',
                 type: 'select',
@@ -5147,763 +5904,6 @@
                                             actionFilter: actionFilters.securityGroups
                                         });
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            vpc: {
-                type: 'select',
-                title: 'label.vpc',
-                id: 'vpc',
-                listView: {
-                    id: 'vpc',
-                    label: 'label.vpc',
-                    fields: {
-                        name: {
-                            label: 'label.name'
-                        },
-                        displaytext: {
-                            label: 'label.description',
-                            truncate: true
-                        },
-                        zonename: {
-                            label: 'label.zone',
-                            truncate: true
-                        },
-                        cidr: {
-                            label: 'label.cidr'
-                        },
-                        state: {
-                            label: 'label.state',
-                            indicator: {
-                                'Enabled': 'on',
-                                'Disabled': 'off'
-                            }
-                        }
-                    },
-
-                    advSearchFields: {
-                        name: {
-                            label: 'label.name'
-                        },
-                        zoneid: {
-                            label: 'label.zone',
-                            select: function (args) {
-                                $.ajax({
-                                    url: createURL('listZones'),
-                                    data: {
-                                        listAll: true
-                                    },
-                                    success: function (json) {
-                                        var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
-
-                                        args.response.success({
-                                            data: $.map(zones, function (zone) {
-                                                return {
-                                                    id: zone.id,
-                                                    description: zone.name
-                                                };
-                                            })
-                                        });
-                                    }
-                                });
-                            }
-                        },
-
-                        domainid: {
-                            label: 'label.domain',
-                            select: function (args) {
-                                if (isAdmin() || isDomainAdmin()) {
-                                    $.ajax({
-                                        url: createURL('listDomains'),
-                                        data: {
-                                            listAll: true,
-                                            details: 'min'
-                                        },
-                                        success: function (json) {
-                                            var array1 = [{
-                                                id: '',
-                                                description: ''
-                                            }];
-                                            var domains = json.listdomainsresponse.domain;
-                                            if (domains != null && domains.length > 0) {
-                                                for (var i = 0; i < domains.length; i++) {
-                                                    array1.push({
-                                                        id: domains[i].id,
-                                                        description: domains[i].path
-                                                    });
-                                                }
-                                            }
-                                            array1.sort(function (a, b) {
-                                                return a.description.localeCompare(b.description);
-                                            });
-                                            args.response.success({
-                                                data: array1
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    args.response.success({
-                                        data: null
-                                    });
-                                }
-                            },
-                            isHidden: function (args) {
-                                if (isAdmin() || isDomainAdmin())
-                                    return false;
-                                else
-                                    return true;
-                            }
-                        },
-
-                        account: {
-                            label: 'label.account',
-                            isHidden: function (args) {
-                                if (isAdmin() || isDomainAdmin())
-                                    return false;
-                                else
-                                    return true;
-                            }
-                        },
-                        tagKey: {
-                            label: 'label.tag.key'
-                        },
-                        tagValue: {
-                            label: 'label.tag.value'
-                        }
-                    },
-
-                    dataProvider: function (args) {
-                        var data = {};
-                        listViewDataProvider(args, data);
-
-                        $.ajax({
-                            url: createURL('listVPCs'),
-                            data: data,
-                            success: function (json) {
-                                var items = json.listvpcsresponse.vpc ? json.listvpcsresponse.vpc : {};
-
-                                //If we are coming from Home > Regions, show only regional vpcs
-                                if (args.context.regions)
-                                    items = $.grep(
-                                        items,
-                                        function (vpc, i) {
-                                            return vpc.regionlevelvpc;
-                                        });
-
-                                args.response.success({
-                                    data: items
-                                });
-                            },
-                            error: function (XMLHttpResponse) {
-                                cloudStack.dialog.notice({
-                                    message: parseXMLHttpResponse(XMLHttpResponse)
-                                });
-                                args.response.error();
-                            }
-                        });
-                    },
-                    actions: {
-                        add: {
-                            label: 'label.add.vpc',
-                            messages: {
-                                notification: function (args) {
-                                    return 'label.add.vpc';
-                                }
-                            },
-                            createForm: {
-                                title: 'label.add.vpc',
-                                messages: {
-                                    notification: function (args) {
-                                        return 'label.add.vpc';
-                                    }
-                                },
-                                fields: {
-                                    name: {
-                                        label: 'label.name',
-                                        docID: 'helpVPCName',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
-                                    displaytext: {
-                                        label: 'label.description',
-                                        docID: 'helpVPCDescription',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
-                                    zoneid: {
-                                        label: 'label.zone',
-                                        docID: 'helpVPCZone',
-                                        validation: {
-                                            required: true
-                                        },
-                                        select: function (args) {
-                                            var data = {};
-                                            $.ajax({
-                                                url: createURL('listZones'),
-                                                data: data,
-                                                success: function (json) {
-                                                    var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
-                                                    var advZones = $.grep(zones, function (zone) {
-                                                        return zone.networktype == 'Advanced' && !zone.securitygroupsenabled;
-                                                    });
-                                                    args.response.success({
-                                                        data: $.map(advZones, function (zone) {
-                                                            return {
-                                                                id: zone.id,
-                                                                description: zone.name
-                                                            };
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    },
-                                    cidr: {
-                                        label: 'label.super.cidr.for.guest.networks',
-                                        docID: 'helpVPCSuperCIDR',
-                                        validation: {
-                                            required: true,
-                                            ipv4cidr: true
-                                        }
-                                    },
-                                    networkdomain: {
-                                        docID: 'helpVPCDomain',
-                                        label: 'label.DNS.domain.for.guest.networks'
-                                        //format: FQDN
-                                    },
-                                    publicLoadBalancerProvider: {
-                                        label: 'label.public.load.balancer.provider',
-                                        select: function (args) {
-                                            var items = [];
-                                            items.push({
-                                                id: 'VpcVirtualRouter',
-                                                description: 'VpcVirtualRouter'
-                                            });
-                                            args.response.success({
-                                                data: items
-                                            });
-                                        }
-                                    },
-                                    vpcoffering: {
-                                        label: 'label.vpc.offering',
-                                        validation: {
-                                            required: true
-                                        },
-
-                                        select: function (args) {
-                                            var data = {};
-                                            $.ajax({
-                                                url: createURL('listVPCOfferings'),
-                                                data: {},
-                                                success: function (json) {
-                                                    var offerings = json.listvpcofferingsresponse.vpcoffering ? json.listvpcofferingsresponse.vpcoffering : [];
-                                                    var filteredofferings = $.grep(offerings, function (offering) {
-                                                        return offering.state == 'Enabled';
-                                                    });
-                                                    args.response.success({
-                                                        data: $.map(filteredofferings, function (vpco) {
-                                                            return {
-                                                                id: vpco.id,
-                                                                description: vpco.name
-                                                            };
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            },
-                            action: function (args) {
-                                var vpcOfferingName = args.data.vpcoffering
-                                var dataObj = {
-                                    name: args.data.name,
-                                    displaytext: args.data.displaytext,
-                                    zoneid: args.data.zoneid,
-                                    cidr: args.data.cidr,
-                                    vpcofferingid: args.data.vpcoffering
-                                };
-
-                                if (args.data.networkdomain != null && args.data.networkdomain.length > 0)
-                                    $.extend(dataObj, {
-                                        networkdomain: args.data.networkdomain
-                                    });
-
-                                $.ajax({
-                                    url: createURL("createVPC"),
-                                    dataType: "json",
-                                    data: dataObj,
-                                    async: true,
-                                    success: function (json) {
-                                        var jid = json.createvpcresponse.jobid;
-                                        args.response.success({
-                                            _custom: {
-                                                jobId: jid,
-                                                getUpdatedItem: function (json) {
-                                                    return json.queryasyncjobresultresponse.jobresult.vpc;
-                                                }
-                                            }
-                                        });
-                                    },
-                                    error: function (data) {
-                                        args.response.error(parseXMLHttpResponse(data));
-                                    }
-                                });
-
-                            },
-                            notification: {
-                                poll: pollAsyncJobResult
-                            }
-
-                        },
-                        configureVpc: {
-                            label: 'label.configure.vpc',
-                            textLabel: 'label.configure',
-                            action: {
-                                custom: cloudStack.uiCustom.vpc(cloudStack.vpc)
-                            }
-                        }
-                    },
-
-                    detailView: {
-                        name: 'label.details',
-                        actions: {
-                            configureVpc: {
-                                label: 'label.configure',
-                                textLabel: 'label.configure',
-                                action: {
-                                    custom: cloudStack.uiCustom.vpc(cloudStack.vpc)
-                                },
-                                messages: {
-                                    notification: function () {
-                                        return '';
-                                    }
-                                }
-                            },
-
-                            edit: {
-                                label: 'label.edit',
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL('updateVPC'),
-                                        data: {
-                                            id: args.context.vpc[0].id,
-                                            name: args.data.name,
-                                            displaytext: args.data.displaytext
-                                        },
-                                        success: function (json) {
-                                            var jid = json.updatevpcresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        return json.queryasyncjobresultresponse.jobresult.vpc;
-                                                    }
-                                                }
-                                            });
-                                        },
-                                        error: function (data) {
-                                            args.response.error(parseXMLHttpResponse(data));
-                                        }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            },
-
-                            restart: {
-                                label: 'label.restart.vpc',
-                                createForm: {
-                                    title: 'label.restart.vpc',
-                                    desc: function (args) {
-                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
-                                            return 'message.restart.vpc';
-                                        } else {
-                                            return 'message.restart.vpc.remark';
-                                        }
-                                    },
-
-                                    preFilter: function (args) {
-                                        var zoneObj;
-                                        $.ajax({
-                                            url: createURL("listZones&id=" + args.context.vpc[0].zoneid),
-                                            dataType: "json",
-                                            async: false,
-                                            success: function (json) {
-                                                zoneObj = json.listzonesresponse.zone[0];
-                                            }
-                                        });
-
-
-                                        args.$form.find('.form-item[rel=cleanup]').find('input').attr('checked', 'checked'); //checked
-                                        args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
-                                        args.$form.find('.form-item[rel=makeredundant]').find('input').attr('checked', 'checked'); //checked
-                                        args.$form.find('.form-item[rel=makeredundant]').css('display', 'inline-block'); //shown
-
-                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
-                                            args.$form.find('.form-item[rel=makeredundant]').hide();
-                                        } else {
-                                            args.$form.find('.form-item[rel=makeredundant]').show();
-                                        }
-                                    },
-                                    fields: {
-                                        cleanup: {
-                                            label: 'label.clean.up',
-                                            isBoolean: true
-                                        },
-                                        makeredundant: {
-                                            label: 'label.make.redundant',
-                                            isBoolean: true
-                                        }
-                                    }
-                                },
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.restart.vpc';
-                                    },
-                                    notification: function (args) {
-                                        return 'label.restart.vpc';
-                                    }
-                                },
-
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("restartVPC"),
-                                        data: {
-                                            id: args.context.vpc[0].id,
-                                            cleanup: (args.data.cleanup == "on"),
-                                            makeredundant: (args.data.makeredundant == "on")
-                                        },
-                                        success: function (json) {
-                                            var jid = json.restartvpcresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        return json.queryasyncjobresultresponse.jobresult.vpc;
-                                                    }
-                                                }
-                                            });
-                                        },
-                                        error: function (data) {
-                                            args.response.error(parseXMLHttpResponse(data));
-                                        }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            },
-
-                            remove: {
-                                label: 'label.remove.vpc',
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.remove.vpc';
-                                    },
-                                    notification: function (args) {
-                                        return 'label.remove.vpc';
-                                    }
-                                },
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("deleteVPC"),
-                                        data: {
-                                            id: args.context.vpc[0].id
-                                        },
-                                        success: function (json) {
-                                            var jid = json.deletevpcresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid
-                                                }
-                                            });
-                                        },
-                                        error: function (data) {
-                                            args.response.error(parseXMLHttpResponse(data));
-                                        }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            }
-                        },
-
-                        tabFilter: function (args) {
-                            var hiddenTabs = [];
-                            var isRouterOwner = isAdmin();
-                            if (!isRouterOwner)
-                                hiddenTabs.push("router");
-                            return hiddenTabs;
-                        },
-
-                        tabs: {
-                            details: {
-                                title: 'label.details',
-                                fields: [{
-                                    name: {
-                                        label: 'label.name',
-                                        isEditable: true
-                                    }
-                                }, {
-                                    displaytext: {
-                                        label: 'label.description',
-                                        isEditable: true
-                                    },
-                                    account: {
-                                        label: 'label.account'
-                                    },
-                                    domain: {
-                                        label: 'label.domain'
-                                    },
-                                    zonename: {
-                                        label: 'label.zone'
-                                    },
-                                    cidr: {
-                                        label: 'label.cidr'
-                                    },
-                                    networkdomain: {
-                                        label: 'label.network.domain'
-                                    },
-                                    state: {
-                                        label: 'label.state'
-                                    },
-                                    ispersistent: {
-                                        label: 'label.persistent',
-                                        converter: function (booleanValue) {
-                                            if (booleanValue == true) {
-                                                return "Yes";
-                                            }
-
-                                            return "No";
-                                        }
-                                    },
-                                    redundantvpcrouter: {
-                                        label: 'label.redundant.vpc',
-                                        converter: function (booleanValue) {
-                                            if (booleanValue == true) {
-                                                return "Yes";
-                                            }
-
-                                            return "No";
-                                        }
-                                    },
-                                    restartrequired: {
-                                        label: 'label.restart.required',
-                                        converter: function (booleanValue) {
-                                            if (booleanValue == true) {
-                                                return "Yes";
-                                            }
-
-                                            return "No";
-                                        }
-                                    },
-                                    id: {
-                                        label: 'label.id'
-                                    }
-                                }],
-
-                                tags: cloudStack.api.tags({
-                                    resourceType: 'Vpc',
-                                    contextId: 'vpc'
-                                }),
-
-                                dataProvider: function (args) {
-                                    $.ajax({
-                                        url: createURL("listVPCs"),
-                                        dataType: "json",
-                                        data: {
-                                            id: args.context.vpc[0].id
-                                        },
-                                        async: true,
-                                        success: function (json) {
-                                            var item = json.listvpcsresponse.vpc[0];
-                                            args.response.success({
-                                                data: item
-                                            });
-                                        }
-                                    });
-                                }
-                            },
-                            router: {
-                                title: 'label.vpc.router.details',
-                                fields: [{
-                                    name: {
-                                        label: 'label.name'
-                                    }
-                                }, {
-                                    state: {
-                                        label: 'label.state'
-                                    },
-                                    hostname: {
-                                        label: 'label.host'
-                                    },
-                                    linklocalip: {
-                                        label: 'label.linklocal.ip'
-                                    },
-                                    isredundantrouter: {
-                                        label: 'label.redundant.router',
-                                        converter: function (booleanValue) {
-                                            if (booleanValue == true) {
-                                                return "Yes";
-                                            }
-                                            return "No";
-                                        }
-                                    },
-                                    redundantstate: {
-                                        label: 'label.redundant.state'
-                                    },
-                                    id: {
-                                        label: 'label.id'
-                                    },
-                                    serviceofferingname: {
-                                        label: 'label.service.offering'
-                                    },
-                                    zonename: {
-                                        label: 'label.zone'
-                                    },
-                                    gateway: {
-                                        label: 'label.gateway'
-                                    },
-                                    publicip: {
-                                        label: 'label.public.ip'
-                                    },
-                                    guestipaddress: {
-                                        label: 'label.guest.ip'
-                                    },
-                                    dns1: {
-                                        label: 'label.dns'
-                                    },
-                                    account: {
-                                        label: 'label.account'
-                                    },
-                                    domain: {
-                                        label: 'label.domain'
-                                    }
-                                }],
-
-                                dataProvider: function (args) {
-                                    $.ajax({
-                                        url: createURL("listRouters&listAll=true&vpcid=" + args.context.vpc[0].id),
-                                        dataType: "json",
-                                        async: true,
-                                        success: function (json) {
-                                            for (var i = 0; i < json.listroutersresponse.router.length; i++) {
-                                                var item = json.listroutersresponse.router[i];
-
-                                                args.response.success({
-                                                    actionFilter: cloudStack.sections.system.routerActionFilter,
-                                                    data: item
-                                                });
-                                            }
-                                        }
-                                    });
-                                }
-                            },
-                            staticRoutes: {
-                                title: 'label.static.routes',
-                                custom: function (args) {
-                                    return $('<div>').multiEdit({
-                                        noSelect: true,
-                                        context: args.context,
-                                        fields: {
-                                            cidr: {
-                                                edit: true,
-                                                label: 'label.CIDR.of.destination.network'
-                                            },
-                                            nexthop: {
-                                                edit: true,
-                                                label: 'label.nexthop'
-                                            },
-                                            'add-rule': {
-                                                label: 'label.add.route',
-                                                addButton: true
-                                            }
-                                        },
-
-                                        tags: cloudStack.api.tags({
-                                            resourceType: 'StaticRoute',
-                                            contextId: 'multiRule'
-                                        }),
-
-                                        add: {
-                                            label: 'label.add',
-                                            action: function (args) {
-                                                $.ajax({
-                                                    url: createURL('createStaticRoute'),
-                                                    data: {
-                                                        vpcid: args.context.vpc[0].id,
-                                                        cidr: args.data.cidr,
-                                                        nexthop: args.data.nexthop
-                                                    },
-                                                    success: function (data) {
-                                                        args.response.success({
-                                                            _custom: {
-                                                                jobId: data.createstaticrouteresponse.jobid
-                                                            },
-                                                            notification: {
-                                                                label: 'label.add.static.route',
-                                                                poll: pollAsyncJobResult
-                                                            }
-                                                        });
-                                                    },
-                                                    error: function (data) {
-                                                        args.response.error(parseXMLHttpResponse(data));
-                                                    }
-                                                });
-                                            }
-                                        },
-                                        actions: {
-                                            destroy: {
-                                                label: 'label.remove.static.route',
-                                                action: function (args) {
-                                                    $.ajax({
-                                                        url: createURL('deleteStaticRoute'),
-                                                        data: {
-                                                            id: args.context.multiRule[0].id
-                                                        },
-                                                        dataType: 'json',
-                                                        async: true,
-                                                        success: function (data) {
-                                                            var jobID = data.deletestaticrouteresponse.jobid;
-
-                                                            args.response.success({
-                                                                _custom: {
-                                                                    jobId: jobID
-                                                                },
-                                                                notification: {
-                                                                    label: 'label.remove.static.route',
-                                                                    poll: pollAsyncJobResult
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        },
-                                        dataProvider: function (args) {
-                                            $.ajax({
-                                                url: createURL('listStaticRoutes'),
-                                                data: {
-                                                    vpcid: args.context.vpc[0].id,
-                                                    listAll: true
-                                                },
-                                                success: function (json) {
-                                                    var items = json.liststaticroutesresponse.staticroute;
-                                                    args.response.success({
-                                                        data: items
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
                                 }
                             }
                         }
