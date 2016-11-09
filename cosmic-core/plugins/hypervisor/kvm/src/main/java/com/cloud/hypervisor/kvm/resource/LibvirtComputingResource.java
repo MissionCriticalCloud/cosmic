@@ -13,11 +13,11 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_DHCP_HOST;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_VM;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_TUNNEL;
-import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_RESIZE_VOLUME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SECURITY_GROUP;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_UNAME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_VERSIONS;
 
@@ -1795,7 +1795,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         // add the VNC port passwd here, get the passwd from the vmInstance.
         final String passwd = vmTo.getVncPassword();
-        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, vmTo.getVncAddr(), passwd, null);
+        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, passwd, null);
         devices.addDevice(grap);
 
         final InputDef input = new InputDef("tablet", "usb");

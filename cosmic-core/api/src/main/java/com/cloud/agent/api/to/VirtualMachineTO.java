@@ -34,7 +34,6 @@ public class VirtualMachineTO {
     boolean limitCpuUse;
     boolean enableDynamicallyScaleVm;
     String vncPassword;
-    String vncAddr;
     Map<String, String> params;
     String uuid;
     DiskTO[] disks;
@@ -230,14 +229,6 @@ public class VirtualMachineTO {
 
     public void setVncPassword(final String vncPassword) {
         this.vncPassword = vncPassword;
-    }
-
-    public String getVncAddr() {
-        return vncAddr;
-    }
-
-    public void setVncAddr(final String vncAddr) {
-        this.vncAddr = vncAddr;
     }
 
     public Map<String, String> getDetails() {

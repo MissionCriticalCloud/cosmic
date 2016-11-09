@@ -1262,17 +1262,15 @@ public class LibvirtVmDef {
 
     public static class GraphicDef {
         private final String type;
-        private final String listenAddr;
         private final String passwd;
         private final String keyMap;
         private short port = -2;
         private boolean autoPort = false;
 
-        public GraphicDef(final String type, final short port, final boolean autoPort, final String listenAddr, final String passwd, final String keyMap) {
+        public GraphicDef(final String type, final short port, final boolean autoPort, final String passwd, final String keyMap) {
             this.type = type;
             this.port = port;
             this.autoPort = autoPort;
-            this.listenAddr = listenAddr;
             this.passwd = StringEscapeUtils.escapeXml(passwd);
             this.keyMap = keyMap;
         }
@@ -1286,11 +1284,9 @@ public class LibvirtVmDef {
             } else if (port != -2) {
                 graphicBuilder.append(" port='" + port + "'");
             }
-            if (listenAddr != null) {
-                graphicBuilder.append(" listen='" + listenAddr + "'");
-            } else {
-                graphicBuilder.append(" listen=''");
-            }
+
+            graphicBuilder.append(" listen='0.0.0.0'");
+
             if (passwd != null) {
                 graphicBuilder.append(" passwd='" + passwd + "'");
             } else if (keyMap != null) {
