@@ -168,13 +168,11 @@ public class LibvirtComputingResourceTest {
 
         final String os = "Ubuntu";
 
-        final String vncAddr = "";
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
         final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, speed, minRam, maxRam,
                 BootloaderType.HVM, os, false, false, vncPassword);
-        to.setVncAddr(vncAddr);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
         final LibvirtVmDef vm = lcr.createVmFromSpec(to);
@@ -196,7 +194,7 @@ public class LibvirtComputingResourceTest {
         assertXpath(domainDoc, "/domain/devices/serial/@type", "pty");
         assertXpath(domainDoc, "/domain/devices/serial/target/@port", "0");
         assertXpath(domainDoc, "/domain/devices/graphics/@type", "vnc");
-        assertXpath(domainDoc, "/domain/devices/graphics/@listen", to.getVncAddr());
+        assertXpath(domainDoc, "/domain/devices/graphics/@listen", "0.0.0.0");
         assertXpath(domainDoc, "/domain/devices/graphics/@autoport", "yes");
         assertXpath(domainDoc, "/domain/devices/graphics/@passwd", to.getVncPassword());
 
@@ -269,13 +267,11 @@ public class LibvirtComputingResourceTest {
 
         final String os = "Ubuntu";
 
-        final String vncAddr = "";
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
         final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
-        to.setVncAddr(vncAddr);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
         final LibvirtVmDef vm = lcr.createVmFromSpec(to);
@@ -300,13 +296,11 @@ public class LibvirtComputingResourceTest {
 
         final String os = "Ubuntu";
 
-        final String vncAddr = "";
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
         final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
-        to.setVncAddr(vncAddr);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
         final LibvirtVmDef vm = lcr.createVmFromSpec(to);
@@ -333,13 +327,11 @@ public class LibvirtComputingResourceTest {
 
         final String os = "Ubuntu";
 
-        final String vncAddr = "";
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
         final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
-        to.setVncAddr(vncAddr);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
         final LibvirtVmDef vm = lcr.createVmFromSpec(to);

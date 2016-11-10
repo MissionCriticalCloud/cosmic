@@ -33,7 +33,6 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
     @Override
     public Answer execute(final StartCommand command, final LibvirtComputingResource libvirtComputingResource) {
         final VirtualMachineTO vmSpec = command.getVirtualMachine();
-        vmSpec.setVncAddr(command.getHostIp());
         final String vmName = vmSpec.getName();
         LibvirtVmDef vm = null;
 
@@ -87,7 +86,7 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
                 if (libvirtComputingResource.passCmdLine(vmName, vmSpec.getBootArgs())) {
                     s_logger.debug("Passing cmdline succeeded");
                 } else {
-                    String errorMessage = "Passing cmdline failed, aborting.";
+                    final String errorMessage = "Passing cmdline failed, aborting.";
                     s_logger.debug(errorMessage);
                     return new StartAnswer(command, errorMessage);
                 }
@@ -104,8 +103,8 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
                 s_logger.debug("Starting ssh attempts to " + controlIp);
                 final VirtualRoutingResource virtRouterResource = libvirtComputingResource.getVirtRouterResource();
 
-                if (! virtRouterResource.connect(controlIp, 30, 5000)) {
-                    String errorMessage = "Unable to login to router via linklocal address " + controlIp +
+                if (!virtRouterResource.connect(controlIp, 30, 5000)) {
+                    final String errorMessage = "Unable to login to router via linklocal address " + controlIp +
                             " after 30 tries, aborting.";
                     s_logger.debug(errorMessage);
                     return new StartAnswer(command, errorMessage);
