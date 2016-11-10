@@ -340,6 +340,10 @@ class CsIP:
                         "-m state --state RELATED,ESTABLISHED " +
                         "-j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
 
+        self.fw.append(["mangle", "front",
+                        "-A POSTROUTING " +
+                        "-p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
+
         if self.get_type() in ["public"]:
             self.fw.append(["mangle", "front",
                             "-A PREROUTING " +
@@ -354,9 +358,6 @@ class CsIP:
                             "-A VPN_%s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.address['public_ip']])
             self.fw.append(["mangle", "",
                             "-A VPN_%s -j RETURN" % self.address['public_ip']])
-            self.fw.append(["mangle", "front",
-                            "-A POSTROUTING " +
-                            "-p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
             self.fw.append(["nat", "",
                             "-A POSTROUTING -o eth2 -j SNAT --to-source %s" % self.address['public_ip']])
             self.fw.append(["mangle", "",
@@ -419,6 +420,10 @@ class CsIP:
         self.fw.append(["", "front", "-A OUTPUT -j NETWORK_STATS"])
 
         self.fw.append(["filter", "", "-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+
+        self.fw.append(["mangle", "front",
+                        "-A POSTROUTING " +
+                        "-p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
 
         if self.get_type() in ["guest"]:
             guestNetworkCidr = self.address['network']
