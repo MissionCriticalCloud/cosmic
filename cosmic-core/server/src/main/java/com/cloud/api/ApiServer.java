@@ -39,6 +39,7 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
+import com.google.gson.reflect.TypeToken;
 import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -100,6 +101,7 @@ import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -321,11 +323,11 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         final String info = job.getCmdInfo();
         String cmdEventType = "unknown";
         if (info != null) {
-            final String marker = "\"cmdEventType\"";
-            final int begin = info.indexOf(marker);
-            if (begin >= 0) {
-                cmdEventType = info.substring(begin + marker.length() + 2, info.indexOf(",", begin) - 1);
-
+            Type type = new TypeToken<Map<String, String>>(){}.getType();
+            Map<String, String> cmdInfo = ApiGsonHelper.getBuilder().create().fromJson(info, type);
+            String eventTypeObj = cmdInfo.get("cmdEventType");
+            if (eventTypeObj != null) {
+                cmdEventType = eventTypeObj;
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Retrieved cmdEventType from job info: " + cmdEventType);
                 }
