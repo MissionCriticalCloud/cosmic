@@ -91,9 +91,7 @@ public class ConfigurationDaoImpl extends GenericDaoBase<ConfigurationVO, String
                 configurations = listIncludingRemovedBy(sc);
 
                 for (final ConfigurationVO config : configurations) {
-                    if (config.getValue() != null) {
-                        _configs.put(config.getName(), config.getValue());
-                    }
+                    _configs.put(config.getName(), config.getValue());
                 }
             }
         }
