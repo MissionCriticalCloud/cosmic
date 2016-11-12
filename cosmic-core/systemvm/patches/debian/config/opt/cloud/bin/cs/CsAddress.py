@@ -612,7 +612,10 @@ class CsIP:
         gw = interface.get_gateway()
         logging.info("Interface has the following gateway ==> %s", gw)
 
-        if bag['nw_type'] == "guest" and rip == gw:
+        guest_gw = self.config.cmdline().get_guest_gw()
+        logging.info("Interface has the following gateway ==> %s", guest_gw)
+
+        if bag['nw_type'] == "guest" and (rip == gw or rip == guest_gw):
             return True
         return False
 
