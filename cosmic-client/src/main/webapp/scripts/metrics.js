@@ -137,7 +137,7 @@
 
                                 $.ajax({
                                     url: createURL('listClusters'),
-                                    data: {zoneid: zone.id},
+                                    data: {zoneid: zone.id, pagesize: -1},
                                     success: function (json) {
                                         if (json && json.listclustersresponse && json.listclustersresponse.cluster && json.listclustersresponse.count) {
                                             items[idx].clusters += parseInt(json.listclustersresponse.count);
@@ -147,7 +147,7 @@
                                                 }
                                                 $.ajax({
                                                     url: createURL('listHosts'),
-                                                    data: {clusterid: cluster.id, type: 'routing'},
+                                                    data: {clusterid: cluster.id, type: 'routing', pagesize: -1},
                                                     success: function (json) {
                                                         if (json && json.listhostsresponse && json.listhostsresponse.host && json.listhostsresponse.count) {
                                                             items[idx].hosts += parseInt(json.listhostsresponse.count);
@@ -409,7 +409,7 @@
 
                                 $.ajax({
                                     url: createURL('listHosts'),
-                                    data: {clusterid: cluster.id, type: 'routing'},
+                                    data: {clusterid: cluster.id, type: 'routing', pagesize: -1},
                                     success: function (json) {
                                         if (json && json.listhostsresponse && json.listhostsresponse.host && json.listhostsresponse.count) {
                                             items[idx].hosts += parseInt(json.listhostsresponse.count);
