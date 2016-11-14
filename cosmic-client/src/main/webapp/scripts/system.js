@@ -2464,6 +2464,11 @@
                                                 label: 'label.destroy.router',
                                                 messages: {
                                                     confirm: function (args) {
+                                                        if (args && args.context && args.context.routers[0]) {
+                                                            if (args.context.routers[0].state == 'Running') {
+                                                                return dictionary['message.action.stop.router'] + ' ' + dictionary['message.confirm.destroy.router'];
+                                                            }
+                                                        }
                                                         return 'message.confirm.destroy.router';
                                                     },
                                                     notification: function (args) {
@@ -3631,6 +3636,16 @@
                                                 label: 'label.destroy.router',
                                                 messages: {
                                                     confirm: function (args) {
+                                                        if (args && args.context && args.context.routers[0]) {
+                                                            if (args.context.routers[0].state == 'Running') {
+                                                                return dictionary['message.action.stop.router'] + ' ' + dictionary['message.confirm.destroy.router'];
+                                                            }
+                                                        }
+                                                        if (args && args.context && args.context.routers[0]) {
+                                                            if (args.context.routers[0].state == 'Running') {
+                                                                return dictionary['message.action.stop.router'] + ' ' + dictionary['message.confirm.destroy.router'];
+                                                            }
+                                                        }
                                                         return 'message.confirm.destroy.router';
                                                     },
                                                     notification: function (args) {
@@ -6522,6 +6537,11 @@
                                         label: 'label.destroy.router',
                                         messages: {
                                             confirm: function (args) {
+                                                if (args && args.context && args.context.routers[0]) {
+                                                    if (args.context.routers[0].state == 'Running') {
+                                                        return dictionary['message.action.stop.router'] + ' ' + dictionary['message.confirm.destroy.router'];
+                                                    }
+                                                }
                                                 return 'message.confirm.destroy.router';
                                             },
                                             notification: function (args) {
@@ -14538,8 +14558,9 @@
             allowedActions.push("stop");
 
             allowedActions.push("restart");
-
+            allowedActions.push("remove");
             allowedActions.push("viewConsole");
+
             if (isAdmin())
                 allowedActions.push("migrate");
         } else if (jsonObj.state == 'Stopped') {
