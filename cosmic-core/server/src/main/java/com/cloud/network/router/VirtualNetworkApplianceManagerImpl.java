@@ -612,7 +612,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                         }
                         final Site2SiteVpnConnection.State oldState = conn.getState();
                         final Site2SiteCustomerGateway gw = _s2sCustomerGatewayDao.findById(conn.getCustomerGatewayId());
-                        if (answer.isIPPresent(gw.getGatewayIp())) {
+                        if (answer.isIpPresent(gw.getGatewayIp())) {
                             if (answer.isConnected(gw.getGatewayIp())) {
                                 conn.setState(Site2SiteVpnConnection.State.Connected);
                             } else {
