@@ -626,10 +626,10 @@ public class KvmStorageProcessor implements StorageProcessor {
                     final QemuImgFile srcFile = new QemuImgFile(KvmPhysicalDisk.rbdStringBuilder(primaryPool.getSourceHost(),
                             primaryPool.getSourcePort(), primaryPool.getAuthUserName(),
                             primaryPool.getAuthSecret(), rbdSnapshot));
-                    srcFile.setFormat(PhysicalDiskFormat.RAW);
+                    srcFile.setFormat(snapshotDisk.getFormat());
 
                     final QemuImgFile destFile = new QemuImgFile(snapshotFile);
-                    destFile.setFormat(snapshotDisk.getFormat());
+                    destFile.setFormat(PhysicalDiskFormat.QCOW2);
 
                     logger.debug("Backing up RBD snapshot " + rbdSnapshot + " to " + snapshotFile);
                     final QemuImg q = new QemuImg(cmd.getWaitInMillSeconds());
