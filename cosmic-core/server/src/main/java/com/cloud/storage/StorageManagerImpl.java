@@ -1289,7 +1289,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                 continue;
             }
 
-            s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeOnImageStore.getVolumeId());
+            long volumeId = volumeOnImageStore.getVolumeId();
+            s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeId);
 
             // Remove it from image store
             final ImageStoreEntity secStore = (ImageStoreEntity) _dataStoreMgr.getDataStore(volumeOnImageStore.getDataStoreId(), DataStoreRole.Image);
@@ -1297,6 +1298,10 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
             // Now expunge it from DB since this entry was created only for download purpose
             _volumeStoreDao.expunge(volumeOnImageStore.getId());
+            Volume volume = _volumeDao.findById(volumeId);
+            if (volume != null && volume.getState() == Volume.State.Expunged) {
+                _volumeDao.remove(volumeId);
+            }
         }
 
         // Cleanup expired template URLs
