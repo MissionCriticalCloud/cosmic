@@ -58,12 +58,6 @@ public class CheckS2SVpnConnectionsAnswer extends Answer {
     }
 
     public boolean isIPPresent(String ip) {
-        if (this.getResult()) {
-            Boolean status = ipToConnected.get(ip);
-            if (status != null) {
-                return true;
-            }
-        }
-        return  false;
+        return this.getResult() && ipToConnected.get(ip) != null;
     }
 }
