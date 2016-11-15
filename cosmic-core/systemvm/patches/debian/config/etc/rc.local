@@ -30,6 +30,9 @@ fi
 date > /var/cache/cloud/boot_up_done
 logger -t cloud "Boot up process done"
 
+logger -t cloud "Clearing the cmdline_incoming file"
+rm -f /var/cache/cloud/cmdline_incoming >/dev/null 2>&1
+
 #Restore the persistent iptables nat, rules and filters for IPv4 and IPv6 if they exist
 ipv4="/etc/iptables/router_rules.v4"
 if [ -e $ipv4 ]

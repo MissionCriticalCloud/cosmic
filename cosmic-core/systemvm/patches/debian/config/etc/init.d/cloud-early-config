@@ -122,7 +122,7 @@ get_boot_params() {
         CMDLINE_FILE_INCOMING=/var/cache/cloud/cmdline_incoming
 
         log_it "Waiting for a new ${CMDLINE_FILE_INCOMING} file to arrive.. (dots show progress)"
-        rm -f ${CMDLINE_FILE_INCOMING} >/dev/null 2>&1
+        find ${CMDLINE_FILE_INCOMING} -mmin +10 -type f -delete
         sleep 1
 
         sleep_times=0
