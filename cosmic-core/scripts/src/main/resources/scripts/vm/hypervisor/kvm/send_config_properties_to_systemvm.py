@@ -121,4 +121,6 @@ if __name__ == "__main__":
     compare_write_read(AUTHORIZED_KEYS_FILE_CACHE, write_count, read_count)
 
     # write file when done
-    write_file(CMDLINE_INCOMING, "DONE")
+    write_count = write_file(CMDLINE_INCOMING, "DONE")
+    read_count = read_guest_file(CMDLINE_INCOMING, write_count)
+    compare_write_read(CMDLINE_INCOMING, write_count, read_count)
