@@ -429,6 +429,10 @@ class CsIP:
 
         if self.get_type() in ["guest"]:
             guestNetworkCidr = self.address['network']
+            # jump to egress chain
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
+                            (self.dev, guestNetworkCidr, self.dev)])
+            # jump to ingress chain
             self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
                             (self.dev, self.dev)])
             self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
@@ -448,8 +452,6 @@ class CsIP:
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" %
                             self.dev])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
-                            (self.dev, guestNetworkCidr, self.dev)])
             self.fw.append(["", "front", "-A NETWORK_STATS -o %s" %
                             self.dev])
             self.fw.append(["", "front", "-A NETWORK_STATS -i %s" %
@@ -466,10 +468,16 @@ class CsIP:
                 self.fw.append(["", "front", "-A NETWORK_STATS -o eth1"])
                 self.fw.append(["", "front", "-A NETWORK_STATS -i eth1"])
             else:
-                self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
-                                (self.dev, self.dev)])
+                # create egress chain
+                self.fw.append(["mangle", "", "-N ACL_OUTBOUND_%s" % self.dev])
+                # jump to egress chain
                 self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
                                 (self.dev, guestNetworkCidr, self.dev)])
+                # create ingress chain
+                self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % self.dev])
+                # jump to ingress chain
+                self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
+                                (self.dev, self.dev)])
                 self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
                 self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
 
