@@ -416,6 +416,7 @@ class CsIP:
     def fw_vpcrouter(self):
         if not self.config.is_vpc():
             return
+
         self.fw.append(["mangle", "front", "-A PREROUTING " +
                         "-m state --state RELATED,ESTABLISHED " +
                         "-j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
@@ -428,61 +429,57 @@ class CsIP:
 
         if self.get_type() in ["guest"]:
             guestNetworkCidr = self.address['network']
-            self.fw.append(["filter", "", "-A FORWARD -o %s -j ACL_INBOUND_%s" %
+            # jump to egress chain
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
+                            (self.dev, guestNetworkCidr, self.dev)])
+            # jump to ingress chain
+            self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
                             (self.dev, self.dev)])
-            self.fw.append(
-                ["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.22/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.252/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "front", "-A ACL_INBOUND_%s -d 225.0.0.50/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.22/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.252/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["mangle", "front", "-A ACL_OUTBOUND_%s -d 225.0.0.50/32 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" % (
-                    self.dev, guestNetworkCidr)])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (
-                    self.dev, guestNetworkCidr)])
-
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" % (
-                self.dev, self.address['network'], self.dev)])
-            self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -s %s" %
-                            ("eth1", "eth1", guestNetworkCidr)])
-            self.fw.append(["", "front", "-A NETWORK_STATS_%s -o %s -d %s" %
-                            ("eth1", "eth1", guestNetworkCidr)])
-            self.fw.append(["nat", "front",
-                            "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" %
+            self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.22/32 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.252/32 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 225.0.0.50/32 -j ACCEPT" % self.dev])
+            self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % self.dev])
+            self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.22/32 -j ACCEPT" % self.dev])
+            self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 224.0.0.252/32 -j ACCEPT" % self.dev])
+            self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 225.0.0.50/32 -j ACCEPT" % self.dev])
+            self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 255.255.255.255/32 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" %
+                            (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" %
+                            (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" %
+                            self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
+            self.fw.append(["", "front", "-A NETWORK_STATS -o %s" %
+                            self.dev])
+            self.fw.append(["", "front", "-A NETWORK_STATS -i %s" %
+                            self.dev])
+            self.fw.append(["nat", "front","-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" %
                             (guestNetworkCidr, self.dev, self.address['public_ip'])])
 
         if self.get_type() in ["public"]:
-            self.fw.append(
-                ["mangle", "", "-A FORWARD -j VPN_STATS_%s" % self.dev])
-            self.fw.append(
-                ["mangle", "", "-A VPN_STATS_%s -o %s -m mark --mark 0x525/0xffffffff" % (self.dev, self.dev)])
-            self.fw.append(
-                ["mangle", "", "-A VPN_STATS_%s -i %s -m mark --mark 0x524/0xffffffff" % (self.dev, self.dev)])
-            self.fw.append(
-                ["", "front", "-A FORWARD -j NETWORK_STATS_eth1"])
-
-        self.fw.append(["", "", "-A NETWORK_STATS -i eth0 -o eth2 -p tcp"])
-        self.fw.append(["", "", "-A NETWORK_STATS -i eth2 -o eth0 -p tcp"])
-        self.fw.append(["", "", "-A NETWORK_STATS ! -i eth0 -o eth2 -p tcp"])
-        self.fw.append(["", "", "-A NETWORK_STATS -i eth2 ! -o eth0 -p tcp"])
+            guestNetworkCidr = self.address['network']
+            if self.dev == 'eth1':
+                self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_eth1"])
+                self.fw.append(["mangle", "", "-A VPN_STATS_eth1 -o eth1 -m mark --mark 0x525/0xffffffff"])
+                self.fw.append(["mangle", "", "-A VPN_STATS_eth1 -i eth1 -m mark --mark 0x524/0xffffffff"])
+                self.fw.append(["", "front", "-A NETWORK_STATS -o eth1"])
+                self.fw.append(["", "front", "-A NETWORK_STATS -i eth1"])
+            else:
+                # create egress chain
+                self.fw.append(["mangle", "", "-N ACL_OUTBOUND_%s" % self.dev])
+                # jump to egress chain
+                self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
+                                (self.dev, guestNetworkCidr, self.dev)])
+                # create ingress chain
+                self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % self.dev])
+                # jump to ingress chain
+                self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
+                                (self.dev, self.dev)])
+                self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
+                self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
 
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.18/32 -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.22/32 -j ACCEPT"])
