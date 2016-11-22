@@ -105,7 +105,6 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -243,7 +242,7 @@ public class CommandSetupHelper {
         final NicProfile nicProfile = new NicProfile(nic, guestNetwork, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(guestNetwork.getId(),
                 router.getId()), _networkModel.isSecurityGroupSupportedInNetwork(guestNetwork), _networkModel.getNetworkTag(router.getHypervisorType(), guestNetwork));
         final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
-        String maxconn;
+        final String maxconn;
         if (offering.getConcurrentConnections() == null) {
             maxconn = _configDao.getValue(Config.NetworkLBHaproxyMaxConn.key());
         } else {
@@ -276,7 +275,7 @@ public class CommandSetupHelper {
             }
         }
 
-        SetPortForwardingRulesCommand cmd;
+        final SetPortForwardingRulesCommand cmd;
 
         if (router.getVpcId() != null) {
             cmd = new SetPortForwardingRulesVpcCommand(rulesTO);
@@ -436,13 +435,10 @@ public class CommandSetupHelper {
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
             final List<PublicIpAddress> ipAddrList = vlanAndIp.getValue();
             // Source nat ip address should always be sent first
-            Collections.sort(ipAddrList, new Comparator<PublicIpAddress>() {
-                @Override
-                public int compare(final PublicIpAddress o1, final PublicIpAddress o2) {
-                    final boolean s1 = o1.isSourceNat();
-                    final boolean s2 = o2.isSourceNat();
-                    return s1 ^ s2 ? s1 ^ true ? 1 : -1 : 0;
-                }
+            Collections.sort(ipAddrList, (o1, o2) -> {
+                final boolean s1 = o1.isSourceNat();
+                final boolean s2 = o2.isSourceNat();
+                return (s1 ^ s2) ? (!s1 ? 1 : -1) : 0;
             });
 
             // Get network rate - required for IpAssoc
@@ -451,26 +447,20 @@ public class CommandSetupHelper {
 
             final IpAddressTO[] ipsToSend = new IpAddressTO[ipAddrList.size()];
             int i = 0;
-            boolean firstIP = true;
 
             for (final PublicIpAddress ipAddr : ipAddrList) {
 
                 final boolean add = ipAddr.getState() == IpAddress.State.Releasing ? false : true;
-                boolean sourceNat = ipAddr.isSourceNat();
-                /* enable sourceNAT for the first ip of the public interface */
-                if (firstIP) {
-                    sourceNat = true;
-                }
+                final boolean sourceNat = ipAddr.isSourceNat();
                 final String vlanId = ipAddr.getVlanTag();
                 final String vlanGateway = ipAddr.getGateway();
                 final String vlanNetmask = ipAddr.getNetmask();
-                String vifMacAddress;
+                final String vifMacAddress;
                 // For non-source nat IP, set the mac to be something based on
                 // first public nic's MAC
                 // We cannot depend on first ip because we need to deal with
                 // first ip of other nics
                 if (router.getVpcId() != null) {
-                    //vifMacAddress = NetUtils.generateMacOnIncrease(baseMac, ipAddr.getVlanId());
                     vifMacAddress = ipAddr.getMacAddress();
                 } else {
                     if (!sourceNat && ipAddr.getVlanId() != 0) {
@@ -481,19 +471,12 @@ public class CommandSetupHelper {
                 }
 
                 final String ipAddress = ipAddr.getAddress().addr();
-                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, firstIP, sourceNat, vlanId, vlanGateway, vlanNetmask,
+                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, false, sourceNat, vlanId, vlanGateway, vlanNetmask,
                         vifMacAddress, networkRate, ipAddr.isOneToOneNat());
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
                 ipsToSend[i++] = ip;
-                /*
-                 * send the firstIP = true for the first Add, this is to create
-                 * primary on interface
-                 */
-                if (!firstIP || add) {
-                    firstIP = false;
-                }
             }
 
             Long associatedWithNetworkId = ipAddrList.get(0).getAssociatedWithNetworkId();
