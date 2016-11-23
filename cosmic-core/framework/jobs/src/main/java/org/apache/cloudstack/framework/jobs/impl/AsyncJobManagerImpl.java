@@ -27,6 +27,7 @@ import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.api.ApiErrorCode;
+import org.apache.cloudstack.api.response.ExceptionResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
@@ -61,6 +62,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -260,7 +262,10 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                             jobDispatcher.runJob(job);
                         } else {
                             s_logger.error("Unable to find job dispatcher, job will be cancelled");
-                            completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
+                            final ExceptionResponse response = new ExceptionResponse();
+                            response.setErrorCode(ApiErrorCode.INTERNAL_ERROR.getHttpCode());
+                            response.setErrorText("Unable to find job dispatcher, job will be cancelled");
+                            completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), JobSerializerHelper.toSerializedString(response));
                         }
                     }
 
@@ -269,7 +274,10 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                     }
                 } catch (final Throwable e) {
                     s_logger.error("Unexpected exception", e);
-                    completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), null);
+                    final ExceptionResponse response = new ExceptionResponse();
+                    response.setErrorCode(ApiErrorCode.INTERNAL_ERROR.getHttpCode());
+                    response.setErrorText(ExceptionUtils.getRootCauseMessage(e));
+                    completeAsyncJob(job.getId(), JobInfo.Status.FAILED, ApiErrorCode.INTERNAL_ERROR.getHttpCode(), JobSerializerHelper.toSerializedString(response));
                 } finally {
                     // guard final clause as well
                     try {
