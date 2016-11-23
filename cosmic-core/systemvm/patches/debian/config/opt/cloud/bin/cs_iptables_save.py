@@ -179,6 +179,7 @@ class Tables(UserDict):
                         poli = self.data[key].poli[chain]
                         print(":%s %s [0:0]" % (chain, poli), file=f)
                     for chain in self.data[key].values():
+                        elem = None
                         for elem in chain:
                             print(elem, file=f)
                         # not really the correct place for this, but for now it is the only working place.
