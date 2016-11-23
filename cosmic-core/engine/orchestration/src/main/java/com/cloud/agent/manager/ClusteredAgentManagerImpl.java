@@ -625,15 +625,6 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
         }
     }
 
-    // notifies MS peers to schedule a host scan task immediately, triggered during addHost operation
-    public void notifyNodesInClusterToScheduleHostScanTask() {
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Notifying other MS nodes to run host scan task");
-        }
-        final Command[] cmds = new Command[]{new ScheduleHostScanTaskCommand()};
-        _clusterMgr.broadcast(0, _gson.toJson(cmds));
-    }
-
     public String findPeer(final long hostId) {
         return getPeerName(hostId);
     }
@@ -763,30 +754,6 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
     protected static void logI(final byte[] bytes, final String msg) {
         s_logger.info("Seq " + Request.getAgentId(bytes) + "-" + Request.getSequence(bytes) + ": MgmtId " + Request.getManagementServerId(bytes) + ": " +
                 (Request.isRequest(bytes) ? "Req: " : "Resp: ") + msg);
-    }
-
-    public void closePeer(final String peerName) {
-        synchronized (_peers) {
-            final SocketChannel ch = _peers.get(peerName);
-            if (ch != null) {
-                try {
-                    ch.close();
-                } catch (final IOException e) {
-                    s_logger.warn("Unable to close peer socket connection to " + peerName);
-                }
-            }
-            _peers.remove(peerName);
-            _sslEngines.remove(peerName);
-        }
-    }
-
-    public SocketChannel connectToPeer(final long hostId, final SocketChannel prevCh) {
-        final String peerName = getPeerName(hostId);
-        if (peerName == null) {
-            return null;
-        }
-
-        return connectToPeer(peerName, prevCh);
     }
 
     @Override
