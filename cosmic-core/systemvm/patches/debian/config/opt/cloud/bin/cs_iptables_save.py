@@ -182,7 +182,7 @@ class Tables(UserDict):
                         for elem in chain:
                             print(elem, file=f)
                         # not really the correct place for this, but for now it is the only working place.
-                        if key == "filter" and elem.startswith("INPUT",3):
+                        if (key == "filter") and (elem is not None) and elem.startswith("INPUT", 3):
                             print("-A INPUT -m limit --limit 2/second -j LOG --log-prefix \"iptables denied: [input]\" --log-level 4", file=f)
                     print("COMMIT", file=f)
 
