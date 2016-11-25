@@ -11,6 +11,7 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Network;
 import com.cloud.offering.DiskOfferingInfo;
@@ -95,7 +96,7 @@ public interface VirtualMachineManager extends Manager {
 
     void migrateAway(String vmUuid, long hostId) throws InsufficientServerCapacityException;
 
-    void migrate(String vmUuid, long srcHostId, DeployDestination dest) throws ResourceUnavailableException, ConcurrentOperationException;
+    void migrate(String vmUuid, long srcHostId, DeployDestination dest) throws ResourceUnavailableException, ConcurrentOperationException, VirtualMachineMigrationException;
 
     void migrateWithStorage(String vmUuid, long srcId, long destId, Map<Long, Long> volumeToPool) throws ResourceUnavailableException, ConcurrentOperationException;
 

@@ -85,6 +85,7 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.gpu.dao.VGPUTypesDao;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.ha.HighAvailabilityManager.WorkType;
@@ -3736,7 +3737,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     @Override
     public void migrate(final String vmUuid, final long srcHostId, final DeployDestination dest)
-            throws ResourceUnavailableException, ConcurrentOperationException {
+            throws ResourceUnavailableException, ConcurrentOperationException, VirtualMachineMigrationException {
 
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
@@ -3768,10 +3769,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     throw (ResourceUnavailableException) jobResult;
                 } else if (jobResult instanceof ConcurrentOperationException) {
                     throw (ConcurrentOperationException) jobResult;
-                } else if (jobResult instanceof RuntimeException) {
-                    throw (RuntimeException) jobResult;
                 } else if (jobResult instanceof Throwable) {
-                    throw new RuntimeException("Unexpected exception", (Throwable) jobResult);
+                    Throwable t = (Throwable) jobResult;
+                    throw new VirtualMachineMigrationException(t.getMessage(), t);
                 }
             }
         }

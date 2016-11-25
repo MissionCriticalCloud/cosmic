@@ -90,51 +90,52 @@ var pollAsyncJobResult = function (args) {
             var result = json.queryasyncjobresultresponse;
             if (result.jobstatus == 0) {
                 return; //Job has not completed
-            } else {
-                if (result.jobstatus == 1) { // Succeeded
-                    if (args._custom.getUpdatedItem != null && args._custom.getActionFilter != null) {
-                        args.complete({
-                            data: args._custom.getUpdatedItem(json),
-                            actionFilter: args._custom.getActionFilter()
-                        });
-                    } else if (args._custom.getUpdatedItem != null && args._custom.getActionFilter == null) {
-                        args.complete({
-                            data: args._custom.getUpdatedItem(json)
-                        });
-                    } else {
-                        args.complete({
-                            data: json.queryasyncjobresultresponse.jobresult
-                        });
-                    }
-
-                    if (args._custom.fullRefreshAfterComplete == true) {
-                        setTimeout(function () {
-                            $(window).trigger('cloudStack.fullRefresh');
-                        }, 500);
-                    }
-
-                    if (args._custom.onComplete) {
-                        args._custom.onComplete(json, args._custom);
-                    }
-                } else if (result.jobstatus == 2) { // Failed
-                    var msg = (result.jobresult.errortext == null) ? "" : result.jobresult.errortext;
-                    if (args._custom.getUpdatedItemWhenAsyncJobFails != null && args._custom.getActionFilter != null) {
-                        args.error({
-                            message: msg,
-                            updatedData: args._custom.getUpdatedItemWhenAsyncJobFails(),
-                            actionFilter: args._custom.getActionFilter()
-                        });
-                    } else if (args._custom.getUpdatedItemWhenAsyncJobFails != null && args._custom.getActionFilter == null) {
-                        args.error({
-                            message: msg,
-                            updatedData: args._custom.getUpdatedItemWhenAsyncJobFails()
-                        });
-                    } else {
-                        args.error({
-                            message: msg
-                        });
-                    }
+            } else if (result.jobstatus == 1) { // Succeeded
+                if (args._custom.getUpdatedItem != null && args._custom.getActionFilter != null) {
+                    args.complete({
+                        data: args._custom.getUpdatedItem(json),
+                        actionFilter: args._custom.getActionFilter()
+                    });
+                } else if (args._custom.getUpdatedItem != null && args._custom.getActionFilter == null) {
+                    args.complete({
+                        data: args._custom.getUpdatedItem(json)
+                    });
+                } else {
+                    args.complete({
+                        data: json.queryasyncjobresultresponse.jobresult
+                    });
                 }
+
+                if (args._custom.fullRefreshAfterComplete == true) {
+                    setTimeout(function () {
+                        $(window).trigger('cloudStack.fullRefresh');
+                    }, 500);
+                }
+
+                if (args._custom.onComplete) {
+                    args._custom.onComplete(json, args._custom);
+                }
+            } else if (result.jobstatus == 2) { // Failed
+                var msg = (typeof result.jobresult.errortext !== 'undefined') ? result.jobresult.errortext : 'Job failed.';
+                if (args._custom.getUpdatedItemWhenAsyncJobFails != null && args._custom.getActionFilter != null) {
+                    args.error({
+                        message: msg,
+                        updatedData: args._custom.getUpdatedItemWhenAsyncJobFails(),
+                        actionFilter: args._custom.getActionFilter()
+                    });
+                } else if (args._custom.getUpdatedItemWhenAsyncJobFails != null && args._custom.getActionFilter == null) {
+                    args.error({
+                        message: msg,
+                        updatedData: args._custom.getUpdatedItemWhenAsyncJobFails()
+                    });
+                } else {
+                    args.error({
+                        message: msg
+                    });
+                }
+                setTimeout(function () {
+                    $(window).trigger('cloudStack.fullRefresh');
+                }, 500);
             }
         },
         error: function (XMLHttpResponse) {
