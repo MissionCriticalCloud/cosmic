@@ -221,14 +221,14 @@ class TestRouterDHCPHosts(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 router.linklocalip,
-                "cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $2}'" % (vm.nic[0].ipaddress))
+                "cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}'" % (vm.nic[0].ipaddress))
         except KeyError:
             self.skipTest(
                 "Provide a marvin config file with host\
                         credentials to run %s" %
                 self._testMethodName)
 
-        self.logger.debug("cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $2}' RESULT IS ==> %s" % (vm.nic[0].ipaddress, result))
+        self.logger.debug("cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}' RESULT IS ==> %s" % (vm.nic[0].ipaddress, result))
         res = str(result)
 
         self.assertEqual(

@@ -8,6 +8,7 @@ from cs.CsDatabag import CsDataBag
 
 LEASES = "/var/lib/misc/dnsmasq.leases"
 DHCP_HOSTS = "/etc/dhcphosts.txt"
+DHCP_OPTS = "/etc/dhcpopts.txt"
 CLOUD_CONF = "/etc/dnsmasq.d/cloud.conf"
 
 
@@ -20,14 +21,19 @@ class CsDhcp(CsDataBag):
         self.devinfo = CsHelper.get_device_info()
         self.preseed()
         self.cloud = CsFile(DHCP_HOSTS)
+        self.dhcp_opts = CsFile(DHCP_OPTS)
         self.conf = CsFile(CLOUD_CONF)
 
         self.cloud.repopulate()
+        self.dhcp_opts.repopulate()
 
         for item in self.dbag:
             if item == "id":
                 continue
             self.add(self.dbag[item])
+            if self.dbag[item]['default_gateway'] == "0.0.0.0":
+                self.add_dhcp_opts(self.dbag[item])
+
         self.write_hosts()
 
         if self.cloud.is_changed():
@@ -37,6 +43,7 @@ class CsDhcp(CsDataBag):
 
         self.conf.commit()
         self.cloud.commit()
+        self.dhcp_opts.commit()
 
         # We restart DNSMASQ every time the configure.py is called in order to avoid lease problems.
         # But only do that on the master or else VMs will get leases from the backup resulting in
@@ -110,7 +117,9 @@ class CsDhcp(CsDataBag):
 
     def add(self, entry):
         self.add_host(entry['ipv4_adress'], entry['host_name'])
-        self.cloud.add("%s,%s,%s,infinite" % (entry['mac_address'],
+        tag = "set:" + str(entry['ipv4_adress']).replace(".","_")
+        self.cloud.add("%s,%s,%s,%s,infinite" % (entry['mac_address'],
+                                              tag,
                                               entry['ipv4_adress'],
                                               entry['host_name']))
         i = IPAddress(entry['ipv4_adress'])
@@ -120,6 +129,12 @@ class CsDhcp(CsDataBag):
                 v['dnsmasq'] = True
                 # Virtual Router
                 v['gateway'] = entry['default_gateway']
+
+    def add_dhcp_opts(self, entry):
+        tag = str(entry['ipv4_adress']).replace(".","_")
+        self.dhcp_opts.add("%s,%s" % (tag, 3))
+        self.dhcp_opts.add("%s,%s" % (tag, 6))
+        self.dhcp_opts.add("%s,%s" % (tag, 15))
 
     def add_host(self, ip, hosts):
         self.hosts[ip] = hosts
