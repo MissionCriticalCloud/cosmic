@@ -1,6 +1,8 @@
 package org.apache.cloudstack.api;
 
-public interface ResponseObject {
+import java.io.Serializable;
+
+public interface ResponseObject extends Serializable {
     /**
      * Get the name of the API response
      *
