@@ -125,7 +125,7 @@ class CsFile:
             print ' line = ' + line
             if line.lstrip().startswith(ignoreLinesStartWith):
                 continue
-            if re.search(search, line):
+            if search in line:
                 found = True
                 break
 
@@ -138,7 +138,7 @@ class CsFile:
         for index, line in enumerate(self.new_config):
             if line.lstrip().startswith("#"):
                 continue
-            if not re.search(search, line):
+            if search not in line:
                 temp_config.append(line)
 
         self.new_config = list(temp_config)
