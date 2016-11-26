@@ -38,7 +38,7 @@ public abstract class VifDriverBase implements VifDriver {
             }
         }
 
-        if (libvirtComputingResource.isGuestPvEnabled(platformEmulator)) {
+        if (libvirtComputingResource.isGuestVirtIoCapable(platformEmulator)) {
             return LibvirtVmDef.InterfaceDef.NicModel.VIRTIO;
         } else {
             return LibvirtVmDef.InterfaceDef.NicModel.E1000;

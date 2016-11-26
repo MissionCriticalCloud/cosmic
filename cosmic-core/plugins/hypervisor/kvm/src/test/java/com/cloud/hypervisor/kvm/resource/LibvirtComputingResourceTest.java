@@ -2711,7 +2711,7 @@ public class LibvirtComputingResourceTest {
 
             when(libvirtComputingResource.getVifDriver(nic.getType())).thenReturn(vifDriver);
 
-            when(vifDriver.plug(nic, "Other PV", "")).thenReturn(interfaceDef);
+            when(vifDriver.plug(nic, "Default - VirtIO capable OS (64-bit)", "")).thenReturn(interfaceDef);
             when(interfaceDef.toString()).thenReturn("Interface");
 
             final String interfaceDefStr = interfaceDef.toString();
@@ -2733,7 +2733,7 @@ public class LibvirtComputingResourceTest {
             verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
             verify(libvirtComputingResource, times(1)).getDomain(conn, instanceName);
             verify(libvirtComputingResource, times(1)).getVifDriver(nic.getType());
-            verify(vifDriver, times(1)).plug(nic, "Other PV", "");
+            verify(vifDriver, times(1)).plug(nic, "Default - VirtIO capable OS (64-bit)", "");
         } catch (final LibvirtException e) {
             fail(e.getMessage());
         } catch (final InternalErrorException e) {
@@ -2805,7 +2805,7 @@ public class LibvirtComputingResourceTest {
 
             when(libvirtComputingResource.getVifDriver(nic.getType())).thenReturn(vifDriver);
 
-            when(vifDriver.plug(nic, "Other PV", "")).thenThrow(InternalErrorException.class);
+            when(vifDriver.plug(nic, "Default - VirtIO capable OS (64-bit)", "")).thenThrow(InternalErrorException.class);
         } catch (final LibvirtException e) {
             fail(e.getMessage());
         } catch (final InternalErrorException e) {
@@ -2823,7 +2823,7 @@ public class LibvirtComputingResourceTest {
             verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
             verify(libvirtComputingResource, times(1)).getDomain(conn, instanceName);
             verify(libvirtComputingResource, times(1)).getVifDriver(nic.getType());
-            verify(vifDriver, times(1)).plug(nic, "Other PV", "");
+            verify(vifDriver, times(1)).plug(nic, "Default - VirtIO capable OS (64-bit)", "");
         } catch (final LibvirtException e) {
             fail(e.getMessage());
         } catch (final InternalErrorException e) {
