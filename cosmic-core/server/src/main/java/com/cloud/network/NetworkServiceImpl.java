@@ -1625,8 +1625,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 restartNetwork = true;
                 networkOfferingChanged = true;
 
-                //Setting the new network's isReduntant to the new network offering's RedundantRouter.
-                network.setIsReduntant(_networkOfferingDao.findById(networkOfferingId).getRedundantRouter());
+                //Setting the new network's isRedundant to the new network offering's RedundantRouter.
+                network.setIsRedundant(_networkOfferingDao.findById(networkOfferingId).getRedundantRouter());
             }
         }
 

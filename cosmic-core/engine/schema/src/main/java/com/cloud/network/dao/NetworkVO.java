@@ -556,7 +556,7 @@ public class NetworkVO implements Network {
         return Network.class;
     }
 
-    public void setIsReduntant(final boolean reduntant) {
-        this.isRedundant = reduntant;
+    public void setIsRedundant(final boolean redundant) {
+        this.isRedundant = redundant;
     }
 }
