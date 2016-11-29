@@ -215,6 +215,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     private String _instance;
     private boolean _useSSlCopy;
     private String _allowedInternalSites;
+    private String _allowedExternalCidrs;
     private SystemVmLoadScanner<Long> _loadScanner;
     private Map<Long, ZoneHostInfo> _zoneHostInfoMap; // map <zone id, info about running host in zone>
 
@@ -247,6 +248,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
+        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
 
         String value = configs.get("secstorage.capacityscan.interval");
         final long _capacityScanInterval = NumbersUtil.parseLong(value, DEFAULT_CAPACITY_SCAN_INTERVAL);
@@ -945,15 +947,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
         _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
         if (_allowedInternalSites != null) {
-            final List<String> allowedCidrs = new ArrayList<>();
-            final String[] cidrs = _allowedInternalSites.split(",");
-            for (final String cidr : cidrs) {
-                if (NetUtils.isValidCIDR(cidr) || NetUtils.isValidIp(cidr) || !cidr.startsWith("0.0.0.0")) {
-                    allowedCidrs.add(cidr);
-                }
-            }
+            List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedInternalSites);
             setupCmd.setAllowedInternalSites(allowedCidrs.toArray(new String[allowedCidrs.size()]));
         }
+
+        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
+        if (_allowedExternalCidrs != null) {
+            List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedExternalCidrs);
+            setupCmd.setAllowedExternalCidrs(allowedCidrs.toArray(new String[allowedCidrs.size()]));
+        }
+
         final String copyPasswd = _configDao.getValue("secstorage.copy.password");
         setupCmd.setCopyPassword(copyPasswd);
         setupCmd.setCopyUserName(TemplateConstants.DEFAULT_HTTP_AUTH_USER);
@@ -965,6 +968,17 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             logger.debug("failed to program http auth into secondary storage vm : " + secStorageVm.getHostName());
             return false;
         }
+    }
+
+    private List<String> GenerateAllowedCidrs(String cidrList) {
+        final List<String> allowedCidrs = new ArrayList<>();
+        final String[] cidrs = cidrList.split(",");
+        for (final String cidr : cidrs) {
+            if (NetUtils.isValidCIDR(cidr) || NetUtils.isValidIp(cidr) || !cidr.startsWith("0.0.0.0")) {
+                allowedCidrs.add(cidr);
+            }
+        }
+        return allowedCidrs;
     }
 
     @Override

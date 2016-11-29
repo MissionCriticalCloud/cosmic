@@ -881,19 +881,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         if (result != null) {
             s_logger.warn("Error in stopping httpd service err=" + result);
         }
-        final String port = Integer.toString(TemplateConstants.DEFAULT_TMPLT_COPY_PORT);
-        final String intf = TemplateConstants.DEFAULT_TMPLT_COPY_INTF;
-
-        command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("iptables -I INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + port + " -j ACCEPT;" + "iptables -I INPUT -i " + intf +
-                " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j ACCEPT;");
-
-        result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in opening up httpd port err=" + result);
-            return;
-        }
 
         command = new Script("/bin/bash", s_logger);
         command.add("-c");

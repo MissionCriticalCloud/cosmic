@@ -717,6 +717,14 @@ public enum Config {
             null,
             "Comma separated list of cidrs internal to the datacenter that can host template download servers, please note 0.0.0.0 is not a valid site",
             null),
+    SecStorageAllowedExternalAccessCidrs(
+            "Advanced",
+            ManagementServer.class,
+            String.class,
+            "secstorage.allowed.external.cidrs",
+            "0.0.0.0/0",
+            "Comma separated list of cidrs that the SSVM is accessible from",
+            null),
     SecStorageEncryptCopy(
             "Advanced",
             ManagementServer.class,

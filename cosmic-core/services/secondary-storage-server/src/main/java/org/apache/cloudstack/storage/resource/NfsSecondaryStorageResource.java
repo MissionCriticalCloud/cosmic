@@ -1520,6 +1520,15 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 success = false;
             }
         }
+
+        for (final String cidr : cmd.getAllowedExternalCidrs()) {
+            final String tmpresult = this.setExternalAccess(cidr);
+            if (tmpresult != null) {
+                result.append(", ").append(tmpresult);
+                success = false;
+            }
+        }
+
         if (success) {
             if (cmd.getCopyPassword() != null && cmd.getCopyUserName() != null) {
                 final String tmpresult = configureAuth(cmd.getCopyUserName(), cmd.getCopyPassword());
@@ -1552,7 +1561,8 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         final Script command = new Script("/bin/bash", s_logger);
         final String intf = "eth1";
         command.add("-c");
-        command.add("iptables -I OUTPUT -o " + intf + " -d " + destCidr + " -p tcp -m state --state NEW -m tcp  -j ACCEPT");
+        command.add("iptables -I OUTPUT -o " + intf + " -d " + destCidr
+                + " -p tcp -m state --state NEW -m tcp  -j ACCEPT");
 
         final String result = command.execute();
         if (result != null) {
@@ -1561,6 +1571,25 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         }
 
         addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, destCidr);
+
+        return null;
+    }
+
+    public String setExternalAccess(final String sourceCidr) {
+        if (!_inSystemVM) {
+            return null;
+        }
+        final Script command = new Script("/bin/bash", s_logger);
+        final String intf = "eth2";
+        command.add("-c");
+        command.add("iptables -I INPUT -i " + intf + " -s " + sourceCidr
+                + " -p tcp -m state --state NEW -m tcp  -j ACCEPT");
+
+        final String result = command.execute();
+        if (result != null) {
+            s_logger.warn("Error in allowing external firewall to " + sourceCidr + ", err=" + result);
+            return "Error in allowing external to " + sourceCidr + ", err=" + result;
+        }
 
         return null;
     }
