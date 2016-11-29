@@ -943,6 +943,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
+        _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
         if (_allowedInternalSites != null) {
             final List<String> allowedCidrs = new ArrayList<>();
             final String[] cidrs = _allowedInternalSites.split(",");
