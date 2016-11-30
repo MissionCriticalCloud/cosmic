@@ -4,19 +4,6 @@
 
 #set -x
 
-check_gw() {
-  ping -c 1 -n -q $1 > /dev/null
-  if [ $? -gt 0 ]
-  then
-    sleep 1
-    ping -c 1 -n -q $1 > /dev/null
-  fi
-  if [ $? -gt 0 ]
-  then
-    exit 1
-  fi
-}
-
 cert="/root/.ssh/id_rsa.cloud"
 
 script=$1
@@ -25,7 +12,18 @@ shift
 domRIp=$1
 shift
 
-check_gw "$domRIp"
-
-ssh -p 3922 -q -o StrictHostKeyChecking=no -i $cert root@$domRIp "/opt/cloud/bin/$script $*"
-exit $?
+tries=0
+until ssh -p 3922 -q -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 -i ${cert} root@${domRIp} "/opt/cloud/bin/$script $*"
+do
+  exit_status=$?
+  if [ "${exit_status}" -lt 255 ]; then
+      echo "Got exit status ${exit_status}, not retrying"
+      exit ${exit_status}
+  fi
+  sleep 1
+  let "tries++"
+  if [ "${tries}" -ge 5 ];
+    then echo "Failed after ${tries} tries, exiting"
+    exit ${exit_status}
+  fi
+done
