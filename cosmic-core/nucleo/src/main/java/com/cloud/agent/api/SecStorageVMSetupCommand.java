@@ -2,6 +2,7 @@ package com.cloud.agent.api;
 
 public class SecStorageVMSetupCommand extends Command {
     String[] allowedInternalSites = new String[0];
+    String[] allowedExternalCidrs = new String[0];
     String copyUserName;
     String copyPassword;
 
@@ -20,6 +21,14 @@ public class SecStorageVMSetupCommand extends Command {
 
     public void setAllowedInternalSites(final String[] allowedInternalSites) {
         this.allowedInternalSites = allowedInternalSites;
+    }
+
+    public String[] getAllowedExternalCidrs() {
+        return allowedExternalCidrs;
+    }
+
+    public void setAllowedExternalCidrs(final String[] allowedExternalCidrs) {
+        this.allowedExternalCidrs = allowedExternalCidrs;
     }
 
     public String getCopyUserName() {
