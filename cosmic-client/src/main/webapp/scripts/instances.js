@@ -2498,7 +2498,12 @@
                             netmask: {
                                 label: 'label.netmask'
                             },
-
+                            broadcasturi: {
+                                label: 'label.broadcast.uri'
+                            },
+                            isolationuri : {
+                                label: 'label.isolation.uri'
+                            },
                             ip6address: {
                                 label: 'label.ipv6.address'
                             },
