@@ -131,9 +131,6 @@
             },
             preFilter: function (args) {
                 var hiddenFields = [];
-                if (!isAdmin()) {
-                    hiddenFields.push('instancename');
-                }
                 return hiddenFields;
             },
             fields: {
@@ -2011,10 +2008,6 @@
 
                             if (!args.context.instances[0].publicip) {
                                 hiddenFields.push('publicip');
-                            }
-
-                            if (!isAdmin()) {
-                                hiddenFields.push('instancename');
                             }
 
                             return hiddenFields;
