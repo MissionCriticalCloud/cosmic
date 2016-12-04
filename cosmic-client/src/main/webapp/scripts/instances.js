@@ -142,7 +142,7 @@
                     truncate: true
                 },
                 instancename: {
-                    label: 'label.internal.name'
+                    label: 'label.instance.name'
                 },
                 displayname: {
                     label: 'label.display.name',
@@ -2028,6 +2028,12 @@
                             name: {
                                 label: 'label.host.name'
                             },
+                            instancename: {
+                                label: 'label.instance.name'
+                            },
+                            id: {
+                                label: 'label.id'
+                            },
                             state: {
                                 label: 'label.state',
                                 pollAgainIfValueIsIn: {
@@ -2130,7 +2136,6 @@
                             publicip: {
                                 label: 'label.public.ip'
                             },
-
                             group: {
                                 label: 'label.group',
                                 isEditable: true
@@ -2142,11 +2147,12 @@
                             hostname: {
                                 label: 'label.host'
                             },
-                            publicip: {
-                                label: 'label.public.ip'
-                            },
                             keypair: {
                                 label: 'label.ssh.key.pair'
+                            },
+                            passwordenabled: {
+                                label: 'label.password.enabled',
+                                converter: cloudStack.converters.toBooleanText
                             },
                             domain: {
                                 label: 'label.domain'
@@ -2154,15 +2160,12 @@
                             account: {
                                 label: 'label.account'
                             },
+                            username: {
+                                label: 'label.created.by'
+                            },
                             created: {
                                 label: 'label.created',
                                 converter: cloudStack.converters.toLocalDate
-                            },
-                            name: {
-                                label: 'label.name'
-                            },
-                            id: {
-                                label: 'label.id'
                             }
                         }],
 

@@ -481,6 +481,7 @@ dictionary = {
 'label.cpu.utilized': '<fmt:message key="label.cpu.utilized" />',
 'label.created.by.system': '<fmt:message key="label.created.by.system" />',
 'label.created': '<fmt:message key="label.created" />',
+'label.created.by': '<fmt:message key="label.created.by" />',
 'label.create.project': '<fmt:message key="label.create.project" />',
 'label.create.template': '<fmt:message key="label.create.template" />',
 'label.create.VPN.connection': '<fmt:message key="label.create.VPN.connection" />',
