@@ -193,7 +193,7 @@ public interface DeploymentPlanner extends Adapter {
             return false;
         }
 
-        private boolean shouldAvoid(final long dataCenterId, final Long podId, final Long clusterId, final long id) {
+        private boolean shouldAvoid(final long dataCenterId, final Long podId, final Long clusterId, final long poolId) {
             if (dcIds.contains(dataCenterId)) {
                 return true;
             }
@@ -206,7 +206,7 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (hostIds.contains(id)) {
+            if (poolIds.contains(poolId)) {
                 return true;
             }
 
