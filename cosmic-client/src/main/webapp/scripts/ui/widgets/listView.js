@@ -1118,7 +1118,7 @@
             complete: function ($newPanel) {
                 // Make detail view element
                 if (!args.pageGenerator && !data.isMaximized)
-                    $detailView = $('<div>').addClass('detail-view').detailView(data).appendTo($newPanel);
+                    $detailView = $('<div>').addClass('detail-view label-hovered').detailView(data).appendTo($newPanel);
                 else if (!args.pageGenerator && data.isMaximized)
                     $detailView = $newPanel.detailView(data);
                 else
