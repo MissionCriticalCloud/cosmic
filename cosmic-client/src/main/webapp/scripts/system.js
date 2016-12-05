@@ -14483,14 +14483,14 @@
 
         if (jsonObj.resourcestate == "Enabled") {
             allowedActions.push("edit");
-            allowedActions.push("enableMaintenanceMode");
+            //allowedActions.push("enableMaintenanceMode");
             allowedActions.push("disable");
 
             if (jsonObj.state != "Disconnected")
                 allowedActions.push("forceReconnect");
         } else if (jsonObj.resourcestate == "ErrorInMaintenance") {
             allowedActions.push("edit");
-            allowedActions.push("enableMaintenanceMode");
+            //allowedActions.push("enableMaintenanceMode");
             allowedActions.push("cancelMaintenanceMode");
         } else if (jsonObj.resourcestate == "PrepareForMaintenance") {
             allowedActions.push("edit");
