@@ -4,13 +4,13 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>5.1.1.7-SNAPSHOT</version>
+        <version>5.1.1.7</version>
     </parent>
 
     <artifactId>cosmic-core</artifactId>
     <packaging>pom</packaging>
     <name>Cosmic Core</name>
-    <version>5.1.1.7-SNAPSHOT</version>
+    <version>5.1.1.7</version>
     <description>Cosmic is an IaaS ("Infrastructure as a Service") cloud orchestration platform.</description>
     <url>http://www.cosmic.cloud</url>
 
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.1.1.7-SNAPSHOT</version>
+            <version>5.1.1.7</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
