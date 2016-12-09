@@ -19,4 +19,4 @@ for i in $CMDLINE
   done
 
 
-cd $COSMIC_HOME; java -Djavax.net.ssl.trustStore=./certs/realhostip.keystore -Djsse.enableSNIExtension=false -jar $COSMIC_HOME/cloud-agent-*.jar
+cd $COSMIC_HOME; java -jar $COSMIC_HOME/cloud-agent-*.jar
