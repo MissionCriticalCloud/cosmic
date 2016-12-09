@@ -101,6 +101,9 @@ public class ClusterVO implements Cluster {
 
     @Override
     public HypervisorType getHypervisorType() {
+        if (hypervisorType == null) {
+            return HypervisorType.KVM;
+        }
         return HypervisorType.getType(hypervisorType);
     }
 
