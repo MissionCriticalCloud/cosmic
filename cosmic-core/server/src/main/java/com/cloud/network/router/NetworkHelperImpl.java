@@ -349,12 +349,18 @@ public class NetworkHelperImpl implements NetworkHelper {
         }
 
         final DataCenterDeployment plan = new DataCenterDeployment(0, null, null, null, null, null);
-        assert router.getIsRedundantRouter();
         final List<Long> networkIds = _routerDao.getRouterNetworks(router.getId());
 
         DomainRouterVO routerToBeAvoid = null;
-        if (networkIds.size() != 0) {
-            final List<DomainRouterVO> routerList = _routerDao.findByNetwork(networkIds.get(0));
+
+        List<DomainRouterVO> routerList = null;
+        if (router.getVpcId() != null) {
+            routerList = _routerDao.listByVpcId(router.getVpcId());
+        } else if (networkIds.size() != 0) {
+            routerList = _routerDao.findByNetwork(networkIds.get(0));
+        }
+
+        if (routerList != null) {
             for (final DomainRouterVO rrouter : routerList) {
                 if (rrouter.getHostId() != null && rrouter.getIsRedundantRouter() && rrouter.getState() == State.Running) {
                     if (routerToBeAvoid != null) {
