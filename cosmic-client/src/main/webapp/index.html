@@ -266,8 +266,8 @@
                                 <p id="from_vpc_tier">
                                     <div class="specify-ip">
                                         <label>
-                                            <translate key="label.ip.address"/>
-                                            (<translate key="label.optional"/>):
+                                            <span><translate key="label.ip.address"/></span>
+                                            (<span><translate key="label.optional"/></span>):
                                         </label>
                                         <input type="text" name="vpc-specify-ip" />
                                     </div>
@@ -386,7 +386,7 @@
                                     <!-- Name -->
                                     <div class="select odd vm-instance-name">
                                         <div class="name">
-                                            <span><translate key="label.name"/> (<translate key="label.optional"/>)</span>
+                                            <span><span><translate key="label.name"/></span> (<span><translate key="label.optional"/></span>)</span>
                                         </div>
                                         <div class="value">
                                             <input type="text" name="displayname" class="disallowSpecialCharacters" />
@@ -395,7 +395,7 @@
                                     <!-- Add to group -->
                                     <div class="select">
                                         <div class="name">
-                                            <span><translate key="label.add.to.group"/> (<translate key="label.optional"/>)</span>
+                                            <span><span><translate key="label.add.to.group"/></span> (<span><translate key="label.optional"/></span>)</span>
                                         </div>
                                         <div class="value">
                                             <input type="text" name="groupname" class="disallowSpecialCharacters" />
@@ -530,7 +530,7 @@
                                     <!-- userdata -->
                                     <div class="select">
                                         <div class="name">
-                                            <span><translate key="label.add.userdata"/> (<translate key="label.optional"/>)</span>
+                                            <span><span><translate key="label.add.userdata"/></span> (<span><translate key="label.optional"/></span>)</span>
                                         </div>
                                         <div class="value">
                                             <textarea name="userdata" class="disallowSpecialCharacters"></textarea>
@@ -1371,7 +1371,7 @@
                         <ul data-item="zoneCapacities">
                             <li concat-value="25">
                                 <div class="label">
-                                    <translate key="label.zone"/>: <span data-list-item="zoneName"></span>
+                                    <span><translate key="label.zone"/></span>: <span data-list-item="zoneName"></span>
                                 </div>
                                 <div class="pie-chart-container">
                                     <div class="percent-label"><span data-list-item="percent"></span>%</div>
