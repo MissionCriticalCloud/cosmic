@@ -54,7 +54,7 @@
 
     <error-page>
         <exception-type>java.lang.Exception</exception-type>
-        <location>/error.jsp</location>
+        <location>/error.html</location>
     </error-page>
 
     <session-config>
