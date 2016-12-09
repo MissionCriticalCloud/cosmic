@@ -91,9 +91,18 @@ public class ClusterDetailsDaoImpl extends GenericDaoBase<ClusterDetailsVO, Long
         sc.setParameters("clusterId", clusterId);
         sc.setParameters("name", name);
 
-        final ClusterDetailsVO detail = findOneIncludingRemovedBy(sc);
+        ClusterDetailsVO detail = findOneIncludingRemovedBy(sc);
         if ("password".equals(name) && detail != null) {
             detail.setValue(DBEncryptionUtil.decrypt(detail.getValue()));
+        }
+        if ("cpuOvercommitRatio".equals(name) || "memoryOvercommitRatio".equals(name)) {
+            final String detailDefaultValue = "1.0";
+            if (detail != null && detail.getValue() == null) {
+                detail.setValue(detailDefaultValue);
+            } else if (detail == null) {
+                this.persist(clusterId, name, detailDefaultValue);
+                detail = findOneIncludingRemovedBy(sc);
+            }
         }
         return detail;
     }
