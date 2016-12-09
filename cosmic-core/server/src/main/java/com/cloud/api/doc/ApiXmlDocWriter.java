@@ -69,13 +69,11 @@ public class ApiXmlDocWriter {
         final List<String> asyncResponses = new ArrayList<>();
         asyncResponses.add(TemplateResponse.class.getName());
         asyncResponses.add(VolumeResponse.class.getName());
-        //asyncResponses.add(LoadBalancerResponse.class.getName());
         asyncResponses.add(HostResponse.class.getName());
         asyncResponses.add(IPAddressResponse.class.getName());
         asyncResponses.add(StoragePoolResponse.class.getName());
         asyncResponses.add(UserVmResponse.class.getName());
         asyncResponses.add(SecurityGroupResponse.class.getName());
-        //asyncResponses.add(ExternalLoadBalancerResponse.class.getName());
         asyncResponses.add(SnapshotResponse.class.getName());
 
         return asyncResponses;
@@ -265,8 +263,8 @@ public class ApiXmlDocWriter {
 
     private static void writeCommand(final ObjectOutputStream out, final String command) throws ClassNotFoundException, IOException {
         final Class<?> clas = Class.forName(s_allApiCommands.get(command));
-        ArrayList<Argument> request;
-        ArrayList<Argument> response;
+        final ArrayList<Argument> request;
+        final ArrayList<Argument> response;
 
         // Create a new command, set name/description/usage
         final Command apiCommand = new Command();
@@ -399,7 +397,7 @@ public class ApiXmlDocWriter {
                         if (superClass != null) {
                             final String superName = superClass.getName();
                             if (superName.equals(BaseResponse.class.getName())) {
-                                ArrayList<Argument> fieldArguments;
+                                final ArrayList<Argument> fieldArguments;
                                 final Field[] fields = fieldClass.getDeclaredFields();
                                 fieldArguments = setResponseFields(fields, fieldClass);
                                 respArg.setArguments(fieldArguments);

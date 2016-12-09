@@ -95,7 +95,6 @@ import com.cloud.vm.NicVO;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.response.ExternalLoadBalancerResponse;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.network.ExternalNetworkDeviceManager.NetworkDevice;
@@ -177,23 +176,6 @@ public abstract class ExternalLoadBalancerDeviceManagerImpl extends AdapterBase 
     @Inject
     IpAddressManager _ipAddrMgr;
     private long _defaultLbCapacity;
-
-    public ExternalLoadBalancerResponse createExternalLoadBalancerResponse(final Host externalLoadBalancer) {
-        final Map<String, String> lbDetails = _hostDetailDao.findDetails(externalLoadBalancer.getId());
-        final ExternalLoadBalancerResponse response = new ExternalLoadBalancerResponse();
-        response.setId(externalLoadBalancer.getUuid());
-        response.setIpAddress(externalLoadBalancer.getPrivateIpAddress());
-        response.setUsername(lbDetails.get("username"));
-        response.setPublicInterface(lbDetails.get("publicInterface"));
-        response.setPrivateInterface(lbDetails.get("privateInterface"));
-        response.setNumRetries(lbDetails.get("numRetries"));
-        return response;
-    }
-
-    public void setExternalLoadBalancerForNetwork(final Network network, final long externalLBDeviceID) {
-        final NetworkExternalLoadBalancerVO lbDeviceForNetwork = new NetworkExternalLoadBalancerVO(network.getId(), externalLBDeviceID);
-        _networkExternalLBDao.persist(lbDeviceForNetwork);
-    }
 
     @Override
     @DB
