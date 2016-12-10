@@ -3,6 +3,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="count" class="org.apache.cloudstack.spring.module.factory.ModuleBasedContextFactoryTest.InstantiationCounter" />
+    <bean id="count" class="com.cloud.spring.module.factory.ModuleBasedContextFactoryTest.InstantiationCounter" />
 
 </beans>

@@ -23,16 +23,15 @@
                       http://www.springframework.org/schema/context
                       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-    <context:annotation-config/>
+    <bean id="DefaultConfigResources" class="java.util.ArrayList" />
+    <bean id="DefaultConfigProperties" class="java.util.Properties" />
 
-    <bean id="name" class="java.lang.String" >
-        <constructor-arg value="child1" />
+    <bean id="ModuleProperties" class="com.cloud.spring.module.factory.QuietLoaderFactory" >
+        <property name="resources">
+            <list>
+                <value>classpath:modules.properties</value>
+            </list>
+        </property>
     </bean>
-    
-    <bean id="child1" class="java.lang.String" >
-        <constructor-arg value="child1" />
-    </bean>
-    
-    <bean id="override" class="com.cloud.spring.module.factory.InitTest" />
-    
+
 </beans>
