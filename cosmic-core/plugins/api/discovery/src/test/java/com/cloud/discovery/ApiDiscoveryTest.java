@@ -1,4 +1,4 @@
-package org.apache.cloudstack.discovery;
+package com.cloud.discovery;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -10,7 +10,7 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.discovery.ApiDiscoveryService;
+import com.cloud.discovery.ApiDiscoveryService;
 
 import javax.inject.Inject;
 

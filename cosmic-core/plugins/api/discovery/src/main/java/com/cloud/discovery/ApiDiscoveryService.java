@@ -1,4 +1,4 @@
-package org.apache.cloudstack.discovery;
+package com.cloud.discovery;
 
 import com.cloud.api.response.ListResponse;
 import com.cloud.user.User;

@@ -1,4 +1,4 @@
-package org.apache.cloudstack.discovery;
+package com.cloud.discovery;
 
 import com.cloud.api.command.user.discovery.ListApisCmd;
 import com.cloud.api.response.ApiDiscoveryResponse;

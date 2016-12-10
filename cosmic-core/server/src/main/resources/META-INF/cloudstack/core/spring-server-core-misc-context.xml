@@ -37,7 +37,7 @@
     <bean id="apiDBUtils" class="com.cloud.api.ApiDBUtils" />
 
     <bean id="apiDiscoveryServiceImpl"
-          class="org.apache.cloudstack.discovery.ApiDiscoveryServiceImpl">
+          class="ApiDiscoveryServiceImpl">
         <property name="apiAccessCheckers" value="#{apiCheckersRegistry.registered}" />
         <property name="services" value="#{apiCommandsRegistry.registered}" />
     </bean>
