@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.utils.db.GenericDao;
 import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

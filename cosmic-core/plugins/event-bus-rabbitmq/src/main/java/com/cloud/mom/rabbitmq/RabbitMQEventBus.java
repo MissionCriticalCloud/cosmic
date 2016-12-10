@@ -1,13 +1,13 @@
 package com.cloud.mom.rabbitmq;
 
-import com.cloud.utils.Ternary;
-import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
 import com.cloud.framework.events.EventSubscriber;
 import com.cloud.framework.events.EventTopic;
+import com.cloud.utils.Ternary;
+import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.naming.ConfigurationException;
@@ -118,7 +118,7 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
             final Connection connection = getConnection();
             final Channel channel = createChannel(connection);
             createExchange(channel, amqpExchangeName);
-            if(!amqpQueueName.isEmpty()) {
+            if (!amqpQueueName.isEmpty()) {
                 createQueue(channel, amqpQueueName);
                 bindQueue(channel, amqpQueueName, amqpExchangeName);
                 routingKey = amqpQueueName;
@@ -316,7 +316,7 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     private void bindQueue(final Channel channel, final String queueName, final String exchangeName) throws IOException {
         try {
-            channel.queueBind(queueName,exchangeName,queueName);
+            channel.queueBind(queueName, exchangeName, queueName);
         } catch (final IOException e) {
             s_logger.warn("Failed to bind queue" + e + " on RabbitMQ server");
             throw e;

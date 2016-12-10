@@ -4,6 +4,8 @@ import com.cloud.configuration.Config;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.dao.EventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.projects.Project;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.server.ManagementService;
@@ -16,8 +18,6 @@ import com.cloud.utils.ReflectUtil;
 import com.cloud.utils.component.ComponentContext;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

@@ -6,6 +6,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
@@ -18,7 +19,6 @@ import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
-import com.cloud.framework.events.EventBus;
 
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;

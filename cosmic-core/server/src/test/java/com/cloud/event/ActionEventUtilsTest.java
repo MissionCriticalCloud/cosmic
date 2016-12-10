@@ -4,6 +4,8 @@ import com.cloud.configuration.Config;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.dao.EventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.Event;
+import com.cloud.framework.events.EventBus;
 import com.cloud.network.IpAddress;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.user.AccountVO;
@@ -14,8 +16,6 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.framework.events.Event;
-import com.cloud.framework.events.EventBus;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

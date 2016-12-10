@@ -1,9 +1,9 @@
 package org.apache.cloudstack.messagebus;
 
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.MessageDetector;
-import org.apache.cloudstack.framework.messagebus.MessageSubscriber;
-import org.apache.cloudstack.framework.messagebus.PublishScope;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.MessageDetector;
+import com.cloud.framework.messagebus.MessageSubscriber;
+import com.cloud.framework.messagebus.PublishScope;
 
 import javax.inject.Inject;
 

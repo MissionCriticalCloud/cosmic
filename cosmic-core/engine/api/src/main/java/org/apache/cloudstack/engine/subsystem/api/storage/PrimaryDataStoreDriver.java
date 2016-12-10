@@ -1,10 +1,10 @@
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
+import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.Host;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.storage.command.CommandResult;
-import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 
 public interface PrimaryDataStoreDriver extends DataStoreDriver {
     ChapInfo getChapInfo(VolumeInfo volumeInfo);

@@ -1,6 +1,7 @@
 package com.cloud.storage.motion;
 
 import com.cloud.agent.api.to.VirtualMachineTO;
+import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.Host;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.StorageStrategyFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
-import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 
 import javax.inject.Inject;
 import java.util.LinkedList;

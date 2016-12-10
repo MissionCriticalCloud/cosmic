@@ -5,6 +5,8 @@ import com.cloud.agent.api.GetVncPortAnswer;
 import com.cloud.agent.api.GetVncPortCommand;
 import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.security.keys.KeysManager;
+import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.info.ConsoleProxyInfo;
@@ -18,8 +20,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.framework.security.keys.KeysManager;
-import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

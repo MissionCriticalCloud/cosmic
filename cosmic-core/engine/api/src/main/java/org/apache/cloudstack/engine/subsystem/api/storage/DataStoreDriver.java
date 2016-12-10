@@ -2,8 +2,8 @@ package org.apache.cloudstack.engine.subsystem.api.storage;
 
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
+import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.storage.command.CommandResult;
-import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 
 import java.util.Map;
 

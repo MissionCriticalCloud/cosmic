@@ -2,13 +2,13 @@ package com.cloud.vm;
 
 import com.cloud.exception.CloudException;
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.framework.jobs.AsyncJob;
+import com.cloud.framework.jobs.AsyncJobDispatcher;
+import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.framework.jobs.AsyncJobDispatcher;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.inject.Inject;

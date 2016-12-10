@@ -3,6 +3,8 @@ package com.cloud.storage.listener;
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.server.ManagementService;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
@@ -11,8 +13,6 @@ import com.cloud.storage.SnapshotVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;

@@ -1,5 +1,6 @@
 package com.cloud.storage.upload;
 
+import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Upload.Mode;
 import com.cloud.storage.Upload.Status;
@@ -7,10 +8,9 @@ import com.cloud.storage.Upload.Type;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.utils.component.Manager;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 /**
  * Monitor upload progress of all entities.

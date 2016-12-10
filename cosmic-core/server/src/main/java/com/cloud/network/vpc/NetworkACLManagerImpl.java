@@ -6,6 +6,8 @@ import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
@@ -26,8 +28,6 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.PublishScope;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -240,7 +240,7 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
 
         revokeRule(rule);
 
-        boolean success;
+        final boolean success;
 
         try {
             applyNetworkACL(rule.getAclId());
@@ -470,7 +470,7 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     private boolean applyACLToPrivateGw(final PrivateGateway gateway, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
-        List<VpcProvider> vpcElements;
+        final List<VpcProvider> vpcElements;
         vpcElements = new ArrayList<>();
         vpcElements.add((VpcProvider) _ntwkModel.getElementImplementingProvider(Network.Provider.VPCVirtualRouter.getName()));
 

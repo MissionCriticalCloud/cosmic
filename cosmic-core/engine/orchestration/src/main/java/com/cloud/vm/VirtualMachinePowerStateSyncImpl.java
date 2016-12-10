@@ -2,11 +2,11 @@ package com.cloud.vm;
 
 import com.cloud.agent.api.HostVmStateReportEntry;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.PublishScope;
 
 import javax.inject.Inject;
 import java.util.Date;

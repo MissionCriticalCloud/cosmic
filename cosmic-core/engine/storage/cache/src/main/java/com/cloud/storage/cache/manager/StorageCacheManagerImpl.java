@@ -2,6 +2,7 @@ package com.cloud.storage.cache.manager;
 
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.configuration.Config;
+import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.cache.allocator.StorageCacheAllocator;
@@ -25,7 +26,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreState
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
 import org.apache.cloudstack.engine.subsystem.api.storage.StorageCacheManager;
-import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;

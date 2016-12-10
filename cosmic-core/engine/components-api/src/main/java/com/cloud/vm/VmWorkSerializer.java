@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
+import com.cloud.framework.jobs.impl.JobSerializerHelper;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
