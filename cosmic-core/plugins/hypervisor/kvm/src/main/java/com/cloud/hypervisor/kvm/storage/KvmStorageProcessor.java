@@ -45,10 +45,10 @@ import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.qemu.QemuImg;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
-import org.apache.cloudstack.utils.qemu.QemuImgException;
-import org.apache.cloudstack.utils.qemu.QemuImgFile;
+import com.cloud.utils.qemu.QemuImg;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImgException;
+import com.cloud.utils.qemu.QemuImgFile;
 
 import javax.naming.ConfigurationException;
 import java.io.File;

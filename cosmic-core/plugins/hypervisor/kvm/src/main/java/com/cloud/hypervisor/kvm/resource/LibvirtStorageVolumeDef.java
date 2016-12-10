@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import org.apache.cloudstack.utils.qemu.QemuImg;
+import com.cloud.utils.qemu.QemuImg;
 
 import org.apache.commons.lang.NotImplementedException;
 

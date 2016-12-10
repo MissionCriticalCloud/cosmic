@@ -110,9 +110,9 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.PowerState;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.linux.CpuStat;
-import org.apache.cloudstack.utils.linux.MemStat;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.linux.CpuStat;
+import com.cloud.utils.linux.MemStat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;

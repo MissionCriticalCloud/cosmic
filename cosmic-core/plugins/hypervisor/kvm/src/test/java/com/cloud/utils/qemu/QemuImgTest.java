@@ -1,11 +1,11 @@
-package org.apache.cloudstack.utils.qemu;
+package com.cloud.utils.qemu;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.io.File;
 import java.util.HashMap;

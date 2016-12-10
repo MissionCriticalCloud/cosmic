@@ -8,7 +8,7 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.util.HashMap;
 import java.util.List;

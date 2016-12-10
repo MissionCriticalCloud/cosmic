@@ -12,7 +12,7 @@ import com.cloud.storage.Volume;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.net.URI;
 import java.net.URISyntaxException;

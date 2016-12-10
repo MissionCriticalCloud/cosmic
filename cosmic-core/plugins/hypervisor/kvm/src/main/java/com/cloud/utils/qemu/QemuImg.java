@@ -1,4 +1,4 @@
-package org.apache.cloudstack.utils.qemu;
+package com.cloud.utils.qemu;
 
 import com.cloud.storage.Storage;
 import com.cloud.utils.script.OutputInterpreter;

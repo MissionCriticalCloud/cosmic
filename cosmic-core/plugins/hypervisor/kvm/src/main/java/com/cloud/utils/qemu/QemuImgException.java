@@ -1,4 +1,4 @@
-package org.apache.cloudstack.utils.qemu;
+package com.cloud.utils.qemu;
 
 public class QemuImgException extends Exception {
 

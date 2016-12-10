@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 public class KvmPhysicalDisk {
     private final String name;

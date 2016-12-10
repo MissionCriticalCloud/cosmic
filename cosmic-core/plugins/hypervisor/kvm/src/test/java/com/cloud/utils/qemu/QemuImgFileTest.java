@@ -1,8 +1,8 @@
-package org.apache.cloudstack.utils.qemu;
+package com.cloud.utils.qemu;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import org.junit.Ignore;
 import org.junit.Test;
