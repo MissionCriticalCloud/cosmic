@@ -76,6 +76,6 @@
     <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="gslbServiceProvidersRegistry" />
         <property name="typeClass"
-                  value="GslbServiceProvider" />
+                  value="com.cloud.region.gslb.GslbServiceProvider" />
     </bean>
 </beans>
