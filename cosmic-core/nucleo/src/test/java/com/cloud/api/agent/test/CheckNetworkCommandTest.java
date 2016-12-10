@@ -1,4 +1,4 @@
-package org.apache.cloudstack.api.agent.test;
+package com.cloud.api.agent.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -1,15 +1,13 @@
-package org.apache.cloudstack.api.agent.test;
+package com.cloud.api.agent.test;
 
 import static org.junit.Assert.assertFalse;
 
-import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.AgentControlCommand;
 
 import org.junit.Test;
 
-public class AgentControlAnswerTest {
+public class AgentControlCommandTest {
     AgentControlCommand acc = new AgentControlCommand();
-    AgentControlAnswer aca = new AgentControlAnswer(acc);
 
     @Test
     public void testExecuteInSequence() {
