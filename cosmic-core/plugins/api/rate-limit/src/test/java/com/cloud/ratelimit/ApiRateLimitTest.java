@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

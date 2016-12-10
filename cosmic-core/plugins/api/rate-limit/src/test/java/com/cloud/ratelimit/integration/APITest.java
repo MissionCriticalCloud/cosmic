@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit.integration;
+package com.cloud.ratelimit.integration;
 
 import com.cloud.api.ApiGsonHelper;
 import com.cloud.api.response.SuccessResponse;

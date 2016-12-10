@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit.integration;
+package com.cloud.ratelimit.integration;
 
 import com.cloud.serializer.Param;
 import org.apache.cloudstack.api.BaseResponse;

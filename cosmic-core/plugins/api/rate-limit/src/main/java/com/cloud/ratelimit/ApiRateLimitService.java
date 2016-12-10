@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.user.Account;

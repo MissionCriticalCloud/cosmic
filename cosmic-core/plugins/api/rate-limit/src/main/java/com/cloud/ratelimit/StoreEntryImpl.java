@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

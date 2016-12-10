@@ -2,6 +2,7 @@ package com.cloud.api.command.user.discovery;
 
 import com.cloud.api.response.ApiDiscoveryResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.discovery.ApiDiscoveryService;
 import com.cloud.user.User;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -10,7 +11,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.discovery.ApiDiscoveryService;
 
 import javax.inject.Inject;
 

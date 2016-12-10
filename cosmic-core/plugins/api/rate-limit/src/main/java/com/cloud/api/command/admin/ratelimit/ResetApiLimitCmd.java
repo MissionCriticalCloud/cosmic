@@ -14,7 +14,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.ratelimit.ApiRateLimitService;
+import com.cloud.ratelimit.ApiRateLimitService;
 
 import javax.inject.Inject;
 

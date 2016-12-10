@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 /**
  * Interface for each entry in LimitStore.

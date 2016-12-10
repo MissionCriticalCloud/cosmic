@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 /**
  * Interface to define how an api limit store should work.

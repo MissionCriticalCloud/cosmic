@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 import com.cloud.api.command.admin.ratelimit.ResetApiLimitCmd;
 import com.cloud.api.command.user.ratelimit.GetApiLimitCmd;

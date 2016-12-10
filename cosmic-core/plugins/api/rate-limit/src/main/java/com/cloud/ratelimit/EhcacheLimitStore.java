@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ratelimit;
+package com.cloud.ratelimit;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
