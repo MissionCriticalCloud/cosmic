@@ -9,7 +9,7 @@ import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.List;
 import java.util.Set;

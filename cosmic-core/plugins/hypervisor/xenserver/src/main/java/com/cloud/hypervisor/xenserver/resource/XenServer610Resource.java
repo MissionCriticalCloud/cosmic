@@ -4,7 +4,7 @@ import com.cloud.agent.api.to.DiskTO;
 import com.cloud.resource.ServerResource;
 import com.cloud.storage.Volume;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.ejb.Local;
 import java.util.ArrayList;

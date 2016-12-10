@@ -34,9 +34,9 @@ import org.apache.cloudstack.framework.events.Event;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

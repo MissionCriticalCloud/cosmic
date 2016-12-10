@@ -12,6 +12,8 @@ import com.cloud.server.ManagementServer;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.StoragePoolWorkDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.user.dao.UserDao;
@@ -33,8 +35,6 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

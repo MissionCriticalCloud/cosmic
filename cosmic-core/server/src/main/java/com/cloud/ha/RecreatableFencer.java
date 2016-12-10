@@ -5,7 +5,7 @@ import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import java.util.List;

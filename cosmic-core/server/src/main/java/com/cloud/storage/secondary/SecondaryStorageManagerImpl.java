@@ -102,10 +102,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

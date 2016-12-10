@@ -88,7 +88,7 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.region.PortableIpDaoImpl;
 import org.apache.cloudstack.region.PortableIpRangeDaoImpl;
 import org.apache.cloudstack.region.dao.RegionDaoImpl;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDaoImpl;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

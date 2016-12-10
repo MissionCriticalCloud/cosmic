@@ -1,7 +1,7 @@
 package com.cloud.storage.download;
 
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
+import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 
 public class NotDownloadedState extends DownloadActiveState {
 

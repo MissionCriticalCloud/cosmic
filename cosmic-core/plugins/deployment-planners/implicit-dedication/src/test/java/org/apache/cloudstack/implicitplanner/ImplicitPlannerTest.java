@@ -48,7 +48,7 @@ import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;

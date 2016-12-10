@@ -74,8 +74,8 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -78,10 +78,10 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

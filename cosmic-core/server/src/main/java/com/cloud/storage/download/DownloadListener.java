@@ -28,10 +28,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
-import org.apache.cloudstack.storage.command.DownloadCommand;
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
-import org.apache.cloudstack.storage.command.DownloadProgressCommand;
-import org.apache.cloudstack.storage.command.DownloadProgressCommand.RequestType;
+import com.cloud.storage.command.DownloadCommand;
+import com.cloud.storage.command.DownloadCommand.ResourceType;
+import com.cloud.storage.command.DownloadProgressCommand;
+import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 
 import javax.inject.Inject;
 import java.util.Date;

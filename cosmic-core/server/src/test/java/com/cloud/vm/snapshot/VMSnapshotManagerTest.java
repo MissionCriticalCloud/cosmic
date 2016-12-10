@@ -40,7 +40,7 @@ import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import java.util.ArrayList;
 import java.util.List;

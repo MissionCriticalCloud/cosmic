@@ -8,7 +8,7 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.VirtualMachine.PowerState;
 import com.cloud.vm.snapshot.VMSnapshot;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.HashMap;
 import java.util.List;

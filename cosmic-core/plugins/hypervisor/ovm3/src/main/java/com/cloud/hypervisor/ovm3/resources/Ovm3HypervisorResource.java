@@ -69,12 +69,12 @@ import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.CreateObjectCommand;
-import org.apache.cloudstack.storage.command.DeleteCommand;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.CreateObjectCommand;
+import com.cloud.storage.command.DeleteCommand;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

@@ -18,8 +18,8 @@ import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.template.VirtualMachineTemplate;
-import org.apache.cloudstack.storage.command.DownloadCommand;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
+import com.cloud.storage.command.DownloadCommand;
+import com.cloud.storage.to.TemplateObjectTO;
 
 import java.nio.ByteBuffer;
 

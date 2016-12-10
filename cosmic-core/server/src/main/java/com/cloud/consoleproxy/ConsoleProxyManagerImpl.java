@@ -96,10 +96,10 @@ import org.apache.cloudstack.framework.security.keys.KeysManager;
 import org.apache.cloudstack.framework.security.keystore.KeystoreDao;
 import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
 import org.apache.cloudstack.framework.security.keystore.KeystoreVO;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

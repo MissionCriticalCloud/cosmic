@@ -20,8 +20,12 @@ import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
+import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.storage.dao.VMTemplateZoneDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.download.DownloadMonitor;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.template.VirtualMachineTemplate.State;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
@@ -53,10 +57,6 @@ import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
 import org.apache.cloudstack.framework.async.AsyncRpcContext;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
-import org.apache.cloudstack.storage.command.TemplateOrVolumePostUploadCommand;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -306,7 +306,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
             }
 
-            String eventType;
+            final String eventType;
             if (template.getFormat().equals(ImageFormat.ISO)) {
                 eventType = EventTypes.EVENT_ISO_DELETE;
             } else {

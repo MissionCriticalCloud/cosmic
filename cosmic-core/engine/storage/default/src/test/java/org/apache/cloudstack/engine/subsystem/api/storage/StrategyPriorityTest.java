@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 import com.cloud.host.Host;
 import com.cloud.storage.Snapshot;
 import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy.SnapshotOperation;
-import org.apache.cloudstack.storage.helper.StorageStrategyFactoryImpl;
+import com.cloud.storage.helper.StorageStrategyFactoryImpl;
 
 import java.util.ArrayList;
 import java.util.List;

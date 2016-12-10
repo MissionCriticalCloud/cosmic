@@ -14,12 +14,12 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ServerResource;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.dao.StoragePoolHostDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,7 +1,7 @@
 package org.apache.cloudstack.engine.subsystem.api.storage;
 
 import com.cloud.agent.api.Answer;
-import org.apache.cloudstack.storage.command.CommandResult;
+import com.cloud.storage.command.CommandResult;
 
 public class SnapshotResult extends CommandResult {
     private SnapshotInfo snashot;

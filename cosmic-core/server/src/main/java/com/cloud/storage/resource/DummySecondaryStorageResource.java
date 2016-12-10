@@ -20,11 +20,11 @@ import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.command.DownloadCommand;
+import com.cloud.storage.command.DownloadProgressCommand;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.storage.template.TemplateProp;
-import org.apache.cloudstack.storage.command.DownloadCommand;
-import org.apache.cloudstack.storage.command.DownloadProgressCommand;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

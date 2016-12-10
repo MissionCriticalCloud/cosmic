@@ -10,7 +10,7 @@ import com.cloud.storage.VolumeVO;
 import com.cloud.utils.component.Manager;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 /**
  * Monitor upload progress of all entities.

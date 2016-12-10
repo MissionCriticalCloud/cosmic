@@ -7,12 +7,12 @@ import com.cloud.storage.StoragePool;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import java.util.List;
 

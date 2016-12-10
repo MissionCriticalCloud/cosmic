@@ -129,6 +129,10 @@ import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.storage.snapshot.SnapshotSchedule;
 import com.cloud.template.VirtualMachineTemplate;
@@ -272,10 +276,6 @@ import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
 import org.apache.cloudstack.region.PortableIp;
 import org.apache.cloudstack.region.PortableIpRange;
 import org.apache.cloudstack.region.Region;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.usage.Usage;
 import org.apache.cloudstack.usage.UsageService;
 import org.apache.cloudstack.usage.UsageTypes;
@@ -515,7 +515,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         snapshotResponse.setIntervalType(ApiDBUtils.getSnapshotIntervalTypes(snapshot.getId()));
         snapshotResponse.setState(snapshot.getState());
 
-        SnapshotInfo snapshotInfo;
+        final SnapshotInfo snapshotInfo;
 
         if (snapshot instanceof SnapshotInfo) {
             snapshotInfo = (SnapshotInfo) snapshot;
@@ -1599,7 +1599,7 @@ public class ApiResponseHelper implements ResponseGenerator {
 
     @Override
     public List<TemplateResponse> createTemplateResponses(final ResponseView view, final VirtualMachineTemplate result, final Long zoneId, final boolean readyOnly) {
-        List<TemplateJoinVO> tvo;
+        final List<TemplateJoinVO> tvo;
         if (zoneId == null || zoneId == -1 || result.isCrossZones()) {
             tvo = ApiDBUtils.newTemplateView(result);
         } else {
@@ -1801,7 +1801,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setEgressDefaultPolicy(offering.getEgressDefaultPolicy());
         response.setConcurrentConnections(offering.getConcurrentConnections());
         response.setSupportsStrechedL2Subnet(offering.getSupportsStrechedL2());
-        Long so;
+        final Long so;
         if (offering.getServiceOfferingId() != null) {
             so = offering.getServiceOfferingId();
         } else {
@@ -2149,7 +2149,7 @@ public class ApiResponseHelper implements ResponseGenerator {
 
     @Override
     public List<TemplateResponse> createIsoResponses(final ResponseView view, final VirtualMachineTemplate result, final Long zoneId, final boolean readyOnly) {
-        List<TemplateJoinVO> tvo;
+        final List<TemplateJoinVO> tvo;
         if (zoneId == null || zoneId == -1) {
             tvo = ApiDBUtils.newTemplateView(result);
         } else {

@@ -2,9 +2,9 @@ package org.apache.cloudstack.engine.subsystem.api.storage;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.StoragePool;
+import com.cloud.storage.command.CommandResult;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
-import org.apache.cloudstack.storage.command.CommandResult;
 
 public interface TemplateService {
 

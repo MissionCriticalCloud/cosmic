@@ -67,8 +67,8 @@ import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SSHCmdHelper;
 import com.cloud.utils.ssh.SshHelper;
 import com.cloud.vm.VirtualMachine.PowerState;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;

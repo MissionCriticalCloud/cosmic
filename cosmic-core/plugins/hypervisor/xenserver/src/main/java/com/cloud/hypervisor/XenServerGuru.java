@@ -29,11 +29,11 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

@@ -14,8 +14,8 @@ import com.cloud.exception.ConnectionException;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.storage.dao.StoragePoolHostDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.db.DB;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 

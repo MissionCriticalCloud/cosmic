@@ -44,6 +44,10 @@ import com.cloud.storage.dao.SnapshotPolicyDao;
 import com.cloud.storage.dao.SnapshotScheduleDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -94,10 +98,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -951,7 +951,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
                 final String snapshotDir = TemplateConstants.DEFAULT_SNAPSHOT_ROOT_DIR + "/" + accountId + "/" + volumeId;
                 final DeleteSnapshotsDirCommand cmd = new DeleteSnapshotsDirCommand(ssHost.getTO(), snapshotDir);
                 final EndPoint ep = _epSelector.select(ssHost);
-                Answer answer;
+                final Answer answer;
                 if (ep == null) {
                     final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
                     s_logger.error(errMsg);

@@ -39,7 +39,7 @@ import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
 import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMEntityDao;
 import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import java.util.List;

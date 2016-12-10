@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDaoImpl;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

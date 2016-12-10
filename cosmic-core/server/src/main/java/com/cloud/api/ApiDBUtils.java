@@ -200,6 +200,8 @@ import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplateDetailsDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.template.TemplateManager;
 import com.cloud.template.VirtualMachineTemplate;
@@ -279,8 +281,6 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.framework.jobs.dao.AsyncJobDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -1767,7 +1767,7 @@ public class ApiDBUtils {
     }
 
     public static Map<String, String> getResourceDetails(final long resourceId, final ResourceObjectType resourceType) {
-        Map<String, String> details;
+        final Map<String, String> details;
         if (isAdmin(CallContext.current().getCallingAccount())) {
             details = s_resourceDetailsService.getDetailsMap(resourceId, resourceType, null);
         } else {

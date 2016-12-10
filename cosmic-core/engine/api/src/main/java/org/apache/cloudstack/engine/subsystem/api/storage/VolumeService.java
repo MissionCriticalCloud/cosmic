@@ -5,10 +5,10 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.offering.DiskOffering;
+import com.cloud.storage.command.CommandResult;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.engine.cloud.entity.api.VolumeEntity;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.storage.command.CommandResult;
 
 import java.util.Map;
 

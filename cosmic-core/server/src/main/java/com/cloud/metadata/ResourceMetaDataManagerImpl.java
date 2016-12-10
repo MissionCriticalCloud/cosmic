@@ -37,7 +37,7 @@ import org.apache.cloudstack.resourcedetail.dao.UserDetailsDao;
 import org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDao;
 import org.apache.cloudstack.resourcedetail.dao.VpcDetailsDao;
 import org.apache.cloudstack.resourcedetail.dao.VpcGatewayDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolDetailsDao;
+import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

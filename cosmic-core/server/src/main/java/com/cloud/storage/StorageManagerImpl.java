@@ -60,6 +60,19 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreDetailsDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
+import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.datastore.db.VolumeDataStoreDao;
+import com.cloud.storage.datastore.db.VolumeDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.listener.StoragePoolMonitor;
 import com.cloud.storage.listener.VolumeStateListener;
 import com.cloud.template.TemplateManager;
@@ -130,19 +143,6 @@ import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -836,7 +836,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
         final String oldUrl = secHost.getStorageUrl();
 
-        URI oldUri;
+        final URI oldUri;
         try {
             oldUri = new URI(UriUtils.encodeURIComponent(oldUrl));
             if (!oldUri.getScheme().equalsIgnoreCase(uri.getScheme())) {
@@ -1289,7 +1289,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                 continue;
             }
 
-            long volumeId = volumeOnImageStore.getVolumeId();
+            final long volumeId = volumeOnImageStore.getVolumeId();
             s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeId);
 
             // Remove it from image store
@@ -1298,7 +1298,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
             // Now expunge it from DB since this entry was created only for download purpose
             _volumeStoreDao.expunge(volumeOnImageStore.getId());
-            Volume volume = _volumeDao.findById(volumeId);
+            final Volume volume = _volumeDao.findById(volumeId);
             if (volume != null && volume.getState() == Volume.State.Expunged) {
                 _volumeDao.remove(volumeId);
             }
@@ -1503,7 +1503,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         params.put("role", DataStoreRole.ImageCache);
 
         final DataStoreLifeCycle lifeCycle = storeProvider.getDataStoreLifeCycle();
-        DataStore store;
+        final DataStore store;
         try {
             store = lifeCycle.initialize(params);
         } catch (final Exception e) {
@@ -1584,7 +1584,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @Override
     @DB
     public PrimaryDataStoreInfo preparePrimaryStorageForMaintenance(final Long primaryStorageId) throws ResourceUnavailableException, InsufficientCapacityException {
-        StoragePoolVO primaryStorage;
+        final StoragePoolVO primaryStorage;
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
         if (primaryStorage == null) {
@@ -1610,7 +1610,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @DB
     public PrimaryDataStoreInfo cancelPrimaryStorageForMaintenance(final CancelPrimaryStorageMaintenanceCmd cmd) throws ResourceUnavailableException {
         final Long primaryStorageId = cmd.getId();
-        StoragePoolVO primaryStorage;
+        final StoragePoolVO primaryStorage;
 
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
@@ -2035,8 +2035,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final List<Long> list = new ArrayList<>();
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs;
-            PreparedStatement pstmt;
+            final ResultSet rs;
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, storeId);
             rs = pstmt.executeQuery();
@@ -2054,8 +2054,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final String sql = "SELECT backup_snap_id FROM snapshots WHERE volume_id=? and backup_snap_id is not NULL";
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs;
-            PreparedStatement pstmt;
+            final ResultSet rs;
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
             rs = pstmt.executeQuery();

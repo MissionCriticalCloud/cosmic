@@ -24,6 +24,9 @@ import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
@@ -44,9 +47,6 @@ import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplat
 import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 
 import javax.inject.Inject;
 import java.util.HashMap;

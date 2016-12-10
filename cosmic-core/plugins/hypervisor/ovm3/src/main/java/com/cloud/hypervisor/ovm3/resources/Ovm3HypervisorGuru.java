@@ -18,8 +18,8 @@ import com.cloud.vm.VirtualMachineProfile;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 
 import javax.inject.Inject;
 

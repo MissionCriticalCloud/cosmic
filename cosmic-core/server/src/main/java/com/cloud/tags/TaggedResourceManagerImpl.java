@@ -59,7 +59,7 @@ import com.cloud.vm.snapshot.VMSnapshotVO;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

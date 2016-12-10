@@ -37,9 +37,9 @@ import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

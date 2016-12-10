@@ -37,7 +37,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

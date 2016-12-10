@@ -30,7 +30,7 @@ import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;

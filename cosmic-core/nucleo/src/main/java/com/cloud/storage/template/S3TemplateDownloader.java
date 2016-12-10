@@ -5,11 +5,11 @@ import static com.cloud.utils.StringUtils.join;
 import static java.util.Arrays.asList;
 
 import com.cloud.agent.api.to.S3TO;
+import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.utils.net.HTTPUtils;
 import com.cloud.utils.net.Proxy;
 import com.cloud.utils.storage.S3.S3Utils;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

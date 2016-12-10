@@ -21,7 +21,7 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

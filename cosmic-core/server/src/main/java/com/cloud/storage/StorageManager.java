@@ -12,12 +12,12 @@ import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VMInstanceVO;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
 import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import java.math.BigDecimal;
 import java.util.List;
