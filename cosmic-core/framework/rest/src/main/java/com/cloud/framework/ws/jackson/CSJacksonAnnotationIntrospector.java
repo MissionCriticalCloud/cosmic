@@ -17,7 +17,7 @@ public class CSJacksonAnnotationIntrospector extends NopAnnotationIntrospector {
 
     @Override
     public Version version() {
-        return new Version(1, 7, 0, "abc", "org.apache.cloudstack", "cloudstack-framework-rest");
+        return new Version(1, 7, 0, "abc", "com.cloud", "cloudstack-framework-rest");
     }
 
     @Override

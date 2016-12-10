@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 
 public class AlertManagerImpl extends ManagerBase implements AlertManager, Configurable {
     private static final Logger s_logger = LoggerFactory.getLogger(AlertManagerImpl.class.getName());
-    private static final Logger s_alertsLogger = LoggerFactory.getLogger("org.apache.cloudstack.alerts");
+    private static final Logger s_alertsLogger = LoggerFactory.getLogger("com.cloud.alerts");
 
     private static final long INITIAL_CAPACITY_CHECK_DELAY = 30L * 1000L; // thirty seconds expressed in milliseconds
 

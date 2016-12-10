@@ -33,7 +33,7 @@
           init-method="scan">
         <property name="packages">
             <list>
-                <value>org.apache.cloudstack.framework</value>
+                <value>com.cloud.framework</value>
             </list>
         </property>
     </bean>

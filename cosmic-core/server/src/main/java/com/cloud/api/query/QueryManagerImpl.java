@@ -315,8 +315,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
      * (non-Javadoc)
      *
      * @see
-     * com.cloud.api.query.QueryService#searchForUsers(org.apache.cloudstack
-     * .api.command.admin.user.ListUsersCmd)
+     * com.cloud.api.query.QueryService#searchForUsers(com.cloud.api.command.admin.user.ListUsersCmd)
      */
     @Override
     public ListResponse<UserResponse> searchForUsers(final ListUsersCmd cmd) throws PermissionDeniedException {

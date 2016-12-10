@@ -56,7 +56,7 @@ public class CSExceptionErrorCode {
             // Have a special error code for ServerApiException when it is
             // thrown in a standalone manner when failing to detect any of the above
             // standard exceptions.
-            ExceptionErrorCodeMap.put("org.apache.cloudstack.api.ServerApiException", 9999);
+            ExceptionErrorCodeMap.put("com.cloud.api.ServerApiException", 9999);
         } catch (final Exception e) {
             e.printStackTrace();
             throw new ExceptionInInitializerError(e);

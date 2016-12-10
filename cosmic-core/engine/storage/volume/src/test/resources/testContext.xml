@@ -29,18 +29,16 @@
                                  http://www.springframework.org/schema/context
                                           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config />
-    <context:component-scan base-package="org.apache.cloudstack.storage" />
-    <context:component-scan
-        base-package="org.apache.cloudstack.engine.subsystem.api.storage" />
+    <context:component-scan base-package="com.cloud.storage" />
+    <context:component-scan base-package="com.cloud.engine.subsystem.api.storage" />
     <context:component-scan base-package="com.cloud.utils.db" />
     <context:component-scan base-package="com.cloud.utils.component" />
     <context:component-scan base-package="com.cloud.host.dao" />
     <context:component-scan base-package="com.cloud.dc.dao" />
-    <context:component-scan base-package="com.cloud.dc.dao" />
-    <context:component-scan base-package="org.apache.cloudstack.framework" />
+    <context:component-scan base-package="com.cloud.framework" />
 
     <tx:annotation-driven transaction-manager="transactionManager" />
-    <bean class="org.apache.cloudstack.storage.volume.test.TestConfiguration" />
+    <bean class="com.cloud.storage.volume.test.TestConfiguration" />
     <aop:config proxy-target-class="true">
         <aop:aspect id="dbContextBuilder" ref="transactionContextBuilder">
             <aop:pointcut id="captureAnyMethod" expression="@annotation(com.cloud.utils.db.DB)" />
@@ -54,7 +52,7 @@
           init-method="scan">
         <property name="packages">
             <list>
-                <value>org.apache.cloudstack.framework</value>
+                <value>com.cloud.framework</value>
             </list>
         </property>
     </bean>
@@ -74,6 +72,6 @@
         <property name="messageSerializer" ref="messageSerializer" />
     </bean>
 
-    <bean id="eventBus" class="org.apache.cloudstack.framework.eventbus.EventBusBase" />
+    <bean id="eventBus" class="com.cloud.framework.eventbus.EventBusBase" />
 
 </beans>

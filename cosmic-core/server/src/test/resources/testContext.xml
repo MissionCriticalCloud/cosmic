@@ -30,7 +30,7 @@
 
     <context:annotation-config />
 
-    <context:component-scan base-package="org.apache.cloudstack, com.cloud" />
+    <context:component-scan base-package="com.cloud" />
 
     <!--
       @DB support
@@ -58,7 +58,7 @@
           init-method="scan">
         <property name="packages">
             <list>
-                <value>org.apache.cloudstack.framework</value>
+                <value>com.cloud.framework</value>
             </list>
         </property>
     </bean>
@@ -78,7 +78,7 @@
         <property name="messageSerializer" ref="messageSerializer" />
     </bean>
 
-    <bean id="eventBus" class="org.apache.cloudstack.framework.eventbus.EventBusBase" />
+    <bean id="eventBus" class="com.cloud.framework.eventbus.EventBusBase" />
 
     <bean id="apiServlet" class="com.cloud.api.ApiServlet" />
 

@@ -71,7 +71,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     NetworkOfferingDaoImpl _ntwkOffDao;
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#updateConfiguration(org.apache.cloudstack.api.commands.UpdateCfgCmd)
+     * @see com.cloud.configuration.ConfigurationService#updateConfiguration(com.cloud.api.commands.UpdateCfgCmd)
      */
     @Override
     public Configuration updateConfiguration(final UpdateCfgCmd cmd) {
@@ -80,7 +80,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#createServiceOffering(org.apache.cloudstack.api.commands.CreateServiceOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#createServiceOffering(com.cloud.api.commands.CreateServiceOfferingCmd)
      */
     @Override
     public ServiceOffering createServiceOffering(final CreateServiceOfferingCmd cmd) {
@@ -89,7 +89,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#updateServiceOffering(org.apache.cloudstack.api.commands.UpdateServiceOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#updateServiceOffering(com.cloud.api.commands.UpdateServiceOfferingCmd)
      */
     @Override
     public ServiceOffering updateServiceOffering(final UpdateServiceOfferingCmd cmd) {
@@ -98,7 +98,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deleteServiceOffering(org.apache.cloudstack.api.commands.DeleteServiceOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#deleteServiceOffering(com.cloud.api.commands.DeleteServiceOfferingCmd)
      */
     @Override
     public boolean deleteServiceOffering(final DeleteServiceOfferingCmd cmd) {
@@ -107,7 +107,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#updateDiskOffering(org.apache.cloudstack.api.commands.UpdateDiskOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#updateDiskOffering(com.cloud.api.commands.UpdateDiskOfferingCmd)
      */
     @Override
     public DiskOffering updateDiskOffering(final UpdateDiskOfferingCmd cmd) {
@@ -116,7 +116,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deleteDiskOffering(org.apache.cloudstack.api.commands.DeleteDiskOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#deleteDiskOffering(com.cloud.api.commands.DeleteDiskOfferingCmd)
      */
     @Override
     public boolean deleteDiskOffering(final DeleteDiskOfferingCmd cmd) {
@@ -125,7 +125,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#createDiskOffering(org.apache.cloudstack.api.commands.CreateDiskOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#createDiskOffering(com.cloud.api.commands.CreateDiskOfferingCmd)
      */
     @Override
     public DiskOffering createDiskOffering(final CreateDiskOfferingCmd cmd) {
@@ -143,7 +143,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#editPod(org.apache.cloudstack.api.commands.UpdatePodCmd)
+     * @see com.cloud.configuration.ConfigurationService#editPod(com.cloud.api.commands.UpdatePodCmd)
      */
     @Override
     public Pod editPod(final UpdatePodCmd cmd) {
@@ -152,7 +152,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deletePod(org.apache.cloudstack.api.commands.DeletePodCmd)
+     * @see com.cloud.configuration.ConfigurationService#deletePod(com.cloud.api.commands.DeletePodCmd)
      */
     @Override
     public boolean deletePod(final DeletePodCmd cmd) {
@@ -161,7 +161,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#createZone(org.apache.cloudstack.api.commands.CreateZoneCmd)
+     * @see com.cloud.configuration.ConfigurationService#createZone(com.cloud.api.commands.CreateZoneCmd)
      */
     @Override
     public DataCenter createZone(final CreateZoneCmd cmd) {
@@ -170,7 +170,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#editZone(org.apache.cloudstack.api.commands.UpdateZoneCmd)
+     * @see com.cloud.configuration.ConfigurationService#editZone(com.cloud.api.commands.UpdateZoneCmd)
      */
     @Override
     public DataCenter editZone(final UpdateZoneCmd cmd) {
@@ -179,7 +179,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deleteZone(org.apache.cloudstack.api.commands.DeleteZoneCmd)
+     * @see com.cloud.configuration.ConfigurationService#deleteZone(com.cloud.api.commands.DeleteZoneCmd)
      */
     @Override
     public boolean deleteZone(final DeleteZoneCmd cmd) {
@@ -188,7 +188,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#createVlanAndPublicIpRange(org.apache.cloudstack.api.commands.CreateVlanIpRangeCmd)
+     * @see com.cloud.configuration.ConfigurationService#createVlanAndPublicIpRange(com.cloud.api.commands.CreateVlanIpRangeCmd)
      */
     @Override
     public Vlan createVlanAndPublicIpRange(final CreateVlanIpRangeCmd cmd) throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException,
@@ -207,7 +207,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deleteVlanIpRange(org.apache.cloudstack.api.commands.DeleteVlanIpRangeCmd)
+     * @see com.cloud.configuration.ConfigurationService#deleteVlanIpRange(com.cloud.api.commands.DeleteVlanIpRangeCmd)
      */
     @Override
     public boolean deleteVlanIpRange(final DeleteVlanIpRangeCmd cmd) {
@@ -228,7 +228,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#createNetworkOffering(org.apache.cloudstack.api.commands.CreateNetworkOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#createNetworkOffering(com.cloud.api.commands.CreateNetworkOfferingCmd)
      */
     @Override
     public NetworkOffering createNetworkOffering(final CreateNetworkOfferingCmd cmd) {
@@ -237,7 +237,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#updateNetworkOffering(org.apache.cloudstack.api.commands.UpdateNetworkOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#updateNetworkOffering(com.cloud.api.commands.UpdateNetworkOfferingCmd)
      */
     @Override
     public NetworkOffering updateNetworkOffering(final UpdateNetworkOfferingCmd cmd) {
@@ -246,7 +246,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#searchForNetworkOfferings(org.apache.cloudstack.api.commands.ListNetworkOfferingsCmd)
+     * @see com.cloud.configuration.ConfigurationService#searchForNetworkOfferings(com.cloud.api.commands.ListNetworkOfferingsCmd)
      */
     @Override
     public Pair<List<? extends NetworkOffering>, Integer> searchForNetworkOfferings(final ListNetworkOfferingsCmd cmd) {
@@ -255,7 +255,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationService#deleteNetworkOffering(org.apache.cloudstack.api.commands.DeleteNetworkOfferingCmd)
+     * @see com.cloud.configuration.ConfigurationService#deleteNetworkOffering(com.cloud.api.commands.DeleteNetworkOfferingCmd)
      */
     @Override
     public boolean deleteNetworkOffering(final DeleteNetworkOfferingCmd cmd) {

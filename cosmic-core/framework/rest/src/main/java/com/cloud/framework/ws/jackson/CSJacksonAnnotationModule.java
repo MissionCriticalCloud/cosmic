@@ -15,7 +15,7 @@ public class CSJacksonAnnotationModule extends Module {
 
     @Override
     public Version version() {
-        return new Version(1, 0, 0, "", "org.apache.cloudstack", "cloudstack-framework-rest");
+        return new Version(1, 0, 0, "", "com.cloud", "cloudstack-framework-rest");
     }
 
     @Override
