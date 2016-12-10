@@ -1,5 +1,6 @@
 package com.cloud.projects;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.dao.ProjectAccountJoinDao;
 import com.cloud.api.query.dao.ProjectInvitationJoinDao;
@@ -40,7 +41,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
@@ -502,8 +502,8 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
     @ActionEvent(eventType = EventTypes.EVENT_PROJECT_INVITATION_UPDATE, eventDescription = "updating project invitation", async = true)
     public boolean updateInvitation(final long projectId, String accountName, final String token, final boolean accept) {
         final Account caller = CallContext.current().getCallingAccount();
-        Long accountId;
-        boolean result;
+        final Long accountId;
+        final boolean result;
 
         //if accountname and token are null, default accountname to caller's account name
         if (accountName == null && token == null) {
@@ -533,7 +533,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
         }
 
         //check that invitation exists
-        ProjectInvitationVO invite;
+        final ProjectInvitationVO invite;
         if (token == null) {
             invite = _projectInvitationDao.findByAccountIdProjectId(accountId, projectId, ProjectInvitation.State.Pending);
         } else {
@@ -552,7 +552,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
                 result = Transaction.execute(new TransactionCallback<Boolean>() {
                     @Override
                     public Boolean doInTransaction(final TransactionStatus status) {
-                        boolean result;
+                        final boolean result;
 
                         final ProjectInvitation.State newState = accept ? ProjectInvitation.State.Completed : ProjectInvitation.State.Declined;
 
@@ -995,7 +995,7 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
                 msg.setContent(content, "text/plain");
                 msg.saveChanges();
 
-                SMTPTransport smtpTrans;
+                final SMTPTransport smtpTrans;
                 if (_smtpUseAuth) {
                     smtpTrans = new SMTPSSLTransport(_smtpSession, new URLName("smtp", _smtpHost, _smtpPort, null, _smtpUsername, _smtpPassword));
                 } else {

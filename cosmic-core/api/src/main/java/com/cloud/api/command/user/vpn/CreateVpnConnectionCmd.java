@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vpn;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.api.response.Site2SiteVpnGatewayResponse;
@@ -9,7 +10,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.vpc.Vpc;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

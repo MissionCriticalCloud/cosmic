@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vm;
 
+import com.cloud.acl.RoleType;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
@@ -30,7 +31,6 @@ import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

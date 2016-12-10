@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.volume;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
@@ -9,7 +10,6 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.storage.Volume;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

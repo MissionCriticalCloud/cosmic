@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.network;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.NetworkACLItemResponse;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.NetworkResponse;
@@ -9,7 +10,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

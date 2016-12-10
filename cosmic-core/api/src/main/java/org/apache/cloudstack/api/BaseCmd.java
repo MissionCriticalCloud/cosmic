@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api;
 
+import com.cloud.acl.RoleType;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.dao.EntityManager;
@@ -45,7 +46,6 @@ import com.cloud.utils.HttpUtils;
 import com.cloud.utils.ReflectUtil;
 import com.cloud.vm.UserVmService;
 import com.cloud.vm.snapshot.VMSnapshotService;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.alert.AlertService;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.query.QueryService;

@@ -1,5 +1,6 @@
 package com.cloud.network;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
@@ -83,7 +84,6 @@ import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 
@@ -197,7 +197,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     Set<Purpose> getPublicIpPurposeInRules(final PublicIpAddress ip, final boolean includeRevoked, final boolean includingFirewall) {
         final Set<Purpose> result = new HashSet<>();
-        List<FirewallRuleVO> rules;
+        final List<FirewallRuleVO> rules;
         if (includeRevoked) {
             rules = _firewallDao.listByIp(ip.getId());
         } else {
@@ -1175,7 +1175,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public long findPhysicalNetworkId(final long zoneId, final String tag, final TrafficType trafficType) {
-        List<PhysicalNetworkVO> pNtwks;
+        final List<PhysicalNetworkVO> pNtwks;
         if (trafficType != null) {
             pNtwks = _physicalNetworkDao.listByZoneAndTrafficType(zoneId, trafficType);
         } else {
@@ -1783,7 +1783,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public boolean isNetworkAvailableInDomain(final long networkId, final long domainId) {
-        Long networkDomainId;
+        final Long networkDomainId;
         final Network network = getNetwork(networkId);
         if (network.getGuestType() != Network.GuestType.Shared) {
             s_logger.trace("Network id=" + networkId + " is not shared");
@@ -1966,7 +1966,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public NicProfile getNicProfile(final VirtualMachine vm, final long networkId, final String broadcastUri) {
-        NicVO nic;
+        final NicVO nic;
         if (broadcastUri != null) {
             nic = _nicDao.findByNetworkIdInstanceIdAndBroadcastUri(networkId, vm.getId(), broadcastUri);
         } else {
@@ -2013,7 +2013,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public PublicIpAddress getSourceNatIpAddressForGuestNetwork(final Account owner, final Network guestNetwork) {
         final List<? extends IpAddress> addrs = listPublicIpsAssignedToGuestNtwk(owner.getId(), guestNetwork.getId(), true);
 
-        IPAddressVO sourceNatIp;
+        final IPAddressVO sourceNatIp;
         if (addrs.isEmpty()) {
             return null;
         } else {
@@ -2243,7 +2243,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             // in windows VM in password reset script.
 
             if (isWindows) {
-                MessageDigest md5;
+                final MessageDigest md5;
                 try {
                     md5 = MessageDigest.getInstance("MD5");
                 } catch (final NoSuchAlgorithmException e) {

@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
@@ -34,7 +35,6 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;

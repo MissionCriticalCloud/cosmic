@@ -1,5 +1,6 @@
 package com.cloud.api.query;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroupDomainMapVO;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.affinity.AffinityGroupVMMapVO;
@@ -177,7 +178,6 @@ import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.ResourceDetail;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;

@@ -1,12 +1,12 @@
 package com.cloud.api.command.user.loadbalancer;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;

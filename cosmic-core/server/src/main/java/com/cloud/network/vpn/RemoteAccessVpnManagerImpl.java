@@ -1,5 +1,6 @@
 package com.cloud.network.vpn;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.vpn.ListRemoteAccessVpnsCmd;
 import com.cloud.api.command.user.vpn.ListVpnUsersCmd;
 import com.cloud.configuration.Config;
@@ -58,7 +59,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;

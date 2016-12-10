@@ -1,11 +1,11 @@
 package com.cloud.network;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
-import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;

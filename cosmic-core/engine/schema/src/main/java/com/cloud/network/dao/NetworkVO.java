@@ -1,5 +1,6 @@
 package com.cloud.network.dao;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
@@ -7,7 +8,6 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.ControlledEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

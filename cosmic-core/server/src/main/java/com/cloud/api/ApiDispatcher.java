@@ -1,5 +1,8 @@
 package com.cloud.api;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.InfrastructureEntity;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.dispatch.DispatchChain;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
@@ -12,9 +15,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.InfrastructureEntity;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCmd;
@@ -101,7 +101,7 @@ public class ApiDispatcher {
 
             // Synchronise job on the object if needed
             if (asyncCmd.getJob() != null && asyncCmd.getSyncObjId() != null && asyncCmd.getSyncObjType() != null) {
-                Long queueSizeLimit;
+                final Long queueSizeLimit;
                 if (asyncCmd.getSyncObjType() != null && asyncCmd.getSyncObjType().equalsIgnoreCase(BaseAsyncCmd.snapshotHostSyncObject)) {
                     queueSizeLimit = _createSnapshotQueueSizeLimit;
                 } else {

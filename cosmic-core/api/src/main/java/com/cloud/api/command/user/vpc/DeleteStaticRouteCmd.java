@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vpc;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.SuccessResponse;
@@ -7,7 +8,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.StaticRoute;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

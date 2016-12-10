@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.network;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
@@ -7,7 +8,6 @@ import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.network.Network;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.admin.systemvm;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.SystemVmResponse;
@@ -12,7 +13,6 @@ import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

@@ -1,5 +1,6 @@
 package com.cloud.network.lb;
 
+import com.cloud.acl.SecurityChecker;
 import com.cloud.api.command.user.loadbalancer.DeleteSslCertCmd;
 import com.cloud.api.command.user.loadbalancer.ListSslCertsCmd;
 import com.cloud.api.command.user.loadbalancer.UploadSslCertCmd;
@@ -23,7 +24,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.context.CallContext;
 
 import javax.crypto.BadPaddingException;

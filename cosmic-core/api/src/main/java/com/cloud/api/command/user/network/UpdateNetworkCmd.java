@@ -1,5 +1,7 @@
 package com.cloud.api.command.user.network;
 
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.NetworkOfferingResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.event.EventTypes;
@@ -10,8 +12,6 @@ import com.cloud.network.Network;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

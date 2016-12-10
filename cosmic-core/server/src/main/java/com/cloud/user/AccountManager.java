@@ -1,5 +1,6 @@
 package com.cloud.user;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.api.command.admin.account.UpdateAccountCmd;
 import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
@@ -11,7 +12,6 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.acl.ControlledEntity;
 
 import java.net.InetAddress;
 import java.util.List;

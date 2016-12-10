@@ -1,5 +1,6 @@
 package com.cloud.resourcelimit;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource;
@@ -37,6 +38,10 @@ import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.dao.VolumeDaoImpl.SumCount;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
@@ -63,15 +68,10 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
-import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
-import com.cloud.storage.datastore.db.TemplateDataStoreDao;
-import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -391,7 +391,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
     public List<ResourceLimitVO> searchForLimits(final Long id, Long accountId, Long domainId, final Integer type, final Long startIndex, final Long pageSizeVal) {
         final Account caller = CallContext.current().getCallingAccount();
         final List<ResourceLimitVO> limits = new ArrayList<>();
-        boolean isAccount;
+        final boolean isAccount;
 
         if (!_accountMgr.isAdmin(caller.getId())) {
             accountId = caller.getId();
@@ -1028,7 +1028,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
 
     private long calculatePublicIpForAccount(final long accountId) {
         Long dedicatedCount = 0L;
-        Long allocatedCount;
+        final Long allocatedCount;
 
         final List<VlanVO> dedicatedVlans = _vlanDao.listDedicatedVlans(accountId);
         for (final VlanVO dedicatedVlan : dedicatedVlans) {

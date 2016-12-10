@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.loadbalancer;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.event.EventTypes;
@@ -13,7 +14,6 @@ import com.cloud.network.Network;
 import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

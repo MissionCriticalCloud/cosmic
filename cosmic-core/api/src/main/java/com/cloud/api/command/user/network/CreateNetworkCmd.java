@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.network;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.NetworkOfferingResponse;
@@ -16,7 +17,6 @@ import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

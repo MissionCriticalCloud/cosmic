@@ -1,6 +1,6 @@
 package com.cloud.serializer;
 
-import org.apache.cloudstack.acl.RoleType;
+import com.cloud.acl.RoleType;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.firewall;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
@@ -8,7 +9,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.TrafficType;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;

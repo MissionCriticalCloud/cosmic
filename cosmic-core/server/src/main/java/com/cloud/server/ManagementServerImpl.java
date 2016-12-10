@@ -1,5 +1,6 @@
 package com.cloud.server;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.affinity.AffinityGroupProcessor;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
@@ -613,7 +614,6 @@ import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.context.CallContext;

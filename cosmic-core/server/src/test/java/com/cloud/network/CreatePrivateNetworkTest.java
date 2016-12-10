@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -31,7 +32,6 @@ import com.cloud.user.AccountVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.util.ArrayList;

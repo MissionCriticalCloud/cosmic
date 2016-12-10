@@ -1,7 +1,7 @@
 package com.cloud.api.response;
 
+import com.cloud.acl.RoleType;
 import com.cloud.serializer.Param;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 

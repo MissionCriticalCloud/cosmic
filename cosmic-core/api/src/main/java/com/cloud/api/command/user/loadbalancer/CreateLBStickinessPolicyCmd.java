@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.loadbalancer;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBStickinessResponse;
 import com.cloud.event.EventTypes;
@@ -10,7 +11,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

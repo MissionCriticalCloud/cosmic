@@ -1,6 +1,6 @@
 package com.cloud.network.rules;
 
-import org.apache.cloudstack.acl.ControlledEntity;
+import com.cloud.acl.ControlledEntity;
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;

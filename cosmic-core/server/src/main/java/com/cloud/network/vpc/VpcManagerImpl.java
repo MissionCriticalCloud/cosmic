@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.command.user.vpc.ListPrivateGatewaysCmd;
 import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
 import com.cloud.configuration.Config;
@@ -93,7 +94,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.dao.DomainRouterDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.ConfigDepot;

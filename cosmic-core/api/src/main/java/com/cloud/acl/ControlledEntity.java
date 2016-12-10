@@ -1,4 +1,4 @@
-package org.apache.cloudstack.acl;
+package com.cloud.acl;
 
 import com.cloud.domain.PartOf;
 import com.cloud.user.OwnedBy;

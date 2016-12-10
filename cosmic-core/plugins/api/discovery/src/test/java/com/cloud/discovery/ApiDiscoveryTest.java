@@ -8,13 +8,13 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.APIChecker;
 import com.cloud.api.command.user.discovery.ListApisCmd;
 import com.cloud.api.response.ApiDiscoveryResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.PluggableService;
-import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.APICommand;
 
 import javax.naming.ConfigurationException;

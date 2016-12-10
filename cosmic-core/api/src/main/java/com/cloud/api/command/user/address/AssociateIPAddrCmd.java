@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.address;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkResponse;
@@ -23,7 +24,6 @@ import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

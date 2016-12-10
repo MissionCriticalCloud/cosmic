@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.address;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.event.EventTypes;
@@ -11,7 +12,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;

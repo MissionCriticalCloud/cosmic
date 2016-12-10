@@ -1,5 +1,7 @@
 package com.cloud.api.command.user.firewall;
 
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkResponse;
@@ -15,8 +17,6 @@ import com.cloud.user.Account;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

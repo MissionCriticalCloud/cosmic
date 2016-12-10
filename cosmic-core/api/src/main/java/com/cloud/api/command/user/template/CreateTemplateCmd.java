@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.template;
 
+import com.cloud.acl.SecurityChecker;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SnapshotResponse;
@@ -15,7 +16,6 @@ import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

@@ -1,10 +1,10 @@
 package com.cloud.api.command.admin.account;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.region.RegionService;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

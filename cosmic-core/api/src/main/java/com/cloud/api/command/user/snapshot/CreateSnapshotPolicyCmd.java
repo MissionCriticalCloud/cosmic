@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.snapshot;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.exception.InvalidParameterValueException;
@@ -8,7 +9,6 @@ import com.cloud.projects.Project;
 import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

@@ -1,5 +1,6 @@
 package com.cloud.vpc;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
 import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
@@ -50,7 +51,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import javax.inject.Inject;
@@ -544,7 +544,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
 
     /* (non-Javadoc)
      * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.network.Network, com.cloud.deploy
-     * .DeploymentPlan, java.lang.String, java.lang.String, boolean, java.lang.Long, org.apache.cloudstack.acl.ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
+     * .DeploymentPlan, java.lang.String, java.lang.String, boolean, java.lang.Long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
     public List<NetworkVO> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name, final String
@@ -659,7 +659,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
 
     /* (non-Javadoc)
      * @see com.cloud.network.NetworkManager#createGuestNetwork(long, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String,
-      * com.cloud.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, org.apache.cloudstack.acl.ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
+      * com.cloud.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,

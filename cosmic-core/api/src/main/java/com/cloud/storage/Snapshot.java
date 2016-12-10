@@ -1,8 +1,8 @@
 package com.cloud.storage;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.fsm.StateObject;
-import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 

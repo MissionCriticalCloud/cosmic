@@ -1,13 +1,13 @@
 package com.cloud.api.command.user.autoscale;
 
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.AutoScaleVmProfileResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

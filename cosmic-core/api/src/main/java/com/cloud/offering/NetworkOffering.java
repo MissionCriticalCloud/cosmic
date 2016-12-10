@@ -1,8 +1,8 @@
 package com.cloud.offering;
 
+import com.cloud.acl.InfrastructureEntity;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
-import org.apache.cloudstack.acl.InfrastructureEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 

@@ -21,8 +21,6 @@ import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.AdapterBase;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.SecurityChecker;
 
 import javax.inject.Inject;
 

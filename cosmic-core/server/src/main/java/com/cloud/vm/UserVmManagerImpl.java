@@ -1,5 +1,7 @@
 package com.cloud.vm;
 
+import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.AffinityGroupVO;
 import com.cloud.affinity.dao.AffinityGroupDao;
@@ -221,8 +223,6 @@ import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd.HTTPMethod;
 import org.apache.cloudstack.context.CallContext;

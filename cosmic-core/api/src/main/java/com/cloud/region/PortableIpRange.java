@@ -1,6 +1,6 @@
 package com.cloud.region;
 
-import org.apache.cloudstack.acl.InfrastructureEntity;
+import com.cloud.acl.InfrastructureEntity;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.api.InternalIdentity;
 

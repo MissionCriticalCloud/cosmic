@@ -1,5 +1,8 @@
 package com.cloud.affinity;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
@@ -32,9 +35,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;

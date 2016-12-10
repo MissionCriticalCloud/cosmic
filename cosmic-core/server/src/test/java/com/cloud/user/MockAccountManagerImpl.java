@@ -1,5 +1,8 @@
 package com.cloud.user;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.admin.account.UpdateAccountCmd;
 import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.RegisterCmd;
@@ -18,9 +21,6 @@ import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 
 import javax.naming.ConfigurationException;
 import java.net.InetAddress;

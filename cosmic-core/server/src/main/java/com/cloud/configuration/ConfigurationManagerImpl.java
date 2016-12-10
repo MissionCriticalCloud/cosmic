@@ -1,5 +1,6 @@
 package com.cloud.configuration;
 
+import com.cloud.acl.SecurityChecker;
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.dao.AffinityGroupDao;
@@ -169,7 +170,6 @@ import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicIpAliasVO;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;

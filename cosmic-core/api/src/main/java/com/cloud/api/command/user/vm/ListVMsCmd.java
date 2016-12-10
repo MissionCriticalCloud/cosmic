@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vm;
 
+import com.cloud.acl.RoleType;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.InstanceGroupResponse;
@@ -16,7 +17,6 @@ import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

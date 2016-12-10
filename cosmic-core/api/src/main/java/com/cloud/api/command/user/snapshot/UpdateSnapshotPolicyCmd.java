@@ -1,12 +1,12 @@
 package com.cloud.api.command.user.snapshot;
 
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker;
 import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

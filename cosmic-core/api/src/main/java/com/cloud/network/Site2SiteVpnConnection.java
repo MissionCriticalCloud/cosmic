@@ -1,6 +1,6 @@
 package com.cloud.network;
 
-import org.apache.cloudstack.acl.ControlledEntity;
+import com.cloud.acl.ControlledEntity;
 import org.apache.cloudstack.api.Displayable;
 import org.apache.cloudstack.api.InternalIdentity;
 

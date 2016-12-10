@@ -1,11 +1,11 @@
 package com.cloud.api.command.user.vpn;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.RemoteAccessVpn;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;

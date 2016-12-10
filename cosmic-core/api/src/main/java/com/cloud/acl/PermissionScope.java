@@ -1,4 +1,4 @@
-package org.apache.cloudstack.acl;
+package com.cloud.acl;
 
 public enum PermissionScope {
     RESOURCE(0),

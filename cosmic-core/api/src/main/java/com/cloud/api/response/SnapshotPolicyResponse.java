@@ -1,8 +1,8 @@
 package com.cloud.api.response;
 
+import com.cloud.acl.RoleType;
 import com.cloud.serializer.Param;
 import com.cloud.storage.snapshot.SnapshotPolicy;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;

@@ -1,5 +1,7 @@
 package com.cloud.api;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.agent.api.VgpuTypesInfo;
@@ -261,8 +263,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.snapshot.VMSnapshot;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
 import org.apache.cloudstack.api.ResponseGenerator;

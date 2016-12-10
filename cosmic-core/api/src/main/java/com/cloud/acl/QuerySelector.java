@@ -1,8 +1,7 @@
-package org.apache.cloudstack.acl;
+package com.cloud.acl;
 
 import com.cloud.user.Account;
 import com.cloud.utils.component.Adapter;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public interface QuerySelector extends Adapter {
      * @param action action
      * @return list of domain Ids granted to the caller account.
      */
-    List<Long> getAuthorizedDomains(Account caller, String action, AccessType accessType);
+    List<Long> getAuthorizedDomains(Account caller, String action, SecurityChecker.AccessType accessType);
 
     /**
      * List granted accounts for the caller, given a specific action.
@@ -27,7 +26,7 @@ public interface QuerySelector extends Adapter {
      * @param action action.
      * @return list of domain Ids granted to the caller account.
      */
-    List<Long> getAuthorizedAccounts(Account caller, String action, AccessType accessType);
+    List<Long> getAuthorizedAccounts(Account caller, String action, SecurityChecker.AccessType accessType);
 
     /**
      * List granted resources for the caller, given a specific action.
@@ -36,7 +35,7 @@ public interface QuerySelector extends Adapter {
      * @param action action.
      * @return list of domain Ids granted to the caller account.
      */
-    List<Long> getAuthorizedResources(Account caller, String action, AccessType accessType);
+    List<Long> getAuthorizedResources(Account caller, String action, SecurityChecker.AccessType accessType);
 
     /**
      * Check if this account is associated with a policy with scope of ALL
@@ -45,7 +44,7 @@ public interface QuerySelector extends Adapter {
      * @param action action.
      * @return true if this account is attached with a policy for the given action of ALL scope.
      */
-    boolean isGrantedAll(Account caller, String action, AccessType accessType);
+    boolean isGrantedAll(Account caller, String action, SecurityChecker.AccessType accessType);
 
     /**
      * List of ACL group the given account belongs to

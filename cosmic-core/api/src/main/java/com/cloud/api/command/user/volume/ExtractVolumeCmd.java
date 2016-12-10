@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.volume;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
@@ -8,7 +9,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.storage.Upload;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

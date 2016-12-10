@@ -1,9 +1,9 @@
 package com.cloud.api.response;
 
+import com.cloud.acl.RoleType;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.serializer.Param;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd.CommandType;
 import org.apache.cloudstack.api.BaseResponse;

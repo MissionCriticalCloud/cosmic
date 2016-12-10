@@ -1,5 +1,6 @@
 package com.cloud.api.command.admin.internallb;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
@@ -8,7 +9,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

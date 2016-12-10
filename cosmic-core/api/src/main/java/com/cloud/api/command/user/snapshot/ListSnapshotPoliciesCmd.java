@@ -1,11 +1,11 @@
 package com.cloud.api.command.user.snapshot;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.autoscale;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.AutoScaleVmProfileResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.TemplateResponse;
@@ -11,7 +12,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.securitygroup;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SecurityGroupResponse;
@@ -9,7 +10,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityRule;
 import com.cloud.utils.StringUtils;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.network;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.SuccessResponse;
@@ -10,7 +11,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

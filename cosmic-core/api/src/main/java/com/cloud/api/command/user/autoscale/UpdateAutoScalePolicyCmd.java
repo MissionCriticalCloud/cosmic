@@ -1,11 +1,11 @@
 package com.cloud.api.command.user.autoscale;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.AutoScalePolicyResponse;
 import com.cloud.api.response.ConditionResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScalePolicy;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

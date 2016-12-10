@@ -6,12 +6,12 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.event.dao.EventDao;
 import com.cloud.server.ManagementServerImpl;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 
 import java.util.Date;
 import java.util.List;

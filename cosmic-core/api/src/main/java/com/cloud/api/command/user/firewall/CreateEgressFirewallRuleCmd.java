@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.firewall;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.event.EventTypes;
@@ -10,7 +11,6 @@ import com.cloud.network.Network;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;

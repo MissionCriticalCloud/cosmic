@@ -1,12 +1,12 @@
 package com.cloud.api.command.user.volume;
 
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.Volume;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

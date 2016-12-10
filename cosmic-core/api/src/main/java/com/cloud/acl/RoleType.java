@@ -1,4 +1,4 @@
-package org.apache.cloudstack.acl;
+package com.cloud.acl;
 
 // Enum for default roles in CloudStack
 public enum RoleType {

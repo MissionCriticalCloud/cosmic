@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vpn;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
@@ -9,7 +10,6 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.RemoteAccessVpn;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

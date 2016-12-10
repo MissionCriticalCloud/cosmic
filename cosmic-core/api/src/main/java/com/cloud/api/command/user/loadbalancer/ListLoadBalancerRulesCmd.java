@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.loadbalancer;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
@@ -9,7 +10,6 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;

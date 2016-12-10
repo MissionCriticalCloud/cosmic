@@ -15,6 +15,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.admin.vm.AssignVMCmd;
 import com.cloud.api.command.user.vm.RestoreVMCmd;
 import com.cloud.api.command.user.vm.ScaleVMCmd;
@@ -75,8 +77,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;

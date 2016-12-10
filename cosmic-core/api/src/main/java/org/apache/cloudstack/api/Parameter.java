@@ -2,7 +2,7 @@ package org.apache.cloudstack.api;
 
 import static java.lang.annotation.ElementType.FIELD;
 
-import org.apache.cloudstack.acl.RoleType;
+import com.cloud.acl.RoleType;
 import org.apache.cloudstack.api.BaseCmd.CommandType;
 
 import java.lang.annotation.Retention;

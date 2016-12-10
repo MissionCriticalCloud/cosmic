@@ -1,12 +1,12 @@
 package com.cloud.api.command.user.firewall;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.PortForwardingRule;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

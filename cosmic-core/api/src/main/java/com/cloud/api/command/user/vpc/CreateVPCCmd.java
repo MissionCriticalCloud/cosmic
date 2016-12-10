@@ -1,5 +1,6 @@
 package com.cloud.api.command.user.vpc;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VpcOfferingResponse;
@@ -11,7 +12,6 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.Vpc;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;

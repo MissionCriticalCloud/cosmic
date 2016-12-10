@@ -1,9 +1,9 @@
 package com.cloud.api.command.user.vmgroup;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.response.InstanceGroupResponse;
 import com.cloud.user.Account;
 import com.cloud.vm.InstanceGroup;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;

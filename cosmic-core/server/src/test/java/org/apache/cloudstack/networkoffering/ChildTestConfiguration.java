@@ -1,5 +1,6 @@
 package org.apache.cloudstack.networkoffering;
 
+import com.cloud.acl.SecurityChecker;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.agent.AgentManager;
@@ -83,7 +84,6 @@ import com.cloud.vm.dao.NicDaoImpl;
 import com.cloud.vm.dao.NicSecondaryIpDaoImpl;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
-import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;

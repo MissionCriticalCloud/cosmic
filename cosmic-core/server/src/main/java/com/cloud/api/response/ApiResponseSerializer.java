@@ -1,5 +1,6 @@
 package com.cloud.api.response;
 
+import com.cloud.acl.RoleType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseGsonHelper;
 import com.cloud.api.ApiServer;
@@ -9,7 +10,6 @@ import com.cloud.utils.HttpUtils;
 import com.cloud.utils.encoding.URLEncoder;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.ResponseObject;

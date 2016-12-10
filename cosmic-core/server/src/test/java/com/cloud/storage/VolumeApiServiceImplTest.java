@@ -5,6 +5,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.volume.CreateVolumeCmd;
 import com.cloud.api.command.user.volume.DetachVolumeCmd;
 import com.cloud.exception.InvalidParameterValueException;
@@ -24,8 +26,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;

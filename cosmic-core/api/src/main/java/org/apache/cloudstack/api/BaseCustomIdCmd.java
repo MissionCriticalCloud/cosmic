@@ -1,6 +1,6 @@
 package org.apache.cloudstack.api;
 
-import org.apache.cloudstack.acl.RoleType;
+import com.cloud.acl.RoleType;
 
 public abstract class BaseCustomIdCmd extends BaseCmd {
 

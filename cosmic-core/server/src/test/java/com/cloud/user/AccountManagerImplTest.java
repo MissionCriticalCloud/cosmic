@@ -1,5 +1,8 @@
 package com.cloud.user;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.SecurityChecker;
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.dao.ResourceCountDao;
@@ -49,9 +52,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.SecurityChecker;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
