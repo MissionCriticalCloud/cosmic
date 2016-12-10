@@ -1,4 +1,4 @@
-package org.apache.cloudstack.hypervisor.xenserver;
+package com.cloud.hypervisor.xenserver;
 
 public final class XenserverConfigs {
     public static final String XS620HotFix = "xs620hotfix";

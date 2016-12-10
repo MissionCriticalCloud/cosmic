@@ -15,11 +15,11 @@ import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.script.Script;
 import com.cloud.utils.qemu.QemuImg;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.qemu.QemuImgException;
 import com.cloud.utils.qemu.QemuImgFile;
+import com.cloud.utils.script.Script;
 
 import java.io.File;
 import java.nio.charset.Charset;

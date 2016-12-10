@@ -28,7 +28,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
+import com.cloud.hypervisor.xenserver.XenserverConfigs;
 import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.command.StorageSubSystemCommand;

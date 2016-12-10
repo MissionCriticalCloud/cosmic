@@ -5,7 +5,7 @@ import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.ssh.SSHCmdHelper;
-import org.apache.cloudstack.hypervisor.xenserver.XenServerResourceNewBase;
+import com.cloud.hypervisor.xenserver.XenServerResourceNewBase;
 
 import javax.ejb.Local;
 

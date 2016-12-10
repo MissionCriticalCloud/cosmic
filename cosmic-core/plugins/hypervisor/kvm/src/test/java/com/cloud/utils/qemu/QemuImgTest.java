@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-import com.cloud.utils.script.Script;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.script.Script;
 
 import java.io.File;
 import java.util.HashMap;

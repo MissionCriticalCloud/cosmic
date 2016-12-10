@@ -2,7 +2,7 @@ package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.resource.ServerResource;
-import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
+import com.cloud.hypervisor.xenserver.XenserverConfigs;
 
 import javax.ejb.Local;
 import java.util.Map;

@@ -56,7 +56,7 @@ import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.HypervisorVersionChangedException;
-import org.apache.cloudstack.hypervisor.xenserver.XenserverConfigs;
+import com.cloud.hypervisor.xenserver.XenserverConfigs;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,4 +1,4 @@
-package org.apache.cloudstack.hypervisor.xenserver;
+package com.cloud.hypervisor.xenserver;
 
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;

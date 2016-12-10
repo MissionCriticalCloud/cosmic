@@ -12,8 +12,8 @@ import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.script.Script;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.script.Script;
 
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
