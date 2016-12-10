@@ -1,14 +1,14 @@
 package com.cloud.api.command;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.ldap.LdapManager;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

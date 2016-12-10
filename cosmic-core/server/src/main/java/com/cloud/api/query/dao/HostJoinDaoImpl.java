@@ -1,5 +1,6 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.api.ApiConstants.HostDetails;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.HostJoinVO;
 import com.cloud.api.response.GpuResponse;
@@ -18,7 +19,6 @@ import com.cloud.storage.StorageStats;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ApiConstants.HostDetails;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;

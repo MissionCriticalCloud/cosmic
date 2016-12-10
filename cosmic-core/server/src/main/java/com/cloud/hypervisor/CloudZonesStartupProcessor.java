@@ -6,6 +6,7 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.manager.authn.AgentAuthnException;
+import com.cloud.api.ResourceDetail;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.dc.ClusterVO;
@@ -25,7 +26,6 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.MacAddress;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.api.ResourceDetail;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

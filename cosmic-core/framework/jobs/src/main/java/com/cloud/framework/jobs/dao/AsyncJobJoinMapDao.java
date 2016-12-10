@@ -1,8 +1,8 @@
 package com.cloud.framework.jobs.dao;
 
 import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import java.util.Date;
 import java.util.List;

@@ -1,5 +1,7 @@
 package com.cloud.template;
 
+import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
+import com.cloud.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import com.cloud.api.command.user.iso.DeleteIsoCmd;
 import com.cloud.api.command.user.iso.ExtractIsoCmd;
 import com.cloud.api.command.user.iso.RegisterIsoCmd;
@@ -17,8 +19,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
-import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,5 +1,11 @@
 package com.cloud.api.commands;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DedicateHostResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.HostResponse;
@@ -8,12 +14,6 @@ import com.cloud.dc.DedicatedResources;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

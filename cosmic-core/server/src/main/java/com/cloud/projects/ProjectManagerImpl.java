@@ -8,6 +8,7 @@ import com.cloud.api.query.dao.ProjectJoinDao;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
@@ -43,7 +44,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.mail.Authenticator;

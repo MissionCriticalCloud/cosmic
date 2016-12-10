@@ -2,6 +2,7 @@ package com.cloud.network.lb;
 
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.loadbalancer.ListApplicationLoadBalancersCmd;
+import com.cloud.context.CallContext;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
@@ -42,7 +43,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.cloud.framework.jobs;
 
 import com.cloud.framework.jobs.impl.SyncQueueItem;
-import org.apache.cloudstack.jobs.JobInfo;
+import com.cloud.jobs.JobInfo;
 
 import java.util.Date;
 

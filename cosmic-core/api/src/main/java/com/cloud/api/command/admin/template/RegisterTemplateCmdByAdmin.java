@@ -1,14 +1,14 @@
 package com.cloud.api.command.admin.template;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.template.VirtualMachineTemplate;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
 
 import java.net.URISyntaxException;
 import java.util.List;

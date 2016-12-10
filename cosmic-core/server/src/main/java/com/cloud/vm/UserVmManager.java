@@ -2,6 +2,7 @@ package com.cloud.vm;
 
 import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
+import com.cloud.api.BaseCmd.HTTPMethod;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ManagementServerException;
@@ -13,7 +14,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.BaseCmd.HTTPMethod;
 
 import java.util.HashMap;
 import java.util.List;

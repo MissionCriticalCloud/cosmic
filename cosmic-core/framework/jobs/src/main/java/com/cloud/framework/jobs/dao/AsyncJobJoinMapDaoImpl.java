@@ -1,6 +1,7 @@
 package com.cloud.framework.jobs.dao;
 
 import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -9,7 +10,6 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

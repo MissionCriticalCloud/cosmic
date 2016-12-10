@@ -33,8 +33,8 @@
                 <!-- Put CallContext listener first because it will open and then close a DB connection.
                     If you put it after the TransactionContextListener, the thread will hold open a DB
                     connection for the life of the thread -->
-                <bean class="org.apache.cloudstack.context.CallContextListener" />
-                <bean class="org.apache.cloudstack.context.LogContextListener" />
+                <bean class="com.cloud.context.CallContextListener" />
+                <bean class="com.cloud.context.LogContextListener" />
                 <bean class="com.cloud.utils.db.TransactionContextListener" />
             </list>
         </property>

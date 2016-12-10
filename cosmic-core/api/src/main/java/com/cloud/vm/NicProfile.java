@@ -1,12 +1,12 @@
 package com.cloud.vm;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.vm.Nic.ReservationStrategy;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.io.Serializable;
 import java.net.URI;

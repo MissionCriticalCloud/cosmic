@@ -1,11 +1,11 @@
 package com.cloud.vm;
 
+import com.cloud.context.CallContext;
 import com.cloud.framework.jobs.AsyncJobExecutionContext;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.Pair;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.GlobalLock;
-import org.apache.cloudstack.context.CallContext;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

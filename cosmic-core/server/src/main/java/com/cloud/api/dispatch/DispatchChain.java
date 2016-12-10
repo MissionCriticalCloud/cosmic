@@ -1,6 +1,6 @@
 package com.cloud.api.dispatch;
 
-import org.apache.cloudstack.api.ServerApiException;
+import com.cloud.api.ServerApiException;
 
 import java.util.ArrayList;
 import java.util.List;

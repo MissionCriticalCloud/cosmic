@@ -1,11 +1,11 @@
 package com.cloud.api.response;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.serializer.Param;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.HashMap;
 import java.util.List;

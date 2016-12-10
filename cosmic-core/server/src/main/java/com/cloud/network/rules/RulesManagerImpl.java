@@ -2,6 +2,7 @@ package com.cloud.network.rules;
 
 import com.cloud.api.command.user.firewall.ListPortForwardingRulesCmd;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
@@ -68,7 +69,6 @@ import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

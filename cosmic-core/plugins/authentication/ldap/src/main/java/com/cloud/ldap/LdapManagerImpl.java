@@ -1,5 +1,6 @@
 package com.cloud.ldap;
 
+import com.cloud.api.LdapValidator;
 import com.cloud.api.command.LDAPConfigCmd;
 import com.cloud.api.command.LDAPRemoveCmd;
 import com.cloud.api.command.LdapAddConfigurationCmd;
@@ -17,7 +18,6 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.ldap.dao.LdapConfigurationDao;
 import com.cloud.ldap.dao.LdapTrustMapDao;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.LdapValidator;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

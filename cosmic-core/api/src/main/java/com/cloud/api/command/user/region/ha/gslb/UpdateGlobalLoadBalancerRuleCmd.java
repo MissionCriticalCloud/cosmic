@@ -1,16 +1,17 @@
 package com.cloud.api.command.user.region.ha.gslb;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GlobalLoadBalancerResponse;
+import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
 
 import javax.inject.Inject;
 
@@ -75,7 +76,7 @@ public class UpdateGlobalLoadBalancerRuleCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() {
-        org.apache.cloudstack.context.CallContext.current().setEventDetails("Global Load balancer Id: " + getId());
+        CallContext.current().setEventDetails("Global Load balancer Id: " + getId());
         final GlobalLoadBalancerRule gslbRule = _gslbService.updateGlobalLoadBalancerRule(this);
         if (gslbRule != null) {
             final GlobalLoadBalancerResponse response = _responseGenerator.createGlobalLoadBalancerResponse(gslbRule);

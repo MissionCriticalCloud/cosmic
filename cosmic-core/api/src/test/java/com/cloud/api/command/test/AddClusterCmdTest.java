@@ -1,12 +1,12 @@
 package com.cloud.api.command.test;
 
+import com.cloud.api.ResponseGenerator;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceService;
-import org.apache.cloudstack.api.ResponseGenerator;
-import org.apache.cloudstack.api.ServerApiException;
 
 import java.util.Arrays;
 

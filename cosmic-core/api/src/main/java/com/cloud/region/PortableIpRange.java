@@ -1,8 +1,8 @@
 package com.cloud.region;
 
 import com.cloud.acl.InfrastructureEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface PortableIpRange extends InfrastructureEntity, InternalIdentity, Identity {
 

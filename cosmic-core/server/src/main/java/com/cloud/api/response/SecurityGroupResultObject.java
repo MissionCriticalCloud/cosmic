@@ -2,11 +2,11 @@ package com.cloud.api.response;
 
 import com.cloud.acl.ControlledEntity;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupRules;
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.ArrayList;
 import java.util.HashMap;

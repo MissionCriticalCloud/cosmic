@@ -1,10 +1,10 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.user.UserAccount;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

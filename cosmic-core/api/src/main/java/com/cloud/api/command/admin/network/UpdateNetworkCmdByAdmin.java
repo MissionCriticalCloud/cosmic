@@ -1,18 +1,18 @@
 package com.cloud.api.command.admin.network;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.network.UpdateNetworkCmd;
 import com.cloud.api.response.NetworkResponse;
+import com.cloud.context.CallContext;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

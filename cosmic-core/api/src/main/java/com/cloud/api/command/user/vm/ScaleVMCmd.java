@@ -1,6 +1,15 @@
 package com.cloud.api.command.user.vm;
 
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.api.ACL;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserVmResponse;
@@ -12,15 +21,6 @@ import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.api.ACL;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
 
 import java.util.Collection;
 import java.util.HashMap;

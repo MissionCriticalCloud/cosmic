@@ -1,6 +1,6 @@
 package com.cloud.api;
 
-import org.apache.cloudstack.usage.UsageService;
+import com.cloud.usage.UsageService;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;

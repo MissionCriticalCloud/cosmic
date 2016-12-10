@@ -1,6 +1,13 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.BaseAsyncCreateCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
@@ -10,13 +17,6 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.RemoteAccessVpn;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

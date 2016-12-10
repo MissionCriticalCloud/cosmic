@@ -1,7 +1,7 @@
 package com.cloud.network.security;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

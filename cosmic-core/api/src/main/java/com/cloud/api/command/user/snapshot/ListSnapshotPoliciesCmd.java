@@ -1,15 +1,15 @@
 package com.cloud.api.command.user.snapshot;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

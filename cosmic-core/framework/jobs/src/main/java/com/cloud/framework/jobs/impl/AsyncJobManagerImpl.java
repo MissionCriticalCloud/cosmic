@@ -1,8 +1,10 @@
 package com.cloud.framework.jobs.impl;
 
+import com.cloud.api.ApiErrorCode;
 import com.cloud.api.response.ExceptionResponse;
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
+import com.cloud.context.CallContext;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.jobs.AsyncJob;
@@ -17,6 +19,8 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDetector;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.jobs.JobInfo;
+import com.cloud.jobs.JobInfo.Status;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Pair;
@@ -42,10 +46,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.jobs.JobInfo;
-import org.apache.cloudstack.jobs.JobInfo.Status;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

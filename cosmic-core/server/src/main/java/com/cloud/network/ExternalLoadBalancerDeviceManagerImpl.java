@@ -13,6 +13,7 @@ import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
+import com.cloud.api.ApiConstants;
 import com.cloud.configuration.Config;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterIpAddressVO;
@@ -97,7 +98,6 @@ import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.api.ApiConstants;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,5 +1,6 @@
 package com.cloud.api.command.test;
 
+import com.cloud.api.ResponseGenerator;
 import com.cloud.api.command.user.vm.AddIpToVmNicCmd;
 import com.cloud.api.command.user.vm.RemoveIpFromVmNicCmd;
 import com.cloud.api.response.NicSecondaryIpResponse;
@@ -12,7 +13,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.NetworkService;
 import com.cloud.vm.NicSecondaryIp;
-import org.apache.cloudstack.api.ResponseGenerator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

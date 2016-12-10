@@ -7,6 +7,7 @@ import com.cloud.alert.AlertManager;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.DataCenter;
@@ -136,7 +137,6 @@ import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

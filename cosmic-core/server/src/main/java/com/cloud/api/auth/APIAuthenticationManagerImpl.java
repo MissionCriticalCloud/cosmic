@@ -1,11 +1,8 @@
 package com.cloud.api.auth;
 
+import com.cloud.api.APICommand;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
-import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.cloud.vm;
 
 import com.cloud.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 /**
  * Each entry represents the alis ip of a perticular nic.

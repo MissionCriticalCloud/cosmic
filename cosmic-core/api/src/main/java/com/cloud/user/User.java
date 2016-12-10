@@ -1,6 +1,6 @@
 package com.cloud.user;
 
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.InternalIdentity;
 
 import java.util.Date;
 

@@ -1,9 +1,9 @@
 package com.cloud.api.command.admin.config;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseListCmd;
 import com.cloud.api.response.DeploymentPlannersResponse;
 import com.cloud.api.response.ListResponse;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseListCmd;
 
 import java.util.ArrayList;
 import java.util.List;

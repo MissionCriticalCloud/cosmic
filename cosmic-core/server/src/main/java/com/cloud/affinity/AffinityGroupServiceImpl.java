@@ -7,6 +7,7 @@ import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.api.command.user.affinitygroup.CreateAffinityGroupCmd;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
@@ -37,7 +38,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,10 +1,10 @@
 package com.cloud.network.as;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

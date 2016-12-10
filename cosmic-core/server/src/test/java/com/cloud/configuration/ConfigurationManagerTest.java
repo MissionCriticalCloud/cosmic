@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
 import com.cloud.api.command.admin.vlan.ReleasePublicIpRangeCmd;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -53,7 +54,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

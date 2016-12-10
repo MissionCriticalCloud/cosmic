@@ -1,7 +1,7 @@
 package com.cloud.deploy;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.deploy.DeploymentPlanner.PlannerResourceUsage;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

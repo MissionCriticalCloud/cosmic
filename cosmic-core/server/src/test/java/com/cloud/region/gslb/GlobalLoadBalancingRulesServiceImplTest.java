@@ -10,6 +10,7 @@ import com.cloud.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleC
 import com.cloud.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
 import com.cloud.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
 import com.cloud.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
+import com.cloud.context.CallContext;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -30,7 +31,6 @@ import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

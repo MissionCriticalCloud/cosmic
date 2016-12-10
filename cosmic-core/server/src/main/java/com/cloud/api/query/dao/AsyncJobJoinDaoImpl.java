@@ -1,6 +1,7 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiSerializerHelper;
+import com.cloud.api.ResponseObject;
 import com.cloud.api.SerializationContext;
 import com.cloud.api.query.vo.AsyncJobJoinVO;
 import com.cloud.api.response.AsyncJobResponse;
@@ -8,7 +9,6 @@ import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ResponseObject;
 
 import java.util.Date;
 import java.util.List;

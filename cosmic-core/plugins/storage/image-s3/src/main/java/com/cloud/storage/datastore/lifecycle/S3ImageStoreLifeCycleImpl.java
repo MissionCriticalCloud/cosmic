@@ -1,6 +1,7 @@
 package com.cloud.storage.datastore.lifecycle;
 
 import com.cloud.agent.api.StoragePoolInfo;
+import com.cloud.api.ApiConstants;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.HostScope;
@@ -15,7 +16,6 @@ import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.image.datastore.ImageStoreHelper;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.storage.image.store.lifecycle.ImageStoreLifeCycle;
-import org.apache.cloudstack.api.ApiConstants;
 
 import javax.inject.Inject;
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package com.cloud.network.vpc;
 
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface VpcOffering extends InternalIdentity, Identity {
     public static final String defaultVPCOfferingName = "Default VPC offering";

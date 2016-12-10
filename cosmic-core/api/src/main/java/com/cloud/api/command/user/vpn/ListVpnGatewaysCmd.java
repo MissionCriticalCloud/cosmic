@@ -1,15 +1,15 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.Site2SiteVpnGatewayResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

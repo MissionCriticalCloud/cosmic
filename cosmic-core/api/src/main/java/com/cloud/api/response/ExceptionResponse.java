@@ -1,8 +1,8 @@
 package com.cloud.api.response;
 
+import com.cloud.api.BaseResponse;
 import com.cloud.serializer.Param;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import org.apache.cloudstack.api.BaseResponse;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,6 +5,7 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
 import com.cloud.deploy.DataCenterDeployment;
@@ -66,7 +67,6 @@ import com.cloud.vm.VirtualMachineName;
 import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;

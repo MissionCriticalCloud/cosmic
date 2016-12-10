@@ -1,14 +1,14 @@
 package com.cloud.api.command.user.region.ha.gslb;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListTaggedResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.GlobalLoadBalancerResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.RegionResponse;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

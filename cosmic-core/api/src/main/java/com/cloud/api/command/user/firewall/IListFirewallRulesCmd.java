@@ -1,7 +1,7 @@
 package com.cloud.api.command.user.firewall;
 
+import com.cloud.api.IBaseListTaggedResourcesCmd;
 import com.cloud.network.rules.FirewallRule;
-import org.apache.cloudstack.api.IBaseListTaggedResourcesCmd;
 
 public interface IListFirewallRulesCmd extends IBaseListTaggedResourcesCmd {
     Long getIpAddressId();

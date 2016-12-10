@@ -1,5 +1,8 @@
 package com.cloud.api.command.test;
 
+import com.cloud.api.ResponseGenerator;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.exception.ConcurrentOperationException;
@@ -8,9 +11,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.UserVmService;
-import org.apache.cloudstack.api.ResponseGenerator;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
 
 import java.util.LinkedList;
 import java.util.List;

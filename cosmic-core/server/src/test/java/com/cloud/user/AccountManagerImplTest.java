@@ -7,6 +7,7 @@ import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.configuration.dao.ResourceLimitDao;
+import com.cloud.context.CallContext;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DataCenterVnetDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
@@ -55,7 +56,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

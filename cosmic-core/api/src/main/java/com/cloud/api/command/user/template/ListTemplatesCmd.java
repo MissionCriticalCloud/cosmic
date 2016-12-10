@@ -1,18 +1,18 @@
 package com.cloud.api.command.user.template;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiCommandJobType;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListTaggedResourcesCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.context.CallContext;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

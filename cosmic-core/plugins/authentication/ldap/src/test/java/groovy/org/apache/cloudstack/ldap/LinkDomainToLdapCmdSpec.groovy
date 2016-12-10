@@ -1,5 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.ServerApiException
 import com.cloud.api.command.LinkDomainToLdapCmd
 import com.cloud.api.response.LinkDomainToLdapResponse
 import com.cloud.exception.InvalidParameterValueException
@@ -10,7 +11,6 @@ import com.cloud.user.Account
 import com.cloud.user.AccountService
 import com.cloud.user.User
 import com.cloud.user.UserAccount
-import org.apache.cloudstack.api.ServerApiException
 import spock.lang.Shared
 import spock.lang.Specification
 

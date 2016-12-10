@@ -16,12 +16,12 @@
 // under the License.
 package com.cloud.api.command.user.template;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.TemplatePermissionsResponse;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

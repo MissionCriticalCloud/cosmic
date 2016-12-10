@@ -9,9 +9,9 @@ import com.cloud.host.dao.HostTagsDaoImpl;
 import com.cloud.storage.dao.SnapshotDaoImpl;
 import com.cloud.storage.dao.VolumeDaoImpl;
 import com.cloud.tags.dao.ResourceTagsDaoImpl;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.vm.dao.NicDaoImpl;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;
 

@@ -1,10 +1,10 @@
 package com.cloud.resourcedetail;
 
+import com.cloud.api.ResourceDetail;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.api.ResourceDetail;
 
 import java.util.HashMap;
 import java.util.List;

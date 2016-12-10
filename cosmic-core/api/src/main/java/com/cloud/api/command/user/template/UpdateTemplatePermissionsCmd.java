@@ -1,10 +1,10 @@
 package com.cloud.api.command.user.template;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

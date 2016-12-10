@@ -1,6 +1,7 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.DomainJoinVO;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ResourceLimitAndCountResponse;
@@ -9,7 +10,6 @@ import com.cloud.domain.Domain;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.List;
 

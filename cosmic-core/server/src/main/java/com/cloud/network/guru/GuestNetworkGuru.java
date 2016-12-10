@@ -1,6 +1,7 @@
 package com.cloud.network.guru;
 
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.dao.DataCenterDao;
@@ -55,7 +56,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

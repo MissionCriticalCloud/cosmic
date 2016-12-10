@@ -1,5 +1,9 @@
 package com.cloud.api.command.user.vpc;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListTaggedResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.StaticRouteResponse;
@@ -9,10 +13,6 @@ import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

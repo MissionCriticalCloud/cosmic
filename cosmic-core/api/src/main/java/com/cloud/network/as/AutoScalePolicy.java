@@ -1,7 +1,7 @@
 package com.cloud.network.as;
 
 import com.cloud.acl.ControlledEntity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.InternalIdentity;
 
 import java.util.Date;
 

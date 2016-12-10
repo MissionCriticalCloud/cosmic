@@ -1,12 +1,12 @@
 package com.cloud.api.command.admin.network;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.network.Network;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.ArrayList;
 import java.util.List;

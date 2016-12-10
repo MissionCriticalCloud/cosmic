@@ -1,9 +1,9 @@
 package com.cloud.api.command.test;
 
 import com.cloud.api.command.admin.usage.GetUsageRecordsCmd;
+import com.cloud.usage.Usage;
+import com.cloud.usage.UsageService;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.usage.Usage;
-import org.apache.cloudstack.usage.UsageService;
 
 import java.util.ArrayList;
 import java.util.Date;

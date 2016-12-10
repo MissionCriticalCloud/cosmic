@@ -11,6 +11,7 @@ import com.cloud.configuration.ResourceCountVO;
 import com.cloud.configuration.ResourceLimitVO;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.configuration.dao.ResourceLimitDao;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
@@ -71,7 +72,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

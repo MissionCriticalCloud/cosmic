@@ -2,6 +2,7 @@ package com.cloud.framework.jobs.dao;
 
 import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.framework.jobs.impl.VmWorkJobVO.Step;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -13,7 +14,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

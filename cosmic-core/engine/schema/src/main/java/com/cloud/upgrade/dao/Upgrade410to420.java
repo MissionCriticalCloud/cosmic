@@ -1,5 +1,6 @@
 package com.cloud.upgrade.dao;
 
+import com.cloud.api.ApiConstants;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
 import com.cloud.network.vpc.NetworkACL;
@@ -7,7 +8,6 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.api.ApiConstants;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

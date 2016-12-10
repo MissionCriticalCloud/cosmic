@@ -1,5 +1,11 @@
 package com.cloud.api.command.admin.network;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkDeviceResponse;
 import com.cloud.exception.ConcurrentOperationException;
@@ -10,7 +16,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Host;
 import com.cloud.network.ExternalNetworkDeviceManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.api.Parameter;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -20,9 +25,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@org.apache.cloudstack.api.APICommand(name = "listNetworkDevice", description = "List network devices", responseObject = NetworkDeviceResponse.class,
+@APICommand(name = "listNetworkDevice", description = "List network devices", responseObject = NetworkDeviceResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
-public class ListNetworkDeviceCmd extends org.apache.cloudstack.api.BaseListCmd {
+public class ListNetworkDeviceCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListNetworkDeviceCmd.class);
     private static final String s_name = "listnetworkdevice";
 
@@ -32,12 +37,12 @@ public class ListNetworkDeviceCmd extends org.apache.cloudstack.api.BaseListCmd 
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
 
-    @Parameter(name = org.apache.cloudstack.api.ApiConstants.NETWORK_DEVICE_TYPE,
+    @Parameter(name = ApiConstants.NETWORK_DEVICE_TYPE,
             type = CommandType.STRING,
             description = "Network device type, now supports ExternalDhcp, JuniperSRXFirewall, PaloAltoFirewall")
     private String type;
 
-    @Parameter(name = org.apache.cloudstack.api.ApiConstants.NETWORK_DEVICE_PARAMETER_LIST, type = CommandType.MAP, description = "parameters for network device")
+    @Parameter(name = ApiConstants.NETWORK_DEVICE_PARAMETER_LIST, type = CommandType.MAP, description = "parameters for network device")
     private Map paramList;
 
     public String getDeviceType() {
@@ -49,7 +54,7 @@ public class ListNetworkDeviceCmd extends org.apache.cloudstack.api.BaseListCmd 
     }
 
     @Override
-    public void execute() throws ResourceUnavailableException, InsufficientCapacityException, org.apache.cloudstack.api.ServerApiException, ConcurrentOperationException,
+    public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
             ResourceAllocationException {
         try {
             final List<Host> devices = nwDeviceMgr.listNetworkDevice(this);
@@ -66,9 +71,9 @@ public class ListNetworkDeviceCmd extends org.apache.cloudstack.api.BaseListCmd 
             listResponse.setResponseName(getCommandName());
             this.setResponseObject(listResponse);
         } catch (final InvalidParameterValueException ipve) {
-            throw new org.apache.cloudstack.api.ServerApiException(org.apache.cloudstack.api.ApiErrorCode.PARAM_ERROR, ipve.getMessage());
+            throw new ServerApiException(ApiErrorCode.PARAM_ERROR, ipve.getMessage());
         } catch (final CloudRuntimeException cre) {
-            throw new org.apache.cloudstack.api.ServerApiException(org.apache.cloudstack.api.ApiErrorCode.INTERNAL_ERROR, cre.getMessage());
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, cre.getMessage());
         }
     }
 

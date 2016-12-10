@@ -1,6 +1,7 @@
 package com.cloud.network.vpc;
 
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
@@ -27,7 +28,6 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

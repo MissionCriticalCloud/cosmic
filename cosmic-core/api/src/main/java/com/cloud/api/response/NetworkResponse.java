@@ -1,12 +1,12 @@
 package com.cloud.api.response;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
 import com.cloud.network.Network;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.serializer.Param;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 import java.util.List;
 import java.util.Set;

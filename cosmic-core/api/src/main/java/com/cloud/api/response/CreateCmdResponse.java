@@ -1,7 +1,7 @@
 package com.cloud.api.response;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
 
 import com.google.gson.annotations.SerializedName;
 

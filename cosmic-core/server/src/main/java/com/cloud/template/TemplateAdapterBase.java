@@ -1,5 +1,6 @@
 package com.cloud.template;
 
+import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.user.iso.DeleteIsoCmd;
 import com.cloud.api.command.user.iso.RegisterIsoCmd;
@@ -9,6 +10,7 @@ import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
@@ -45,8 +47,6 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.util.HashMap;

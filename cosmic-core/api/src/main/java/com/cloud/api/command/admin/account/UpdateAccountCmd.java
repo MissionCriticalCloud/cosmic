@@ -1,18 +1,18 @@
 package com.cloud.api.command.admin.account;
 
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.api.ACL;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.region.RegionService;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.ACL;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
 
 import javax.inject.Inject;
 import java.util.Collection;

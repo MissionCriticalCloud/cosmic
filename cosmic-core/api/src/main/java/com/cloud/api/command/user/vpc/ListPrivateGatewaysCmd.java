@@ -1,15 +1,15 @@
 package com.cloud.api.command.user.vpc;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

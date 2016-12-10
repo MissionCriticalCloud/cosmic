@@ -1,15 +1,12 @@
 package com.cloud.api.auth;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ApiResponseSerializer;
 import com.cloud.api.response.LogoutCmdResponse;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.auth.APIAuthenticationType;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
-import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -20,6 +20,7 @@ import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
@@ -28,7 +29,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;

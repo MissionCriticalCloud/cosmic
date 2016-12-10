@@ -1,8 +1,8 @@
 package com.cloud.domain;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.user.OwnedBy;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.Date;
 

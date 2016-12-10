@@ -1,15 +1,12 @@
 package com.cloud.api.doc;
 
 import com.cloud.alert.AlertManager;
-import com.cloud.serializer.Param;
-import com.cloud.utils.IteratorUtil;
-import com.cloud.utils.ReflectUtil;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.Parameter;
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.BaseAsyncCreateCmd;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.IPAddressResponse;
@@ -19,6 +16,9 @@ import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
+import com.cloud.serializer.Param;
+import com.cloud.utils.IteratorUtil;
+import com.cloud.utils.ReflectUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

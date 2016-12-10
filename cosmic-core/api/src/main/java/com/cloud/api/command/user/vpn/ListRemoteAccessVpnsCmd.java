@@ -1,16 +1,16 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

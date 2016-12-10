@@ -1,5 +1,6 @@
 package com.cloud.vm;
 
+import com.cloud.context.CallContext;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobDispatcher;
 import com.cloud.framework.jobs.AsyncJobManager;
@@ -11,7 +12,6 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;

@@ -4,12 +4,12 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 
+import com.cloud.api.ResponseGenerator;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.storage.AddImageStoreCmd;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.StorageService;
-import org.apache.cloudstack.api.ResponseGenerator;
-import org.apache.cloudstack.api.ServerApiException;
 
 import java.util.Map;
 

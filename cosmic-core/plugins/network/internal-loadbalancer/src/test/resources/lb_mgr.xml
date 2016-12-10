@@ -34,6 +34,6 @@
         <property name="name" value="UserDao" />
     </bean>
 
-    <bean class="org.apache.cloudstack.internallbvmmgr.LbChildTestConfiguration" />
+    <bean class="com.cloud.internallbvmmgr.LbChildTestConfiguration" />
 
 </beans>

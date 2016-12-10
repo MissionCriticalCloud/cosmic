@@ -1,9 +1,9 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
-import org.apache.cloudstack.api.InternalIdentity;
 
 public class VolumeTO implements InternalIdentity {
     private long id;

@@ -1,5 +1,6 @@
 package com.cloud.storage.image.db;
 
+import com.cloud.api.ApiConstants;
 import com.cloud.storage.datastore.db.ImageStoreDetailVO;
 import com.cloud.storage.datastore.db.ImageStoreDetailsDao;
 import com.cloud.utils.crypt.DBEncryptionUtil;
@@ -7,7 +8,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.api.ApiConstants;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.cloud.api.command.admin.vpc;
 
-import org.apache.cloudstack.api.ApiCmdTestUtil;
-import org.apache.cloudstack.api.ApiConstants;
+import com.cloud.api.ApiCmdTestUtil;
+import com.cloud.api.ApiConstants;
 
 import java.util.HashMap;
 import java.util.List;

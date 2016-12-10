@@ -1,13 +1,13 @@
 package com.cloud.api.command.admin.vm;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VMUserDataResponse;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

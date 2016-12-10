@@ -12,6 +12,7 @@ import com.cloud.api.command.user.vpn.ListVpnGatewaysCmd;
 import com.cloud.api.command.user.vpn.ResetVpnConnectionCmd;
 import com.cloud.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
@@ -50,7 +51,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

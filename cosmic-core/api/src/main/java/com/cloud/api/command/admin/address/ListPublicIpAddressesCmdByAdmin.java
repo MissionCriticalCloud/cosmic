@@ -1,12 +1,12 @@
 package com.cloud.api.command.admin.address;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.address.ListPublicIpAddressesCmd;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.network.IpAddress;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.ArrayList;
 import java.util.List;

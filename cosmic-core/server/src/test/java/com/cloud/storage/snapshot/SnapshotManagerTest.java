@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
@@ -46,7 +47,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;
 import java.util.UUID;

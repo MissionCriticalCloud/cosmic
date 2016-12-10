@@ -1,7 +1,7 @@
 package com.cloud.event;
 
+import com.cloud.context.CallContext;
 import com.cloud.utils.component.ComponentMethodInterceptor;
-import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

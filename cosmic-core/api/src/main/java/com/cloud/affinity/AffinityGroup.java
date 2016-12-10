@@ -1,8 +1,8 @@
 package com.cloud.affinity;
 
 import com.cloud.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface AffinityGroup extends ControlledEntity, InternalIdentity, Identity {
 

@@ -6,6 +6,7 @@ import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
@@ -98,7 +99,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.dao.DomainRouterDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

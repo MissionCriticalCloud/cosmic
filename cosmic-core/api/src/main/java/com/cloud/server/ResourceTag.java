@@ -1,8 +1,8 @@
 package com.cloud.server;
 
 import com.cloud.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface ResourceTag extends ControlledEntity, Identity, InternalIdentity {
 

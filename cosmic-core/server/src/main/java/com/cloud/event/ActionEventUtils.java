@@ -1,6 +1,8 @@
 package com.cloud.event;
 
+import com.cloud.api.Identity;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.dao.EventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -16,8 +18,6 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.ReflectUtil;
 import com.cloud.utils.component.ComponentContext;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

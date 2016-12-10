@@ -1,16 +1,16 @@
 package com.cloud.api.command.user.vm;
 
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.api.ACL;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.GetVMPasswordResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.api.ACL;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.security.InvalidParameterException;
 

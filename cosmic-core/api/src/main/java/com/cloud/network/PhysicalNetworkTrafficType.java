@@ -1,8 +1,8 @@
 package com.cloud.network;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Networks.TrafficType;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 public interface PhysicalNetworkTrafficType extends InternalIdentity, Identity {
 

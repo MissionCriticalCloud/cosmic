@@ -7,7 +7,7 @@ import com.cloud.api.response.UserResponse
 import com.cloud.ldap.LdapManager
 import com.cloud.ldap.LdapUser
 import com.cloud.ldap.NoLdapUserMatchingQueryException
-import org.apache.cloudstack.query.QueryService
+import com.cloud.query.QueryService
 
 class LdapListUsersCmdSpec extends spock.lang.Specification {
     def "Test getEntityOwnerId is 1"() {

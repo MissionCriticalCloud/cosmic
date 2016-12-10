@@ -1,7 +1,12 @@
 package com.cloud.network.as;
 
 import com.cloud.acl.ControlledEntity;
+import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd.HTTPMethod;
+import com.cloud.api.BaseListAccountResourcesCmd;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.autoscale.CreateCounterCmd;
 import com.cloud.api.command.user.autoscale.CreateAutoScalePolicyCmd;
 import com.cloud.api.command.user.autoscale.CreateAutoScaleVmGroupCmd;
@@ -20,6 +25,7 @@ import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
 import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -82,12 +88,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.UserVmManager;
 import com.cloud.vm.UserVmService;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseCmd.HTTPMethod;
-import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.security.InvalidParameterException;

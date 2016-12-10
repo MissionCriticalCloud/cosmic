@@ -28,6 +28,7 @@ import com.cloud.network.security.dao.SecurityGroupWorkDaoImpl;
 import com.cloud.network.security.dao.VmRulesetLogDaoImpl;
 import com.cloud.projects.ProjectManager;
 import com.cloud.tags.dao.ResourceTagsDaoImpl;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.dao.AccountDaoImpl;
@@ -37,7 +38,6 @@ import com.cloud.vm.dao.NicDaoImpl;
 import com.cloud.vm.dao.UserVmDaoImpl;
 import com.cloud.vm.dao.UserVmDetailsDaoImpl;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;
 

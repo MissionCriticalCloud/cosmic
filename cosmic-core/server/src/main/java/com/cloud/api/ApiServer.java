@@ -1,6 +1,8 @@
 package com.cloud.api;
 
 import com.cloud.acl.APIChecker;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.auth.APIAuthenticationManager;
 import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
 import com.cloud.api.command.admin.host.ListHostsCmd;
 import com.cloud.api.command.admin.router.ListRoutersCmd;
@@ -31,6 +33,7 @@ import com.cloud.api.response.ExceptionResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoginCmdResponse;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.domain.Domain;
@@ -78,19 +81,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.ApiServerService;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

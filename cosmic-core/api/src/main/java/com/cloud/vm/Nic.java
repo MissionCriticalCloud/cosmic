@@ -1,11 +1,11 @@
 package com.cloud.vm;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.Mode;
 import com.cloud.utils.fsm.FiniteState;
 import com.cloud.utils.fsm.StateMachine;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.net.URI;
 import java.util.Date;

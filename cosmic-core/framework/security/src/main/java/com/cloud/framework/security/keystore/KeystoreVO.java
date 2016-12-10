@@ -1,7 +1,7 @@
 package com.cloud.framework.security.keystore;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.utils.db.Encrypt;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

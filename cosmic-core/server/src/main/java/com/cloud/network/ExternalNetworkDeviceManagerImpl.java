@@ -1,6 +1,7 @@
 package com.cloud.network;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.api.ApiConstants;
 import com.cloud.api.command.admin.network.AddNetworkDeviceCmd;
 import com.cloud.api.command.admin.network.DeleteNetworkDeviceCmd;
 import com.cloud.api.command.admin.network.ListNetworkDeviceCmd;
@@ -30,7 +31,6 @@ import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.api.ApiConstants;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

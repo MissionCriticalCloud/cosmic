@@ -1,9 +1,9 @@
 package com.cloud.api.response;
 
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
 import com.cloud.serializer.Param;
 import com.cloud.template.VirtualMachineTemplate;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 import com.google.gson.annotations.SerializedName;
 

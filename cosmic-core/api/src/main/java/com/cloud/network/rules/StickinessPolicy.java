@@ -1,9 +1,9 @@
 package com.cloud.network.rules;
 
+import com.cloud.api.Displayable;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.Displayable;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.List;
 

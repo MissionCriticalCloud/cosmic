@@ -1,5 +1,9 @@
 package com.cloud.api.command;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.user.ListUsersCmd;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.ListResponse;
@@ -7,12 +11,8 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
+import com.cloud.query.QueryService;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.query.QueryService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

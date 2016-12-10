@@ -1,18 +1,18 @@
 package com.cloud.api.command.admin.template;
 
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.api.ACL;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.ACL;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.List;
 

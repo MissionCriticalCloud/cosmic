@@ -1,5 +1,6 @@
 package com.cloud.network.lb;
 
+import com.cloud.context.CallContext;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
@@ -10,7 +11,6 @@ import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.user.Account;
-import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;
 

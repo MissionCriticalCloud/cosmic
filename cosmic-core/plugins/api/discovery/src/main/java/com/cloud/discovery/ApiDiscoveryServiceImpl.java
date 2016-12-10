@@ -1,6 +1,12 @@
 package com.cloud.discovery;
 
 import com.cloud.acl.APIChecker;
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseAsyncCmd;
+import com.cloud.api.BaseAsyncCreateCmd;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.Parameter;
 import com.cloud.api.command.user.discovery.ListApisCmd;
 import com.cloud.api.response.ApiDiscoveryResponse;
 import com.cloud.api.response.ApiParameterResponse;
@@ -12,12 +18,6 @@ import com.cloud.utils.ReflectUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ComponentLifecycleBase;
 import com.cloud.utils.component.PluggableService;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.Parameter;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

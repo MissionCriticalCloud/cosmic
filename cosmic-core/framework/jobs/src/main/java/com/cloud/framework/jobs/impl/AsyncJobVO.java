@@ -1,9 +1,9 @@
 package com.cloud.framework.jobs.impl;
 
 import com.cloud.framework.jobs.AsyncJob;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.UuidUtils;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;

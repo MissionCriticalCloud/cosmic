@@ -12,6 +12,7 @@ import com.cloud.api.command.user.snapshot.UpdateSnapshotPolicyCmd;
 import com.cloud.api.commands.ListRecurringSnapshotScheduleCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.domain.dao.DomainDao;
@@ -97,7 +98,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

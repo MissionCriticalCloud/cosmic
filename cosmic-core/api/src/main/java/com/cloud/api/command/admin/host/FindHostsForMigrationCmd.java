@@ -1,15 +1,15 @@
 package com.cloud.api.command.admin.host;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.host.Host;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;

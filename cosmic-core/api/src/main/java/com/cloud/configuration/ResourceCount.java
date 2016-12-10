@@ -1,6 +1,6 @@
 package com.cloud.configuration;
 
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.InternalIdentity;
 
 public interface ResourceCount extends Resource, InternalIdentity {
 

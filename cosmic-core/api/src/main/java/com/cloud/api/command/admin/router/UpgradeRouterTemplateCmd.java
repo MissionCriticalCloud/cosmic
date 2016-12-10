@@ -1,5 +1,13 @@
 package com.cloud.api.command.admin.router;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiCommandJobType;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
@@ -7,18 +15,11 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.UpgradeRouterTemplateResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.context.CallContext;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 @APICommand(name = "upgradeRouterTemplate", description = "Upgrades router to use newer template", responseObject = BaseResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
-public class UpgradeRouterTemplateCmd extends org.apache.cloudstack.api.BaseCmd {
+public class UpgradeRouterTemplateCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeRouterTemplateCmd.class.getName());
     private static final String s_name = "upgraderoutertemplateresponse";
 

@@ -1,10 +1,10 @@
 package com.cloud.api.response;
 
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 import java.util.List;
 import java.util.Map;

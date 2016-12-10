@@ -1,5 +1,6 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.template.VirtualMachineTemplate;
@@ -7,7 +8,6 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.List;
 

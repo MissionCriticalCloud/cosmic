@@ -1,11 +1,11 @@
 package com.cloud.api.command.test;
 
+import com.cloud.api.ResponseGenerator;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.region.AddRegionCmd;
 import com.cloud.api.response.RegionResponse;
 import com.cloud.region.Region;
 import com.cloud.region.RegionService;
-import org.apache.cloudstack.api.ResponseGenerator;
-import org.apache.cloudstack.api.ServerApiException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

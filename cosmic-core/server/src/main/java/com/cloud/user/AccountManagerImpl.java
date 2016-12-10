@@ -20,6 +20,7 @@ import com.cloud.configuration.ResourceCountVO;
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.configuration.dao.ResourceLimitDao;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -123,7 +124,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;

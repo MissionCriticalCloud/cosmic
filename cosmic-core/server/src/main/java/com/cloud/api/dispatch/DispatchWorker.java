@@ -1,6 +1,6 @@
 package com.cloud.api.dispatch;
 
-import org.apache.cloudstack.api.ServerApiException;
+import com.cloud.api.ServerApiException;
 
 /**
  * Describes the behavior of the workers in the Chain of Responsibility, that receive and

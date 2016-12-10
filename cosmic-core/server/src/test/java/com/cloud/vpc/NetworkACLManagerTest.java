@@ -1,6 +1,7 @@
 package com.cloud.vpc;
 
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.messagebus.MessageBus;
@@ -24,14 +25,13 @@ import com.cloud.network.vpc.VpcService;
 import com.cloud.network.vpc.dao.NetworkACLDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.tags.dao.ResourceTagDao;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;

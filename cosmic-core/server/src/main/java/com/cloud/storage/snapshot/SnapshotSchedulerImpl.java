@@ -1,5 +1,6 @@
 package com.cloud.storage.snapshot;
 
+import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiDispatcher;
 import com.cloud.api.ApiGsonHelper;
 import com.cloud.api.command.user.snapshot.CreateSnapshotCmd;
@@ -33,7 +34,6 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.api.ApiConstants;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

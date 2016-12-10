@@ -1,5 +1,11 @@
 package com.cloud.api.command.admin.host;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiCommandJobType;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiConstants.HostDetails;
+import com.cloud.api.BaseListCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
@@ -11,12 +17,6 @@ import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiCommandJobType;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiConstants.HostDetails;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

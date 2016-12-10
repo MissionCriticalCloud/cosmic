@@ -5,6 +5,7 @@ import com.cloud.api.command.user.loadbalancer.DeleteSslCertCmd;
 import com.cloud.api.command.user.loadbalancer.ListSslCertsCmd;
 import com.cloud.api.command.user.loadbalancer.UploadSslCertCmd;
 import com.cloud.api.response.SslCertResponse;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
@@ -24,7 +25,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

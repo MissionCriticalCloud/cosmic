@@ -1,8 +1,8 @@
 package com.cloud.framework.jobs.impl;
 
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

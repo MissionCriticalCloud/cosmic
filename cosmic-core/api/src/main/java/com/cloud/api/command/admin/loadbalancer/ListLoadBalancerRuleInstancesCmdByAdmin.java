@@ -1,5 +1,7 @@
 package com.cloud.api.command.admin.loadbalancer;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRuleInstancesCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoadBalancerRuleVmMapResponse;
@@ -7,8 +9,6 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 
 import java.util.ArrayList;
 import java.util.List;

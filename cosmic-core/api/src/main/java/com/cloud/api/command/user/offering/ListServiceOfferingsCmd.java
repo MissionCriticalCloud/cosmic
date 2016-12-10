@@ -1,12 +1,12 @@
 package com.cloud.api.command.user.offering;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseListDomainResourcesCmd;
+import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.UserVmResponse;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseListDomainResourcesCmd;
-import org.apache.cloudstack.api.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

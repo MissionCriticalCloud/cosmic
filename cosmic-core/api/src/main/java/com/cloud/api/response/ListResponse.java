@@ -1,7 +1,7 @@
 package com.cloud.api.response;
 
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.ResponseObject;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.ResponseObject;
 
 import java.util.List;
 

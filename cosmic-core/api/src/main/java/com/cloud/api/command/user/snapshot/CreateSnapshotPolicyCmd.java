@@ -1,6 +1,12 @@
 package com.cloud.api.command.user.snapshot;
 
 import com.cloud.acl.RoleType;
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.exception.InvalidParameterValueException;
@@ -9,12 +15,6 @@ import com.cloud.projects.Project;
 import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ServerApiException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

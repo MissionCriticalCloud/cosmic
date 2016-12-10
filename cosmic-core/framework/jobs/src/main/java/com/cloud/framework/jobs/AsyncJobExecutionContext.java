@@ -1,5 +1,6 @@
 package com.cloud.framework.jobs;
 
+import com.cloud.context.CallContext;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -7,11 +8,10 @@ import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
 import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
 import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.framework.jobs.impl.SyncQueueItem;
+import com.cloud.jobs.JobInfo;
 import com.cloud.managed.threadlocal.ManagedThreadLocal;
 import com.cloud.user.Account;
 import com.cloud.user.User;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

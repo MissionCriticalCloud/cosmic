@@ -9,6 +9,7 @@ import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.volume.CreateVolumeCmd;
 import com.cloud.api.command.user.volume.DetachVolumeCmd;
+import com.cloud.context.CallContext;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
@@ -34,7 +35,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

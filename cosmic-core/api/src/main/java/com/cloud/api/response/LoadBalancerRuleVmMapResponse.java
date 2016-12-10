@@ -1,11 +1,11 @@
 package com.cloud.api.response;
 
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 import java.util.List;
 

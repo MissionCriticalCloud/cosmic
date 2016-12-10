@@ -59,6 +59,7 @@ import com.cloud.storage.dao.VMTemplateHostDaoImpl;
 import com.cloud.storage.dao.VMTemplateZoneDaoImpl;
 import com.cloud.storage.dao.VolumeDaoImpl;
 import com.cloud.tags.dao.ResourceTagsDaoImpl;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDaoImpl;
 import com.cloud.user.dao.UserStatisticsDaoImpl;
@@ -75,7 +76,6 @@ import com.cloud.vpc.dao.MockNetworkServiceMapDaoImpl;
 import com.cloud.vpc.dao.MockVpcDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingServiceMapDaoImpl;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;
 

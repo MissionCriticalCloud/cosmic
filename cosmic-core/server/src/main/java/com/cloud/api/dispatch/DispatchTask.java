@@ -1,6 +1,6 @@
 package com.cloud.api.dispatch;
 
-import org.apache.cloudstack.api.BaseCmd;
+import com.cloud.api.BaseCmd;
 
 import java.util.Map;
 

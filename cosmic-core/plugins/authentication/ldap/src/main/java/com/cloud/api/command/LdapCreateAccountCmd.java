@@ -1,7 +1,15 @@
 package com.cloud.api.command;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
+import com.cloud.context.CallContext;
 import com.cloud.domain.DomainVO;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
@@ -10,14 +18,6 @@ import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;

@@ -5,6 +5,7 @@ import com.cloud.api.command.admin.usage.GetUsageRecordsCmd;
 import com.cloud.api.command.admin.usage.RemoveRawUsageRecordsCmd;
 import com.cloud.api.response.UsageTypeResponse;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.exception.InvalidParameterValueException;
@@ -44,10 +45,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.usage.Usage;
-import org.apache.cloudstack.usage.UsageService;
-import org.apache.cloudstack.usage.UsageTypes;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

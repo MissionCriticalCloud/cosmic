@@ -1,7 +1,6 @@
 package com.cloud.usage;
 
-import org.apache.cloudstack.api.InternalIdentity;
-import org.apache.cloudstack.usage.Usage;
+import com.cloud.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

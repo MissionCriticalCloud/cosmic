@@ -47,7 +47,6 @@ import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.usage.UsageTypes;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

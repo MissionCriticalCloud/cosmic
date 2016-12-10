@@ -1,5 +1,6 @@
 package com.cloud.engine.datacenter.entity.api.db;
 
+import com.cloud.api.Identity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.host.Status;
@@ -9,7 +10,6 @@ import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;
-import org.apache.cloudstack.api.Identity;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;

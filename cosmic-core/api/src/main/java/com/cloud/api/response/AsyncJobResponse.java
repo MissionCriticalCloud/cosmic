@@ -1,11 +1,11 @@
 package com.cloud.api.response;
 
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
+import com.cloud.api.ResponseObject;
+import com.cloud.jobs.JobInfo;
 import com.cloud.serializer.Param;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
-import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import java.util.Date;
 

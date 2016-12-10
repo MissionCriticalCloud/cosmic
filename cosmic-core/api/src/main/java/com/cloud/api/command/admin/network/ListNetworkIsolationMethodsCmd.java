@@ -1,10 +1,10 @@
 package com.cloud.api.command.admin.network;
 
+import com.cloud.api.APICommand;
+import com.cloud.api.BaseListCmd;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.network.Networks;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.BaseListCmd;
 
 import java.util.ArrayList;
 import java.util.List;

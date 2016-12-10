@@ -1,5 +1,6 @@
 package com.cloud.network.lb;
 
+import com.cloud.context.CallContext;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -20,6 +21,7 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.tags.dao.ResourceTagDao;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
@@ -27,8 +29,6 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;

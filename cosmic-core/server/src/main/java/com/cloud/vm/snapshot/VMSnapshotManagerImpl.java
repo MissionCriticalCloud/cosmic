@@ -1,6 +1,7 @@
 package com.cloud.vm.snapshot;
 
 import com.cloud.api.command.user.vmsnapshot.ListVMSnapshotCmd;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.VMSnapshotOptions;
@@ -27,6 +28,7 @@ import com.cloud.gpu.GPU;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.jobs.JobInfo;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.Snapshot;
@@ -66,8 +68,6 @@ import com.cloud.vm.VmWorkSerializer;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

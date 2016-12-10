@@ -1,5 +1,6 @@
 package com.cloud.metadata;
 
+import com.cloud.api.ResourceDetail;
 import com.cloud.dc.dao.DataCenterDetailsDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
@@ -37,7 +38,6 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.vm.dao.NicDetailsDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
-import org.apache.cloudstack.api.ResourceDetail;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

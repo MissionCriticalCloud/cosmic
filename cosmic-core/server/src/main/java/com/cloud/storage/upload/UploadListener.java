@@ -23,6 +23,7 @@ import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.host.Host;
+import com.cloud.jobs.JobInfo;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Upload.Status;
@@ -31,7 +32,6 @@ import com.cloud.storage.UploadVO;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.upload.UploadState.UploadEvent;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.inject.Inject;
 import java.util.Collections;

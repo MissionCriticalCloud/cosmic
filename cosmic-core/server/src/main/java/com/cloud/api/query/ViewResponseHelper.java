@@ -1,7 +1,10 @@
 package com.cloud.api.query;
 
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.ApiConstants.HostDetails;
+import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.AccountJoinVO;
 import com.cloud.api.query.vo.AffinityGroupJoinVO;
 import com.cloud.api.query.vo.AsyncJobJoinVO;
@@ -26,10 +29,6 @@ import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
-import com.cloud.user.Account;
-import org.apache.cloudstack.api.ApiConstants.HostDetails;
-import org.apache.cloudstack.api.ApiConstants.VMDetails;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.DiskOfferingResponse;
@@ -54,7 +53,8 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
-import org.apache.cloudstack.context.CallContext;
+import com.cloud.context.CallContext;
+import com.cloud.user.Account;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

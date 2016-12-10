@@ -17,12 +17,14 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.vm.AssignVMCmd;
 import com.cloud.api.command.user.vm.RestoreVMCmd;
 import com.cloud.api.command.user.vm.ScaleVMCmd;
 import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
@@ -80,8 +82,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

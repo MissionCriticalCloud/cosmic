@@ -1,6 +1,6 @@
 package com.cloud.api.command.admin.storage;
 
-import org.apache.cloudstack.api.ApiCmdTestUtil;
+import com.cloud.api.ApiCmdTestUtil;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,11 +1,11 @@
 package com.cloud.ha;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.ha.HighAvailabilityManager.Step;
 import com.cloud.ha.HighAvailabilityManager.WorkType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

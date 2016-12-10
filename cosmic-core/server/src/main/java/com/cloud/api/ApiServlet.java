@@ -1,5 +1,9 @@
 package com.cloud.api;
 
+import com.cloud.api.auth.APIAuthenticationManager;
+import com.cloud.api.auth.APIAuthenticationType;
+import com.cloud.api.auth.APIAuthenticator;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.user.Account;
@@ -9,13 +13,6 @@ import com.cloud.utils.HttpUtils;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiServerService;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.auth.APIAuthenticationType;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;

@@ -1,7 +1,7 @@
 package com.cloud.resourcedetail;
 
+import com.cloud.api.ResourceDetail;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.ResourceDetail;
 
 import java.util.List;
 import java.util.Map;

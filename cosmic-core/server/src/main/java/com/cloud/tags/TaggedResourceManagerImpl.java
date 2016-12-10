@@ -1,6 +1,9 @@
 package com.cloud.tags;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.api.query.dao.ResourceTagJoinDao;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.domain.PartOf;
@@ -37,6 +40,7 @@ import com.cloud.storage.SnapshotPolicyVO;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
@@ -56,10 +60,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.snapshot.VMSnapshotVO;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
-import org.apache.cloudstack.context.CallContext;
-import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

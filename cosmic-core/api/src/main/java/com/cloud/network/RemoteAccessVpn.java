@@ -1,9 +1,9 @@
 package com.cloud.network;
 
 import com.cloud.acl.ControlledEntity;
-import org.apache.cloudstack.api.Displayable;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.Displayable;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface RemoteAccessVpn extends ControlledEntity, InternalIdentity, Identity, Displayable {
     long getServerAddressId();

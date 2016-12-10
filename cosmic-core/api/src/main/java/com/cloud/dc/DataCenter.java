@@ -1,9 +1,9 @@
 package com.cloud.dc;
 
 import com.cloud.acl.InfrastructureEntity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.org.Grouping;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.Map;
 

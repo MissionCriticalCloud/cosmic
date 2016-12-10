@@ -4,6 +4,7 @@ import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.vpn.ListRemoteAccessVpnsCmd;
 import com.cloud.api.command.user.vpn.ListVpnUsersCmd;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
@@ -62,7 +63,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

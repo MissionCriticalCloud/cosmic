@@ -2,13 +2,13 @@ package com.cloud.api.response;
 
 import com.cloud.acl.RoleType;
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseResponse;
+import com.cloud.api.EntityReference;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseResponse;
-import org.apache.cloudstack.api.EntityReference;
 
 import java.util.Date;
 import java.util.LinkedHashSet;

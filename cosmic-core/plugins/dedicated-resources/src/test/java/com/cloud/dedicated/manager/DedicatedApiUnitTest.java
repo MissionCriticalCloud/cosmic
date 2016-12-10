@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.dao.AffinityGroupDao;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
@@ -18,6 +19,7 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
@@ -27,8 +29,6 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;

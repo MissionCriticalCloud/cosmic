@@ -1,15 +1,15 @@
 package com.cloud.vm;
 
+import com.cloud.context.CallContext;
 import com.cloud.exception.CloudException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobDispatcher;
 import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.inject.Inject;
 import java.util.Map;

@@ -31,7 +31,7 @@
         <property name="name" value="ConfigurationManager" />
     </bean>
 
-    <bean class="org.apache.cloudstack.networkoffering.ChildTestConfiguration" />
+    <bean class="com.cloud.networkoffering.ChildTestConfiguration" />
     <bean id="UservmDetailsDaoImpl" class="com.cloud.vm.dao.UserVmDetailsDaoImpl" />
     <bean id="hostGpuGroupsDaoImpl" class="com.cloud.gpu.dao.HostGpuGroupsDaoImpl" />
     <bean id="vGPUTypesDaoImpl" class="com.cloud.gpu.dao.VGPUTypesDaoImpl" />

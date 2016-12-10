@@ -1,9 +1,9 @@
 package com.cloud.framework.jobs;
 
 import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.jobs.JobInfo;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.jobs.JobInfo;
 
 import java.io.Serializable;
 import java.util.List;

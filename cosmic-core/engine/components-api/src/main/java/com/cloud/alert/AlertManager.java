@@ -2,7 +2,6 @@ package com.cloud.alert;
 
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.alert.AlertService;
 
 public interface AlertManager extends Manager, AlertService {
 
