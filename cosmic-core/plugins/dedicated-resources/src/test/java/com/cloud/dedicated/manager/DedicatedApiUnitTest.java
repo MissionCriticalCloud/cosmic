@@ -1,4 +1,4 @@
-package org.apache.cloudstack.dedicated.manager;
+package com.cloud.dedicated.manager;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
@@ -12,6 +12,7 @@ import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.dc.dao.HostPodDao;
+import com.cloud.dedicated.DedicatedResourceManagerImpl;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.exception.InvalidParameterValueException;
@@ -26,7 +27,6 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.UserVmDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.dedicated.DedicatedResourceManagerImpl;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 

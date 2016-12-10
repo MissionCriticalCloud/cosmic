@@ -10,7 +10,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.ClusterResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
-import org.apache.cloudstack.dedicated.DedicatedService;
+import com.cloud.dedicated.DedicatedService;
 
 import javax.inject.Inject;
 

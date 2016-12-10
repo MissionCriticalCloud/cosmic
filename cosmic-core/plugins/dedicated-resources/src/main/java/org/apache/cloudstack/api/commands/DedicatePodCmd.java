@@ -13,7 +13,7 @@ import org.apache.cloudstack.api.response.DedicatePodResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.dedicated.DedicatedService;
+import com.cloud.dedicated.DedicatedService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

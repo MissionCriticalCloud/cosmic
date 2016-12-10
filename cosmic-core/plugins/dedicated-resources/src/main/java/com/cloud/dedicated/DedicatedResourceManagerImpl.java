@@ -1,4 +1,4 @@
-package org.apache.cloudstack.dedicated;
+package com.cloud.dedicated;
 
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupService;

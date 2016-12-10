@@ -1,4 +1,4 @@
-package org.apache.cloudstack.dedicated;
+package com.cloud.dedicated;
 
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;

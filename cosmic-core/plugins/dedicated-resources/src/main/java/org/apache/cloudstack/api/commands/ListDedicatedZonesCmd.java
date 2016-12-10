@@ -14,7 +14,7 @@ import org.apache.cloudstack.api.response.DedicateZoneResponse;
 import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
-import org.apache.cloudstack.dedicated.DedicatedService;
+import com.cloud.dedicated.DedicatedService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

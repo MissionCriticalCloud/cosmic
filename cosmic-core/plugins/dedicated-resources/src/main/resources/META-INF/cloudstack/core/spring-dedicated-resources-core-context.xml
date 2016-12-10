@@ -28,6 +28,6 @@
                       >
 
     <bean id="DedicatedResourceManagerImpl"
-        class="org.apache.cloudstack.dedicated.DedicatedResourceManagerImpl" />
+        class="com.cloud.dedicated.DedicatedResourceManagerImpl" />
     
 </beans>
