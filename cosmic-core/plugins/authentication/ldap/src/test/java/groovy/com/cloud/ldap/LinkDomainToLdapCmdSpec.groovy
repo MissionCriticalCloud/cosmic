@@ -1,4 +1,4 @@
-package groovy.org.apache.cloudstack.ldap
+package groovy.com.cloud.ldap
 
 import com.cloud.api.ServerApiException
 import com.cloud.api.command.LinkDomainToLdapCmd

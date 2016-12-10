@@ -1,4 +1,4 @@
-package groovy.org.apache.cloudstack.ldap
+package groovy.com.cloud.ldap
 
 import javax.naming.NamingEnumeration
 import javax.naming.NamingException

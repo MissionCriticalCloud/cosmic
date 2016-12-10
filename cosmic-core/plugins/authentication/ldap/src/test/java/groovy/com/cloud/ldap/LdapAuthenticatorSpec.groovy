@@ -1,5 +1,9 @@
-package groovy.org.apache.cloudstack.ldap
+package groovy.com.cloud.ldap
 
+import com.cloud.ldap.LdapAuthenticator
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapTrustMapVO
+import com.cloud.ldap.LdapUser
 import com.cloud.server.auth.UserAuthenticator
 import com.cloud.user.Account
 import com.cloud.user.AccountManager
@@ -8,10 +12,6 @@ import com.cloud.user.UserAccount
 import com.cloud.user.UserAccountVO
 import com.cloud.user.dao.UserAccountDao
 import com.cloud.utils.Pair
-import com.cloud.ldap.LdapAuthenticator
-import com.cloud.ldap.LdapManager
-import com.cloud.ldap.LdapTrustMapVO
-import com.cloud.ldap.LdapUser
 
 class LdapAuthenticatorSpec extends spock.lang.Specification {
 
