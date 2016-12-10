@@ -324,7 +324,7 @@ public class IPRangeConfig {
         final String updateSql = "UPDATE `cloud`.`data_center` set mac_address = mac_address+1 where id=?";
         final Vector<String> problemIPs = new Vector<>();
 
-        Connection conn;
+        final Connection conn;
         try {
             conn = txn.getConnection();
         } catch (final SQLException e) {
@@ -423,7 +423,7 @@ public class IPRangeConfig {
         final String isPublicIPAllocatedSelectSql = "SELECT * FROM `cloud`.`user_ip_address` WHERE public_ip_address = ? AND vlan_id = ?";
 
         final Vector<String> problemIPs = new Vector<>();
-        Connection conn;
+        final Connection conn;
         try {
             conn = txn.getConnection();
         } catch (final SQLException e) {
@@ -517,124 +517,6 @@ public class IPRangeConfig {
         } catch (final SQLException ex) {
             System.out.println(ex.getMessage());
             return true;
-        }
-    }
-
-    public static String getPublicNetmask(final String zone) {
-        return DatabaseConfig.getDatabaseValueString("SELECT * FROM `cloud`.`data_center` WHERE name = \"" + zone + "\"", "netmask",
-                "Unable to start DB connection to read public netmask. Please contact Cloud Support.");
-    }
-
-    public static String getPublicGateway(final String zone) {
-        return DatabaseConfig.getDatabaseValueString("SELECT * FROM `cloud`.`data_center` WHERE name = \"" + zone + "\"", "gateway",
-                "Unable to start DB connection to read public gateway. Please contact Cloud Support.");
-    }
-
-    public static String getGuestNetworkCidr(final Long zoneId) {
-        return DatabaseConfig.getDatabaseValueString("SELECT * FROM `cloud`.`data_center` WHERE id = \"" + zoneId + "\"", "guest_network_cidr",
-                "Unable to start DB connection to read guest cidr network. Please contact Cloud Support.");
-    }
-
-    public static boolean validCIDR(final String cidr) {
-        if (cidr == null || cidr.isEmpty()) {
-            return false;
-        }
-        final String[] cidrPair = cidr.split("\\/");
-        if (cidrPair.length != 2) {
-            return false;
-        }
-        final String cidrAddress = cidrPair[0];
-        final String cidrSize = cidrPair[1];
-        if (!validIP(cidrAddress)) {
-            return false;
-        }
-        int cidrSizeNum;
-
-        try {
-            cidrSizeNum = Integer.parseInt(cidrSize);
-        } catch (final Exception e) {
-            return false;
-        }
-
-        if (cidrSizeNum < 1 || cidrSizeNum > 32) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public static boolean sameSubnet(final String ip1, final String ip2, final String netmask) {
-        if (ip1 == null || ip1.isEmpty() || ip2 == null || ip2.isEmpty()) {
-            return true;
-        }
-        final String subnet1 = NetUtils.getSubNet(ip1, netmask);
-        final String subnet2 = NetUtils.getSubNet(ip2, netmask);
-
-        return (subnet1.equals(subnet2));
-    }
-
-    public List<String> changePublicIPRangeGUI(final String op, final String zone, final String startIP, final String endIP, final long physicalNetworkId) {
-        String result = checkErrors("public", op, null, zone, startIP, endIP);
-        if (!result.equals("success")) {
-            return DatabaseConfig.genReturnList("false", result);
-        }
-
-        final long zoneId = PodZoneConfig.getZoneId(zone);
-        result = changeRange(op, "public", -1, zoneId, startIP, endIP, null, physicalNetworkId);
-
-        return DatabaseConfig.genReturnList("true", result);
-    }
-
-    public List<String> changePrivateIPRangeGUI(final String op, final String pod, final String zone, final String startIP, final String endIP) {
-        String result = checkErrors("private", op, pod, zone, startIP, endIP);
-        if (!result.equals("success")) {
-            return DatabaseConfig.genReturnList("false", result);
-        }
-
-        final long podId = PodZoneConfig.getPodId(pod, zone);
-        final long zoneId = PodZoneConfig.getZoneId(zone);
-        result = changeRange(op, "private", podId, zoneId, startIP, endIP, null, -1);
-
-        return DatabaseConfig.genReturnList("true", result);
-    }
-
-    private String genSuccessString(final Vector<String> problemIPs, final String op) {
-        if (problemIPs == null) {
-            return "";
-        }
-
-        if (problemIPs.size() == 0) {
-            if (op.equals("add")) {
-                return "Successfully added all IPs in the specified range.";
-            } else if (op.equals("delete")) {
-                return "Successfully deleted all IPs in the specified range.";
-            } else {
-                return "";
-            }
-        } else {
-            String successString = "";
-            if (op.equals("add")) {
-                successString += "Failed to add the following IPs, because they are already in the database: <br><br>";
-            } else if (op.equals("delete")) {
-                successString += "Failed to delete the following IPs, because they are in use: <br><br>";
-            }
-
-            for (int i = 0; i < problemIPs.size(); i++) {
-                successString += problemIPs.elementAt(i);
-                if (i != (problemIPs.size() - 1)) {
-                    successString += ", ";
-                }
-            }
-
-            successString += "<br><br>";
-
-            if (op.equals("add")) {
-                successString += "Successfully added all other IPs in the specified range.";
-            } else if (op.equals("delete")) {
-                successString += "Successfully deleted all other IPs in the specified range.";
-            }
-
-            return successString;
         }
     }
 }
