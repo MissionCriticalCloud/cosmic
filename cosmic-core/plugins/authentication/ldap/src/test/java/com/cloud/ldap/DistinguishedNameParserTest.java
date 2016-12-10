@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;

@@ -1,10 +1,10 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapAddConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
 import com.cloud.exception.InvalidParameterValueException
+import com.cloud.ldap.LdapManager
 import org.apache.cloudstack.api.ServerApiException
-import org.apache.cloudstack.api.command.LdapAddConfigurationCmd
-import org.apache.cloudstack.ldap.LdapManager
 
 class LdapAddConfigurationCmdSpec extends spock.lang.Specification {
 

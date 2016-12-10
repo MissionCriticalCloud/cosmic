@@ -1,5 +1,6 @@
 package com.cloud.api.response;
 
+import com.cloud.api.command.LDAPConfigCmd;
 import com.cloud.serializer.Param;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
@@ -7,7 +8,7 @@ import org.apache.cloudstack.api.BaseResponse;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * @deprecated as of 4.3 along with the api {@link org.apache.cloudstack.api.command.LDAPConfigCmd}
+ * @deprecated as of 4.3 along with the api {@link LDAPConfigCmd}
  */
 @Deprecated
 public class LDAPConfigResponse extends BaseResponse {

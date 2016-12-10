@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 import javax.inject.Inject;
 import javax.naming.NamingEnumeration;

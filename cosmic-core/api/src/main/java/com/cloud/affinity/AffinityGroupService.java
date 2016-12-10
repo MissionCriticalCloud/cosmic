@@ -1,7 +1,7 @@
 package com.cloud.affinity;
 
+import com.cloud.api.command.user.affinitygroup.CreateAffinityGroupCmd;
 import com.cloud.uservm.UserVm;
-import org.apache.cloudstack.api.command.user.affinitygroup.CreateAffinityGroupCmd;
 
 import java.util.List;
 

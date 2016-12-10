@@ -1,11 +1,11 @@
 package com.cloud.network;
 
+import com.cloud.api.command.admin.network.AddNetworkDeviceCmd;
+import com.cloud.api.command.admin.network.DeleteNetworkDeviceCmd;
+import com.cloud.api.command.admin.network.ListNetworkDeviceCmd;
 import com.cloud.api.response.NetworkDeviceResponse;
 import com.cloud.host.Host;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.api.command.admin.network.AddNetworkDeviceCmd;
-import org.apache.cloudstack.api.command.admin.network.DeleteNetworkDeviceCmd;
-import org.apache.cloudstack.api.command.admin.network.ListNetworkDeviceCmd;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,10 +1,10 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
+import com.cloud.ldap.dao.LdapConfigurationDao;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.ldap.dao.LdapConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.directory.SearchControls;

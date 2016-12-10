@@ -1,6 +1,12 @@
 package com.cloud.template;
 
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.user.iso.DeleteIsoCmd;
+import com.cloud.api.command.user.iso.RegisterIsoCmd;
+import com.cloud.api.command.user.template.DeleteTemplateCmd;
+import com.cloud.api.command.user.template.ExtractTemplateCmd;
+import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
+import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.dc.DataCenterVO;
@@ -39,12 +45,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.command.user.iso.DeleteIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.RegisterIsoCmd;
-import org.apache.cloudstack.api.command.user.template.DeleteTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 

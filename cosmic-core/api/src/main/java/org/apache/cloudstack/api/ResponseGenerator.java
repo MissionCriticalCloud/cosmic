@@ -2,6 +2,7 @@ package org.apache.cloudstack.api;
 
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.command.user.job.QueryAsyncJobResultCmd;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.AsyncJobResponse;
@@ -170,7 +171,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.command.user.job.QueryAsyncJobResultCmd;
 import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.usage.Usage;
 

@@ -1,5 +1,12 @@
 package com.cloud.vpc;
 
+import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
+import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
+import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
+import com.cloud.api.command.user.network.CreateNetworkCmd;
+import com.cloud.api.command.user.network.ListNetworksCmd;
+import com.cloud.api.command.user.network.RestartNetworkCmd;
+import com.cloud.api.command.user.vm.ListNicsCmd;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -44,13 +51,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.api.command.admin.network.DedicateGuestVlanRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import org.apache.cloudstack.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
-import org.apache.cloudstack.api.command.user.network.CreateNetworkCmd;
-import org.apache.cloudstack.api.command.user.network.ListNetworksCmd;
-import org.apache.cloudstack.api.command.user.network.RestartNetworkCmd;
-import org.apache.cloudstack.api.command.user.vm.ListNicsCmd;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import javax.inject.Inject;

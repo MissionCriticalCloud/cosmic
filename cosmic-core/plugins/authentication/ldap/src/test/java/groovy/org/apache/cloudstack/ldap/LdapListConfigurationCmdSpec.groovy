@@ -1,10 +1,10 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapListConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
+import com.cloud.ldap.LdapConfigurationVO
+import com.cloud.ldap.LdapManager
 import com.cloud.utils.Pair
-import org.apache.cloudstack.api.command.LdapListConfigurationCmd
-import org.apache.cloudstack.ldap.LdapConfigurationVO
-import org.apache.cloudstack.ldap.LdapManager
 
 class LdapListConfigurationCmdSpec extends spock.lang.Specification {
 

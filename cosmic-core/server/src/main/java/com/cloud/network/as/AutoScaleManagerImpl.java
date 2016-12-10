@@ -1,6 +1,20 @@
 package com.cloud.network.as;
 
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.admin.autoscale.CreateCounterCmd;
+import com.cloud.api.command.user.autoscale.CreateAutoScalePolicyCmd;
+import com.cloud.api.command.user.autoscale.CreateAutoScaleVmGroupCmd;
+import com.cloud.api.command.user.autoscale.CreateAutoScaleVmProfileCmd;
+import com.cloud.api.command.user.autoscale.CreateConditionCmd;
+import com.cloud.api.command.user.autoscale.ListAutoScalePoliciesCmd;
+import com.cloud.api.command.user.autoscale.ListAutoScaleVmGroupsCmd;
+import com.cloud.api.command.user.autoscale.ListAutoScaleVmProfilesCmd;
+import com.cloud.api.command.user.autoscale.ListConditionsCmd;
+import com.cloud.api.command.user.autoscale.ListCountersCmd;
+import com.cloud.api.command.user.autoscale.UpdateAutoScalePolicyCmd;
+import com.cloud.api.command.user.autoscale.UpdateAutoScaleVmGroupCmd;
+import com.cloud.api.command.user.autoscale.UpdateAutoScaleVmProfileCmd;
+import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
 import com.cloud.configuration.ConfigurationManager;
@@ -71,20 +85,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd.HTTPMethod;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.command.admin.autoscale.CreateCounterCmd;
-import org.apache.cloudstack.api.command.user.autoscale.CreateAutoScalePolicyCmd;
-import org.apache.cloudstack.api.command.user.autoscale.CreateAutoScaleVmGroupCmd;
-import org.apache.cloudstack.api.command.user.autoscale.CreateAutoScaleVmProfileCmd;
-import org.apache.cloudstack.api.command.user.autoscale.CreateConditionCmd;
-import org.apache.cloudstack.api.command.user.autoscale.ListAutoScalePoliciesCmd;
-import org.apache.cloudstack.api.command.user.autoscale.ListAutoScaleVmGroupsCmd;
-import org.apache.cloudstack.api.command.user.autoscale.ListAutoScaleVmProfilesCmd;
-import org.apache.cloudstack.api.command.user.autoscale.ListConditionsCmd;
-import org.apache.cloudstack.api.command.user.autoscale.ListCountersCmd;
-import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScalePolicyCmd;
-import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScaleVmGroupCmd;
-import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScaleVmProfileCmd;
-import org.apache.cloudstack.api.command.user.vm.DeployVMCmd;
 import org.apache.cloudstack.config.ApiServiceConfiguration;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
@@ -857,7 +857,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
             throw new InvalidParameterValueException("The Source " + source + " does not exist; Unable to create Counter");
         }
 
-        CounterVO counter;
+        final CounterVO counter;
 
         s_logger.debug("Adding Counter " + name);
         counter = _counterDao.persist(new CounterVO(src, name, cmd.getValue()));
@@ -928,7 +928,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
         if (counter == null) {
             throw new InvalidParameterValueException("Unable to find counter");
         }
-        ConditionVO condition;
+        final ConditionVO condition;
 
         condition = _conditionDao.persist(new ConditionVO(cid, threshold, cmd.getEntityOwnerId(), cmd.getDomainId(), op));
         s_logger.info("Successfully created condition with Id: " + condition.getId());
@@ -1290,7 +1290,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
                 }
             }
 
-            UserVm vm;
+            final UserVm vm;
             final IpAddresses addrs = new IpAddresses(null, null);
             if (zone.getNetworkType() == NetworkType.Basic) {
                 vm = _userVmService.createBasicSecurityGroupVirtualMachine(zone, serviceOffering, template, null, owner, "autoScaleVm-" + asGroup.getId() + "-" +

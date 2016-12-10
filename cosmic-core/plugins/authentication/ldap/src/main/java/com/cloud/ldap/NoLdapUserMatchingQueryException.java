@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 public class NoLdapUserMatchingQueryException extends Exception {
     private static final long serialVersionUID = 7124360347208388174L;

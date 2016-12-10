@@ -1,8 +1,8 @@
-package org.apache.cloudstack.ldap.dao;
+package com.cloud.ldap.dao;
 
+import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.ldap.LdapConfigurationVO;
 
 import java.util.List;
 

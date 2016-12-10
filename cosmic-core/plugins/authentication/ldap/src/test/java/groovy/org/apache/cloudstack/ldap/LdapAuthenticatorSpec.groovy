@@ -8,10 +8,10 @@ import com.cloud.user.UserAccount
 import com.cloud.user.UserAccountVO
 import com.cloud.user.dao.UserAccountDao
 import com.cloud.utils.Pair
-import org.apache.cloudstack.ldap.LdapAuthenticator
-import org.apache.cloudstack.ldap.LdapManager
-import org.apache.cloudstack.ldap.LdapTrustMapVO
-import org.apache.cloudstack.ldap.LdapUser
+import com.cloud.ldap.LdapAuthenticator
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapTrustMapVO
+import com.cloud.ldap.LdapUser
 
 class LdapAuthenticatorSpec extends spock.lang.Specification {
 

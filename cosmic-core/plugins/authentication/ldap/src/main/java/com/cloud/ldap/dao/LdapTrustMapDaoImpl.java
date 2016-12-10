@@ -1,9 +1,9 @@
-package org.apache.cloudstack.ldap.dao;
+package com.cloud.ldap.dao;
 
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.ldap.LdapTrustMapVO;
+import com.cloud.ldap.LdapTrustMapVO;
 
 import org.springframework.stereotype.Component;
 

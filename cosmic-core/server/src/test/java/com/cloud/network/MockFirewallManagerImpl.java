@@ -1,5 +1,6 @@
 package com.cloud.network;
 
+import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.dao.IPAddressVO;
@@ -13,7 +14,6 @@ import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-import org.apache.cloudstack.api.command.user.firewall.IListFirewallRulesCmd;
 
 import javax.naming.ConfigurationException;
 import java.util.List;

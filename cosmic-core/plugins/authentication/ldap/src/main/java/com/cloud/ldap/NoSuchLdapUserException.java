@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 public class NoSuchLdapUserException extends Exception {
     private static final long serialVersionUID = 6782938919658010900L;

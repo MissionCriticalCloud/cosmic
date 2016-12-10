@@ -1,7 +1,7 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.LdapConfiguration
-import org.apache.cloudstack.ldap.LdapContextFactory
+import com.cloud.ldap.LdapConfiguration
+import com.cloud.ldap.LdapContextFactory
 import spock.lang.Shared
 
 import javax.naming.NamingException

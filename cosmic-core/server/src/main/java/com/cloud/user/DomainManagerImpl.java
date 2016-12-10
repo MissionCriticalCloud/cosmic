@@ -1,5 +1,8 @@
 package com.cloud.user;
 
+import com.cloud.api.command.admin.domain.ListDomainChildrenCmd;
+import com.cloud.api.command.admin.domain.ListDomainsCmd;
+import com.cloud.api.command.admin.domain.UpdateDomainCmd;
 import com.cloud.configuration.Resource.ResourceOwnerType;
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.configuration.dao.ResourceCountDao;
@@ -39,9 +42,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
-import org.apache.cloudstack.api.command.admin.domain.ListDomainChildrenCmd;
-import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
-import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.messagebus.MessageBus;

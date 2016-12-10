@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.dao.LdapConfigurationDaoImpl
+import com.cloud.ldap.dao.LdapConfigurationDaoImpl
 
 class LdapConfigurationDaoImplSpec extends spock.lang.Specification {
     def "Test setting up of a LdapConfigurationDao"() {

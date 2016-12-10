@@ -1,9 +1,9 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.ADLdapUserManagerImpl
-import org.apache.cloudstack.ldap.LdapUserManager
-import org.apache.cloudstack.ldap.LdapUserManagerFactory
-import org.apache.cloudstack.ldap.OpenLdapUserManagerImpl
+import com.cloud.ldap.ADLdapUserManagerImpl
+import com.cloud.ldap.LdapUserManager
+import com.cloud.ldap.LdapUserManagerFactory
+import com.cloud.ldap.OpenLdapUserManagerImpl
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.ApplicationContext
 import spock.lang.Shared

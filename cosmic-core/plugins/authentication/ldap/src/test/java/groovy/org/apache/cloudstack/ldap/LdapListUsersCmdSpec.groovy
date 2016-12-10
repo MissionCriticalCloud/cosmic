@@ -1,12 +1,12 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapListUsersCmd
 import com.cloud.api.response.LdapUserResponse
 import com.cloud.api.response.ListResponse
 import com.cloud.api.response.UserResponse
-import org.apache.cloudstack.api.command.LdapListUsersCmd
-import org.apache.cloudstack.ldap.LdapManager
-import org.apache.cloudstack.ldap.LdapUser
-import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapUser
+import com.cloud.ldap.NoLdapUserMatchingQueryException
 import org.apache.cloudstack.query.QueryService
 
 class LdapListUsersCmdSpec extends spock.lang.Specification {

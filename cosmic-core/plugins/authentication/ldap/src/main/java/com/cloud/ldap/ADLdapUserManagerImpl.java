@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;

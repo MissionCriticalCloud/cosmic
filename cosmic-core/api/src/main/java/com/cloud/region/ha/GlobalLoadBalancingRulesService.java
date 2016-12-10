@@ -1,12 +1,12 @@
 package com.cloud.region.ha;
 
+import com.cloud.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.ListGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.UpdateGlobalLoadBalancerRuleCmd;
 import com.cloud.network.rules.LoadBalancer;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.ListGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.UpdateGlobalLoadBalancerRuleCmd;
 
 import java.util.List;
 

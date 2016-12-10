@@ -1,5 +1,16 @@
 package com.cloud.template;
 
+import com.cloud.api.command.user.iso.DeleteIsoCmd;
+import com.cloud.api.command.user.iso.ExtractIsoCmd;
+import com.cloud.api.command.user.iso.RegisterIsoCmd;
+import com.cloud.api.command.user.iso.UpdateIsoCmd;
+import com.cloud.api.command.user.template.CopyTemplateCmd;
+import com.cloud.api.command.user.template.CreateTemplateCmd;
+import com.cloud.api.command.user.template.DeleteTemplateCmd;
+import com.cloud.api.command.user.template.ExtractTemplateCmd;
+import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
+import com.cloud.api.command.user.template.RegisterTemplateCmd;
+import com.cloud.api.command.user.template.UpdateTemplateCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.exception.ResourceAllocationException;
@@ -8,17 +19,6 @@ import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
-import org.apache.cloudstack.api.command.user.iso.DeleteIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.ExtractIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.RegisterIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.UpdateIsoCmd;
-import org.apache.cloudstack.api.command.user.template.CopyTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.CreateTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.DeleteTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.UpdateTemplateCmd;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

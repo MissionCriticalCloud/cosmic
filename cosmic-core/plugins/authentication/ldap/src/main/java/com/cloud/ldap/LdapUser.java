@@ -1,4 +1,4 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
 public class LdapUser implements Comparable<LdapUser> {
     private final String email;

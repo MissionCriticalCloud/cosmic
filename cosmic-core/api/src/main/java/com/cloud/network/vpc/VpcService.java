@@ -1,5 +1,7 @@
 package com.cloud.network.vpc;
 
+import com.cloud.api.command.user.vpc.ListPrivateGatewaysCmd;
+import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -8,8 +10,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.command.user.vpc.ListPrivateGatewaysCmd;
-import org.apache.cloudstack.api.command.user.vpc.ListStaticRoutesCmd;
 
 import java.util.List;
 import java.util.Map;

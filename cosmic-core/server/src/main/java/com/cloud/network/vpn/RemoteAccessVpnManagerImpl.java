@@ -1,5 +1,7 @@
 package com.cloud.network.vpn;
 
+import com.cloud.api.command.user.vpn.ListRemoteAccessVpnsCmd;
+import com.cloud.api.command.user.vpn.ListVpnUsersCmd;
 import com.cloud.configuration.Config;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
@@ -57,8 +59,6 @@ import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.command.user.vpn.ListRemoteAccessVpnsCmd;
-import org.apache.cloudstack.api.command.user.vpn.ListVpnUsersCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
@@ -121,7 +121,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
 
-        Long networkId;
+        final Long networkId;
 
         // make sure ip address exists
         final PublicIpAddress ipAddr = _networkMgr.getPublicIpAddress(publicIpId);
@@ -181,7 +181,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             throw new InvalidParameterValueException("Invalid ip range " + ipRange);
         }
 
-        Pair<String, Integer> cidr;
+        final Pair<String, Integer> cidr;
 
         // TODO: assumes one virtual network / domr per account per zone
         if (networkId != null) {

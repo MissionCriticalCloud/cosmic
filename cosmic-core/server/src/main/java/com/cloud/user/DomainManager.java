@@ -1,8 +1,8 @@
 package com.cloud.user;
 
+import com.cloud.api.command.admin.domain.UpdateDomainCmd;
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
-import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
 
 import java.util.List;
 import java.util.Set;

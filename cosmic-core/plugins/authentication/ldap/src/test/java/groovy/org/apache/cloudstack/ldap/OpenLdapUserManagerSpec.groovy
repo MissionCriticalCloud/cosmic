@@ -1,7 +1,7 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.LdapConfiguration
-import org.apache.cloudstack.ldap.OpenLdapUserManagerImpl
+import com.cloud.ldap.LdapConfiguration
+import com.cloud.ldap.OpenLdapUserManagerImpl
 import spock.lang.Shared
 
 import javax.naming.NamingException

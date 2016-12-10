@@ -1,5 +1,7 @@
 package com.cloud.vpc;
 
+import com.cloud.api.command.admin.router.UpgradeRouterCmd;
+import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -16,8 +18,6 @@ import com.cloud.user.User;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.api.command.admin.router.UpgradeRouterCmd;
-import org.apache.cloudstack.api.command.admin.router.UpgradeRouterTemplateCmd;
 
 import javax.naming.ConfigurationException;
 import java.util.List;

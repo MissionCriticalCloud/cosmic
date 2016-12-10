@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.LdapUtils
+import com.cloud.ldap.LdapUtils
 
 import javax.naming.directory.Attribute
 import javax.naming.directory.Attributes

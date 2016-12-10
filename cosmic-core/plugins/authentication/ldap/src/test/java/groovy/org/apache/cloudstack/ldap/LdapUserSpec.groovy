@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.LdapUser
+import com.cloud.ldap.LdapUser
 
 class LdapUserSpec extends spock.lang.Specification {
 

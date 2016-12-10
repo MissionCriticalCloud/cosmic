@@ -1,10 +1,10 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapUserSearchCmd
 import com.cloud.api.response.LdapUserResponse
-import org.apache.cloudstack.api.command.LdapUserSearchCmd
-import org.apache.cloudstack.ldap.LdapManager
-import org.apache.cloudstack.ldap.LdapUser
-import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapUser
+import com.cloud.ldap.NoLdapUserMatchingQueryException
 
 class LdapSearchUserCmdSpec extends spock.lang.Specification {
     def "Test getEntityOwnerId is 1"() {

@@ -1,11 +1,11 @@
-package org.apache.cloudstack.ldap.dao;
+package com.cloud.ldap.dao;
 
+import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
-import org.apache.cloudstack.ldap.LdapConfigurationVO;
 
 import java.util.List;
 

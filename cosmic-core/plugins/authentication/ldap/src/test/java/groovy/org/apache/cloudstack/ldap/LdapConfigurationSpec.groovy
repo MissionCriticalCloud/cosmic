@@ -5,10 +5,10 @@ import org.apache.cloudstack.framework.config.ConfigKey
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao
 import org.apache.cloudstack.framework.config.impl.ConfigDepotImpl
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO
-import org.apache.cloudstack.ldap.LdapConfiguration
-import org.apache.cloudstack.ldap.LdapConfigurationVO
-import org.apache.cloudstack.ldap.LdapUserManager
-import org.apache.cloudstack.ldap.dao.LdapConfigurationDao
+import com.cloud.ldap.LdapConfiguration
+import com.cloud.ldap.LdapConfigurationVO
+import com.cloud.ldap.LdapUserManager
+import com.cloud.ldap.dao.LdapConfigurationDao
 
 import javax.naming.directory.SearchControls
 

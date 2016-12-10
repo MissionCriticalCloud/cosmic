@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.LdapConfigurationVO
+import com.cloud.ldap.LdapConfigurationVO
 
 
 class LdapConfigurationVOSpec extends spock.lang.Specification {

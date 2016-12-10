@@ -1,17 +1,17 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapImportUsersCmd
 import com.cloud.api.response.LdapUserResponse
 import com.cloud.domain.Domain
 import com.cloud.domain.DomainVO
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapUser
 import com.cloud.user.AccountService
 import com.cloud.user.AccountVO
 import com.cloud.user.DomainService
 import com.cloud.user.User
 import com.cloud.user.UserAccountVO
 import com.cloud.user.UserVO
-import org.apache.cloudstack.api.command.LdapImportUsersCmd
-import org.apache.cloudstack.ldap.LdapManager
-import org.apache.cloudstack.ldap.LdapUser
 
 class LdapImportUsersCmdSpec extends spock.lang.Specification {
 

@@ -1,5 +1,9 @@
 package com.cloud.region;
 
+import com.cloud.api.command.admin.account.UpdateAccountCmd;
+import com.cloud.api.command.admin.domain.UpdateDomainCmd;
+import com.cloud.api.command.admin.user.DeleteUserCmd;
+import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -13,10 +17,6 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DbProperties;
-import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
-import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
-import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
-import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

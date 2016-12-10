@@ -1,12 +1,12 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.command.LdapCreateAccountCmd
+import com.cloud.ldap.LdapManager
+import com.cloud.ldap.LdapUser
+import com.cloud.ldap.NoLdapUserMatchingQueryException
 import com.cloud.user.AccountService
 import org.apache.cloudstack.api.ServerApiException
-import org.apache.cloudstack.api.command.LdapCreateAccountCmd
 import org.apache.cloudstack.context.CallContext
-import org.apache.cloudstack.ldap.LdapManager
-import org.apache.cloudstack.ldap.LdapUser
-import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
 
 class LdapCreateAccountCmdSpec extends spock.lang.Specification {
 

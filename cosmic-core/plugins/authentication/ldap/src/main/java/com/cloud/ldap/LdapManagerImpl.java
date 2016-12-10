@@ -1,23 +1,23 @@
-package org.apache.cloudstack.ldap;
+package com.cloud.ldap;
 
+import com.cloud.api.command.LDAPConfigCmd;
+import com.cloud.api.command.LDAPRemoveCmd;
+import com.cloud.api.command.LdapAddConfigurationCmd;
+import com.cloud.api.command.LdapCreateAccountCmd;
+import com.cloud.api.command.LdapDeleteConfigurationCmd;
+import com.cloud.api.command.LdapImportUsersCmd;
+import com.cloud.api.command.LdapListConfigurationCmd;
+import com.cloud.api.command.LdapListUsersCmd;
+import com.cloud.api.command.LdapUserSearchCmd;
+import com.cloud.api.command.LinkDomainToLdapCmd;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.ldap.dao.LdapConfigurationDao;
+import com.cloud.ldap.dao.LdapTrustMapDao;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.LdapValidator;
-import org.apache.cloudstack.api.command.LDAPConfigCmd;
-import org.apache.cloudstack.api.command.LDAPRemoveCmd;
-import org.apache.cloudstack.api.command.LdapAddConfigurationCmd;
-import org.apache.cloudstack.api.command.LdapCreateAccountCmd;
-import org.apache.cloudstack.api.command.LdapDeleteConfigurationCmd;
-import org.apache.cloudstack.api.command.LdapImportUsersCmd;
-import org.apache.cloudstack.api.command.LdapListConfigurationCmd;
-import org.apache.cloudstack.api.command.LdapListUsersCmd;
-import org.apache.cloudstack.api.command.LdapUserSearchCmd;
-import org.apache.cloudstack.api.command.LinkDomainToLdapCmd;
-import org.apache.cloudstack.ldap.dao.LdapConfigurationDao;
-import org.apache.cloudstack.ldap.dao.LdapTrustMapDao;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

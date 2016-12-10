@@ -1,10 +1,10 @@
 package com.cloud.network.element;
 
+import com.cloud.api.command.admin.router.ConfigureVirtualRouterElementCmd;
+import com.cloud.api.command.admin.router.ListVirtualRouterElementsCmd;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.utils.component.PluggableService;
-import org.apache.cloudstack.api.command.admin.router.ConfigureVirtualRouterElementCmd;
-import org.apache.cloudstack.api.command.admin.router.ListVirtualRouterElementsCmd;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException
+import com.cloud.ldap.NoLdapUserMatchingQueryException
 
 class NoLdapUserMatchingQueryExceptionSpec extends spock.lang.Specification {
     def "Test that the query is correctly set within the No LDAP user matching query exception object"() {

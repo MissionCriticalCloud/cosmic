@@ -1,5 +1,9 @@
 package com.cloud.user;
 
+import com.cloud.api.command.admin.account.UpdateAccountCmd;
+import com.cloud.api.command.admin.user.DeleteUserCmd;
+import com.cloud.api.command.admin.user.RegisterCmd;
+import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.query.vo.ControlledViewEntity;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
@@ -17,10 +21,6 @@ import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
-import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
-import org.apache.cloudstack.api.command.admin.user.RegisterCmd;
-import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
 
 import javax.naming.ConfigurationException;
 import java.net.InetAddress;

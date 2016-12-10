@@ -1,5 +1,9 @@
 package com.cloud.network;
 
+import com.cloud.api.command.admin.network.CreateStorageNetworkIpRangeCmd;
+import com.cloud.api.command.admin.network.DeleteStorageNetworkIpRangeCmd;
+import com.cloud.api.command.admin.network.ListStorageNetworkIpRangeCmd;
+import com.cloud.api.command.admin.network.UpdateStorageNetworkIpRangeCmd;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.StorageNetworkIpAddressVO;
 import com.cloud.dc.StorageNetworkIpRange;
@@ -25,10 +29,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
-import org.apache.cloudstack.api.command.admin.network.CreateStorageNetworkIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.DeleteStorageNetworkIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.ListStorageNetworkIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.UpdateStorageNetworkIpRangeCmd;
 
 import javax.inject.Inject;
 import java.sql.Connection;

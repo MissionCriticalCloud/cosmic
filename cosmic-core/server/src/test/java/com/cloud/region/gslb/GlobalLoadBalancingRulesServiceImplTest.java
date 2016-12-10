@@ -6,6 +6,10 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
+import com.cloud.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -25,10 +29,6 @@ import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.AssignToGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.CreateGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.DeleteGlobalLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 

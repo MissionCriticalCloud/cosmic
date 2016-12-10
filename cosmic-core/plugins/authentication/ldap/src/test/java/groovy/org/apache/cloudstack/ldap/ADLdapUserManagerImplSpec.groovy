@@ -1,7 +1,7 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.ldap.ADLdapUserManagerImpl
-import org.apache.cloudstack.ldap.LdapConfiguration
+import com.cloud.ldap.ADLdapUserManagerImpl
+import com.cloud.ldap.LdapConfiguration
 import spock.lang.Shared
 
 import javax.naming.directory.SearchControls
