@@ -1,12 +1,12 @@
 package com.cloud.storage.template;
 
 import com.cloud.imagestore.ImageStoreUtil;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.net.Proxy;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.io.File;
 import java.io.IOException;

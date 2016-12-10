@@ -10,8 +10,8 @@ import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Status;
-import com.cloud.resource.ServerResource;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.resource.ServerResource;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

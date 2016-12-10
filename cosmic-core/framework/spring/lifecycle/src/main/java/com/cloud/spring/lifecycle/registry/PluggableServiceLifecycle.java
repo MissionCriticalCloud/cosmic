@@ -1,4 +1,4 @@
-package org.apache.cloudstack.spring.lifecycle.registry;
+package com.cloud.spring.lifecycle.registry;
 
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.PluggableService;

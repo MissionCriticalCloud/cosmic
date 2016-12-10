@@ -1,7 +1,7 @@
 package com.cloud.cluster;
 
-import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.utils.concurrency.NamedThreadFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;

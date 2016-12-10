@@ -15,6 +15,7 @@ import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.storage.Volume.Event;
 import com.cloud.storage.command.UploadStatusAnswer;
 import com.cloud.storage.command.UploadStatusAnswer.UploadStatus;
@@ -42,7 +43,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

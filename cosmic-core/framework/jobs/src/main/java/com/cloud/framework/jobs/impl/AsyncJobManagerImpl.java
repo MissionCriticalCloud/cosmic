@@ -17,6 +17,7 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDetector;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
@@ -45,7 +46,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.jobs.JobInfo;
 import org.apache.cloudstack.jobs.JobInfo.Status;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

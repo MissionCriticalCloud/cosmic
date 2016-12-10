@@ -17,13 +17,13 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import java.util.concurrent.Executors;

@@ -6,6 +6,7 @@ import com.cloud.event.UsageEventVO;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.event.dao.UsageEventDetailsDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageIPAddressDao;
 import com.cloud.usage.dao.UsageJobDao;
@@ -46,7 +47,6 @@ import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.usage.UsageTypes;
 
 import javax.inject.Inject;

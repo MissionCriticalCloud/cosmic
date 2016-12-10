@@ -47,6 +47,7 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
 import com.cloud.org.Grouping;
@@ -96,7 +97,6 @@ import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
-import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

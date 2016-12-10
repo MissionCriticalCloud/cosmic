@@ -33,6 +33,8 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.Status.Event;
 import com.cloud.identity.ManagementServerNode;
+import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.resource.ServerResource;
 import com.cloud.security.SSLUtils;
 import com.cloud.serializer.GsonHelper;
@@ -45,8 +47,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.TaskExecutionException;
 import com.cloud.utils.nio.Link;
 import com.cloud.utils.nio.Task;
-import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,4 +1,4 @@
-package org.apache.cloudstack.spring.lifecycle;
+package com.cloud.spring.lifecycle;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.apache.cloudstack.spring.lifecycle;
+package com.cloud.spring.lifecycle;
 
 import com.cloud.framework.config.ConfigDepotAdmin;
 import com.cloud.framework.config.Configurable;

@@ -7,11 +7,11 @@ import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
 import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
 import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.framework.jobs.impl.SyncQueueItem;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.jobs.JobInfo;
-import com.cloud.managed.threadlocal.ManagedThreadLocal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

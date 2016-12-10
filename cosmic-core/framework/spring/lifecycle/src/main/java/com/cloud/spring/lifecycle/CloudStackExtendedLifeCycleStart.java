@@ -1,4 +1,4 @@
-package org.apache.cloudstack.spring.lifecycle;
+package com.cloud.spring.lifecycle;
 
 public class CloudStackExtendedLifeCycleStart extends AbstractSmartLifeCycle implements Runnable {
 

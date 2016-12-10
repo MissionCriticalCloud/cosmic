@@ -20,6 +20,7 @@ import com.cloud.api.response.ExtractResponse;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.host.Host;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Upload.Status;
 import com.cloud.storage.Upload.Type;
@@ -31,7 +32,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.jobs.JobInfo;
-import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import java.util.Collections;

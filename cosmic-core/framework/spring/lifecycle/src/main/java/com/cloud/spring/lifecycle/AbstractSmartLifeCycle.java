@@ -1,4 +1,4 @@
-package org.apache.cloudstack.spring.lifecycle;
+package com.cloud.spring.lifecycle;
 
 import org.springframework.context.SmartLifecycle;
 

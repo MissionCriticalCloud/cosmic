@@ -2,12 +2,12 @@ package org.apache.cloudstack.context;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.CloudAuthenticationException;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
 import com.cloud.projects.Project;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.UuidUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.managed.threadlocal.ManagedThreadLocal;
 
 import java.util.HashMap;
 import java.util.Map;

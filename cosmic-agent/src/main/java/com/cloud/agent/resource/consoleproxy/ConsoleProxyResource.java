@@ -16,12 +16,12 @@ import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
 import com.cloud.agent.service.Agent.ExitStatus;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedReader;

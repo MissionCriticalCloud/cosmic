@@ -2,9 +2,9 @@ package com.cloud.ha;
 
 import com.cloud.alert.AlertManager;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.usage.dao.UsageJobDao;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

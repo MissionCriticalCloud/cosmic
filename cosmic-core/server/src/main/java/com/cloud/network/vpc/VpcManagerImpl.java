@@ -27,6 +27,7 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -98,7 +99,6 @@ import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.dao.DomainRouterDao;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

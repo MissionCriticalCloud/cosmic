@@ -58,6 +58,7 @@ import com.cloud.framework.jobs.impl.AsyncJobVO;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
@@ -90,7 +91,6 @@ import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.auth.APIAuthenticationManager;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

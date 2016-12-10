@@ -10,6 +10,7 @@ import com.cloud.framework.jobs.AsyncJobDispatcher;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.dao.AsyncJobDao;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotPolicyVO;
 import com.cloud.storage.SnapshotScheduleVO;
@@ -33,7 +34,6 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import org.apache.cloudstack.api.ApiConstants;
-import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

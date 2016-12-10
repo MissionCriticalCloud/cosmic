@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.cloud.managed.threadlocal.ManagedThreadLocal;
 import com.cloud.managed.context.ManagedContextListener;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
 
 import java.util.ArrayList;
 import java.util.List;

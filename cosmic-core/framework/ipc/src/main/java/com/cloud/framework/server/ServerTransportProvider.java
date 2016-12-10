@@ -7,8 +7,8 @@ import com.cloud.framework.transport.TransportEndpoint;
 import com.cloud.framework.transport.TransportEndpointSite;
 import com.cloud.framework.transport.TransportPdu;
 import com.cloud.framework.transport.TransportProvider;
-import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.utils.concurrency.NamedThreadFactory;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
