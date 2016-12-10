@@ -131,6 +131,7 @@ class CsDhcp(CsDataBag):
                 v['gateway'] = entry['default_gateway']
 
     def add_dhcp_opts(self, entry):
+        # This means we won't serve these DHCP options for hosts with this tag
         tag = str(entry['ipv4_adress']).replace(".","_")
         self.dhcp_opts.add("%s,%s" % (tag, 3))
         self.dhcp_opts.add("%s,%s" % (tag, 6))
