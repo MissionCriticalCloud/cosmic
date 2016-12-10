@@ -2,6 +2,7 @@ package org.apache.cloudstack.framework.jobs.impl;
 
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
@@ -45,7 +46,6 @@ import org.apache.cloudstack.framework.messagebus.PublishScope;
 import org.apache.cloudstack.jobs.JobInfo;
 import org.apache.cloudstack.jobs.JobInfo.Status;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

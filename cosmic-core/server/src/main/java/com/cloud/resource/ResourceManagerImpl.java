@@ -70,6 +70,7 @@ import com.cloud.host.dao.HostTagsDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.org.Cluster;
@@ -132,7 +133,6 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -1652,7 +1652,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         return null;
                     }
 
-                    HostVO host;
+                    final HostVO host;
                     if (deferAgentCreation) {
                         host = (HostVO) createHostAndAgentDeferred(resource, entry.getValue(), true, hostTags, false);
                     } else {
@@ -1893,7 +1893,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             url = URLDecoder.decode(url);
         }
 
-        URI uri;
+        final URI uri;
 
         final DataCenterVO zone = resourceChecker.checkIfDataCenterExists(dcId);
         final Account account = CallContext.current().getCallingAccount();
@@ -2022,7 +2022,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
 
             final List<HostVO> hosts = new ArrayList<>();
-            Map<? extends ServerResource, Map<String, String>> resources;
+            final Map<? extends ServerResource, Map<String, String>> resources;
             resources = discoverer.find(dcId, podId, cluster.getId(), uri, username, password, null);
 
             if (resources != null) {
@@ -2116,7 +2116,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Cluster.ClusterType newClusterType;
+        final Cluster.ClusterType newClusterType;
         if (clusterType != null && !clusterType.isEmpty()) {
             try {
                 newClusterType = Cluster.ClusterType.valueOf(clusterType);
@@ -2132,7 +2132,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Grouping.AllocationState newAllocationState;
+        final Grouping.AllocationState newAllocationState;
         if (allocationState != null && !allocationState.isEmpty()) {
             try {
                 newAllocationState = Grouping.AllocationState.valueOf(allocationState);
@@ -2283,7 +2283,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
 
         final List<VMInstanceVO> vmsRunningOnHost = _vmDao.listByHostId(hostId);
 
-        if (! vmsRunningOnHost.isEmpty()) {
+        if (!vmsRunningOnHost.isEmpty()) {
             throw new InvalidParameterValueException("There are active VMs on this host. Please migrate all VMs on this host to another host before starting maintenance.");
         }
 
@@ -2370,7 +2370,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     public List<HypervisorType> getSupportedHypervisorTypes(final long zoneId, final boolean forVirtualRouter, final Long podId) {
         final List<HypervisorType> hypervisorTypes = new ArrayList<>();
 
-        List<ClusterVO> clustersForZone;
+        final List<ClusterVO> clustersForZone;
         if (podId != null) {
             clustersForZone = _clusterDao.listByPodId(podId);
         } else {

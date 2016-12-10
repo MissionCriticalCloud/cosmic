@@ -6,8 +6,8 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.imagestore.ImageStoreUtil;
 import org.apache.cloudstack.storage.template.UploadEntity;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import java.io.IOException;
 import java.net.URI;

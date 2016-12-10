@@ -1,4 +1,4 @@
-package org.apache.cloudstack.utils.identity;
+package com.cloud.identity;
 
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;

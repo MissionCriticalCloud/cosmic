@@ -31,6 +31,8 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.identity.ManagementServerNode;
+import com.cloud.imagestore.ImageStoreUtil;
 import com.cloud.org.Grouping;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.Storage.ImageFormat;
@@ -132,8 +134,6 @@ import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import javax.inject.Inject;
 import java.net.MalformedURLException;
@@ -264,8 +264,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.volume, displayVolume);
 
         Long zoneId = cmd.getZoneId();
-        Long diskOfferingId;
-        DiskOfferingVO diskOffering;
+        final Long diskOfferingId;
+        final DiskOfferingVO diskOffering;
         final Storage.ProvisioningType provisioningType;
         Long size;
         Long minIops = null;
@@ -563,7 +563,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     protected VolumeVO createVolumeFromSnapshot(final VolumeVO volume, final long snapshotId, final Long vmId) throws StorageUnavailableException {
-        VolumeInfo createdVolume;
+        final VolumeInfo createdVolume;
         final SnapshotVO snapshot = _snapshotDao.findById(snapshotId);
         snapshot.getVolumeId();
 
@@ -708,7 +708,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
 
-            VmWorkJobVO placeHolder;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId);
@@ -1321,7 +1321,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
 
                 placeHolder = createPlaceHolderWork(userVm.getId());
 
@@ -1619,7 +1619,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateMigrateVolume(vol.getId(), destPool.getId(), liveMigrateVolume);
@@ -1869,7 +1869,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         final Long volumeId = cmmd.getId();
-        VolumeVO volume;
+        final VolumeVO volume;
 
         if (volumeId != null) {
             volume = _volsDao.findById(volumeId);
@@ -1882,7 +1882,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw new InvalidParameterValueException("Unable to find volume with ID: " + volumeId);
         }
 
-        Long vmId;
+        final Long vmId;
 
         if (cmmd.getVirtualMachineId() == null) {
             vmId = volume.getInstanceId();
@@ -1934,7 +1934,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateDetachVolumeFromVM(vmId, volumeId);
@@ -2092,7 +2092,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateTakeVolumeSnapshot(volumeId, policyId, snapshotId, account, quiescevm);
@@ -2392,7 +2392,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateExtractVolume(volume.getId(), zoneId);
@@ -2447,7 +2447,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final VolumeInfo srcVol = volFactory.getVolume(volumeId);
         final AsyncCallFuture<VolumeApiResult> cvAnswer = volService.copyVolume(srcVol, secStore);
         // Check if you got a valid answer.
-        VolumeApiResult cvResult;
+        final VolumeApiResult cvResult;
         try {
             cvResult = cvAnswer.get();
         } catch (final InterruptedException e1) {
@@ -2645,7 +2645,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final StoragePool destPool = (StoragePool) dataStoreMgr.getDataStore(destPoolId, DataStoreRole.Primary);
         assert destPool != null;
 
-        Volume newVol;
+        final Volume newVol;
         try {
             if (liveMigrateVolume) {
                 newVol = liveMigrateVolume(vol, destPool);

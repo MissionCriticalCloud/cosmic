@@ -14,6 +14,8 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
+import com.cloud.graphite.GraphiteClient;
+import com.cloud.graphite.GraphiteException;
 import com.cloud.host.Host;
 import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
@@ -49,6 +51,7 @@ import com.cloud.storage.VolumeStats;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.usage.UsageUtils;
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.user.dao.VmDiskStatisticsDao;
 import com.cloud.utils.NumbersUtil;
@@ -79,9 +82,6 @@ import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.utils.graphite.GraphiteClient;
-import org.apache.cloudstack.utils.graphite.GraphiteException;
-import org.apache.cloudstack.utils.usage.UsageUtils;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -280,7 +280,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
         final TimeZone usageTimezone = TimeZone.getTimeZone(_usageTimeZone);
         final Calendar cal = Calendar.getInstance(usageTimezone);
         cal.setTime(new Date());
-        long endDate;
+        final long endDate;
         final int HOURLY_TIME = 60;
         final int DAILY_TIME = 60 * 24;
         if (_usageAggregationRange == DAILY_TIME) {

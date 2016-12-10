@@ -64,6 +64,7 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.network.IpAddress;
 import com.cloud.network.dao.IPAddressDao;
@@ -627,7 +628,6 @@ import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -1217,7 +1217,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         sb.and("hypervisorVersion", sb.entity().getHypervisorVersion(), SearchCriteria.Op.EQ);
 
         final String haTag = _haMgr.getHaTag();
-        SearchBuilder<HostTagVO> hostTagSearch;
+        final SearchBuilder<HostTagVO> hostTagSearch;
         if (haHosts != null && haTag != null && !haTag.isEmpty()) {
             hostTagSearch = _hostTagsDao.createSearchBuilder();
             if ((Boolean) haHosts) {
@@ -1370,7 +1370,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             sb.and("allocated", sb.entity().getAllocatedTime(), SearchCriteria.Op.NNULL);
         }
 
-        VlanType vlanType;
+        final VlanType vlanType;
         if (forVirtualNetwork != null) {
             vlanType = forVirtualNetwork ? VlanType.VirtualNetwork : VlanType.DirectAttached;
         } else {
@@ -2346,8 +2346,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         final Account caller = getCaller();
         boolean securityGroupsEnabled = false;
-        boolean elasticLoadBalancerEnabled;
-        boolean KVMSnapshotEnabled;
+        final boolean elasticLoadBalancerEnabled;
+        final boolean KVMSnapshotEnabled;
         String supportELB = "false";
         final List<NetworkVO> networks = _networkDao.listSecurityGroupEnabledNetworks();
         if (networks != null && !networks.isEmpty()) {
@@ -2825,10 +2825,10 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
 
         final Type hostType = srcHost.getType();
-        Pair<List<HostVO>, Integer> allHostsPair;
-        List<HostVO> allHosts;
+        final Pair<List<HostVO>, Integer> allHostsPair;
+        final List<HostVO> allHosts;
         final Map<Host, Boolean> requiresStorageMotion = new HashMap<>();
-        DataCenterDeployment plan;
+        final DataCenterDeployment plan;
 
         if (canMigrateWithStorage) {
             allHostsPair = searchForServers(startIndex, pageSize, null, hostType, null, srcHost.getDataCenterId(), null, null, null, null, null, null,
@@ -2990,7 +2990,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final StoragePoolVO srcVolumePool = _poolDao.findById(volume.getPoolId());
         // Get all the pools available. Only shared pools are considered because only a volume on a shared pools
         // can be live migrated while the virtual machine stays on the same host.
-        List<StoragePoolVO> storagePools;
+        final List<StoragePoolVO> storagePools;
         if (srcVolumePool.getClusterId() == null) {
             storagePools = _poolDao.findZoneWideStoragePoolsByTags(volume.getDataCenterId(), null);
         } else {
@@ -3164,7 +3164,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         final List<CapacityVO> capacities = new ArrayList<>();
 
-        Integer pageSize;
+        final Integer pageSize;
         try {
             pageSize = Integer.valueOf(cmd.getPageSizeVal().toString());
         } catch (final IllegalArgumentException e) {

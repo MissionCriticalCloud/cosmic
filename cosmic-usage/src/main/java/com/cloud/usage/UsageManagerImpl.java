@@ -48,7 +48,6 @@ import com.cloud.utils.db.TransactionLegacy;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.usage.UsageTypes;
-import org.apache.cloudstack.utils.usage.UsageUtils;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

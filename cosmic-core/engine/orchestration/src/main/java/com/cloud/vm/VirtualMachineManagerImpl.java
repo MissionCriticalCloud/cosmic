@@ -96,6 +96,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -180,7 +181,6 @@ import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -2619,7 +2619,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public void stopForced(String vmUuid) throws ResourceUnavailableException {
+    public void stopForced(final String vmUuid) throws ResourceUnavailableException {
         try {
             advanceStop(vmUuid, true);
         } catch (final OperationTimedoutException e) {
@@ -3770,7 +3770,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } else if (jobResult instanceof ConcurrentOperationException) {
                     throw (ConcurrentOperationException) jobResult;
                 } else if (jobResult instanceof Throwable) {
-                    Throwable t = (Throwable) jobResult;
+                    final Throwable t = (Throwable) jobResult;
                     throw new VirtualMachineMigrationException(t.getMessage(), t);
                 }
             }

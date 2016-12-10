@@ -2,6 +2,7 @@ package com.cloud.cluster;
 
 import com.cloud.cluster.dao.ManagementServerHostDao;
 import com.cloud.cluster.dao.ManagementServerHostPeerDao;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Profiler;
 import com.cloud.utils.component.ComponentLifecycle;
@@ -23,7 +24,6 @@ import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

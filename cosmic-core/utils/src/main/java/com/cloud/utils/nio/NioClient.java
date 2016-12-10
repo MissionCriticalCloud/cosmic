@@ -1,6 +1,6 @@
 package com.cloud.utils.nio;
 
-import org.apache.cloudstack.utils.security.SSLUtils;
+import com.cloud.security.SSLUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
