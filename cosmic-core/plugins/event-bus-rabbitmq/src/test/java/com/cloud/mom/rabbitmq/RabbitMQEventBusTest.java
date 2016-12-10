@@ -1,4 +1,4 @@
-package org.apache.cloudstack.mom.rabbitmq;
+package com.cloud.mom.rabbitmq;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -1,4 +1,4 @@
-package org.apache.cloudstack.mom.rabbitmq;
+package com.cloud.mom.rabbitmq;
 
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
