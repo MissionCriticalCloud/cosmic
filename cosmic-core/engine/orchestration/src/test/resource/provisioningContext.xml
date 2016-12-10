@@ -33,6 +33,6 @@
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean class="ChildTestConfiguration" />
+    <bean class="com.cloud.engine.provisioning.test.ChildTestConfiguration" />
 
 </beans>

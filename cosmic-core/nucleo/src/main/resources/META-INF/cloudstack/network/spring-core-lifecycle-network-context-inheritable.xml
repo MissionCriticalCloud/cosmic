@@ -4,76 +4,76 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="ipDeployersRegistry" />
         <property name="typeClass" value="com.cloud.network.element.IpDeployer" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="dhcpProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.DhcpServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="networkGurusRegistry" />
         <property name="typeClass" value="com.cloud.network.guru.NetworkGuru" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="networkElementsRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.NetworkElement" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="vpcProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.VpcProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="firewallServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.FirewallServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="portForwardingServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.PortForwardingServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="staticNatServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.StaticNatServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="networkACLServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.NetworkACLServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="loadBalancingServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.LoadBalancingServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="site2SiteVpnServiceProvidersRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.Site2SiteVpnServiceProvider" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="remoteAccessVPNServiceProviderRegistry" />
         <property name="typeClass"
                   value="com.cloud.network.element.RemoteAccessVPNServiceProvider" />
     </bean>
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="gslbServiceProvidersRegistry" />
         <property name="typeClass"
                   value="GslbServiceProvider" />

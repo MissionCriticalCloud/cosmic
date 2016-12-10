@@ -4,18 +4,18 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="deploymentPlannersRegistry" />
         <property name="typeClass" value="com.cloud.deploy.DeploymentPlanner" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="affinityProcessorsRegistry" />
         <property name="typeClass"
                   value="com.cloud.affinity.AffinityGroupProcessor" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="haPlannersRegistry" />
         <property name="typeClass" value="com.cloud.deploy.HAPlanner" />
     </bean>

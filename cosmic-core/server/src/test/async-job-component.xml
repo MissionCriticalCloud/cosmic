@@ -13,7 +13,7 @@
   If you found that the Manager or Adapter are not properly documented, please contact
   the author. -->
 <components.xml>
-    <management-server class="com.vmops.server.ManagementServerImpl">
+    <management-server class="com.cloud.server.ManagementServerImpl">
         <dao name="domain router" class="com.cloud.vm.dao.DomainRouterDaoImpl" />
         <dao name="host" class="com.cloud.host.dao.HostDaoImpl" />
         <dao name="VM Instance" class="com.cloud.vm.dao.VMInstanceDaoImpl" />

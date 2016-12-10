@@ -4,35 +4,35 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="userAuthenticatorsRegistry" />
         <property name="typeClass"
                   value="com.cloud.server.auth.UserAuthenticator" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="pluggableAPIAuthenticatorsRegistry" />
         <property name="typeClass"
                   value=" com.cloud.api.auth.PluggableAPIAuthenticator" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="securityCheckersRegistry" />
         <property name="typeClass"
                   value="com.cloud.acl.SecurityChecker" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="apiCheckersRegistry" />
         <property name="typeClass" value="com.cloud.acl.APIChecker" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="querySelectorsRegistry" />
         <property name="typeClass" value="com.cloud.acl.QuerySelector" />
     </bean>
 
-    <bean class="RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="userPasswordEncodersRegistry" />
         <property name="typeClass" value="com.cloud.server.auth.UserAuthenticator" />
     </bean>

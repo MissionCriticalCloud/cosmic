@@ -21,10 +21,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
-    <bean id="ancientDataMotionStrategy"
-          class="com.cloud.storage.motion.AncientDataMotionStrategy" />
-    <bean id="xenserverStorageMotionStrategy"
-          class="XenServerStorageMotionStrategy" />
-    <bean id="storageSystemDataMotionStrategy"
-          class="com.cloud.storage.motion.StorageSystemDataMotionStrategy" />
+    <bean id="ancientDataMotionStrategy" class="com.cloud.storage.motion.AncientDataMotionStrategy" />
+    <bean id="xenserverStorageMotionStrategy" class="com.cloud.storage.motion.XenServerStorageMotionStrategy" />
+    <bean id="storageSystemDataMotionStrategy" class="com.cloud.storage.motion.StorageSystemDataMotionStrategy" />
 </beans>

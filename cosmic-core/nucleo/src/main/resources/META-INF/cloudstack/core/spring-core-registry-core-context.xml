@@ -248,7 +248,7 @@
         <property name="excludeKey" value="affinity.processors.exclude" />
     </bean>
 
-    <bean class="DumpRegistry">
+    <bean class="com.cloud.spring.lifecycle.registry.DumpRegistry">
         <property name="registries" value="#{registryRegistry.registered}" />
     </bean>
 

@@ -36,8 +36,7 @@
 
     <bean id="apiDBUtils" class="com.cloud.api.ApiDBUtils" />
 
-    <bean id="apiDiscoveryServiceImpl"
-          class="ApiDiscoveryServiceImpl">
+    <bean id="apiDiscoveryServiceImpl" class="com.cloud.discovery.ApiDiscoveryServiceImpl">
         <property name="apiAccessCheckers" value="#{apiCheckersRegistry.registered}" />
         <property name="services" value="#{apiCommandsRegistry.registered}" />
     </bean>
