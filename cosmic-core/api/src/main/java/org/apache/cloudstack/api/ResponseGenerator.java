@@ -169,9 +169,9 @@ import org.apache.cloudstack.api.response.VpnUsersResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
-import org.apache.cloudstack.region.PortableIp;
-import org.apache.cloudstack.region.PortableIpRange;
-import org.apache.cloudstack.region.Region;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpRange;
+import com.cloud.region.Region;
 import org.apache.cloudstack.usage.Usage;
 
 import java.text.DecimalFormat;

@@ -59,6 +59,7 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleVO;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.server.auth.UserAuthenticator.ActionOnFailedAuthentication;
 import com.cloud.storage.VMTemplateVO;
@@ -122,7 +123,7 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
@@ -1072,7 +1073,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             }
 
             // delete global load balancer rules for the account.
-            final List<org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
+            final List<GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
             if (gslbRules != null && !gslbRules.isEmpty()) {
                 _gslbService.revokeAllGslbRulesForAccount(caller, accountId);
             }

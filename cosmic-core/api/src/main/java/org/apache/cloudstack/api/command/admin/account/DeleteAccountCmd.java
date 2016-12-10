@@ -15,7 +15,7 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.AccountResponse;
 import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.region.RegionService;
+import com.cloud.region.RegionService;
 
 import javax.inject.Inject;
 

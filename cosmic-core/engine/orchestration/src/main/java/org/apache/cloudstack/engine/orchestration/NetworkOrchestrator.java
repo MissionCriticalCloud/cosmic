@@ -168,7 +168,7 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.region.PortableIpDao;
+import com.cloud.region.PortableIpDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

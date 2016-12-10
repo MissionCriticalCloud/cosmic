@@ -8,8 +8,8 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.RegionResponse;
-import org.apache.cloudstack.region.Region;
-import org.apache.cloudstack.region.RegionService;
+import com.cloud.region.Region;
+import com.cloud.region.RegionService;
 
 import javax.inject.Inject;
 

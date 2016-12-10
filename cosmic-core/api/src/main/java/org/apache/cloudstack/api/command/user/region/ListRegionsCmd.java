@@ -6,8 +6,8 @@ import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
-import org.apache.cloudstack.region.Region;
-import org.apache.cloudstack.region.RegionService;
+import com.cloud.region.Region;
+import com.cloud.region.RegionService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

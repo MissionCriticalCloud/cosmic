@@ -4,8 +4,8 @@ import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.region.AddRegionCmd;
 import org.apache.cloudstack.api.response.RegionResponse;
-import org.apache.cloudstack.region.Region;
-import org.apache.cloudstack.region.RegionService;
+import com.cloud.region.Region;
+import com.cloud.region.RegionService;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

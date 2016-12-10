@@ -55,7 +55,7 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

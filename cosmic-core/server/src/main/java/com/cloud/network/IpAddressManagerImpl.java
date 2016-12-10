@@ -133,10 +133,10 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.region.PortableIp;
-import org.apache.cloudstack.region.PortableIpDao;
-import org.apache.cloudstack.region.PortableIpVO;
-import org.apache.cloudstack.region.Region;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpDao;
+import com.cloud.region.PortableIpVO;
+import com.cloud.region.Region;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

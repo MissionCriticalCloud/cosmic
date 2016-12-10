@@ -4,7 +4,7 @@ import com.cloud.serializer.Param;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
-import org.apache.cloudstack.region.PortableIp;
+import com.cloud.region.PortableIp;
 
 import java.util.Date;
 

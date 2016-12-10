@@ -8,8 +8,8 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.PortableIpRangeResponse;
 import org.apache.cloudstack.api.response.PortableIpResponse;
-import org.apache.cloudstack.region.PortableIp;
-import org.apache.cloudstack.region.PortableIpRange;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpRange;
 
 import java.util.ArrayList;
 import java.util.List;

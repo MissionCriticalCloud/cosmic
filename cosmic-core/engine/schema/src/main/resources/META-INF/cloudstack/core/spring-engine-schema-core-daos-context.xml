@@ -155,8 +155,8 @@
     <bean id="firewallRulesDaoImpl" class="com.cloud.network.dao.FirewallRulesDaoImpl" />
     <bean id="MonitoringServiceDaoImpl" class="com.cloud.network.dao.MonitoringServiceDaoImpl" />
     <bean id="OpRouterMonitorServiceDaoImpl" class="com.cloud.network.dao.OpRouterMonitorServiceDaoImpl" />
-    <bean id="globalLoadBalancerDaoImpl" class="org.apache.cloudstack.region.gslb.GlobalLoadBalancerDaoImpl" />
-    <bean id="globalLoadBalancerLbRuleMapDaoImpl" class="org.apache.cloudstack.region.gslb.GlobalLoadBalancerLbRuleMapDaoImpl" />
+    <bean id="globalLoadBalancerDaoImpl" class="com.cloud.region.gslb.GlobalLoadBalancerDaoImpl" />
+    <bean id="globalLoadBalancerLbRuleMapDaoImpl" class="com.cloud.region.gslb.GlobalLoadBalancerLbRuleMapDaoImpl" />
     <bean id="guestOSCategoryDaoImpl" class="com.cloud.storage.dao.GuestOSCategoryDaoImpl" />
     <bean id="guestOSDaoImpl" class="com.cloud.storage.dao.GuestOSDaoImpl" />
     <bean id="guestOSHypervisorDaoImpl" class="com.cloud.storage.dao.GuestOSHypervisorDaoImpl" />
@@ -214,8 +214,8 @@
     <bean id="physicalNetworkTrafficTypeDaoImpl" class="com.cloud.network.dao.PhysicalNetworkTrafficTypeDaoImpl" />
     <bean id="podVlanDaoImpl" class="com.cloud.dc.dao.PodVlanDaoImpl" />
     <bean id="podVlanMapDaoImpl" class="com.cloud.dc.dao.PodVlanMapDaoImpl" />
-    <bean id="PortableIpDaoImpl" class="org.apache.cloudstack.region.PortableIpDaoImpl" />
-    <bean id="PortableIpRangeDaoImpl" class="org.apache.cloudstack.region.PortableIpRangeDaoImpl" />
+    <bean id="PortableIpDaoImpl" class="com.cloud.region.PortableIpDaoImpl" />
+    <bean id="PortableIpRangeDaoImpl" class="com.cloud.region.PortableIpRangeDaoImpl" />
     <bean id="portForwardingRulesDaoImpl" class="com.cloud.network.rules.dao.PortForwardingRulesDaoImpl" />
     <bean id="storagePoolHostDaoImpl" class="com.cloud.storage.dao.StoragePoolHostDaoImpl" />
     <bean id="primaryDataStoreDaoImpl" class="com.cloud.storage.datastore.db.PrimaryDataStoreDaoImpl" />
@@ -227,7 +227,7 @@
     <bean id="projectInvitationDaoImpl" class="com.cloud.projects.dao.ProjectInvitationDaoImpl" />
     <bean id="projectInvitationJoinDaoImpl" class="com.cloud.api.query.dao.ProjectInvitationJoinDaoImpl" />
     <bean id="projectJoinDaoImpl" class="com.cloud.api.query.dao.ProjectJoinDaoImpl" />
-    <bean id="regionDaoImpl" class="org.apache.cloudstack.region.dao.RegionDaoImpl" />
+    <bean id="regionDaoImpl" class="com.cloud.region.dao.RegionDaoImpl" />
     <bean id="remoteAccessVpnDaoImpl" class="com.cloud.network.dao.RemoteAccessVpnDaoImpl" />
     <bean id="resourceCountDaoImpl" class="com.cloud.configuration.dao.ResourceCountDaoImpl" />
     <bean id="resourceLimitDaoImpl" class="com.cloud.configuration.dao.ResourceLimitDaoImpl" />

@@ -13,7 +13,7 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.response.PortableIpRangeResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
-import org.apache.cloudstack.region.PortableIpRange;
+import com.cloud.region.PortableIpRange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

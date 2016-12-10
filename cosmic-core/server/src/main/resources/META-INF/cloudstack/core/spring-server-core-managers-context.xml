@@ -134,9 +134,9 @@
 
     <bean id="queryManagerImpl" class="com.cloud.api.query.QueryManagerImpl" />
 
-    <bean id="regionManagerImpl" class="org.apache.cloudstack.region.RegionManagerImpl" />
+    <bean id="regionManagerImpl" class="com.cloud.region.RegionManagerImpl" />
 
-    <bean id="regionServiceImpl" class="org.apache.cloudstack.region.RegionServiceImpl" />
+    <bean id="regionServiceImpl" class="com.cloud.region.RegionServiceImpl" />
 
     <bean id="remoteAccessVpnManagerImpl" class="com.cloud.network.vpn.RemoteAccessVpnManagerImpl">
         <property name="vpnServiceProviders" value="#{remoteAccessVPNServiceProviderRegistry.registered}" />
@@ -251,7 +251,7 @@
     <bean id="PlannerHostReservationDaoImpl" class="com.cloud.deploy.dao.PlannerHostReservationDaoImpl" />
 
     <bean id="GlobalLoadBalancingRulesServiceImpl"
-          class="org.apache.cloudstack.region.gslb.GlobalLoadBalancingRulesServiceImpl">
+          class="com.cloud.region.gslb.GlobalLoadBalancingRulesServiceImpl">
         <property name="gslbServiceProviders" value="#{gslbServiceProvidersRegistry.registered}" />
     </bean>
     <bean id="certServiceImpl" class="org.apache.cloudstack.network.lb.CertServiceImpl" />
