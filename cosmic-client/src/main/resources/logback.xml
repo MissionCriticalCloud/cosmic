@@ -51,7 +51,7 @@
     </appender>
 
     <logger name="com.cloud.utils.db.GenericDaoBase" level="WARN" />
-    <logger name="com.cloud.cloudstack.spring" level="WARN" />
+    <logger name="com.cloud.spring" level="WARN" />
 
     <logger name="org.springframework" level="WARN" />
 
