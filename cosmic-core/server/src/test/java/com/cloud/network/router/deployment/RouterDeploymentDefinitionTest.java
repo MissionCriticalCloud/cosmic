@@ -1,4 +1,4 @@
-package org.cloud.network.router.deployment;
+package com.cloud.network.router.deployment;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -10,7 +10,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -303,7 +303,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockPods.add(mockHostPodVO1);
         mockPods.add(mockHostPodVO2);
         mockPods.add(mockHostPodVO3);
-        final RouterDeploymentDefinition deployment = spy(this.deployment);
+        final RouterDeploymentDefinition deployment = Mockito.spy(this.deployment);
         doReturn(mockPods).when(deployment).listByDataCenterIdVMTypeAndStates(
                 DATA_CENTER_ID, VirtualMachine.Type.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
@@ -351,7 +351,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockPods.add(mockHostPodVO1);
         mockPods.add(mockHostPodVO2);
         // Deployment under test is a Mockito spy
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doReturn(mockPods).when(deploymentUT).listByDataCenterIdVMTypeAndStates(
                 DATA_CENTER_ID, VirtualMachine.Type.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
@@ -447,7 +447,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testFindOrDeployVirtualRouter() throws ConcurrentOperationException,
             InsufficientCapacityException, ResourceUnavailableException {
         // Prepare
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doNothing().when(deploymentUT).findOrDeployVirtualRouter();
 
         // Execute
@@ -466,7 +466,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockDestinations.add(mock(DeployDestination.class));
         mockDestinations.add(mock(DeployDestination.class));
 
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doNothing().when(deploymentUT).lock();
         doNothing().when(deploymentUT).checkPreconditions();
         doReturn(mockDestinations).when(deploymentUT).findDestinations();
@@ -504,7 +504,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockDestinations.add(mock(DeployDestination.class));
         mockDestinations.add(mock(DeployDestination.class));
 
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doNothing().when(deploymentUT).checkPreconditions();
         doReturn(mockDestinations).when(deploymentUT).findDestinations();
         doNothing().when(deploymentUT).planDeploymentRouters();
@@ -675,7 +675,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         deployment.routers = new ArrayList<>();
         when(mockNw.isRedundant()).thenReturn(true);
         //this.deployment.routers.add(routerVO1);
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doReturn(2).when(deploymentUT).getNumberOfRoutersToDeploy();
 
         final DomainRouterVO routerVO1 = mock(DomainRouterVO.class);
@@ -776,7 +776,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     protected void driveTestExecuteDeployment(final int noOfRoutersToDeploy, final boolean passPreparation)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
         // Prepare
-        final RouterDeploymentDefinition deploymentUT = spy(deployment);
+        final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doReturn(noOfRoutersToDeploy).when(deploymentUT).getNumberOfRoutersToDeploy();
         doReturn(passPreparation).when(deploymentUT).prepareDeployment();
         doNothing().when(deploymentUT).findVirtualProvider();

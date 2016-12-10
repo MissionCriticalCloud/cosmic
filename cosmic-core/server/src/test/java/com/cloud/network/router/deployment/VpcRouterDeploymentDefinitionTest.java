@@ -1,4 +1,4 @@
-package org.cloud.network.router.deployment;
+package com.cloud.network.router.deployment;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -270,10 +270,10 @@ public class VpcRouterDeploymentDefinitionTest extends RouterDeploymentDefinitio
         final PublicIp publicIp = mock(PublicIp.class);
         when(vpcMgr.assignSourceNatIpAddressToVpc(mockOwner, mockVpc)).thenReturn(publicIp);
 
-        Set<Network.Provider> providers = new HashSet<>();
+        final Set<Network.Provider> providers = new HashSet<>();
         providers.add(Network.Provider.VPCVirtualRouter);
 
-        Map<Network.Service, Set<Network.Provider>> serviceSetMap = new HashMap<>();
+        final Map<Network.Service, Set<Network.Provider>> serviceSetMap = new HashMap<>();
         serviceSetMap.put(Network.Service.SourceNat, providers);
 
         when(vpcMgr.getVpcOffSvcProvidersMap(mockVpc.getVpcOfferingId())).thenReturn(serviceSetMap);

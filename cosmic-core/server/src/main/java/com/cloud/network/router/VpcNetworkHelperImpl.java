@@ -11,6 +11,7 @@ import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
+import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

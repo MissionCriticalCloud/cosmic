@@ -5,6 +5,7 @@ import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.Vpc;
@@ -21,8 +22,6 @@ import com.cloud.vm.dao.VMInstanceDao;
 import javax.ejb.Local;
 import javax.inject.Inject;
 import java.net.URI;
-
-import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 
 @Local(value = {NicProfileHelper.class})
 public class NicProfileHelperImpl implements NicProfileHelper {

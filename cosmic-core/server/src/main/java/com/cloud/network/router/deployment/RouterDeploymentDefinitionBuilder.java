@@ -1,4 +1,4 @@
-package org.cloud.network.router.deployment;
+package com.cloud.network.router.deployment;
 
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
@@ -175,7 +175,7 @@ public class RouterDeploymentDefinitionBuilder {
         }
 
         public RouterDeploymentDefinition build() {
-            RouterDeploymentDefinition routerDeploymentDefinition;
+            final RouterDeploymentDefinition routerDeploymentDefinition;
             if (vpc != null) {
                 routerDeploymentDefinition = new VpcRouterDeploymentDefinition(guestNetwork, vpc, dest, owner, params);
             } else {
