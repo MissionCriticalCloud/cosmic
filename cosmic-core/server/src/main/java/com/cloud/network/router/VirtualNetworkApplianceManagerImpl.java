@@ -191,7 +191,7 @@ import org.apache.cloudstack.alert.AlertService;
 import org.apache.cloudstack.alert.AlertService.AlertType;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

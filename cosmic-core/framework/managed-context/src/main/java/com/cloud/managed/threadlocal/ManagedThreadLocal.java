@@ -1,6 +1,6 @@
-package org.apache.cloudstack.managed.threadlocal;
+package com.cloud.managed.threadlocal;
 
-import org.apache.cloudstack.managed.context.ManagedContextUtils;
+import com.cloud.managed.context.ManagedContextUtils;
 
 import java.util.HashMap;
 import java.util.Map;

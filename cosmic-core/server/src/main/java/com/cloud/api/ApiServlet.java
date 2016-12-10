@@ -15,7 +15,7 @@ import org.apache.cloudstack.api.auth.APIAuthenticationManager;
 import org.apache.cloudstack.api.auth.APIAuthenticationType;
 import org.apache.cloudstack.api.auth.APIAuthenticator;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.managed.context.ManagedContext;
+import com.cloud.managed.context.ManagedContext;
 
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;

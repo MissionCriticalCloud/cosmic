@@ -123,7 +123,7 @@ import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;

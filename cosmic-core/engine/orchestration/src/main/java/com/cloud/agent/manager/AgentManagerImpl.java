@@ -71,7 +71,7 @@ import com.cloud.utils.nio.Link;
 import com.cloud.utils.nio.NioServer;
 import com.cloud.utils.nio.Task;
 import com.cloud.utils.time.InaccurateClock;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

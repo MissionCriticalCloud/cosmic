@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.kvm.resource;
 
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.util.ArrayList;
 import java.util.HashSet;

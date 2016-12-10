@@ -1,6 +1,6 @@
-package org.apache.cloudstack.managed.context;
+package com.cloud.managed.context;
 
-import org.apache.cloudstack.managed.context.impl.DefaultManagedContext;
+import com.cloud.managed.context.impl.DefaultManagedContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

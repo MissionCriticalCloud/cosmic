@@ -8,7 +8,7 @@ import com.cloud.framework.transport.TransportEndpointSite;
 import com.cloud.framework.transport.TransportPdu;
 import com.cloud.framework.transport.TransportProvider;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.security.SecureRandom;
 import java.util.HashMap;

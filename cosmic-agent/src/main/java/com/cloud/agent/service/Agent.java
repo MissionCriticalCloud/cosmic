@@ -30,7 +30,7 @@ import com.cloud.utils.nio.NioConnection;
 import com.cloud.utils.nio.Task;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;

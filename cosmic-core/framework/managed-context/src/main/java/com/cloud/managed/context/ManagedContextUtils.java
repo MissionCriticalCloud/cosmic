@@ -1,4 +1,4 @@
-package org.apache.cloudstack.managed.context;
+package com.cloud.managed.context;
 
 public class ManagedContextUtils {
 

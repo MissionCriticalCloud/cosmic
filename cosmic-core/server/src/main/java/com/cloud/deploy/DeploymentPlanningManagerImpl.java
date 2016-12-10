@@ -96,7 +96,7 @@ import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

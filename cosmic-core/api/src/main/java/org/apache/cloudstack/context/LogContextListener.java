@@ -1,7 +1,7 @@
 package org.apache.cloudstack.context;
 
 import com.cloud.dao.EntityManager;
-import org.apache.cloudstack.managed.context.ManagedContextListener;
+import com.cloud.managed.context.ManagedContextListener;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

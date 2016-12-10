@@ -32,7 +32,7 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.managed.context.ManagedContext;
+import com.cloud.managed.context.ManagedContext;
 
 import javax.inject.Inject;
 import java.lang.reflect.Array;

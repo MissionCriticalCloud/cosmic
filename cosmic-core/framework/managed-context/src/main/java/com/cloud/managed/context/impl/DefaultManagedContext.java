@@ -1,9 +1,9 @@
-package org.apache.cloudstack.managed.context.impl;
+package com.cloud.managed.context.impl;
 
-import org.apache.cloudstack.managed.context.ManagedContext;
-import org.apache.cloudstack.managed.context.ManagedContextListener;
-import org.apache.cloudstack.managed.context.ManagedContextUtils;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.managed.context.ManagedContext;
+import com.cloud.managed.context.ManagedContextListener;
+import com.cloud.managed.context.ManagedContextUtils;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
 
 import java.util.List;
 import java.util.Stack;

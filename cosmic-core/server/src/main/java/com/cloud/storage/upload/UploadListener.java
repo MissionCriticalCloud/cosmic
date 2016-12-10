@@ -31,7 +31,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.jobs.JobInfo;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import java.util.Collections;

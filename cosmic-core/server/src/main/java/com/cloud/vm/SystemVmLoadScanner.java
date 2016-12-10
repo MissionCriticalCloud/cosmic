@@ -5,7 +5,7 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.GlobalLock;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

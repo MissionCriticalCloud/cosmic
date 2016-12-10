@@ -1,7 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.storage.StorageLayer;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.io.File;
 

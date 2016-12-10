@@ -9,7 +9,7 @@ import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.utils.net.HTTPUtils;
 import com.cloud.utils.net.Proxy;
 import com.cloud.utils.storage.S3.S3Utils;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

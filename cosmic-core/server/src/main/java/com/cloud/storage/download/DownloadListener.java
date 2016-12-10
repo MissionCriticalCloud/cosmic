@@ -31,7 +31,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService;
 import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import java.util.Date;

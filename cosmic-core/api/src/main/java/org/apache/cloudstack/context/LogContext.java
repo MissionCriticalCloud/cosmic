@@ -6,7 +6,7 @@ import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.UuidUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
 
 import java.util.HashMap;
 import java.util.Map;

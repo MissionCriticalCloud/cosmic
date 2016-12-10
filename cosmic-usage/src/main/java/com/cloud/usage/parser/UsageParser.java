@@ -1,6 +1,6 @@
 package com.cloud.usage.parser;
 
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.util.Date;
 

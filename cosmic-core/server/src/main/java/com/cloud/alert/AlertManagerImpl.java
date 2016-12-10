@@ -38,7 +38,7 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.mail.Authenticator;

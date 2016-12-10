@@ -6,7 +6,7 @@ import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.net.Proxy;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import java.io.File;
 import java.io.IOException;

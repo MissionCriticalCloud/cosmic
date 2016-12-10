@@ -13,7 +13,7 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.managed.context.ManagedContext;
+import com.cloud.managed.context.ManagedContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

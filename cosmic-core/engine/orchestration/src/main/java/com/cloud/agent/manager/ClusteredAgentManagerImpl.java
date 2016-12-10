@@ -45,8 +45,8 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.TaskExecutionException;
 import com.cloud.utils.nio.Link;
 import com.cloud.utils.nio.Task;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
+import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

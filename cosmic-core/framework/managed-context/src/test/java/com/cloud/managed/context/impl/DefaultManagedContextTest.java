@@ -1,12 +1,12 @@
-package org.apache.cloudstack.managed.context.impl;
+package com.cloud.managed.context.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.apache.cloudstack.managed.context.ManagedContextListener;
-import org.apache.cloudstack.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.managed.context.ManagedContextListener;
 
 import java.util.ArrayList;
 import java.util.List;

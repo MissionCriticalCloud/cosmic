@@ -8,7 +8,7 @@ import com.cloud.framework.events.EventTopic;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;

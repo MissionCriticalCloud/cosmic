@@ -12,7 +12,7 @@ import com.cloud.storage.resource.LocalNfsSecondaryStorageResource;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import com.cloud.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;
 import java.io.File;
