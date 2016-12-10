@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
+import com.cloud.api.response.SslCertResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -12,8 +14,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.SslCertResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;

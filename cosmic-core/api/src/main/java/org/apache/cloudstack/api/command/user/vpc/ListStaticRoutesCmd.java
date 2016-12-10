@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.PrivateGatewayResponse;
+import com.cloud.api.response.StaticRouteResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.VpcGateway;
@@ -9,10 +13,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.PrivateGatewayResponse;
-import org.apache.cloudstack.api.response.StaticRouteResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import java.util.ArrayList;
 import java.util.List;

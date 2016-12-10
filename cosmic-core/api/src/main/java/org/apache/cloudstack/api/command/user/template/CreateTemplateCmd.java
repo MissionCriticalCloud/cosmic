@@ -1,5 +1,11 @@
 package org.apache.cloudstack.api.command.user.template;
 
+import com.cloud.api.response.GuestOSResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.SnapshotResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
@@ -18,12 +24,6 @@ import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.GuestOSResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.SnapshotResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.Collection;

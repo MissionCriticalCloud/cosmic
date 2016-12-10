@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScaleVmGroupResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScaleVmGroup;
 import com.cloud.user.Account;
@@ -12,7 +13,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

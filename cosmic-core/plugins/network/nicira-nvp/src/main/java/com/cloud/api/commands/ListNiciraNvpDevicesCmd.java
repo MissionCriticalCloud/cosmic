@@ -1,6 +1,8 @@
 package com.cloud.api.commands;
 
+import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NiciraNvpDeviceResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
@@ -14,8 +16,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

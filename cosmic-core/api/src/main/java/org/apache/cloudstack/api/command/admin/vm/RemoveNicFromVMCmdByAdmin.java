@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.vm;
 
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.api.APICommand;
@@ -8,7 +9,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.RemoveNicFromVMCmd;
-import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.ArrayList;

@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.guest;
 
+import com.cloud.api.response.GuestOSCategoryResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.storage.GuestOsCategory;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
@@ -7,8 +9,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.command.user.iso.ListIsosCmd;
-import org.apache.cloudstack.api.response.GuestOSCategoryResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import java.util.ArrayList;
 import java.util.List;

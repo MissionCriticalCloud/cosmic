@@ -2,6 +2,10 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.HostJoinVO;
+import com.cloud.api.response.GpuResponse;
+import com.cloud.api.response.HostForMigrationResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.VgpuResponse;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
 import com.cloud.host.Host;
@@ -14,10 +18,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
-import org.apache.cloudstack.api.response.GpuResponse;
-import org.apache.cloudstack.api.response.HostForMigrationResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.VgpuResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
@@ -153,7 +153,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
             if (details.contains(HostDetails.all) || details.contains(HostDetails.stats)) {
                 // set CPU/RAM/Network stats
-                String cpuUsed;
+                final String cpuUsed;
                 final HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
                     final float cpuUtil = (float) hostStats.getCpuUtilization();
@@ -297,7 +297,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
             if (details.contains(HostDetails.all) || details.contains(HostDetails.stats)) {
                 // set CPU/RAM/Network stats
-                String cpuUsed;
+                final String cpuUsed;
                 final HostStats hostStats = ApiDBUtils.getHostStatistics(host.getId());
                 if (hostStats != null) {
                     final float cpuUtil = (float) hostStats.getCpuUtilization();

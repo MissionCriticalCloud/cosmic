@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.user.event;
 
+import com.cloud.api.response.EventResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.event.Event;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.EventResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import java.util.Date;
 

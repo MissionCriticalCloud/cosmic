@@ -1,11 +1,11 @@
 package org.apache.cloudstack.api.command.user.offering;
 
+import com.cloud.api.response.DiskOfferingResponse;
+import com.cloud.api.response.ListResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListDomainResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.DiskOfferingResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

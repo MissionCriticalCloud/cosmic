@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.user.Account;
@@ -8,7 +9,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.Site2SiteVpnConnectionResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

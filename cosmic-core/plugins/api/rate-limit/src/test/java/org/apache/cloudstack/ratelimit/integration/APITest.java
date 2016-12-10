@@ -1,8 +1,8 @@
 package org.apache.cloudstack.ratelimit.integration;
 
 import com.cloud.api.ApiGsonHelper;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

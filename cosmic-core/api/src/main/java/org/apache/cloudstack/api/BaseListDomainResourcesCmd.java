@@ -1,6 +1,6 @@
 package org.apache.cloudstack.api;
 
-import org.apache.cloudstack.api.response.DomainResponse;
+import com.cloud.api.response.DomainResponse;
 
 public abstract class BaseListDomainResourcesCmd extends BaseListCmd implements IBaseListDomainResourcesCmd {
 

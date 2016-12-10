@@ -1,14 +1,14 @@
 package org.apache.cloudstack.api.command.admin.loadbalancer;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.LoadBalancerRuleVmMapResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.command.user.loadbalancer.ListLoadBalancerRuleInstancesCmd;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.LoadBalancerRuleVmMapResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.ArrayList;
 import java.util.List;

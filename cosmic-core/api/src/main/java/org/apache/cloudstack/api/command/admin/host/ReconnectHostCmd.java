@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.HostResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.host.Host;
 import com.cloud.user.Account;
@@ -10,7 +11,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.HostResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

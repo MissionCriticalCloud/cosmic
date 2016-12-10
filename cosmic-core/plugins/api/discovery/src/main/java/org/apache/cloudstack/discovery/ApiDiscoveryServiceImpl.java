@@ -1,5 +1,9 @@
 package org.apache.cloudstack.discovery;
 
+import com.cloud.api.response.ApiDiscoveryResponse;
+import com.cloud.api.response.ApiParameterResponse;
+import com.cloud.api.response.ApiResponseResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.serializer.Param;
 import com.cloud.user.User;
 import com.cloud.utils.ReflectUtil;
@@ -14,10 +18,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.command.user.discovery.ListApisCmd;
-import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
-import org.apache.cloudstack.api.response.ApiParameterResponse;
-import org.apache.cloudstack.api.response.ApiResponseResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

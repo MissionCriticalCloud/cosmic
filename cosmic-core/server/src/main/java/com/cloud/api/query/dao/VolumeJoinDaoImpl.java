@@ -4,6 +4,7 @@ import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
@@ -14,7 +15,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
@@ -98,7 +98,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
                 volResponse.setHypervisor(ApiDBUtils.getHypervisorTypeFromFormat(volume.getDataCenterId(), volume.getFormat()).toString());
             }
             if (volume.getDownloadState() != Status.DOWNLOADED) {
-                String volumeStatus;
+                final String volumeStatus;
                 if (volume.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
                     if (volume.getDownloadPercent() == 100) {
                         volumeStatus = "Checking Volume";

@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.address;
 
+import com.cloud.api.response.IPAddressResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
@@ -10,7 +11,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.address.AssociateIPAddrCmd;
-import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

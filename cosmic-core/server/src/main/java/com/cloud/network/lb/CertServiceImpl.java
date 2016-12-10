@@ -1,5 +1,6 @@
 package com.cloud.network.lb;
 
+import com.cloud.api.response.SslCertResponse;
 import com.cloud.dao.EntityManager;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
@@ -23,7 +24,6 @@ import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.api.command.user.loadbalancer.DeleteSslCertCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.ListSslCertsCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.UploadSslCertCmd;
-import org.apache.cloudstack.api.response.SslCertResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import javax.crypto.BadPaddingException;

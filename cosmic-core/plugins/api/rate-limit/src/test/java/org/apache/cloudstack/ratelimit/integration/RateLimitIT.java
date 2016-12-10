@@ -3,9 +3,9 @@ package org.apache.cloudstack.ratelimit.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.cloud.api.response.ApiLimitResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.api.response.ApiLimitResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;

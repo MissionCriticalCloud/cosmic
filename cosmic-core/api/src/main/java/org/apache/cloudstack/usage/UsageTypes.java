@@ -1,6 +1,6 @@
 package org.apache.cloudstack.usage;
 
-import org.apache.cloudstack.api.response.UsageTypeResponse;
+import com.cloud.api.response.UsageTypeResponse;
 
 import java.util.ArrayList;
 import java.util.List;

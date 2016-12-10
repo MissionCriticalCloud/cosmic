@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vm;
 
+import com.cloud.api.response.NicResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.event.EventTypes;
@@ -21,8 +23,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.NicResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.ArrayList;

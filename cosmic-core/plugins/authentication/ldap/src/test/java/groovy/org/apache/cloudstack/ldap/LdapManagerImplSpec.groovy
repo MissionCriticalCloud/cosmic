@@ -1,5 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.response.LinkDomainToLdapResponse
 import com.cloud.exception.InvalidParameterValueException
 import com.cloud.utils.Pair
 import org.apache.cloudstack.api.command.LDAPConfigCmd
@@ -12,7 +13,6 @@ import org.apache.cloudstack.api.command.LdapListConfigurationCmd
 import org.apache.cloudstack.api.command.LdapListUsersCmd
 import org.apache.cloudstack.api.command.LdapUserSearchCmd
 import org.apache.cloudstack.api.command.LinkDomainToLdapCmd
-import org.apache.cloudstack.api.response.LinkDomainToLdapResponse
 import org.apache.cloudstack.ldap.LdapConfiguration
 import org.apache.cloudstack.ldap.LdapConfigurationVO
 import org.apache.cloudstack.ldap.LdapContextFactory

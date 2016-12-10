@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.ConditionResponse;
+import com.cloud.api.response.CounterResponse;
+import com.cloud.api.response.DomainResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.Condition;
@@ -10,9 +13,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ConditionResponse;
-import org.apache.cloudstack.api.response.CounterResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

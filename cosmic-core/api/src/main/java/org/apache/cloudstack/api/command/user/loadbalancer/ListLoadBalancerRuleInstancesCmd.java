@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
+import com.cloud.api.response.FirewallRuleResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.LoadBalancerRuleVmMapResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
@@ -8,10 +12,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.FirewallRuleResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.LoadBalancerRuleVmMapResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.ArrayList;
 import java.util.List;

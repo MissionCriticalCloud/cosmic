@@ -1,10 +1,10 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
+import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.user.Account;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
 
 import java.util.List;
 

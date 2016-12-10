@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.region;
 
+import com.cloud.api.response.RegionResponse;
 import com.cloud.region.Region;
 import com.cloud.region.RegionService;
 import com.cloud.user.Account;
@@ -9,7 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.RegionResponse;
 
 import javax.inject.Inject;
 

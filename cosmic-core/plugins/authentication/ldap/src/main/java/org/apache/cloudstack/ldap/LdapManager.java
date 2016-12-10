@@ -1,12 +1,12 @@
 package org.apache.cloudstack.ldap;
 
+import com.cloud.api.response.LdapConfigurationResponse;
+import com.cloud.api.response.LdapUserResponse;
+import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.PluggableService;
 import org.apache.cloudstack.api.command.LdapListConfigurationCmd;
-import org.apache.cloudstack.api.response.LdapConfigurationResponse;
-import org.apache.cloudstack.api.response.LdapUserResponse;
-import org.apache.cloudstack.api.response.LinkDomainToLdapResponse;
 
 import java.util.List;
 

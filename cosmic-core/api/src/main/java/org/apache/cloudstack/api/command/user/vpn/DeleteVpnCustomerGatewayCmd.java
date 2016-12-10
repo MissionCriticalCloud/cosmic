@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.user.Account;
@@ -11,8 +13,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.Site2SiteCustomerGatewayResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

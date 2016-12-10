@@ -16,8 +16,8 @@ import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.IPAddressResponse;
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.IPAddressResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

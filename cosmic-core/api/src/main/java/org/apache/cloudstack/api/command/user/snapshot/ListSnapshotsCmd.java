@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.snapshot;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.SnapshotResponse;
+import com.cloud.api.response.VolumeResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.storage.Snapshot;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
@@ -7,10 +11,6 @@ import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.SnapshotResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.List;

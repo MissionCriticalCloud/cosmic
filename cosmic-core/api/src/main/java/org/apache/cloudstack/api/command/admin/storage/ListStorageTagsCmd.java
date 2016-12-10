@@ -1,10 +1,10 @@
 package org.apache.cloudstack.api.command.admin.storage;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.StorageTagResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.StorageTagResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class ListStorageTagsCmd extends BaseListCmd {
 
     @Override
     public void execute() {
-        ListResponse<StorageTagResponse> response = _queryService.searchForStorageTags(this);
+        final ListResponse<StorageTagResponse> response = _queryService.searchForStorageTags(this);
 
         response.setResponseName(getCommandName());
 

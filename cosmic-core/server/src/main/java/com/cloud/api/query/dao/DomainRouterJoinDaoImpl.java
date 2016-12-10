@@ -2,6 +2,8 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.DomainRouterJoinVO;
+import com.cloud.api.response.DomainRouterResponse;
+import com.cloud.api.response.NicResponse;
 import com.cloud.maint.Version;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;
@@ -11,8 +13,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.DomainRouterResponse;
-import org.apache.cloudstack.api.response.NicResponse;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 

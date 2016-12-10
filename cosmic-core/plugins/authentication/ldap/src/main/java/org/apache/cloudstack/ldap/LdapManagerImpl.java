@@ -1,5 +1,8 @@
 package org.apache.cloudstack.ldap;
 
+import com.cloud.api.response.LdapConfigurationResponse;
+import com.cloud.api.response.LdapUserResponse;
+import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.LdapValidator;
@@ -13,9 +16,6 @@ import org.apache.cloudstack.api.command.LdapListConfigurationCmd;
 import org.apache.cloudstack.api.command.LdapListUsersCmd;
 import org.apache.cloudstack.api.command.LdapUserSearchCmd;
 import org.apache.cloudstack.api.command.LinkDomainToLdapCmd;
-import org.apache.cloudstack.api.response.LdapConfigurationResponse;
-import org.apache.cloudstack.api.response.LdapUserResponse;
-import org.apache.cloudstack.api.response.LinkDomainToLdapResponse;
 import org.apache.cloudstack.ldap.dao.LdapConfigurationDao;
 import org.apache.cloudstack.ldap.dao.LdapTrustMapDao;
 

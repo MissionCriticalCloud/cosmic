@@ -1,5 +1,6 @@
 package com.cloud.template;
 
+import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
@@ -18,7 +19,6 @@ import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
 import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplateCmd;
 import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
 import org.apache.cloudstack.api.command.user.template.UpdateTemplateCmd;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

@@ -1,10 +1,10 @@
 package com.cloud.affinity;
 
+import com.cloud.api.response.ControlledViewEntityResponse;
 import com.cloud.serializer.Param;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
-import org.apache.cloudstack.api.response.ControlledViewEntityResponse;
 
 import java.util.ArrayList;
 import java.util.List;

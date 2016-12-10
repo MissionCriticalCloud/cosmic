@@ -16,9 +16,9 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.FirewallRuleResponse;
-import org.apache.cloudstack.api.response.IPAddressResponse;
-import org.apache.cloudstack.api.response.IpForwardingRuleResponse;
+import com.cloud.api.response.FirewallRuleResponse;
+import com.cloud.api.response.IPAddressResponse;
+import com.cloud.api.response.IpForwardingRuleResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;

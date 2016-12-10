@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.resource;
 
+import com.cloud.api.response.AlertResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
@@ -8,8 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AlertResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import java.util.Date;
 import java.util.List;

@@ -1,9 +1,9 @@
 package org.apache.cloudstack.api.command.user.config;
 
+import com.cloud.api.response.CapabilitiesResponse;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.response.CapabilitiesResponse;
 
 import java.util.Map;
 

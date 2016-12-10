@@ -1,10 +1,10 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.HostTagResponse;
+import com.cloud.api.response.ListResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.response.HostTagResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class ListHostTagsCmd extends BaseListCmd {
 
     @Override
     public void execute() {
-        ListResponse<HostTagResponse> response = _queryService.searchForHostTags(this);
+        final ListResponse<HostTagResponse> response = _queryService.searchForHostTags(this);
 
         response.setResponseName(getCommandName());
 

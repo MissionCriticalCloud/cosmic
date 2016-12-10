@@ -1,5 +1,6 @@
 package com.cloud.storage;
 
+import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.api.command.user.volume.GetUploadParamsForVolumeCmd
 import org.apache.cloudstack.api.command.user.volume.MigrateVolumeCmd;
 import org.apache.cloudstack.api.command.user.volume.ResizeVolumeCmd;
 import org.apache.cloudstack.api.command.user.volume.UploadVolumeCmd;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
 
 import java.net.MalformedURLException;
 

@@ -1,6 +1,6 @@
 package groovy.org.apache.cloudstack.ldap
 
-import org.apache.cloudstack.api.response.LdapConfigurationResponse
+import com.cloud.api.response.LdapConfigurationResponse
 
 class LdapConfigurationResponseSpec extends spock.lang.Specification {
     def "Testing succcessful setting of LdapConfigurationResponse hostname"() {

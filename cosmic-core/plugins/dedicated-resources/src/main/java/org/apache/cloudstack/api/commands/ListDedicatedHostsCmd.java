@@ -1,8 +1,13 @@
 package org.apache.cloudstack.api.commands;
 
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.response.DedicateHostResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;
+import com.cloud.dedicated.DedicatedService;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -10,11 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DedicateHostResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import com.cloud.dedicated.DedicatedService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

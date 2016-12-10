@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.admin.volume;
 
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.storage.Volume;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.volume.MigrateVolumeCmd;
-import org.apache.cloudstack.api.response.VolumeResponse;
 
 @APICommand(name = "migrateVolume", description = "Migrate volume", responseObject = VolumeResponse.class, since = "3.0.0", responseView = ResponseView.Full, entityType =
         {Volume.class},

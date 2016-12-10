@@ -2,12 +2,12 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.ServiceOfferingJoinVO;
+import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
 
 import java.util.List;
 

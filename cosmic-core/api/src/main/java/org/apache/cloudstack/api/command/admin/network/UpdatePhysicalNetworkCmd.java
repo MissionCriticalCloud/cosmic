@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.network;
 
+import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.user.Account;
@@ -8,7 +9,6 @@ import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
 
 import java.util.List;
 

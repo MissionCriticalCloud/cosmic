@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.region;
 
+import com.cloud.api.response.PortableIpRangeResponse;
+import com.cloud.api.response.RegionResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
@@ -12,8 +14,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.PortableIpRangeResponse;
-import org.apache.cloudstack.api.response.RegionResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

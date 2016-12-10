@@ -1,9 +1,9 @@
 package org.apache.cloudstack.api;
 
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.SuccessResponse;
+import com.cloud.api.response.TemplateResponse;
 import com.cloud.exception.InvalidParameterValueException;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
 
 import java.util.List;
 

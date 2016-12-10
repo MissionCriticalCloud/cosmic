@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command;
 
+import com.cloud.api.response.LDAPConfigResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -12,8 +14,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.LDAPConfigResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 import org.apache.cloudstack.ldap.LdapConfiguration;

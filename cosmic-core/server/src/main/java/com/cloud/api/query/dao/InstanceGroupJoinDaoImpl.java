@@ -2,11 +2,11 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.InstanceGroupJoinVO;
+import com.cloud.api.response.InstanceGroupResponse;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.InstanceGroup;
-import org.apache.cloudstack.api.response.InstanceGroupResponse;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package org.apache.cloudstack.api;
 
+import com.cloud.api.response.GuestOSResponse;
+import com.cloud.api.response.TemplateResponse;
 import org.apache.cloudstack.api.command.user.iso.UpdateIsoCmd;
-import org.apache.cloudstack.api.response.GuestOSResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
 
 import java.util.Collection;
 import java.util.Map;

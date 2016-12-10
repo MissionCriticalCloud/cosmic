@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.RemoteAccessVpnResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.RemoteAccessVpn;
@@ -8,8 +10,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.RemoteAccessVpnResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

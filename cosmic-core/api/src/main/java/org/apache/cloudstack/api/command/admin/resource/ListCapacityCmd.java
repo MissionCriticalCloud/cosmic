@@ -1,16 +1,16 @@
 package org.apache.cloudstack.api.command.admin.resource;
 
+import com.cloud.api.response.CapacityResponse;
+import com.cloud.api.response.ClusterResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.capacity.Capacity;
 import com.cloud.exception.InvalidParameterValueException;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.CapacityResponse;
-import org.apache.cloudstack.api.response.ClusterResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.text.DecimalFormat;
 import java.util.List;

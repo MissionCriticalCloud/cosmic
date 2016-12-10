@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.LdapUserResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -18,9 +21,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.LdapUserResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.ldap.LdapManager;
 import org.apache.cloudstack.ldap.LdapUser;
 import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException;

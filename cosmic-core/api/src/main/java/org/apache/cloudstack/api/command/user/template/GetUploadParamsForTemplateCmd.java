@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.template;
 
+import com.cloud.api.response.GetUploadParamsResponse;
+import com.cloud.api.response.GuestOSResponse;
 import com.cloud.exception.ResourceAllocationException;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.AbstractGetUploadParamsCmd;
@@ -7,8 +9,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
-import org.apache.cloudstack.api.response.GuestOSResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.net.MalformedURLException;

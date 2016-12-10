@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.Site2SiteVpnConnectionResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.acl.RoleType;
@@ -7,9 +10,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.Site2SiteVpnConnectionResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.cloud.api;
 
+import com.cloud.api.response.ExceptionResponse;
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.CloudException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ExceptionResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobDispatcher;
@@ -61,7 +61,7 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
             final String acctIdStr = params.get("ctxAccountId");
             final String contextDetails = params.get("ctxDetails");
 
-            Long userId;
+            final Long userId;
             Account accountObject = null;
 
             if (cmdObj instanceof BaseAsyncCreateCmd) {
@@ -99,7 +99,7 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
                 CallContext.unregister();
             }
         } catch (IllegalAccessException | InstantiationException | ClassNotFoundException | ServerApiException e) {
-            String errorMsg;
+            final String errorMsg;
             int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
             if (!(e instanceof ServerApiException)) {
                 s_logger.error("Unexpected exception while executing " + job.getCmd(), e);

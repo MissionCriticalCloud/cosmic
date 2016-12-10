@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.storage;
 
+import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.storage.StoragePool;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
@@ -8,7 +9,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
 
 import java.util.List;
 

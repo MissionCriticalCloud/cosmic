@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.nat;
 
+import com.cloud.api.response.IPAddressResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -13,8 +15,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.firewall.DeletePortForwardingRuleCmd;
-import org.apache.cloudstack.api.response.IPAddressResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

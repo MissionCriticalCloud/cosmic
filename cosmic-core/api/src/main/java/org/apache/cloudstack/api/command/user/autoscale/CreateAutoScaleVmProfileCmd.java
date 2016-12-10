@@ -1,5 +1,10 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScaleVmProfileResponse;
+import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.UserResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
@@ -14,11 +19,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.HashMap;

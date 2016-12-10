@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.storage;
 
+import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.storage.ImageStore;
 import com.cloud.user.Account;
@@ -9,7 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ImageStoreResponse;
 
 import java.util.Collection;
 import java.util.HashMap;

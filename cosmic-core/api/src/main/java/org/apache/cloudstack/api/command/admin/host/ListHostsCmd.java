@@ -1,5 +1,11 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.ClusterResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -11,12 +17,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ClusterResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

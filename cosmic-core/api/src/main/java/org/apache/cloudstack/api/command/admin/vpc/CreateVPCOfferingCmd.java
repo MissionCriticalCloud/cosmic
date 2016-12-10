@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.vpc.VpcOffering;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
-import org.apache.cloudstack.api.response.VpcOfferingResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;

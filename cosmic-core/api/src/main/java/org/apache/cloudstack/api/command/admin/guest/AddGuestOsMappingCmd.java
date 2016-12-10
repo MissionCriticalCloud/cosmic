@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.guest;
 
+import com.cloud.api.response.GuestOSResponse;
+import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.user.Account;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.GuestOSResponse;
-import org.apache.cloudstack.api.response.GuestOsMappingResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

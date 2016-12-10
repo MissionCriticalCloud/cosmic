@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.network;
 
+import com.cloud.api.response.NetworkOfferingResponse;
+import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Service;
@@ -12,8 +14,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.NetworkOfferingResponse;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;

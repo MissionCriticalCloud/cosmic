@@ -1,13 +1,13 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.ClusterResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ClusterResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

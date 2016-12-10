@@ -1,13 +1,13 @@
 package org.apache.cloudstack.api.command.admin.user;
 
+import com.cloud.api.response.RegisterResponse;
+import com.cloud.api.response.UserResponse;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.RegisterResponse;
-import org.apache.cloudstack.api.response.UserResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

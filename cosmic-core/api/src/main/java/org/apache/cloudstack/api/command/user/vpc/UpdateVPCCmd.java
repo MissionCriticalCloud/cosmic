@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
@@ -14,7 +15,6 @@ import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

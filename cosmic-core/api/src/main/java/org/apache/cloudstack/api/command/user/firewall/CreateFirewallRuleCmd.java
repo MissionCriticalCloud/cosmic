@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.firewall;
 
+import com.cloud.api.response.FirewallResponse;
+import com.cloud.api.response.IPAddressResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -17,8 +19,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.FirewallResponse;
-import org.apache.cloudstack.api.response.IPAddressResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.ArrayList;

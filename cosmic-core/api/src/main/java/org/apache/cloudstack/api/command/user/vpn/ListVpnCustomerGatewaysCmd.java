@@ -1,13 +1,13 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.Site2SiteCustomerGatewayResponse;
 
 import java.util.ArrayList;
 import java.util.List;

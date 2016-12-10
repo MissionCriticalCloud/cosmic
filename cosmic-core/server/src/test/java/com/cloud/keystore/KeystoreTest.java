@@ -1,8 +1,8 @@
 package com.cloud.keystore;
 
 import com.cloud.api.ApiSerializerHelper;
-import org.apache.cloudstack.api.response.AlertResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
+import com.cloud.api.response.AlertResponse;
+import com.cloud.api.response.UserVmResponse;
 
 import junit.framework.TestCase;
 import org.junit.After;

@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.snapshot;
 
+import com.cloud.api.response.SnapshotPolicyResponse;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.projects.Project;
@@ -13,8 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,9 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.response.LdapUserResponse
+import com.cloud.api.response.ListResponse
+import com.cloud.api.response.UserResponse
 import org.apache.cloudstack.api.command.LdapListUsersCmd
-import org.apache.cloudstack.api.response.LdapUserResponse
-import org.apache.cloudstack.api.response.ListResponse
-import org.apache.cloudstack.api.response.UserResponse
 import org.apache.cloudstack.ldap.LdapManager
 import org.apache.cloudstack.ldap.LdapUser
 import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException

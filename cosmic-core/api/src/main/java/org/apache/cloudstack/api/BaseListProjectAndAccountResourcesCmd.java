@@ -1,6 +1,6 @@
 package org.apache.cloudstack.api;
 
-import org.apache.cloudstack.api.response.ProjectResponse;
+import com.cloud.api.response.ProjectResponse;
 
 public abstract class BaseListProjectAndAccountResourcesCmd extends BaseListAccountResourcesCmd implements IBaseListProjectAndAccountResourcesCmd {
 

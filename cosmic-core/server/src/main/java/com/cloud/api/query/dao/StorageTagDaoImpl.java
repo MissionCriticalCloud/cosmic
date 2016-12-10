@@ -1,10 +1,10 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.StorageTagVO;
+import com.cloud.api.response.StorageTagResponse;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.StorageTagResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;

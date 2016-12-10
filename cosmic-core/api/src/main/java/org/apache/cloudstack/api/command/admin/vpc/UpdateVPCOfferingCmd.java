@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.VpcOffering;
 import com.cloud.user.Account;
@@ -9,7 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.VpcOfferingResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

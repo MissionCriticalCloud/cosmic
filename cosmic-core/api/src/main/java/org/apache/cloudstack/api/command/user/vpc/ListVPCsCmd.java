@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.VpcOfferingResponse;
+import com.cloud.api.response.VpcResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.acl.RoleType;
@@ -8,10 +12,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.VpcOfferingResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.List;

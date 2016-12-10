@@ -16,10 +16,10 @@
 // under the License.
 package org.apache.cloudstack.api.command.admin.template;
 
+import com.cloud.api.response.TemplatePermissionsResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.command.user.template.ListTemplatePermissionsCmd;
-import org.apache.cloudstack.api.response.TemplatePermissionsResponse;
 
 @APICommand(name = "listTemplatePermissions", description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
         TemplatePermissionsResponse.class, responseView = ResponseView.Full,

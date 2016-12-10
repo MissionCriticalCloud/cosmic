@@ -13,12 +13,6 @@ import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.AuthenticationCmdResponse;
-import org.apache.cloudstack.api.response.CreateCmdResponse;
-import org.apache.cloudstack.api.response.ExceptionResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Field;
@@ -252,7 +246,7 @@ public class ApiResponseSerializer {
             }
 
             field.setAccessible(true);
-            Object fieldValue;
+            final Object fieldValue;
             try {
                 fieldValue = field.get(obj);
             } catch (final IllegalArgumentException e) {

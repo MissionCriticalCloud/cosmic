@@ -1,6 +1,16 @@
 package org.apache.cloudstack.api.command.user.vm;
 
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.response.DiskOfferingResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.NetworkResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.SecurityGroupResponse;
+import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.event.EventTypes;
@@ -30,16 +40,6 @@ import org.apache.cloudstack.api.BaseAsyncCreateCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DiskOfferingResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.ArrayList;

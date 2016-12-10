@@ -1,5 +1,11 @@
 package org.apache.cloudstack.api.command.user.template;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.GuestOSResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.template.VirtualMachineTemplate;
 import org.apache.cloudstack.api.APICommand;
@@ -10,12 +16,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.GuestOSResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.net.URISyntaxException;

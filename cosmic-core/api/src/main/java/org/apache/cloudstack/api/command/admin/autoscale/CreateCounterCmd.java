@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.autoscale;
 
+import com.cloud.api.response.CounterResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.Counter;
 import com.cloud.user.Account;
@@ -10,7 +11,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.CounterResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

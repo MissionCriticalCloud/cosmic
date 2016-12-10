@@ -1,9 +1,9 @@
 package org.apache.cloudstack.api;
 
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.GetUploadParamsResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.ZoneResponse;
 
 import java.net.URL;
 import java.util.UUID;

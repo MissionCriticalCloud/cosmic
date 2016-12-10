@@ -1,9 +1,9 @@
 package org.apache.cloudstack.api;
 
+import com.cloud.api.response.TemplatePermissionsResponse;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.TemplatePermissionsResponse;
 
 import java.util.List;
 

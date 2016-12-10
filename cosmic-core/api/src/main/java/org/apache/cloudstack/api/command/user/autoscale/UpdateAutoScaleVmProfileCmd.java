@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScaleVmProfileResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.UserResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
@@ -13,9 +16,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.Map;

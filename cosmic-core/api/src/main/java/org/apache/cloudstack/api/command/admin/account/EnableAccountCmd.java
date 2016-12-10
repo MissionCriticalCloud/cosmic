@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.account;
 
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.DomainResponse;
 import com.cloud.region.RegionService;
 import com.cloud.user.Account;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -11,8 +13,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
 
 import javax.inject.Inject;
 

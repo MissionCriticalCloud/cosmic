@@ -1,5 +1,9 @@
 package com.cloud.dedicated;
 
+import com.cloud.api.response.DedicateClusterResponse;
+import com.cloud.api.response.DedicateHostResponse;
+import com.cloud.api.response.DedicatePodResponse;
+import com.cloud.api.response.DedicateZoneResponse;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;
 import com.cloud.utils.Pair;
@@ -8,10 +12,6 @@ import org.apache.cloudstack.api.commands.ListDedicatedClustersCmd;
 import org.apache.cloudstack.api.commands.ListDedicatedHostsCmd;
 import org.apache.cloudstack.api.commands.ListDedicatedPodsCmd;
 import org.apache.cloudstack.api.commands.ListDedicatedZonesCmd;
-import org.apache.cloudstack.api.response.DedicateClusterResponse;
-import org.apache.cloudstack.api.response.DedicateHostResponse;
-import org.apache.cloudstack.api.response.DedicatePodResponse;
-import org.apache.cloudstack.api.response.DedicateZoneResponse;
 
 import java.util.List;
 

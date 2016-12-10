@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.network;
 
+import com.cloud.api.response.NetworkResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.network.CreateNetworkCmd;
-import org.apache.cloudstack.api.response.NetworkResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

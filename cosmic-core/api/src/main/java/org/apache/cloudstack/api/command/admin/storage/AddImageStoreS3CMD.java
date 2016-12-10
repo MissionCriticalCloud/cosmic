@@ -16,6 +16,7 @@ import static org.apache.cloudstack.api.BaseCmd.CommandType.BOOLEAN;
 import static org.apache.cloudstack.api.BaseCmd.CommandType.INTEGER;
 import static org.apache.cloudstack.api.BaseCmd.CommandType.STRING;
 
+import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -30,7 +31,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ImageStoreResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +82,7 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException,
             ResourceAllocationException, NetworkRuleConflictException {
 
-        Map<String, String> dm = new HashMap();
+        final Map<String, String> dm = new HashMap();
 
         dm.put(ApiConstants.S3_ACCESS_KEY, getAccessKey());
         dm.put(ApiConstants.S3_SECRET_KEY, getSecretKey());
@@ -112,8 +112,8 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
         }
 
         try {
-            ImageStore result = _storageService.discoverImageStore(null, null, "S3", null, dm);
-            ImageStoreResponse storeResponse;
+            final ImageStore result = _storageService.discoverImageStore(null, null, "S3", null, dm);
+            final ImageStoreResponse storeResponse;
             if (result != null) {
                 storeResponse = _responseGenerator.createImageStoreResponse(result);
                 storeResponse.setResponseName(getCommandName());
@@ -122,7 +122,7 @@ public final class AddImageStoreS3CMD extends BaseCmd implements ClientOptions {
             } else {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to add S3 Image Store.");
             }
-        } catch (DiscoveryException ex) {
+        } catch (final DiscoveryException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
         }

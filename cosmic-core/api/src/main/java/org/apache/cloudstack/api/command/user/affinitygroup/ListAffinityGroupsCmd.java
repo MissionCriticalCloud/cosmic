@@ -2,13 +2,13 @@ package org.apache.cloudstack.api.command.user.affinitygroup;
 
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.UserVmResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

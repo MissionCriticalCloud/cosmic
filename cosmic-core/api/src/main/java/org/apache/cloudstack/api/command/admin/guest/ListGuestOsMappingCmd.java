@@ -1,14 +1,14 @@
 package org.apache.cloudstack.api.command.admin.guest;
 
+import com.cloud.api.response.GuestOSResponse;
+import com.cloud.api.response.GuestOsMappingResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.GuestOSResponse;
-import org.apache.cloudstack.api.response.GuestOsMappingResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import java.util.ArrayList;
 import java.util.List;

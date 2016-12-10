@@ -1,5 +1,14 @@
 package org.apache.cloudstack.api.command.admin.router;
 
+import com.cloud.api.response.ClusterResponse;
+import com.cloud.api.response.DomainRouterResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.NetworkResponse;
+import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.api.response.VpcResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.api.APICommand;
@@ -7,15 +16,6 @@ import org.apache.cloudstack.api.ApiCommandJobType;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ClusterResponse;
-import org.apache.cloudstack.api.response.DomainRouterResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

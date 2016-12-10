@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.configuration.Config;
 import com.cloud.exception.RequestLimitException;
 import com.cloud.user.Account;
@@ -13,7 +14,6 @@ import com.cloud.user.AccountService;
 import com.cloud.user.AccountVO;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
-import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.naming.ConfigurationException;

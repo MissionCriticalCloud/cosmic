@@ -1,7 +1,7 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.response.LdapUserResponse
 import org.apache.cloudstack.api.command.LdapUserSearchCmd
-import org.apache.cloudstack.api.response.LdapUserResponse
 import org.apache.cloudstack.ldap.LdapManager
 import org.apache.cloudstack.ldap.LdapUser
 import org.apache.cloudstack.ldap.NoLdapUserMatchingQueryException

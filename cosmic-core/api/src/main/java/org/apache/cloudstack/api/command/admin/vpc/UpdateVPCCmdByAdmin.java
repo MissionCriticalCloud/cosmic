@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import com.cloud.api.response.VpcResponse;
 import com.cloud.network.vpc.Vpc;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vpc.UpdateVPCCmd;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

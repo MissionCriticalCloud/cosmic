@@ -10,9 +10,9 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ZoneResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

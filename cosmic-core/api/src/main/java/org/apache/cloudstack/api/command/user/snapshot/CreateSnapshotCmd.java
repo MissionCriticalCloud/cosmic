@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.snapshot;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.SnapshotPolicyResponse;
+import com.cloud.api.response.SnapshotResponse;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
@@ -16,10 +20,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
-import org.apache.cloudstack.api.response.SnapshotResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

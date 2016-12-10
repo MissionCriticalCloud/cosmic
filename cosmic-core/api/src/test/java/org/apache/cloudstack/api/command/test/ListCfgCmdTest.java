@@ -1,11 +1,11 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.ConfigurationResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.command.admin.config.ListCfgsByCmd;
-import org.apache.cloudstack.api.response.ConfigurationResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.config.Configuration;
 
 import java.util.ArrayList;

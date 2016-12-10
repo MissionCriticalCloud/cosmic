@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
@@ -7,8 +9,6 @@ import com.cloud.resource.ResourceService;
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.host.AddHostCmd;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import java.util.Arrays;
 

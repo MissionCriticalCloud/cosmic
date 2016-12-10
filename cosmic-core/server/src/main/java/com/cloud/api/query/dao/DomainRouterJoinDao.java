@@ -1,10 +1,10 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.DomainRouterJoinVO;
+import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.user.Account;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.response.DomainRouterResponse;
 
 import java.util.List;
 

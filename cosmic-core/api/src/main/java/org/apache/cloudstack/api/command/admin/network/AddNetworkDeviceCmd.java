@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.network;
 
+import com.cloud.api.response.NetworkDeviceResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -14,7 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.NetworkDeviceResponse;
 
 import javax.inject.Inject;
 import java.util.Map;

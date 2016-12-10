@@ -13,6 +13,7 @@ import com.cloud.agent.api.storage.UploadProgressCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiSerializerHelper;
+import com.cloud.api.response.ExtractResponse;
 import com.cloud.host.Host;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Upload.Status;
@@ -24,7 +25,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.command.user.iso.ExtractIsoCmd;
 import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
 import org.apache.cloudstack.api.command.user.volume.ExtractVolumeCmd;
-import org.apache.cloudstack.api.response.ExtractResponse;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
@@ -109,7 +109,7 @@ public class UploadListener implements Listener {
         this.eventId = eventId;
         this.asyncJobId = asyncJobId;
         this.asyncMgr = asyncMgr;
-        String extractId;
+        final String extractId;
         if (type == Type.VOLUME) {
             extractId = ApiDBUtils.findVolumeById(uploadObj.getTypeId()).getUuid();
         } else {

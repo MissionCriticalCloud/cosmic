@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.usage;
 
+import com.cloud.api.response.TrafficMonitorResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.user.Account;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.TrafficMonitorResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

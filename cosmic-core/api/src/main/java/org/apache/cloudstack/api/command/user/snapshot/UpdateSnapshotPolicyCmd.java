@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.snapshot;
 
+import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.Volume;
@@ -14,7 +15,6 @@ import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.SnapshotPolicyResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

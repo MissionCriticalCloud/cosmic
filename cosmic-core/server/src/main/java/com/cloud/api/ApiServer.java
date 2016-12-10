@@ -3,6 +3,11 @@ package com.cloud.api;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
 import com.cloud.api.response.ApiResponseSerializer;
+import com.cloud.api.response.AsyncJobResponse;
+import com.cloud.api.response.CreateCmdResponse;
+import com.cloud.api.response.ExceptionResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.LoginCmdResponse;
 import com.cloud.configuration.Config;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
@@ -39,7 +44,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import com.google.gson.reflect.TypeToken;
 import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -74,11 +78,6 @@ import org.apache.cloudstack.api.command.user.vm.ListVMsCmd;
 import org.apache.cloudstack.api.command.user.vmgroup.ListVMGroupsCmd;
 import org.apache.cloudstack.api.command.user.volume.ListVolumesCmd;
 import org.apache.cloudstack.api.command.user.zone.ListZonesCmd;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.CreateCmdResponse;
-import org.apache.cloudstack.api.response.ExceptionResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.LoginCmdResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
@@ -131,6 +130,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
@@ -323,9 +323,10 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         final String info = job.getCmdInfo();
         String cmdEventType = "unknown";
         if (info != null) {
-            Type type = new TypeToken<Map<String, String>>(){}.getType();
-            Map<String, String> cmdInfo = ApiGsonHelper.getBuilder().create().fromJson(info, type);
-            String eventTypeObj = cmdInfo.get("cmdEventType");
+            final Type type = new TypeToken<Map<String, String>>() {
+            }.getType();
+            final Map<String, String> cmdInfo = ApiGsonHelper.getBuilder().create().fromJson(info, type);
+            final String eventTypeObj = cmdInfo.get("cmdEventType");
             if (eventTypeObj != null) {
                 cmdEventType = eventTypeObj;
                 if (s_logger.isDebugEnabled()) {

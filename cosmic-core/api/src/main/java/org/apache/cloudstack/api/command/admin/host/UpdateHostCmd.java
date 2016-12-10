@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.GuestOSCategoryResponse;
+import com.cloud.api.response.HostResponse;
 import com.cloud.host.Host;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
@@ -8,8 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.GuestOSCategoryResponse;
-import org.apache.cloudstack.api.response.HostResponse;
 
 import java.util.List;
 

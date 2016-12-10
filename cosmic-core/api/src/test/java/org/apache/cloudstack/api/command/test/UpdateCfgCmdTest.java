@@ -1,11 +1,11 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.exception.InvalidParameterValueException;
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.admin.config.UpdateCfgCmd;
-import org.apache.cloudstack.api.response.ConfigurationResponse;
 import org.apache.cloudstack.config.Configuration;
 
 import junit.framework.Assert;

@@ -1,6 +1,11 @@
 package org.apache.cloudstack.api.commands;
 
+import com.cloud.api.response.DedicateZoneResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.dc.DedicatedResources;
+import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
@@ -9,11 +14,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DedicateZoneResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
-import com.cloud.dedicated.DedicatedService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

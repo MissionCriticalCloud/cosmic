@@ -16,12 +16,12 @@
 // under the License.
 package org.apache.cloudstack.api.command.user.iso;
 
+import com.cloud.api.response.TemplatePermissionsResponse;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.TemplatePermissionsResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class ListIsoPermissionsCmd extends BaseListTemplateOrIsoPermissionsCmd {
     }
 
     @Override
-    protected boolean templateIsCorrectType(VirtualMachineTemplate template) {
+    protected boolean templateIsCorrectType(final VirtualMachineTemplate template) {
         return template.getFormat().equals(ImageFormat.ISO);
     }
 

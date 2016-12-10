@@ -5,13 +5,13 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
+import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.network.security.dao.SecurityGroupVMMapDao;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.user.Account;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

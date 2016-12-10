@@ -1,15 +1,15 @@
 package org.apache.cloudstack.api.command.admin.vm;
 
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.StoragePoolResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.command.user.vm.ListVMsCmd;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

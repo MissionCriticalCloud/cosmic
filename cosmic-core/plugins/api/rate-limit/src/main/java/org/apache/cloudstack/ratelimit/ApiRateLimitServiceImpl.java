@@ -1,5 +1,6 @@
 package org.apache.cloudstack.ratelimit;
 
+import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.configuration.Config;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.RequestLimitException;
@@ -10,7 +11,6 @@ import com.cloud.utils.component.AdapterBase;
 import org.apache.cloudstack.acl.APIChecker;
 import org.apache.cloudstack.api.command.admin.ratelimit.ResetApiLimitCmd;
 import org.apache.cloudstack.api.command.user.ratelimit.GetApiLimitCmd;
-import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;

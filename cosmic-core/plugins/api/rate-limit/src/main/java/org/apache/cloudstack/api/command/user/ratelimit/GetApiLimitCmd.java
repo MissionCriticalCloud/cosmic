@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.user.ratelimit;
 
+import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.configuration.Config;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ApiLimitResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.ratelimit.ApiRateLimitService;

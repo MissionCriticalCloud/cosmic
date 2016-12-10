@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.account;
 
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.DomainResponse;
 import com.cloud.user.Account;
 import com.cloud.user.UserAccount;
 import org.apache.cloudstack.api.APICommand;
@@ -9,8 +11,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.Collection;

@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScalePolicyResponse;
+import com.cloud.api.response.AutoScaleVmGroupResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.as.AutoScaleVmGroup;
 import com.cloud.user.Account;
@@ -13,8 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCustomIdCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
-import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;

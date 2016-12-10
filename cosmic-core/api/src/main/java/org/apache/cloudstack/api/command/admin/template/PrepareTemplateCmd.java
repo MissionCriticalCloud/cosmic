@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.admin.template;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.StoragePoolResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -9,10 +13,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.List;
 

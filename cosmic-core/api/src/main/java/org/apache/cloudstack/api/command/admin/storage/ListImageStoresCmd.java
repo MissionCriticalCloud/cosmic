@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.admin.storage;
 
+import com.cloud.api.response.ImageStoreResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ZoneResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ImageStoreResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

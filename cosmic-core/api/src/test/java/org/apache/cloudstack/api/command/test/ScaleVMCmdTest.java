@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.UserVmService;
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.ScaleVMCmd;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,11 +1,11 @@
 package org.apache.cloudstack.api.command.user.job;
 
+import com.cloud.api.response.AsyncJobResponse;
+import com.cloud.api.response.ListResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 
 import java.util.Date;
 

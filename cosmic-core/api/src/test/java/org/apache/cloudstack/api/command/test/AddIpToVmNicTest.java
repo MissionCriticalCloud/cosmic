@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.NicSecondaryIpResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -11,8 +13,6 @@ import com.cloud.vm.NicSecondaryIp;
 import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.command.user.vm.AddIpToVmNicCmd;
 import org.apache.cloudstack.api.command.user.vm.RemoveIpFromVmNicCmd;
-import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

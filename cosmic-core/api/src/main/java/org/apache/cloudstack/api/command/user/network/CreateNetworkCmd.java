@@ -1,5 +1,13 @@
 package org.apache.cloudstack.api.command.user.network;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.NetworkACLResponse;
+import com.cloud.api.response.NetworkOfferingResponse;
+import com.cloud.api.response.NetworkResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.VpcResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -16,14 +24,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.NetworkACLResponse;
-import org.apache.cloudstack.api.response.NetworkOfferingResponse;
-import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

@@ -1,5 +1,11 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScalePolicyResponse;
+import com.cloud.api.response.AutoScaleVmGroupResponse;
+import com.cloud.api.response.AutoScaleVmProfileResponse;
+import com.cloud.api.response.FirewallRuleResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.as.AutoScaleVmGroup;
 import org.apache.cloudstack.acl.RoleType;
@@ -7,12 +13,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
-import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
-import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
-import org.apache.cloudstack.api.response.FirewallRuleResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.List;

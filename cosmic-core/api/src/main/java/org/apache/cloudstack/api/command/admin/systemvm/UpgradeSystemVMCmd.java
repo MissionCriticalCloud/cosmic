@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.systemvm;
 
+import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.api.response.SystemVmResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.user.Account;
@@ -13,8 +15,6 @@ import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.UpgradeVMCmd;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
-import org.apache.cloudstack.api.response.SystemVmResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.Map;

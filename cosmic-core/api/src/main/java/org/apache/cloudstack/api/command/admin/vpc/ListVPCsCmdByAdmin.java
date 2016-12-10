@@ -1,12 +1,12 @@
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.command.user.vpc.ListVPCsCmd;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.event;
 
+import com.cloud.api.response.EventResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.Event;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
@@ -9,8 +11,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.EventResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.Date;

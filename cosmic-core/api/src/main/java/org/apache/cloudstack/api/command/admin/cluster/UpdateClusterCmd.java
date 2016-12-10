@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.cluster;
 
+import com.cloud.api.response.ClusterResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.org.Cluster;
 import com.cloud.user.Account;
@@ -9,7 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ClusterResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

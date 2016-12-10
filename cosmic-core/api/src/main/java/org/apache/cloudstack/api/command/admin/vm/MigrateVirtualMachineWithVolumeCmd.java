@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.vm;
 
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -17,8 +19,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.PrivateGatewayResponse;
+import com.cloud.api.response.StaticRouteResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -16,9 +19,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.PrivateGatewayResponse;
-import org.apache.cloudstack.api.response.StaticRouteResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

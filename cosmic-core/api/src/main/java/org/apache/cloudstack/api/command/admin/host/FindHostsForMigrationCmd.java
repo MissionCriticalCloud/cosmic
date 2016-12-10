@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.admin.host;
 
+import com.cloud.api.response.HostForMigrationResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.host.Host;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
@@ -7,9 +10,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.HostForMigrationResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.ArrayList;
 import java.util.List;

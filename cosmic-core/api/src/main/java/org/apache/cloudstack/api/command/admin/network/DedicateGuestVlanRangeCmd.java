@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.admin.network;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.GuestVlanRangeResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
+import com.cloud.api.response.ProjectResponse;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.GuestVlan;
@@ -10,10 +14,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.GuestVlanRangeResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

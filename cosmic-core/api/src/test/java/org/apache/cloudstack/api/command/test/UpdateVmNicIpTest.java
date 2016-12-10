@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.test;
 
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
@@ -10,7 +11,6 @@ import org.apache.cloudstack.api.ResponseGenerator;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.UpdateVmNicIpCmd;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import java.util.LinkedList;
 import java.util.List;

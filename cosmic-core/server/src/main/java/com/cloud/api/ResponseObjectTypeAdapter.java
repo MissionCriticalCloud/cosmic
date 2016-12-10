@@ -1,8 +1,8 @@
 package com.cloud.api;
 
+import com.cloud.api.response.ExceptionResponse;
+import com.cloud.api.response.SuccessResponse;
 import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.api.response.ExceptionResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

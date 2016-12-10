@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.PrivateGatewayResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
@@ -7,9 +10,6 @@ import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.PrivateGatewayResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import java.util.ArrayList;
 import java.util.List;

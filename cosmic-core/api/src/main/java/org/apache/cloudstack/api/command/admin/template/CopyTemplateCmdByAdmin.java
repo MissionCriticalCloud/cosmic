@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.template;
 
+import com.cloud.api.response.TemplateResponse;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.template.VirtualMachineTemplate;
@@ -8,7 +9,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.template.CopyTemplateCmd;
-import org.apache.cloudstack.api.response.TemplateResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import java.util.List;

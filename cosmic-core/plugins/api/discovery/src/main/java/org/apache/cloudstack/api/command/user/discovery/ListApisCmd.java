@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.discovery;
 
+import com.cloud.api.response.ApiDiscoveryResponse;
+import com.cloud.api.response.ListResponse;
 import com.cloud.user.User;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -7,8 +9,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.ApiDiscoveryResponse;
-import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.discovery.ApiDiscoveryService;
 

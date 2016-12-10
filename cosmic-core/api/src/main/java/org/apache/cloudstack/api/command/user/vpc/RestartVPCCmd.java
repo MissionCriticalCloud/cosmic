@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vpc;
 
+import com.cloud.api.response.SuccessResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -14,8 +16,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.SuccessResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

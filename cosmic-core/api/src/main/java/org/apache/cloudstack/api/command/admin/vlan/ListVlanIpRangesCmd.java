@@ -1,19 +1,19 @@
 package org.apache.cloudstack.api.command.admin.vlan;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.NetworkResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
+import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.VlanIpRangeResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.dc.Vlan;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
-import org.apache.cloudstack.api.response.PodResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.VlanIpRangeResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.List;

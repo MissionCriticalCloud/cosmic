@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.volume;
 
+import com.cloud.api.response.SuccessResponse;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
@@ -11,8 +13,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.SuccessResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

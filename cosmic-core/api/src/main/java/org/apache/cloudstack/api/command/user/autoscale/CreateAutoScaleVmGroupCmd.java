@@ -1,5 +1,9 @@
 package org.apache.cloudstack.api.command.user.autoscale;
 
+import com.cloud.api.response.AutoScalePolicyResponse;
+import com.cloud.api.response.AutoScaleVmGroupResponse;
+import com.cloud.api.response.AutoScaleVmProfileResponse;
+import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
@@ -13,10 +17,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.AutoScalePolicyResponse;
-import org.apache.cloudstack.api.response.AutoScaleVmGroupResponse;
-import org.apache.cloudstack.api.response.AutoScaleVmProfileResponse;
-import org.apache.cloudstack.api.response.FirewallRuleResponse;
 
 import java.util.List;
 

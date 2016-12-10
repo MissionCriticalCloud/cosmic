@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.admin.autoscale;
 
+import com.cloud.api.response.CounterResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.user.Account;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.CounterResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

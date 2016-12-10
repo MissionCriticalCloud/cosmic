@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.region.ha.gslb;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.GlobalLoadBalancerResponse;
+import com.cloud.api.response.RegionResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -12,9 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.GlobalLoadBalancerResponse;
-import org.apache.cloudstack.api.response.RegionResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;

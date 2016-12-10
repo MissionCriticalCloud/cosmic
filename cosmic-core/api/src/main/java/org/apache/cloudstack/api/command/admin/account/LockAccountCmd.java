@@ -1,13 +1,13 @@
 package org.apache.cloudstack.api.command.admin.account;
 
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.DomainResponse;
 import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

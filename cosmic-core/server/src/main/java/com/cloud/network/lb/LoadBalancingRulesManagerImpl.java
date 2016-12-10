@@ -1,6 +1,7 @@
 package com.cloud.network.lb;
 
 import com.cloud.agent.api.to.LoadBalancerTO;
+import com.cloud.api.response.ServiceResponse;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
@@ -126,7 +127,6 @@ import org.apache.cloudstack.api.command.user.loadbalancer.ListLBStickinessPolic
 import org.apache.cloudstack.api.command.user.loadbalancer.ListLoadBalancerRuleInstancesCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.ListLoadBalancerRulesCmd;
 import org.apache.cloudstack.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
-import org.apache.cloudstack.api.response.ServiceResponse;
 import org.apache.cloudstack.config.ApiServiceConfiguration;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;

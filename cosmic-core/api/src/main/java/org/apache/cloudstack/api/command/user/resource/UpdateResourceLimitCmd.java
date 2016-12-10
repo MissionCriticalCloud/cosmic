@@ -1,5 +1,8 @@
 package org.apache.cloudstack.api.command.user.resource;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.ResourceLimitResponse;
 import com.cloud.configuration.ResourceLimit;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
@@ -7,9 +10,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.ResourceLimitResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

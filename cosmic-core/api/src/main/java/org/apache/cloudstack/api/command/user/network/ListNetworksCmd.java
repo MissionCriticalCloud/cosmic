@@ -1,5 +1,10 @@
 package org.apache.cloudstack.api.command.user.network;
 
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.NetworkResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
+import com.cloud.api.response.VpcResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.network.Network;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.acl.RoleType;
@@ -8,11 +13,6 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListTaggedResourcesCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.ArrayList;
 import java.util.List;

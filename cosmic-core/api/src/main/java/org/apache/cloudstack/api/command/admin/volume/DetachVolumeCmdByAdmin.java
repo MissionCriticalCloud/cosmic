@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.volume;
 
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.api.APICommand;
@@ -7,7 +8,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.volume.DetachVolumeCmd;
-import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

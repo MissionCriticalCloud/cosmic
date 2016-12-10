@@ -1,8 +1,8 @@
 package groovy.org.apache.cloudstack.ldap
 
+import com.cloud.api.response.LdapConfigurationResponse
 import com.cloud.utils.Pair
 import org.apache.cloudstack.api.command.LdapListConfigurationCmd
-import org.apache.cloudstack.api.response.LdapConfigurationResponse
 import org.apache.cloudstack.ldap.LdapConfigurationVO
 import org.apache.cloudstack.ldap.LdapManager
 

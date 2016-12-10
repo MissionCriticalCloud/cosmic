@@ -2,6 +2,8 @@ package org.apache.cloudstack.api.command.user.affinitygroup;
 
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ProjectResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
@@ -12,8 +14,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

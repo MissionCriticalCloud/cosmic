@@ -1,14 +1,14 @@
 package org.apache.cloudstack.api.command.user.zone;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.InvalidParameterValueException;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vmgroup;
 
+import com.cloud.api.response.InstanceGroupResponse;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.user.Account;
 import com.cloud.vm.InstanceGroup;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.InstanceGroupResponse;
-import org.apache.cloudstack.api.response.SuccessResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

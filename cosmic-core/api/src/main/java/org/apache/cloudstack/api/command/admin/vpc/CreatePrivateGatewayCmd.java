@@ -1,5 +1,10 @@
 package org.apache.cloudstack.api.command.admin.vpc;
 
+import com.cloud.api.response.NetworkACLResponse;
+import com.cloud.api.response.NetworkOfferingResponse;
+import com.cloud.api.response.PhysicalNetworkResponse;
+import com.cloud.api.response.PrivateGatewayResponse;
+import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -18,11 +23,6 @@ import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.BaseAsyncCreateCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.NetworkACLResponse;
-import org.apache.cloudstack.api.response.NetworkOfferingResponse;
-import org.apache.cloudstack.api.response.PhysicalNetworkResponse;
-import org.apache.cloudstack.api.response.PrivateGatewayResponse;
-import org.apache.cloudstack.api.response.VpcResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

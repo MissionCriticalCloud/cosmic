@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.admin.router;
 
+import com.cloud.api.response.VirtualRouterProviderResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -14,7 +15,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.VirtualRouterProviderResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import javax.inject.Inject;

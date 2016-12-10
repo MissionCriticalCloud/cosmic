@@ -1,6 +1,7 @@
 package com.cloud.api.auth;
 
 import com.cloud.api.response.ApiResponseSerializer;
+import com.cloud.api.response.LogoutCmdResponse;
 import com.cloud.user.Account;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -9,7 +10,6 @@ import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.auth.APIAuthenticationType;
 import org.apache.cloudstack.api.auth.APIAuthenticator;
 import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
-import org.apache.cloudstack.api.response.LogoutCmdResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

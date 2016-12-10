@@ -1,5 +1,7 @@
 package org.apache.cloudstack.api.command.user.vpn;
 
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteVpnConnection;
@@ -10,8 +12,6 @@ import org.apache.cloudstack.api.ApiErrorCode;
 import org.apache.cloudstack.api.BaseAsyncCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.Site2SiteVpnConnectionResponse;
 import org.apache.cloudstack.context.CallContext;
 
 import org.slf4j.Logger;

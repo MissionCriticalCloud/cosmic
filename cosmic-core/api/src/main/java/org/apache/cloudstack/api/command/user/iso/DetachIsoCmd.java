@@ -1,5 +1,6 @@
 package org.apache.cloudstack.api.command.user.iso;
 
+import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.uservm.UserVm;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.command.user.vm.DeployVMCmd;
-import org.apache.cloudstack.api.response.UserVmResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
