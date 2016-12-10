@@ -1,4 +1,4 @@
-package org.apache.cloudstack.lb;
+package com.cloud.lb;
 
 import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.FirewallRuleVO;

@@ -131,8 +131,8 @@ import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDao;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
-import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.security.InvalidParameterException;

@@ -38,7 +38,7 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

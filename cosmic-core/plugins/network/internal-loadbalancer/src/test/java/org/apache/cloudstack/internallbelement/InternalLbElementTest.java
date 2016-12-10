@@ -28,7 +28,7 @@ import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

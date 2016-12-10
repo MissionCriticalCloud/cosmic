@@ -48,7 +48,7 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
-import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
