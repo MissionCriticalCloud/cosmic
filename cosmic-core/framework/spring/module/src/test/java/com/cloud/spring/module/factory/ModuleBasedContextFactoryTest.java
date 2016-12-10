@@ -6,9 +6,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.cloud.spring.module.model.ModuleDefinitionSet;
 import com.cloud.spring.module.locator.impl.ClasspathModuleDefinitionLocator;
 import com.cloud.spring.module.model.ModuleDefinition;
+import com.cloud.spring.module.model.ModuleDefinitionSet;
 
 import java.io.IOException;
 import java.util.Collection;

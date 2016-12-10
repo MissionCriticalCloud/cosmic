@@ -1,9 +1,9 @@
 package com.cloud.spring.module.locator.impl;
 
-import com.cloud.spring.module.model.ModuleDefinition;
-import com.cloud.spring.module.util.ModuleLocationUtils;
 import com.cloud.spring.module.locator.ModuleDefinitionLocator;
+import com.cloud.spring.module.model.ModuleDefinition;
 import com.cloud.spring.module.model.impl.DefaultModuleDefinition;
+import com.cloud.spring.module.util.ModuleLocationUtils;
 
 import java.io.IOException;
 import java.util.Collection;

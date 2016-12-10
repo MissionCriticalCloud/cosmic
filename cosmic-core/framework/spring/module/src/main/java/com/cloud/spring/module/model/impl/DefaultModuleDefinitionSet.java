@@ -1,8 +1,8 @@
 package com.cloud.spring.module.model.impl;
 
+import com.cloud.spring.module.context.ResourceApplicationContext;
 import com.cloud.spring.module.model.ModuleDefinition;
 import com.cloud.spring.module.model.ModuleDefinitionSet;
-import com.cloud.spring.module.context.ResourceApplicationContext;
 
 import java.io.IOException;
 import java.io.InputStream;

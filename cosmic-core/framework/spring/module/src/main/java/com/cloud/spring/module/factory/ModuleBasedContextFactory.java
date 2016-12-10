@@ -1,7 +1,7 @@
 package com.cloud.spring.module.factory;
 
-import com.cloud.spring.module.model.ModuleDefinitionSet;
 import com.cloud.spring.module.model.ModuleDefinition;
+import com.cloud.spring.module.model.ModuleDefinitionSet;
 import com.cloud.spring.module.model.impl.DefaultModuleDefinitionSet;
 
 import java.io.IOException;
