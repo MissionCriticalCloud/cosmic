@@ -1,8 +1,8 @@
-package org.apache.cloudstack.framework.config;
+package com.cloud.framework.config;
 
+import com.cloud.framework.config.impl.ConfigDepotImpl;
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.framework.config.impl.ConfigDepotImpl;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 
 import java.sql.Date;
 

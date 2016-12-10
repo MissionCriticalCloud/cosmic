@@ -9,6 +9,8 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Resource;
 import com.cloud.exception.ConnectionException;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
@@ -40,8 +42,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
 import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;

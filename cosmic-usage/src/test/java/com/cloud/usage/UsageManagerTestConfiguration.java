@@ -2,6 +2,7 @@ package com.cloud.usage;
 
 import com.cloud.alert.AlertManager;
 import com.cloud.event.dao.UsageEventDao;
+import com.cloud.framework.config.dao.ConfigurationDaoImpl;
 import com.cloud.usage.UsageManagerTestConfiguration.Library;
 import com.cloud.usage.dao.UsageDaoImpl;
 import com.cloud.usage.dao.UsageIPAddressDaoImpl;
@@ -29,7 +30,6 @@ import com.cloud.usage.parser.VmDiskUsageParser;
 import com.cloud.usage.parser.VolumeUsageParser;
 import com.cloud.user.dao.AccountDaoImpl;
 import com.cloud.user.dao.UserStatisticsDaoImpl;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

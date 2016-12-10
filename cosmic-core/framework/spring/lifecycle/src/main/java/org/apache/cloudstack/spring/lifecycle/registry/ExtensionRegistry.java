@@ -1,8 +1,8 @@
 package org.apache.cloudstack.spring.lifecycle.registry;
 
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
 import com.cloud.utils.component.Registry;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;

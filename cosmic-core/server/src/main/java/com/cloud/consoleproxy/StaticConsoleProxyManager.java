@@ -2,6 +2,7 @@ package com.cloud.consoleproxy;
 
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupProxyCommand;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
 import com.cloud.info.ConsoleProxyInfo;
@@ -12,7 +13,6 @@ import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.ConsoleProxyDao;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

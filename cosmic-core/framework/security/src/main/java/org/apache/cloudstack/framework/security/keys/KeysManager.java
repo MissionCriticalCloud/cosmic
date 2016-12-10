@@ -1,6 +1,6 @@
 package org.apache.cloudstack.framework.security.keys;
 
-import org.apache.cloudstack.framework.config.ConfigKey;
+import com.cloud.framework.config.ConfigKey;
 
 /**
  * Started this file to manage keys.  Will be needed by other services.

@@ -4,6 +4,7 @@ import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.DomainRouterJoinVO;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.NicResponse;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.maint.Version;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;
@@ -14,7 +15,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

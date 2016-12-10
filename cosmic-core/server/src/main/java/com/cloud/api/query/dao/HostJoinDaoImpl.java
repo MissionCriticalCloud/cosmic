@@ -6,6 +6,7 @@ import com.cloud.api.response.GpuResponse;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.VgpuResponse;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
 import com.cloud.host.Host;
@@ -18,7 +19,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;

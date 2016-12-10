@@ -2,7 +2,11 @@ package com.cloud.storage.cache.manager;
 
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.configuration.Config;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.DataStoreRole;
+import com.cloud.storage.cache.allocator.StorageCacheAllocator;
+import com.cloud.storage.datastore.ObjectInDataStoreManager;
+import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -22,11 +26,7 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreState
 import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
 import org.apache.cloudstack.engine.subsystem.api.storage.StorageCacheManager;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import com.cloud.storage.cache.allocator.StorageCacheAllocator;
-import com.cloud.storage.datastore.ObjectInDataStoreManager;
-import com.cloud.storage.datastore.db.ImageStoreVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

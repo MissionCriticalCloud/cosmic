@@ -6,12 +6,12 @@ import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.config.Configuration;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
-import org.apache.cloudstack.config.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;

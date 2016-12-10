@@ -12,6 +12,7 @@ import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Network;
 import com.cloud.offering.DiskOfferingInfo;
@@ -20,7 +21,6 @@ import com.cloud.storage.StoragePool;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.fsm.NoTransitionException;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.net.URI;
 import java.util.LinkedHashMap;

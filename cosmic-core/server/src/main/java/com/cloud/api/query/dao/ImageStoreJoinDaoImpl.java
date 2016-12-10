@@ -3,13 +3,13 @@ package com.cloud.api.query.dao;
 import com.cloud.api.query.vo.ImageStoreJoinVO;
 import com.cloud.api.response.ImageStoreDetailResponse;
 import com.cloud.api.response.ImageStoreResponse;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.ImageStore;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

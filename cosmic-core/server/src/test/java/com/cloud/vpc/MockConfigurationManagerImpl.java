@@ -23,6 +23,7 @@ import com.cloud.api.command.admin.zone.CreateZoneCmd;
 import com.cloud.api.command.admin.zone.DeleteZoneCmd;
 import com.cloud.api.command.admin.zone.UpdateZoneCmd;
 import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
+import com.cloud.config.Configuration;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.dc.ClusterVO;
@@ -55,7 +56,6 @@ import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-import org.apache.cloudstack.config.Configuration;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

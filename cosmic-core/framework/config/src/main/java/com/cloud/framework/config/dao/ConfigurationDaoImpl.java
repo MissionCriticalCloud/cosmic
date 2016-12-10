@@ -1,5 +1,6 @@
-package org.apache.cloudstack.framework.config.dao;
+package com.cloud.framework.config.dao;
 
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.DB;
@@ -8,7 +9,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 
 import javax.annotation.PostConstruct;
 import javax.naming.ConfigurationException;

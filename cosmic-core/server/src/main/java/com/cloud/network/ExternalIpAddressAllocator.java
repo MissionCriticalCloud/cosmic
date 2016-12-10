@@ -3,10 +3,10 @@ package com.cloud.network;
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

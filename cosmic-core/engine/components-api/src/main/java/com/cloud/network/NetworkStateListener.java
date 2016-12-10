@@ -2,13 +2,13 @@ package com.cloud.network;
 
 import com.cloud.event.EventCategory;
 import com.cloud.event.dao.UsageEventDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.Network.Event;
 import com.cloud.network.Network.State;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
 

@@ -11,6 +11,7 @@ import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HighAvailabilityManager.Step;
 import com.cloud.ha.HighAvailabilityManager.WorkType;
 import com.cloud.ha.dao.HighAvailabilityDao;
@@ -31,7 +32,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContext;
 
 import javax.inject.Inject;

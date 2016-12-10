@@ -1,6 +1,6 @@
-package org.apache.cloudstack.framework.config;
+package com.cloud.framework.config;
 
-import org.apache.cloudstack.framework.config.ConfigKey.Scope;
+import com.cloud.framework.config.ConfigKey.Scope;
 
 /**
  * This method is used by individual storage for configuration

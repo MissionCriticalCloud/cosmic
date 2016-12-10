@@ -7,6 +7,7 @@ import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.api.response.ResourceTagResponse;
 import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.SecurityGroupRuleResponse;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
@@ -18,7 +19,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

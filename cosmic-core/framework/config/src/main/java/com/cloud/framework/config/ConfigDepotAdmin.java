@@ -1,4 +1,4 @@
-package org.apache.cloudstack.framework.config;
+package com.cloud.framework.config;
 
 import java.util.List;
 

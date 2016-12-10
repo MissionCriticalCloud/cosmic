@@ -4,6 +4,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.event.dao.UsageEventDetailsDao;
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -20,8 +22,6 @@ import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 import org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDao;
 
 import javax.inject.Inject;

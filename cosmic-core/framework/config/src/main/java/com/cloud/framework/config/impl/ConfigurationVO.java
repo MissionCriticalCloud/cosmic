@@ -1,8 +1,8 @@
-package org.apache.cloudstack.framework.config.impl;
+package com.cloud.framework.config.impl;
 
+import com.cloud.config.Configuration;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.utils.crypt.DBEncryptionUtil;
-import org.apache.cloudstack.config.Configuration;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -2,6 +2,7 @@ package com.cloud.configuration;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.consoleproxy.ConsoleProxyManager;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
@@ -15,7 +16,6 @@ import com.cloud.vm.UserVmManager;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;

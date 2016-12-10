@@ -1,7 +1,7 @@
-package org.apache.cloudstack.framework.config.dao;
+package com.cloud.framework.config.dao;
 
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 
 import java.util.Map;
 

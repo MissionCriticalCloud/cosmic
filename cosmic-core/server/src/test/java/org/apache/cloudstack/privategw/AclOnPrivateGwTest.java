@@ -8,6 +8,7 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
 import com.cloud.network.dao.FirewallRulesDao;
@@ -34,7 +35,6 @@ import com.cloud.user.ResourceLimitService;
 import com.cloud.vm.dao.DomainRouterDao;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.naming.ConfigurationException;

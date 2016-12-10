@@ -22,23 +22,23 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.AlertGenerator;
 import com.cloud.event.EventTypes;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.org.Grouping.AllocationState;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.StorageManager;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
-import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.mail.Authenticator;
@@ -344,7 +344,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         // Generate Alerts for Zone Level capacities
         for (final DataCenterVO dc : dataCenterList) {
             for (final Short capacityType : dataCenterCapacityTypes) {
-                List<SummedCapacity> capacity;
+                final List<SummedCapacity> capacity;
                 capacity = _capacityDao.findCapacityBy(capacityType.intValue(), dc.getId(), null, null);
 
                 if (capacityType == Capacity.CAPACITY_TYPE_SECONDARY_STORAGE) {
@@ -379,11 +379,11 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         // Generate Alerts for Cluster Level capacities
         for (final ClusterVO cluster : clusterList) {
             for (final Short capacityType : clusterCapacityTypes) {
-                List<SummedCapacity> capacity;
+                final List<SummedCapacity> capacity;
                 capacity = _capacityDao.findCapacityBy(capacityType.intValue(), cluster.getDataCenterId(), null, cluster.getId());
 
                 // cpu and memory allocated capacity notification threshold can be defined at cluster level, so getting the value if they are defined at cluster level
-                double threshold;
+                final double threshold;
                 switch (capacityType) {
                     case Capacity.CAPACITY_TYPE_STORAGE:
                         capacity.add(getUsedStats(capacityType, cluster.getDataCenterId(), cluster.getPodId(), cluster.getId()));
@@ -793,7 +793,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 msg.setContent(content, "text/plain");
                 msg.saveChanges();
 
-                SMTPTransport smtpTrans;
+                final SMTPTransport smtpTrans;
                 if (_smtpUseAuth) {
                     smtpTrans = new SMTPSSLTransport(_smtpSession, new URLName("smtp", _smtpHost, _smtpPort, null, _smtpUsername, _smtpPassword));
                 } else {

@@ -2,8 +2,8 @@ package com.cloud.managementserver;
 
 import com.cloud.cluster.ManagementServerHostVO;
 import com.cloud.cluster.dao.ManagementServerHostDao;
+import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.utils.net.AddressUtils;
-import org.apache.cloudstack.config.ApiServiceConfiguration;
 
 import java.net.UnknownHostException;
 import java.util.Collection;

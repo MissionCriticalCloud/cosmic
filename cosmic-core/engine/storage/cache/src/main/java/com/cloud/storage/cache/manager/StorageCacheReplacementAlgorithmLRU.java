@@ -1,6 +1,7 @@
 package com.cloud.storage.cache.manager;
 
 import com.cloud.configuration.Config;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
@@ -14,7 +15,6 @@ import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreState
 import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

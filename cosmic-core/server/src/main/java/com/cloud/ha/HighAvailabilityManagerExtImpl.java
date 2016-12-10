@@ -1,9 +1,9 @@
 package com.cloud.ha;
 
 import com.cloud.alert.AlertManager;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.usage.dao.UsageJobDao;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.inject.Inject;

@@ -6,7 +6,7 @@
 
     <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="scopedConfigStorageRegistry" />
-        <property name="typeClass" value="org.apache.cloudstack.framework.config.ScopedConfigStorage" />
+        <property name="typeClass" value="com.cloud.framework.config.ScopedConfigStorage" />
     </bean>
 
     <bean class="org.apache.cloudstack.spring.lifecycle.ConfigDepotLifeCycle" />

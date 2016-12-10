@@ -1,11 +1,11 @@
 package com.cloud.storage.dao;
 
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.ConfigKey.Scope;
-import org.apache.cloudstack.framework.config.ScopedConfigStorage;
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.ConfigKey.Scope;
+import com.cloud.framework.config.ScopedConfigStorage;
 import com.cloud.storage.datastore.db.StoragePoolDetailVO;
 import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
+import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 
 public class StoragePoolDetailsDaoImpl extends ResourceDetailsDaoBase<StoragePoolDetailVO> implements StoragePoolDetailsDao, ScopedConfigStorage {
 

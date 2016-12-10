@@ -1,7 +1,7 @@
 package org.apache.cloudstack.spring.lifecycle;
 
-import org.apache.cloudstack.framework.config.ConfigDepotAdmin;
-import org.apache.cloudstack.framework.config.Configurable;
+import com.cloud.framework.config.ConfigDepotAdmin;
+import com.cloud.framework.config.Configurable;
 
 import javax.inject.Inject;
 

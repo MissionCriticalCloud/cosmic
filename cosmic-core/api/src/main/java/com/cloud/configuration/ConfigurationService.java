@@ -23,6 +23,7 @@ import com.cloud.api.command.admin.zone.CreateZoneCmd;
 import com.cloud.api.command.admin.zone.DeleteZoneCmd;
 import com.cloud.api.command.admin.zone.UpdateZoneCmd;
 import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
+import com.cloud.config.Configuration;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
 import com.cloud.dc.Vlan;
@@ -40,7 +41,6 @@ import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.config.Configuration;
 
 import java.util.List;
 

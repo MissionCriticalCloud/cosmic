@@ -3,6 +3,7 @@ package com.cloud.storage.datastore.driver;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.S3TO;
 import com.cloud.configuration.Config;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.datastore.db.ImageStoreDetailsDao;
 import com.cloud.storage.image.BaseImageStoreDriverImpl;
@@ -12,7 +13,6 @@ import com.cloud.utils.storage.S3.S3Utils;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.net.URL;

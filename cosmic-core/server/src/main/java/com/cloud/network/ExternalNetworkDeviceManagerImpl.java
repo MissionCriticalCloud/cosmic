@@ -7,6 +7,7 @@ import com.cloud.api.command.admin.network.ListNetworkDeviceCmd;
 import com.cloud.api.response.NetworkDeviceResponse;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.network.dao.ExternalFirewallDeviceDao;
@@ -30,7 +31,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

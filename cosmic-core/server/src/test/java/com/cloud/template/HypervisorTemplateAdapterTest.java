@@ -14,11 +14,15 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.event.UsageEventVO;
 import com.cloud.event.dao.UsageEventDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateZoneDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.AccountDao;
@@ -29,14 +33,10 @@ import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.Event;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
-import com.cloud.storage.datastore.db.TemplateDataStoreDao;
-import com.cloud.storage.datastore.db.TemplateDataStoreVO;
-import com.cloud.storage.image.datastore.ImageStoreEntity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -192,7 +192,7 @@ public class HypervisorTemplateAdapterTest {
 
         final UsageEventUtils utils = new UsageEventUtils();
 
-        final Map<String, String> usageUtilsFields = new HashMap<String, String>();
+        final Map<String, String> usageUtilsFields = new HashMap<>();
         usageUtilsFields.put("usageEventDao", "_usageEventDao");
         usageUtilsFields.put("accountDao", "_accountDao");
         usageUtilsFields.put("dcDao", "_dcDao");

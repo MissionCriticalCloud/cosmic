@@ -8,9 +8,9 @@ import com.cloud.agent.api.StartupAnswer;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Status;
 import com.cloud.resource.ServerResource;
-import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import java.util.ArrayList;

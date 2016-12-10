@@ -3,6 +3,7 @@ package com.cloud.storage.allocator;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePool;
@@ -13,7 +14,6 @@ import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

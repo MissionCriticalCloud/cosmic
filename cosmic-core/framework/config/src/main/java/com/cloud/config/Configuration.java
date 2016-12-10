@@ -1,4 +1,4 @@
-package org.apache.cloudstack.config;
+package com.cloud.config;
 
 import java.util.Date;
 

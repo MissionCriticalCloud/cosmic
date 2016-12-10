@@ -8,6 +8,7 @@ import com.cloud.capacity.CapacityVO;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.StorageConflictException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.service.ServiceOfferingVO;
@@ -17,7 +18,6 @@ import com.cloud.utils.Pair;
 import com.cloud.vm.VMInstanceVO;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.math.BigDecimal;
 import java.util.List;

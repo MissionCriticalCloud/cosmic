@@ -39,6 +39,7 @@ import com.cloud.api.command.user.ssh.RegisterSSHKeyPairCmd;
 import com.cloud.api.command.user.vm.GetVMPasswordCmd;
 import com.cloud.api.command.user.vmgroup.UpdateVMGroupCmd;
 import com.cloud.capacity.Capacity;
+import com.cloud.config.Configuration;
 import com.cloud.dc.Pod;
 import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
@@ -61,7 +62,6 @@ import com.cloud.utils.Ternary;
 import com.cloud.vm.InstanceGroup;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
-import org.apache.cloudstack.config.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;

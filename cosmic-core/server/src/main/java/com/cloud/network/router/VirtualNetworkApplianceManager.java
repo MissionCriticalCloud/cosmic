@@ -3,6 +3,7 @@ package com.cloud.network.router;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.network.Network;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VirtualNetworkApplianceService;
@@ -10,7 +11,6 @@ import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.DomainRouterVO;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.util.List;
 

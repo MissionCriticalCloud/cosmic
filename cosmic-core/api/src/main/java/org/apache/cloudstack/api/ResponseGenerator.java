@@ -91,6 +91,7 @@ import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.VpnUsersResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.capacity.Capacity;
+import com.cloud.config.Configuration;
 import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.dc.DataCenter;
@@ -171,7 +172,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import org.apache.cloudstack.api.ApiConstants.HostDetails;
 import org.apache.cloudstack.api.ApiConstants.VMDetails;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.usage.Usage;
 
 import java.text.DecimalFormat;

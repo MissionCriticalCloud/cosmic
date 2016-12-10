@@ -18,6 +18,10 @@ import com.cloud.dc.dao.ClusterDao;
 import com.cloud.deploy.DeploymentClusterPlanner;
 import com.cloud.event.UsageEventVO;
 import com.cloud.exception.ConnectionException;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -36,6 +40,7 @@ import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
@@ -63,13 +68,8 @@ import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
 import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
-import com.cloud.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -846,7 +846,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     @Override
     public float getClusterOverProvisioningFactor(final Long clusterId, final short capacityType) {
 
-        String capacityOverProvisioningName;
+        final String capacityOverProvisioningName;
         if (capacityType == Capacity.CAPACITY_TYPE_CPU) {
             capacityOverProvisioningName = "cpuOvercommitRatio";
         } else if (capacityType == Capacity.CAPACITY_TYPE_MEMORY) {

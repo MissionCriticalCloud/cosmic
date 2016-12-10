@@ -3,10 +3,10 @@ package com.cloud.api.command.test;
 import com.cloud.api.command.admin.config.ListCfgsByCmd;
 import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.config.Configuration;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.ResponseGenerator;
-import org.apache.cloudstack.config.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;

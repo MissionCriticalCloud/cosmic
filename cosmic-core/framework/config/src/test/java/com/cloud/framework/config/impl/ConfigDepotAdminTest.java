@@ -1,4 +1,4 @@
-package org.apache.cloudstack.framework.config.impl;
+package com.cloud.framework.config.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -6,11 +6,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.cloud.dao.EntityManager;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.ScopedConfigStorage;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.ScopedConfigStorage;
+import com.cloud.framework.config.dao.ConfigurationDao;
 
 import java.util.ArrayList;
 

@@ -18,6 +18,7 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.Investigator.UnknownVM;
 import com.cloud.ha.dao.HighAvailabilityDao;
 import com.cloud.host.Host;
@@ -42,7 +43,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.managed.context.ManagedContext;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
@@ -421,7 +421,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     private void processWork(final HaWorkVO work) {
         final WorkType wt = work.getWorkType();
         try {
-            Long nextTime;
+            final Long nextTime;
             if (wt == WorkType.Migration) {
                 nextTime = migrate(work);
             } else if (wt == WorkType.HA) {
@@ -799,7 +799,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     public boolean configure(final String name, final Map<String, Object> xmlParams) throws ConfigurationException {
         _serverId = _msServer.getId();
 
-        Map<String, String> params;
+        final Map<String, String> params;
         params = _configDao.getConfiguration(Long.toHexString(_serverId), xmlParams);
 
         String value = params.get(Config.HAWorkers.key());

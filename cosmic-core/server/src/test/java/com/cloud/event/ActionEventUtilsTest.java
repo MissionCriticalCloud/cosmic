@@ -3,6 +3,7 @@ package com.cloud.event;
 import com.cloud.configuration.Config;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.dao.EventDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.IpAddress;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.user.AccountVO;
@@ -13,7 +14,6 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.Event;
 import org.apache.cloudstack.framework.events.EventBus;
 

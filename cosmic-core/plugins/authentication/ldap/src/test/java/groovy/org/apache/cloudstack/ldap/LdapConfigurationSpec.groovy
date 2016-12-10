@@ -1,14 +1,14 @@
 package groovy.org.apache.cloudstack.ldap
 
-import com.cloud.utils.Pair
-import org.apache.cloudstack.framework.config.ConfigKey
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao
-import org.apache.cloudstack.framework.config.impl.ConfigDepotImpl
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO
+import com.cloud.framework.config.ConfigKey
+import com.cloud.framework.config.dao.ConfigurationDao
+import com.cloud.framework.config.impl.ConfigDepotImpl
+import com.cloud.framework.config.impl.ConfigurationVO
 import com.cloud.ldap.LdapConfiguration
 import com.cloud.ldap.LdapConfigurationVO
 import com.cloud.ldap.LdapUserManager
 import com.cloud.ldap.dao.LdapConfigurationDao
+import com.cloud.utils.Pair
 
 import javax.naming.directory.SearchControls
 

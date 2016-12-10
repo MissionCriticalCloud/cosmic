@@ -2,6 +2,7 @@ package com.cloud.storage.listener;
 
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.server.ManagementService;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
@@ -10,7 +11,6 @@ import com.cloud.storage.SnapshotVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.events.EventBus;
 import org.apache.cloudstack.framework.events.EventBusException;
 

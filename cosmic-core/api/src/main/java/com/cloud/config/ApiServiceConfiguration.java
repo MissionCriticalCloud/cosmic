@@ -1,7 +1,7 @@
-package org.apache.cloudstack.config;
+package com.cloud.config;
 
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
 
 import javax.ejb.Local;
 
