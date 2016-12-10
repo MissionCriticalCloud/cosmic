@@ -550,9 +550,9 @@ public class NetUtils {
         return true;
     }
 
-    public static Set<Long> getAllIpsFromCidr(final String cidr, final long size, final Set<Long> usedIps) {
+    public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final long size, final Set<Long> usedIps) {
         assert size < MAX_CIDR : "You do know this is not for ipv6 right?  Keep it smaller than 32 but you have " + size;
-        final Set<Long> result = new TreeSet<>();
+        final SortedSet<Long> result = new TreeSet<>();
         final long ip = ip2Long(cidr);
         final long startNetMask = ip2Long(getCidrNetmask(size));
         long start = (ip & startNetMask) + 1;

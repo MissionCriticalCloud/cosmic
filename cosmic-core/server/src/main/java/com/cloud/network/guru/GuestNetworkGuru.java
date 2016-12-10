@@ -268,32 +268,42 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             if (network.getSpecifyIpRanges()) {
                 _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, nic.getRequestedIPv4(), null);
             } else {
-                //if Vm is router vm and source nat is enabled in the network, set ip4 to the network gateway
-                boolean isGateway = false;
-                if (vm.getVirtualMachine().getType() == VirtualMachine.Type.DomainRouter) {
-                    if (network.getVpcId() != null) {
-                        final Vpc vpc = _vpcDao.findById(network.getVpcId());
-                        // Redundant Networks need a guest IP that is not the same as the gateway IP.
-                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VPCVirtualRouter) && !vpc.isRedundant()) {
-                            isGateway = true;
+                final VirtualMachine.Type vmtype = vm.getVirtualMachine().getType();
+
+                switch (vmtype) {
+                    case User:
+                        guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
+                        break;
+                    case DomainRouter:
+                        if (network.getVpcId() != null) {
+                            final Vpc vpc = _vpcDao.findById(network.getVpcId());
+                            if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat,
+                                    Provider.VPCVirtualRouter) && !vpc.isRedundant()) {
+                                // Non-redundant VPCs that support SourceNat acquire the gateway ip on their nic
+                                guestIp = network.getGateway();
+                            } else {
+                                // In other cases, acquire an ip address from the DHCP range (take lowest possible)
+                                guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
+                            }
+                        } else if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat,
+                                Provider.VirtualRouter)) {
+                            // Non VPCs that support SourceNat acquire the gateway ip on their nic
+                            guestIp = network.getGateway();
+                        } else {
+                            guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
                         }
-                    } else {
-                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VirtualRouter)) {
-                            isGateway = true;
-                        }
-                    }
+                        break;
+                    default:
+                        // Backwards compatibility
+                        guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
+                        break;
                 }
 
-                if (isGateway) {
-                    guestIp = network.getGateway();
-                } else {
-                    guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
-                    if (guestIp == null) {
-                        throw new InsufficientVirtualNetworkCapacityException("Unable to acquire Guest IP" + " address for network " + network, DataCenter.class,
-                                dc.getId());
-                    }
+                if (guestIp == null) {
+                    throw new InsufficientVirtualNetworkCapacityException("Unable to acquire Guest IP" +
+                            " address for network " + network, DataCenter.class,
+                            dc.getId());
                 }
-
                 nic.setIPv4Address(guestIp);
                 nic.setIPv4Netmask(NetUtils.cidr2Netmask(network.getCidr()));
 

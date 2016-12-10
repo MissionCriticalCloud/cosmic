@@ -168,7 +168,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -3942,29 +3941,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         final List<UserVmVO> vms = _userVmDao.listByNetworkIdAndStates(networkId, VirtualMachine.State.Starting, VirtualMachine.State.Running, VirtualMachine.State.Migrating,
                 VirtualMachine.State.Stopping);
         return vms.isEmpty();
-    }
-
-    protected Set<Long> getAvailableIps(final Network network, final String requestedIp) {
-        final String[] cidr = network.getCidr().split("/");
-        final List<String> ips = _nicDao.listIpAddressInNetwork(network.getId());
-        final Set<Long> usedIps = new TreeSet<>();
-
-        for (final String ip : ips) {
-            if (requestedIp != null && requestedIp.equals(ip)) {
-                s_logger.warn("Requested ip address " + requestedIp + " is already in use in network" + network);
-                return null;
-            }
-
-            usedIps.add(NetUtils.ip2Long(ip));
-        }
-        final Set<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr[0], Integer.parseInt(cidr[1]), usedIps);
-
-        final String gateway = network.getGateway();
-        if (gateway != null && allPossibleIps.contains(NetUtils.ip2Long(gateway))) {
-            allPossibleIps.remove(NetUtils.ip2Long(gateway));
-        }
-
-        return allPossibleIps;
     }
 
     protected boolean canUpgrade(final Network network, final long oldNetworkOfferingId, final long newNetworkOfferingId) {

@@ -77,7 +77,9 @@ public interface IpAddressManager {
 
     IPAddressVO markIpAsUnavailable(long addrId);
 
-    public String acquireGuestIpAddress(Network network, String requestedIp);
+    String acquireGuestIpAddress(Network network, String requestedIp);
+
+    String acquireGuestIpAddressForRouter(Network network, String requestedIp);
 
     boolean applyStaticNats(List<? extends StaticNat> staticNats, boolean continueOnError, boolean forRevoke) throws ResourceUnavailableException;
 
