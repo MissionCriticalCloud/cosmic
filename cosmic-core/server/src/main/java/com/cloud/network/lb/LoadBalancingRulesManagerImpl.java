@@ -29,6 +29,8 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.ExternalDeviceUsageManager;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
@@ -131,8 +133,6 @@ import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDao;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.security.InvalidParameterException;

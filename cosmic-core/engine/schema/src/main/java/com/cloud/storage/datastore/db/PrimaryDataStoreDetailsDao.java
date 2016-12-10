@@ -1,6 +1,6 @@
 package com.cloud.storage.datastore.db;
 
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDao;
+import com.cloud.resourcedetail.ResourceDetailsDao;
 
 public interface PrimaryDataStoreDetailsDao extends ResourceDetailsDao<PrimaryDataStoreDetailVO> {
 }

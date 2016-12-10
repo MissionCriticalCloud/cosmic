@@ -1,8 +1,8 @@
 package com.cloud.storage.volume.db;
 
+import com.cloud.resourcedetail.ResourceDetailsDaoBase;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDetailVO;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDetailsDao;
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 
 import org.springframework.stereotype.Component;
 

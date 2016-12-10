@@ -16,13 +16,13 @@ import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
+import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDao;
 
 import javax.inject.Inject;
 import java.util.HashMap;

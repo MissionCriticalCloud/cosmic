@@ -1,7 +1,7 @@
 package com.cloud.service.dao;
 
+import com.cloud.resourcedetail.ResourceDetailsDaoBase;
 import com.cloud.service.ServiceOfferingDetailsVO;
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 
 import org.springframework.stereotype.Component;
 

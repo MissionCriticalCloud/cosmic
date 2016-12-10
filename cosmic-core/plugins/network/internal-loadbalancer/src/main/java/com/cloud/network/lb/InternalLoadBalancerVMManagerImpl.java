@@ -31,6 +31,8 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
@@ -86,8 +88,6 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -7,6 +7,8 @@ import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.UnsupportedServiceException;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -26,8 +28,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import org.apache.cloudstack.context.CallContext;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;

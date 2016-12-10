@@ -39,6 +39,6 @@
     <bean id="usageEventDetailsDaoImpl" class="com.cloud.event.dao.UsageEventDetailsDaoImpl" />
     <bean id="storagePoolHostDaoImpl" class="com.cloud.storage.dao.StoragePoolHostDaoImpl" />
     <bean id="primaryDataStoreDaoImpl" class="com.cloud.storage.datastore.db.PrimaryDataStoreDaoImpl" />
-    <bean id="userIpAddressDetailsDao" class="org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDaoImpl" />
+    <bean id="userIpAddressDetailsDao" class="com.cloud.resourcedetail.dao.UserIpAddressDetailsDaoImpl" />
 
 </beans>

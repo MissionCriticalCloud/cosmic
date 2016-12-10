@@ -1,5 +1,6 @@
 package com.cloud.lb.dao;
 
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
@@ -10,7 +11,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.net.Ip;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 
 import java.util.List;
 

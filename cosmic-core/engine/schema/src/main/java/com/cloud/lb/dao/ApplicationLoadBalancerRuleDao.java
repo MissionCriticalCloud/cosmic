@@ -1,9 +1,9 @@
 package com.cloud.lb.dao;
 
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.Ip;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 
 import java.util.List;
 

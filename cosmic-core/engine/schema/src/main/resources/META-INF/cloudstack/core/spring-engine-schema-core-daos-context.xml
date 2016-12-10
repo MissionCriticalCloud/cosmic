@@ -249,7 +249,7 @@
     <bean id="snapshotDaoImpl" class="com.cloud.storage.dao.SnapshotDaoImpl" />
     <bean id="snapshotDetailsDaoImpl" class="com.cloud.storage.dao.SnapshotDetailsDaoImpl" />
     <bean id="snapshotPolicyDaoImpl" class="com.cloud.storage.dao.SnapshotPolicyDaoImpl" />
-    <bean id="snapshotPolicyDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.SnapshotPolicyDetailsDaoImpl" />
+    <bean id="snapshotPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.SnapshotPolicyDetailsDaoImpl" />
     <bean id="snapshotScheduleDaoImpl" class="com.cloud.storage.dao.SnapshotScheduleDaoImpl" />
     <bean id="sslCertDao" class="com.cloud.network.dao.SslCertDaoImpl" />
     <bean id="staticRouteDaoImpl" class="com.cloud.network.vpc.dao.StaticRouteDaoImpl" />
@@ -321,22 +321,22 @@
     <bean id="AffinityGroupDaoImpl" class="com.cloud.affinity.dao.AffinityGroupDaoImpl" />
     <bean id="AffinityGroupVMMapDaoImpl" class="com.cloud.affinity.dao.AffinityGroupVMMapDaoImpl" />
     <bean id="AffinityGroupDomainMapDaoImpl" class="com.cloud.affinity.dao.AffinityGroupDomainMapDaoImpl" />
-    <bean id="FirewallRuleDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.FirewallRuleDetailsDaoImpl" />
-    <bean id="UserIpAddressDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDaoImpl" />
-    <bean id="RemoteAccessVpnDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.RemoteAccessVpnDetailsDaoImpl" />
-    <bean id="VpcDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.VpcDetailsDaoImpl" />
-    <bean id="VpcGatewayDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.VpcGatewayDetailsDaoImpl" />
-    <bean id="NetworkACLListDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.NetworkACLListDetailsDaoImpl" />
-    <bean id="NetworkACLItemDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.NetworkACLItemDetailsDaoImpl" />
-    <bean id="Site2SiteVpnGatewayDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.Site2SiteVpnGatewayDetailsDaoImpl" />
-    <bean id="Site2SiteCustomerGatewayDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.Site2SiteCustomerGatewayDetailsDaoImpl" />
-    <bean id="Site2SiteVpnConnectionDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.Site2SiteVpnConnectionDetailsDaoImpl" />
-    <bean id="DiskOfferingDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.DiskOfferingDetailsDaoImpl" />
-    <bean id="UserDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.UserDetailsDaoImpl" />
-    <bean id="AutoScaleVmProfileDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.AutoScaleVmProfileDetailsDaoImpl" />
-    <bean id="AutoScaleVmGroupDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.AutoScaleVmGroupDetailsDaoImpl" />
+    <bean id="FirewallRuleDetailsDaoImpl" class="com.cloud.resourcedetail.dao.FirewallRuleDetailsDaoImpl" />
+    <bean id="UserIpAddressDetailsDaoImpl" class="com.cloud.resourcedetail.dao.UserIpAddressDetailsDaoImpl" />
+    <bean id="RemoteAccessVpnDetailsDaoImpl" class="com.cloud.resourcedetail.dao.RemoteAccessVpnDetailsDaoImpl" />
+    <bean id="VpcDetailsDaoImpl" class="com.cloud.resourcedetail.dao.VpcDetailsDaoImpl" />
+    <bean id="VpcGatewayDetailsDaoImpl" class="com.cloud.resourcedetail.dao.VpcGatewayDetailsDaoImpl" />
+    <bean id="NetworkACLListDetailsDaoImpl" class="com.cloud.resourcedetail.dao.NetworkACLListDetailsDaoImpl" />
+    <bean id="NetworkACLItemDetailsDaoImpl" class="com.cloud.resourcedetail.dao.NetworkACLItemDetailsDaoImpl" />
+    <bean id="Site2SiteVpnGatewayDetailsDaoImpl" class="com.cloud.resourcedetail.dao.Site2SiteVpnGatewayDetailsDaoImpl" />
+    <bean id="Site2SiteCustomerGatewayDetailsDaoImpl" class="com.cloud.resourcedetail.dao.Site2SiteCustomerGatewayDetailsDaoImpl" />
+    <bean id="Site2SiteVpnConnectionDetailsDaoImpl" class="com.cloud.resourcedetail.dao.Site2SiteVpnConnectionDetailsDaoImpl" />
+    <bean id="DiskOfferingDetailsDaoImpl" class="com.cloud.resourcedetail.dao.DiskOfferingDetailsDaoImpl" />
+    <bean id="UserDetailsDaoImpl" class="com.cloud.resourcedetail.dao.UserDetailsDaoImpl" />
+    <bean id="AutoScaleVmProfileDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmProfileDetailsDaoImpl" />
+    <bean id="AutoScaleVmGroupDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmGroupDetailsDaoImpl" />
     <bean id="databaseIntegrityChecker" class="com.cloud.upgrade.DatabaseIntegrityChecker" />
-    <bean id="LBStickinessPolicyDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.LBStickinessPolicyDetailsDaoImpl" />
-    <bean id="LBHealthCheckPolicyDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.LBHealthCheckPolicyDetailsDaoImpl" />
+    <bean id="LBStickinessPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBStickinessPolicyDetailsDaoImpl" />
+    <bean id="LBHealthCheckPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBHealthCheckPolicyDetailsDaoImpl" />
 
 </beans>

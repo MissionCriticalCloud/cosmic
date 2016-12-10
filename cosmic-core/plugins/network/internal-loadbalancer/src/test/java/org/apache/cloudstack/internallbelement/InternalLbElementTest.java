@@ -12,6 +12,7 @@ import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.addr.PublicIp;
@@ -28,7 +29,6 @@ import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.Ip;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

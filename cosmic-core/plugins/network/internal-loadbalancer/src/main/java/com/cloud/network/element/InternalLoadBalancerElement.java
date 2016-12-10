@@ -14,6 +14,7 @@ import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
@@ -48,7 +49,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

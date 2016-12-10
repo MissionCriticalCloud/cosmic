@@ -4,6 +4,7 @@ import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.network.IpAddress.State;
+import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;
@@ -16,7 +17,6 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDao;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

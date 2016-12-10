@@ -4,6 +4,7 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkServiceMapDao;
@@ -13,7 +14,6 @@ import com.cloud.network.lb.InternalLoadBalancerVMManager;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.dao.DomainRouterDao;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

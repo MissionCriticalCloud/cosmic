@@ -21,6 +21,7 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
@@ -85,7 +86,6 @@ import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
