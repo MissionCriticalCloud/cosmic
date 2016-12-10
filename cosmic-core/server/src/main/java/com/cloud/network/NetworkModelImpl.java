@@ -100,6 +100,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.codec.binary.Base64;
@@ -1814,10 +1815,10 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public Set<Long> getAvailableIps(final Network network, final String requestedIp) {
+    public SortedSet<Long> getAvailableIps(final Network network, final String requestedIp) {
         final String[] cidr = network.getCidr().split("/");
         final List<String> ips = getUsedIpsInNetwork(network);
-        final Set<Long> usedIps = new TreeSet<>();
+        final SortedSet<Long> usedIps = new TreeSet<>();
 
         for (final String ip : ips) {
             if (requestedIp != null && requestedIp.equals(ip)) {
@@ -1828,7 +1829,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             usedIps.add(NetUtils.ip2Long(ip));
         }
 
-        final Set<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr[0], Integer.parseInt(cidr[1]), usedIps);
+        final SortedSet<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr[0], Integer.parseInt(cidr[1]), usedIps);
 
         final String gateway = network.getGateway();
         if (gateway != null && allPossibleIps.contains(NetUtils.ip2Long(gateway))) {

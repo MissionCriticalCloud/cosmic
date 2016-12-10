@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * The NetworkModel presents a read-only view into the Network data such as L2 networks,
@@ -220,7 +221,7 @@ public interface NetworkModel {
 
     NicProfile getNicProfile(VirtualMachine vm, long networkId, String broadcastUri);
 
-    Set<Long> getAvailableIps(Network network, String requestedIp);
+    SortedSet<Long> getAvailableIps(Network network, String requestedIp);
 
     String getDomainNetworkDomain(long domainId, long zoneId);
 

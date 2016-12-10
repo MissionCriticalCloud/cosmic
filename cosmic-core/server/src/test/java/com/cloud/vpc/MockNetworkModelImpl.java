@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
 
@@ -771,7 +772,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
      * @see com.cloud.network.NetworkModel#getAvailableIps(com.cloud.network.Network, java.lang.String)
      */
     @Override
-    public Set<Long> getAvailableIps(final Network network, final String requestedIp) {
+    public SortedSet<Long> getAvailableIps(final Network network, final String requestedIp) {
         // TODO Auto-generated method stub
         return null;
     }

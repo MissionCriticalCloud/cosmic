@@ -148,6 +148,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -1659,7 +1660,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
             return null;
         }
 
-        final Set<Long> availableIps = _networkModel.getAvailableIps(network, requestedIp);
+        final SortedSet<Long> availableIps = _networkModel.getAvailableIps(network, requestedIp);
 
         if (availableIps == null || availableIps.isEmpty()) {
             s_logger.debug("There are no free ips in the  network " + network);
@@ -1683,6 +1684,15 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         }
 
         return NetUtils.long2Ip(array[_rand.nextInt(array.length)]);
+    }
+
+    public String acquireGuestIpAddressForRouter(final Network network, final String requestedIp) {
+
+        final SortedSet<Long> availableIps = _networkModel.getAvailableIps(network, requestedIp);
+
+        return (availableIps.isEmpty())
+                ? this.acquireGuestIpAddress(network, requestedIp)
+                : this.acquireGuestIpAddress(network, NetUtils.long2Ip(availableIps.first()));
     }
 
     @Override
