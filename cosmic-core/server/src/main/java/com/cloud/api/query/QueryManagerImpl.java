@@ -1,5 +1,10 @@
 package com.cloud.api.query;
 
+import com.cloud.affinity.AffinityGroupDomainMapVO;
+import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.affinity.AffinityGroupVMMapVO;
+import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
+import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.api.query.dao.AccountJoinDao;
 import com.cloud.api.query.dao.AffinityGroupJoinDao;
 import com.cloud.api.query.dao.AsyncJobJoinDao;
@@ -113,11 +118,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.affinity.AffinityGroupDomainMapVO;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
-import org.apache.cloudstack.affinity.AffinityGroupVMMapVO;
-import org.apache.cloudstack.affinity.dao.AffinityGroupDomainMapDao;
-import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
 import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
 import org.apache.cloudstack.api.ResourceDetail;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
@@ -722,7 +722,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Filter searchFilter = new Filter(UserVmJoinVO.class, "id", true, cmd.getStartIndex(),
                 cmd.getPageSizeVal());
 
-        List<Long> ids;
+        final List<Long> ids;
         if (cmd.getId() != null) {
             if (cmd.getIds() != null && !cmd.getIds().isEmpty()) {
                 throw new InvalidParameterValueException("Specify either id or ids but not both parameters");
@@ -2248,7 +2248,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        List<Long> domainIds;
+        final List<Long> domainIds;
         // For non-root users, only return all offerings for the user's domain,
         // and everything above till root
         if (_accountMgr.isNormalUser(account.getId()) || _accountMgr.isDomainAdmin(account.getId())
@@ -2384,7 +2384,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Long domainId = cmd.getDomainId();
         final Boolean isSystem = cmd.getIsSystem();
         final String vmTypeStr = cmd.getSystemVmType();
-        ServiceOfferingVO currentVmOffering;
+        final ServiceOfferingVO currentVmOffering;
         final Boolean isRecursive = cmd.isRecursive();
 
         final SearchCriteria<ServiceOfferingJoinVO> sc = _srvOfferingJoinDao.createSearchCriteria();
@@ -2784,7 +2784,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        VMTemplateVO template;
+        final VMTemplateVO template;
 
         Boolean isAscending = Boolean.parseBoolean(_configDao.getValue("sortkey.algorithm"));
         isAscending = isAscending == null ? Boolean.TRUE : isAscending;
@@ -2826,7 +2826,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             sc.addAnd("id", SearchCriteria.Op.EQ, templateId);
         } else {
 
-            DomainVO domain;
+            final DomainVO domain;
             if (!permittedAccounts.isEmpty()) {
                 domain = _domainDao.findById(permittedAccounts.get(0).getDomainId());
             } else {
@@ -2921,8 +2921,8 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                     scc.addOr("accountId", SearchCriteria.Op.IN, permittedAccountIds.toArray());
                 }
                 sc.addAnd("publicTemplate", SearchCriteria.Op.SC, scc);
-            } else if (templateFilter == TemplateFilter.all && caller.getType() != Account.ACCOUNT_TYPE_ADMIN ){
-                SearchCriteria<TemplateJoinVO> scc = _templateJoinDao.createSearchCriteria();
+            } else if (templateFilter == TemplateFilter.all && caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
+                final SearchCriteria<TemplateJoinVO> scc = _templateJoinDao.createSearchCriteria();
                 scc.addOr("publicTemplate", SearchCriteria.Op.EQ, true);
 
                 if (listProjectResourcesCriteria == ListProjectResourcesCriteria.SkipProjectResources) {
@@ -3009,7 +3009,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         // sc.addAnd("removed", SearchCriteria.Op.NULL);
 
         // search unique templates and find details by Ids
-        Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair;
+        final Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair;
         if (showRemovedTmpl) {
             uniqueTmplPair = _templateJoinDao.searchIncludingRemovedAndCount(sc, searchFilter);
         } else {

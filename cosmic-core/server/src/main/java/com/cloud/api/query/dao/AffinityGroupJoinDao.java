@@ -1,9 +1,9 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.query.vo.AffinityGroupJoinVO;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.affinity.AffinityGroup;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
 
 import java.util.List;
 

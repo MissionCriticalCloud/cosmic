@@ -1,5 +1,8 @@
 package org.apache.cloudstack.dedicated;
 
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.AffinityGroupService;
+import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
@@ -33,9 +36,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.affinity.AffinityGroup;
-import org.apache.cloudstack.affinity.AffinityGroupService;
-import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
 import org.apache.cloudstack.api.commands.DedicateClusterCmd;
 import org.apache.cloudstack.api.commands.DedicateHostCmd;
 import org.apache.cloudstack.api.commands.DedicatePodCmd;

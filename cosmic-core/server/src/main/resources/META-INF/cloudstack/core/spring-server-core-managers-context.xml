@@ -231,7 +231,7 @@
     <bean id="vMSnapshotManagerImpl" class="com.cloud.vm.snapshot.VMSnapshotManagerImpl" />
 
     <bean id="AffinityGroupServiceImpl"
-          class="org.apache.cloudstack.affinity.AffinityGroupServiceImpl">
+          class="com.cloud.affinity.AffinityGroupServiceImpl">
         <property name="affinityGroupProcessors"
                   value="#{affinityProcessorsRegistry.registered}" />
     </bean>

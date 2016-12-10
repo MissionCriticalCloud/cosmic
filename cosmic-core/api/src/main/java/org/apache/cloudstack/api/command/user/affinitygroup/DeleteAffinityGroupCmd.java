@@ -1,10 +1,10 @@
 package org.apache.cloudstack.api.command.user.affinitygroup;
 
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.user.Account;
 import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.affinity.AffinityGroup;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.ACL;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiCommandJobType;

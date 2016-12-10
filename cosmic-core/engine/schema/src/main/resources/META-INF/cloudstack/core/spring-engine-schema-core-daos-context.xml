@@ -318,9 +318,9 @@
     <bean id="networkDetailsDaoImpl" class="com.cloud.network.dao.NetworkDetailsDaoImpl" />
     <bean id="hostGpuGroupsDaoImpl" class="com.cloud.gpu.dao.HostGpuGroupsDaoImpl" />
     <bean id="vGPUTypesDaoImpl" class="com.cloud.gpu.dao.VGPUTypesDaoImpl" />
-    <bean id="AffinityGroupDaoImpl" class="org.apache.cloudstack.affinity.dao.AffinityGroupDaoImpl" />
-    <bean id="AffinityGroupVMMapDaoImpl" class="org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDaoImpl" />
-    <bean id="AffinityGroupDomainMapDaoImpl" class="org.apache.cloudstack.affinity.dao.AffinityGroupDomainMapDaoImpl" />
+    <bean id="AffinityGroupDaoImpl" class="com.cloud.affinity.dao.AffinityGroupDaoImpl" />
+    <bean id="AffinityGroupVMMapDaoImpl" class="com.cloud.affinity.dao.AffinityGroupVMMapDaoImpl" />
+    <bean id="AffinityGroupDomainMapDaoImpl" class="com.cloud.affinity.dao.AffinityGroupDomainMapDaoImpl" />
     <bean id="FirewallRuleDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.FirewallRuleDetailsDaoImpl" />
     <bean id="UserIpAddressDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.UserIpAddressDetailsDaoImpl" />
     <bean id="RemoteAccessVpnDetailsDaoImpl" class="org.apache.cloudstack.resourcedetail.dao.RemoteAccessVpnDetailsDaoImpl" />

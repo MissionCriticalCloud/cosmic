@@ -1,7 +1,7 @@
 package org.apache.cloudstack.api.command.user.affinitygroup;
 
+import com.cloud.affinity.AffinityGroupTypeResponse;
 import com.cloud.user.Account;
-import org.apache.cloudstack.affinity.AffinityGroupTypeResponse;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.response.ListResponse;

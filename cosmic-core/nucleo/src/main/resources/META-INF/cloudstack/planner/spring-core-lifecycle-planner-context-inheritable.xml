@@ -12,7 +12,7 @@
     <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="affinityProcessorsRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.affinity.AffinityGroupProcessor" />
+                  value="com.cloud.affinity.AffinityGroupProcessor" />
     </bean>
 
     <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">

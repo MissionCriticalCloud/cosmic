@@ -1,7 +1,7 @@
 package org.apache.cloudstack.query;
 
+import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.exception.PermissionDeniedException;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
 import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
 import org.apache.cloudstack.api.command.admin.host.ListHostTagsCmd;
 import org.apache.cloudstack.api.command.admin.host.ListHostsCmd;
