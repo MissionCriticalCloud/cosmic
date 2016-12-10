@@ -14,8 +14,8 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.VirtualMachine;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.events.Event;
-import org.apache.cloudstack.framework.events.EventBus;
+import com.cloud.framework.events.Event;
+import com.cloud.framework.events.EventBus;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

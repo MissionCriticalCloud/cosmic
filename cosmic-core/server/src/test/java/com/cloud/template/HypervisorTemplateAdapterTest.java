@@ -33,9 +33,9 @@ import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
 import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
 import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.events.Event;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
+import com.cloud.framework.events.Event;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 
 import java.lang.reflect.Field;

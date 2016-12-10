@@ -49,6 +49,7 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
+import com.cloud.framework.events.Event;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
@@ -81,8 +82,8 @@ import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.ServerApiException;
 import org.apache.cloudstack.api.auth.APIAuthenticationManager;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
@@ -341,7 +342,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         // For some reason, the instanceType / instanceId are not abstract, which means we may get null values.
         final String instanceType = job.getInstanceType() != null ? job.getInstanceType() : "unknown";
         final String instanceUuid = job.getInstanceId() != null ? ApiDBUtils.findJobInstanceUuid(job) : "";
-        final org.apache.cloudstack.framework.events.Event event = new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.ASYNC_JOB_CHANGE_EVENT
+        final Event event = new Event("management-server", EventCategory.ASYNC_JOB_CHANGE_EVENT
                 .getName(),
                 jobEvent, instanceType, instanceUuid);
 

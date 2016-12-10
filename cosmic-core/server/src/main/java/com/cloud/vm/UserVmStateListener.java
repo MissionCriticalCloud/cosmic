@@ -6,6 +6,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.server.ManagementService;
@@ -17,7 +18,7 @@ import com.cloud.vm.VirtualMachine.Event;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.framework.events.EventBus;
+import com.cloud.framework.events.EventBus;
 
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;
@@ -126,8 +127,8 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
         }
 
         final String resourceName = getEntityFromClassName(VirtualMachine.class.getName());
-        final org.apache.cloudstack.framework.events.Event eventMsg =
-                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+        final com.cloud.framework.events.Event eventMsg =
+                new com.cloud.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
                         vo.getUuid());
         final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);
@@ -142,7 +143,7 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
         eventMsg.setDescription(eventDescription);
         try {
             s_eventBus.publish(eventMsg);
-        } catch (final org.apache.cloudstack.framework.events.EventBusException e) {
+        } catch (final EventBusException e) {
             s_logger.warn("Failed to publish state change event on the the event bus.");
         }
     }

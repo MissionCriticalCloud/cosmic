@@ -6,10 +6,10 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.*;
+import com.cloud.framework.events.Event;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.component.ComponentContext;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -55,8 +55,8 @@ public class AlertGenerator {
             return; // no provider is configured to provide events bus, so just return
         }
 
-        final org.apache.cloudstack.framework.events.Event event =
-                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
+        final com.cloud.framework.events.Event event =
+                new Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
 
         final Map<String, String> eventDescription = new HashMap<>();
         final DataCenterVO dc = s_dcDao.findById(dataCenterId);

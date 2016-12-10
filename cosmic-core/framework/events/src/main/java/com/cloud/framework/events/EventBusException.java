@@ -1,4 +1,4 @@
-package org.apache.cloudstack.framework.events;
+package com.cloud.framework.events;
 
 public class EventBusException extends Exception {
     public EventBusException(final String msg) {

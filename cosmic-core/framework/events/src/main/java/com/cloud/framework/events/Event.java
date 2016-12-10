@@ -1,4 +1,4 @@
-package org.apache.cloudstack.framework.events;
+package com.cloud.framework.events;
 
 import com.google.gson.Gson;
 

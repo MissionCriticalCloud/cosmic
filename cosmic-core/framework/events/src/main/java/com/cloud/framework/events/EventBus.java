@@ -1,4 +1,4 @@
-package org.apache.cloudstack.framework.events;
+package com.cloud.framework.events;
 
 import java.util.UUID;
 

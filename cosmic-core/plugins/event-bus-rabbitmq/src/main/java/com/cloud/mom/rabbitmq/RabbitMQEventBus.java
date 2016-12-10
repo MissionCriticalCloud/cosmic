@@ -3,11 +3,11 @@ package com.cloud.mom.rabbitmq;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.framework.events.Event;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
-import org.apache.cloudstack.framework.events.EventSubscriber;
-import org.apache.cloudstack.framework.events.EventTopic;
+import com.cloud.framework.events.Event;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
+import com.cloud.framework.events.EventSubscriber;
+import com.cloud.framework.events.EventTopic;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.naming.ConfigurationException;

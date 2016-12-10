@@ -16,8 +16,8 @@ import com.cloud.utils.ReflectUtil;
 import com.cloud.utils.component.ComponentContext;
 import org.apache.cloudstack.api.Identity;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -102,8 +102,8 @@ public class ActionEventUtils {
             }
         }
 
-        final org.apache.cloudstack.framework.events.Event event =
-                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, eventCategory, eventType, EventTypes.getEntityForEvent(eventType), entityUuid);
+        final com.cloud.framework.events.Event event =
+                new com.cloud.framework.events.Event(ManagementService.Name, eventCategory, eventType, EventTypes.getEntityForEvent(eventType), entityUuid);
 
         final Map<String, String> eventDescription = new HashMap<>();
         final Project project = s_projectDao.findByProjectAccountId(accountId);

@@ -11,8 +11,8 @@ import com.cloud.storage.SnapshotVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;
@@ -73,8 +73,8 @@ public class SnapshotStateListener implements StateListener<State, Event, Snapsh
         }
 
         final String resourceName = getEntityFromClassName(Snapshot.class.getName());
-        final org.apache.cloudstack.framework.events.Event eventMsg =
-                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+        final com.cloud.framework.events.Event eventMsg =
+                new com.cloud.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
                         vo.getUuid());
         final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);
