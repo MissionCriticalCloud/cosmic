@@ -15,12 +15,12 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManagerImpl;
+import com.cloud.network.topology.AdvancedNetworkTopology;
+import com.cloud.network.topology.BasicNetworkTopology;
+import com.cloud.network.topology.NetworkTopologyContext;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.dao.DomainRouterDao;
-import org.apache.cloudstack.network.topology.AdvancedNetworkTopology;
-import org.apache.cloudstack.network.topology.BasicNetworkTopology;
-import org.apache.cloudstack.network.topology.NetworkTopologyContext;
 
 import java.util.ArrayList;
 import java.util.List;

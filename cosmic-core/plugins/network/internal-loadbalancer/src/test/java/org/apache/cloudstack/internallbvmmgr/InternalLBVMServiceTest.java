@@ -6,6 +6,7 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.network.lb.InternalLoadBalancerVMService;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.service.ServiceOfferingVO;
@@ -22,7 +23,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.network.lb.InternalLoadBalancerVMService;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

@@ -26,7 +26,7 @@
         </property>
     </bean>
 
-    <bean id="InternalLoadBalancerVMService" class="org.apache.cloudstack.network.lb.InternalLoadBalancerVMManagerImpl">
+    <bean id="InternalLoadBalancerVMService" class="com.cloud.network.lb.InternalLoadBalancerVMManagerImpl">
         <property name="name" value="InternalLoadBalancerVMService" />
     </bean>
 

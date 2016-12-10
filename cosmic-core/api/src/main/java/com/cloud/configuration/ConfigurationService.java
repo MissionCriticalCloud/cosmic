@@ -13,6 +13,8 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.api.command.admin.config.UpdateCfgCmd;
@@ -39,8 +41,6 @@ import org.apache.cloudstack.api.command.admin.zone.DeleteZoneCmd;
 import org.apache.cloudstack.api.command.admin.zone.UpdateZoneCmd;
 import org.apache.cloudstack.api.command.user.network.ListNetworkOfferingsCmd;
 import org.apache.cloudstack.config.Configuration;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 
 import java.util.List;
 

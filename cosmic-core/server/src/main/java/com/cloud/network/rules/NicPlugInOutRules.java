@@ -13,6 +13,7 @@ import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
@@ -24,7 +25,6 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import java.net.URI;
 import java.util.HashMap;

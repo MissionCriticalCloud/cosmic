@@ -8,12 +8,12 @@ import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
+import com.cloud.network.lb.InternalLoadBalancerVMManager;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.dao.DomainRouterDao;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
-import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

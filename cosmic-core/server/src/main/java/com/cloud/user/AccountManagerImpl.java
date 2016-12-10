@@ -59,6 +59,7 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 import com.cloud.region.gslb.GlobalLoadBalancerRuleVO;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.server.auth.UserAuthenticator.ActionOnFailedAuthentication;
@@ -123,7 +124,6 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
 import org.apache.cloudstack.framework.messagebus.PublishScope;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;

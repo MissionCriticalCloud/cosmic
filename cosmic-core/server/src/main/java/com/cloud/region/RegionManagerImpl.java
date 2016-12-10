@@ -4,6 +4,7 @@ import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.region.dao.RegionDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
@@ -16,7 +17,6 @@ import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
 import org.apache.cloudstack.api.command.admin.domain.UpdateDomainCmd;
 import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
 import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
-import com.cloud.region.dao.RegionDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -182,7 +182,7 @@ public class RegionManagerImpl extends ManagerBase implements RegionManager, Man
     @Override
     public Account disableAccount(final String accountName, final Long domainId, final Long accountId, final Boolean lockRequested) throws ConcurrentOperationException,
             ResourceUnavailableException {
-        Account account;
+        final Account account;
         if (lockRequested) {
             account = _accountMgr.lockAccount(accountName, domainId, accountId);
         } else {

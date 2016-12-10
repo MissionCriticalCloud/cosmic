@@ -2,6 +2,7 @@ package org.apache.cloudstack.api.command.user.loadbalancer;
 
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.FirewallRule;
 import org.apache.cloudstack.acl.RoleType;
 import org.apache.cloudstack.api.APICommand;
@@ -11,7 +12,6 @@ import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ApplicationLoadBalancerResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

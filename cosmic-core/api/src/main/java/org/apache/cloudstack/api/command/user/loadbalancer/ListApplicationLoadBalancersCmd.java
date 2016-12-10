@@ -1,6 +1,7 @@
 package org.apache.cloudstack.api.command.user.loadbalancer;
 
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.Pair;
 import org.apache.cloudstack.acl.RoleType;
@@ -12,7 +13,6 @@ import org.apache.cloudstack.api.response.ApplicationLoadBalancerResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.NetworkResponse;
-import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
 
 import java.util.ArrayList;
 import java.util.List;

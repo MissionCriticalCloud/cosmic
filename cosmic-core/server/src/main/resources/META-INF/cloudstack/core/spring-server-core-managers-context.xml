@@ -181,13 +181,13 @@
     <bean id="virtualNetworkApplianceFactory"
           class="com.cloud.network.rules.VirtualNetworkApplianceFactory" />
 
-    <bean id="topologyContext" class="org.apache.cloudstack.network.topology.NetworkTopologyContext" init-method="init" />
+    <bean id="topologyContext" class="com.cloud.network.topology.NetworkTopologyContext" init-method="init" />
 
-    <bean id="basicNetworkTopology" class="org.apache.cloudstack.network.topology.BasicNetworkTopology" />
-    <bean id="advancedNetworkTopology" class="org.apache.cloudstack.network.topology.AdvancedNetworkTopology" />
+    <bean id="basicNetworkTopology" class="com.cloud.network.topology.BasicNetworkTopology" />
+    <bean id="advancedNetworkTopology" class="com.cloud.network.topology.AdvancedNetworkTopology" />
 
-    <bean id="basicNetworkVisitor" class="org.apache.cloudstack.network.topology.BasicNetworkVisitor" />
-    <bean id="advancedNetworkVisitor" class="org.apache.cloudstack.network.topology.AdvancedNetworkVisitor" />
+    <bean id="basicNetworkVisitor" class="com.cloud.network.topology.BasicNetworkVisitor" />
+    <bean id="advancedNetworkVisitor" class="com.cloud.network.topology.AdvancedNetworkVisitor" />
 
     <bean id="commandSetupHelper"
           class="com.cloud.network.router.CommandSetupHelper" />
@@ -226,7 +226,7 @@
                   value="#{storagePoolAllocatorsRegistry.registered}" />
     </bean>
 
-    <bean id="ApplicationLoadBalancerService" class="org.apache.cloudstack.network.lb.ApplicationLoadBalancerManagerImpl" />
+    <bean id="ApplicationLoadBalancerService" class="com.cloud.network.lb.ApplicationLoadBalancerManagerImpl" />
 
     <bean id="vMSnapshotManagerImpl" class="com.cloud.vm.snapshot.VMSnapshotManagerImpl" />
 
@@ -254,7 +254,7 @@
           class="com.cloud.region.gslb.GlobalLoadBalancingRulesServiceImpl">
         <property name="gslbServiceProviders" value="#{gslbServiceProvidersRegistry.registered}" />
     </bean>
-    <bean id="certServiceImpl" class="org.apache.cloudstack.network.lb.CertServiceImpl" />
+    <bean id="certServiceImpl" class="com.cloud.network.lb.CertServiceImpl" />
     <bean id="imageStoreUploadMonitorImpl" class="com.cloud.storage.ImageStoreUploadMonitorImpl" />
 
     <bean id="secondaryStorageVmDefaultAllocator" class="com.cloud.storage.secondary.SecondaryStorageVmDefaultAllocator" />

@@ -17,6 +17,7 @@ import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.RulesManager;
+import com.cloud.region.Region;
 import com.cloud.region.dao.RegionDao;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.region.ha.GlobalLoadBalancingRulesService;
@@ -39,7 +40,6 @@ import org.apache.cloudstack.api.command.user.region.ha.gslb.RemoveFromGlobalLoa
 import org.apache.cloudstack.api.command.user.region.ha.gslb.UpdateGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import com.cloud.region.Region;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

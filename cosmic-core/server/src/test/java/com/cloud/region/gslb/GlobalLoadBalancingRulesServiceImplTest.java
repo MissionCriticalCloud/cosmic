@@ -15,6 +15,8 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.RulesManager;
+import com.cloud.region.RegionVO;
+import com.cloud.region.dao.RegionDao;
 import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
@@ -29,8 +31,6 @@ import org.apache.cloudstack.api.command.user.region.ha.gslb.DeleteGlobalLoadBal
 import org.apache.cloudstack.api.command.user.region.ha.gslb.RemoveFromGlobalLoadBalancerRuleCmd;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import com.cloud.region.RegionVO;
-import com.cloud.region.dao.RegionDao;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

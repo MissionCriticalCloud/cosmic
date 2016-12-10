@@ -1,10 +1,10 @@
 package org.apache.cloudstack.api.response;
 
+import com.cloud.region.PortableIpRange;
 import com.cloud.serializer.Param;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseResponse;
 import org.apache.cloudstack.api.EntityReference;
-import com.cloud.region.PortableIpRange;
 
 import java.util.List;
 

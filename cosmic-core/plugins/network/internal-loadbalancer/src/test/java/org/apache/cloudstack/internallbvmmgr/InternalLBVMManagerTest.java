@@ -13,6 +13,7 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.lb.InternalLoadBalancerVMManager;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
@@ -38,7 +39,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
-import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

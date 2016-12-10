@@ -19,7 +19,9 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderVO;
 import com.cloud.network.dao.VirtualRouterProviderDao;
+import com.cloud.network.element.InternalLoadBalancerElement;
 import com.cloud.network.element.VirtualRouterProviderVO;
+import com.cloud.network.lb.InternalLoadBalancerVMManager;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
@@ -27,8 +29,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.Ip;
 import org.apache.cloudstack.lb.ApplicationLoadBalancerRuleVO;
-import org.apache.cloudstack.network.element.InternalLoadBalancerElement;
-import org.apache.cloudstack.network.lb.InternalLoadBalancerVMManager;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

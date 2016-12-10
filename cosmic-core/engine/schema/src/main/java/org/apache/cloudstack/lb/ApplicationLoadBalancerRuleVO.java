@@ -1,9 +1,9 @@
 package org.apache.cloudstack.lb;
 
+import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.network.lb.ApplicationLoadBalancerRule;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;

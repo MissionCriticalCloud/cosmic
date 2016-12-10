@@ -1,13 +1,13 @@
 package org.apache.cloudstack.api.command.user.region;
 
+import com.cloud.region.Region;
+import com.cloud.region.RegionService;
 import org.apache.cloudstack.api.APICommand;
 import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.BaseListCmd;
 import org.apache.cloudstack.api.Parameter;
 import org.apache.cloudstack.api.response.ListResponse;
 import org.apache.cloudstack.api.response.RegionResponse;
-import com.cloud.region.Region;
-import com.cloud.region.RegionService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

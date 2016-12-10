@@ -14,8 +14,8 @@ import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

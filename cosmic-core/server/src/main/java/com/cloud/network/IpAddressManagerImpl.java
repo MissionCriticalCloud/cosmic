@@ -87,6 +87,10 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.org.Grouping;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpDao;
+import com.cloud.region.PortableIpVO;
+import com.cloud.region.Region;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
@@ -133,10 +137,6 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpDao;
-import com.cloud.region.PortableIpVO;
-import com.cloud.region.Region;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

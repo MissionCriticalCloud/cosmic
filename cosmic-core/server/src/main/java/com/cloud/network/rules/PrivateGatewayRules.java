@@ -9,12 +9,12 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.router.NetworkHelper;
 import com.cloud.network.router.NicProfileHelper;
 import com.cloud.network.router.VirtualRouter;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.network.vpc.NetworkACLManager;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineManager;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

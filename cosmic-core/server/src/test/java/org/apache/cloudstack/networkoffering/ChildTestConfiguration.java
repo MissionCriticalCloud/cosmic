@@ -59,6 +59,9 @@ import com.cloud.network.vpn.RemoteAccessVpnService;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.ProjectManager;
+import com.cloud.region.PortableIpDaoImpl;
+import com.cloud.region.PortableIpRangeDaoImpl;
+import com.cloud.region.dao.RegionDaoImpl;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementService;
 import com.cloud.service.dao.ServiceOfferingDaoImpl;
@@ -86,9 +89,6 @@ import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationSe
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.framework.config.ConfigDepot;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import com.cloud.region.PortableIpDaoImpl;
-import com.cloud.region.PortableIpRangeDaoImpl;
-import com.cloud.region.dao.RegionDaoImpl;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

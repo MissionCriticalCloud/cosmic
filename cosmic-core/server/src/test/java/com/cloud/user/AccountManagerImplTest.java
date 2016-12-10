@@ -26,6 +26,7 @@ import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.projects.ProjectManager;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.dao.SnapshotDao;
@@ -55,7 +56,6 @@ import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.messagebus.MessageBus;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
