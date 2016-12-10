@@ -1,7 +1,7 @@
 package com.cloud.storage.datastore.db;
 
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import java.util.List;
 

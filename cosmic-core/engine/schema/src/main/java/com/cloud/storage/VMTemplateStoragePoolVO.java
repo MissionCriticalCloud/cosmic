@@ -1,9 +1,9 @@
 package com.cloud.storage;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.utils.db.GenericDaoBase;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

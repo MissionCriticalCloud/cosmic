@@ -22,6 +22,7 @@ import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientNetworkCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -97,7 +98,6 @@ import com.cloud.vm.NicVO;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -7,13 +7,13 @@
     <bean class="RegistryLifecycle">
         <property name="registryBeanName" value="dataStoreProviderManager" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider" />
+                  value="com.cloud.engine.subsystem.api.storage.DataStoreProvider" />
     </bean>
 
     <bean class="RegistryLifecycle">
         <property name="registry" ref="storagePoolAllocatorsRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator" />
+                  value="com.cloud.engine.subsystem.api.storage.StoragePoolAllocator" />
     </bean>
 
     <bean class="RegistryLifecycle">
@@ -36,19 +36,19 @@
     <bean class="RegistryLifecycle">
         <property name="registry" ref="snapshotStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.SnapshotStrategy" />
     </bean>
 
     <bean class="RegistryLifecycle">
         <property name="registry" ref="vmSnapshotStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy" />
     </bean>
 
     <bean class="RegistryLifecycle">
         <property name="registry" ref="dataMotionStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.DataMotionStrategy" />
     </bean>
 
 </beans>

@@ -17,6 +17,7 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.FirstFitPlanner;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
@@ -42,7 +43,6 @@ import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;

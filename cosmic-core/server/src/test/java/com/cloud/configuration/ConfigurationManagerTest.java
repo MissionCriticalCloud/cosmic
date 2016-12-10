@@ -25,6 +25,7 @@ import com.cloud.dc.dao.DataCenterIpAddressDao;
 import com.cloud.dc.dao.DomainVlanMapDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -53,7 +54,6 @@ import com.cloud.utils.net.Ip;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
 package com.cloud.storage.download;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
+import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
 
 /**
  * Monitor download progress of all templates across all servers

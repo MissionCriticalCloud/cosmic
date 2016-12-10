@@ -2,6 +2,9 @@ package com.cloud.vm.snapshot;
 
 import com.cloud.api.command.user.vmsnapshot.ListVMSnapshotCmd;
 import com.cloud.dao.EntityManager;
+import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
+import com.cloud.engine.subsystem.api.storage.VMSnapshotOptions;
+import com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.CloudException;
@@ -64,9 +67,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.StorageStrategyFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotOptions;
-import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy;
 import org.apache.cloudstack.jobs.JobInfo;
 
 import javax.inject.Inject;

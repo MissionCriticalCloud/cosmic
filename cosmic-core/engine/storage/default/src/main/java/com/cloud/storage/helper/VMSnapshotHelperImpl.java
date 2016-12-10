@@ -1,6 +1,8 @@
 package com.cloud.storage.helper;
 
 import com.cloud.agent.api.VMSnapshotTO;
+import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
@@ -19,8 +21,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

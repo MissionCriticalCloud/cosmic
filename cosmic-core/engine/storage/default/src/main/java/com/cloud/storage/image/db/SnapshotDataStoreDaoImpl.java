@@ -1,5 +1,9 @@
 package com.cloud.storage.image.db;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
@@ -10,10 +14,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.naming.ConfigurationException;
 import java.sql.PreparedStatement;

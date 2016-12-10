@@ -2,6 +2,7 @@ package com.cloud.vpc;
 
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
@@ -30,7 +31,6 @@ import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import javax.inject.Inject;

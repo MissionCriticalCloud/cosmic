@@ -33,6 +33,6 @@
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean class="org.apache.cloudstack.engine.provisioning.test.ChildTestConfiguration" />
+    <bean class="ChildTestConfiguration" />
 
 </beans>

@@ -1,8 +1,8 @@
 package com.cloud.storage.snapshot;
 
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotService;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy;
+import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
+import com.cloud.engine.subsystem.api.storage.SnapshotService;
+import com.cloud.engine.subsystem.api.storage.SnapshotStrategy;
 
 import javax.inject.Inject;
 

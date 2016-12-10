@@ -1,6 +1,10 @@
 package com.cloud.storage.datastore.lifecycle;
 
 import com.cloud.agent.api.StoragePoolInfo;
+import com.cloud.engine.subsystem.api.storage.ClusterScope;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.HostScope;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.resource.Discoverer;
@@ -14,10 +18,6 @@ import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.storage.image.store.lifecycle.ImageStoreLifeCycle;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.UriUtils;
-import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -145,7 +145,7 @@ public class CloudStackImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
     }
 
     /* (non-Javadoc)
-     * @see org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle#migrateToObjectStore(org.apache.cloudstack.engine.subsystem.api.storage.DataStore)
+     * @see DataStoreLifeCycle#migrateToObjectStore(DataStore)
      */
     @Override
     public boolean migrateToObjectStore(final DataStore store) {

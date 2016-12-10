@@ -11,7 +11,7 @@
     </display>
   </class>
   <interface id="2" corner="BOTTOM_RIGHT" language="java"
-    name="org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle" project="cloud-engine-api"
+    name="PrimaryDataStoreLifeCycle" project="cloud-engine-api"
     file="/cloud-engine-api/src/org/apache/cloudstack/engine/subsystem/api/storage/PrimaryDataStoreLifeCycle.java"
     binary="false">
     <position height="-1" width="-1" x="727" y="1011"/>
@@ -42,7 +42,7 @@
     </display>
   </interface>
   <interface id="5" corner="BOTTOM_RIGHT" language="java"
-    name="org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreProvider" project="cloud-engine-api"
+    name="PrimaryDataStoreProvider" project="cloud-engine-api"
     file="/cloud-engine-api/src/org/apache/cloudstack/engine/subsystem/api/storage/PrimaryDataStoreProvider.java"
     binary="false">
     <position height="-1" width="-1" x="189" y="87"/>
@@ -85,7 +85,7 @@
     </display>
   </class>
   <interface id="9" corner="BOTTOM_RIGHT" language="java"
-    name="org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStore" project="cloud-engine-storage"
+    name="PrimaryDataStore" project="cloud-engine-storage"
     file="/cloud-engine-storage/src/org/apache/cloudstack/storage/datastore/PrimaryDataStore.java" binary="false">
     <position height="-1" width="-1" x="770" y="-4"/>
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">

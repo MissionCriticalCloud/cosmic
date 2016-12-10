@@ -5,6 +5,8 @@ import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.api.response.TemplateResponse;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.engine.subsystem.api.storage.TemplateState;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateHostVO;
@@ -19,8 +21,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateState;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

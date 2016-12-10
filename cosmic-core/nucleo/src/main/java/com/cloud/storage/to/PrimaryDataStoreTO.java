@@ -1,9 +1,9 @@
 package com.cloud.storage.to;
 
 import com.cloud.agent.api.to.DataStoreTO;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage.StoragePoolType;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStore;
 
 import java.util.Map;
 

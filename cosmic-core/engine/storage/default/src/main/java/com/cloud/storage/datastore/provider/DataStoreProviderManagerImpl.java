@@ -1,16 +1,16 @@
 package com.cloud.storage.datastore.provider;
 
 import com.cloud.api.response.StorageProviderResponse;
+import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
+import com.cloud.engine.subsystem.api.storage.DataStoreProvider.DataStoreProviderType;
+import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.datastore.PrimaryDataStoreProviderManager;
 import com.cloud.storage.image.ImageStoreDriver;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.component.Registry;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider.DataStoreProviderType;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

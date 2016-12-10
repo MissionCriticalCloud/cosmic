@@ -3,9 +3,9 @@ package com.cloud.storage.to;
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
+import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
 import java.util.ArrayList;
 

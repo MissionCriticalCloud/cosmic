@@ -1,5 +1,10 @@
 package com.cloud.storage.image.manager;
 
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
+import com.cloud.engine.subsystem.api.storage.ImageStoreProvider;
+import com.cloud.engine.subsystem.api.storage.Scope;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.server.StatsCollector;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -9,11 +14,6 @@ import com.cloud.storage.image.ImageStoreDriver;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.storage.image.store.ImageStoreImpl;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.ImageStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

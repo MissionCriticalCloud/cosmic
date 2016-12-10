@@ -1,13 +1,13 @@
 package com.cloud.storage.datastore.provider;
 
+import com.cloud.engine.subsystem.api.storage.DataStoreLifeCycle;
+import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreProvider;
 import com.cloud.storage.datastore.driver.CloudStackPrimaryDataStoreDriverImpl;
 import com.cloud.storage.datastore.lifecycle.CloudStackPrimaryDataStoreLifeCycleImpl;
 import com.cloud.utils.component.ComponentContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreProvider;
 
 import java.util.HashSet;
 import java.util.Map;

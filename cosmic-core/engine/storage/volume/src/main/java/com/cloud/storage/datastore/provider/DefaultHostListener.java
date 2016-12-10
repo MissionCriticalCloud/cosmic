@@ -5,6 +5,8 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ModifyStoragePoolAnswer;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
 import com.cloud.alert.AlertManager;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.exception.StorageConflictException;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.StoragePool;
@@ -13,8 +15,6 @@ import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
 
 import javax.inject.Inject;
 import java.util.List;

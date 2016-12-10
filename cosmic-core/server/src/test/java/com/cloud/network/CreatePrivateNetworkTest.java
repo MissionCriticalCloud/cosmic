@@ -11,6 +11,7 @@ import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
@@ -32,7 +33,6 @@ import com.cloud.user.AccountVO;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.util.ArrayList;
 import java.util.List;

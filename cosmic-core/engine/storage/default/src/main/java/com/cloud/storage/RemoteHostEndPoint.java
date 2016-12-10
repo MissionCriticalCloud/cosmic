@@ -8,6 +8,7 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.Commands;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.OperationTimedoutException;
@@ -23,7 +24,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 
 import javax.inject.Inject;
 import java.util.concurrent.Executors;

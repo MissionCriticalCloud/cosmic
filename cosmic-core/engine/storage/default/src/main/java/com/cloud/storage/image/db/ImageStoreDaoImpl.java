@@ -1,5 +1,6 @@
 package com.cloud.storage.image.db;
 
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.db.ImageStoreDao;
@@ -7,7 +8,6 @@ import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import javax.naming.ConfigurationException;
 import java.util.List;

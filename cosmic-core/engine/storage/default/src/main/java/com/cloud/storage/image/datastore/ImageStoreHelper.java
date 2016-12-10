@@ -1,5 +1,6 @@
 package com.cloud.storage.image.datastore;
 
+import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
@@ -11,7 +12,6 @@ import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;

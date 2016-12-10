@@ -136,16 +136,16 @@
     <bean id="dataCenterVnetDaoImpl" class="com.cloud.dc.dao.DataCenterVnetDaoImpl" />
     <bean id="dataCenterDetailsDaoImpl" class="com.cloud.dc.dao.DataCenterDetailsDaoImpl" />
     <bean id="domainVlanMapDaoImpl" class="com.cloud.dc.dao.DomainVlanMapDaoImpl" />
-    <bean id="engineDcDetailsDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.DcDetailsDaoImpl" />
+    <bean id="engineDcDetailsDaoImpl" class="DcDetailsDaoImpl" />
     <bean id="diskOfferingJoinDaoImpl" class="com.cloud.api.query.dao.DiskOfferingJoinDaoImpl" />
     <bean id="domainDaoImpl" class="com.cloud.domain.dao.DomainDaoImpl" />
     <bean id="domainJoinDaoImpl" class="com.cloud.api.query.dao.DomainJoinDaoImpl" />
     <bean id="domainRouterDaoImpl" class="com.cloud.vm.dao.DomainRouterDaoImpl" />
     <bean id="domainRouterJoinDaoImpl" class="com.cloud.api.query.dao.DomainRouterJoinDaoImpl" />
-    <bean id="engineClusterDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineClusterDaoImpl" />
-    <bean id="engineDataCenterDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineDataCenterDaoImpl" />
-    <bean id="engineHostDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineHostDaoImpl" />
-    <bean id="engineHostPodDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.EngineHostPodDaoImpl" />
+    <bean id="engineClusterDaoImpl" class="EngineClusterDaoImpl" />
+    <bean id="engineDataCenterDaoImpl" class="EngineDataCenterDaoImpl" />
+    <bean id="engineHostDaoImpl" class="EngineHostDaoImpl" />
+    <bean id="engineHostPodDaoImpl" class="EngineHostPodDaoImpl" />
     <bean id="eventDaoImpl" class="com.cloud.event.dao.EventDaoImpl" />
     <bean id="eventJoinDaoImpl" class="com.cloud.event.dao.EventJoinDaoImpl" />
     <bean id="externalFirewallDeviceDaoImpl" class="com.cloud.network.dao.ExternalFirewallDeviceDaoImpl" />
@@ -162,10 +162,10 @@
     <bean id="guestOSHypervisorDaoImpl" class="com.cloud.storage.dao.GuestOSHypervisorDaoImpl" />
     <bean id="highAvailabilityDaoImpl" class="com.cloud.ha.dao.HighAvailabilityDaoImpl" />
     <bean id="hostDaoImpl" class="com.cloud.host.dao.HostDaoImpl" />
-    <bean id="engineHostDetailsDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.HostDetailsDaoImpl" />
+    <bean id="engineHostDetailsDaoImpl" class="HostDetailsDaoImpl" />
     <bean id="hostDetailsDaoImpl" class="com.cloud.host.dao.HostDetailsDaoImpl" />
     <bean id="hostJoinDaoImpl" class="com.cloud.api.query.dao.HostJoinDaoImpl" />
-    <bean id="engineHostTagsDaoImpl" class="org.apache.cloudstack.engine.datacenter.entity.api.db.dao.HostTagsDaoImpl" />
+    <bean id="engineHostTagsDaoImpl" class="HostTagsDaoImpl" />
     <bean id="hostTagsDaoImpl" class="com.cloud.host.dao.HostTagsDaoImpl" />
     <bean id="hostTransferMapDaoImpl" class="com.cloud.cluster.agentlb.dao.HostTransferMapDaoImpl" />
     <bean id="iPAddressDaoImpl" class="com.cloud.network.dao.IPAddressDaoImpl" />
@@ -287,12 +287,12 @@
     <bean id="userVmDaoImpl" class="com.cloud.vm.dao.UserVmDaoImpl" />
     <bean id="userVmDetailsDaoImpl" class="com.cloud.vm.dao.UserVmDetailsDaoImpl" />
     <bean id="userVmJoinDaoImpl" class="com.cloud.api.query.dao.UserVmJoinDaoImpl" />
-    <bean id="vMComputeTagDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMComputeTagDaoImpl" />
-    <bean id="vMEntityDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMEntityDaoImpl" />
+    <bean id="vMComputeTagDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VMComputeTagDaoImpl" />
+    <bean id="vMEntityDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VMEntityDaoImpl" />
     <bean id="vMInstanceDaoImpl" class="com.cloud.vm.dao.VMInstanceDaoImpl" />
-    <bean id="vMNetworkMapDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMNetworkMapDaoImpl" />
-    <bean id="vMReservationDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDaoImpl" />
-    <bean id="vMRootDiskTagDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMRootDiskTagDaoImpl" />
+    <bean id="vMNetworkMapDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VMNetworkMapDaoImpl" />
+    <bean id="vMReservationDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VMReservationDaoImpl" />
+    <bean id="vMRootDiskTagDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VMRootDiskTagDaoImpl" />
     <bean id="vMSnapshotDaoImpl" class="com.cloud.vm.snapshot.dao.VMSnapshotDaoImpl" />
     <bean id="vMSnapshotDetailsDaoImpl" class="com.cloud.vm.snapshot.dao.VMSnapshotDetailsDaoImpl" />
     <bean id="vMTemplateDetailsDaoImpl" class="com.cloud.storage.dao.VMTemplateDetailsDaoImpl" />
@@ -305,7 +305,7 @@
     <bean id="volumeDetailsDaoImpl" class="com.cloud.storage.dao.VolumeDetailsDaoImpl" />
     <bean id="volumeHostDaoImpl" class="com.cloud.storage.dao.VolumeHostDaoImpl" />
     <bean id="volumeJoinDaoImpl" class="com.cloud.api.query.dao.VolumeJoinDaoImpl" />
-    <bean id="volumeReservationDaoImpl" class="org.apache.cloudstack.engine.cloud.entity.api.db.dao.VolumeReservationDaoImpl" />
+    <bean id="volumeReservationDaoImpl" class="com.cloud.engine.cloud.entity.api.db.dao.VolumeReservationDaoImpl" />
     <bean id="vpcDaoImpl" class="com.cloud.network.vpc.dao.VpcDaoImpl" />
     <bean id="vpcGatewayDaoImpl" class="com.cloud.network.vpc.dao.VpcGatewayDaoImpl" />
     <bean id="vpcOfferingDaoImpl" class="com.cloud.network.vpc.dao.VpcOfferingDaoImpl" />

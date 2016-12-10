@@ -1,13 +1,13 @@
 package com.cloud.storage.datastore;
 
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.Scope;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import javax.inject.Inject;
 import java.util.List;

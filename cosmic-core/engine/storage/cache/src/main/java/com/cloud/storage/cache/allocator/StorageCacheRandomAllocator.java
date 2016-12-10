@@ -1,15 +1,15 @@
 package com.cloud.storage.cache.allocator;
 
+import com.cloud.engine.subsystem.api.storage.DataObject;
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.server.StatsCollector;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
 
 import javax.inject.Inject;
 import java.util.List;

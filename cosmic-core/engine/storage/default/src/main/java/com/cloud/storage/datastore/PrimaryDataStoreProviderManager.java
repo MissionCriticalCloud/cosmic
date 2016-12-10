@@ -1,8 +1,8 @@
 package com.cloud.storage.datastore;
 
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 
 public interface PrimaryDataStoreProviderManager {
     PrimaryDataStore getPrimaryDataStore(long dataStoreId);

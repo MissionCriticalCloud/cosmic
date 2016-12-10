@@ -1,10 +1,10 @@
 package com.cloud.storage.datastore.db;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.storage.Volume;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 
 import java.util.List;
 

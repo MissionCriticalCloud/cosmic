@@ -6,6 +6,8 @@ import com.cloud.configuration.Config;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.engine.cloud.entity.api.db.VMReservationVO;
+import com.cloud.engine.cloud.entity.api.db.dao.VMReservationDao;
 import com.cloud.exception.AffinityConflictException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.utils.DateUtil;
@@ -15,8 +17,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.engine.cloud.entity.api.db.VMReservationVO;
-import org.apache.cloudstack.engine.cloud.entity.api.db.dao.VMReservationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

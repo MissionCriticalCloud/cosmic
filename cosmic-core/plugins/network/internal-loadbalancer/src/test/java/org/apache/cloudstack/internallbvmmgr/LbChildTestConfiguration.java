@@ -2,6 +2,7 @@ package org.apache.cloudstack.internallbvmmgr;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
@@ -20,7 +21,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 import org.apache.cloudstack.lb.dao.ApplicationLoadBalancerRuleDao;
 import org.apache.cloudstack.test.utils.SpringUtils;
 

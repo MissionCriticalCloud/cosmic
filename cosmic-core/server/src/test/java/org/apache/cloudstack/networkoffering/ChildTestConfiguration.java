@@ -24,6 +24,8 @@ import com.cloud.dc.dao.PodVlanDaoImpl;
 import com.cloud.dc.dao.PodVlanMapDaoImpl;
 import com.cloud.dc.dao.VlanDaoImpl;
 import com.cloud.domain.dao.DomainDaoImpl;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.event.dao.UsageEventDaoImpl;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -87,8 +89,6 @@ import com.cloud.vm.dao.NicSecondaryIpDaoImpl;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
 import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;

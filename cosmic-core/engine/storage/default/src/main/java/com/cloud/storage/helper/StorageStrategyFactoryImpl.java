@@ -1,17 +1,17 @@
 package com.cloud.storage.helper;
 
+import com.cloud.engine.subsystem.api.storage.DataMotionStrategy;
+import com.cloud.engine.subsystem.api.storage.DataObject;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.SnapshotStrategy;
+import com.cloud.engine.subsystem.api.storage.SnapshotStrategy.SnapshotOperation;
+import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
+import com.cloud.engine.subsystem.api.storage.StrategyPriority;
+import com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.host.Host;
 import com.cloud.storage.Snapshot;
 import com.cloud.vm.snapshot.VMSnapshot;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy.SnapshotOperation;
-import org.apache.cloudstack.engine.subsystem.api.storage.StorageStrategyFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.StrategyPriority;
-import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
 import javax.inject.Inject;
 import java.util.Collection;

@@ -1,9 +1,9 @@
 package com.cloud.storage.image.datastore;
 
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.Scope;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.storage.image.ImageStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import java.util.List;
 

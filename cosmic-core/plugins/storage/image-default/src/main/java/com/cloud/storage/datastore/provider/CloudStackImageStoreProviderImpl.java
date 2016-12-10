@@ -1,5 +1,10 @@
 package com.cloud.storage.datastore.provider;
 
+import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.DataStoreLifeCycle;
+import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
+import com.cloud.engine.subsystem.api.storage.ImageStoreProvider;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.driver.CloudStackImageStoreDriverImpl;
 import com.cloud.storage.datastore.lifecycle.CloudStackImageStoreLifeCycleImpl;
@@ -8,11 +13,6 @@ import com.cloud.storage.image.datastore.ImageStoreHelper;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
 import com.cloud.storage.image.store.lifecycle.ImageStoreLifeCycle;
 import com.cloud.utils.component.ComponentContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
-import org.apache.cloudstack.engine.subsystem.api.storage.ImageStoreProvider;
 
 import javax.inject.Inject;
 import java.util.HashSet;

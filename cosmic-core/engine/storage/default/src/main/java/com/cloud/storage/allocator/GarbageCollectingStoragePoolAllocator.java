@@ -2,13 +2,13 @@ package com.cloud.storage.allocator;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePool;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

@@ -1,6 +1,6 @@
 package com.cloud.storage.image.datastore;
 
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStore;
 
 public interface ImageStoreInfo extends DataStore {
     long getImageStoreId();

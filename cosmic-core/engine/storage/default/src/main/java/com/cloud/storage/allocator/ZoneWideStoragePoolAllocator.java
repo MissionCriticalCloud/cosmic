@@ -2,6 +2,7 @@ package com.cloud.storage.allocator;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePool;
@@ -10,7 +11,6 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.user.Account;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

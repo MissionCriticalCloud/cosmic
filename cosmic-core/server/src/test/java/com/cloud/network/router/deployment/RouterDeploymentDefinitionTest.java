@@ -18,6 +18,7 @@ import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.HostPodVO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -39,7 +40,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.util.ArrayList;
 import java.util.List;

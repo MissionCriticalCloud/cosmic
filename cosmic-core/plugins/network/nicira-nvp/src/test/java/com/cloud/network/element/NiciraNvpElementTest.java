@@ -15,6 +15,7 @@ import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterAnswer;
 import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.domain.Domain;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -39,7 +40,6 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.user.Account;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.ReservationContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;

@@ -6,6 +6,14 @@ import com.cloud.agent.api.CreateStoragePoolCommand;
 import com.cloud.agent.api.DeleteStoragePoolCommand;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.alert.AlertManager;
+import com.cloud.engine.subsystem.api.storage.ClusterScope;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.HostScope;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreParameters;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.StorageConflictException;
 import com.cloud.host.Host;
@@ -37,14 +45,6 @@ import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreParameters;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
@@ -495,7 +495,7 @@ public class CloudStackPrimaryDataStoreLifeCycleImpl implements PrimaryDataStore
     }
 
     /* (non-Javadoc)
-     * @see org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle#migrateToObjectStore(org.apache.cloudstack.engine.subsystem.api.storage.DataStore)
+     * @see DataStoreLifeCycle#migrateToObjectStore(DataStore)
      */
     @Override
     public boolean migrateToObjectStore(final DataStore store) {

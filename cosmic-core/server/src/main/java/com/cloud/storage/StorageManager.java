@@ -5,6 +5,8 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.CapacityVO;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.StorageConflictException;
 import com.cloud.exception.StorageUnavailableException;
@@ -16,8 +18,6 @@ import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VMInstanceVO;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,14 +1,14 @@
 package com.cloud.storage.volume;
 
+import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
+import com.cloud.vm.dao.VMInstanceDao;
 
 import org.junit.Assert;
 import org.junit.Before;

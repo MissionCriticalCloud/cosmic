@@ -3,6 +3,7 @@ package com.cloud.storage;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.configuration.Config;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.managed.context.ManagedContextRunnable;
@@ -12,7 +13,6 @@ import com.cloud.storage.command.DownloadCommand;
 import com.cloud.storage.resource.LocalNfsSecondaryStorageResource;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
 
 import javax.inject.Inject;
 import java.io.File;
