@@ -1,6 +1,6 @@
-package org.apache.cloudstack.api.commands;
+package com.cloud.api.commands;
 
-import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseDedicatedHost", description = "Release the dedication for host", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseDedicatedCluster", description = "Release the dedication for cluster", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
-public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
-    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedHostCmd.class.getName());
+public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
+    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedClusterCmd.class.getName());
 
-    private static final String s_name = "releasededicatedhostresponse";
+    private static final String s_name = "releasededicatedclusterresponse";
     @Inject
     DedicatedService dedicatedService;
 
@@ -30,8 +30,8 @@ public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
 
-    @Parameter(name = ApiConstants.HOST_ID, type = CommandType.UUID, entityType = HostResponse.class, required = true, description = "the ID of the host")
-    private Long hostId;
+    @Parameter(name = ApiConstants.CLUSTER_ID, type = CommandType.UUID, entityType = ClusterResponse.class, required = true, description = "the ID of the Cluster")
+    private Long clusterId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -39,12 +39,12 @@ public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() {
-        final boolean result = dedicatedService.releaseDedicatedResource(null, null, null, getHostId());
+        final boolean result = dedicatedService.releaseDedicatedResource(null, null, getClusterId(), null);
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());
             this.setResponseObject(response);
         } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated Host");
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated cluster");
         }
     }
 
@@ -52,8 +52,8 @@ public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    public Long getHostId() {
-        return hostId;
+    public Long getClusterId() {
+        return clusterId;
     }
 
     @Override
@@ -73,6 +73,6 @@ public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventDescription() {
-        return "releasing dedicated host";
+        return "releasing dedicated cluster";
     }
 }

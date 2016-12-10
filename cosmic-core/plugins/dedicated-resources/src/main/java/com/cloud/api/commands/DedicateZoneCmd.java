@@ -1,4 +1,4 @@
-package org.apache.cloudstack.api.commands;
+package com.cloud.api.commands;
 
 import com.cloud.api.response.DedicateZoneResponse;
 import com.cloud.api.response.DomainResponse;

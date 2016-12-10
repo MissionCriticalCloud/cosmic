@@ -1,6 +1,6 @@
-package org.apache.cloudstack.api.commands;
+package com.cloud.api.commands;
 
-import com.cloud.api.response.PodResponse;
+import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseDedicatedPod", description = "Release the dedication for the pod", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseDedicatedHost", description = "Release the dedication for host", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
-public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
-    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedPodCmd.class.getName());
+public class ReleaseDedicatedHostCmd extends BaseAsyncCmd {
+    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedHostCmd.class.getName());
 
-    private static final String s_name = "releasededicatedpodresponse";
+    private static final String s_name = "releasededicatedhostresponse";
     @Inject
     DedicatedService dedicatedService;
 
@@ -30,8 +30,8 @@ public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
 
-    @Parameter(name = ApiConstants.POD_ID, type = CommandType.UUID, entityType = PodResponse.class, required = true, description = "the ID of the Pod")
-    private Long podId;
+    @Parameter(name = ApiConstants.HOST_ID, type = CommandType.UUID, entityType = HostResponse.class, required = true, description = "the ID of the host")
+    private Long hostId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -39,12 +39,12 @@ public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() {
-        final boolean result = dedicatedService.releaseDedicatedResource(null, getPodId(), null, null);
+        final boolean result = dedicatedService.releaseDedicatedResource(null, null, null, getHostId());
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());
             this.setResponseObject(response);
         } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated pod");
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated Host");
         }
     }
 
@@ -52,8 +52,8 @@ public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    public Long getPodId() {
-        return podId;
+    public Long getHostId() {
+        return hostId;
     }
 
     @Override
@@ -73,6 +73,6 @@ public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventDescription() {
-        return "releasing dedicated pod";
+        return "releasing dedicated host";
     }
 }

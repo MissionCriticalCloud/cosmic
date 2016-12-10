@@ -1,6 +1,6 @@
-package org.apache.cloudstack.api.commands;
+package com.cloud.api.commands;
 
-import com.cloud.api.response.ClusterResponse;
+import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseDedicatedCluster", description = "Release the dedication for cluster", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseDedicatedPod", description = "Release the dedication for the pod", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
-public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
-    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedClusterCmd.class.getName());
+public class ReleaseDedicatedPodCmd extends BaseAsyncCmd {
+    public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedPodCmd.class.getName());
 
-    private static final String s_name = "releasededicatedclusterresponse";
+    private static final String s_name = "releasededicatedpodresponse";
     @Inject
     DedicatedService dedicatedService;
 
@@ -30,8 +30,8 @@ public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
 
-    @Parameter(name = ApiConstants.CLUSTER_ID, type = CommandType.UUID, entityType = ClusterResponse.class, required = true, description = "the ID of the Cluster")
-    private Long clusterId;
+    @Parameter(name = ApiConstants.POD_ID, type = CommandType.UUID, entityType = PodResponse.class, required = true, description = "the ID of the Pod")
+    private Long podId;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -39,12 +39,12 @@ public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() {
-        final boolean result = dedicatedService.releaseDedicatedResource(null, null, getClusterId(), null);
+        final boolean result = dedicatedService.releaseDedicatedResource(null, getPodId(), null, null);
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());
             this.setResponseObject(response);
         } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated cluster");
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to release dedicated pod");
         }
     }
 
@@ -52,8 +52,8 @@ public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
 
-    public Long getClusterId() {
-        return clusterId;
+    public Long getPodId() {
+        return podId;
     }
 
     @Override
@@ -73,6 +73,6 @@ public class ReleaseDedicatedClusterCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventDescription() {
-        return "releasing dedicated cluster";
+        return "releasing dedicated pod";
     }
 }
