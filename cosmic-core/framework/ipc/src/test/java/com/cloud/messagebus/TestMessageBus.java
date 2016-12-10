@@ -1,4 +1,4 @@
-package org.apache.cloudstack.messagebus;
+package com.cloud.messagebus;
 
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDetector;
