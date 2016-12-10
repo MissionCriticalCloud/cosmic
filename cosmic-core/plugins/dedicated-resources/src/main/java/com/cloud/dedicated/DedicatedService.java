@@ -1,5 +1,9 @@
 package com.cloud.dedicated;
 
+import com.cloud.api.commands.ListDedicatedClustersCmd;
+import com.cloud.api.commands.ListDedicatedHostsCmd;
+import com.cloud.api.commands.ListDedicatedPodsCmd;
+import com.cloud.api.commands.ListDedicatedZonesCmd;
 import com.cloud.api.response.DedicateClusterResponse;
 import com.cloud.api.response.DedicateHostResponse;
 import com.cloud.api.response.DedicatePodResponse;
@@ -8,10 +12,6 @@ import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.PluggableService;
-import com.cloud.api.commands.ListDedicatedClustersCmd;
-import com.cloud.api.commands.ListDedicatedHostsCmd;
-import com.cloud.api.commands.ListDedicatedPodsCmd;
-import com.cloud.api.commands.ListDedicatedZonesCmd;
 
 import java.util.List;
 
