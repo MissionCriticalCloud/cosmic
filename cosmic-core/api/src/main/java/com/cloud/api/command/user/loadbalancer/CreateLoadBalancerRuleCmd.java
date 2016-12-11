@@ -253,6 +253,10 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
             throw new InvalidParameterValueException(
                     "Parameter cidrList is deprecated; if you need to open firewall rule for the specific CIDR, please refer to createFirewallRule command");
         }
+        if (lbProtocol != null && !lbProtocol.toLowerCase().equals("tcp")) {
+            throw new InvalidParameterValueException(
+                    "Only TCP protocol is supported because HAProxy can only do TCP.");
+        }
         try {
             final LoadBalancer result =
                     _lbService.createPublicLoadBalancerRule(getXid(), getName(), getDescription(), getSourcePortStart(), getSourcePortEnd(), getDefaultPortStart(),
