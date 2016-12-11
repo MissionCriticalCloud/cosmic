@@ -12,12 +12,12 @@ import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.command.CopyCmdAnswer;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
-import org.apache.cloudstack.storage.to.SnapshotObjectTO;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.command.CopyCmdAnswer;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.to.PrimaryDataStoreTO;
+import com.cloud.storage.to.SnapshotObjectTO;
+import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.io.File;
 import java.net.URI;

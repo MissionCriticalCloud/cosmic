@@ -1,10 +1,10 @@
 package com.cloud.network;
 
+import com.cloud.api.command.admin.usage.AddTrafficMonitorCmd;
+import com.cloud.api.command.admin.usage.DeleteTrafficMonitorCmd;
+import com.cloud.api.command.admin.usage.ListTrafficMonitorsCmd;
 import com.cloud.host.Host;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.api.command.admin.usage.AddTrafficMonitorCmd;
-import org.apache.cloudstack.api.command.admin.usage.DeleteTrafficMonitorCmd;
-import org.apache.cloudstack.api.command.admin.usage.ListTrafficMonitorsCmd;
 
 import java.util.List;
 

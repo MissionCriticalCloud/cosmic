@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import org.apache.cloudstack.api.ResourceDetail;
+import com.cloud.api.ResourceDetail;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

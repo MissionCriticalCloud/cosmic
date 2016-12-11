@@ -1,7 +1,7 @@
 package com.cloud.vm.snapshot.dao;
 
+import com.cloud.resourcedetail.ResourceDetailsDaoBase;
 import com.cloud.vm.snapshot.VMSnapshotDetailsVO;
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
 
 public class VMSnapshotDetailsDaoImpl extends ResourceDetailsDaoBase<VMSnapshotDetailsVO> implements VMSnapshotDetailsDao {
 

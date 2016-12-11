@@ -26,10 +26,10 @@
         </property>
     </bean>
 
-    <bean id="InternalLoadBalancerElementService" class="org.apache.cloudstack.network.element.InternalLoadBalancerElement">
+    <bean id="InternalLoadBalancerElementService" class="com.cloud.network.element.InternalLoadBalancerElement">
         <property name="name" value="InternalLoadBalancerElementService" />
     </bean>
 
-    <bean class="org.apache.cloudstack.internallbelement.ElementChildTestConfiguration" />
+    <bean class="com.cloud.internallbelement.ElementChildTestConfiguration" />
 
 </beans>

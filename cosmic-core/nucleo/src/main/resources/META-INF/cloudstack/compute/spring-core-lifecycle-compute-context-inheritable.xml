@@ -4,17 +4,17 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="haInvestigatorsRegistry" />
         <property name="typeClass" value="com.cloud.ha.Investigator" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="haFenceBuildersRegistry" />
         <property name="typeClass" value="com.cloud.ha.FenceBuilder" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="hypervisorGurusRegistry" />
         <property name="typeClass" value="com.cloud.hypervisor.HypervisorGuru" />
     </bean>

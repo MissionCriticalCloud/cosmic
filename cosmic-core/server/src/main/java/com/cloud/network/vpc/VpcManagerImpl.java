@@ -1,8 +1,12 @@
 package com.cloud.network.vpc;
 
+import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.api.command.user.vpc.ListPrivateGatewaysCmd;
+import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
@@ -11,6 +15,7 @@ import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
@@ -21,7 +26,10 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -91,14 +99,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.dao.DomainRouterDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.api.command.user.vpc.ListPrivateGatewaysCmd;
-import org.apache.cloudstack.api.command.user.vpc.ListStaticRoutesCmd;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -852,7 +852,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                         "Provider " + provider + " should be enabled in at least one physical network of the zone specified");
             }
 
-            List<String> providers;
+            final List<String> providers;
             if (svcProviders.get(service) == null) {
                 providers = new ArrayList<>();
             } else {
@@ -1349,7 +1349,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final Long physicalNetworkIdFinal = physicalNetworkId;
         final PhysicalNetwork physNetFinal = physNet;
-        VpcGatewayVO gatewayVO;
+        final VpcGatewayVO gatewayVO;
         try {
             gatewayVO = Transaction.execute(new TransactionCallbackWithException<VpcGatewayVO, Exception>() {
                 @Override
@@ -1902,7 +1902,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throws ResourceAllocationException, ResourceUnavailableException, InsufficientAddressCapacityException,
             ConcurrentOperationException {
         final Account caller = CallContext.current().getCallingAccount();
-        Account owner;
+        final Account owner;
 
         final IpAddress ipToAssoc = _ntwkModel.getIp(ipId);
         if (ipToAssoc != null) {
@@ -2391,7 +2391,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         s_logger.debug("Releasing VPC ip address " + ip + " from vpc network id=" + networkId);
 
         final long vpcId = ip.getVpcId();
-        boolean success;
+        final boolean success;
         try {
             // unassign ip from the VPC router
             success = _ipAddrMgr.applyIpAssociations(_ntwkModel.getNetwork(networkId), true);
@@ -2465,7 +2465,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final IPAddressVO sourceNatIp = getExistingSourceNatInVpc(owner.getId(), vpc.getId());
 
-        PublicIp ipToReturn;
+        final PublicIp ipToReturn;
 
         if (sourceNatIp != null) {
             ipToReturn = PublicIp.createFromAddrAndVlan(sourceNatIp, _vlanDao.findById(sourceNatIp.getVlanId()));

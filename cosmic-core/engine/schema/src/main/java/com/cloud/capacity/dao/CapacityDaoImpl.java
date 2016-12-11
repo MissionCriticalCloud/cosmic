@@ -4,6 +4,8 @@ import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.storage.Storage;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -14,8 +16,6 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import java.sql.PreparedStatement;
@@ -792,11 +792,11 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
     }
 
     @Override
-    public void updateCapacityState(Long dcId, Long podId, Long clusterId, Long hostId, String capacityState, short[] capacityType) {
+    public void updateCapacityState(final Long dcId, final Long podId, final Long clusterId, final Long hostId, final String capacityState, final short[] capacityType) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final StringBuilder sql = new StringBuilder(UPDATE_CAPACITY_STATE);
         final List<Long> resourceIdList = new ArrayList<>();
-        StringBuilder where = new StringBuilder();
+        final StringBuilder where = new StringBuilder();
 
         if (dcId != null) {
             where.append(" data_center_id = ? ");
@@ -818,9 +818,9 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
         if (capacityType != null && capacityType.length > 0) {
             where.append((where.length() > 0) ? " and capacity_type in " : " capacity_type in ");
 
-            StringBuilder builder = new StringBuilder();
-            for( int i = 0 ; i < capacityType.length; i++ ) {
-                if(i==0) {
+            final StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < capacityType.length; i++) {
+                if (i == 0) {
                     builder.append(" (? ");
                 } else {
                     builder.append(" ,? ");
@@ -838,10 +838,10 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             int i = 1;
             pstmt.setString(i, capacityState);
             i = i + 1;
-            for (int j=0 ; j < resourceIdList.size(); j++, i++) {
+            for (int j = 0; j < resourceIdList.size(); j++, i++) {
                 pstmt.setLong(i, resourceIdList.get(j));
             }
-            for(int j=0; j < capacityType.length; i++, j++ ) {
+            for (int j = 0; j < capacityType.length; i++, j++) {
                 pstmt.setShort(i, capacityType[j]);
             }
 

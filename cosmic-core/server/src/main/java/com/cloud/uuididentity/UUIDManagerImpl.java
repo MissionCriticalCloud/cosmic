@@ -1,5 +1,6 @@
 package com.cloud.uuididentity;
 
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.exception.InvalidParameterValueException;
@@ -7,7 +8,6 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.context.CallContext;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

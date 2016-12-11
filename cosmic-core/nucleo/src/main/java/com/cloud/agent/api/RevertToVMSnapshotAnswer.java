@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
 
 import java.util.List;
 

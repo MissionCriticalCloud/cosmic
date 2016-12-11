@@ -1,7 +1,7 @@
 package com.cloud.uservm;
 
+import com.cloud.acl.ControlledEntity;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.ControlledEntity;
 
 /**
  * This represents one running virtual machine instance.

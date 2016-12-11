@@ -6,6 +6,13 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
+import com.cloud.api.command.admin.storage.CreateSecondaryStagingStoreCmd;
+import com.cloud.api.command.admin.storage.CreateStoragePoolCmd;
+import com.cloud.api.command.admin.storage.DeleteImageStoreCmd;
+import com.cloud.api.command.admin.storage.DeletePoolCmd;
+import com.cloud.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
+import com.cloud.api.command.admin.storage.UpdateStoragePoolCmd;
 import com.cloud.api.query.dao.TemplateJoinDao;
 import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.capacity.Capacity;
@@ -19,10 +26,36 @@ import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.engine.subsystem.api.storage.ClusterScope;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.DataStoreLifeCycle;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
+import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
+import com.cloud.engine.subsystem.api.storage.EndPointSelector;
+import com.cloud.engine.subsystem.api.storage.HostScope;
+import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
+import com.cloud.engine.subsystem.api.storage.ImageStoreProvider;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
+import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
+import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
+import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
+import com.cloud.engine.subsystem.api.storage.TemplateService;
+import com.cloud.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
+import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.engine.subsystem.api.storage.VolumeService;
+import com.cloud.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.AgentUnavailableException;
@@ -36,12 +69,17 @@ import com.cloud.exception.ResourceInUseException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageConflictException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.framework.async.AsyncCallFuture;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.org.Grouping;
 import com.cloud.org.Grouping.AllocationState;
 import com.cloud.resource.ResourceState;
@@ -60,6 +98,19 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreDetailsDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
+import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.datastore.db.VolumeDataStoreDao;
+import com.cloud.storage.datastore.db.VolumeDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.listener.StoragePoolMonitor;
 import com.cloud.storage.listener.VolumeStateListener;
 import com.cloud.template.TemplateManager;
@@ -92,57 +143,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
-import org.apache.cloudstack.api.command.admin.storage.CreateSecondaryStagingStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.CreateStoragePoolCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeleteImageStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeletePoolCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.UpdateStoragePoolCmd;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.ClusterScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreLifeCycle;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProviderManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
-import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.HypervisorHostListener;
-import org.apache.cloudstack.engine.subsystem.api.storage.ImageStoreProvider;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -836,7 +836,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
         final String oldUrl = secHost.getStorageUrl();
 
-        URI oldUri;
+        final URI oldUri;
         try {
             oldUri = new URI(UriUtils.encodeURIComponent(oldUrl));
             if (!oldUri.getScheme().equalsIgnoreCase(uri.getScheme())) {
@@ -1289,7 +1289,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                 continue;
             }
 
-            long volumeId = volumeOnImageStore.getVolumeId();
+            final long volumeId = volumeOnImageStore.getVolumeId();
             s_logger.debug("Removing download url " + volumeOnImageStore.getExtractUrl() + " for volume id " + volumeId);
 
             // Remove it from image store
@@ -1298,7 +1298,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
             // Now expunge it from DB since this entry was created only for download purpose
             _volumeStoreDao.expunge(volumeOnImageStore.getId());
-            Volume volume = _volumeDao.findById(volumeId);
+            final Volume volume = _volumeDao.findById(volumeId);
             if (volume != null && volume.getState() == Volume.State.Expunged) {
                 _volumeDao.remove(volumeId);
             }
@@ -1503,7 +1503,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         params.put("role", DataStoreRole.ImageCache);
 
         final DataStoreLifeCycle lifeCycle = storeProvider.getDataStoreLifeCycle();
-        DataStore store;
+        final DataStore store;
         try {
             store = lifeCycle.initialize(params);
         } catch (final Exception e) {
@@ -1584,7 +1584,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @Override
     @DB
     public PrimaryDataStoreInfo preparePrimaryStorageForMaintenance(final Long primaryStorageId) throws ResourceUnavailableException, InsufficientCapacityException {
-        StoragePoolVO primaryStorage;
+        final StoragePoolVO primaryStorage;
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
         if (primaryStorage == null) {
@@ -1610,7 +1610,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @DB
     public PrimaryDataStoreInfo cancelPrimaryStorageForMaintenance(final CancelPrimaryStorageMaintenanceCmd cmd) throws ResourceUnavailableException {
         final Long primaryStorageId = cmd.getId();
-        StoragePoolVO primaryStorage;
+        final StoragePoolVO primaryStorage;
 
         primaryStorage = _storagePoolDao.findById(primaryStorageId);
 
@@ -2035,8 +2035,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final List<Long> list = new ArrayList<>();
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs;
-            PreparedStatement pstmt;
+            final ResultSet rs;
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, storeId);
             rs = pstmt.executeQuery();
@@ -2054,8 +2054,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final String sql = "SELECT backup_snap_id FROM snapshots WHERE volume_id=? and backup_snap_id is not NULL";
         try {
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            ResultSet rs;
-            PreparedStatement pstmt;
+            final ResultSet rs;
+            final PreparedStatement pstmt;
             pstmt = txn.prepareAutoCloseStatement(sql);
             pstmt.setLong(1, volumeId);
             rs = pstmt.executeQuery();

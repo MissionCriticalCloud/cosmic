@@ -1,6 +1,6 @@
 package com.cloud.storage;
 
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStore;
 
 public interface StoragePoolAutomation {
     public boolean maintain(DataStore store);

@@ -1,18 +1,23 @@
 package com.cloud.network.guru;
 
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
@@ -51,11 +56,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -264,7 +264,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             nic.setIsolationUri(network.getBroadcastUri());
             nic.setIPv4Gateway(network.getGateway());
 
-            String guestIp;
+            final String guestIp;
             if (network.getSpecifyIpRanges()) {
                 _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, nic.getRequestedIPv4(), null);
             } else {

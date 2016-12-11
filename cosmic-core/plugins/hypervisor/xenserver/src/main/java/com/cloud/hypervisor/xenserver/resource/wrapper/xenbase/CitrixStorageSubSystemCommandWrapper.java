@@ -5,7 +5,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 
 @ResourceWrapper(handles = StorageSubSystemCommand.class)
 public final class CitrixStorageSubSystemCommandWrapper extends CommandWrapper<StorageSubSystemCommand, Answer, CitrixResourceBase> {

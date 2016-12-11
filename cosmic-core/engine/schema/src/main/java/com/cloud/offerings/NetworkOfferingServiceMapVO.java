@@ -1,9 +1,9 @@
 package com.cloud.offerings;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

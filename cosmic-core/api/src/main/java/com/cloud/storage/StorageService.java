@@ -1,17 +1,17 @@
 package com.cloud.storage;
 
+import com.cloud.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
+import com.cloud.api.command.admin.storage.CreateSecondaryStagingStoreCmd;
+import com.cloud.api.command.admin.storage.CreateStoragePoolCmd;
+import com.cloud.api.command.admin.storage.DeleteImageStoreCmd;
+import com.cloud.api.command.admin.storage.DeletePoolCmd;
+import com.cloud.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
+import com.cloud.api.command.admin.storage.UpdateStoragePoolCmd;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.exception.ResourceUnavailableException;
-import org.apache.cloudstack.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
-import org.apache.cloudstack.api.command.admin.storage.CreateSecondaryStagingStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.CreateStoragePoolCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeleteImageStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeletePoolCmd;
-import org.apache.cloudstack.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
-import org.apache.cloudstack.api.command.admin.storage.UpdateStoragePoolCmd;
 
 import java.net.UnknownHostException;
 import java.util.Map;

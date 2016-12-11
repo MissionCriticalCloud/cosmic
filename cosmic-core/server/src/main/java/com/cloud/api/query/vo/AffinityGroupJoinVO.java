@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.affinity.AffinityGroup;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.affinity.AffinityGroup;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

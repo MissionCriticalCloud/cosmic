@@ -1,7 +1,6 @@
 package com.cloud.api;
 
 import com.cloud.serializer.Param;
-import org.apache.cloudstack.api.BaseResponse;
 
 import com.google.gson.annotations.SerializedName;
 

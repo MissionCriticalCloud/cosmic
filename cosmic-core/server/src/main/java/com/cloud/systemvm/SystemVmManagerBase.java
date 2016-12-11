@@ -3,6 +3,7 @@ package com.cloud.systemvm;
 import static com.cloud.utils.CloudConstants.PROPERTY_LIST_SEPARATOR;
 
 import com.cloud.cluster.ClusterManager;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
@@ -25,7 +26,6 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.SystemVm;
 import com.cloud.vm.SystemVmLoadScanHandler;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.context.CallContext;
 
 import java.util.Date;
 import java.util.List;

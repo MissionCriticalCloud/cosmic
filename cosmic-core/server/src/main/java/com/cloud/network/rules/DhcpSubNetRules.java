@@ -1,5 +1,6 @@
 package com.cloud.network.rules;
 
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.Vlan;
@@ -16,6 +17,7 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.router.VirtualRouter;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.user.Account;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
@@ -32,8 +34,6 @@ import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicIpAliasVO;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

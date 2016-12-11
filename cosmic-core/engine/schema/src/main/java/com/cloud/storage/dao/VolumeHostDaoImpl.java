@@ -1,14 +1,14 @@
 package com.cloud.storage.dao;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.storage.VolumeHostVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.UpdateBuilder;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import java.util.Date;
 import java.util.List;

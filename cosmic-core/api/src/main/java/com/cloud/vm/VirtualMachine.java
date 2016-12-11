@@ -1,14 +1,14 @@
 package com.cloud.vm;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Displayable;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateMachine2.Transition;
 import com.cloud.utils.fsm.StateMachine2.Transition.Impact;
 import com.cloud.utils.fsm.StateObject;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Displayable;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.Arrays;
 import java.util.Date;

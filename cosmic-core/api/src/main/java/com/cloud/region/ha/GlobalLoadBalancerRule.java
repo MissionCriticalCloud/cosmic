@@ -1,8 +1,8 @@
 package com.cloud.region.ha;
 
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 /**
  * GlobalLoadBalancerRule defines a global (multi zone) load balancing configuration.

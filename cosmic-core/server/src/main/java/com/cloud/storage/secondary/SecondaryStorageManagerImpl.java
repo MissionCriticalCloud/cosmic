@@ -31,10 +31,16 @@ import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -68,6 +74,10 @@ import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.dao.VMTemplateDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;
@@ -96,16 +106,6 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -377,7 +377,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         buf.append(" workers=").append(_configDao.getValue("workers"));
 
-        buf.append(" resource=org.apache.cloudstack.storage.resource.NfsSecondaryStorageResource");
+        buf.append(" resource=com.cloud.storage.resource.NfsSecondaryStorageResource");
         buf.append(" instance=SecStorage");
         buf.append(" sslcopy=").append(Boolean.toString(_useSSlCopy));
         buf.append(" role=").append(vm.getRole().toString());
@@ -947,13 +947,13 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
         _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
         if (_allowedInternalSites != null) {
-            List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedInternalSites);
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedInternalSites);
             setupCmd.setAllowedInternalSites(allowedCidrs.toArray(new String[allowedCidrs.size()]));
         }
 
         _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
         if (_allowedExternalCidrs != null) {
-            List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedExternalCidrs);
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedExternalCidrs);
             setupCmd.setAllowedExternalCidrs(allowedCidrs.toArray(new String[allowedCidrs.size()]));
         }
 
@@ -970,7 +970,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
     }
 
-    private List<String> GenerateAllowedCidrs(String cidrList) {
+    private List<String> GenerateAllowedCidrs(final String cidrList) {
         final List<String> allowedCidrs = new ArrayList<>();
         final String[] cidrs = cidrList.split(",");
         for (final String cidr : cidrs) {
@@ -1004,7 +1004,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                     continue; // only do this for Nfs
                 }
                 final String secUrl = ssStore.getUri();
-                SecStorageSetupCommand setupCmd;
+                final SecStorageSetupCommand setupCmd;
                 if (!_useSSlCopy) {
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, null);
                 } else {
@@ -1079,7 +1079,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         final NetworkVO defaultNetwork = getDefaultNetworkForCreation(dc);
 
-        List<? extends NetworkOffering> offerings;
+        final List<? extends NetworkOffering> offerings;
         if (_sNwMgr.isStorageIpRangeAvailable(dataCenterId)) {
             offerings = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork, NetworkOffering
                     .SystemStorageNetwork);
@@ -1101,7 +1101,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return new HashMap<>();
         }
 
-        VMTemplateVO template;
+        final VMTemplateVO template;
         final HypervisorType availableHypervisor = _resourceMgr.getAvailableHypervisor(dataCenterId);
         template = _templateDao.findSystemVMReadyTemplate(dataCenterId, availableHypervisor);
         if (template == null) {

@@ -2,6 +2,7 @@ package com.cloud.servlet;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.PermissionDeniedException;
+import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.host.HostVO;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.GuestOSVO;
@@ -17,7 +18,6 @@ import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDetailsDao;
-import org.apache.cloudstack.framework.security.keys.KeysManager;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

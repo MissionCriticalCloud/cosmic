@@ -1,7 +1,7 @@
 package com.cloud.consoleproxy.util;
 
-import org.apache.cloudstack.utils.security.SSLUtils;
-import org.apache.cloudstack.utils.security.SecureSSLSocketFactory;
+import com.cloud.security.SSLUtils;
+import com.cloud.security.SecureSSLSocketFactory;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;

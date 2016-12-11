@@ -1,8 +1,8 @@
 package com.cloud.hypervisor;
 
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 /**
  * HypervisorCapability represents one particular hypervisor version's capabilities.

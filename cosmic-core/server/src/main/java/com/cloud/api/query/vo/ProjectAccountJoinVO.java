@@ -1,7 +1,7 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.projects.ProjectAccount.Role;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

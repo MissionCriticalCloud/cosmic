@@ -1,5 +1,8 @@
 package com.cloud.storage.dao;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
@@ -9,9 +12,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

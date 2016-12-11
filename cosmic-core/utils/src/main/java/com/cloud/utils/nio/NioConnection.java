@@ -2,9 +2,9 @@ package com.cloud.utils.nio;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
+import com.cloud.security.SSLUtils;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.NioConnectionException;
-import org.apache.cloudstack.utils.security.SSLUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;

@@ -4,51 +4,51 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registryBeanName" value="dataStoreProviderManager" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.DataStoreProvider" />
+                  value="com.cloud.engine.subsystem.api.storage.DataStoreProvider" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="storagePoolAllocatorsRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator" />
+                  value="com.cloud.engine.subsystem.api.storage.StoragePoolAllocator" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="secondaryStorageVmAllocatorsRegistry" />
         <property name="typeClass"
                   value="com.cloud.storage.secondary.SecondaryStorageVmAllocator" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="templateAdapterRegistry" />
         <property name="typeClass" value="com.cloud.template.TemplateAdapter" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="podAllocatorsRegistry" />
         <property name="typeClass"
                   value="com.cloud.agent.manager.allocator.PodAllocator" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="snapshotStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.SnapshotStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.SnapshotStrategy" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="vmSnapshotStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="dataMotionStrategiesRegistry" />
         <property name="typeClass"
-                  value="org.apache.cloudstack.engine.subsystem.api.storage.DataMotionStrategy" />
+                  value="com.cloud.engine.subsystem.api.storage.DataMotionStrategy" />
     </bean>
 
 </beans>

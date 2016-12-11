@@ -1,8 +1,8 @@
 package com.cloud.network.dao;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

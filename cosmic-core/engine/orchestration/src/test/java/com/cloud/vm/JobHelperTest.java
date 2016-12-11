@@ -3,9 +3,9 @@ package com.cloud.vm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.vm.VirtualMachineManagerImpl.JobHelper;
-import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
 
 import org.junit.Test;
 

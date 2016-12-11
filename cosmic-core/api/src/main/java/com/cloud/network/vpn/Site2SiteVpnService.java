@@ -1,22 +1,22 @@
 package com.cloud.network.vpn;
 
+import com.cloud.api.command.user.vpn.CreateVpnConnectionCmd;
+import com.cloud.api.command.user.vpn.CreateVpnCustomerGatewayCmd;
+import com.cloud.api.command.user.vpn.CreateVpnGatewayCmd;
+import com.cloud.api.command.user.vpn.DeleteVpnConnectionCmd;
+import com.cloud.api.command.user.vpn.DeleteVpnCustomerGatewayCmd;
+import com.cloud.api.command.user.vpn.DeleteVpnGatewayCmd;
+import com.cloud.api.command.user.vpn.ListVpnConnectionsCmd;
+import com.cloud.api.command.user.vpn.ListVpnCustomerGatewaysCmd;
+import com.cloud.api.command.user.vpn.ListVpnGatewaysCmd;
+import com.cloud.api.command.user.vpn.ResetVpnConnectionCmd;
+import com.cloud.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.command.user.vpn.CreateVpnConnectionCmd;
-import org.apache.cloudstack.api.command.user.vpn.CreateVpnCustomerGatewayCmd;
-import org.apache.cloudstack.api.command.user.vpn.CreateVpnGatewayCmd;
-import org.apache.cloudstack.api.command.user.vpn.DeleteVpnConnectionCmd;
-import org.apache.cloudstack.api.command.user.vpn.DeleteVpnCustomerGatewayCmd;
-import org.apache.cloudstack.api.command.user.vpn.DeleteVpnGatewayCmd;
-import org.apache.cloudstack.api.command.user.vpn.ListVpnConnectionsCmd;
-import org.apache.cloudstack.api.command.user.vpn.ListVpnCustomerGatewaysCmd;
-import org.apache.cloudstack.api.command.user.vpn.ListVpnGatewaysCmd;
-import org.apache.cloudstack.api.command.user.vpn.ResetVpnConnectionCmd;
-import org.apache.cloudstack.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
 
 import java.util.List;
 

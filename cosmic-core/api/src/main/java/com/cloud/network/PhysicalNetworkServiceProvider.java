@@ -1,7 +1,7 @@
 package com.cloud.network;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.network.Network.Service;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
 package com.cloud.dc.dao;
 
+import com.cloud.api.ResourceDetail;
 import com.cloud.dc.DataCenterDetailVO;
-import org.apache.cloudstack.api.ResourceDetail;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.ConfigKey.Scope;
-import org.apache.cloudstack.framework.config.ScopedConfigStorage;
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.ConfigKey.Scope;
+import com.cloud.framework.config.ScopedConfigStorage;
+import com.cloud.resourcedetail.ResourceDetailsDaoBase;
 
 public class DataCenterDetailsDaoImpl extends ResourceDetailsDaoBase<DataCenterDetailVO> implements DataCenterDetailsDao, ScopedConfigStorage {
 

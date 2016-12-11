@@ -1,5 +1,49 @@
 package com.cloud.api.query;
 
+import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.affinity.AffinityGroupDomainMapVO;
+import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.affinity.AffinityGroupVMMapVO;
+import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
+import com.cloud.affinity.dao.AffinityGroupVMMapDao;
+import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
+import com.cloud.api.ResourceDetail;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
+import com.cloud.api.command.admin.domain.ListDomainsCmd;
+import com.cloud.api.command.admin.domain.ListDomainsCmdByAdmin;
+import com.cloud.api.command.admin.host.ListHostTagsCmd;
+import com.cloud.api.command.admin.host.ListHostsCmd;
+import com.cloud.api.command.admin.internallb.ListInternalLBVMsCmd;
+import com.cloud.api.command.admin.iso.ListIsosCmdByAdmin;
+import com.cloud.api.command.admin.router.ListRoutersCmd;
+import com.cloud.api.command.admin.storage.ListImageStoresCmd;
+import com.cloud.api.command.admin.storage.ListSecondaryStagingStoresCmd;
+import com.cloud.api.command.admin.storage.ListStoragePoolsCmd;
+import com.cloud.api.command.admin.storage.ListStorageTagsCmd;
+import com.cloud.api.command.admin.template.ListTemplatesCmdByAdmin;
+import com.cloud.api.command.admin.user.ListUsersCmd;
+import com.cloud.api.command.admin.vm.ListVMsCmdByAdmin;
+import com.cloud.api.command.admin.volume.ListVolumesCmdByAdmin;
+import com.cloud.api.command.admin.zone.ListZonesCmdByAdmin;
+import com.cloud.api.command.user.account.ListAccountsCmd;
+import com.cloud.api.command.user.account.ListProjectAccountsCmd;
+import com.cloud.api.command.user.affinitygroup.ListAffinityGroupsCmd;
+import com.cloud.api.command.user.event.ListEventsCmd;
+import com.cloud.api.command.user.iso.ListIsosCmd;
+import com.cloud.api.command.user.job.ListAsyncJobsCmd;
+import com.cloud.api.command.user.offering.ListDiskOfferingsCmd;
+import com.cloud.api.command.user.offering.ListServiceOfferingsCmd;
+import com.cloud.api.command.user.project.ListProjectInvitationsCmd;
+import com.cloud.api.command.user.project.ListProjectsCmd;
+import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
+import com.cloud.api.command.user.tag.ListTagsCmd;
+import com.cloud.api.command.user.template.ListTemplatesCmd;
+import com.cloud.api.command.user.vm.ListVMsCmd;
+import com.cloud.api.command.user.vmgroup.ListVMGroupsCmd;
+import com.cloud.api.command.user.volume.ListResourceDetailsCmd;
+import com.cloud.api.command.user.volume.ListVolumesCmd;
+import com.cloud.api.command.user.zone.ListZonesCmd;
 import com.cloud.api.query.dao.AccountJoinDao;
 import com.cloud.api.query.dao.AffinityGroupJoinDao;
 import com.cloud.api.query.dao.AsyncJobJoinDao;
@@ -47,16 +91,50 @@ import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.AsyncJobResponse;
+import com.cloud.api.response.DiskOfferingResponse;
+import com.cloud.api.response.DomainResponse;
+import com.cloud.api.response.DomainRouterResponse;
+import com.cloud.api.response.EventResponse;
+import com.cloud.api.response.HostResponse;
+import com.cloud.api.response.HostTagResponse;
+import com.cloud.api.response.ImageStoreResponse;
+import com.cloud.api.response.InstanceGroupResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.ProjectAccountResponse;
+import com.cloud.api.response.ProjectInvitationResponse;
+import com.cloud.api.response.ProjectResponse;
+import com.cloud.api.response.ResourceDetailResponse;
+import com.cloud.api.response.ResourceTagResponse;
+import com.cloud.api.response.SecurityGroupResponse;
+import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.api.response.StoragePoolResponse;
+import com.cloud.api.response.StorageTagResponse;
+import com.cloud.api.response.TemplateResponse;
+import com.cloud.api.response.UserResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.api.response.VolumeResponse;
+import com.cloud.api.response.ZoneResponse;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DataCenterDetailsDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreCapabilities;
+import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.TemplateState;
 import com.cloud.event.dao.EventJoinDao;
 import com.cloud.exception.CloudAuthenticationException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -70,6 +148,7 @@ import com.cloud.projects.ProjectInvitation;
 import com.cloud.projects.ProjectManager;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.query.QueryService;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ResourceMetaDataService;
 import com.cloud.server.ResourceTag;
@@ -112,85 +191,6 @@ import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
-import org.apache.cloudstack.affinity.AffinityGroupDomainMapVO;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
-import org.apache.cloudstack.affinity.AffinityGroupVMMapVO;
-import org.apache.cloudstack.affinity.dao.AffinityGroupDomainMapDao;
-import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
-import org.apache.cloudstack.api.BaseListProjectAndAccountResourcesCmd;
-import org.apache.cloudstack.api.ResourceDetail;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.command.admin.account.ListAccountsCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmd;
-import org.apache.cloudstack.api.command.admin.domain.ListDomainsCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.host.ListHostTagsCmd;
-import org.apache.cloudstack.api.command.admin.host.ListHostsCmd;
-import org.apache.cloudstack.api.command.admin.internallb.ListInternalLBVMsCmd;
-import org.apache.cloudstack.api.command.admin.iso.ListIsosCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.router.ListRoutersCmd;
-import org.apache.cloudstack.api.command.admin.storage.ListImageStoresCmd;
-import org.apache.cloudstack.api.command.admin.storage.ListSecondaryStagingStoresCmd;
-import org.apache.cloudstack.api.command.admin.storage.ListStoragePoolsCmd;
-import org.apache.cloudstack.api.command.admin.storage.ListStorageTagsCmd;
-import org.apache.cloudstack.api.command.admin.template.ListTemplatesCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.user.ListUsersCmd;
-import org.apache.cloudstack.api.command.admin.vm.ListVMsCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.volume.ListVolumesCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.zone.ListZonesCmdByAdmin;
-import org.apache.cloudstack.api.command.user.account.ListAccountsCmd;
-import org.apache.cloudstack.api.command.user.account.ListProjectAccountsCmd;
-import org.apache.cloudstack.api.command.user.affinitygroup.ListAffinityGroupsCmd;
-import org.apache.cloudstack.api.command.user.event.ListEventsCmd;
-import org.apache.cloudstack.api.command.user.iso.ListIsosCmd;
-import org.apache.cloudstack.api.command.user.job.ListAsyncJobsCmd;
-import org.apache.cloudstack.api.command.user.offering.ListDiskOfferingsCmd;
-import org.apache.cloudstack.api.command.user.offering.ListServiceOfferingsCmd;
-import org.apache.cloudstack.api.command.user.project.ListProjectInvitationsCmd;
-import org.apache.cloudstack.api.command.user.project.ListProjectsCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.ListSecurityGroupsCmd;
-import org.apache.cloudstack.api.command.user.tag.ListTagsCmd;
-import org.apache.cloudstack.api.command.user.template.ListTemplatesCmd;
-import org.apache.cloudstack.api.command.user.vm.ListVMsCmd;
-import org.apache.cloudstack.api.command.user.vmgroup.ListVMGroupsCmd;
-import org.apache.cloudstack.api.command.user.volume.ListResourceDetailsCmd;
-import org.apache.cloudstack.api.command.user.volume.ListVolumesCmd;
-import org.apache.cloudstack.api.command.user.zone.ListZonesCmd;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.DiskOfferingResponse;
-import org.apache.cloudstack.api.response.DomainResponse;
-import org.apache.cloudstack.api.response.DomainRouterResponse;
-import org.apache.cloudstack.api.response.EventResponse;
-import org.apache.cloudstack.api.response.HostResponse;
-import org.apache.cloudstack.api.response.HostTagResponse;
-import org.apache.cloudstack.api.response.ImageStoreResponse;
-import org.apache.cloudstack.api.response.InstanceGroupResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.ProjectAccountResponse;
-import org.apache.cloudstack.api.response.ProjectInvitationResponse;
-import org.apache.cloudstack.api.response.ProjectResponse;
-import org.apache.cloudstack.api.response.ResourceDetailResponse;
-import org.apache.cloudstack.api.response.ResourceTagResponse;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
-import org.apache.cloudstack.api.response.ServiceOfferingResponse;
-import org.apache.cloudstack.api.response.StoragePoolResponse;
-import org.apache.cloudstack.api.response.StorageTagResponse;
-import org.apache.cloudstack.api.response.TemplateResponse;
-import org.apache.cloudstack.api.response.UserResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.api.response.VolumeResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreCapabilities;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreDriver;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateState;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.query.QueryService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -315,8 +315,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
      * (non-Javadoc)
      *
      * @see
-     * com.cloud.api.query.QueryService#searchForUsers(org.apache.cloudstack
-     * .api.command.admin.user.ListUsersCmd)
+     * com.cloud.api.query.QueryService#searchForUsers(com.cloud.api.command.admin.user.ListUsersCmd)
      */
     @Override
     public ListResponse<UserResponse> searchForUsers(final ListUsersCmd cmd) throws PermissionDeniedException {
@@ -722,7 +721,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Filter searchFilter = new Filter(UserVmJoinVO.class, "id", true, cmd.getStartIndex(),
                 cmd.getPageSizeVal());
 
-        List<Long> ids;
+        final List<Long> ids;
         if (cmd.getId() != null) {
             if (cmd.getIds() != null && !cmd.getIds().isEmpty()) {
                 throw new InvalidParameterValueException("Specify either id or ids but not both parameters");
@@ -2248,7 +2247,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        List<Long> domainIds;
+        final List<Long> domainIds;
         // For non-root users, only return all offerings for the user's domain,
         // and everything above till root
         if (_accountMgr.isNormalUser(account.getId()) || _accountMgr.isDomainAdmin(account.getId())
@@ -2384,7 +2383,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Long domainId = cmd.getDomainId();
         final Boolean isSystem = cmd.getIsSystem();
         final String vmTypeStr = cmd.getSystemVmType();
-        ServiceOfferingVO currentVmOffering;
+        final ServiceOfferingVO currentVmOffering;
         final Boolean isRecursive = cmd.isRecursive();
 
         final SearchCriteria<ServiceOfferingJoinVO> sc = _srvOfferingJoinDao.createSearchCriteria();
@@ -2784,7 +2783,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
         }
 
-        VMTemplateVO template;
+        final VMTemplateVO template;
 
         Boolean isAscending = Boolean.parseBoolean(_configDao.getValue("sortkey.algorithm"));
         isAscending = isAscending == null ? Boolean.TRUE : isAscending;
@@ -2826,7 +2825,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             sc.addAnd("id", SearchCriteria.Op.EQ, templateId);
         } else {
 
-            DomainVO domain;
+            final DomainVO domain;
             if (!permittedAccounts.isEmpty()) {
                 domain = _domainDao.findById(permittedAccounts.get(0).getDomainId());
             } else {
@@ -2921,8 +2920,8 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                     scc.addOr("accountId", SearchCriteria.Op.IN, permittedAccountIds.toArray());
                 }
                 sc.addAnd("publicTemplate", SearchCriteria.Op.SC, scc);
-            } else if (templateFilter == TemplateFilter.all && caller.getType() != Account.ACCOUNT_TYPE_ADMIN ){
-                SearchCriteria<TemplateJoinVO> scc = _templateJoinDao.createSearchCriteria();
+            } else if (templateFilter == TemplateFilter.all && caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
+                final SearchCriteria<TemplateJoinVO> scc = _templateJoinDao.createSearchCriteria();
                 scc.addOr("publicTemplate", SearchCriteria.Op.EQ, true);
 
                 if (listProjectResourcesCriteria == ListProjectResourcesCriteria.SkipProjectResources) {
@@ -3009,7 +3008,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         // sc.addAnd("removed", SearchCriteria.Op.NULL);
 
         // search unique templates and find details by Ids
-        Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair;
+        final Pair<List<TemplateJoinVO>, Integer> uniqueTmplPair;
         if (showRemovedTmpl) {
             uniqueTmplPair = _templateJoinDao.searchIncludingRemovedAndCount(sc, searchFilter);
         } else {

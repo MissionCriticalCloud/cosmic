@@ -1,5 +1,12 @@
 package com.cloud.network;
 
+import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
+import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
+import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
+import com.cloud.api.command.user.network.CreateNetworkCmd;
+import com.cloud.api.command.user.network.ListNetworksCmd;
+import com.cloud.api.command.user.network.RestartNetworkCmd;
+import com.cloud.api.command.user.vm.ListNicsCmd;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -13,13 +20,6 @@ import com.cloud.user.User;
 import com.cloud.utils.Pair;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
-import org.apache.cloudstack.api.command.admin.network.DedicateGuestVlanRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import org.apache.cloudstack.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
-import org.apache.cloudstack.api.command.user.network.CreateNetworkCmd;
-import org.apache.cloudstack.api.command.user.network.ListNetworksCmd;
-import org.apache.cloudstack.api.command.user.network.RestartNetworkCmd;
-import org.apache.cloudstack.api.command.user.vm.ListNicsCmd;
 
 import java.util.List;
 import java.util.Map;

@@ -1,10 +1,10 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.VolumeJoinVO;
+import com.cloud.api.response.VolumeResponse;
 import com.cloud.storage.Volume;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.VolumeResponse;
 
 import java.util.List;
 

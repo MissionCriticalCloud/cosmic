@@ -1,18 +1,18 @@
 package com.cloud.template;
 
 import com.cloud.dc.DataCenterVO;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import java.util.List;
 

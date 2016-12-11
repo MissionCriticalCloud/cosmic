@@ -1,8 +1,8 @@
 package com.cloud.network.security;
 
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 //FIXME: Annotation @doc("")
 public interface SecurityGroup extends ControlledEntity, InternalIdentity, Identity {

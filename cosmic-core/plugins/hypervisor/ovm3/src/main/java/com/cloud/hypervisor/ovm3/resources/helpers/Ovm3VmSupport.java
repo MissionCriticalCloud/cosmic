@@ -31,8 +31,8 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.storage.Volume;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.HashMap;
 import java.util.List;

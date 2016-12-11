@@ -4,12 +4,12 @@ import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.network.NetworkModel;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.UrlUtil;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

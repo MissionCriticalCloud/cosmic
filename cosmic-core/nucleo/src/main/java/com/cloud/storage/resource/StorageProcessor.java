@@ -1,14 +1,14 @@
 package com.cloud.storage.resource;
 
 import com.cloud.agent.api.Answer;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.CreateObjectCommand;
-import org.apache.cloudstack.storage.command.DeleteCommand;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.ForgetObjectCmd;
-import org.apache.cloudstack.storage.command.IntroduceObjectCmd;
-import org.apache.cloudstack.storage.command.SnapshotAndCopyCommand;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.CreateObjectCommand;
+import com.cloud.storage.command.DeleteCommand;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.ForgetObjectCmd;
+import com.cloud.storage.command.IntroduceObjectCmd;
+import com.cloud.storage.command.SnapshotAndCopyCommand;
 
 public interface StorageProcessor {
     public Answer copyTemplateToPrimaryStorage(CopyCommand cmd);

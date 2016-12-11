@@ -13,7 +13,7 @@
   If you found that the Manager or Adapter are not properly documented, please contact
   the author. -->
 <components.xml>
-    <management-server class="com.vmops.server.ManagementServerImpl">
+    <management-server class="com.cloud.server.ManagementServerImpl">
         <dao name="domain router" class="com.cloud.vm.dao.DomainRouterDaoImpl" />
         <dao name="host" class="com.cloud.host.dao.HostDaoImpl" />
         <dao name="VM Instance" class="com.cloud.vm.dao.VMInstanceDaoImpl" />
@@ -98,7 +98,7 @@
         </adapters>
         <adapters key="com.cloud.agent.manager.allocator.StorageAllocator">
             <adapter name="Storage"
-                     class="org.apache.cloudstack.storage.allocator.RandomStoragePoolAllocator">
+                     class="RandomStoragePoolAllocator">
                 <param name="storage.overprovisioning.factor">2</param>
             </adapter>
         </adapters>

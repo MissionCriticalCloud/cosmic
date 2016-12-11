@@ -24,10 +24,10 @@
             </list>
         </property>
     </bean>
-    <bean id="ApplicationLoadBalancerManager" class="org.apache.cloudstack.network.lb.ApplicationLoadBalancerManagerImpl">
+    <bean id="ApplicationLoadBalancerManager" class="com.cloud.network.lb.ApplicationLoadBalancerManagerImpl">
         <property name="name" value="ApplicationLoadBalancerManager" />
     </bean>
 
-    <bean class="org.apache.cloudstack.lb.ChildTestConfiguration" />
+    <bean class="com.cloud.lb.ChildTestConfiguration" />
 
 </beans>

@@ -1,7 +1,7 @@
 package com.cloud.vm.snapshot;
 
+import com.cloud.engine.subsystem.api.storage.VMSnapshotOptions;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.engine.subsystem.api.storage.VMSnapshotOptions;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

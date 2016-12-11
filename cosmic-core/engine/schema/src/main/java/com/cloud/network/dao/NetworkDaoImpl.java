@@ -1,5 +1,6 @@
 package com.cloud.network.dao;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Event;
 import com.cloud.network.Network.GuestType;
@@ -26,7 +27,6 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.SequenceFetcher;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

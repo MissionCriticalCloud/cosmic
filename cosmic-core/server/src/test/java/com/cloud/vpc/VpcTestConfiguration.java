@@ -19,6 +19,7 @@ import com.cloud.dc.dao.PodVlanMapDaoImpl;
 import com.cloud.dc.dao.VlanDaoImpl;
 import com.cloud.domain.dao.DomainDaoImpl;
 import com.cloud.event.dao.UsageEventDao;
+import com.cloud.framework.config.dao.ConfigurationDaoImpl;
 import com.cloud.host.dao.HostDaoImpl;
 import com.cloud.host.dao.HostDetailsDaoImpl;
 import com.cloud.host.dao.HostTagsDaoImpl;
@@ -58,6 +59,7 @@ import com.cloud.storage.dao.VMTemplateHostDaoImpl;
 import com.cloud.storage.dao.VMTemplateZoneDaoImpl;
 import com.cloud.storage.dao.VolumeDaoImpl;
 import com.cloud.tags.dao.ResourceTagsDaoImpl;
+import com.cloud.test.utils.SpringUtils;
 import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDaoImpl;
 import com.cloud.user.dao.UserStatisticsDaoImpl;
@@ -74,8 +76,6 @@ import com.cloud.vpc.dao.MockNetworkServiceMapDaoImpl;
 import com.cloud.vpc.dao.MockVpcDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingDaoImpl;
 import com.cloud.vpc.dao.MockVpcOfferingServiceMapDaoImpl;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDaoImpl;
-import org.apache.cloudstack.test.utils.SpringUtils;
 
 import java.io.IOException;
 

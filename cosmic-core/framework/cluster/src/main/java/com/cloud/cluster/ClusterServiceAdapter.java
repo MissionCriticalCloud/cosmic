@@ -1,7 +1,7 @@
 package com.cloud.cluster;
 
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.utils.component.Adapter;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.rmi.RemoteException;
 

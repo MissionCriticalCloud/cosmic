@@ -13,7 +13,18 @@ import com.cloud.agent.api.storage.UploadProgressCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiSerializerHelper;
+import com.cloud.api.command.user.iso.ExtractIsoCmd;
+import com.cloud.api.command.user.template.ExtractTemplateCmd;
+import com.cloud.api.command.user.volume.ExtractVolumeCmd;
+import com.cloud.api.response.ExtractResponse;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
+import com.cloud.engine.subsystem.api.storage.EndPointSelector;
+import com.cloud.framework.async.AsyncCompletionCallback;
+import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.host.Host;
+import com.cloud.jobs.JobInfo;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Upload.Status;
 import com.cloud.storage.Upload.Type;
@@ -21,17 +32,6 @@ import com.cloud.storage.UploadVO;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.upload.UploadState.UploadEvent;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.api.command.user.iso.ExtractIsoCmd;
-import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
-import org.apache.cloudstack.api.command.user.volume.ExtractVolumeCmd;
-import org.apache.cloudstack.api.response.ExtractResponse;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
-import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.apache.cloudstack.jobs.JobInfo;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -109,7 +109,7 @@ public class UploadListener implements Listener {
         this.eventId = eventId;
         this.asyncJobId = asyncJobId;
         this.asyncMgr = asyncMgr;
-        String extractId;
+        final String extractId;
         if (type == Type.VOLUME) {
             extractId = ApiDBUtils.findVolumeById(uploadObj.getTypeId()).getUuid();
         } else {

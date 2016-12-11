@@ -2,14 +2,14 @@ package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.command.AttachPrimaryDataStoreCmd;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.CreateObjectCommand;
-import org.apache.cloudstack.storage.command.CreatePrimaryDataStoreCmd;
-import org.apache.cloudstack.storage.command.DeleteCommand;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.command.AttachPrimaryDataStoreCmd;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.CreateObjectCommand;
+import com.cloud.storage.command.CreatePrimaryDataStoreCmd;
+import com.cloud.storage.command.DeleteCommand;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 
 public class KvmStorageResource {
 

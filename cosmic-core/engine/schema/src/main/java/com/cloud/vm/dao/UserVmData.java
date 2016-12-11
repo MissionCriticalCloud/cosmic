@@ -1,6 +1,6 @@
 package com.cloud.vm.dao;
 
-import org.apache.cloudstack.api.response.SecurityGroupRuleResponse;
+import com.cloud.api.response.SecurityGroupRuleResponse;
 
 import java.util.Date;
 import java.util.HashSet;

@@ -1,8 +1,8 @@
 package com.cloud.api.dispatch;
 
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.Parameter;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.BaseCmd;
+import com.cloud.api.Parameter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

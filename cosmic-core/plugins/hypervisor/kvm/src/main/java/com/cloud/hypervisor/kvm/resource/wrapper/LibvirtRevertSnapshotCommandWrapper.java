@@ -12,10 +12,10 @@ import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.storage.command.RevertSnapshotCommand;
-import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
-import org.apache.cloudstack.storage.to.SnapshotObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.command.RevertSnapshotCommand;
+import com.cloud.storage.to.PrimaryDataStoreTO;
+import com.cloud.storage.to.SnapshotObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.io.File;
 

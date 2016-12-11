@@ -7,6 +7,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
+import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
+import com.cloud.api.command.admin.network.ReleaseDedicatedGuestVlanRangeCmd;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.dao.DataCenterVnetDao;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
@@ -21,10 +25,6 @@ import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
-import org.apache.cloudstack.api.command.admin.network.DedicateGuestVlanRangeCmd;
-import org.apache.cloudstack.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import org.apache.cloudstack.api.command.admin.network.ReleaseDedicatedGuestVlanRangeCmd;
-import org.apache.cloudstack.context.CallContext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

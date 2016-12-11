@@ -4,11 +4,11 @@
                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.RegistryLifecycle">
+    <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
         <property name="registry" ref="scopedConfigStorageRegistry" />
-        <property name="typeClass" value="org.apache.cloudstack.framework.config.ScopedConfigStorage" />
+        <property name="typeClass" value="com.cloud.framework.config.ScopedConfigStorage" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.ConfigDepotLifeCycle" />
+    <bean class="com.cloud.spring.lifecycle.ConfigDepotLifeCycle" />
 
 </beans>

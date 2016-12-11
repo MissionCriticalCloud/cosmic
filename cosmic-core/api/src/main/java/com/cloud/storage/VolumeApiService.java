@@ -1,17 +1,17 @@
 package com.cloud.storage;
 
+import com.cloud.api.command.user.volume.AttachVolumeCmd;
+import com.cloud.api.command.user.volume.CreateVolumeCmd;
+import com.cloud.api.command.user.volume.DetachVolumeCmd;
+import com.cloud.api.command.user.volume.ExtractVolumeCmd;
+import com.cloud.api.command.user.volume.GetUploadParamsForVolumeCmd;
+import com.cloud.api.command.user.volume.MigrateVolumeCmd;
+import com.cloud.api.command.user.volume.ResizeVolumeCmd;
+import com.cloud.api.command.user.volume.UploadVolumeCmd;
+import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.command.user.volume.AttachVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.CreateVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.DetachVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.ExtractVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.GetUploadParamsForVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.MigrateVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.ResizeVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.UploadVolumeCmd;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
 
 import java.net.MalformedURLException;
 

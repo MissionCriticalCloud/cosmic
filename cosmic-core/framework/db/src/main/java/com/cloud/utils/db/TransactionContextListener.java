@@ -1,6 +1,6 @@
 package com.cloud.utils.db;
 
-import org.apache.cloudstack.managed.context.ManagedContextListener;
+import com.cloud.managed.context.ManagedContextListener;
 
 public class TransactionContextListener implements ManagedContextListener<TransactionLegacy> {
 

@@ -2,17 +2,17 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.DataCenterJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
+import com.cloud.api.response.ResourceTagResponse;
+import com.cloud.api.response.ZoneResponse;
 import com.cloud.dc.DataCenter;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.ResourceTagResponse;
-import org.apache.cloudstack.api.response.ZoneResponse;
 
 import javax.inject.Inject;
 import java.util.List;

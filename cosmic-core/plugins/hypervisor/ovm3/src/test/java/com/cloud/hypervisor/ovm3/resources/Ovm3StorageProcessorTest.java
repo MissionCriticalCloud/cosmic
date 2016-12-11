@@ -15,14 +15,14 @@ import com.cloud.hypervisor.ovm3.resources.helpers.Ovm3ConfigurationTest;
 import com.cloud.hypervisor.ovm3.support.Ovm3SupportTest;
 import com.cloud.storage.Volume;
 import com.cloud.vm.DiskProfile;
-import org.apache.cloudstack.storage.command.CopyCmdAnswer;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.CreateObjectCommand;
-import org.apache.cloudstack.storage.command.DeleteCommand;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.to.SnapshotObjectTO;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.command.CopyCmdAnswer;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.CreateObjectCommand;
+import com.cloud.storage.command.DeleteCommand;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.to.SnapshotObjectTO;
+import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.naming.ConfigurationException;
 

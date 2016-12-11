@@ -1,12 +1,12 @@
 package com.cloud.storage.template;
 
+import com.cloud.imagestore.ImageStoreUtil;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.storage.StorageLayer;
+import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.utils.Pair;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.net.Proxy;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.command.DownloadCommand.ResourceType;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -214,7 +214,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                 remoteSize = maxTemplateSizeInBytes;
             }
 
-            InputStream in = request.getResponseBodyAsStream();
+            final InputStream in = request.getResponseBodyAsStream();
 
             final RandomAccessFile out = new RandomAccessFile(file, "rw");
             out.seek(localFileSize);

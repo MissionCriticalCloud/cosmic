@@ -1,6 +1,9 @@
 package com.cloud.network.element;
 
 import com.cloud.agent.api.to.LoadBalancerTO;
+import com.cloud.api.command.admin.router.ConfigureVirtualRouterElementCmd;
+import com.cloud.api.command.admin.router.CreateVirtualRouterElementCmd;
+import com.cloud.api.command.admin.router.ListVirtualRouterElementsCmd;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
@@ -12,6 +15,7 @@ import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -39,6 +43,8 @@ import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
+import com.cloud.network.router.deployment.RouterDeploymentDefinition;
+import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
@@ -46,6 +52,8 @@ import com.cloud.network.rules.LoadBalancerContainer;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
+import com.cloud.network.topology.NetworkTopology;
+import com.cloud.network.topology.NetworkTopologyContext;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -67,12 +75,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.UserVmDao;
-import org.apache.cloudstack.api.command.admin.router.ConfigureVirtualRouterElementCmd;
-import org.apache.cloudstack.api.command.admin.router.CreateVirtualRouterElementCmd;
-import org.apache.cloudstack.api.command.admin.router.ListVirtualRouterElementsCmd;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.network.topology.NetworkTopology;
-import org.apache.cloudstack.network.topology.NetworkTopologyContext;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -82,8 +84,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
-import org.cloud.network.router.deployment.RouterDeploymentDefinition;
-import org.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,6 +3,7 @@ package com.cloud.network.firewall;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
@@ -14,7 +15,6 @@ import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.util.ArrayList;
 import java.util.List;

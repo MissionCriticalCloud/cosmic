@@ -2,15 +2,15 @@ package com.cloud.network;
 
 import com.cloud.event.EventCategory;
 import com.cloud.event.dao.UsageEventDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.network.Network.Event;
 import com.cloud.network.Network.State;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
 
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;
@@ -69,8 +69,8 @@ public class NetworkStateListener implements StateListener<State, Event, Network
         }
 
         final String resourceName = getEntityFromClassName(Network.class.getName());
-        final org.apache.cloudstack.framework.events.Event eventMsg =
-                new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
+        final com.cloud.framework.events.Event eventMsg =
+                new com.cloud.framework.events.Event("management-server", EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName, vo.getUuid());
         final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());

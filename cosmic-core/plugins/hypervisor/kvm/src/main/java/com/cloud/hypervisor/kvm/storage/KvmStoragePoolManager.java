@@ -9,10 +9,10 @@ import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.Volume;
+import com.cloud.storage.to.PrimaryDataStoreTO;
+import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.storage.to.PrimaryDataStoreTO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.net.URI;
 import java.net.URISyntaxException;

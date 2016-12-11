@@ -1,19 +1,19 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.ViewResponseHelper;
 import com.cloud.api.query.vo.AccountJoinVO;
 import com.cloud.api.query.vo.UserAccountJoinVO;
+import com.cloud.api.response.AccountResponse;
+import com.cloud.api.response.ResourceLimitAndCountResponse;
+import com.cloud.api.response.UserResponse;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.AccountResponse;
-import org.apache.cloudstack.api.response.ResourceLimitAndCountResponse;
-import org.apache.cloudstack.api.response.UserResponse;
 
 import javax.inject.Inject;
 import java.util.List;

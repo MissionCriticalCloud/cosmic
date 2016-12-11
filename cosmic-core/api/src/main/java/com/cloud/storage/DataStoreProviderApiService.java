@@ -1,6 +1,6 @@
 package com.cloud.storage;
 
-import org.apache.cloudstack.api.response.StorageProviderResponse;
+import com.cloud.api.response.StorageProviderResponse;
 
 import java.util.List;
 

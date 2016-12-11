@@ -5,9 +5,19 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.user.volume.AttachVolumeCmd;
+import com.cloud.api.command.user.volume.CreateVolumeCmd;
+import com.cloud.api.command.user.volume.DetachVolumeCmd;
+import com.cloud.api.command.user.volume.ExtractVolumeCmd;
+import com.cloud.api.command.user.volume.GetUploadParamsForVolumeCmd;
+import com.cloud.api.command.user.volume.MigrateVolumeCmd;
+import com.cloud.api.command.user.volume.ResizeVolumeCmd;
+import com.cloud.api.command.user.volume.UploadVolumeCmd;
+import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.dc.ClusterDetailsDao;
@@ -16,6 +26,20 @@ import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.Domain;
+import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.ChapInfo;
+import com.cloud.engine.subsystem.api.storage.DataObject;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
+import com.cloud.engine.subsystem.api.storage.HostScope;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
+import com.cloud.engine.subsystem.api.storage.Scope;
+import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
+import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.engine.subsystem.api.storage.VolumeService;
+import com.cloud.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
@@ -25,19 +49,43 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.framework.async.AsyncCallFuture;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.jobs.AsyncJob;
+import com.cloud.framework.jobs.AsyncJobExecutionContext;
+import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.framework.jobs.Outcome;
+import com.cloud.framework.jobs.dao.VmWorkJobDao;
+import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.framework.jobs.impl.OutcomeImpl;
+import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.gpu.GPU;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.identity.ManagementServerNode;
+import com.cloud.imagestore.ImageStoreUtil;
+import com.cloud.jobs.JobInfo;
 import com.cloud.org.Grouping;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.storage.command.AttachAnswer;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.VolumeDataStoreDao;
+import com.cloud.storage.datastore.db.VolumeDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.snapshot.SnapshotApiService;
 import com.cloud.storage.snapshot.SnapshotManager;
 import com.cloud.template.TemplateManager;
@@ -86,54 +134,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.api.command.user.volume.AttachVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.CreateVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.DetachVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.ExtractVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.GetUploadParamsForVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.MigrateVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.ResizeVolumeCmd;
-import org.apache.cloudstack.api.command.user.volume.UploadVolumeCmd;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.ChapInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObject;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import org.apache.cloudstack.engine.subsystem.api.storage.HostScope;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
-import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
-import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.framework.jobs.AsyncJobExecutionContext;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.apache.cloudstack.framework.jobs.Outcome;
-import org.apache.cloudstack.framework.jobs.dao.VmWorkJobDao;
-import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
-import org.apache.cloudstack.framework.jobs.impl.OutcomeImpl;
-import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
-import org.apache.cloudstack.jobs.JobInfo;
-import org.apache.cloudstack.storage.command.AttachAnswer;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.TemplateOrVolumePostUploadCommand;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.VolumeDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import javax.inject.Inject;
 import java.net.MalformedURLException;
@@ -264,8 +264,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.volume, displayVolume);
 
         Long zoneId = cmd.getZoneId();
-        Long diskOfferingId;
-        DiskOfferingVO diskOffering;
+        final Long diskOfferingId;
+        final DiskOfferingVO diskOffering;
         final Storage.ProvisioningType provisioningType;
         Long size;
         Long minIops = null;
@@ -563,7 +563,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     protected VolumeVO createVolumeFromSnapshot(final VolumeVO volume, final long snapshotId, final Long vmId) throws StorageUnavailableException {
-        VolumeInfo createdVolume;
+        final VolumeInfo createdVolume;
         final SnapshotVO snapshot = _snapshotDao.findById(snapshotId);
         snapshot.getVolumeId();
 
@@ -708,7 +708,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
 
-            VmWorkJobVO placeHolder;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId);
@@ -1321,7 +1321,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
 
                 placeHolder = createPlaceHolderWork(userVm.getId());
 
@@ -1619,7 +1619,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateMigrateVolume(vol.getId(), destPool.getId(), liveMigrateVolume);
@@ -1869,7 +1869,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         final Long volumeId = cmmd.getId();
-        VolumeVO volume;
+        final VolumeVO volume;
 
         if (volumeId != null) {
             volume = _volsDao.findById(volumeId);
@@ -1882,7 +1882,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw new InvalidParameterValueException("Unable to find volume with ID: " + volumeId);
         }
 
-        Long vmId;
+        final Long vmId;
 
         if (cmmd.getVirtualMachineId() == null) {
             vmId = volume.getInstanceId();
@@ -1934,7 +1934,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final AsyncJobExecutionContext jobContext = AsyncJobExecutionContext.getCurrentExecutionContext();
         if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
             // avoid re-entrance
-            VmWorkJobVO placeHolder;
+            final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
                 return orchestrateDetachVolumeFromVM(vmId, volumeId);
@@ -2092,7 +2092,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateTakeVolumeSnapshot(volumeId, policyId, snapshotId, account, quiescevm);
@@ -2392,7 +2392,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobContext.isJobDispatchedBy(VmWorkConstants.VM_WORK_JOB_DISPATCHER)) {
                 // avoid re-entrance
 
-                VmWorkJobVO placeHolder;
+                final VmWorkJobVO placeHolder;
                 placeHolder = createPlaceHolderWork(vm.getId());
                 try {
                     return orchestrateExtractVolume(volume.getId(), zoneId);
@@ -2447,7 +2447,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final VolumeInfo srcVol = volFactory.getVolume(volumeId);
         final AsyncCallFuture<VolumeApiResult> cvAnswer = volService.copyVolume(srcVol, secStore);
         // Check if you got a valid answer.
-        VolumeApiResult cvResult;
+        final VolumeApiResult cvResult;
         try {
             cvResult = cvAnswer.get();
         } catch (final InterruptedException e1) {
@@ -2645,7 +2645,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final StoragePool destPool = (StoragePool) dataStoreMgr.getDataStore(destPoolId, DataStoreRole.Primary);
         assert destPool != null;
 
-        Volume newVol;
+        final Volume newVol;
         try {
             if (liveMigrateVolume) {
                 newVol = liveMigrateVolume(vol, destPool);

@@ -1,7 +1,7 @@
 package com.cloud.network.dao;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.domain.PartOf;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,5 +1,6 @@
 package com.cloud.event;
 
+import com.cloud.config.Configuration;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
 import com.cloud.dc.StorageNetworkIpRange;
@@ -45,13 +46,12 @@ import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.usage.Usage;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.config.Configuration;
-import org.apache.cloudstack.usage.Usage;
 
 import java.util.HashMap;
 import java.util.Map;

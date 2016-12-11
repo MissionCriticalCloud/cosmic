@@ -1,11 +1,11 @@
 package com.cloud.vm;
 
+import com.cloud.context.CallContext;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.utils.Journal;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.jobs.impl.JobSerializerHelper;
 
 import java.io.Serializable;
 import java.util.HashMap;

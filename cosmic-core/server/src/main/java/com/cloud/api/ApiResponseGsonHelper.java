@@ -1,10 +1,9 @@
 package com.cloud.api;
 
+import com.cloud.acl.RoleType;
+import com.cloud.context.CallContext;
 import com.cloud.serializer.Param;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.context.CallContext;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;

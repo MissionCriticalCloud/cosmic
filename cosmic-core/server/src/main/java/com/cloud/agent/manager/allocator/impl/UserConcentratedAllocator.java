@@ -8,6 +8,7 @@ import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.HostPodDao;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.VolumeVO;
@@ -26,7 +27,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -155,7 +155,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
     }
 
     private boolean dataCenterAndPodHasEnoughCapacity(final long dataCenterId, final long podId, final long capacityNeeded, final short capacityType, final long[] hostCandidate) {
-        List<CapacityVO> capacities;
+        final List<CapacityVO> capacities;
 
         final SearchCriteria<CapacityVO> sc = _capacityDao.createSearchCriteria();
         sc.addAnd("capacityType", SearchCriteria.Op.EQ, capacityType);
@@ -208,7 +208,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
                     continue;
                 }
 
-                ServiceOffering so;
+                final ServiceOffering so;
 
                 if (vm.getType() == VirtualMachine.Type.User) {
                     final UserVmVO userVm = _vmDao.findById(vm.getId());

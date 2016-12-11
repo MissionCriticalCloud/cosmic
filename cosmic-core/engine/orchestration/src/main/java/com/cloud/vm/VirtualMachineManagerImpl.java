@@ -17,6 +17,7 @@
 
 package com.cloud.vm;
 
+import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.AgentControlAnswer;
@@ -52,6 +53,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.alert.AlertManager;
 import com.cloud.capacity.CapacityManager;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
@@ -70,6 +72,11 @@ import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.DeploymentPlanningManager;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
+import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
+import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.AffinityConflictException;
@@ -86,6 +93,21 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.jobs.AsyncJob;
+import com.cloud.framework.jobs.AsyncJobExecutionContext;
+import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.framework.jobs.Outcome;
+import com.cloud.framework.jobs.dao.VmWorkJobDao;
+import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.framework.jobs.impl.OutcomeImpl;
+import com.cloud.framework.jobs.impl.VmWorkJobVO;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.MessageDispatcher;
+import com.cloud.framework.messagebus.MessageHandler;
 import com.cloud.gpu.dao.VGPUTypesDao;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.ha.HighAvailabilityManager.WorkType;
@@ -96,6 +118,9 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.identity.ManagementServerNode;
+import com.cloud.jobs.JobInfo;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -121,6 +146,9 @@ import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
 import com.cloud.user.User;
@@ -153,34 +181,6 @@ import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.PrimaryDataStoreInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.StoragePoolAllocator;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.framework.jobs.AsyncJobExecutionContext;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.apache.cloudstack.framework.jobs.Outcome;
-import org.apache.cloudstack.framework.jobs.dao.VmWorkJobDao;
-import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
-import org.apache.cloudstack.framework.jobs.impl.OutcomeImpl;
-import org.apache.cloudstack.framework.jobs.impl.VmWorkJobVO;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.MessageDispatcher;
-import org.apache.cloudstack.framework.messagebus.MessageHandler;
-import org.apache.cloudstack.jobs.JobInfo;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -2619,7 +2619,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public void stopForced(String vmUuid) throws ResourceUnavailableException {
+    public void stopForced(final String vmUuid) throws ResourceUnavailableException {
         try {
             advanceStop(vmUuid, true);
         } catch (final OperationTimedoutException e) {
@@ -3770,7 +3770,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } else if (jobResult instanceof ConcurrentOperationException) {
                     throw (ConcurrentOperationException) jobResult;
                 } else if (jobResult instanceof Throwable) {
-                    Throwable t = (Throwable) jobResult;
+                    final Throwable t = (Throwable) jobResult;
                     throw new VirtualMachineMigrationException(t.getMessage(), t);
                 }
             }

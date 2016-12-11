@@ -21,6 +21,7 @@ import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.domain.Domain;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -41,7 +42,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.user.Account;
 import com.cloud.vm.ReservationContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
 
 import java.net.URI;
 import java.net.URISyntaxException;

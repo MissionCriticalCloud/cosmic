@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.xenserver.resource;
 
+import com.cloud.security.SSLUtils;
+import com.cloud.security.SecureSSLSocketFactory;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
-import org.apache.cloudstack.utils.security.SSLUtils;
-import org.apache.cloudstack.utils.security.SecureSSLSocketFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;

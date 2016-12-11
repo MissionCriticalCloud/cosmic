@@ -1,16 +1,16 @@
 package com.cloud.storage.snapshot;
 
+import com.cloud.api.command.user.snapshot.CreateSnapshotPolicyCmd;
+import com.cloud.api.command.user.snapshot.DeleteSnapshotPoliciesCmd;
+import com.cloud.api.command.user.snapshot.ListSnapshotPoliciesCmd;
+import com.cloud.api.command.user.snapshot.ListSnapshotsCmd;
+import com.cloud.api.command.user.snapshot.UpdateSnapshotPolicyCmd;
 import com.cloud.api.commands.ListRecurringSnapshotScheduleCmd;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.api.command.user.snapshot.CreateSnapshotPolicyCmd;
-import org.apache.cloudstack.api.command.user.snapshot.DeleteSnapshotPoliciesCmd;
-import org.apache.cloudstack.api.command.user.snapshot.ListSnapshotPoliciesCmd;
-import org.apache.cloudstack.api.command.user.snapshot.ListSnapshotsCmd;
-import org.apache.cloudstack.api.command.user.snapshot.UpdateSnapshotPolicyCmd;
 
 import java.util.List;
 

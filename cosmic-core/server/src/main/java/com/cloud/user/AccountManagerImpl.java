@@ -1,6 +1,17 @@
 package com.cloud.user;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.acl.QuerySelector;
+import com.cloud.acl.RoleType;
+import com.cloud.acl.SecurityChecker;
+import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.admin.account.UpdateAccountCmd;
+import com.cloud.api.command.admin.user.DeleteUserCmd;
+import com.cloud.api.command.admin.user.RegisterCmd;
+import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.query.vo.ControlledViewEntity;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
@@ -9,6 +20,7 @@ import com.cloud.configuration.ResourceCountVO;
 import com.cloud.configuration.ResourceLimit;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.configuration.dao.ResourceLimitDao;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -17,6 +29,7 @@ import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.ActionEvents;
@@ -28,6 +41,10 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.PublishScope;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -57,6 +74,8 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
+import com.cloud.region.gslb.GlobalLoadBalancerRuleVO;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.server.auth.UserAuthenticator.ActionOnFailedAuthentication;
 import com.cloud.storage.VMTemplateVO;
@@ -105,24 +124,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.acl.QuerySelector;
-import org.apache.cloudstack.acl.RoleType;
-import org.apache.cloudstack.acl.SecurityChecker;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.affinity.AffinityGroup;
-import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
-import org.apache.cloudstack.api.command.admin.account.UpdateAccountCmd;
-import org.apache.cloudstack.api.command.admin.user.DeleteUserCmd;
-import org.apache.cloudstack.api.command.admin.user.RegisterCmd;
-import org.apache.cloudstack.api.command.admin.user.UpdateUserCmd;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.PublishScope;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleDao;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
@@ -1072,7 +1073,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             }
 
             // delete global load balancer rules for the account.
-            final List<org.apache.cloudstack.region.gslb.GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
+            final List<GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
             if (gslbRules != null && !gslbRules.isEmpty()) {
                 _gslbService.revokeAllGslbRulesForAccount(caller, accountId);
             }

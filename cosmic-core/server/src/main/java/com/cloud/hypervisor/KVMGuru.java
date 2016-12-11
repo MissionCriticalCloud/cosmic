@@ -14,8 +14,8 @@ import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.storage.command.CopyCommand;
-import org.apache.cloudstack.storage.command.StorageSubSystemCommand;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 
 import javax.inject.Inject;
 import java.util.Map;

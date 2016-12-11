@@ -1,12 +1,12 @@
 package com.cloud.network;
 
+import com.cloud.api.command.admin.router.UpgradeRouterCmd;
+import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.user.Account;
-import org.apache.cloudstack.api.command.admin.router.UpgradeRouterCmd;
-import org.apache.cloudstack.api.command.admin.router.UpgradeRouterTemplateCmd;
 
 import java.util.List;
 

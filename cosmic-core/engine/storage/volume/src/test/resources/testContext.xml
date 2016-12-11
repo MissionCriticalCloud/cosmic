@@ -18,9 +18,9 @@
   under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                          http://www.springframework.org/schema/tx 
        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
@@ -28,52 +28,50 @@
        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
                                  http://www.springframework.org/schema/context
                                           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-  <context:annotation-config />
-  <context:component-scan base-package="org.apache.cloudstack.storage" />
-  <context:component-scan
-    base-package="org.apache.cloudstack.engine.subsystem.api.storage" />
-  <context:component-scan base-package="com.cloud.utils.db" />
-  <context:component-scan base-package="com.cloud.utils.component" />
-  <context:component-scan base-package="com.cloud.host.dao" />
-  <context:component-scan base-package="com.cloud.dc.dao" />
-  <context:component-scan base-package="com.cloud.dc.dao" />
-  <context:component-scan base-package="org.apache.cloudstack.framework" />
-  
-  <tx:annotation-driven transaction-manager="transactionManager" />
-  <bean class="org.apache.cloudstack.storage.volume.test.TestConfiguration" />
-  <aop:config proxy-target-class="true">
-    <aop:aspect id="dbContextBuilder" ref="transactionContextBuilder">
-      <aop:pointcut id="captureAnyMethod" expression="@annotation(com.cloud.utils.db.DB)" />
-      <aop:around pointcut-ref="captureAnyMethod" method="AroundAnyMethod" />
-    </aop:aspect>
-  </aop:config>
+    <context:annotation-config />
+    <context:component-scan base-package="com.cloud.storage" />
+    <context:component-scan base-package="com.cloud.engine.subsystem.api.storage" />
+    <context:component-scan base-package="com.cloud.utils.db" />
+    <context:component-scan base-package="com.cloud.utils.component" />
+    <context:component-scan base-package="com.cloud.host.dao" />
+    <context:component-scan base-package="com.cloud.dc.dao" />
+    <context:component-scan base-package="com.cloud.framework" />
 
-  <bean id="transactionContextBuilder" class="com.cloud.utils.db.TransactionContextBuilder" />
-  
-  <bean id="onwireRegistry" class="org.apache.cloudstack.framework.serializer.OnwireClassRegistry"
-    init-method="scan" >
-    <property name="packages">
-      <list>
-        <value>org.apache.cloudstack.framework</value>
-      </list>
-    </property>
-  </bean>
-  
-  <bean id="messageSerializer" class="org.apache.cloudstack.framework.serializer.JsonMessageSerializer">
-    <property name="onwireClassRegistry" ref="onwireRegistry" />
-  </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <bean class="com.cloud.storage.volume.test.TestConfiguration" />
+    <aop:config proxy-target-class="true">
+        <aop:aspect id="dbContextBuilder" ref="transactionContextBuilder">
+            <aop:pointcut id="captureAnyMethod" expression="@annotation(com.cloud.utils.db.DB)" />
+            <aop:around pointcut-ref="captureAnyMethod" method="AroundAnyMethod" />
+        </aop:aspect>
+    </aop:config>
 
-  <bean id="transportProvider" class="org.apache.cloudstack.framework.server.ServerTransportProvider"  init-method="initialize">
-    <property name="workerPoolSize" value="5" />
-    <property name="nodeId" value="Node1" />
-    <property name="messageSerializer" ref="messageSerializer" />
-  </bean>
-  
-  <bean id="rpcProvider" class="org.apache.cloudstack.framework.rpc.RpcProviderImpl" init-method="initialize">
-    <constructor-arg ref="transportProvider" />
-    <property name="messageSerializer" ref="messageSerializer" />
-  </bean>
+    <bean id="transactionContextBuilder" class="com.cloud.utils.db.TransactionContextBuilder" />
 
-  <bean id="eventBus" class = "org.apache.cloudstack.framework.eventbus.EventBusBase" />
-  
+    <bean id="onwireRegistry" class="com.cloud.framework.serializer.OnwireClassRegistry"
+          init-method="scan">
+        <property name="packages">
+            <list>
+                <value>com.cloud.framework</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="messageSerializer" class="com.cloud.framework.serializer.JsonMessageSerializer">
+        <property name="onwireClassRegistry" ref="onwireRegistry" />
+    </bean>
+
+    <bean id="transportProvider" class="com.cloud.framework.server.ServerTransportProvider" init-method="initialize">
+        <property name="workerPoolSize" value="5" />
+        <property name="nodeId" value="Node1" />
+        <property name="messageSerializer" ref="messageSerializer" />
+    </bean>
+
+    <bean id="rpcProvider" class="com.cloud.framework.rpc.RpcProviderImpl" init-method="initialize">
+        <constructor-arg ref="transportProvider" />
+        <property name="messageSerializer" ref="messageSerializer" />
+    </bean>
+
+    <bean id="eventBus" class="com.cloud.framework.eventbus.EventBusBase" />
+
 </beans>

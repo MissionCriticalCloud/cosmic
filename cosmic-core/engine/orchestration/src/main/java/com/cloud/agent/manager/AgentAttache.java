@@ -23,8 +23,8 @@ import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Status;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

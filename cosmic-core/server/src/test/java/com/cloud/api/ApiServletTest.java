@@ -1,13 +1,12 @@
 package com.cloud.api;
 
+import com.cloud.api.auth.APIAuthenticationManager;
+import com.cloud.api.auth.APIAuthenticationType;
+import com.cloud.api.auth.APIAuthenticator;
 import com.cloud.server.ManagementServer;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.User;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.auth.APIAuthenticationType;
-import org.apache.cloudstack.api.auth.APIAuthenticator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

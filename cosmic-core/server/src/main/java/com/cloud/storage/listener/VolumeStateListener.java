@@ -4,6 +4,9 @@ import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.server.ManagementService;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Event;
@@ -14,9 +17,6 @@ import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,8 +92,8 @@ public class VolumeStateListener implements StateListener<State, Event, Volume> 
         }
 
         final String resourceName = getEntityFromClassName(Volume.class.getName());
-        final org.apache.cloudstack.framework.events.Event eventMsg =
-                new org.apache.cloudstack.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+        final com.cloud.framework.events.Event eventMsg =
+                new com.cloud.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
                         vo.getUuid());
         final Map<String, String> eventDescription = new HashMap<>();
         eventDescription.put("resource", resourceName);

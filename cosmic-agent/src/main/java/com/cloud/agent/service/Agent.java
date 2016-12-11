@@ -17,6 +17,7 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentControlChannelException;
+import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -30,7 +31,6 @@ import com.cloud.utils.nio.NioConnection;
 import com.cloud.utils.nio.Task;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
-import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;

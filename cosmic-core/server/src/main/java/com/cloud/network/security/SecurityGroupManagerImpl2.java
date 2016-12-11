@@ -4,6 +4,7 @@ import com.cloud.agent.api.SecurityGroupRulesCmd;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.exception.AgentUnavailableException;
+import com.cloud.managed.context.ManagedContext;
 import com.cloud.network.security.SecurityGroupWork.Step;
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
 import com.cloud.uservm.UserVm;
@@ -13,7 +14,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.managed.context.ManagedContext;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

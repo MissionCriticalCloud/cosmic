@@ -1,8 +1,8 @@
 package com.cloud.offerings;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,8 +1,16 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
+import com.cloud.api.response.NicResponse;
+import com.cloud.api.response.NicSecondaryIpResponse;
+import com.cloud.api.response.SecurityGroupResponse;
+import com.cloud.api.response.UserVmResponse;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.service.ServiceOfferingDetailsVO;
@@ -20,14 +28,6 @@ import com.cloud.vm.VmDetailConstants;
 import com.cloud.vm.VmStats;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDetailsDao;
-import org.apache.cloudstack.affinity.AffinityGroupResponse;
-import org.apache.cloudstack.api.ApiConstants.VMDetails;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.response.NicResponse;
-import org.apache.cloudstack.api.response.NicSecondaryIpResponse;
-import org.apache.cloudstack.api.response.SecurityGroupResponse;
-import org.apache.cloudstack.api.response.UserVmResponse;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;

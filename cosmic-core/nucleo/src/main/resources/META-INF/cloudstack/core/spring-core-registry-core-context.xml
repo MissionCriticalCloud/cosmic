@@ -25,27 +25,27 @@
 >
 
     <bean id="userAuthenticatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="user.authenticators.order" />
         <property name="excludeKey" value="user.authenticators.exclude" />
         <property name="orderConfigDefault" value="SHA256SALT,LDAP" />
     </bean>
 
     <bean id="pluggableAPIAuthenticatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="pluggableApi.authenticators.order" />
         <property name="excludeKey" value="pluggableApi.authenticators.exclude" />
     </bean>
 
     <bean id="userPasswordEncodersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="user.password.encoders.order" />
         <property name="excludeKey" value="user.password.encoders.exclude" />
         <property name="orderConfigDefault" value="SHA256SALT,LDAP" />
     </bean>
 
     <bean id="securityCheckersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="security.checkers.order" />
         <property name="excludeKey" value="security.checkers.exclude" />
         <property name="orderConfigDefault"
@@ -53,13 +53,13 @@
     </bean>
 
     <bean id="resourceDiscoverersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="resource.discoverers.exclude" />
         <property name="excludeDefault" value="dummyHostDiscoverer" />
     </bean>
 
     <bean id="haInvestigatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="ha.investigators.order" />
         <property name="orderConfigDefault"
                   value="SimpleInvestigator,XenServerInvestigator,KVMInvestigator,HypervInvestigator,VMwareInvestigator,PingInvestigator,ManagementIPSysVMInvestigator,Ovm3Investigator" />
@@ -67,13 +67,13 @@
     </bean>
 
     <bean id="haFenceBuildersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="ha.fence.builders.exclude" />
         <property name="excludeDefault" value="RecreatableFencer" />
     </bean>
 
     <bean id="deploymentPlannersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="deployment.planners.order" />
         <property name="orderConfigDefault"
                   value="FirstFitPlanner,UserDispersingPlanner,UserConcentratedPodPlanner,ImplicitDedicationPlanner" />
@@ -82,17 +82,17 @@
     </bean>
 
     <bean id="haPlannersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="ha.planners.exclude" />
     </bean>
 
     <bean id="podAllocatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="pod.allocators.exclude" />
     </bean>
 
     <bean id="hostAllocatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="host.allocators.order" />
         <property name="orderConfigDefault" value="FirstFitRouting" />
         <property name="excludeKey" value="host.allocators.exclude" />
@@ -101,7 +101,7 @@
     </bean>
 
     <bean id="storagePoolAllocatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="storage.pool.allocators.order" />
         <property name="orderConfigDefault"
                   value="LocalStorage,ClusterScopeStoragePoolAllocator,ZoneWideStoragePoolAllocator" />
@@ -110,23 +110,23 @@
     </bean>
 
     <bean id="secondaryStorageVmAllocatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey"
                   value="secondary.storage.vm.allocators.exclude" />
     </bean>
 
     <bean id="consoleProxyAllocatorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="console.proxy.allocator.exclude" />
     </bean>
 
     <bean id="templateAdapterRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="template.adapter.exclude" />
     </bean>
 
     <bean id="ipDeployersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="ip.deployers.exclude" />
         <property name="excludeDefault" value="MidoNetElement" />
         <property name="preRegistered">
@@ -137,7 +137,7 @@
     </bean>
 
     <bean id="dhcpProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="dhcp.providers.exclude" />
         <property name="excludeDefault" value="MidoNetElement" />
         <property name="preRegistered">
@@ -148,12 +148,12 @@
     </bean>
 
     <bean id="networkGurusRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="network.gurus.exclude" />
     </bean>
 
     <bean id="networkElementsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="network.elements.registry.exclude" />
         <property name="excludeDefault" value="ElasticLoadBalancerElement" />
         <property name="preRegistered">
@@ -165,7 +165,7 @@
     </bean>
 
     <bean id="firewallServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="firewall.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -175,7 +175,7 @@
     </bean>
 
     <bean id="loadBalancingServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="load.balancing.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -186,7 +186,7 @@
     </bean>
 
     <bean id="portForwardingServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="port.forwarding.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -196,7 +196,7 @@
     </bean>
 
     <bean id="staticNatServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="static.nat.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -206,7 +206,7 @@
     </bean>
 
     <bean id="networkACLServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="network.acl.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -216,7 +216,7 @@
     </bean>
 
     <bean id="site2SiteVpnServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="site2site.vpn.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -226,7 +226,7 @@
     </bean>
 
     <bean id="remoteAccessVPNServiceProviderRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="remote.access.vpn.service.provider.exclude" />
         <property name="preRegistered">
             <list>
@@ -236,48 +236,48 @@
     </bean>
 
     <bean id="gslbServiceProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="gslb.service.provider.exclude" />
     </bean>
 
     <bean id="affinityProcessorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="affinity.processors.order" />
         <property name="orderConfigDefault"
                   value="HostAntiAffinityProcessor,ExplicitDedicationProcessor" />
         <property name="excludeKey" value="affinity.processors.exclude" />
     </bean>
 
-    <bean class="org.apache.cloudstack.spring.lifecycle.registry.DumpRegistry">
+    <bean class="com.cloud.spring.lifecycle.registry.DumpRegistry">
         <property name="registries" value="#{registryRegistry.registered}" />
     </bean>
 
     <bean id="registryRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
     </bean>
 
     <bean id="apiCheckersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="api.checkers.exclude" />
     </bean>
 
     <bean id="querySelectorsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="query.selectors.exclude" />
     </bean>
 
     <bean id="apiCommandsRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="api.commands.exclude" />
     </bean>
 
     <bean id="hypervisorGurusRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="hypervisor.gurus.exclude" />
     </bean>
 
     <bean id="vpcProvidersRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="vpc.providers.exclude" />
         <property name="preRegistered">
             <list>
@@ -287,17 +287,17 @@
     </bean>
 
     <bean id="snapshotStrategiesRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="snapshot.strategies.exclude" />
     </bean>
 
     <bean id="vmSnapshotStrategiesRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="vmSnapshot.strategies.exclude" />
     </bean>
 
     <bean id="dataMotionStrategiesRegistry"
-          class="org.apache.cloudstack.spring.lifecycle.registry.ExtensionRegistry">
+          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="excludeKey" value="data.motion.strategies.exclude" />
     </bean>
 

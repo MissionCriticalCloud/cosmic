@@ -1,5 +1,8 @@
 package com.cloud.storage.dao;
 
+import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -13,9 +16,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataObjectInStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import org.apache.cloudstack.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

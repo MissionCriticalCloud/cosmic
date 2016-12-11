@@ -7,12 +7,12 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.OperationTimedoutException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.resource.ServerResource;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 /**
  * AgentManager manages hosts. It directly coordinates between the DAOs and the connections it manages.

@@ -17,6 +17,16 @@ import com.cloud.agent.api.UpdateHostPasswordCommand;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.agent.transport.Request;
+import com.cloud.api.ApiConstants;
+import com.cloud.api.command.admin.cluster.AddClusterCmd;
+import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
+import com.cloud.api.command.admin.host.AddHostCmd;
+import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
+import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
+import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
+import com.cloud.api.command.admin.host.ReconnectHostCmd;
+import com.cloud.api.command.admin.host.UpdateHostCmd;
+import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.CapacityState;
@@ -25,6 +35,7 @@ import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.cluster.ClusterManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
@@ -50,6 +61,7 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
@@ -70,6 +82,7 @@ import com.cloud.host.dao.HostTagsDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
+import com.cloud.identity.ManagementServerNode;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.org.Cluster;
@@ -87,6 +100,8 @@ import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VMTemplateDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.StringUtils;
@@ -118,21 +133,6 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.command.admin.cluster.AddClusterCmd;
-import org.apache.cloudstack.api.command.admin.cluster.DeleteClusterCmd;
-import org.apache.cloudstack.api.command.admin.host.AddHostCmd;
-import org.apache.cloudstack.api.command.admin.host.AddSecondaryStorageCmd;
-import org.apache.cloudstack.api.command.admin.host.CancelMaintenanceCmd;
-import org.apache.cloudstack.api.command.admin.host.PrepareForMaintenanceCmd;
-import org.apache.cloudstack.api.command.admin.host.ReconnectHostCmd;
-import org.apache.cloudstack.api.command.admin.host.UpdateHostCmd;
-import org.apache.cloudstack.api.command.admin.host.UpdateHostPasswordCmd;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -1652,7 +1652,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         return null;
                     }
 
-                    HostVO host;
+                    final HostVO host;
                     if (deferAgentCreation) {
                         host = (HostVO) createHostAndAgentDeferred(resource, entry.getValue(), true, hostTags, false);
                     } else {
@@ -1893,7 +1893,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             url = URLDecoder.decode(url);
         }
 
-        URI uri;
+        final URI uri;
 
         final DataCenterVO zone = resourceChecker.checkIfDataCenterExists(dcId);
         final Account account = CallContext.current().getCallingAccount();
@@ -2022,7 +2022,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
 
             final List<HostVO> hosts = new ArrayList<>();
-            Map<? extends ServerResource, Map<String, String>> resources;
+            final Map<? extends ServerResource, Map<String, String>> resources;
             resources = discoverer.find(dcId, podId, cluster.getId(), uri, username, password, null);
 
             if (resources != null) {
@@ -2116,7 +2116,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Cluster.ClusterType newClusterType;
+        final Cluster.ClusterType newClusterType;
         if (clusterType != null && !clusterType.isEmpty()) {
             try {
                 newClusterType = Cluster.ClusterType.valueOf(clusterType);
@@ -2132,7 +2132,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Grouping.AllocationState newAllocationState;
+        final Grouping.AllocationState newAllocationState;
         if (allocationState != null && !allocationState.isEmpty()) {
             try {
                 newAllocationState = Grouping.AllocationState.valueOf(allocationState);
@@ -2283,7 +2283,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
 
         final List<VMInstanceVO> vmsRunningOnHost = _vmDao.listByHostId(hostId);
 
-        if (! vmsRunningOnHost.isEmpty()) {
+        if (!vmsRunningOnHost.isEmpty()) {
             throw new InvalidParameterValueException("There are active VMs on this host. Please migrate all VMs on this host to another host before starting maintenance.");
         }
 
@@ -2370,7 +2370,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     public List<HypervisorType> getSupportedHypervisorTypes(final long zoneId, final boolean forVirtualRouter, final Long podId) {
         final List<HypervisorType> hypervisorTypes = new ArrayList<>();
 
-        List<ClusterVO> clustersForZone;
+        final List<ClusterVO> clustersForZone;
         if (podId != null) {
             clustersForZone = _clusterDao.listByPodId(podId);
         } else {

@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import org.apache.cloudstack.resourcedetail.ResourceDetailsDaoBase;
+import com.cloud.resourcedetail.ResourceDetailsDaoBase;
 
 public class SnapshotDetailsDaoImpl extends ResourceDetailsDaoBase<SnapshotDetailsVO> implements SnapshotDetailsDao {
     @Override

@@ -1,7 +1,5 @@
 package com.cloud.api;
 
-import org.apache.cloudstack.api.ResponseObject;
-
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,7 @@ public class ApiSerializerHelper {
                 }
                 final String clzName = serializedParts[0];
                 String nameField = null;
-                String content;
+                final String content;
                 if (serializedParts.length == 2) {
                     content = serializedParts[1];
                 } else {

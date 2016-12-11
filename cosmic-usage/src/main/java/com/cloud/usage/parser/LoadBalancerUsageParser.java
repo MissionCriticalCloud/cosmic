@@ -1,12 +1,12 @@
 package com.cloud.usage.parser;
 
 import com.cloud.usage.UsageLoadBalancerPolicyVO;
+import com.cloud.usage.UsageTypes;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageLoadBalancerPolicyDao;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.usage.UsageTypes;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

@@ -5,7 +5,7 @@
          version="2.5">
 
     <listener>
-        <listener-class>org.apache.cloudstack.spring.module.web.CloudStackContextLoaderListener</listener-class>
+        <listener-class>com.cloud.spring.module.web.CloudStackContextLoaderListener</listener-class>
     </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>

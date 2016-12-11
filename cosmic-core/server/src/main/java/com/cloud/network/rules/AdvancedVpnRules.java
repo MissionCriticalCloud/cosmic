@@ -5,10 +5,10 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VirtualRouter;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.vm.VirtualMachine.State;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import java.util.List;
 

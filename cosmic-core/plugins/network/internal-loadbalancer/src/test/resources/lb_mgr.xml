@@ -26,7 +26,7 @@
         </property>
     </bean>
 
-    <bean id="InternalLoadBalancerVMManager" class="org.apache.cloudstack.network.lb.InternalLoadBalancerVMManagerImpl">
+    <bean id="InternalLoadBalancerVMManager" class="com.cloud.network.lb.InternalLoadBalancerVMManagerImpl">
         <property name="name" value="InternalLoadBalancerVMManager" />
     </bean>
 
@@ -34,6 +34,6 @@
         <property name="name" value="UserDao" />
     </bean>
 
-    <bean class="org.apache.cloudstack.internallbvmmgr.LbChildTestConfiguration" />
+    <bean class="com.cloud.internallbvmmgr.LbChildTestConfiguration" />
 
 </beans>

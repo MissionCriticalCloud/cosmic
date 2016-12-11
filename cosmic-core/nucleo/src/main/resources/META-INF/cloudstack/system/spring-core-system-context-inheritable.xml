@@ -9,8 +9,8 @@
     <!--
       LifeCycle
     -->
-    <bean id="cloudStackLifeCycle" class="org.apache.cloudstack.spring.lifecycle.CloudStackExtendedLifeCycle" />
-    <bean id="moduleStartup" class="org.apache.cloudstack.spring.lifecycle.CloudStackExtendedLifeCycleStart">
+    <bean id="cloudStackLifeCycle" class="com.cloud.spring.lifecycle.CloudStackExtendedLifeCycle" />
+    <bean id="moduleStartup" class="com.cloud.spring.lifecycle.CloudStackExtendedLifeCycleStart">
         <property name="lifeCycle" ref="cloudStackLifeCycle" />
     </bean>
 

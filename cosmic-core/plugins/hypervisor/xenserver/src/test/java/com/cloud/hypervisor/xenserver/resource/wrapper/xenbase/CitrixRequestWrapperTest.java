@@ -85,10 +85,10 @@ import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.utils.Pair;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachine;
-import org.apache.cloudstack.storage.command.AttachAnswer;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.command.AttachAnswer;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.net.URI;
 import java.util.ArrayList;

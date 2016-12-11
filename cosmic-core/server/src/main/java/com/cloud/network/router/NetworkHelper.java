@@ -11,6 +11,7 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Network;
+import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.user.Account;
 import com.cloud.user.User;
@@ -21,8 +22,6 @@ import com.cloud.vm.VirtualMachineProfile.Param;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.cloud.network.router.deployment.RouterDeploymentDefinition;
 
 public interface NetworkHelper {
 

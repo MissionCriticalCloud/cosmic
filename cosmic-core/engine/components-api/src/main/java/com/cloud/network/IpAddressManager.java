@@ -8,6 +8,7 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.rules.FirewallRule;
@@ -16,7 +17,6 @@ import com.cloud.user.Account;
 import com.cloud.utils.db.DB;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineProfile;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 import java.util.List;
 

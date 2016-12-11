@@ -7,7 +7,7 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.snapshot.VMSnapshot;
-import org.apache.cloudstack.storage.to.VolumeObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.ArrayList;
 import java.util.List;

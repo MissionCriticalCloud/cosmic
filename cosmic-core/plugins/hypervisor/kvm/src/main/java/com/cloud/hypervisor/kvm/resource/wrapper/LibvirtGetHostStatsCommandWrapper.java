@@ -8,8 +8,8 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.Pair;
-import org.apache.cloudstack.utils.linux.CpuStat;
-import org.apache.cloudstack.utils.linux.MemStat;
+import com.cloud.utils.linux.CpuStat;
+import com.cloud.utils.linux.MemStat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

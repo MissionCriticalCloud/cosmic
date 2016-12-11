@@ -1,7 +1,5 @@
 package com.cloud.api;
 
-import org.apache.cloudstack.api.ResponseObject;
-
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;

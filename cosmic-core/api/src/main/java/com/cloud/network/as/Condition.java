@@ -1,8 +1,8 @@
 package com.cloud.network.as;
 
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 public interface Condition extends ControlledEntity, Identity, InternalIdentity {
 

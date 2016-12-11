@@ -1,10 +1,10 @@
 package com.cloud.network;
 
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Displayable;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 import com.cloud.utils.net.Ip;
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Displayable;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import java.util.Date;
 

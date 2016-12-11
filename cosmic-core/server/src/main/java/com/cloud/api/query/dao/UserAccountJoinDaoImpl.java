@@ -1,12 +1,12 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.UserAccountJoinVO;
+import com.cloud.api.response.UserResponse;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.UserResponse;
 
 import java.util.List;
 

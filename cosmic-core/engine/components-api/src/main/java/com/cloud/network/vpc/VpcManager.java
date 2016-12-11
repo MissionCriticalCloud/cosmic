@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -14,7 +15,6 @@ import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
-import org.apache.cloudstack.acl.ControlledEntity.ACLType;
 
 import java.util.List;
 import java.util.Map;

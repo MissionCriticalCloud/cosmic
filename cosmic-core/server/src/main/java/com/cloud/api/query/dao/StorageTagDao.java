@@ -1,8 +1,8 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.StorageTagVO;
+import com.cloud.api.response.StorageTagResponse;
 import com.cloud.utils.db.GenericDao;
-import org.apache.cloudstack.api.response.StorageTagResponse;
 
 import java.util.List;
 

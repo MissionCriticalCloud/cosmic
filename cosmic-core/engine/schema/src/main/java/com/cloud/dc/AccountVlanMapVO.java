@@ -1,7 +1,7 @@
 package com.cloud.dc;
 
+import com.cloud.api.InternalIdentity;
 import com.cloud.user.OwnedBy;
-import org.apache.cloudstack.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

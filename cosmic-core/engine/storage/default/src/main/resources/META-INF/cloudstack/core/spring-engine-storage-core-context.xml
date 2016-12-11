@@ -23,43 +23,43 @@
 >
 
     <!--Image formats-->
-    <bean id="ISO" class="org.apache.cloudstack.storage.image.format.ISO"/>
-    <bean id="OVA" class="org.apache.cloudstack.storage.image.format.OVA"/>
-    <bean id="QCOW2" class="org.apache.cloudstack.storage.image.format.QCOW2"/>
-    <bean id="VHD" class="org.apache.cloudstack.storage.image.format.VHD"/>
-    <bean id="VHDX" class="org.apache.cloudstack.storage.image.format.VHDX"/>
-    <bean id="unknown" class="org.apache.cloudstack.storage.image.format.Unknown"/>
+    <bean id="ISO" class="com.cloud.storage.image.format.ISO" />
+    <bean id="OVA" class="com.cloud.storage.image.format.OVA" />
+    <bean id="QCOW2" class="com.cloud.storage.image.format.QCOW2" />
+    <bean id="VHD" class="com.cloud.storage.image.format.VHD" />
+    <bean id="VHDX" class="com.cloud.storage.image.format.VHDX" />
+    <bean id="unknown" class="com.cloud.storage.image.format.Unknown" />
 
     <bean id="VMSnapshotHelperImpl"
-          class="org.apache.cloudstack.storage.helper.VMSnapshotHelperImpl"/>
+          class="com.cloud.storage.helper.VMSnapshotHelperImpl" />
 
     <bean id="objectInDataStoreManagerImpl"
-          class="org.apache.cloudstack.storage.datastore.ObjectInDataStoreManagerImpl"/>
+          class="com.cloud.storage.datastore.ObjectInDataStoreManagerImpl" />
 
     <bean id="dataObjectManagerImpl"
-          class="org.apache.cloudstack.storage.datastore.DataObjectManagerImpl"/>
+          class="com.cloud.storage.datastore.DataObjectManagerImpl" />
 
     <bean id="defaultEndPointSelector"
-          class="org.apache.cloudstack.storage.endpoint.DefaultEndPointSelector"/>
+          class="com.cloud.storage.endpoint.DefaultEndPointSelector" />
 
     <bean id="dataStoreManagerImpl"
-          class="org.apache.cloudstack.storage.datastore.DataStoreManagerImpl"
+          class="com.cloud.storage.datastore.DataStoreManagerImpl"
           depends-on="dataStoreProviderManager">
-        <property name="primaryStoreMgr" ref="primaryDataStoreProviderMgr"/>
-        <property name="imageDataStoreMgr" ref="imageStoreProviderMgr"/>
+        <property name="primaryStoreMgr" ref="primaryDataStoreProviderMgr" />
+        <property name="imageDataStoreMgr" ref="imageStoreProviderMgr" />
     </bean>
 
     <bean id="dataStoreProviderManager"
-          class="org.apache.cloudstack.storage.datastore.provider.DataStoreProviderManagerImpl">
+          class="com.cloud.storage.datastore.provider.DataStoreProviderManagerImpl">
         <property name="providers">
-            <list/>
+            <list />
         </property>
     </bean>
 
-    <bean id="storageStrategyFactoryImpl" class="org.apache.cloudstack.storage.helper.StorageStrategyFactoryImpl">
-        <property name="dataMotionStrategies" value="#{dataMotionStrategiesRegistry.registered}"/>
-        <property name="snapshotStrategies" value="#{snapshotStrategiesRegistry.registered}"/>
-        <property name="vmSnapshotStrategies" value="#{vmSnapshotStrategiesRegistry.registered}"/>
+    <bean id="storageStrategyFactoryImpl" class="com.cloud.storage.helper.StorageStrategyFactoryImpl">
+        <property name="dataMotionStrategies" value="#{dataMotionStrategiesRegistry.registered}" />
+        <property name="snapshotStrategies" value="#{snapshotStrategiesRegistry.registered}" />
+        <property name="vmSnapshotStrategies" value="#{vmSnapshotStrategiesRegistry.registered}" />
     </bean>
 
 </beans>

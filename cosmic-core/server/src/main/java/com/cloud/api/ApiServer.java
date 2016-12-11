@@ -1,9 +1,39 @@
 package com.cloud.api;
 
+import com.cloud.acl.APIChecker;
+import com.cloud.api.ResponseObject.ResponseView;
+import com.cloud.api.auth.APIAuthenticationManager;
+import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
+import com.cloud.api.command.admin.host.ListHostsCmd;
+import com.cloud.api.command.admin.router.ListRoutersCmd;
+import com.cloud.api.command.admin.storage.ListStoragePoolsCmd;
+import com.cloud.api.command.admin.user.ListUsersCmd;
+import com.cloud.api.command.admin.vm.ListVMsCmdByAdmin;
+import com.cloud.api.command.admin.volume.ListVolumesCmdByAdmin;
+import com.cloud.api.command.admin.zone.ListZonesCmdByAdmin;
+import com.cloud.api.command.user.account.ListAccountsCmd;
+import com.cloud.api.command.user.account.ListProjectAccountsCmd;
+import com.cloud.api.command.user.event.ListEventsCmd;
+import com.cloud.api.command.user.offering.ListDiskOfferingsCmd;
+import com.cloud.api.command.user.offering.ListServiceOfferingsCmd;
+import com.cloud.api.command.user.project.ListProjectInvitationsCmd;
+import com.cloud.api.command.user.project.ListProjectsCmd;
+import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
+import com.cloud.api.command.user.tag.ListTagsCmd;
+import com.cloud.api.command.user.vm.ListVMsCmd;
+import com.cloud.api.command.user.vmgroup.ListVMGroupsCmd;
+import com.cloud.api.command.user.volume.ListVolumesCmd;
+import com.cloud.api.command.user.zone.ListZonesCmd;
 import com.cloud.api.dispatch.DispatchChainFactory;
 import com.cloud.api.dispatch.DispatchTask;
 import com.cloud.api.response.ApiResponseSerializer;
+import com.cloud.api.response.AsyncJobResponse;
+import com.cloud.api.response.CreateCmdResponse;
+import com.cloud.api.response.ExceptionResponse;
+import com.cloud.api.response.ListResponse;
+import com.cloud.api.response.LoginCmdResponse;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.domain.Domain;
@@ -20,6 +50,18 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.RequestLimitException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.config.impl.ConfigurationVO;
+import com.cloud.framework.events.Event;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
+import com.cloud.framework.jobs.AsyncJob;
+import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.MessageDispatcher;
+import com.cloud.framework.messagebus.MessageHandler;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
@@ -39,58 +81,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
-import com.google.gson.reflect.TypeToken;
-import org.apache.cloudstack.acl.APIChecker;
-import org.apache.cloudstack.api.APICommand;
-import org.apache.cloudstack.api.ApiConstants;
-import org.apache.cloudstack.api.ApiErrorCode;
-import org.apache.cloudstack.api.ApiServerService;
-import org.apache.cloudstack.api.BaseAsyncCmd;
-import org.apache.cloudstack.api.BaseAsyncCreateCmd;
-import org.apache.cloudstack.api.BaseCmd;
-import org.apache.cloudstack.api.BaseListCmd;
-import org.apache.cloudstack.api.ResponseObject;
-import org.apache.cloudstack.api.ResponseObject.ResponseView;
-import org.apache.cloudstack.api.ServerApiException;
-import org.apache.cloudstack.api.auth.APIAuthenticationManager;
-import org.apache.cloudstack.api.command.admin.account.ListAccountsCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.host.ListHostsCmd;
-import org.apache.cloudstack.api.command.admin.router.ListRoutersCmd;
-import org.apache.cloudstack.api.command.admin.storage.ListStoragePoolsCmd;
-import org.apache.cloudstack.api.command.admin.user.ListUsersCmd;
-import org.apache.cloudstack.api.command.admin.vm.ListVMsCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.volume.ListVolumesCmdByAdmin;
-import org.apache.cloudstack.api.command.admin.zone.ListZonesCmdByAdmin;
-import org.apache.cloudstack.api.command.user.account.ListAccountsCmd;
-import org.apache.cloudstack.api.command.user.account.ListProjectAccountsCmd;
-import org.apache.cloudstack.api.command.user.event.ListEventsCmd;
-import org.apache.cloudstack.api.command.user.offering.ListDiskOfferingsCmd;
-import org.apache.cloudstack.api.command.user.offering.ListServiceOfferingsCmd;
-import org.apache.cloudstack.api.command.user.project.ListProjectInvitationsCmd;
-import org.apache.cloudstack.api.command.user.project.ListProjectsCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.ListSecurityGroupsCmd;
-import org.apache.cloudstack.api.command.user.tag.ListTagsCmd;
-import org.apache.cloudstack.api.command.user.vm.ListVMsCmd;
-import org.apache.cloudstack.api.command.user.vmgroup.ListVMGroupsCmd;
-import org.apache.cloudstack.api.command.user.volume.ListVolumesCmd;
-import org.apache.cloudstack.api.command.user.zone.ListZonesCmd;
-import org.apache.cloudstack.api.response.AsyncJobResponse;
-import org.apache.cloudstack.api.response.CreateCmdResponse;
-import org.apache.cloudstack.api.response.ExceptionResponse;
-import org.apache.cloudstack.api.response.ListResponse;
-import org.apache.cloudstack.api.response.LoginCmdResponse;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
-import org.apache.cloudstack.framework.events.EventBus;
-import org.apache.cloudstack.framework.events.EventBusException;
-import org.apache.cloudstack.framework.jobs.AsyncJob;
-import org.apache.cloudstack.framework.jobs.AsyncJobManager;
-import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.MessageDispatcher;
-import org.apache.cloudstack.framework.messagebus.MessageHandler;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -131,6 +121,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
@@ -323,9 +314,10 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         final String info = job.getCmdInfo();
         String cmdEventType = "unknown";
         if (info != null) {
-            Type type = new TypeToken<Map<String, String>>(){}.getType();
-            Map<String, String> cmdInfo = ApiGsonHelper.getBuilder().create().fromJson(info, type);
-            String eventTypeObj = cmdInfo.get("cmdEventType");
+            final Type type = new TypeToken<Map<String, String>>() {
+            }.getType();
+            final Map<String, String> cmdInfo = ApiGsonHelper.getBuilder().create().fromJson(info, type);
+            final String eventTypeObj = cmdInfo.get("cmdEventType");
             if (eventTypeObj != null) {
                 cmdEventType = eventTypeObj;
                 if (s_logger.isDebugEnabled()) {
@@ -340,7 +332,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         // For some reason, the instanceType / instanceId are not abstract, which means we may get null values.
         final String instanceType = job.getInstanceType() != null ? job.getInstanceType() : "unknown";
         final String instanceUuid = job.getInstanceId() != null ? ApiDBUtils.findJobInstanceUuid(job) : "";
-        final org.apache.cloudstack.framework.events.Event event = new org.apache.cloudstack.framework.events.Event("management-server", EventCategory.ASYNC_JOB_CHANGE_EVENT
+        final Event event = new Event("management-server", EventCategory.ASYNC_JOB_CHANGE_EVENT
                 .getName(),
                 jobEvent, instanceType, instanceUuid);
 

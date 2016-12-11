@@ -1,8 +1,8 @@
 package com.cloud.vpc.dao;
 
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.utils.db.GenericDaoBase;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 
 import java.util.HashMap;
 import java.util.Map;

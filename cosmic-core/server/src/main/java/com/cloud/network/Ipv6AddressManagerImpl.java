@@ -8,6 +8,7 @@ import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.user.Account;
@@ -15,7 +16,6 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

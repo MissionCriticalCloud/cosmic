@@ -1,5 +1,6 @@
 package com.cloud.template;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
@@ -10,15 +11,51 @@ import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
+import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
+import com.cloud.api.BaseUpdateTemplateOrIsoCmd;
+import com.cloud.api.BaseUpdateTemplateOrIsoPermissionsCmd;
+import com.cloud.api.command.user.iso.DeleteIsoCmd;
+import com.cloud.api.command.user.iso.ExtractIsoCmd;
+import com.cloud.api.command.user.iso.ListIsoPermissionsCmd;
+import com.cloud.api.command.user.iso.RegisterIsoCmd;
+import com.cloud.api.command.user.iso.UpdateIsoCmd;
+import com.cloud.api.command.user.iso.UpdateIsoPermissionsCmd;
+import com.cloud.api.command.user.template.CopyTemplateCmd;
+import com.cloud.api.command.user.template.CreateTemplateCmd;
+import com.cloud.api.command.user.template.DeleteTemplateCmd;
+import com.cloud.api.command.user.template.ExtractTemplateCmd;
+import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
+import com.cloud.api.command.user.template.ListTemplatePermissionsCmd;
+import com.cloud.api.command.user.template.RegisterTemplateCmd;
+import com.cloud.api.command.user.template.UpdateTemplateCmd;
+import com.cloud.api.command.user.template.UpdateTemplatePermissionsCmd;
 import com.cloud.api.query.dao.UserVmJoinDao;
 import com.cloud.api.query.vo.UserVmJoinVO;
+import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.Domain;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.engine.subsystem.api.storage.EndPoint;
+import com.cloud.engine.subsystem.api.storage.EndPointSelector;
+import com.cloud.engine.subsystem.api.storage.Scope;
+import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
+import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
+import com.cloud.engine.subsystem.api.storage.StorageCacheManager;
+import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
+import com.cloud.engine.subsystem.api.storage.TemplateInfo;
+import com.cloud.engine.subsystem.api.storage.TemplateService;
+import com.cloud.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
+import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
+import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
@@ -28,10 +65,18 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.framework.async.AsyncCallFuture;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.imagestore.ImageStoreUtil;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.DataStoreRole;
@@ -57,6 +102,10 @@ import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
+import com.cloud.storage.command.AttachCommand;
+import com.cloud.storage.command.CommandResult;
+import com.cloud.storage.command.DettachCommand;
+import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -65,6 +114,15 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.ImageStoreDao;
+import com.cloud.storage.datastore.db.ImageStoreVO;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
+import com.cloud.storage.image.datastore.ImageStoreEntity;
+import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.TemplateAdapter.TemplateAdapterType;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.user.Account;
@@ -93,64 +151,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.BaseListTemplateOrIsoPermissionsCmd;
-import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoCmd;
-import org.apache.cloudstack.api.BaseUpdateTemplateOrIsoPermissionsCmd;
-import org.apache.cloudstack.api.command.user.iso.DeleteIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.ExtractIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.ListIsoPermissionsCmd;
-import org.apache.cloudstack.api.command.user.iso.RegisterIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.UpdateIsoCmd;
-import org.apache.cloudstack.api.command.user.iso.UpdateIsoPermissionsCmd;
-import org.apache.cloudstack.api.command.user.template.CopyTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.CreateTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.DeleteTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.ExtractTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.GetUploadParamsForTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.ListTemplatePermissionsCmd;
-import org.apache.cloudstack.api.command.user.template.RegisterTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.UpdateTemplateCmd;
-import org.apache.cloudstack.api.command.user.template.UpdateTemplatePermissionsCmd;
-import org.apache.cloudstack.api.response.GetUploadParamsResponse;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPoint;
-import org.apache.cloudstack.engine.subsystem.api.storage.EndPointSelector;
-import org.apache.cloudstack.engine.subsystem.api.storage.Scope;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.SnapshotInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.StorageCacheManager;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService;
-import org.apache.cloudstack.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeDataFactory;
-import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
-import org.apache.cloudstack.engine.subsystem.api.storage.ZoneScope;
-import org.apache.cloudstack.framework.async.AsyncCallFuture;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.messagebus.MessageBus;
-import org.apache.cloudstack.framework.messagebus.PublishScope;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.storage.command.AttachCommand;
-import org.apache.cloudstack.storage.command.CommandResult;
-import org.apache.cloudstack.storage.command.DettachCommand;
-import org.apache.cloudstack.storage.command.TemplateOrVolumePostUploadCommand;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
-import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
-import org.apache.cloudstack.storage.image.datastore.ImageStoreEntity;
-import org.apache.cloudstack.storage.to.TemplateObjectTO;
-import org.apache.cloudstack.utils.imagestore.ImageStoreUtil;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -487,8 +487,8 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         final long poolId = pool.getId();
         final long templateId = template.getId();
-        VMTemplateStoragePoolVO templateStoragePoolRef;
-        TemplateDataStoreVO templateStoreRef;
+        final VMTemplateStoragePoolVO templateStoragePoolRef;
+        final TemplateDataStoreVO templateStoreRef;
 
         templateStoragePoolRef = _tmpltPoolDao.findByPoolTemplate(poolId, templateId);
         if (templateStoragePoolRef != null) {
@@ -814,7 +814,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
     @Override
     public DataStore getImageStore(final String storeUuid, final Long zoneId) {
-        DataStore imageStore;
+        final DataStore imageStore;
         if (storeUuid != null) {
             imageStore = _dataStoreMgr.getDataStore(storeUuid, DataStoreRole.Image);
         } else {
@@ -831,7 +831,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     public String getChecksum(final DataStore store, final String templatePath) {
         final EndPoint ep = _epSelector.select(store);
         final ComputeChecksumCommand cmd = new ComputeChecksumCommand(store.getTO(), templatePath);
-        Answer answer;
+        final Answer answer;
         if (ep == null) {
             final String errMsg = "No remote endpoint to send command, check if host or ssvm is down?";
             s_logger.error(errMsg);
@@ -1357,9 +1357,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         final HypervisorType hyperType;
-        VolumeVO volume;
+        final VolumeVO volume;
         SnapshotVO snapshot = null;
-        VMTemplateVO privateTemplate;
+        final VMTemplateVO privateTemplate;
         if (volumeId != null) { // create template from volume
             volume = _volumeDao.findById(volumeId);
             if (volume == null) {
@@ -1518,7 +1518,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             if (store == null) {
                 throw new CloudRuntimeException("cannot find an image store for zone " + zoneId);
             }
-            AsyncCallFuture<TemplateApiResult> future;
+            final AsyncCallFuture<TemplateApiResult> future;
 
             if (snapshotId != null) {
                 final DataStoreRole dataStoreRole = ApiResponseHelper.getDataStoreRole(snapshot, _snapshotStoreDao, _dataStoreMgr);
@@ -1541,7 +1541,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 throw new CloudRuntimeException("Creating private Template need to specify snapshotId or volumeId");
             }
 
-            CommandResult result;
+            final CommandResult result;
             try {
                 result = future.get();
                 if (result.isFailed()) {
@@ -1688,7 +1688,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             template.setSortKey(sortKey);
         }
 
-        ImageFormat imageFormat;
+        final ImageFormat imageFormat;
         if (format != null) {
             try {
                 imageFormat = ImageFormat.valueOf(format.toUpperCase());
@@ -1880,7 +1880,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         final DataTO isoTO = tmplt.getTO();
         final DiskTO disk = new DiskTO(isoTO, null, null, Volume.Type.ISO);
-        Command cmd;
+        final Command cmd;
         if (attach) {
             cmd = new AttachCommand(disk, vmName);
         } else {

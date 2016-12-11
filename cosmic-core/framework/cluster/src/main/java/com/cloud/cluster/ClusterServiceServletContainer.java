@@ -1,7 +1,7 @@
 package com.cloud.cluster;
 
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,7 +1,7 @@
 package com.cloud.server;
 
+import com.cloud.api.ResourceDetail;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import org.apache.cloudstack.api.ResourceDetail;
 
 import java.util.List;
 import java.util.Map;

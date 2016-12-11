@@ -1,11 +1,11 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
+import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.projects.ProjectInvitation;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.ProjectInvitationResponse;
 
 import java.util.List;
 

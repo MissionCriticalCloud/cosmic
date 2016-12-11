@@ -1,11 +1,11 @@
 package com.cloud.cluster;
 
 import com.cloud.cluster.dao.ManagementServerHostDao;
+import com.cloud.framework.config.ConfigDepot;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.db.DbProperties;
-import org.apache.cloudstack.framework.config.ConfigDepot;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

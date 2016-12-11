@@ -1,13 +1,13 @@
 package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.DiskOfferingJoinVO;
+import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import org.apache.cloudstack.api.response.DiskOfferingResponse;
 
 import java.util.List;
 

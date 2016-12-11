@@ -1,15 +1,24 @@
 package com.cloud.network.security;
 
+import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.NetworkRulesSystemVmCommand;
 import com.cloud.agent.api.NetworkRulesVmSecondaryIpCommand;
 import com.cloud.agent.api.SecurityGroupRulesCmd;
 import com.cloud.agent.api.SecurityGroupRulesCmd.IpPortAndProto;
 import com.cloud.agent.manager.Commands;
+import com.cloud.api.command.user.securitygroup.AuthorizeSecurityGroupEgressCmd;
+import com.cloud.api.command.user.securitygroup.AuthorizeSecurityGroupIngressCmd;
+import com.cloud.api.command.user.securitygroup.CreateSecurityGroupCmd;
+import com.cloud.api.command.user.securitygroup.DeleteSecurityGroupCmd;
+import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupEgressCmd;
+import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupIngressCmd;
 import com.cloud.api.query.dao.SecurityGroupJoinDao;
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.configuration.Config;
+import com.cloud.context.CallContext;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
@@ -18,6 +27,9 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceInUseException;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.identity.ManagementServerNode;
+import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.security.SecurityGroupWork.Step;
@@ -65,18 +77,6 @@ import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.SecurityChecker.AccessType;
-import org.apache.cloudstack.api.command.user.securitygroup.AuthorizeSecurityGroupEgressCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.AuthorizeSecurityGroupIngressCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.CreateSecurityGroupCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.DeleteSecurityGroupCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.RevokeSecurityGroupEgressCmd;
-import org.apache.cloudstack.api.command.user.securitygroup.RevokeSecurityGroupIngressCmd;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.managed.context.ManagedContextRunnable;
-import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
 import javax.ejb.ConcurrentAccessException;
 import javax.inject.Inject;
@@ -308,7 +308,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         //create command for the to add ip in ipset and arptables rules
         final NetworkRulesVmSecondaryIpCommand cmd = new NetworkRulesVmSecondaryIpCommand(vmName, vmMac, secondaryIp, ruleAction);
         s_logger.debug("Asking agent to configure rules for vm secondary ip");
-        Commands cmds;
+        final Commands cmds;
 
         cmds = new Commands(cmd);
         try {
@@ -324,8 +324,8 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
 
     private List<SecurityGroupRuleVO> authorizeSecurityGroupRule(final Long securityGroupId, String protocol, final Integer startPort, Integer endPort, final Integer icmpType,
                                                                  final Integer icmpCode, final List<String> cidrList, final Map groupList, final SecurityRuleType ruleType) {
-        Integer startPortOrType;
-        Integer endPortOrCode;
+        final Integer startPortOrType;
+        final Integer endPortOrCode;
 
         // Validate parameters
         final SecurityGroup securityGroup = _securityGroupDao.findById(securityGroupId);
@@ -768,7 +768,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
     public String getSecurityGroupsNamesForVm(final long vmId) {
         try {
             final List<SecurityGroupVMMapVO> networkGroupsToVmMap = _securityGroupVMMapDao.listByInstanceId(vmId);
-            int size;
+            final int size;
             int j = 0;
             final StringBuilder networkGroupNames = new StringBuilder();
 
@@ -917,7 +917,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
                 UserVm vm;
-                Long seqnum;
+                final Long seqnum;
 
                 boolean locked = false;
                 try {
@@ -933,7 +933,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
                         return;
                     }
                     locked = true;
-                    Long agentId;
+                    final Long agentId;
                     final VmRulesetLogVO log = _rulesetLogDao.findByVmId(userVmId);
                     if (log == null) {
                         s_logger.warn("Cannot find log record for vm id=" + userVmId);
@@ -1154,7 +1154,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
             return;
         }
         if (vm.getType() != VirtualMachine.Type.User) {
-            Commands cmds;
+            final Commands cmds;
             final NetworkRulesSystemVmCommand nrc = new NetworkRulesSystemVmCommand(vm.getInstanceName(), vm.getType());
             cmds = new Commands(nrc);
             try {

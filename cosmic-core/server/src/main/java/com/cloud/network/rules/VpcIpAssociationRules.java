@@ -6,10 +6,10 @@ import com.cloud.network.Network;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.Nic;
 import com.cloud.vm.dao.NicDao;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class VpcIpAssociationRules extends RuleApplier {
             final String broadcastURI = BroadcastDomainType.Vlan.toUri(ipAddr.getVlanTag()).toString();
             final Nic nic = nicDao.findByNetworkIdInstanceIdAndBroadcastUri(ipAddr.getNetworkId(), _router.getId(), broadcastURI);
 
-            String macAddress;
+            final String macAddress;
             if (nic == null) {
                 if (ipAddr.getState() != IpAddress.State.Releasing) {
                     throw new CloudRuntimeException("Unable to find the nic in network " + ipAddr.getNetworkId() + "  to apply the ip address " + ipAddr + " for");

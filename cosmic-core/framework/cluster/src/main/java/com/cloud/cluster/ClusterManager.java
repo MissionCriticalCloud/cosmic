@@ -1,7 +1,7 @@
 package com.cloud.cluster;
 
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.utils.component.Manager;
-import org.apache.cloudstack.framework.config.ConfigKey;
 
 public interface ClusterManager extends Manager {
     static final String ALERT_SUBJECT = "cluster-alert";

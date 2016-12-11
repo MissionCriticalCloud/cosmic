@@ -1,11 +1,11 @@
 package com.cloud.usage.parser;
 
+import com.cloud.usage.UsageTypes;
 import com.cloud.usage.UsageVMSnapshotVO;
 import com.cloud.usage.UsageVO;
 import com.cloud.usage.dao.UsageDao;
 import com.cloud.usage.dao.UsageVMSnapshotDao;
 import com.cloud.user.AccountVO;
-import org.apache.cloudstack.usage.UsageTypes;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

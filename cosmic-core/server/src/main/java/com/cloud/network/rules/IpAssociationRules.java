@@ -4,7 +4,7 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;
-import org.apache.cloudstack.network.topology.NetworkTopologyVisitor;
+import com.cloud.network.topology.NetworkTopologyVisitor;
 
 import java.util.List;
 

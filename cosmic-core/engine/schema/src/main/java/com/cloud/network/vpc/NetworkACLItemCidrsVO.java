@@ -1,6 +1,6 @@
 package com.cloud.network.vpc;
 
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.api.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +34,7 @@ public class NetworkACLItemCidrsVO implements InternalIdentity {
     }
 
     /* (non-Javadoc)
-     * @see org.apache.cloudstack.api.InternalIdentity#getId()
+     * @see InternalIdentity#getId()
      */
     @Override
     public long getId() {

@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
-import org.apache.cloudstack.acl.ControlledEntity;
-import org.apache.cloudstack.api.Identity;
-import org.apache.cloudstack.api.InternalIdentity;
+import com.cloud.acl.ControlledEntity;
+import com.cloud.api.Identity;
+import com.cloud.api.InternalIdentity;
 
 /**
  * This is the interface for all VO classes representing DB views created for previous ControlledEntity.

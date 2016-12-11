@@ -1,10 +1,39 @@
 package com.cloud.configuration;
 
+import com.cloud.acl.SecurityChecker;
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.AffinityGroupService;
+import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.alert.AlertManager;
 import com.cloud.api.ApiDBUtils;
+import com.cloud.api.command.admin.config.UpdateCfgCmd;
+import com.cloud.api.command.admin.network.CreateNetworkOfferingCmd;
+import com.cloud.api.command.admin.network.DeleteNetworkOfferingCmd;
+import com.cloud.api.command.admin.network.UpdateNetworkOfferingCmd;
+import com.cloud.api.command.admin.offering.CreateDiskOfferingCmd;
+import com.cloud.api.command.admin.offering.CreateServiceOfferingCmd;
+import com.cloud.api.command.admin.offering.DeleteDiskOfferingCmd;
+import com.cloud.api.command.admin.offering.DeleteServiceOfferingCmd;
+import com.cloud.api.command.admin.offering.UpdateDiskOfferingCmd;
+import com.cloud.api.command.admin.offering.UpdateServiceOfferingCmd;
+import com.cloud.api.command.admin.pod.DeletePodCmd;
+import com.cloud.api.command.admin.pod.UpdatePodCmd;
+import com.cloud.api.command.admin.region.CreatePortableIpRangeCmd;
+import com.cloud.api.command.admin.region.DeletePortableIpRangeCmd;
+import com.cloud.api.command.admin.region.ListPortableIpRangesCmd;
+import com.cloud.api.command.admin.vlan.CreateVlanIpRangeCmd;
+import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
+import com.cloud.api.command.admin.vlan.DeleteVlanIpRangeCmd;
+import com.cloud.api.command.admin.vlan.ReleasePublicIpRangeCmd;
+import com.cloud.api.command.admin.zone.CreateZoneCmd;
+import com.cloud.api.command.admin.zone.DeleteZoneCmd;
+import com.cloud.api.command.admin.zone.UpdateZoneCmd;
+import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
+import com.cloud.config.Configuration;
 import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterDetailsDao;
@@ -39,6 +68,8 @@ import com.cloud.deploy.DeploymentClusterPlanner;
 import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
+import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
+import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
@@ -48,6 +79,11 @@ import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.ConfigDepot;
+import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
+import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.gpu.GPU;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -87,6 +123,15 @@ import com.cloud.org.Grouping;
 import com.cloud.org.Grouping.AllocationState;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
+import com.cloud.region.PortableIp;
+import com.cloud.region.PortableIpDao;
+import com.cloud.region.PortableIpRange;
+import com.cloud.region.PortableIpRangeDao;
+import com.cloud.region.PortableIpRangeVO;
+import com.cloud.region.PortableIpVO;
+import com.cloud.region.Region;
+import com.cloud.region.RegionVO;
+import com.cloud.region.dao.RegionDao;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingDetailsVO;
@@ -99,6 +144,9 @@ import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.test.IPRangeConfig;
 import com.cloud.user.Account;
 import com.cloud.user.AccountDetailVO;
@@ -131,54 +179,6 @@ import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicIpAliasVO;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.apache.cloudstack.acl.SecurityChecker;
-import org.apache.cloudstack.affinity.AffinityGroup;
-import org.apache.cloudstack.affinity.AffinityGroupService;
-import org.apache.cloudstack.affinity.dao.AffinityGroupDao;
-import org.apache.cloudstack.api.command.admin.config.UpdateCfgCmd;
-import org.apache.cloudstack.api.command.admin.network.CreateNetworkOfferingCmd;
-import org.apache.cloudstack.api.command.admin.network.DeleteNetworkOfferingCmd;
-import org.apache.cloudstack.api.command.admin.network.UpdateNetworkOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.CreateDiskOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.CreateServiceOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.DeleteDiskOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.DeleteServiceOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.UpdateDiskOfferingCmd;
-import org.apache.cloudstack.api.command.admin.offering.UpdateServiceOfferingCmd;
-import org.apache.cloudstack.api.command.admin.pod.DeletePodCmd;
-import org.apache.cloudstack.api.command.admin.pod.UpdatePodCmd;
-import org.apache.cloudstack.api.command.admin.region.CreatePortableIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.region.DeletePortableIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.region.ListPortableIpRangesCmd;
-import org.apache.cloudstack.api.command.admin.vlan.CreateVlanIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.vlan.DedicatePublicIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.vlan.DeleteVlanIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.vlan.ReleasePublicIpRangeCmd;
-import org.apache.cloudstack.api.command.admin.zone.CreateZoneCmd;
-import org.apache.cloudstack.api.command.admin.zone.DeleteZoneCmd;
-import org.apache.cloudstack.api.command.admin.zone.UpdateZoneCmd;
-import org.apache.cloudstack.api.command.user.network.ListNetworkOfferingsCmd;
-import org.apache.cloudstack.config.Configuration;
-import org.apache.cloudstack.context.CallContext;
-import org.apache.cloudstack.engine.orchestration.service.NetworkOrchestrationService;
-import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
-import org.apache.cloudstack.framework.config.ConfigDepot;
-import org.apache.cloudstack.framework.config.ConfigKey;
-import org.apache.cloudstack.framework.config.Configurable;
-import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
-import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
-import org.apache.cloudstack.region.PortableIp;
-import org.apache.cloudstack.region.PortableIpDao;
-import org.apache.cloudstack.region.PortableIpRange;
-import org.apache.cloudstack.region.PortableIpRangeDao;
-import org.apache.cloudstack.region.PortableIpRangeVO;
-import org.apache.cloudstack.region.PortableIpVO;
-import org.apache.cloudstack.region.Region;
-import org.apache.cloudstack.region.RegionVO;
-import org.apache.cloudstack.region.dao.RegionDao;
-import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolDetailsDao;
-import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -441,7 +441,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         CallContext.current().setEventDetails(" Name: " + name + " New Value: " + (name.toLowerCase().contains("password") ? "*****" : value == null ? "" : value));
         // check if config value exists
         final ConfigurationVO config = _configDao.findByName(name);
-        String catergory;
+        final String catergory;
 
         // FIX ME - All configuration parameters are not moved from config.java to configKey
         if (config == null) {
@@ -516,7 +516,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 return "Invalid scope id provided for the parameter " + name;
             }
         }
-        Class<?> type;
+        final Class<?> type;
         final Config c = Config.getConfig(name);
         if (c == null) {
             s_logger.warn("Did not find configuration " + name + " in Config.java. Perhaps moved to ConfigDepot");
@@ -1544,7 +1544,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                     // release the dedication for this zone
                     final DedicatedResourceVO resource = _dedicatedDao.findByZoneId(zoneId);
-                    Long resourceId;
+                    final Long resourceId;
                     if (resource != null) {
                         resourceId = resource.getId();
                         if (!_dedicatedDao.remove(resourceId)) {
@@ -1763,7 +1763,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
         // verify that physical network exists
-        PhysicalNetworkVO pNtwk;
+        final PhysicalNetworkVO pNtwk;
         if (physicalNetworkId != null) {
             pNtwk = _physicalNetworkDao.findById(physicalNetworkId);
             if (pNtwk == null) {
@@ -1948,7 +1948,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (newVlanGateway == null && newVlanNetmask == null && sameSubnet == false) {
             throw new InvalidParameterValueException("The ip range dose not belong to any of the existing subnets, Provide the netmask and gateway if you want to add new subnet");
         }
-        Pair<String, String> vlanDetails;
+        final Pair<String, String> vlanDetails;
 
         if (sameSubnet) {
             vlanDetails = new Pair<>(vlanGateway, vlanNetmask);
@@ -2593,7 +2593,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                         providers.add(provider);
 
-                        Set<Service> serviceSet;
+                        final Set<Service> serviceSet;
                         if (providerCombinationToVerify.get(provider) == null) {
                             serviceSet = new HashSet<>();
                         } else {
@@ -3142,7 +3142,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
             for (final NetworkOfferingVO offering : offerings) {
                 boolean addOffering = true;
-                List<Service> checkForProviders;
+                final List<Service> checkForProviders;
 
                 if (checkForTags) {
                     if (!pNtwkTags.contains(offering.getTags())) {
@@ -3472,7 +3472,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         final HostPodVO podFinal = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
 
-        Grouping.AllocationState allocationState;
+        final Grouping.AllocationState allocationState;
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             allocationState = Grouping.AllocationState.valueOf(allocationStateStr);
             podFinal.setAllocationState(allocationState);
@@ -4338,7 +4338,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                     final String ipRange = startIp + "-" + endIp;
                     pod.setDescription(ipRange);
-                    Grouping.AllocationState allocationState;
+                    final Grouping.AllocationState allocationState;
                     if (allocationStateStrFinal != null && !allocationStateStrFinal.isEmpty()) {
                         allocationState = Grouping.AllocationState.valueOf(allocationStateStrFinal);
                         pod.setAllocationState(allocationState);
