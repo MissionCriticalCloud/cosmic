@@ -117,19 +117,19 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
         } catch (final LibvirtException e) {
             s_logger.warn("LibvirtException ", e);
             if (conn != null) {
-                libvirtComputingResource.handleVmStartFailure(conn, vm);
+                libvirtComputingResource.handleVmStartFailure(vm);
             }
             return new StartAnswer(command, e.getMessage());
         } catch (final InternalErrorException e) {
             s_logger.warn("InternalErrorException ", e);
             if (conn != null) {
-                libvirtComputingResource.handleVmStartFailure(conn, vm);
+                libvirtComputingResource.handleVmStartFailure(vm);
             }
             return new StartAnswer(command, e.getMessage());
         } catch (final URISyntaxException e) {
             s_logger.warn("URISyntaxException ", e);
             if (conn != null) {
-                libvirtComputingResource.handleVmStartFailure(conn, vm);
+                libvirtComputingResource.handleVmStartFailure(vm);
             }
             return new StartAnswer(command, e.getMessage());
         } finally {
