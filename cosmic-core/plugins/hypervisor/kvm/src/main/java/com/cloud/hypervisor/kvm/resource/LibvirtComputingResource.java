@@ -1374,6 +1374,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 logger.debug("Giving up on cmdline passing after 100 times, aborting.");
                 return false;
             }
+            // Give it some time to get ready
+            try {
+                Thread.sleep(15000);
+            } catch (final InterruptedException e) {
+                logger.debug("Interrupted while awaiting next try: ", e);
+            }
         }
         return true;
     }
