@@ -19,6 +19,7 @@ import com.cloud.vm.VirtualMachine;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.libvirt.Connect;
 import org.libvirt.DomainInfo.DomainState;
 import org.libvirt.LibvirtException;
@@ -114,20 +115,8 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
 
             state = DomainState.VIR_DOMAIN_RUNNING;
             return new StartAnswer(command);
-        } catch (final LibvirtException e) {
-            s_logger.warn("LibvirtException ", e);
-            if (conn != null) {
-                libvirtComputingResource.handleVmStartFailure(vm);
-            }
-            return new StartAnswer(command, e.getMessage());
-        } catch (final InternalErrorException e) {
-            s_logger.warn("InternalErrorException ", e);
-            if (conn != null) {
-                libvirtComputingResource.handleVmStartFailure(vm);
-            }
-            return new StartAnswer(command, e.getMessage());
-        } catch (final URISyntaxException e) {
-            s_logger.warn("URISyntaxException ", e);
+        } catch (final LibvirtException | InternalErrorException | URISyntaxException e) {
+            s_logger.warn("Exception while starting VM: " + ExceptionUtils.getRootCauseMessage(e));
             if (conn != null) {
                 libvirtComputingResource.handleVmStartFailure(vm);
             }
