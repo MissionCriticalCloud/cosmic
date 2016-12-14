@@ -18,6 +18,7 @@
     <modules>
         <module>api</module>
         <module>apidoc</module>
+        <module>db-scripts</module>
         <module>engine/api</module>
         <module>engine/components-api</module>
         <module>engine/orchestration</module>
@@ -67,8 +68,6 @@
         <module>server</module>
         <module>services/console-proxy-server</module>
         <module>services/secondary-storage-server</module>
-        <module>db-scripts</module>
-        <module>admin-scripts</module>
     </modules>
 
     <dependencies>
