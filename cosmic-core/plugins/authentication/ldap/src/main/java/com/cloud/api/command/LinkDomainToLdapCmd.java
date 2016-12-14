@@ -8,13 +8,13 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.util.UUID;

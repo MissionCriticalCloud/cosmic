@@ -3,7 +3,7 @@ package com.cloud.api;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

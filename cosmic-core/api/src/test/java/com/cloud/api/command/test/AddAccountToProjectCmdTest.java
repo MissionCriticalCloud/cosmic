@@ -1,10 +1,10 @@
 package com.cloud.api.command.test;
 
 import com.cloud.api.command.user.account.AddAccountToProjectCmd;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectService;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

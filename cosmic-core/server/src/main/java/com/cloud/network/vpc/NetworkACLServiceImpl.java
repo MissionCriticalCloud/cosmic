@@ -9,7 +9,6 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
@@ -34,6 +33,7 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import javax.inject.Inject;

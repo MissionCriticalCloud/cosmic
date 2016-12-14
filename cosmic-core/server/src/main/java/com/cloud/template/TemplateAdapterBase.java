@@ -15,7 +15,6 @@ import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.dao.UsageEventDao;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -45,6 +44,7 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.utils.EnumUtils;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
 

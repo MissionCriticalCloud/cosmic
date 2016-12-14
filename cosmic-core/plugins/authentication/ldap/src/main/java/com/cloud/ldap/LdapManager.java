@@ -4,9 +4,9 @@ import com.cloud.api.command.LdapListConfigurationCmd;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.PluggableService;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

@@ -10,11 +10,11 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 import com.cloud.api.ResponseGenerator;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.resource.ResourceService;
 import com.cloud.server.ManagementService;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import junit.framework.TestCase;
 import org.junit.Assert;

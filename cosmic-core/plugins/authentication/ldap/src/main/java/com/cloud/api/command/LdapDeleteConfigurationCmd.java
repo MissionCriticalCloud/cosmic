@@ -6,9 +6,9 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.LdapConfigurationResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.ldap.LdapManager;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 

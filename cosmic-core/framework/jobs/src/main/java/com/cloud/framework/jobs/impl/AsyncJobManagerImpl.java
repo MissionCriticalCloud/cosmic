@@ -18,7 +18,6 @@ import com.cloud.framework.jobs.dao.SyncQueueItemDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDetector;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.identity.ManagementServerNode;
 import com.cloud.jobs.JobInfo;
 import com.cloud.jobs.JobInfo.Status;
 import com.cloud.managed.context.ManagedContextRunnable;
@@ -44,6 +43,7 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
+import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.vm.dao.VMInstanceDao;
 

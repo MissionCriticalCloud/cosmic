@@ -10,8 +10,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.uservm.UserVm;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

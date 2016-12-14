@@ -1,4 +1,4 @@
-package com.cloud.imagestore;
+package com.cloud.utils.imagestore;
 
 import com.cloud.utils.script.Script;
 

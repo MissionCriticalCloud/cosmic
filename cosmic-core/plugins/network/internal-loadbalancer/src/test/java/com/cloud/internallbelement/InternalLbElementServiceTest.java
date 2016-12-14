@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
@@ -15,6 +14,7 @@ import com.cloud.network.element.InternalLoadBalancerElementService;
 import com.cloud.network.element.VirtualRouterProviderVO;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 

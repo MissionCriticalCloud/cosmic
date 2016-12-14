@@ -1,4 +1,4 @@
-package com.cloud.security;
+package com.cloud.utils.security;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;

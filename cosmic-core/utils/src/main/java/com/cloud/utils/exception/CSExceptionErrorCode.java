@@ -38,7 +38,7 @@ public class CSExceptionErrorCode {
             ExceptionErrorCodeMap.put("com.cloud.exception.InsufficientServerCapacityException", 4335);
             ExceptionErrorCodeMap.put("com.cloud.exception.InsufficientStorageCapacityException", 4340);
             ExceptionErrorCodeMap.put("com.cloud.exception.InternalErrorException", 4345);
-            ExceptionErrorCodeMap.put("com.cloud.exception.InvalidParameterValueException", 4350);
+            ExceptionErrorCodeMap.put("InvalidParameterValueException", 4350);
             ExceptionErrorCodeMap.put("com.cloud.exception.ManagementServerException", 4355);
             ExceptionErrorCodeMap.put("com.cloud.exception.NetworkRuleConflictException", 4360);
             ExceptionErrorCodeMap.put("com.cloud.exception.PermissionDeniedException", 4365);

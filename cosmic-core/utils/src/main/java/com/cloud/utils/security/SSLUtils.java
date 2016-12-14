@@ -1,4 +1,4 @@
-package com.cloud.security;
+package com.cloud.utils.security;
 
 import javax.net.ssl.SSLContext;
 import java.security.NoSuchAlgorithmException;

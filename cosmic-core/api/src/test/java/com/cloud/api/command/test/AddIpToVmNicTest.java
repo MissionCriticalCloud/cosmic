@@ -8,10 +8,10 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.NetworkService;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.NicSecondaryIp;
 
 import junit.framework.Assert;

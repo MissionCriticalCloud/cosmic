@@ -13,9 +13,9 @@ import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.Network;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.NicSecondaryIp;
 
 import org.slf4j.Logger;

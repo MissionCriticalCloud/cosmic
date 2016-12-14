@@ -11,7 +11,6 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.dao.LoadBalancerCertMapDao;
 import com.cloud.network.dao.LoadBalancerCertMapVO;
 import com.cloud.network.dao.LoadBalancerVO;
@@ -25,6 +24,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

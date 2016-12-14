@@ -11,7 +11,6 @@ import com.cloud.api.command.LdapListUsersCmd
 import com.cloud.api.command.LdapUserSearchCmd
 import com.cloud.api.command.LinkDomainToLdapCmd
 import com.cloud.api.response.LinkDomainToLdapResponse
-import com.cloud.exception.InvalidParameterValueException
 import com.cloud.ldap.LdapConfiguration
 import com.cloud.ldap.LdapConfigurationVO
 import com.cloud.ldap.LdapContextFactory
@@ -25,6 +24,7 @@ import com.cloud.ldap.NoLdapUserMatchingQueryException
 import com.cloud.ldap.dao.LdapConfigurationDaoImpl
 import com.cloud.ldap.dao.LdapTrustMapDao
 import com.cloud.utils.Pair
+import com.cloud.utils.exception.InvalidParameterValueException
 
 import javax.naming.NamingException
 import javax.naming.ldap.InitialLdapContext

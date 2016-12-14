@@ -5,8 +5,8 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.UserResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.UserAccount;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

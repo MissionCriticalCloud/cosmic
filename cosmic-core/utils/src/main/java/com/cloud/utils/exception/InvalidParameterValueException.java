@@ -1,6 +1,4 @@
-package com.cloud.exception;
-
-import com.cloud.utils.exception.CloudRuntimeException;
+package com.cloud.utils.exception;
 
 public class InvalidParameterValueException extends CloudRuntimeException {
 

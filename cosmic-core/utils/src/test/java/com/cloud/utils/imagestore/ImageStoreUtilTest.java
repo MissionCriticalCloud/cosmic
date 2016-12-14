@@ -1,4 +1,4 @@
-package com.cloud.imagestore;
+package com.cloud.utils.imagestore;
 
 import java.net.MalformedURLException;
 import java.net.URL;

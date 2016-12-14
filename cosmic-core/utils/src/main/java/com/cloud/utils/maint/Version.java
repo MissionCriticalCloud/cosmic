@@ -1,4 +1,4 @@
-package com.cloud.maint;
+package com.cloud.utils.maint;
 
 public class Version {
     public static String trimToPatch(String version) {

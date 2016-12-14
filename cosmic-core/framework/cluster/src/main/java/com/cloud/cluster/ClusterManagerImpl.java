@@ -5,7 +5,6 @@ import com.cloud.cluster.dao.ManagementServerHostPeerDao;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
-import com.cloud.identity.ManagementServerNode;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Profiler;
@@ -22,6 +21,7 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.events.SubscriptionMgr;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
+import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.utils.net.NetUtils;
 

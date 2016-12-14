@@ -1,4 +1,4 @@
-package com.cloud.hypervisor;
+package com.cloud.utils.hypervisor;
 
 import com.cloud.utils.exception.CloudRuntimeException;
 

@@ -1,6 +1,5 @@
 package com.cloud.upgrade;
 
-import com.cloud.maint.Version;
 import com.cloud.upgrade.dao.VersionDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;
@@ -8,6 +7,7 @@ import com.cloud.utils.component.SystemIntegrityChecker;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.maint.Version;
 
 import javax.inject.Inject;
 import java.sql.Connection;

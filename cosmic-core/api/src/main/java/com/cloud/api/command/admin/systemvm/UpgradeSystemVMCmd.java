@@ -12,9 +12,9 @@ import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine;
 
 import java.util.Map;

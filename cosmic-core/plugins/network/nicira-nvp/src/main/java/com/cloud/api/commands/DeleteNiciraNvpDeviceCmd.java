@@ -12,11 +12,11 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.element.NiciraNvpElementService;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 

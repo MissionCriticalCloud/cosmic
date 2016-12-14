@@ -1,6 +1,5 @@
 package com.cloud.storage.dao;
 
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
@@ -22,6 +21,7 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.sql.PreparedStatement;

@@ -13,10 +13,10 @@ import com.cloud.api.response.AutoScaleVmGroupResponse;
 import com.cloud.api.response.AutoScaleVmProfileResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.AutoScaleVmGroup;
 import com.cloud.network.rules.LoadBalancer;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

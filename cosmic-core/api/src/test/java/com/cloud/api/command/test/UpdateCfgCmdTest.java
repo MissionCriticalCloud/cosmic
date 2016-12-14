@@ -6,7 +6,7 @@ import com.cloud.api.command.admin.config.UpdateCfgCmd;
 import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.config.Configuration;
 import com.cloud.configuration.ConfigurationService;
-import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

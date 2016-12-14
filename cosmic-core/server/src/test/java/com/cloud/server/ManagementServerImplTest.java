@@ -5,11 +5,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import com.cloud.api.command.user.ssh.RegisterSSHKeyPairCmd;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
 import com.cloud.user.SSHKeyPair;
 import com.cloud.user.SSHKeyPairVO;
 import com.cloud.user.dao.SSHKeyPairDao;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

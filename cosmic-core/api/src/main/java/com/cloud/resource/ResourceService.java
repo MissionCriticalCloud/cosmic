@@ -10,11 +10,11 @@ import com.cloud.api.command.admin.host.ReconnectHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Cluster;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import java.util.List;

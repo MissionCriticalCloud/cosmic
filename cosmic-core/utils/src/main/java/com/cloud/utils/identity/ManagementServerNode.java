@@ -1,4 +1,4 @@
-package com.cloud.identity;
+package com.cloud.utils.identity;
 
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;

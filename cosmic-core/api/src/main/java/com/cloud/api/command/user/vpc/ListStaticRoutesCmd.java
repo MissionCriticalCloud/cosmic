@@ -8,10 +8,10 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.VpcResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

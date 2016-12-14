@@ -1,4 +1,4 @@
-package com.cloud.graphite;
+package com.cloud.utils.graphite;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

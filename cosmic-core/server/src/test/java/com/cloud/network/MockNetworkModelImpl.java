@@ -2,7 +2,6 @@ package com.cloud.network;
 
 import com.cloud.dc.Vlan;
 import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
@@ -19,6 +18,7 @@ import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.user.Account;
 import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachine;

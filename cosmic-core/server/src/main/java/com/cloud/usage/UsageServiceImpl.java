@@ -8,7 +8,6 @@ import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
@@ -43,6 +42,7 @@ import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 

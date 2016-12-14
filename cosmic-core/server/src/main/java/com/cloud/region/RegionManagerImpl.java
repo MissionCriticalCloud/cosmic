@@ -6,7 +6,6 @@ import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.region.dao.RegionDao;
 import com.cloud.user.Account;
@@ -17,6 +16,7 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DbProperties;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

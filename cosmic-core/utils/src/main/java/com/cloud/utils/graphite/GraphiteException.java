@@ -1,4 +1,4 @@
-package com.cloud.graphite;
+package com.cloud.utils.graphite;
 
 public class GraphiteException extends RuntimeException {
 

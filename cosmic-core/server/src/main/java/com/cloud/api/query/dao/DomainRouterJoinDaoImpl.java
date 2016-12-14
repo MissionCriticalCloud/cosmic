@@ -6,7 +6,6 @@ import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.NicResponse;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.maint.Version;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
@@ -15,6 +14,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
+import com.cloud.utils.maint.Version;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

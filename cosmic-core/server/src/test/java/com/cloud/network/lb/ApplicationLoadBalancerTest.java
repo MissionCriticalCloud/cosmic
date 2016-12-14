@@ -5,7 +5,6 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.lb.ApplicationLoadBalancerRuleVO;
@@ -27,6 +26,7 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 

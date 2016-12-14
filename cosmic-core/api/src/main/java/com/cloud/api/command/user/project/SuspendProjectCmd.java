@@ -10,9 +10,9 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.projects.Project;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

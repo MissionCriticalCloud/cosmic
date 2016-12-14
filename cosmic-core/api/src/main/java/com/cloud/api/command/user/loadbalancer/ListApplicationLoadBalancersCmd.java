@@ -9,10 +9,10 @@ import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.Pair;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;

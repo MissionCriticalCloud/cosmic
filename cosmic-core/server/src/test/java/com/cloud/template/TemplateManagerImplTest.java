@@ -28,7 +28,6 @@ import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.event.dao.UsageEventDao;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
@@ -71,6 +70,7 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 

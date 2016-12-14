@@ -7,9 +7,9 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.ResizeVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.storage.Volume;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 @APICommand(name = "resizeVolume", description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

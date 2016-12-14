@@ -15,10 +15,10 @@ import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.SecurityGroupRuleResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityRule;
 import com.cloud.utils.StringUtils;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Collection;
 import java.util.HashMap;
