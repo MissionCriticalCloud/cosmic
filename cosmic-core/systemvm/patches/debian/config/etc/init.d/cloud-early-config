@@ -980,6 +980,9 @@ EOF
   cp /etc/cloud-nic.rules /etc/udev/rules.d/cloud-nic.rules
   echo "" > /etc/dnsmasq.d/dhcphosts.txt
   echo "dhcp-hostsfile=/etc/dhcphosts.txt" > /etc/dnsmasq.d/cloud.conf
+  echo "dhcp-optsfile=/etc/dhcpopts.txt" >> /etc/dnsmasq.d/cloud.conf
+  echo "log-dhcp" >> /etc/dnsmasq.d/cloud.conf
+  touch /etc/dhcpopts.txt
 
   [ -z $DOMAIN ] && DOMAIN="cloudnine.internal"
   #DNS server will append $DOMAIN to local queries
