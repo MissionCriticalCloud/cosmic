@@ -25,6 +25,7 @@ import com.cloud.upgrade.dao.Upgrade480to500;
 import com.cloud.upgrade.dao.Upgrade500to501;
 import com.cloud.upgrade.dao.Upgrade501to510;
 import com.cloud.upgrade.dao.Upgrade510to511;
+import com.cloud.upgrade.dao.Upgrade511to520;
 import com.cloud.upgrade.dao.VersionDao;
 import com.cloud.upgrade.dao.VersionDaoImpl;
 import com.cloud.upgrade.dao.VersionVO;
@@ -67,94 +68,103 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
 
         _upgradeMap.put("4.0.0", new DbUpgrade[]{new Upgrade40to41(), new Upgrade410to420(), new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new
                 Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.0.1", new DbUpgrade[]{new Upgrade40to41(), new Upgrade410to420(), new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new
                 Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.0.2", new DbUpgrade[]{new Upgrade40to41(), new Upgrade410to420(), new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new
                 Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.1.0", new DbUpgrade[]{new Upgrade410to420(), new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new Upgrade440to441(), new
                 Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new
-                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.1.1", new DbUpgrade[]{new Upgrade410to420(), new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new Upgrade440to441(), new
                 Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new
-                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.2.0", new DbUpgrade[]{new Upgrade420to421(), new Upgrade421to430(), new Upgrade430to440(), new Upgrade440to441(), new Upgrade441to442(), new
                 Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new
-                Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.2.1", new DbUpgrade[]{new Upgrade421to430(), new Upgrade430to440(), new Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new
                 Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new
-                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.3.0", new DbUpgrade[]{new Upgrade430to440(), new Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new
                 Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new
-                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.3.1", new DbUpgrade[]{new Upgrade431to440(), new Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new
                 Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new
-                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.3.2", new DbUpgrade[]{new Upgrade432to440(), new Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new
                 Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new
-                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.4.0", new DbUpgrade[]{new Upgrade440to441(), new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new
                 Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new
-                Upgrade501to510(), new Upgrade510to511()});
+                Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.4.1", new DbUpgrade[]{new Upgrade441to442(), new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new
                 Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new
-                Upgrade510to511()});
+                Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.4.2", new DbUpgrade[]{new Upgrade442to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.4.3", new DbUpgrade[]{new Upgrade443to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.4.4", new DbUpgrade[]{new Upgrade444to450(), new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new
-                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
         _upgradeMap.put("4.5.0", new DbUpgrade[]{new Upgrade450to451(), new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new
-                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.5.1", new DbUpgrade[]{new Upgrade451to452(), new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new
-                Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.5.2", new DbUpgrade[]{new Upgrade452to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new
-                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.5.3", new DbUpgrade[]{new Upgrade453to460(), new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new
-                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.6.0", new DbUpgrade[]{new Upgrade460to461(), new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new
-                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+                Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.6.1", new DbUpgrade[]{new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new
-                Upgrade501to510(), new Upgrade510to511()});
+                Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.6.2", new DbUpgrade[]{new Upgrade461to470(), new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new
-                Upgrade501to510(), new Upgrade510to511()});
+                Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
         _upgradeMap.put("4.7.0", new DbUpgrade[]{new Upgrade470to471(), new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new
-                Upgrade510to511()});
+                Upgrade510to511(), new Upgrade511to520()});
 
-        _upgradeMap.put("4.7.1", new DbUpgrade[]{new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+        _upgradeMap.put("4.7.1", new DbUpgrade[]{new Upgrade471to480(), new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new
+                Upgrade511to520()});
 
-        _upgradeMap.put("4.8.0", new DbUpgrade[]{new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+        _upgradeMap.put("4.8.0", new DbUpgrade[]{new Upgrade480to500(), new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
-        _upgradeMap.put("5.0.0", new DbUpgrade[]{new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
+        _upgradeMap.put("5.0.0", new DbUpgrade[]{new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
-        _upgradeMap.put("5.0.1", new DbUpgrade[]{new Upgrade501to510(), new Upgrade510to511()});
+        _upgradeMap.put("5.0.1", new DbUpgrade[]{new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520()});
 
-        _upgradeMap.put("5.1.0", new DbUpgrade[]{new Upgrade510to511()});
+        _upgradeMap.put("5.1.0", new DbUpgrade[]{new Upgrade510to511(), new Upgrade511to520()});
+
+        _upgradeMap.put("5.1.1", new DbUpgrade[]{new Upgrade511to520()});
     }
 
     @Override
