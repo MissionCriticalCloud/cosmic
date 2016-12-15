@@ -1,0 +1,3 @@
+--;
+-- Schema upgrade from 5.1.1 to 5.2.0;
+--;
