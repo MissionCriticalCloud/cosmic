@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.context.CallContext;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
@@ -29,6 +28,7 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.MockAccountManagerImpl;
 import com.cloud.user.User;
 import com.cloud.user.UserVO;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.UUID;

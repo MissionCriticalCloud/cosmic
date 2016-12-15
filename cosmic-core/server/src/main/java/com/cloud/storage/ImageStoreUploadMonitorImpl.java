@@ -19,7 +19,6 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.identity.ManagementServerNode;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.storage.Volume.Event;
 import com.cloud.storage.command.UploadStatusAnswer;
@@ -43,6 +42,7 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.identity.ManagementServerNode;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

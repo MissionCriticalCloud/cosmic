@@ -1,7 +1,7 @@
 package com.cloud.region;
 
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.region.dao.RegionDao;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;

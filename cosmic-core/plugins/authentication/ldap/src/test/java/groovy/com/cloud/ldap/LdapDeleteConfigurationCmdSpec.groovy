@@ -3,8 +3,8 @@ package groovy.com.cloud.ldap
 import com.cloud.api.ServerApiException
 import com.cloud.api.command.LdapDeleteConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
-import com.cloud.exception.InvalidParameterValueException
 import com.cloud.ldap.LdapManager
+import com.cloud.utils.exception.InvalidParameterValueException
 
 class LdapDeleteConfigurationCmdSpec extends spock.lang.Specification {
 

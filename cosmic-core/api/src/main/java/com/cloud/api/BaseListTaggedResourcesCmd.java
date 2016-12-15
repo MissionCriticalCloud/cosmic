@@ -1,6 +1,6 @@
 package com.cloud.api;
 
-import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Collection;
 import java.util.HashMap;

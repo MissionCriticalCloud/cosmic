@@ -66,7 +66,7 @@
 
     <bean id="cloudZonesStartupProcessor" class="com.cloud.hypervisor.CloudZonesStartupProcessor" />
 
-    <bean id="managementServerNode" class="com.cloud.identity.ManagementServerNode" />
+    <bean id="managementServerNode" class="com.cloud.utils.identity.ManagementServerNode" />
 
     <bean id="ExternalIpAddressAllocator" class="com.cloud.network.ExternalIpAddressAllocator">
         <property name="name" value="Basic" />

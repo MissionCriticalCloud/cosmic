@@ -8,7 +8,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.HostScope;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreParameters;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
@@ -22,6 +21,7 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;

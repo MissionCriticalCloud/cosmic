@@ -10,7 +10,7 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.capacity.Capacity;
-import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.text.DecimalFormat;
 import java.util.List;

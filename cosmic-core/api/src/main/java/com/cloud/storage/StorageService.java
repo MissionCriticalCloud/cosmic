@@ -9,9 +9,9 @@ import com.cloud.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
 import com.cloud.api.command.admin.storage.UpdateStoragePoolCmd;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.net.UnknownHostException;
 import java.util.Map;

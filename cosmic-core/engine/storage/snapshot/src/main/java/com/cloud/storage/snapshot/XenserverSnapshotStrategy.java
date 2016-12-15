@@ -10,7 +10,6 @@ import com.cloud.engine.subsystem.api.storage.SnapshotResult;
 import com.cloud.engine.subsystem.api.storage.SnapshotService;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -32,6 +31,7 @@ import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.inject.Inject;

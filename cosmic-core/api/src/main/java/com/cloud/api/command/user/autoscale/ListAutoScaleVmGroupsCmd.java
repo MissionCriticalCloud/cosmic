@@ -11,8 +11,8 @@ import com.cloud.api.response.AutoScaleVmProfileResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.as.AutoScaleVmGroup;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;

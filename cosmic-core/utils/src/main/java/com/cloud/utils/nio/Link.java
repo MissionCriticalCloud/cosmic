@@ -1,8 +1,8 @@
 package com.cloud.utils.nio;
 
-import com.cloud.security.SSLUtils;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.db.DbProperties;
+import com.cloud.utils.security.SSLUtils;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;

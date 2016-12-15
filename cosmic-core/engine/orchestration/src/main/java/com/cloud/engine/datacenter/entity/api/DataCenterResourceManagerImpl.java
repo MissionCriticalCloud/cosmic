@@ -10,7 +10,7 @@ import com.cloud.engine.datacenter.entity.api.db.dao.EngineClusterDao;
 import com.cloud.engine.datacenter.entity.api.db.dao.EngineDataCenterDao;
 import com.cloud.engine.datacenter.entity.api.db.dao.EngineHostDao;
 import com.cloud.engine.datacenter.entity.api.db.dao.EngineHostPodDao;
-import com.cloud.exception.InvalidParameterValueException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 

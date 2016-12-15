@@ -15,11 +15,11 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.network.as.AutoScaleVmProfile;
 import com.cloud.user.Account;
 import com.cloud.user.User;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.HashMap;
 import java.util.Map;

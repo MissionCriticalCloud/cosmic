@@ -6,9 +6,9 @@ import com.cloud.api.command.admin.host.AddHostCmd;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.host.Host;
 import com.cloud.resource.ResourceService;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Arrays;
 

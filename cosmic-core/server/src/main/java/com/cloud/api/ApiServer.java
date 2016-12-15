@@ -45,7 +45,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.AccountLimitException;
 import com.cloud.exception.CloudAuthenticationException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.RequestLimitException;
 import com.cloud.exception.ResourceAllocationException;
@@ -81,6 +80,7 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

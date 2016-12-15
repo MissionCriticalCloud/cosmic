@@ -14,10 +14,10 @@ import com.cloud.api.command.LinkDomainToLdapCmd;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.ldap.dao.LdapConfigurationDao;
 import com.cloud.ldap.dao.LdapTrustMapDao;
 import com.cloud.utils.Pair;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

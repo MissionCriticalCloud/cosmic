@@ -6,9 +6,9 @@ import com.cloud.api.command.user.securitygroup.CreateSecurityGroupCmd;
 import com.cloud.api.command.user.securitygroup.DeleteSecurityGroupCmd;
 import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupEgressCmd;
 import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupIngressCmd;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceInUseException;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

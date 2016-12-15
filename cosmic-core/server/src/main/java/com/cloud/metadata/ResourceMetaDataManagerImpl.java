@@ -4,7 +4,6 @@ import com.cloud.api.ResourceDetail;
 import com.cloud.dc.dao.DataCenterDetailsDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.dao.NetworkDetailsDao;
 import com.cloud.resourcedetail.ResourceDetailsDao;
 import com.cloud.resourcedetail.dao.AutoScaleVmGroupDetailsDao;
@@ -36,6 +35,7 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.dao.NicDetailsDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 

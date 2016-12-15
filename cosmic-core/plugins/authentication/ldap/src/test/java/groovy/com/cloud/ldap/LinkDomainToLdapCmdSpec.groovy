@@ -3,7 +3,6 @@ package groovy.com.cloud.ldap
 import com.cloud.api.ServerApiException
 import com.cloud.api.command.LinkDomainToLdapCmd
 import com.cloud.api.response.LinkDomainToLdapResponse
-import com.cloud.exception.InvalidParameterValueException
 import com.cloud.ldap.LdapManager
 import com.cloud.ldap.LdapUser
 import com.cloud.ldap.NoLdapUserMatchingQueryException
@@ -11,6 +10,7 @@ import com.cloud.user.Account
 import com.cloud.user.AccountService
 import com.cloud.user.User
 import com.cloud.user.UserAccount
+import com.cloud.utils.exception.InvalidParameterValueException
 import spock.lang.Shared
 import spock.lang.Specification
 

@@ -9,11 +9,11 @@ import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.org.Grouping;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -8,9 +8,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,8 +10,8 @@ import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.Event;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Date;
 import java.util.List;

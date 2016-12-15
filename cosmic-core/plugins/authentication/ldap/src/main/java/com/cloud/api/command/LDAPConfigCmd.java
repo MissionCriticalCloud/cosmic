@@ -9,7 +9,6 @@ import com.cloud.api.response.LDAPConfigResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -19,6 +18,7 @@ import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.ldap.LdapManager;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

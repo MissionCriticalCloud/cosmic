@@ -30,7 +30,6 @@ import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Networks.TrafficType;
@@ -41,6 +40,7 @@ import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

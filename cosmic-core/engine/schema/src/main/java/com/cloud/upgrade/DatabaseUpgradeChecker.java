@@ -1,6 +1,5 @@
 package com.cloud.upgrade;
 
-import com.cloud.maint.Version;
 import com.cloud.upgrade.dao.DbUpgrade;
 import com.cloud.upgrade.dao.Upgrade40to41;
 import com.cloud.upgrade.dao.Upgrade410to420;
@@ -35,6 +34,7 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.ScriptRunner;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.maint.Version;
 
 import javax.ejb.Local;
 import javax.inject.Inject;
@@ -153,7 +153,7 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
         _upgradeMap.put("5.0.0", new DbUpgrade[]{new Upgrade500to501(), new Upgrade501to510(), new Upgrade510to511()});
 
         _upgradeMap.put("5.0.1", new DbUpgrade[]{new Upgrade501to510(), new Upgrade510to511()});
-        
+
         _upgradeMap.put("5.1.0", new DbUpgrade[]{new Upgrade510to511()});
     }
 

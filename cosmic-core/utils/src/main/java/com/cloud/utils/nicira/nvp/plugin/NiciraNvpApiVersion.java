@@ -1,6 +1,6 @@
 package com.cloud.utils.nicira.nvp.plugin;
 
-import com.cloud.maint.Version;
+import com.cloud.utils.maint.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

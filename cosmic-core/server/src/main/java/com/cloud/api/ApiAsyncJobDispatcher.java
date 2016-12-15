@@ -4,7 +4,6 @@ import com.cloud.api.response.ExceptionResponse;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.exception.CloudException;
-import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobDispatcher;
 import com.cloud.framework.jobs.AsyncJobManager;
@@ -13,6 +12,7 @@ import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;

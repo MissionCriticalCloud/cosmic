@@ -24,7 +24,7 @@
 
     <bean id="lockMasterListener" class="com.cloud.server.LockMasterListener">
         <constructor-arg>
-            <bean class="com.cloud.identity.ManagementServerNode" factory-method="getManagementServerId" />
+            <bean class="com.cloud.utils.identity.ManagementServerNode" factory-method="getManagementServerId" />
         </constructor-arg>
     </bean>
 
