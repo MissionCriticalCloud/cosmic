@@ -2,10 +2,8 @@ package com.cloud.dc;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -25,42 +22,41 @@ public class ClusterVO implements Cluster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    long id;
+    private long id;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "guid")
-    String guid;
+    private String guid;
 
     @Column(name = "data_center_id")
-    long dataCenterId;
+    private long dataCenterId;
 
     @Column(name = "pod_id")
-    long podId;
+    private long podId;
 
     @Column(name = "hypervisor_type")
-    String hypervisorType;
+    private String hypervisorType;
 
     @Column(name = "cluster_type")
     @Enumerated(value = EnumType.STRING)
-    Cluster.ClusterType clusterType;
+    private ClusterType clusterType;
 
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
-    AllocationState allocationState;
+    private AllocationState allocationState;
 
     @Column(name = "managed_state")
     @Enumerated(value = EnumType.STRING)
-    ManagedState managedState;
+    private ManagedState managedState;
+
     @Column(name = "uuid")
-    String uuid;
-    @Column(name = GenericDao.REMOVED_COLUMN)
-    private Date removed;
+    private String uuid;
 
     public ClusterVO() {
-        clusterType = Cluster.ClusterType.CloudManaged;
-        allocationState = Grouping.AllocationState.Enabled;
+        clusterType = ClusterType.CloudManaged;
+        allocationState = AllocationState.Enabled;
 
         this.uuid = UUID.randomUUID().toString();
     }
@@ -69,8 +65,8 @@ public class ClusterVO implements Cluster {
         this.dataCenterId = dataCenterId;
         this.podId = podId;
         this.name = name;
-        this.clusterType = Cluster.ClusterType.CloudManaged;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.clusterType = ClusterType.CloudManaged;
+        this.allocationState = AllocationState.Enabled;
         this.managedState = ManagedState.Managed;
         this.uuid = UUID.randomUUID().toString();
     }
@@ -101,18 +97,17 @@ public class ClusterVO implements Cluster {
 
     @Override
     public HypervisorType getHypervisorType() {
-        if (hypervisorType == null) {
-            return HypervisorType.KVM;
-        }
-        return HypervisorType.getType(hypervisorType);
+        return (hypervisorType != null)
+                ? HypervisorType.getType(hypervisorType)
+                : HypervisorType.KVM;
     }
 
     @Override
-    public Cluster.ClusterType getClusterType() {
+    public ClusterType getClusterType() {
         return clusterType;
     }
 
-    public void setClusterType(final Cluster.ClusterType clusterType) {
+    public void setClusterType(final ClusterType clusterType) {
         this.clusterType = clusterType;
     }
 
@@ -134,8 +129,8 @@ public class ClusterVO implements Cluster {
         this.managedState = managedState;
     }
 
-    public void setHypervisorType(final String hy) {
-        hypervisorType = hy;
+    public void setHypervisorType(final String hypervisorType) {
+        this.hypervisorType = hypervisorType;
     }
 
     public void setName(final String name) {
@@ -162,10 +157,6 @@ public class ClusterVO implements Cluster {
 
     public void setGuid(final String guid) {
         this.guid = guid;
-    }
-
-    public Date getRemoved() {
-        return removed;
     }
 
     @Override
