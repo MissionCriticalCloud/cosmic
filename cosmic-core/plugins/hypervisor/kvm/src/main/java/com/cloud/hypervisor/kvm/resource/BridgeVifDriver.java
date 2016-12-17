@@ -47,13 +47,13 @@ public class BridgeVifDriver extends VifDriverBase {
         final String value = (String) params.get("scripts.timeout");
         timeout = NumbersUtil.parseInt(value, 30 * 60) * 1000;
 
-        modifyVlanPath = Script.findScript(networkScriptsDir, "modifyvlan.sh");
+        modifyVlanPath = Script.findScript(networkScriptsDir, LibvirtComputingResourceProperties.Constants.SCRIPT_MODIFY_VLAN);
         if (modifyVlanPath == null) {
-            throw new ConfigurationException("Unable to find modifyvlan.sh");
+            throw new ConfigurationException("Unable to find " + LibvirtComputingResourceProperties.Constants.SCRIPT_MODIFY_VLAN);
         }
-        modifyVxlanPath = Script.findScript(networkScriptsDir, "modifyvxlan.sh");
+        modifyVxlanPath = Script.findScript(networkScriptsDir, LibvirtComputingResourceProperties.Constants.SCRIPT_MODIFY_VXLAN);
         if (modifyVxlanPath == null) {
-            throw new ConfigurationException("Unable to find modifyvxlan.sh");
+            throw new ConfigurationException("Unable to find " + LibvirtComputingResourceProperties.Constants.SCRIPT_MODIFY_VXLAN);
         }
 
         libvirtVersion = (Long) params.get("libvirtVersion");
