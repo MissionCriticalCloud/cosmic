@@ -160,11 +160,11 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (podIds.contains(cluster.getPodId())) {
+            if (! podIds.isEmpty() && podIds.contains(cluster.getPodId())) {
                 return true;
             }
 
-            if (clusterIds.contains(cluster.getId())) {
+            if (! clusterIds.isEmpty() && clusterIds.contains(cluster.getId())) {
                 return true;
             }
             return false;
@@ -175,7 +175,7 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (podIds.contains(pod.getId())) {
+            if (! podIds.isEmpty() && podIds.contains(pod.getId())) {
                 return true;
             }
 
@@ -198,15 +198,15 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (podIds.contains(podId)) {
+            if (! podIds.isEmpty() && podIds.contains(podId)) {
                 return true;
             }
 
-            if (clusterIds.contains(clusterId)) {
+            if (! clusterIds.isEmpty() && clusterIds.contains(clusterId)) {
                 return true;
             }
 
-            if (poolIds.contains(poolId)) {
+            if (! poolIds.isEmpty() && poolIds.contains(poolId)) {
                 return true;
             }
 
