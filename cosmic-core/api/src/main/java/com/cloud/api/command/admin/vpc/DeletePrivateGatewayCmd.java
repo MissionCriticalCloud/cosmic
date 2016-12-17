@@ -92,6 +92,6 @@ public class DeletePrivateGatewayCmd extends BaseAsyncCmd {
 
     @Override
     public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+        return CallContext.current().getCallingAccount().getId();
     }
 }
