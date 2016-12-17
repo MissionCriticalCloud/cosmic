@@ -1187,18 +1187,6 @@ cloudStack.docs = {
         desc: 'A short description of the offering that can be displayed to users',
         externalLink: ''
     },
-    helpOvm3pool: {
-        desc: 'Pool the Ovm3 nodes in this cluster, required for vm node migrations',
-        externalLink: ''
-    },
-    helpOvm3cluster: {
-        desc: 'Use the native Ovm3 OCFS2 clustering, required for native HA and requires pooling',
-        externalLink: ''
-    },
-    helpOvm3Vip: {
-        desc: 'The VIP used by the pool and cluster',
-        externalLink: ''
-    },
     helpLdapGroupName: {
         desc: 'Fully qualified name of OU/GROUP in LDAP',
         externalLink: ''

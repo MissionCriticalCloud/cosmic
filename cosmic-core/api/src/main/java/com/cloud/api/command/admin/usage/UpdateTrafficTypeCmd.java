@@ -39,18 +39,13 @@ public class UpdateTrafficTypeCmd extends BaseAsyncCmd {
             description = "The network name label of the physical device dedicated to this traffic on a KVM host")
     private String kvmLabel;
 
-    @Parameter(name = ApiConstants.OVM3_NETWORK_LABEL,
-            type = CommandType.STRING,
-            description = "The network name of the physical device dedicated to this traffic on an OVM3 host")
-    private String ovm3Label;
-
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
-        final PhysicalNetworkTrafficType result = _networkService.updatePhysicalNetworkTrafficType(getId(), getXenLabel(), getKvmLabel(), getOvm3Label());
+        final PhysicalNetworkTrafficType result = _networkService.updatePhysicalNetworkTrafficType(getId(), getXenLabel(), getKvmLabel());
         if (result != null) {
             final TrafficTypeResponse response = _responseGenerator.createTrafficTypeResponse(result);
             response.setResponseName(getCommandName());
@@ -75,10 +70,6 @@ public class UpdateTrafficTypeCmd extends BaseAsyncCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    public String getOvm3Label() {
-        return ovm3Label;
-    }
 
     @Override
     public String getCommandName() {

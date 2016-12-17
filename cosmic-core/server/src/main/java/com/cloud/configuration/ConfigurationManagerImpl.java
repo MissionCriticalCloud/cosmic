@@ -360,8 +360,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         configValuesForValidation.add("wait");
         configValuesForValidation.add("xenserver.heartbeat.interval");
         configValuesForValidation.add("xenserver.heartbeat.timeout");
-        configValuesForValidation.add("ovm3.heartbeat.interval");
-        configValuesForValidation.add("ovm3.heartbeat.timeout");
         configValuesForValidation.add("incorrect.login.attempts.allowed");
         configValuesForValidation.add("vm.password.length");
         configValuesForValidation.add("remote.access.vpn.psk.length");
@@ -1522,7 +1520,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                             } catch (final InvalidParameterValueException noStorage) {
                                 final PhysicalNetworkTrafficTypeVO mgmtTraffic = _trafficTypeDao.findBy(mgmtPhyNetwork.getId(), TrafficType.Management);
                                 _networkSvc.addTrafficTypeToPhysicalNetwork(mgmtPhyNetwork.getId(), TrafficType.Storage.toString(), "vlan", mgmtTraffic.getXenNetworkLabel(),
-                                        mgmtTraffic.getKvmNetworkLabel(), mgmtTraffic.getVlan(), mgmtTraffic.getOvm3NetworkLabel());
+                                        mgmtTraffic.getKvmNetworkLabel(), mgmtTraffic.getVlan());
                                 s_logger.info("No storage traffic type was specified by admin, create default storage traffic on physical network " + mgmtPhyNetwork.getId()
                                         + " with same configure of management traffic type");
                             }

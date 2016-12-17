@@ -385,8 +385,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
      */
     @Override
     public PhysicalNetworkTrafficType addTrafficTypeToPhysicalNetwork(final Long physicalNetworkId, final String trafficType, final String isolationMethod, final String
-            xenLabel, final String kvmLabel,
-                                                                      final String vlan, final String ovm3Label) {
+            xenLabel, final String kvmLabel, final String vlan) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -404,7 +403,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
      * @see com.cloud.network.NetworkService#updatePhysicalNetworkTrafficType(java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public PhysicalNetworkTrafficType updatePhysicalNetworkTrafficType(final Long id, final String xenLabel, final String kvmLabel, final String ovm3Label) {
+    public PhysicalNetworkTrafficType updatePhysicalNetworkTrafficType(final Long id, final String xenLabel, final String kvmLabel) {
         // TODO Auto-generated method stub
         return null;
     }

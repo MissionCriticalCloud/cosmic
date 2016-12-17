@@ -31,10 +31,6 @@ public class TrafficTypeResponse extends BaseResponse {
     @Param(description = "The network name label of the physical device dedicated to this traffic on a KVM host")
     private String kvmNetworkLabel;
 
-    @SerializedName(ApiConstants.OVM3_NETWORK_LABEL)
-    @Param(description = "The network name of the physical device dedicated to this traffic on an OVM3 host")
-    private String ovm3NetworkLabel;
-
     @Override
     public String getObjectId() {
         return id;
@@ -78,13 +74,5 @@ public class TrafficTypeResponse extends BaseResponse {
 
     public void setKvmLabel(final String kvmLabel) {
         kvmNetworkLabel = kvmLabel;
-    }
-
-    public String getOvm3Label() {
-        return ovm3NetworkLabel;
-    }
-
-    public void setOvm3Label(final String ovm3Label) {
-        ovm3NetworkLabel = ovm3Label;
     }
 }

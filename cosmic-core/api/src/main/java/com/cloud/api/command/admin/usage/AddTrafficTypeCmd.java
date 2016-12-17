@@ -49,11 +49,6 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
             description = "The network name label of the physical device dedicated to this traffic on a KVM host")
     private String kvmLabel;
 
-    @Parameter(name = ApiConstants.OVM3_NETWORK_LABEL,
-            type = CommandType.STRING,
-            description = "The network name of the physical device dedicated to this traffic on an OVM3 host")
-    private String ovm3Label;
-
     @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "The VLAN id to be used for Management traffic by the host")
     private String vlan;
 
@@ -92,7 +87,7 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
     public void create() throws ResourceAllocationException {
         final PhysicalNetworkTrafficType result =
                 _networkService.addTrafficTypeToPhysicalNetwork(getPhysicalNetworkId(), getTrafficType(), getIsolationMethod(), getXenLabel(), getKvmLabel(),
-                        getVlan(), getOvm3Label());
+                        getVlan());
         if (result != null) {
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
@@ -131,10 +126,6 @@ public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
 
     public String getVlan() {
         return vlan;
-    }
-
-    public String getOvm3Label() {
-        return ovm3Label;
     }
 
     public void setVlan(final String vlan) {

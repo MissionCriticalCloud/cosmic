@@ -13,6 +13,4 @@ public interface PhysicalNetworkTrafficType extends InternalIdentity, Identity {
     String getXenNetworkLabel();
 
     String getKvmNetworkLabel();
-
-    String getOvm3NetworkLabel();
 }

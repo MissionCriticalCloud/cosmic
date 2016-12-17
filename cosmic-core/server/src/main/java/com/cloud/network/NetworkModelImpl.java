@@ -1288,9 +1288,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                     case KVM:
                         label = mgmtTraffic.getKvmNetworkLabel();
                         break;
-                    case Ovm3:
-                        label = mgmtTraffic.getOvm3NetworkLabel();
-                        break;
                 }
                 return label;
             }
@@ -1316,9 +1313,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                         break;
                     case KVM:
                         label = storageTraffic.getKvmNetworkLabel();
-                        break;
-                    case Ovm3:
-                        label = storageTraffic.getOvm3NetworkLabel();
                         break;
                 }
                 return label;
@@ -1675,9 +1669,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                     case KVM:
                         label = publicTraffic.getKvmNetworkLabel();
                         break;
-                    case Ovm3:
-                        label = publicTraffic.getOvm3NetworkLabel();
-                        break;
                 }
                 return label;
             }
@@ -1703,9 +1694,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                         break;
                     case KVM:
                         label = guestTraffic.getKvmNetworkLabel();
-                        break;
-                    case Ovm3:
-                        label = guestTraffic.getOvm3NetworkLabel();
                         break;
                     default:
                         break;

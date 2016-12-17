@@ -2403,7 +2403,6 @@ public class ApiResponseHelper implements ResponseGenerator {
 
         response.setXenLabel(result.getXenNetworkLabel());
         response.setKvmLabel(result.getKvmNetworkLabel());
-        response.setOvm3Label(result.getOvm3NetworkLabel());
 
         response.setObjectName("traffictype");
         return response;
