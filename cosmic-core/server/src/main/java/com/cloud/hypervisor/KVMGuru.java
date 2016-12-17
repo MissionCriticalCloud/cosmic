@@ -82,8 +82,8 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
         if (host != null) {
             guestOsMapping = _guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), getHypervisorType().toString(), host.getHypervisorVersion());
         }
-        if (guestOsMapping == null || host == null) {
-            to.setPlatformEmulator("Other");
+        if (guestOsMapping == null) {
+            to.setPlatformEmulator("Default - VirtIO capable OS (64-bit)");
         } else {
             to.setPlatformEmulator(guestOsMapping.getGuestOsName());
         }

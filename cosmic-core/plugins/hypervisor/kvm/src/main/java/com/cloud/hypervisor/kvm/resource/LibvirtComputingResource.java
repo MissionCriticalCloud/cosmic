@@ -621,7 +621,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         final Domain vm = getDomain(conn, vmName);
-        vm.attachDevice(getVifDriver(nicTo.getType()).plug(nicTo, "Other PV", "").toString());
+        vm.attachDevice(getVifDriver(nicTo.getType()).plug(nicTo, "Default - VirtIO capable OS (64-bit)", "").toString());
     }
 
     public String networkUsage(final String privateIpAddress, final String option, final String vif) {
@@ -1661,7 +1661,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         if (vmTo.getOs().startsWith("Windows")) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
             clock.setTimer("rtc", "catchup", null);
-        } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestPvEnabled(vmTo.getOs())) {
+        } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
                 clock.setTimer("kvmclock", null, null, isKvmclockDisabled());
             }
@@ -1735,28 +1735,14 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return uuid;
     }
 
-    boolean isGuestPvEnabled(final String guestOsName) {
+    boolean isGuestVirtIoCapable(final String guestOsName) {
         if (guestOsName == null) {
-            return false;
-        }
-        if (guestOsName.startsWith("Ubuntu") || guestOsName.startsWith("Fedora 13")
-                || guestOsName.startsWith("Fedora 12")
-                || guestOsName.startsWith("Fedora 11")
-                || guestOsName.startsWith("Fedora 10") || guestOsName.startsWith("Fedora 9")
-                || guestOsName.startsWith("CentOS 5.3") || guestOsName.startsWith("CentOS 5.4")
-                || guestOsName.startsWith("CentOS 5.5") || guestOsName.startsWith("CentOS")
-                || guestOsName.startsWith("Fedora")
-                || guestOsName.startsWith("Red Hat Enterprise Linux 5.3")
-                || guestOsName.startsWith("Red Hat Enterprise Linux 5.4")
-                || guestOsName.startsWith("Red Hat Enterprise Linux 5.5")
-                || guestOsName.startsWith("Red Hat Enterprise Linux 6")
-                || guestOsName.startsWith("Debian GNU/Linux")
-                || guestOsName.startsWith("FreeBSD 10") || guestOsName.startsWith("Oracle")
-                || guestOsName.startsWith("Other PV")) {
             return true;
-        } else {
+        }
+        if (guestOsName.startsWith("Non-VirtIO")) {
             return false;
         }
+        return true;
     }
 
     public void createVifs(final VirtualMachineTO vmSpec, final LibvirtVmDef vm)
@@ -1966,7 +1952,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     private DiskDef.DiskBus getGuestDiskModel(final String platformEmulator) {
-        if (isGuestPvEnabled(platformEmulator)) {
+        if (isGuestVirtIoCapable(platformEmulator)) {
             return DiskDef.DiskBus.VIRTIO;
         } else {
             return DiskDef.DiskBus.IDE;
