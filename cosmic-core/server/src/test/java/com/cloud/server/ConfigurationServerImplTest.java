@@ -1,20 +1,6 @@
 package com.cloud.server;
 
-import com.cloud.configuration.ConfigurationManager;
-import com.cloud.configuration.dao.ResourceCountDao;
-import com.cloud.dc.dao.DataCenterDao;
-import com.cloud.dc.dao.HostPodDao;
-import com.cloud.dc.dao.VlanDao;
-import com.cloud.domain.dao.DomainDao;
-import com.cloud.framework.config.ConfigDepot;
-import com.cloud.framework.config.ConfigDepotAdmin;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.network.dao.NetworkDao;
-import com.cloud.offerings.dao.NetworkOfferingDao;
-import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
 
 import java.io.File;
@@ -36,49 +22,9 @@ public class ConfigurationServerImplTest {
 
     final static String TEST = "the quick brown fox jumped over the lazy dog";
     @Spy
-    ConfigurationServerImpl windowsImpl = new ConfigurationServerImpl() {
-        protected boolean isOnWindows() {
-            return true;
-        }
-    };
-    @Spy
-    ConfigurationServerImpl linuxImpl = new ConfigurationServerImpl() {
-        protected boolean isOnWindows() {
-            return false;
-        }
-    };
+    ConfigurationServerImpl linuxImpl;
     @Mock
     private ConfigurationDao _configDao;
-    @Mock
-    private DataCenterDao _zoneDao;
-    @Mock
-    private HostPodDao _podDao;
-    @Mock
-    private DiskOfferingDao _diskOfferingDao;
-    @Mock
-    private ServiceOfferingDao _serviceOfferingDao;
-    @Mock
-    private NetworkOfferingDao _networkOfferingDao;
-    @Mock
-    private DataCenterDao _dataCenterDao;
-    @Mock
-    private NetworkDao _networkDao;
-    @Mock
-    private VlanDao _vlanDao;
-    @Mock
-    private DomainDao _domainDao;
-    @Mock
-    private AccountDao _accountDao;
-    @Mock
-    private ResourceCountDao _resourceCountDao;
-    @Mock
-    private NetworkOfferingServiceMapDao _ntwkOfferingServiceMapDao;
-    @Mock
-    private ConfigDepotAdmin _configDepotAdmin;
-    @Mock
-    private ConfigDepot _configDepot;
-    @Mock
-    private ConfigurationManager _configMgr;
     @Mock
     private ManagementService _mgrService;
     @InjectMocks
@@ -118,11 +64,7 @@ public class ConfigurationServerImplTest {
     }
 
     @Test
-    public void testWindowsScript() {
-        Assert.assertTrue(windowsImpl.isOnWindows());
-        Assert.assertEquals("scripts/vm/systemvm/injectkeys.py", windowsImpl.getInjectScript());
-
-        Assert.assertFalse(linuxImpl.isOnWindows());
+    public void testScript() {
         Assert.assertEquals("scripts/vm/systemvm/injectkeys.sh", linuxImpl.getInjectScript());
     }
 
