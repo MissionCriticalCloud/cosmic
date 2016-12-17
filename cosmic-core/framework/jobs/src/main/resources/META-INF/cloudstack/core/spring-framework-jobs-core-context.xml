@@ -24,8 +24,6 @@
 
     <bean id="asyncJobDaoImpl"
           class="com.cloud.framework.jobs.dao.AsyncJobDaoImpl" />
-    <bean id="asyncJobJournalDaoImpl"
-          class="com.cloud.framework.jobs.dao.AsyncJobJournalDaoImpl" />
     <bean id="asyncJobJoinMapDaoImpl"
           class="com.cloud.framework.jobs.dao.AsyncJobJoinMapDaoImpl" />
     <bean id="asyncJobManagerImpl"
@@ -40,4 +38,5 @@
           class="com.cloud.framework.jobs.impl.SyncQueueManagerImpl" />
     <bean id="vmWorkJobDaoImpl"
           class="com.cloud.framework.jobs.dao.VmWorkJobDaoImpl" />
+
 </beans>

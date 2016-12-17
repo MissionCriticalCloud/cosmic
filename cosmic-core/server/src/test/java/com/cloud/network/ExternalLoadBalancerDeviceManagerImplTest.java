@@ -14,14 +14,12 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
-import com.cloud.network.dao.ExternalFirewallDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.InlineLoadBalancerNicMapDao;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkExternalFirewallDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerVO;
 import com.cloud.network.dao.NetworkServiceMapDao;
@@ -112,10 +110,6 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
     @Mock
     NetworkServiceMapDao _ntwkSrvcProviderDao;
     @Mock
-    NetworkExternalFirewallDao _networkExternalFirewallDao;
-    @Mock
-    ExternalFirewallDeviceDao _externalFirewallDeviceDao;
-    @Mock
     IpAddressManager _ipAddrMgr;
 
     @Mock
@@ -196,7 +190,6 @@ public class ExternalLoadBalancerDeviceManagerImplTest {
     public void testUsageTask() {
         final ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask usageTask = Mockito
                 .mock(ExternalDeviceUsageManagerImpl.ExternalDeviceNetworkUsageTask.class);
-        Mockito.when(_hostDao.listByType(Host.Type.ExternalFirewall)).thenReturn(new ArrayList<>());
         Mockito.when(_hostDao.listByType(Host.Type.ExternalLoadBalancer)).thenReturn(new ArrayList<>());
         usageTask.runInContext();
         Mockito.verify(usageTask, Mockito.times(0)).runExternalDeviceNetworkUsageTask();

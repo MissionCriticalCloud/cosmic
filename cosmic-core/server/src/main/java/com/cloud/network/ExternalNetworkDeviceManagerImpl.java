@@ -11,13 +11,11 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
-import com.cloud.network.dao.ExternalFirewallDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.InlineLoadBalancerNicMapDao;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkExternalFirewallDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerDao;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
@@ -38,16 +36,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements ExternalNetworkDeviceManager {
 
-    private static final Logger s_logger = LoggerFactory.getLogger(ExternalNetworkDeviceManagerImpl.class);
     @Inject
     AgentManager _agentMgr;
     @Inject
@@ -91,13 +85,7 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
     @Inject
     ExternalLoadBalancerDeviceDao _externalLoadBalancerDeviceDao;
     @Inject
-    ExternalFirewallDeviceDao _externalFirewallDeviceDao;
-    @Inject
     NetworkExternalLoadBalancerDao _networkExternalLBDao;
-    @Inject
-    NetworkExternalFirewallDao _networkExternalFirewallDao;
-    ScheduledExecutorService _executor;
-    int _externalNetworkStatsInterval;
 
     @Override
     public Host addNetworkDevice(final AddNetworkDeviceCmd cmd) {
@@ -106,8 +94,6 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
             throw new CloudRuntimeException("Parameter list is null");
         }
 
-        final Collection paramsCollection = paramList.values();
-        final HashMap params = (HashMap) (paramsCollection.toArray())[0];
         return null;
     }
 
@@ -137,7 +123,6 @@ public class ExternalNetworkDeviceManagerImpl extends ManagerBase implements Ext
             final List<Host> deviceAll = new ArrayList<>();
             deviceAll.addAll(listNetworkDevice(zoneId, physicalNetworkId, podId, Host.Type.ExternalDhcp));
             deviceAll.addAll(listNetworkDevice(zoneId, physicalNetworkId, podId, Host.Type.ExternalLoadBalancer));
-            deviceAll.addAll(listNetworkDevice(zoneId, physicalNetworkId, podId, Host.Type.ExternalFirewall));
             res = deviceAll;
         } else {
             throw new CloudRuntimeException("Unknown network device type:" + cmd.getDeviceType());

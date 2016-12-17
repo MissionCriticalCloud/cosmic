@@ -125,8 +125,6 @@
     <bean id="certificateDaoImpl" class="com.cloud.certificate.dao.CertificateDaoImpl" />
     <bean id="clusterDaoImpl" class="com.cloud.dc.dao.ClusterDaoImpl" />
     <bean id="clusterDetailsDaoImpl" class="com.cloud.dc.ClusterDetailsDaoImpl" />
-    <bean id="clusterVSMMapDaoImpl" class="com.cloud.dc.dao.ClusterVSMMapDaoImpl" />
-    <bean id="commandExecLogDaoImpl" class="com.cloud.secstorage.CommandExecLogDaoImpl" />
     <bean id="conditionDaoImpl" class="com.cloud.network.as.dao.ConditionDaoImpl" />
     <bean id="consoleProxyDaoImpl" class="com.cloud.vm.dao.ConsoleProxyDaoImpl" />
     <bean id="counterDaoImpl" class="com.cloud.network.as.dao.CounterDaoImpl" />
@@ -148,7 +146,6 @@
     <bean id="engineHostPodDaoImpl" class="com.cloud.engine.datacenter.entity.api.db.dao.EngineHostPodDaoImpl" />
     <bean id="eventDaoImpl" class="com.cloud.event.dao.EventDaoImpl" />
     <bean id="eventJoinDaoImpl" class="com.cloud.event.dao.EventJoinDaoImpl" />
-    <bean id="externalFirewallDeviceDaoImpl" class="com.cloud.network.dao.ExternalFirewallDeviceDaoImpl" />
     <bean id="externalLoadBalancerDeviceDaoImpl" class="com.cloud.network.dao.ExternalLoadBalancerDeviceDaoImpl" />
     <bean id="externalPublicIpStatisticsDaoImpl" class="com.cloud.usage.dao.ExternalPublicIpStatisticsDaoImpl" />
     <bean id="firewallRulesCidrsDaoImpl" class="com.cloud.network.dao.FirewallRulesCidrsDaoImpl" />
@@ -195,7 +192,6 @@
     <bean id="networkACLItemCidrsDaoImpl" class="com.cloud.network.vpc.dao.NetworkACLItemCidrsDaoImpl" />
     <bean id="networkDaoImpl" class="com.cloud.network.dao.NetworkDaoImpl" />
     <bean id="networkDomainDaoImpl" class="com.cloud.network.dao.NetworkDomainDaoImpl" />
-    <bean id="networkExternalFirewallDaoImpl" class="com.cloud.network.dao.NetworkExternalFirewallDaoImpl" />
     <bean id="networkExternalLoadBalancerDaoImpl" class="com.cloud.network.dao.NetworkExternalLoadBalancerDaoImpl" />
     <bean id="networkOfferingDaoImpl" class="com.cloud.offerings.dao.NetworkOfferingDaoImpl" />
     <bean id="networkOfferingServiceMapDaoImpl" class="com.cloud.offerings.dao.NetworkOfferingServiceMapDaoImpl" />

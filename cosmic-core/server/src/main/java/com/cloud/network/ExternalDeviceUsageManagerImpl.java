@@ -15,19 +15,14 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.dao.ExternalFirewallDeviceDao;
-import com.cloud.network.dao.ExternalFirewallDeviceVO;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceDao;
 import com.cloud.network.dao.ExternalLoadBalancerDeviceVO;
 import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.InlineLoadBalancerNicMapDao;
 import com.cloud.network.dao.InlineLoadBalancerNicMapVO;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkExternalFirewallDao;
-import com.cloud.network.dao.NetworkExternalFirewallVO;
 import com.cloud.network.dao.NetworkExternalLoadBalancerDao;
 import com.cloud.network.dao.NetworkExternalLoadBalancerVO;
 import com.cloud.network.dao.NetworkServiceMapDao;
@@ -35,7 +30,6 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
@@ -128,10 +122,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     @Inject
     NetworkServiceMapDao _ntwkSrvcProviderDao;
     @Inject
-    NetworkExternalFirewallDao _networkExternalFirewallDao;
-    @Inject
-    ExternalFirewallDeviceDao _externalFirewallDeviceDao;
-    @Inject
     NetworkModel _networkModel;
     ScheduledExecutorService _executor;
     private int _externalNetworkStatsInterval;
@@ -161,17 +151,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     @Override
     public boolean stop() {
         return true;
-    }
-
-    private ExternalFirewallDeviceVO getExternalFirewallForNetwork(final Network network) {
-        final NetworkExternalFirewallVO fwDeviceForNetwork = _networkExternalFirewallDao.findByNetworkId(network.getId());
-        if (fwDeviceForNetwork != null) {
-            final long fwDeviceId = fwDeviceForNetwork.getExternalFirewallDeviceId();
-            final ExternalFirewallDeviceVO fwDevice = _externalFirewallDeviceDao.findById(fwDeviceId);
-            assert (fwDevice != null);
-            return fwDevice;
-        }
-        return null;
     }
 
     @Override
@@ -326,7 +305,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
             // Check if there are any external devices
             // Skip external device usage collection if none exist
 
-            if (_hostDao.listByType(Host.Type.ExternalFirewall).isEmpty() && _hostDao.listByType(Host.Type.ExternalLoadBalancer).isEmpty()) {
+            if (_hostDao.listByType(Host.Type.ExternalLoadBalancer).isEmpty()) {
                 s_logger.debug("External devices are not used. Skipping external device usage collection");
                 return;
             }
@@ -382,41 +361,9 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                             continue;
                         }
 
-                        final ExternalFirewallDeviceVO fwDeviceVO = getExternalFirewallForNetwork(network);
                         final ExternalLoadBalancerDeviceVO lbDeviceVO = getExternalLoadBalancerForNetwork(network);
-                        if (lbDeviceVO == null && fwDeviceVO == null) {
+                        if (lbDeviceVO == null) {
                             continue;
-                        }
-
-                        // Get network stats from the external firewall
-                        ExternalNetworkResourceUsageAnswer firewallAnswer = null;
-                        HostVO externalFirewall = null;
-                        if (fwDeviceVO != null) {
-                            externalFirewall = _hostDao.findById(fwDeviceVO.getHostId());
-                            if (externalFirewall != null) {
-                                final Long fwDeviceId = new Long(externalFirewall.getId());
-                                if (!fwDeviceUsageAnswerMap.containsKey(fwDeviceId)) {
-                                    try {
-                                        final ExternalNetworkResourceUsageCommand cmd = new ExternalNetworkResourceUsageCommand();
-                                        firewallAnswer = (ExternalNetworkResourceUsageAnswer) _agentMgr.easySend(externalFirewall.getId(), cmd);
-                                        if (firewallAnswer == null || !firewallAnswer.getResult()) {
-                                            final String details = (firewallAnswer != null) ? firewallAnswer.getDetails() : "details unavailable";
-                                            final String msg = "Unable to get external firewall stats for network" + zone.getName() + " due to: " + details + ".";
-                                            s_logger.error(msg);
-                                        } else {
-                                            fwDeviceUsageAnswerMap.put(fwDeviceId, firewallAnswer);
-                                        }
-                                    } catch (final Exception e) {
-                                        final String msg = "Unable to get external firewall stats for network" + zone.getName();
-                                        s_logger.error(msg, e);
-                                    }
-                                } else {
-                                    if (s_logger.isTraceEnabled()) {
-                                        s_logger.trace("Reusing usage Answer for device id " + fwDeviceId + "for Network " + network.getId());
-                                    }
-                                    firewallAnswer = fwDeviceUsageAnswerMap.get(fwDeviceId);
-                                }
-                            }
                         }
 
                         // Get network stats from the external load balancer
@@ -450,7 +397,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                             }
                         }
 
-                        if (firewallAnswer == null && lbAnswer == null) {
+                        if (lbAnswer == null) {
                             continue;
                         }
 
@@ -460,11 +407,11 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                             continue;
                         }
 
-                        if (!manageStatsEntries(true, accountId, zoneId, network, externalFirewall, firewallAnswer, externalLoadBalancer, lbAnswer)) {
+                        if (!manageStatsEntries(true, accountId, zoneId, network, externalLoadBalancer, lbAnswer)) {
                             continue;
                         }
 
-                        manageStatsEntries(false, accountId, zoneId, network, externalFirewall, firewallAnswer, externalLoadBalancer, lbAnswer);
+                        manageStatsEntries(false, accountId, zoneId, network, externalLoadBalancer, lbAnswer);
                     }
 
                     accountsProcessed.add(new Long(accountId));
@@ -477,9 +424,9 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
          * Stats entries are created for source NAT IP addresses, static NAT rules, port forwarding rules, and load
          * balancing rules
          */
-        private boolean manageStatsEntries(final boolean create, final long accountId, final long zoneId, final Network network, final HostVO externalFirewall,
-                                           final ExternalNetworkResourceUsageAnswer firewallAnswer, final HostVO externalLoadBalancer, final ExternalNetworkResourceUsageAnswer
-                                                   lbAnswer) {
+        private boolean manageStatsEntries(final boolean create, final long accountId, final long zoneId, final Network network, final HostVO externalLoadBalancer, final
+        ExternalNetworkResourceUsageAnswer
+                lbAnswer) {
             final String accountErrorMsg = "Failed to update external network stats entry. Details: account ID = " + accountId;
             try {
                 Transaction.execute(new TransactionCallbackNoReturn() {
@@ -493,42 +440,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
                             final String supportedSourceNatTypes = sourceNatCapabilities.get(Network.Capability.SupportedSourceNatTypes).toLowerCase();
                             if (supportedSourceNatTypes.contains("zone")) {
                                 sharedSourceNat = true;
-                            }
-                        }
-
-                        if (externalFirewall != null && firewallAnswer != null) {
-                            if (!sharedSourceNat) {
-                                // Manage the entry for this network's source NAT IP address
-                                final List<IPAddressVO> sourceNatIps = _ipAddressDao.listByAssociatedNetwork(network.getId(), true);
-                                if (sourceNatIps.size() == 1) {
-                                    final String publicIp = sourceNatIps.get(0).getAddress().addr();
-                                    if (!createOrUpdateStatsEntry(create, accountId, zoneId, network.getId(), publicIp, externalFirewall.getId(), firewallAnswer, false)) {
-                                        throw new CloudRuntimeException(networkErrorMsg + ", source NAT IP = " + publicIp);
-                                    }
-                                }
-
-                                // Manage one entry for each static NAT rule in this network
-                                final List<IPAddressVO> staticNatIps = _ipAddressDao.listStaticNatPublicIps(network.getId());
-                                for (final IPAddressVO staticNatIp : staticNatIps) {
-                                    final String publicIp = staticNatIp.getAddress().addr();
-                                    if (!createOrUpdateStatsEntry(create, accountId, zoneId, network.getId(), publicIp, externalFirewall.getId(), firewallAnswer, false)) {
-                                        throw new CloudRuntimeException(networkErrorMsg + ", static NAT rule public IP = " + publicIp);
-                                    }
-                                }
-
-                                // Manage one entry for each port forwarding rule in this network
-                                final List<PortForwardingRuleVO> portForwardingRules = _portForwardingRulesDao.listByNetwork(network.getId());
-                                for (final PortForwardingRuleVO portForwardingRule : portForwardingRules) {
-                                    final String publicIp = _networkModel.getIp(portForwardingRule.getSourceIpAddressId()).getAddress().addr();
-                                    if (!createOrUpdateStatsEntry(create, accountId, zoneId, network.getId(), publicIp, externalFirewall.getId(), firewallAnswer, false)) {
-                                        throw new CloudRuntimeException(networkErrorMsg + ", port forwarding rule public IP = " + publicIp);
-                                    }
-                                }
-                            } else {
-                                // Manage the account-wide entry for the external firewall
-                                if (!createOrUpdateStatsEntry(create, accountId, zoneId, network.getId(), null, externalFirewall.getId(), firewallAnswer, false)) {
-                                    throw new CloudRuntimeException(networkErrorMsg);
-                                }
                             }
                         }
 

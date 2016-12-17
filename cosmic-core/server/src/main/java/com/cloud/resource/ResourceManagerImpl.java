@@ -46,7 +46,6 @@ import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.dc.dao.ClusterVSMMapDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DataCenterIpAddressDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
@@ -219,8 +218,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     private VMTemplateDao _templateDao;
     @Inject
     private ConfigurationManager _configMgr;
-    @Inject
-    private ClusterVSMMapDao _clusterVSMMapDao;
     private HypervisorType _defaultSystemVMHypervisor;
     private GenericSearchBuilder<HostVO, String> _hypervisorsInDC;
     private SearchBuilder<HostGpuGroupsVO> _gpuAvailability;
@@ -1400,7 +1397,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     /*
      * ResourceStateAdapter is responsible for throwing Exception if Pod is
      * null and non-null is required. for example, XcpServerDiscoever.
-     * Others, like ExternalFireware don't require Pod
      */
         final Long podId = p == null ? null : p.getId();
 
