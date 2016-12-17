@@ -20,7 +20,7 @@ public interface Cluster extends Grouping, InternalIdentity, Identity {
 
     ManagedState getManagedState();
 
-    public static enum ClusterType {
+    enum ClusterType {
         CloudManaged, ExternalManaged
     }
 }
