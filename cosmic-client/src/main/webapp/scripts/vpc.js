@@ -1832,7 +1832,7 @@
 
             add: {
                 preCheck: function (args) {
-                    if (isAdmin()) { //root-admin
+                    if (isAdmin() || isDomainAdmin()) { //root or domain-admin
                         var items;
                         $.ajax({
                             url: createURL('listPrivateGateways'),
@@ -1875,6 +1875,34 @@
                                     },
                                     success: function (json) {
                                         var objs = json.listphysicalnetworksresponse.physicalnetwork;
+                                        var items = [];
+                                        $(objs).each(function () {
+                                            items.push({
+                                                id: this.id,
+                                                description: this.name
+                                            });
+                                        });
+                                        args.response.success({
+                                            data: items
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        networkofferingid: {
+                            docID: 'helpGuestNetworkNetworkOffering',
+                            label: 'label.network.offering',
+                            select: function (args) {
+                                $.ajax({
+                                    url: createURL("listNetworkOfferings"),
+                                    data: {
+                                        zoneid: args.context.vpc[0].zoneid,
+                                        traffictype: "Guest",
+                                        specifyvlan: "true",
+                                        keyword: "private"
+                                    },
+                                    success: function (json) {
+                                        var objs = json.listnetworkofferingsresponse.networkoffering;
                                         var items = [];
                                         $(objs).each(function () {
                                             items.push({
@@ -1970,6 +1998,7 @@
                         url: createURL('createPrivateGateway' + array1.join("")),
                         data: {
                             physicalnetworkid: args.data.physicalnetworkid,
+                            networkofferingid: args.data.networkofferingid,
                             vpcid: args.context.vpc[0].id,
                             ipaddress: args.data.ipaddress,
                             gateway: args.data.gateway,
@@ -2053,6 +2082,34 @@
                                                     },
                                                     success: function (json) {
                                                         var objs = json.listphysicalnetworksresponse.physicalnetwork;
+                                                        var items = [];
+                                                        $(objs).each(function () {
+                                                            items.push({
+                                                                id: this.id,
+                                                                description: this.name
+                                                            });
+                                                        });
+                                                        args.response.success({
+                                                            data: items
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        networkofferingid: {
+                                            docID: 'helpGuestNetworkNetworkOffering',
+                                            label: 'label.network.offering',
+                                            select: function (args) {
+                                                $.ajax({
+                                                    url: createURL("listNetworkOfferings"),
+                                                    data: {
+                                                        zoneid: args.context.vpc[0].zoneid,
+                                                        traffictype: "Guest",
+                                                        specifyvlan: "true",
+                                                        keyword: "private"
+                                                    },
+                                                    success: function (json) {
+                                                        var objs = json.listnetworkofferingsresponse.networkoffering;
                                                         var items = [];
                                                         $(objs).each(function () {
                                                             items.push({
@@ -2153,6 +2210,7 @@
                                         url: createURL('createPrivateGateway' + array1.join("")),
                                         data: {
                                             physicalnetworkid: args.data.physicalnetworkid,
+                                            networkofferingid: args.data.networkofferingid,
                                             vpcid: args.context.vpc[0].id,
                                             ipaddress: args.data.ipaddress,
                                             gateway: args.data.gateway,
