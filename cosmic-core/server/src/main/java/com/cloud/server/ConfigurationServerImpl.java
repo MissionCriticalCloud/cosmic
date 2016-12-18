@@ -10,7 +10,6 @@ import com.cloud.configuration.ResourceCountVO;
 import com.cloud.configuration.dao.ResourceCountDao;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.HostPodVO;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
@@ -62,7 +61,6 @@ import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
-import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -1123,12 +1121,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         return new String(Base64.encodeBase64(storeBytes));
     }
 
-    protected boolean isOnWindows() {
-        final String os = System.getProperty("os.name", "generic").toLowerCase();
-        final boolean onWindows = (os != null && os.startsWith("windows"));
-        return onWindows;
-    }
-
     private void updateKeyPairsOnDisk(final String homeDir) {
         final File keyDir = new File(homeDir + "/.ssh");
         final Boolean devel = Boolean.valueOf(_configDao.getValue("developer"));
@@ -1149,29 +1141,19 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         }
     }
 
-    protected void injectSshKeysIntoSystemVmIsoPatch(String publicKeyPath, String privKeyPath) {
+    protected void injectSshKeysIntoSystemVmIsoPatch(final String publicKeyPath, final String privKeyPath) {
         s_logger.info("Trying to inject public and private keys into systemvm iso");
         final String injectScript = getInjectScript();
-        String scriptPath = Script.findScript("", injectScript);
-        String systemVmIsoPath = Script.findScript("", "vms/systemvm.iso");
+        final String scriptPath = Script.findScript("", injectScript);
+        final String systemVmIsoPath = Script.findScript("", "vms/systemvm.iso");
         if (scriptPath == null) {
             throw new CloudRuntimeException("Unable to find key inject script " + injectScript);
         }
         if (systemVmIsoPath == null) {
             throw new CloudRuntimeException("Unable to find systemvm iso vms/systemvm.iso");
         }
-        Script command = null;
-        if (isOnWindows()) {
-            command = new Script("python", s_logger);
-        } else {
-            command = new Script("/bin/bash", s_logger);
-        }
-        if (isOnWindows()) {
-            scriptPath = scriptPath.replaceAll("\\\\", "/");
-            systemVmIsoPath = systemVmIsoPath.replaceAll("\\\\", "/");
-            publicKeyPath = publicKeyPath.replaceAll("\\\\", "/");
-            privKeyPath = privKeyPath.replaceAll("\\\\", "/");
-        }
+        final Script command = new Script("/bin/bash", s_logger);
+
         command.add(scriptPath);
         command.add(publicKeyPath);
         command.add(privKeyPath);
@@ -1244,14 +1226,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
     }
 
     protected String getInjectScript() {
-        String injectScript = null;
-        final boolean onWindows = isOnWindows();
-        if (onWindows) {
-            injectScript = "scripts/vm/systemvm/injectkeys.py";
-        } else {
-            injectScript = "scripts/vm/systemvm/injectkeys.sh";
-        }
-        return injectScript;
+        return "scripts/vm/systemvm/injectkeys.sh";
     }
 
     @Override
@@ -1295,11 +1270,8 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             if (s_logger.isInfoEnabled()) {
                 s_logger.info("Systemvm keypairs not found in database. Need to store them in the database");
             }
-            // FIXME: take a global database lock here for safety.
-            final boolean onWindows = isOnWindows();
-            if (!onWindows) {
-                Script.runSimpleBashScript("if [ -f " + privkeyfile + " ]; then rm -f " + privkeyfile + "; fi; ssh-keygen -t rsa -N '' -f " + privkeyfile + " -q");
-            }
+
+            Script.runSimpleBashScript("if [ -f " + privkeyfile + " ]; then rm -f " + privkeyfile + "; fi; ssh-keygen -t rsa -N '' -f " + privkeyfile + " -q");
 
             final byte[] arr1 = new byte[4094]; // configuration table column value size
             try (DataInputStream dis = new DataInputStream(new FileInputStream(privkeyfile))) {
@@ -1385,65 +1357,5 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             configVOList.add(configVo);
         }
         return configVOList;
-    }
-
-    @DB
-    protected HostPodVO createPod(final long userId, final String podName, final long zoneId, final String gateway, final String cidr, final String startIp, String endIp)
-            throws InternalErrorException {
-        final String[] cidrPair = cidr.split("\\/");
-        final String cidrAddress = cidrPair[0];
-        final int cidrSize = Integer.parseInt(cidrPair[1]);
-
-        if (startIp != null) {
-            if (endIp == null) {
-                endIp = NetUtils.getIpRangeEndIpFromCidr(cidrAddress, cidrSize);
-            }
-        }
-
-        // Create the new pod in the database
-        String ipRange;
-        if (startIp != null) {
-            ipRange = startIp + "-";
-            if (endIp != null) {
-                ipRange += endIp;
-            }
-        } else {
-            ipRange = "";
-        }
-
-        final HostPodVO pod = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
-        try {
-            final String endIpFinal = endIp;
-            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InternalErrorException>() {
-                @Override
-                public void doInTransactionWithoutResult(final TransactionStatus status) throws InternalErrorException {
-                    if (_podDao.persist(pod) == null) {
-                        throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
-                    }
-
-                    if (startIp != null) {
-                        _zoneDao.addPrivateIpAddress(zoneId, pod.getId(), startIp, endIpFinal);
-                    }
-
-                    final String ipNums = _configDao.getValue("linkLocalIp.nums");
-                    final int nums = Integer.parseInt(ipNums);
-                    if (nums > 16 || nums <= 0) {
-                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "is wrong, should be 1~16");
-                    }
-                    /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
-                    final String[] linkLocalIpRanges = NetUtils.getLinkLocalIPRange(nums);
-                    if (linkLocalIpRanges == null) {
-                        throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "may be wrong, should be 1~16");
-                    } else {
-                        _zoneDao.addLinkLocalIpAddress(zoneId, pod.getId(), linkLocalIpRanges[0], linkLocalIpRanges[1]);
-                    }
-                }
-            });
-        } catch (final Exception e) {
-            s_logger.error("Unable to create new pod due to " + e.getMessage(), e);
-            throw new InternalErrorException("Failed to create new pod. Please contact Cloud Support.");
-        }
-
-        return pod;
     }
 }

@@ -264,10 +264,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return cmdsTimeout * 1000;
     }
 
-    public String getDomrScriptsDir() {
-        return domrScriptsDir;
-    }
-
     public String getGuestCpuModel() {
         return guestCpuModel;
     }
@@ -300,10 +296,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return hypervisorUri;
     }
 
-    public String getKvmScriptsDir() {
-        return kvmScriptsDir;
-    }
-
     public boolean isKvmclockDisable() {
         return kvmclockDisable;
     }
@@ -316,10 +308,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return localStorageUuid;
     }
 
-    public String getMountPath() {
-        return mountPath;
-    }
-
     public String getNetworkScriptsDir() {
         return networkScriptsDir;
     }
@@ -328,24 +316,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return networkBridgeType;
     }
 
-    public String getNetworkDirectSourceMode() {
-        return networkDirectSourceMode;
-    }
-
-    public String getNetworkDirectDevice() {
-        return networkDirectDevice;
-    }
-
     public String getPod() {
         return pod;
-    }
-
-    public String getPrivateMacaddrStart() {
-        return privateMacaddrStart;
-    }
-
-    public String getPrivateIpaddrStart() {
-        return privateIpaddrStart;
     }
 
     public String getPrivateBridgeName() {
@@ -358,10 +330,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
 
     public String getPrivateNetworkDevice() {
         return privateNetworkDevice;
-    }
-
-    public String getPrivateNetworkName() {
-        return privateNetworkName;
     }
 
     public String getStorageScriptsDir() {
@@ -396,22 +364,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return vmRngEnable;
     }
 
-    public RngBackendModel getVmRngModel() {
-        return vmRngModel;
-    }
-
-    public String getVmRngPath() {
-        return vmRngPath;
-    }
-
-    public WatchDogModel getVmWatchdogModel() {
-        return vmWatchdogModel;
-    }
-
-    public WatchDogAction getVmWatchdogAction() {
-        return vmWatchdogAction;
-    }
-
     public int getVmMigrateDowntime() {
         return vmMigrateDowntime;
     }
@@ -434,14 +386,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
 
     public String getPool() {
         return pool;
-    }
-
-    public boolean isVmMemballoonDisable() {
-        return vmMemballoonDisable;
-    }
-
-    public boolean isVmRngEnable() {
-        return vmRngEnable;
     }
 
     public String getZone() {
@@ -473,11 +417,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     }
 
     public static class Constants {
-        public static final String BRIDGE_LINKLOCAL = "linklocal";
-        public static final String BRIDGE_PUBLIC = "public";
-        public static final String BRIDGE_PRIVATE = "private";
-        public static final String BRIDGE_GUEST = "guest";
-
         public static final String PROPERTY_KEY_DOMR_SCRIPTS_DIR = "domr.scripts.dir";
         public static final String PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR = "hypervisor.scripts.dir";
         public static final String PROPERTY_KEY_KVM_SCRIPTS_DIR = "kvm.scripts.dir";
@@ -544,21 +483,19 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
 
         public static final String DEFAULT_VM_RNG_PATH = "/dev/random";
         public static final String SCRIPT_MODIFY_VLAN = "modifyvlan.sh";
+        public static final String SCRIPT_MODIFY_VXLAN = "modifyvxlan.sh";
         public static final String SCRIPT_VERSIONS = "versions.sh";
         public static final String SCRIPT_SEND_CONFIG_PROPERTIES = "send_config_properties_to_systemvm.py";
         public static final String SCRIPT_KVM_HEART_BEAT = "kvmheartbeat.sh";
-        public static final String SCRIPT_CREATE_VM = "createvm.sh";
         public static final String SCRIPT_MANAGE_SNAPSHOT = "managesnapshot.sh";
         public static final String SCRIPT_RESIZE_VOLUME = "resizevolume.sh";
         public static final String SCRIPT_CREATE_TEMPLATE = "createtmplt.sh";
         public static final String SCRIPT_SECURITY_GROUP = "security_group.py";
-        public static final String SCRIPT_OVS_TUNNEL = "ovstunnel.py";
         public static final String SCRIPT_ROUTER_PROXY = "router_proxy.sh";
         public static final String SCRIPT_OVS_PVLAN_DHCP_HOST = "ovs-pvlan-dhcp-host.sh";
         public static final String SCRIPT_OVS_PVLAN_VM = "ovs-pvlan-vm.sh";
         public static final String SCRIPT_PING_TEST = "pingtest.sh";
         public static final String SCRIPT_LOCAL_GATEWAY = "ip route |grep default|awk '{print $3}'";
-        public static final String SCRIPT_UNAME = "uname -r";
 
         public static final String FORMAT_NETWORK_SPEED = "ethtool %s |grep Speed | cut -d \\  -f 2";
         public static final String FORMAT_PRIVATE_BRIDGE_NAME = "cloud-%s-0";

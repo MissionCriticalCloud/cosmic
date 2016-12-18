@@ -1,4 +1,0 @@
-#! /bin/bash
-
-/sbin/ifconfig $1 0.0.0.0 up
-/usr/sbin/ivs-ctl add-port $1
