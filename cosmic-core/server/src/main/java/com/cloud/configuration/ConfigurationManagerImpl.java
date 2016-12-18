@@ -3053,8 +3053,10 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
-        // Don't return system network offerings to the user
-        sc.addAnd("systemOnly", SearchCriteria.Op.EQ, false);
+        // Don't return system network offerings to the user except for private gateway offerings
+        if (keyword == null || ! keyword.equals("private")) {
+            sc.addAnd("systemOnly", SearchCriteria.Op.EQ, false);
+        }
 
         // if networkId is specified, list offerings available for upgrade only
         // (for this network)
