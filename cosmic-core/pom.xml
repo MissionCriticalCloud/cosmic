@@ -56,7 +56,6 @@
         <module>plugins/event-bus-rabbitmq</module>
         <module>plugins/host-allocator-random</module>
         <module>plugins/hypervisor/kvm</module>
-        <module>plugins/hypervisor/ovm3</module>
         <module>plugins/hypervisor/xenserver</module>
         <module>plugins/network/nicira-nvp</module>
         <module>plugins/storage/allocator-random</module>

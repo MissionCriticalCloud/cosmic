@@ -56,9 +56,6 @@
             case 'KVM':
                 hypervisorAttr = 'kvmnetworklabel';
                 break;
-            case 'Ovm3':
-                hypervisorAttr = 'ovm3networklabel';
-                break;
         }
 
         trafficLabelStr = trafficLabel ? '&' + hypervisorAttr + '=' + trafficLabel : '';
@@ -430,8 +427,6 @@
                                     var nonSupportedHypervisors = {};
                                     if (args.context.zones[0]['network-model'] == "Advanced" && args.context.zones[0]['zone-advanced-sg-enabled'] == "on") {
                                         firstOption = "KVM";
-                                        nonSupportedHypervisors["Ovm"] = 1;
-                                        nonSupportedHypervisors["Ovm3"] = 1;
                                     }
 
                                     if (items != null) {
@@ -810,39 +805,6 @@
                                     args.$select.change();
                                 }
                             });
-
-                            var vSwitchEnabled = false;
-                            var dvSwitchEnabled = false;
-
-                            args.$select.bind("change", function (event) {
-                                var $form = $(this).closest('form');
-                                var $vsmFields = $form.find('[rel]').filter(function () {
-                                    var vsmFields = [
-                                        'vsmipaddress',
-                                        'vsmusername',
-                                        'vsmpassword'
-                                    ];
-
-                                    return $.inArray($(this).attr('rel'), vsmFields) > -1;
-                                });
-
-                                if ($(this).val() == "Ovm3") {
-                                    $form.find('.form-item[rel=ovm3pool]').css('display', 'inline-block');
-                                    $form.find('.form-item[rel=ovm3pool]').find('input[type=checkbox]').removeAttr('checked');
-
-                                    $form.find('.form-item[rel=ovm3cluster]').css('display', 'inline-block');
-                                    $form.find('.form-item[rel=ovm3cluster]').find('input[type=checkbox]').removeAttr('checked');
-                                    $form.find('[rel=ovm3vip]').css('display', 'block');
-                                } else {
-                                    $form.find('.form-item[rel=overridepublictraffic]').css('display', 'none');
-                                    $form.find('.form-item[rel=overrideguesttraffic]').css('display', 'none');
-
-                                    $form.find('[rel=vCenterHost]').css('display', 'none');
-                                    $form.find('[rel=vCenterUsername]').css('display', 'none');
-                                    $form.find('[rel=vCenterPassword]').css('display', 'none');
-                                    $form.find('[rel=vCenterDatacenter]').css('display', 'none');
-                                }
-                            });
                         }
                     },
                     name: {
@@ -850,48 +812,13 @@
                         validation: {
                             required: true
                         }
-                    },
+                    }
                 }
             },
             host: {
                 preFilter: function (args) {
-                    var selectedClusterObj = {
-                        hypervisortype: args.data.hypervisor
-                    };
-
-                    var $form = args.$form;
-
-                    if (selectedClusterObj.hypervisortype == "Ovm3") {
-                        $form.find('.form-item[rel=hostname]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=username]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=password]').css('display', 'inline-block');
-
-                        $form.find('.form-item[rel=vcenterHost]').hide();
-
-                        $form.find('.form-item[rel=agentUsername]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=agentUsername]').find('input').val("oracle");
-                        $form.find('.form-item[rel=agentPassword]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=agentPort]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=agentPort]').find('input').val("8899");
-                        $form.find('.form-item[rel=ovm3vip]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=ovm3pool]').css('display', 'inline-block');
-                        $form.find('.form-item[rel=ovm3cluster]').css('display', 'inline-block');
-                    } else {
-                        $form.find('[rel=hostname]').css('display', 'block');
-                        $form.find('[rel=username]').css('display', 'block');
-                        $form.find('[rel=password]').css('display', 'block');
-
-                        $form.find('[rel=vcenterHost]').hide();
-
-                        $form.find('[rel=agentUsername]').hide();
-                        $form.find('[rel=agentPassword]').hide();
-
-                        $form.find('.form-item[rel=agentPort]').hide();
-                        $form.find('.form-item[rel=ovm3vip]').hide();
-                        $form.find('.form-item[rel=ovm3pool]').hide();
-                        $form.find('.form-item[rel=ovm3cluster]').hide();
-                    }
                 },
+
                 fields: {
                     hostname: {
                         label: 'label.host.name',
@@ -918,16 +845,6 @@
                         isPassword: true
                     },
                     //input_group="general" ends here
-
-                    //input_group="OVM3" starts here
-                    agentPort: {
-                        label: 'label.agent.port',
-                        validation: {
-                            required: false
-                        },
-                        isHidden: true
-                    },
-                    //input_group="OVM3" ends here
 
                     //always appear (begin)
                     hosttags: {
@@ -1046,28 +963,6 @@
                                 items.push({
                                     id: "iscsi",
                                     description: "iscsi"
-                                });
-                                args.response.success({
-                                    data: items
-                                });
-                            } else if (selectedClusterObj.hypervisortype == "Ovm") {
-                                var items = [];
-                                items.push({
-                                    id: "nfs",
-                                    description: "nfs"
-                                });
-                                items.push({
-                                    id: "ocfs2",
-                                    description: "ocfs2"
-                                });
-                                args.response.success({
-                                    data: items
-                                });
-                            } else if (selectedClusterObj.hypervisortype == "Ovm3") {
-                                var items = [];
-                                items.push({
-                                    id: "nfs",
-                                    description: "nfs"
                                 });
                                 args.response.success({
                                     data: items

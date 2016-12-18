@@ -215,7 +215,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     protected void setupSupportedVpcHypervisorsList() {
         hTypes.add(HypervisorType.XenServer);
         hTypes.add(HypervisorType.KVM);
-        hTypes.add(HypervisorType.Ovm3);
     }
 
     @Override

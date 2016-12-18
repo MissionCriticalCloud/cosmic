@@ -8,9 +8,6 @@ public class Hypervisor {
         None, //for storage hosts
         XenServer,
         KVM,
-        VirtualBox,
-        Parralels,
-        Ovm3,
 
         Any; /*If you don't care about the hypervisor type*/
 
@@ -22,14 +19,8 @@ public class Hypervisor {
                 return HypervisorType.XenServer;
             } else if (hypervisor.equalsIgnoreCase("KVM")) {
                 return HypervisorType.KVM;
-            } else if (hypervisor.equalsIgnoreCase("VirtualBox")) {
-                return HypervisorType.VirtualBox;
-            } else if (hypervisor.equalsIgnoreCase("Parralels")) {
-                return HypervisorType.Parralels;
             } else if (hypervisor.equalsIgnoreCase("Any")) {
                 return HypervisorType.Any;
-            } else if (hypervisor.equalsIgnoreCase("Ovm3")) {
-                return HypervisorType.Ovm3;
             } else {
                 return HypervisorType.None;
             }
@@ -46,8 +37,6 @@ public class Hypervisor {
                 return ImageFormat.VHD;
             } else if (hyperType == HypervisorType.KVM) {
                 return ImageFormat.QCOW2;
-            } else if (hyperType == HypervisorType.Ovm3) {
-                return ImageFormat.RAW;
             } else {
                 return null;
             }

@@ -2777,12 +2777,11 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             return new Ternary<>(new Pair<>(new ArrayList<HostVO>(), new Integer(0)), new ArrayList<>(), new HashMap<>());
         }
 
-        if (!vm.getHypervisorType().equals(HypervisorType.XenServer) && !vm.getHypervisorType().equals(HypervisorType.KVM)
-                && !vm.getHypervisorType().equals(HypervisorType.Ovm3)) {
+        if (!vm.getHypervisorType().equals(HypervisorType.XenServer) && !vm.getHypervisorType().equals(HypervisorType.KVM)) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug(vm + " is not XenServer/KVM/Ovm3, cannot migrate this VM.");
+                s_logger.debug(vm + " is not XenServer/KVM, cannot migrate this VM.");
             }
-            throw new InvalidParameterValueException("Unsupported Hypervisor Type for VM migration, we support " + "XenServer/KVM/Ovm3 only");
+            throw new InvalidParameterValueException("Unsupported Hypervisor Type for VM migration, we support " + "XenServer/KVM only");
         }
 
         final long srcHostId = vm.getHostId();

@@ -3,7 +3,7 @@
 --;
 
 -- Remove hypervisors we no longer support
-UPDATE guest_os_hypervisor SET removed=now() WHERE hypervisor_type NOT IN ("KVM", "XenServer", "OVM3");
+UPDATE guest_os_hypervisor SET removed=now() WHERE hypervisor_type NOT IN ("KVM", "XenServer");
 
 -- Remove old templates
 UPDATE vm_template SET removed=now(), state='Inactive' WHERE `name` LIKE 'CentOS 5%' AND removed is NULL;
