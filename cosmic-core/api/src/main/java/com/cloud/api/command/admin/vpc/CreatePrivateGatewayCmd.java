@@ -13,6 +13,7 @@ import com.cloud.api.response.NetworkOfferingResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.VpcResponse;
+import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -164,7 +165,7 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
 
     @Override
     public long getEntityOwnerId() {
-        return Account.ACCOUNT_ID_SYSTEM;
+        return CallContext.current().getCallingAccount().getId();
     }
 
     @Override
