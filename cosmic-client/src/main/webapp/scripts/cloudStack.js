@@ -169,25 +169,6 @@
                     }
                 });
 
-
-                // Populate IDP list
-                $.ajax({
-                    type: 'GET',
-                    url: createURL('listIdps'),
-                    dataType: 'json',
-                    async: false,
-                    success: function (data, textStatus, xhr) {
-                        if (data && data.listidpsresponse && data.listidpsresponse.idp) {
-                            var idpList = data.listidpsresponse.idp.sort(function (a, b) {
-                                return a.orgName.localeCompare(b.orgName);
-                            });
-                            g_idpList = idpList;
-                        }
-                    },
-                    error: function (xhr) {
-                    }
-                });
-
                 return userValid ? {
                     user: {
                         userid: g_userid,
