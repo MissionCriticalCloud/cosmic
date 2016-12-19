@@ -110,6 +110,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -226,41 +227,41 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             public void doInTransactionWithoutResult(final TransactionStatus status) {
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultVPCOfferingName) == null) {
-                    s_logger.debug("Creating default VPC offering " + VpcOffering.defaultVPCOfferingName);
+                    s_logger.debug("Creating VPC offering " + VpcOffering.defaultVPCOfferingName);
 
-                    final Map<Service, Set<Provider>> svcProviderMap = new HashMap<>();
-                    final Set<Provider> defaultProviders = new HashSet<>();
-                    defaultProviders.add(Provider.VPCVirtualRouter);
-                    for (final Service svc : getSupportedServices()) {
-                        if (svc == Service.Lb) {
-                            final Set<Provider> lbProviders = new HashSet<>();
-                            lbProviders.add(Provider.VPCVirtualRouter);
-                            lbProviders.add(Provider.InternalLbVm);
-                            svcProviderMap.put(svc, lbProviders);
-                        } else {
-                            svcProviderMap.put(svc, defaultProviders);
-                        }
-                    }
+                    final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.defaultVPCOfferingName, VpcOffering.defaultVPCOfferingName, svcProviderMap,
                             true, State.Enabled, null, false, false, false);
                 }
 
-                if (_vpcOffDao.findByUniqueName(VpcOffering.redundantVPCOfferingName) == null) {
-                    s_logger.debug("Creating Redundant VPC offering " + VpcOffering.redundantVPCOfferingName);
+                if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayVPCOfferingName) == null) {
+                    s_logger.debug("Creating VPC offering " + VpcOffering.defaultRemoteGatewayVPCOfferingName);
 
-                    final Map<Service, Set<Provider>> svcProviderMap = new HashMap<>();
-                    final Set<Provider> defaultProviders = new HashSet<>();
-                    defaultProviders.add(Provider.VPCVirtualRouter);
-                    for (final Service svc : getSupportedServices()) {
-                        if (svc == Service.Lb) {
-                            final Set<Provider> lbProviders = new HashSet<>();
-                            lbProviders.add(Provider.VPCVirtualRouter);
-                            lbProviders.add(Provider.InternalLbVm);
-                            svcProviderMap.put(svc, lbProviders);
-                        } else {
-                            svcProviderMap.put(svc, defaultProviders);
-                        }
-                    }
+                    final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_SERVICES);
+                    createVpcOffering(VpcOffering.defaultRemoteGatewayVPCOfferingName, VpcOffering.defaultRemoteGatewayVPCOfferingName, svcProviderMap,
+                            true, State.Enabled, null, false, false, false);
+                }
+
+                if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName) == null) {
+                    s_logger.debug("Creating VPC offering " + VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName);
+
+                    final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_WITH_VPN_SERVICES);
+                    createVpcOffering(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, svcProviderMap,
+                            true, State.Enabled, null, false, false, false);
+                }
+
+                if (_vpcOffDao.findByUniqueName(VpcOffering.defaultInternalVPCOfferingName) == null) {
+                    s_logger.debug("Creating VPC offering " + VpcOffering.defaultInternalVPCOfferingName);
+
+                    final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(INTERNAL_VPC_SERVICES);
+                    createVpcOffering(VpcOffering.defaultInternalVPCOfferingName, VpcOffering.defaultInternalVPCOfferingName, svcProviderMap,
+                            true, State.Enabled, null, false, false, false);
+                }
+
+                if (_vpcOffDao.findByUniqueName(VpcOffering.redundantVPCOfferingName) == null) {
+                    s_logger.debug("Creating VPC offering " + VpcOffering.redundantVPCOfferingName);
+
+                    final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.redundantVPCOfferingName, VpcOffering.redundantVPCOfferingName, svcProviderMap,
                             true, State.Enabled, null, false, false, true);
                 }
@@ -288,6 +289,23 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return true;
     }
 
+    private Map<Service, Set<Provider>> getServiceSetMap(List<Service> serviceToAdd) {
+        final Map<Service, Set<Provider>> svcProviderMap = new HashMap<>();
+        final Set<Provider> defaultProviders = new HashSet<>();
+        defaultProviders.add(Provider.VPCVirtualRouter);
+        for (final Service svc : serviceToAdd) {
+            if (svc == Service.Lb) {
+                final Set<Provider> lbProviders = new HashSet<>();
+                lbProviders.add(Provider.VPCVirtualRouter);
+                lbProviders.add(Provider.InternalLbVm);
+                svcProviderMap.put(svc, lbProviders);
+            } else {
+                svcProviderMap.put(svc, defaultProviders);
+            }
+        }
+        return svcProviderMap;
+    }
+
     @Override
     public boolean start() {
         _executor.scheduleAtFixedRate(new VpcCleanupTask(), _cleanupInterval, _cleanupInterval, TimeUnit.SECONDS);
@@ -299,20 +317,45 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return true;
     }
 
-    protected List<Service> getSupportedServices() {
-        final List<Service> services = new ArrayList<>();
-        services.add(Network.Service.Dhcp);
-        services.add(Network.Service.Dns);
-        services.add(Network.Service.UserData);
-        services.add(Network.Service.NetworkACL);
-        services.add(Network.Service.PortForwarding);
-        services.add(Network.Service.Lb);
-        services.add(Network.Service.SourceNat);
-        services.add(Network.Service.StaticNat);
-        services.add(Network.Service.Gateway);
-        services.add(Network.Service.Vpn);
-        return services;
-    }
+    private final List<Service> DEFAULT_SERVICES = new ArrayList<Service>() {{
+        add(Network.Service.Dhcp);
+        add(Network.Service.Dns);
+        add(Network.Service.UserData);
+        add(Network.Service.NetworkACL);
+        add(Network.Service.PortForwarding);
+        add(Network.Service.Lb);
+        add(Network.Service.SourceNat);
+        add(Network.Service.StaticNat);
+        add(Network.Service.Gateway);
+        add(Network.Service.Vpn);
+    }};
+
+    private final List<Service> REMOTE_GATEWAY_SERVICES = new ArrayList<Service>() {{
+        add(Network.Service.Dhcp);
+        add(Network.Service.Dns);
+        add(Network.Service.StaticNat);
+        add(Network.Service.UserData);
+        add(Network.Service.NetworkACL);
+    }};
+
+
+    private final List<Service> REMOTE_GATEWAY_WITH_VPN_SERVICES = new ArrayList<Service>() {{
+        add(Network.Service.Dhcp);
+        add(Network.Service.Dns);
+        add(Network.Service.StaticNat);
+        add(Network.Service.UserData);
+        add(Network.Service.NetworkACL);
+        add(Network.Service.Vpn);
+    }};
+
+    private final List<Service> INTERNAL_VPC_SERVICES = new ArrayList<Service>() {{
+        add(Network.Service.Dhcp);
+        add(Network.Service.Dns);
+        add(Network.Service.StaticNat);
+        add(Network.Service.UserData);
+        add(Network.Service.NetworkACL);
+        add(Network.Service.Gateway);
+    }};
 
     @DB
     protected VpcOffering createVpcOffering(final String name, final String displayText,

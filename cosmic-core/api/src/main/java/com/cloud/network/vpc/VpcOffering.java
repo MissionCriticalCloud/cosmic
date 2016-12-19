@@ -5,6 +5,9 @@ import com.cloud.api.InternalIdentity;
 
 public interface VpcOffering extends InternalIdentity, Identity {
     public static final String defaultVPCOfferingName = "Default VPC offering";
+    public static final String defaultRemoteGatewayVPCOfferingName = "Default Remote Gateway VPC offering";
+    public static final String defaultRemoteGatewayWithVPNVPCOfferingName = "Default Remote Gateway with VPN VPC offering";
+    public static final String defaultInternalVPCOfferingName = "Default Internal VPC offering";
     public static final String redundantVPCOfferingName = "Redundant VPC offering";
 
     /**
