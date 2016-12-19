@@ -600,23 +600,27 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
             if (hosts.size() > 0) {
                 s_logger.debug("Found " + hosts.size() + " unmanaged direct hosts, processing connect for them...");
                 for (final HostVO host : hosts) {
-                    final AgentAttache agentattache = findAttache(host.getId());
-                    if (agentattache != null) {
-                        // already loaded, skip
-                        if (agentattache.forForward()) {
-                            if (s_logger.isInfoEnabled()) {
-                                s_logger.info(host + " is detected down, but we have a forward attache running, disconnect this one before launching the host");
+                    try {
+                        final AgentAttache agentattache = findAttache(host.getId());
+                        if (agentattache != null) {
+                            // already loaded, skip
+                            if (agentattache.forForward()) {
+                                if (s_logger.isInfoEnabled()) {
+                                    s_logger.info(host + " is detected down, but we have a forward attache running, disconnect this one before launching the host");
+                                }
+                                removeAgent(agentattache, Status.Disconnected);
+                            } else {
+                                continue;
                             }
-                            removeAgent(agentattache, Status.Disconnected);
-                        } else {
-                            continue;
                         }
-                    }
 
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Loading directly connected host " + host.getId() + "(" + host.getName() + ")");
+                        if (s_logger.isDebugEnabled()) {
+                            s_logger.debug("Loading directly connected host " + host.getId() + "(" + host.getName() + ")");
+                        }
+                        loadDirectlyConnectedHost(host, false);
+                    } catch (final Throwable e) {
+                        s_logger.warn("Can not load directly connected host " + host.getId() + "(" + host.getName() + ") due to ", e);
                     }
-                    loadDirectlyConnectedHost(host, false);
                 }
             }
         }
