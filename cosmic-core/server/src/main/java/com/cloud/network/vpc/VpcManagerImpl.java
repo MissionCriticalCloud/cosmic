@@ -1671,7 +1671,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
 
         // CIDR should be outside of link-local cidr
-        if (NetUtils.isNetworksOverlap(cidr, NetUtils.getLinkLocalCIDR())) {
+        if (NetUtils.isNetworkAWithinNetworkB(cidr, NetUtils.getLinkLocalCIDR())) {
             throw new InvalidParameterValueException(
                     "CIDR should be outside of link local cidr " + NetUtils.getLinkLocalCIDR());
         }
