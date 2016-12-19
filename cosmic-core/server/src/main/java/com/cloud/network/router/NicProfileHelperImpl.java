@@ -98,8 +98,8 @@ public class NicProfileHelperImpl implements NicProfileHelper {
         final NicProfile guestNic = new NicProfile();
 
         // Redundant VPCs should not acquire the gateway ip because that is the VIP between the two routers to which guest VMs connect
-        // VPCs without sourcenat service also should not acquire the gateway ip because it is in use by an external device on the network
-        if (vpcRouterDeploymentDefinition.isRedundant() || !vpcRouterDeploymentDefinition.hasSourceNatService()) {
+        // VPCs without gateway service also should not acquire the gateway ip because it is in use by an external device on the network
+        if (vpcRouterDeploymentDefinition.isRedundant() || !vpcRouterDeploymentDefinition.hasGatewayService()) {
             guestNic.setIPv4Address(_ipAddrMgr.acquireGuestIpAddressForRouter(guestNetwork, null));
         } else {
             guestNic.setIPv4Address(guestNetwork.getGateway());
