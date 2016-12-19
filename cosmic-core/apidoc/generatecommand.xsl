@@ -10,7 +10,7 @@
                 <link rel="stylesheet" href="../includes/main.css" type="text/css" />
                 <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 
-                <title>CloudStack API Reference</title>
+                <title>Cosmic API Reference</title>
             </head>
 
             <body>

@@ -10,7 +10,7 @@
                 <link rel="stylesheet" href="includes/main.css" type="text/css" />
                 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
-                <title>CloudStack API Reference</title>
+                <title>Cosmic API Reference</title>
             </head>
 
             <body>
@@ -23,7 +23,7 @@
                         <div id="main_master">
                             <div id="inside_header">
                                 <div class="header_top">
-                                    <a class="cloud_logo" href="http://cloudstack.org"></a>
+                                    <a class="cloud_logo" href="https://github.com/MissionCriticalCloud/cosmic/issues"></a>
                                     <div class="mainemenu_panel">
 
                                     </div>
@@ -34,15 +34,10 @@
 
                                 <div class="inside_apileftpanel">
                                     <div class="inside_contentpanel" style="width:930px;">
-                                        <!-- Modify this line for the release version -->
-                                        <h1>Apache CloudStack API Documentation (v4.6.0)</h1>
-                                        <a class="api_backbutton" href="http://cloudstack.apache.org/docs/api/"></a>
+                                        <h1>Cosmic API Documentation</h1>
+                                        <a class="api_backbutton" href="/"></a>
                                         <div class="apiannouncement_box">
                                             <div class="apiannouncement_contentarea">
-                                                <h3>Using the CloudStack API</h3>
-                                                <p>For information about how the APIs work, and tips on how to use them, see the
-                                                    <a href="http://docs.cloudstack.apache.org/en/latest/dev.html">Developer's Guide</a>.
-                                                </p>
                                             </div>
                                         </div>
 

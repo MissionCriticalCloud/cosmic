@@ -5,12 +5,12 @@
     <xsl:template match="/">
         <html>
             <head>
-                <title>Cloudstack API</title>
+                <title>Cosmic API</title>
             </head>
             <body>
                 <table border="1" cellpadding="1" cellspacing="0.5">
                     <tr>
-                        <h1 ALIGN='CENTER'>Cloudstack API Version 4.6.0</h1>
+                        <h1 ALIGN='CENTER'>Cosmic API</h1>
                         <br />
                         <h2 ALIGN='CENTER'>Table of Contents</h2>
                         <th>
@@ -1277,11 +1277,11 @@
                             <xsl:if test="name='getCloudIdentifier'">
                                 <tr>
                                     <td>
-                                        <h4 ALIGN='CENTER'>Cloudstack Specific Commands</h4>
+                                        <h4 ALIGN='CENTER'>Cosmic Specific Commands</h4>
                                         <br></br>
                                     </td>
                                     <td>
-                                        <h4 ALIGN='CENTER'>Cloudstack Specific Command Descriptions</h4>
+                                        <h4 ALIGN='CENTER'>Cosmic Specific Command Descriptions</h4>
                                         <br></br>
                                     </td>
                                 </tr>
