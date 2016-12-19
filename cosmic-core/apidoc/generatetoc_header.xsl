@@ -34,8 +34,8 @@
 
                                 <div class="inside_apileftpanel">
                                     <div class="inside_contentpanel" style="width:930px;">
-                                        <h1>Cosmic API Documentation</h1>
-                                        <a class="api_backbutton" href="/"></a>
+                                        <h1>API Documentation</h1>
+                                        <a class="api_backbutton" href="javascript:window.history.back();"></a>
                                         <div class="apiannouncement_box">
                                             <div class="apiannouncement_contentarea">
                                             </div>
