@@ -88,6 +88,7 @@ public class RouterDeploymentDefinition {
     protected Long serviceOfferingId;
     protected Long tableLockId;
     protected boolean isPublicNetwork;
+    protected boolean isGateway = true;
     protected PublicIp sourceNatIp;
 
     protected RouterDeploymentDefinition(final Network guestNetwork, final DeployDestination dest, final Account owner, final Map<Param, Object> params) {
@@ -167,6 +168,10 @@ public class RouterDeploymentDefinition {
 
     public boolean hasSourceNatService() {
         return isPublicNetwork;
+    }
+
+    public boolean hasGatewayService() {
+        return isGateway;
     }
 
     protected void generateDeploymentPlan() {

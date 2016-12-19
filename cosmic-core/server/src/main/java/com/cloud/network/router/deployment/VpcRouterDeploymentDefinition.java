@@ -126,6 +126,10 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
         return hasService(Network.Service.SourceNat);
     }
 
+    public boolean hasGatewayService() {
+        return hasService(Network.Service.Gateway);
+    }
+
     private boolean hasService(final Network.Service service) {
         final Map<Network.Service, Set<Network.Provider>> vpcOffSvcProvidersMap = vpcMgr.getVpcOffSvcProvidersMap(vpc.getVpcOfferingId());
         try {
