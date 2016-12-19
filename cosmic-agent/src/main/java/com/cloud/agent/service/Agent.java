@@ -463,7 +463,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         final ReadyCommand ready = (ReadyCommand) cmd;
 
-        logger.info("Proccess agent ready command, agent id = " + ready.getHostId());
+        logger.info("Process agent ready command, agent id = " + ready.getHostId());
         if (ready.getHostId() != null) {
             setId(ready.getHostId());
         }
@@ -509,7 +509,7 @@ public class Agent implements HandlerFactory, IAgentControl {
             return;
         }
 
-        logger.info("Proccess agent startup answer, agent id = " + startup.getHostId());
+        logger.info("Process agent startup answer, agent id = " + startup.getHostId());
 
         setId(startup.getHostId());
         _pingInterval = (long) startup.getPingInterval() * 1000; // change to ms.
@@ -806,7 +806,7 @@ public class Agent implements HandlerFactory, IAgentControl {
             try {
                 _link.send(request.toBytes());
             } catch (final ClosedChannelException e) {
-                logger.warn("Unable to post agent control reques: " + request.toString());
+                logger.warn("Unable to post agent control request: " + request.toString());
                 throw new AgentControlChannelException("Unable to post agent control request due to " + e.getMessage());
             }
         } else {
