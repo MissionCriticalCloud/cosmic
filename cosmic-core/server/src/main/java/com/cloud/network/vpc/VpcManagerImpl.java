@@ -49,7 +49,6 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.element.NetworkElement;
-import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.VpcProvider;
 import com.cloud.network.vpc.VpcOffering.State;
 import com.cloud.network.vpc.dao.NetworkACLDao;
@@ -110,7 +109,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -333,16 +331,13 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private final List<Service> REMOTE_GATEWAY_SERVICES = new ArrayList<Service>() {{
         add(Network.Service.Dhcp);
         add(Network.Service.Dns);
-        add(Network.Service.StaticNat);
         add(Network.Service.UserData);
         add(Network.Service.NetworkACL);
     }};
 
-
     private final List<Service> REMOTE_GATEWAY_WITH_VPN_SERVICES = new ArrayList<Service>() {{
         add(Network.Service.Dhcp);
         add(Network.Service.Dns);
-        add(Network.Service.StaticNat);
         add(Network.Service.UserData);
         add(Network.Service.NetworkACL);
         add(Network.Service.Vpn);
@@ -351,14 +346,13 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private final List<Service> INTERNAL_VPC_SERVICES = new ArrayList<Service>() {{
         add(Network.Service.Dhcp);
         add(Network.Service.Dns);
-        add(Network.Service.StaticNat);
         add(Network.Service.UserData);
         add(Network.Service.NetworkACL);
         add(Network.Service.Gateway);
     }};
 
     @DB
-    protected VpcOffering createVpcOffering(final String name, final String displayText,
+    private VpcOffering createVpcOffering(final String name, final String displayText,
                                             final Map<Network.Service, Set<Network.Provider>> svcProviderMap,
                                             final boolean isDefault, final State state, final Long serviceOfferingId, final boolean supportsDistributedRouter,
                                             final boolean offersRegionLevelVPC,
@@ -1810,12 +1804,12 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
     }
 
-    protected boolean isCidrBlacklisted(final String cidr, final long zoneId) {
+    private boolean isCidrBlacklisted(final String cidr, final long zoneId) {
         final String routesStr = NetworkOrchestrationService.BlacklistedRoutes.valueIn(zoneId);
         if (routesStr != null && !routesStr.isEmpty()) {
             final String[] cidrBlackList = routesStr.split(",");
 
-            if (cidrBlackList != null && cidrBlackList.length > 0) {
+            if (cidrBlackList.length > 0) {
                 for (final String blackListedRoute : cidrBlackList) {
                     if (NetUtils.isNetworksOverlap(blackListedRoute, cidr)) {
                         return true;
@@ -1996,7 +1990,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     }
 
     @DB
-    protected void validateNewVpcGuestNetwork(final String cidr, final String gateway, final Account networkOwner,
+    private void validateNewVpcGuestNetwork(final String cidr, final String gateway, final Account networkOwner,
                                               final Vpc vpc, final String networkDomain) {
 
         Transaction.execute(new TransactionCallbackNoReturn() {
@@ -2028,8 +2022,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                     // network cidrs
                     final List<? extends Network> ntwks = _ntwkDao.listByVpc(vpc.getId());
                     for (final Network ntwk : ntwks) {
-                        assert cidr != null : "Why the network cidr is null when it belongs to vpc?";
-
                         if (NetUtils.isNetworkAWithinNetworkB(ntwk.getCidr(), cidr)
                                 || NetUtils.isNetworkAWithinNetworkB(cidr, ntwk.getCidr())) {
                             throw new InvalidParameterValueException(
@@ -2069,7 +2061,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 vpcOffSvcProvidersMap.get(Network.Service.SourceNat).contains(Network.Provider.VPCVirtualRouter);
     }
 
-    protected IPAddressVO getExistingSourceNatInVpc(final long ownerId, final long vpcId) {
+    private IPAddressVO getExistingSourceNatInVpc(final long ownerId, final long vpcId) {
 
         final List<IPAddressVO> addrs = listPublicIpsAssignedToVpc(ownerId, true, vpcId);
 
@@ -2092,7 +2084,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return sourceNatIp;
     }
 
-    protected List<IPAddressVO> listPublicIpsAssignedToVpc(final long accountId, final Boolean sourceNat,
+    private List<IPAddressVO> listPublicIpsAssignedToVpc(final long accountId, final Boolean sourceNat,
                                                            final long vpcId) {
         final SearchCriteria<IPAddressVO> sc = IpAddressSearch.create();
         sc.setParameters("accountId", accountId);
@@ -2121,7 +2113,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return applyStaticRoutesForVpc(route.getVpcId());
     }
 
-    public boolean cleanupVpcResources(final long vpcId, final Account caller, final long callerUserId)
+    private boolean cleanupVpcResources(final long vpcId, final Account caller, final long callerUserId)
             throws ResourceUnavailableException, ConcurrentOperationException {
         s_logger.debug("Cleaning up resources for vpc id=" + vpcId);
         boolean success = true;
@@ -2194,32 +2186,31 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final Pair<List<NetworkACLVO>, Integer> aclsCountPair = _networkAclDao.searchAndCount(searchCriteria, filter);
 
         final List<NetworkACLVO> acls = aclsCountPair.first();
-        for (final NetworkACLVO networkAcl : acls) {
+        acls.forEach(networkAcl -> {
             if (networkAcl.getId() != NetworkACL.DEFAULT_ALLOW && networkAcl.getId() != NetworkACL.DEFAULT_DENY) {
                 _networkAclMgr.deleteNetworkACL(networkAcl);
             }
-        }
+        });
+
         return success;
     }
 
     private List<Provider> getVpcProviders(final long vpcId) {
         final List<String> providerNames = _vpcSrvcDao.getDistinctProviders(vpcId);
         final Map<String, Provider> providers = new HashMap<>();
-        for (final String providerName : providerNames) {
+        providerNames.forEach(providerName -> {
             if (!providers.containsKey(providerName)) {
                 providers.put(providerName, Network.Provider.getProvider(providerName));
             }
-        }
+        });
 
         return new ArrayList<>(providers.values());
     }
 
-    public List<VpcProvider> getVpcElements() {
+    private List<VpcProvider> getVpcElements() {
         if (vpcElements == null) {
             vpcElements = new ArrayList<>();
             vpcElements.add((VpcProvider) _ntwkModel.getElementImplementingProvider(Provider.VPCVirtualRouter.getName()));
-            vpcElements.add(
-                    (VpcProvider) _ntwkModel.getElementImplementingProvider(Provider.JuniperContrailVpcRouter.getName()));
         }
 
         if (vpcElements == null) {
@@ -2245,7 +2236,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     }
 
     @DB
-    protected boolean revokeStaticRoutesForVpc(final long vpcId, final Account caller)
+    private boolean revokeStaticRoutesForVpc(final long vpcId, final Account caller)
             throws ResourceUnavailableException {
         // get all static routes for the vpc
         final List<StaticRouteVO> routes = _staticRouteDao.listByVpcId(vpcId);
@@ -2266,7 +2257,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return true;
     }
 
-    protected void markStaticRouteForRevoke(final StaticRouteVO route, final Account caller) {
+    private void markStaticRouteForRevoke(final StaticRouteVO route, final Account caller) {
         s_logger.debug("Revoking static route " + route);
         if (caller != null) {
             _accountMgr.checkAccess(caller, null, false, route);
@@ -2284,13 +2275,13 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
     }
 
-    protected PrivateGateway getPrivateGatewayProfile(final VpcGateway gateway) {
+    private PrivateGateway getPrivateGatewayProfile(final VpcGateway gateway) {
         final Network network = _ntwkModel.getNetwork(gateway.getNetworkId());
         return new PrivateGatewayProfile(gateway, network.getPhysicalNetworkId());
     }
 
     @DB
-    protected boolean deletePrivateGatewayFromTheDB(final PrivateGateway gateway) {
+    private boolean deletePrivateGatewayFromTheDB(final PrivateGateway gateway) {
         // check if there are ips allocted in the network
         final long networkId = gateway.getNetworkId();
 
@@ -2309,17 +2300,15 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 _ntwkMgr.destroyNetwork(networkId, context, false);
                 s_logger.debug("Deleted private network id=" + networkId);
             }
-        } catch (final InterruptedException e) {
-            s_logger.error("deletePrivateGatewayFromTheDB failed to delete network id " + networkId + "due to => ", e);
-        } catch (final ExecutionException e) {
+        } catch (final InterruptedException | ExecutionException e) {
             s_logger.error("deletePrivateGatewayFromTheDB failed to delete network id " + networkId + "due to => ", e);
         }
 
         return true;
     }
 
-    protected boolean applyStaticRoutes(final List<? extends StaticRoute> routes, final Account caller,
-                                        final boolean updateRoutesInDB) throws ResourceUnavailableException {
+    private boolean applyStaticRoutes(final List<? extends StaticRoute> routes, final Account caller,
+                                      final boolean updateRoutesInDB) throws ResourceUnavailableException {
         final boolean success = true;
         final List<StaticRouteProfile> staticRouteProfiles = new ArrayList<>(routes.size());
 
@@ -2352,7 +2341,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return success;
     }
 
-    protected boolean applyStaticRoutes(final List<StaticRouteProfile> routes) throws ResourceUnavailableException {
+    private boolean applyStaticRoutes(final List<StaticRouteProfile> routes) throws ResourceUnavailableException {
         if (routes.isEmpty()) {
             s_logger.debug("No static routes to apply");
             return true;
@@ -2360,22 +2349,19 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final Vpc vpc = _vpcDao.findById(routes.get(0).getVpcId());
 
         s_logger.debug("Applying static routes for vpc " + vpc);
-        final String staticNatProvider = _vpcSrvcDao.getProviderForServiceInVpc(vpc.getId(), Service.StaticNat);
+        final List<Provider> providersToImplement = getVpcProviders(vpc.getId());
 
-        for (final VpcProvider provider : getVpcElements()) {
-            if (!(provider instanceof StaticNatServiceProvider && provider.getName().equalsIgnoreCase(staticNatProvider))) {
-                continue;
-            }
-
-            if (provider.applyStaticRoutes(vpc, routes)) {
-                s_logger.debug("Applied static routes for vpc " + vpc);
-            } else {
-                s_logger.warn("Failed to apply static routes for vpc " + vpc);
-                return false;
+        for (final VpcProvider element : getVpcElements()) {
+            if (providersToImplement.contains(element.getProvider())) {
+                if (element.applyStaticRoutes(vpc, routes)) {
+                    s_logger.debug("Applied static routes for vpc " + vpc);
+                    return true;
+                }
             }
         }
 
-        return true;
+        s_logger.warn("Failed to apply static routes for vpc " + vpc);
+        return false;
     }
 
     @Inject
