@@ -3,7 +3,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.2.0.0</version>
+        <version>5.2.0.1-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
     <artifactId>cloud-framework-rest</artifactId>
