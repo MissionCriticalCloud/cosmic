@@ -10,7 +10,7 @@
                 <link rel="stylesheet" href="../includes/main.css" type="text/css" />
                 <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 
-                <title>CloudStack API Reference</title>
+                <title>Cosmic API Reference</title>
             </head>
 
             <body>
@@ -230,13 +230,6 @@
                                     </li>
 
                                 </ul>
-                                <p>Copyright © 2015 The Apache Software Foundation, Licensed under the
-                                    <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0.</a>
-                                    <br />
-                                    Apache, CloudStack, Apache CloudStack, the Apache CloudStack logo, the CloudMonkey logo and the Apache feather logo are trademarks of The Apache
-                                    Software Foundation.
-                                </p>
-
                             </div>
                         </div>
 

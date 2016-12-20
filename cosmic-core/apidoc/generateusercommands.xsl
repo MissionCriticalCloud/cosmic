@@ -10,7 +10,7 @@
                 <link rel="stylesheet" href="../includes/main.css" type="text/css" />
                 <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 
-                <title>Apache CloudStack | The Power Behind Your Cloud</title>
+                <title>Cosmic</title>
             </head>
 
             <body>
@@ -24,7 +24,7 @@
                             <div id="inside_header">
 
                                 <div class="header_top">
-                                    <a class="cloud_logo" href="http://cloudstack.org"></a>
+                                    <a class="cloud_logo" href="https://github.com/MissionCriticalCloud/cosmic/issues"></a>
                                     <div class="mainemenu_panel">
 
                                     </div>
@@ -39,9 +39,8 @@
                                         <div class="api_titlebox">
                                             <div class="api_titlebox_left">
                                                 <xsl:for-each select="command/command">
-                                                    <!-- Modify this line for the release version -->
                                                     <span>
-                                                        Apache CloudStack v4.6.0 User API Reference
+                                                        Cosmic User API Reference
                                                     </span>
                                                     <p></p>
                                                     <h1>
@@ -166,12 +165,6 @@
                         <div id="footer">
 
                             <div id="footer_mainmaster">
-                                <p>Copyright © 2015 The Apache Software Foundation, Licensed under the
-                                    <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0.</a>
-                                    <br />
-                                    Apache, CloudStack, Apache CloudStack, the Apache CloudStack logo, the CloudMonkey logo and the Apache feather logo are trademarks of The Apache
-                                    Software Foundation.
-                                </p>
                             </div>
                         </div>
 

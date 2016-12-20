@@ -5,7 +5,7 @@
     <xsl:template match="/">
         <html>
             <head>
-                <title>Cloudstack API</title>
+                <title>Cosmic API</title>
             </head>
             <body>
                 <table border="1">
