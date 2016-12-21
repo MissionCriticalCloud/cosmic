@@ -48,13 +48,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implements VMInstanceDao {
 
-    public static final Logger s_logger = LoggerFactory.getLogger(VMInstanceDaoImpl.class);
+    private static final Logger s_logger = LoggerFactory.getLogger(VMInstanceDaoImpl.class);
+
     private static final int MAX_CONSECUTIVE_SAME_STATE_UPDATE_COUNT = 3;
-    private static final String ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART1 = "SELECT host.cluster_id, SUM(IF(vm.state='Running' AND vm.account_id = ?, 1, 0)) " +
+    private static final String ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART1 = "SELECT host.cluster_id, SUM(IF(vm.state IN ('Starting', 'Running') AND vm.account_id = ?, 1, 0)) " +
             "FROM `cloud`.`host` host LEFT JOIN `cloud`.`vm_instance` vm ON host.id = vm.host_id WHERE ";
     private static final String ORDER_CLUSTERS_NUMBER_OF_VMS_FOR_ACCOUNT_PART2 = " AND host.type = 'Routing' AND host.removed is null GROUP BY host.cluster_id " +
             "ORDER BY 2 ASC ";
-    private static final String ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT = "SELECT pod.id, SUM(IF(vm.state='Running' AND vm.account_id = ?, 1, 0)) FROM `cloud`.`" +
+    private static final String ORDER_PODS_NUMBER_OF_VMS_FOR_ACCOUNT = "SELECT pod.id, SUM(IF(vm.state IN ('Starting', 'Running') AND vm.account_id = ?, 1, 0)) FROM `cloud`.`" +
             "host_pod_ref` pod LEFT JOIN `cloud`.`vm_instance` vm ON pod.id = vm.pod_id WHERE pod.data_center_id = ? AND pod.removed is null "
             + " GROUP BY pod.id ORDER BY 2 ASC ";
     private static final String ORDER_HOSTS_NUMBER_OF_VMS_FOR_ACCOUNT =
@@ -68,165 +69,160 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
                     "INNER JOIN `cloud`.`host` ON vm.host_id = host.id WHERE vm.state = 'Running' AND host.data_center_id = ? ";
     private static final String COUNT_VMS_BASED_ON_VGPU_TYPES2 =
             "GROUP BY offering.service_offering_id) results GROUP BY pci, type";
-    protected SearchBuilder<VMInstanceVO> VMClusterSearch;
-    protected SearchBuilder<VMInstanceVO> LHVMClusterSearch;
-    protected SearchBuilder<VMInstanceVO> IdStatesSearch;
-    protected SearchBuilder<VMInstanceVO> AllFieldsSearch;
-    protected SearchBuilder<VMInstanceVO> ZoneTemplateNonExpungedSearch;
-    protected SearchBuilder<VMInstanceVO> NameLikeSearch;
-    protected SearchBuilder<VMInstanceVO> StateChangeSearch;
-    protected SearchBuilder<VMInstanceVO> TransitionSearch;
-    protected SearchBuilder<VMInstanceVO> TypesSearch;
-    protected SearchBuilder<VMInstanceVO> IdTypesSearch;
-    protected SearchBuilder<VMInstanceVO> HostIdTypesSearch;
-    protected SearchBuilder<VMInstanceVO> HostIdStatesSearch;
-    protected SearchBuilder<VMInstanceVO> HostIdUpTypesSearch;
-    protected SearchBuilder<VMInstanceVO> HostUpSearch;
-    protected SearchBuilder<VMInstanceVO> InstanceNameSearch;
-    protected SearchBuilder<VMInstanceVO> HostNameSearch;
-    protected SearchBuilder<VMInstanceVO> HostNameAndZoneSearch;
-    protected GenericSearchBuilder<VMInstanceVO, Long> FindIdsOfVirtualRoutersByAccount;
-    protected GenericSearchBuilder<VMInstanceVO, Long> CountActiveByHost;
-    protected GenericSearchBuilder<VMInstanceVO, Long> CountRunningByAccount;
-    protected SearchBuilder<VMInstanceVO> NetworkTypeSearch;
-    protected GenericSearchBuilder<VMInstanceVO, String> DistinctHostNameSearch;
-    protected SearchBuilder<VMInstanceVO> HostAndStateSearch;
-    protected SearchBuilder<VMInstanceVO> StartingWithNoHostSearch;
-    protected Attribute _updateTimeAttr;
+
+    private SearchBuilder<VMInstanceVO> _vmClusterSearch;
+    private SearchBuilder<VMInstanceVO> _lhvmClusterSearch;
+    private SearchBuilder<VMInstanceVO> _allFieldsSearch;
+    private SearchBuilder<VMInstanceVO> _zoneTemplateNonExpungedSearch;
+    private SearchBuilder<VMInstanceVO> _nameLikeSearch;
+    private SearchBuilder<VMInstanceVO> _stateChangeSearch;
+    private SearchBuilder<VMInstanceVO> _transitionSearch;
+    private SearchBuilder<VMInstanceVO> _typesSearch;
+    private SearchBuilder<VMInstanceVO> _idTypesSearch;
+    private SearchBuilder<VMInstanceVO> _hostIdTypesSearch;
+    private SearchBuilder<VMInstanceVO> _hostIdStatesSearch;
+    private SearchBuilder<VMInstanceVO> _hostIdUpTypesSearch;
+    private SearchBuilder<VMInstanceVO> _hostUpSearch;
+    private SearchBuilder<VMInstanceVO> _instanceNameSearch;
+    private SearchBuilder<VMInstanceVO> _hostNameSearch;
+    private SearchBuilder<VMInstanceVO> _hostNameAndZoneSearch;
+    private GenericSearchBuilder<VMInstanceVO, Long> _findIdsOfVirtualRoutersByAccount;
+    private GenericSearchBuilder<VMInstanceVO, Long> _countActiveByHost;
+    private GenericSearchBuilder<VMInstanceVO, Long> _countStartingOrRunningByAccount;
+    private SearchBuilder<VMInstanceVO> _networkTypeSearch;
+    private GenericSearchBuilder<VMInstanceVO, String> _distinctHostNameSearch;
+    private SearchBuilder<VMInstanceVO> _hostAndStateSearch;
+    private SearchBuilder<VMInstanceVO> _startingWithNoHostSearch;
+    private Attribute _updateTimeAttr;
+
     @Inject
-    protected HostDao _hostDao;
+    private HostDao _hostDao;
     @Inject
-    ResourceTagDao _tagsDao;
+    private ResourceTagDao _tagsDao;
     @Inject
-    NicDao _nicDao;
+    private NicDao _nicDao;
 
     public VMInstanceDaoImpl() {
     }
 
     @PostConstruct
     protected void init() {
-
-        IdStatesSearch = createSearchBuilder();
-        IdStatesSearch.and("id", IdStatesSearch.entity().getId(), Op.EQ);
-        IdStatesSearch.and("states", IdStatesSearch.entity().getState(), Op.IN);
-        IdStatesSearch.done();
-
-        VMClusterSearch = createSearchBuilder();
+        _vmClusterSearch = createSearchBuilder();
         final SearchBuilder<HostVO> hostSearch = _hostDao.createSearchBuilder();
-        VMClusterSearch.join("hostSearch", hostSearch, hostSearch.entity().getId(), VMClusterSearch.entity().getHostId(), JoinType.INNER);
+        _vmClusterSearch.join("hostSearch", hostSearch, hostSearch.entity().getId(), _vmClusterSearch.entity().getHostId(), JoinType.INNER);
         hostSearch.and("clusterId", hostSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        VMClusterSearch.done();
+        _vmClusterSearch.done();
 
-        LHVMClusterSearch = createSearchBuilder();
+        _lhvmClusterSearch = createSearchBuilder();
         final SearchBuilder<HostVO> hostSearch1 = _hostDao.createSearchBuilder();
-        LHVMClusterSearch.join("hostSearch1", hostSearch1, hostSearch1.entity().getId(), LHVMClusterSearch.entity().getLastHostId(), JoinType.INNER);
-        LHVMClusterSearch.and("hostid", LHVMClusterSearch.entity().getHostId(), Op.NULL);
+        _lhvmClusterSearch.join("hostSearch1", hostSearch1, hostSearch1.entity().getId(), _lhvmClusterSearch.entity().getLastHostId(), JoinType.INNER);
+        _lhvmClusterSearch.and("hostid", _lhvmClusterSearch.entity().getHostId(), Op.NULL);
         hostSearch1.and("clusterId", hostSearch1.entity().getClusterId(), SearchCriteria.Op.EQ);
-        LHVMClusterSearch.done();
+        _lhvmClusterSearch.done();
 
-        AllFieldsSearch = createSearchBuilder();
-        AllFieldsSearch.and("host", AllFieldsSearch.entity().getHostId(), Op.EQ);
-        AllFieldsSearch.and("lastHost", AllFieldsSearch.entity().getLastHostId(), Op.EQ);
-        AllFieldsSearch.and("state", AllFieldsSearch.entity().getState(), Op.EQ);
-        AllFieldsSearch.and("zone", AllFieldsSearch.entity().getDataCenterId(), Op.EQ);
-        AllFieldsSearch.and("pod", AllFieldsSearch.entity().getPodIdToDeployIn(), Op.EQ);
-        AllFieldsSearch.and("type", AllFieldsSearch.entity().getType(), Op.EQ);
-        AllFieldsSearch.and("account", AllFieldsSearch.entity().getAccountId(), Op.EQ);
-        AllFieldsSearch.done();
+        _allFieldsSearch = createSearchBuilder();
+        _allFieldsSearch.and("host", _allFieldsSearch.entity().getHostId(), Op.EQ);
+        _allFieldsSearch.and("lastHost", _allFieldsSearch.entity().getLastHostId(), Op.EQ);
+        _allFieldsSearch.and("state", _allFieldsSearch.entity().getState(), Op.EQ);
+        _allFieldsSearch.and("zone", _allFieldsSearch.entity().getDataCenterId(), Op.EQ);
+        _allFieldsSearch.and("pod", _allFieldsSearch.entity().getPodIdToDeployIn(), Op.EQ);
+        _allFieldsSearch.and("type", _allFieldsSearch.entity().getType(), Op.EQ);
+        _allFieldsSearch.and("account", _allFieldsSearch.entity().getAccountId(), Op.EQ);
+        _allFieldsSearch.done();
 
-        ZoneTemplateNonExpungedSearch = createSearchBuilder();
-        ZoneTemplateNonExpungedSearch.and("zone", ZoneTemplateNonExpungedSearch.entity().getDataCenterId(), Op.EQ);
-        ZoneTemplateNonExpungedSearch.and("template", ZoneTemplateNonExpungedSearch.entity().getTemplateId(), Op.EQ);
-        ZoneTemplateNonExpungedSearch.and("state", ZoneTemplateNonExpungedSearch.entity().getState(), Op.NEQ);
-        ZoneTemplateNonExpungedSearch.done();
+        _zoneTemplateNonExpungedSearch = createSearchBuilder();
+        _zoneTemplateNonExpungedSearch.and("zone", _zoneTemplateNonExpungedSearch.entity().getDataCenterId(), Op.EQ);
+        _zoneTemplateNonExpungedSearch.and("template", _zoneTemplateNonExpungedSearch.entity().getTemplateId(), Op.EQ);
+        _zoneTemplateNonExpungedSearch.and("state", _zoneTemplateNonExpungedSearch.entity().getState(), Op.NEQ);
+        _zoneTemplateNonExpungedSearch.done();
 
-        NameLikeSearch = createSearchBuilder();
-        NameLikeSearch.and("name", NameLikeSearch.entity().getHostName(), Op.LIKE);
-        NameLikeSearch.done();
+        _nameLikeSearch = createSearchBuilder();
+        _nameLikeSearch.and("name", _nameLikeSearch.entity().getHostName(), Op.LIKE);
+        _nameLikeSearch.done();
 
-        StateChangeSearch = createSearchBuilder();
-        StateChangeSearch.and("id", StateChangeSearch.entity().getId(), Op.EQ);
-        StateChangeSearch.and("states", StateChangeSearch.entity().getState(), Op.EQ);
-        StateChangeSearch.and("host", StateChangeSearch.entity().getHostId(), Op.EQ);
-        StateChangeSearch.and("update", StateChangeSearch.entity().getUpdated(), Op.EQ);
-        StateChangeSearch.done();
+        _stateChangeSearch = createSearchBuilder();
+        _stateChangeSearch.and("id", _stateChangeSearch.entity().getId(), Op.EQ);
+        _stateChangeSearch.and("states", _stateChangeSearch.entity().getState(), Op.EQ);
+        _stateChangeSearch.and("host", _stateChangeSearch.entity().getHostId(), Op.EQ);
+        _stateChangeSearch.and("update", _stateChangeSearch.entity().getUpdated(), Op.EQ);
+        _stateChangeSearch.done();
 
-        TransitionSearch = createSearchBuilder();
-        TransitionSearch.and("updateTime", TransitionSearch.entity().getUpdateTime(), Op.LT);
-        TransitionSearch.and("states", TransitionSearch.entity().getState(), Op.IN);
-        TransitionSearch.done();
+        _transitionSearch = createSearchBuilder();
+        _transitionSearch.and("updateTime", _transitionSearch.entity().getUpdateTime(), Op.LT);
+        _transitionSearch.and("states", _transitionSearch.entity().getState(), Op.IN);
+        _transitionSearch.done();
 
-        TypesSearch = createSearchBuilder();
-        TypesSearch.and("types", TypesSearch.entity().getType(), Op.IN);
-        TypesSearch.done();
+        _typesSearch = createSearchBuilder();
+        _typesSearch.and("types", _typesSearch.entity().getType(), Op.IN);
+        _typesSearch.done();
 
-        IdTypesSearch = createSearchBuilder();
-        IdTypesSearch.and("id", IdTypesSearch.entity().getId(), Op.EQ);
-        IdTypesSearch.and("types", IdTypesSearch.entity().getType(), Op.IN);
-        IdTypesSearch.done();
+        _idTypesSearch = createSearchBuilder();
+        _idTypesSearch.and("id", _idTypesSearch.entity().getId(), Op.EQ);
+        _idTypesSearch.and("types", _idTypesSearch.entity().getType(), Op.IN);
+        _idTypesSearch.done();
 
-        HostIdTypesSearch = createSearchBuilder();
-        HostIdTypesSearch.and("hostid", HostIdTypesSearch.entity().getHostId(), Op.EQ);
-        HostIdTypesSearch.and("types", HostIdTypesSearch.entity().getType(), Op.IN);
-        HostIdTypesSearch.done();
+        _hostIdTypesSearch = createSearchBuilder();
+        _hostIdTypesSearch.and("hostid", _hostIdTypesSearch.entity().getHostId(), Op.EQ);
+        _hostIdTypesSearch.and("types", _hostIdTypesSearch.entity().getType(), Op.IN);
+        _hostIdTypesSearch.done();
 
-        HostIdStatesSearch = createSearchBuilder();
-        HostIdStatesSearch.and("hostId", HostIdStatesSearch.entity().getHostId(), Op.EQ);
-        HostIdStatesSearch.and("states", HostIdStatesSearch.entity().getState(), Op.IN);
-        HostIdStatesSearch.done();
+        _hostIdStatesSearch = createSearchBuilder();
+        _hostIdStatesSearch.and("hostId", _hostIdStatesSearch.entity().getHostId(), Op.EQ);
+        _hostIdStatesSearch.and("states", _hostIdStatesSearch.entity().getState(), Op.IN);
+        _hostIdStatesSearch.done();
 
-        HostIdUpTypesSearch = createSearchBuilder();
-        HostIdUpTypesSearch.and("hostid", HostIdUpTypesSearch.entity().getHostId(), Op.EQ);
-        HostIdUpTypesSearch.and("types", HostIdUpTypesSearch.entity().getType(), Op.IN);
-        HostIdUpTypesSearch.and("states", HostIdUpTypesSearch.entity().getState(), Op.NIN);
-        HostIdUpTypesSearch.done();
+        _hostIdUpTypesSearch = createSearchBuilder();
+        _hostIdUpTypesSearch.and("hostid", _hostIdUpTypesSearch.entity().getHostId(), Op.EQ);
+        _hostIdUpTypesSearch.and("types", _hostIdUpTypesSearch.entity().getType(), Op.IN);
+        _hostIdUpTypesSearch.and("states", _hostIdUpTypesSearch.entity().getState(), Op.NIN);
+        _hostIdUpTypesSearch.done();
 
-        HostUpSearch = createSearchBuilder();
-        HostUpSearch.and("host", HostUpSearch.entity().getHostId(), Op.EQ);
-        HostUpSearch.and("states", HostUpSearch.entity().getState(), Op.IN);
-        HostUpSearch.done();
+        _hostUpSearch = createSearchBuilder();
+        _hostUpSearch.and("host", _hostUpSearch.entity().getHostId(), Op.EQ);
+        _hostUpSearch.and("states", _hostUpSearch.entity().getState(), Op.IN);
+        _hostUpSearch.done();
 
-        InstanceNameSearch = createSearchBuilder();
-        InstanceNameSearch.and("instanceName", InstanceNameSearch.entity().getInstanceName(), Op.EQ);
-        InstanceNameSearch.done();
+        _instanceNameSearch = createSearchBuilder();
+        _instanceNameSearch.and("instanceName", _instanceNameSearch.entity().getInstanceName(), Op.EQ);
+        _instanceNameSearch.done();
 
-        HostNameSearch = createSearchBuilder();
-        HostNameSearch.and("hostName", HostNameSearch.entity().getHostName(), Op.EQ);
-        HostNameSearch.done();
+        _hostNameSearch = createSearchBuilder();
+        _hostNameSearch.and("hostName", _hostNameSearch.entity().getHostName(), Op.EQ);
+        _hostNameSearch.done();
 
-        HostNameAndZoneSearch = createSearchBuilder();
-        HostNameAndZoneSearch.and("hostName", HostNameAndZoneSearch.entity().getHostName(), Op.EQ);
-        HostNameAndZoneSearch.and("zone", HostNameAndZoneSearch.entity().getDataCenterId(), Op.EQ);
-        HostNameAndZoneSearch.done();
+        _hostNameAndZoneSearch = createSearchBuilder();
+        _hostNameAndZoneSearch.and("hostName", _hostNameAndZoneSearch.entity().getHostName(), Op.EQ);
+        _hostNameAndZoneSearch.and("zone", _hostNameAndZoneSearch.entity().getDataCenterId(), Op.EQ);
+        _hostNameAndZoneSearch.done();
 
-        FindIdsOfVirtualRoutersByAccount = createSearchBuilder(Long.class);
-        FindIdsOfVirtualRoutersByAccount.selectFields(FindIdsOfVirtualRoutersByAccount.entity().getId());
-        FindIdsOfVirtualRoutersByAccount.and("account", FindIdsOfVirtualRoutersByAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
-        FindIdsOfVirtualRoutersByAccount.and("type", FindIdsOfVirtualRoutersByAccount.entity().getType(), SearchCriteria.Op.EQ);
-        FindIdsOfVirtualRoutersByAccount.and("state", FindIdsOfVirtualRoutersByAccount.entity().getState(), SearchCriteria.Op.NIN);
-        FindIdsOfVirtualRoutersByAccount.done();
+        _findIdsOfVirtualRoutersByAccount = createSearchBuilder(Long.class);
+        _findIdsOfVirtualRoutersByAccount.selectFields(_findIdsOfVirtualRoutersByAccount.entity().getId());
+        _findIdsOfVirtualRoutersByAccount.and("account", _findIdsOfVirtualRoutersByAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
+        _findIdsOfVirtualRoutersByAccount.and("type", _findIdsOfVirtualRoutersByAccount.entity().getType(), SearchCriteria.Op.EQ);
+        _findIdsOfVirtualRoutersByAccount.and("state", _findIdsOfVirtualRoutersByAccount.entity().getState(), SearchCriteria.Op.NIN);
+        _findIdsOfVirtualRoutersByAccount.done();
 
-        CountActiveByHost = createSearchBuilder(Long.class);
-        CountActiveByHost.select(null, Func.COUNT, null);
-        CountActiveByHost.and("host", CountActiveByHost.entity().getHostId(), SearchCriteria.Op.EQ);
-        CountActiveByHost.and("state", CountActiveByHost.entity().getState(), SearchCriteria.Op.IN);
-        CountActiveByHost.done();
+        _countActiveByHost = createSearchBuilder(Long.class);
+        _countActiveByHost.select(null, Func.COUNT, null);
+        _countActiveByHost.and("host", _countActiveByHost.entity().getHostId(), SearchCriteria.Op.EQ);
+        _countActiveByHost.and("state", _countActiveByHost.entity().getState(), SearchCriteria.Op.IN);
+        _countActiveByHost.done();
 
-        CountRunningByAccount = createSearchBuilder(Long.class);
-        CountRunningByAccount.select(null, Func.COUNT, null);
-        CountRunningByAccount.and("account", CountRunningByAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
-        CountRunningByAccount.and("state", CountRunningByAccount.entity().getState(), SearchCriteria.Op.EQ);
-        CountRunningByAccount.done();
+        _countStartingOrRunningByAccount = createSearchBuilder(Long.class);
+        _countStartingOrRunningByAccount.select(null, Func.COUNT, null);
+        _countStartingOrRunningByAccount.and("account", _countStartingOrRunningByAccount.entity().getAccountId(), SearchCriteria.Op.EQ);
+        _countStartingOrRunningByAccount.and("states", _countStartingOrRunningByAccount.entity().getState(), SearchCriteria.Op.IN);
+        _countStartingOrRunningByAccount.done();
 
-        HostAndStateSearch = createSearchBuilder();
-        HostAndStateSearch.and("host", HostAndStateSearch.entity().getHostId(), Op.EQ);
-        HostAndStateSearch.and("states", HostAndStateSearch.entity().getState(), Op.IN);
-        HostAndStateSearch.done();
+        _hostAndStateSearch = createSearchBuilder();
+        _hostAndStateSearch.and("host", _hostAndStateSearch.entity().getHostId(), Op.EQ);
+        _hostAndStateSearch.and("states", _hostAndStateSearch.entity().getState(), Op.IN);
+        _hostAndStateSearch.done();
 
-        StartingWithNoHostSearch = createSearchBuilder();
-        StartingWithNoHostSearch.and("state", StartingWithNoHostSearch.entity().getState(), Op.EQ);
-        StartingWithNoHostSearch.and("host", StartingWithNoHostSearch.entity().getHostId(), Op.NULL);
-        StartingWithNoHostSearch.done();
+        _startingWithNoHostSearch = createSearchBuilder();
+        _startingWithNoHostSearch.and("state", _startingWithNoHostSearch.entity().getState(), Op.EQ);
+        _startingWithNoHostSearch.and("host", _startingWithNoHostSearch.entity().getHostId(), Op.NULL);
+        _startingWithNoHostSearch.done();
 
         _updateTimeAttr = _allAttributes.get("updateTime");
         assert _updateTimeAttr != null : "Couldn't get this updateTime attribute";
@@ -234,18 +230,18 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
         final SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
         nicSearch.and("networkId", nicSearch.entity().getNetworkId(), SearchCriteria.Op.EQ);
 
-        DistinctHostNameSearch = createSearchBuilder(String.class);
-        DistinctHostNameSearch.selectFields(DistinctHostNameSearch.entity().getHostName());
+        _distinctHostNameSearch = createSearchBuilder(String.class);
+        _distinctHostNameSearch.selectFields(_distinctHostNameSearch.entity().getHostName());
 
-        DistinctHostNameSearch.and("types", DistinctHostNameSearch.entity().getType(), SearchCriteria.Op.IN);
-        DistinctHostNameSearch.and("removed", DistinctHostNameSearch.entity().getRemoved(), SearchCriteria.Op.NULL);
-        DistinctHostNameSearch.join("nicSearch", nicSearch, DistinctHostNameSearch.entity().getId(), nicSearch.entity().getInstanceId(), JoinBuilder.JoinType.INNER);
-        DistinctHostNameSearch.done();
+        _distinctHostNameSearch.and("types", _distinctHostNameSearch.entity().getType(), SearchCriteria.Op.IN);
+        _distinctHostNameSearch.and("removed", _distinctHostNameSearch.entity().getRemoved(), SearchCriteria.Op.NULL);
+        _distinctHostNameSearch.join("nicSearch", nicSearch, _distinctHostNameSearch.entity().getId(), nicSearch.entity().getInstanceId(), JoinBuilder.JoinType.INNER);
+        _distinctHostNameSearch.done();
     }
 
     @Override
     public List<VMInstanceVO> listByHostId(final long hostid) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("host", hostid);
 
         return listBy(sc);
@@ -253,7 +249,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByZoneId(final long zoneId) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("zone", zoneId);
 
         return listBy(sc);
@@ -261,14 +257,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByPodId(final long podId) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("pod", podId);
         return listBy(sc);
     }
 
     @Override
     public List<VMInstanceVO> listNonExpungedByZoneAndTemplate(final long zoneId, final long templateId) {
-        final SearchCriteria<VMInstanceVO> sc = ZoneTemplateNonExpungedSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _zoneTemplateNonExpungedSearch.create();
 
         sc.setParameters("zone", zoneId);
         sc.setParameters("template", templateId);
@@ -279,14 +275,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> findVMInstancesLike(final String name) {
-        final SearchCriteria<VMInstanceVO> sc = NameLikeSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _nameLikeSearch.create();
         sc.setParameters("name", "%" + name + "%");
         return listBy(sc);
     }
 
     @Override
     public List<VMInstanceVO> findVMInTransition(final Date time, final State... states) {
-        final SearchCriteria<VMInstanceVO> sc = TransitionSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _transitionSearch.create();
 
         sc.setParameters("states", (Object[]) states);
         sc.setParameters("updateTime", time);
@@ -296,7 +292,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByHostAndState(final long hostId, final State... states) {
-        final SearchCriteria<VMInstanceVO> sc = HostIdStatesSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostIdStatesSearch.create();
         sc.setParameters("hostId", hostId);
         sc.setParameters("states", (Object[]) states);
 
@@ -305,14 +301,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByTypes(final Type... types) {
-        final SearchCriteria<VMInstanceVO> sc = TypesSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _typesSearch.create();
         sc.setParameters("types", (Object[]) types);
         return listBy(sc);
     }
 
     @Override
     public VMInstanceVO findByIdTypes(final long id, final Type... types) {
-        final SearchCriteria<VMInstanceVO> sc = IdTypesSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _idTypesSearch.create();
         sc.setParameters("id", id);
         sc.setParameters("types", (Object[]) types);
         return findOneIncludingRemovedBy(sc);
@@ -320,14 +316,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public VMInstanceVO findVMByInstanceName(final String name) {
-        final SearchCriteria<VMInstanceVO> sc = InstanceNameSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _instanceNameSearch.create();
         sc.setParameters("instanceName", name);
         return findOneBy(sc);
     }
 
     @Override
     public VMInstanceVO findVMByHostName(final String hostName) {
-        final SearchCriteria<VMInstanceVO> sc = HostNameSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostNameSearch.create();
         sc.setParameters("hostName", hostName);
         return findOneBy(sc);
     }
@@ -342,7 +338,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByHostIdTypes(final long hostid, final Type... types) {
-        final SearchCriteria<VMInstanceVO> sc = HostIdTypesSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostIdTypesSearch.create();
         sc.setParameters("hostid", hostid);
         sc.setParameters("types", (Object[]) types);
         return listBy(sc);
@@ -350,7 +346,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listUpByHostIdTypes(final long hostid, final Type... types) {
-        final SearchCriteria<VMInstanceVO> sc = HostIdUpTypesSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostIdUpTypesSearch.create();
         sc.setParameters("hostid", hostid);
         sc.setParameters("types", (Object[]) types);
         sc.setParameters("states", new Object[]{State.Destroyed, State.Stopped, State.Expunging});
@@ -359,7 +355,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByZoneIdAndType(final long zoneId, final VirtualMachine.Type type) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("zone", zoneId);
         sc.setParameters("type", type.toString());
         return listBy(sc);
@@ -367,7 +363,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listUpByHostId(final Long hostId) {
-        final SearchCriteria<VMInstanceVO> sc = HostUpSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostUpSearch.create();
         sc.setParameters("host", hostId);
         sc.setParameters("states", new Object[]{State.Starting, State.Running});
         return listBy(sc);
@@ -375,7 +371,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByLastHostId(final Long hostId) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("lastHost", hostId);
         sc.setParameters("state", State.Stopped);
         return listBy(sc);
@@ -383,7 +379,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByTypeAndState(final VirtualMachine.Type type, final State state) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("type", type);
         sc.setParameters("state", state);
         return listBy(sc);
@@ -391,14 +387,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByAccountId(final long accountId) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("account", accountId);
         return listBy(sc);
     }
 
     @Override
     public List<Long> findIdsOfAllocatedVirtualRoutersForAccount(final long accountId) {
-        final SearchCriteria<Long> sc = FindIdsOfVirtualRoutersByAccount.create();
+        final SearchCriteria<Long> sc = _findIdsOfVirtualRoutersByAccount.create();
         sc.setParameters("account", accountId);
         sc.setParameters("type", VirtualMachine.Type.DomainRouter);
         sc.setParameters("state", new Object[]{State.Destroyed, State.Error, State.Expunging});
@@ -407,21 +403,21 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listByClusterId(final long clusterId) {
-        final SearchCriteria<VMInstanceVO> sc = VMClusterSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _vmClusterSearch.create();
         sc.setJoinParameters("hostSearch", "clusterId", clusterId);
         return listBy(sc);
     }
 
     @Override
     public List<VMInstanceVO> listLHByClusterId(final long clusterId) {
-        final SearchCriteria<VMInstanceVO> sc = LHVMClusterSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _lhvmClusterSearch.create();
         sc.setJoinParameters("hostSearch1", "clusterId", clusterId);
         return listBy(sc);
     }
 
     @Override
     public List<VMInstanceVO> listVmsMigratingFromHost(final Long hostId) {
-        final SearchCriteria<VMInstanceVO> sc = AllFieldsSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("lastHost", hostId);
         sc.setParameters("state", State.Migrating);
         return listBy(sc);
@@ -429,7 +425,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public Long countActiveByHostId(final long hostId) {
-        final SearchCriteria<Long> sc = CountActiveByHost.create();
+        final SearchCriteria<Long> sc = _countActiveByHost.create();
         sc.setParameters("host", hostId);
         sc.setParameters("state", State.Running, State.Starting, State.Stopping, State.Migrating);
         return customSearch(sc, null).get(0);
@@ -551,28 +547,28 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public Long countRunningByAccount(final long accountId) {
-        final SearchCriteria<Long> sc = CountRunningByAccount.create();
+    public Long countStartingOrRunningByAccount(final long accountId) {
+        final SearchCriteria<Long> sc = _countStartingOrRunningByAccount.create();
         sc.setParameters("account", accountId);
-        sc.setParameters("state", State.Running);
+        sc.setParameters("states", State.Starting, State.Running);
         return customSearch(sc, null).get(0);
     }
 
     @Override
     public List<VMInstanceVO> listNonRemovedVmsByTypeAndNetwork(final long networkId, final VirtualMachine.Type... types) {
-        if (NetworkTypeSearch == null) {
+        if (_networkTypeSearch == null) {
 
             final SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
             nicSearch.and("networkId", nicSearch.entity().getNetworkId(), SearchCriteria.Op.EQ);
 
-            NetworkTypeSearch = createSearchBuilder();
-            NetworkTypeSearch.and("types", NetworkTypeSearch.entity().getType(), SearchCriteria.Op.IN);
-            NetworkTypeSearch.and("removed", NetworkTypeSearch.entity().getRemoved(), SearchCriteria.Op.NULL);
-            NetworkTypeSearch.join("nicSearch", nicSearch, NetworkTypeSearch.entity().getId(), nicSearch.entity().getInstanceId(), JoinBuilder.JoinType.INNER);
-            NetworkTypeSearch.done();
+            _networkTypeSearch = createSearchBuilder();
+            _networkTypeSearch.and("types", _networkTypeSearch.entity().getType(), SearchCriteria.Op.IN);
+            _networkTypeSearch.and("removed", _networkTypeSearch.entity().getRemoved(), SearchCriteria.Op.NULL);
+            _networkTypeSearch.join("nicSearch", nicSearch, _networkTypeSearch.entity().getId(), nicSearch.entity().getInstanceId(), JoinBuilder.JoinType.INNER);
+            _networkTypeSearch.done();
         }
 
-        final SearchCriteria<VMInstanceVO> sc = NetworkTypeSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _networkTypeSearch.create();
         if (types != null && types.length != 0) {
             sc.setParameters("types", (Object[]) types);
         }
@@ -583,7 +579,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<String> listDistinctHostNames(final long networkId, final VirtualMachine.Type... types) {
-        final SearchCriteria<String> sc = DistinctHostNameSearch.create();
+        final SearchCriteria<String> sc = _distinctHostNameSearch.create();
         if (types != null && types.length != 0) {
             sc.setParameters("types", (Object[]) types);
         }
@@ -594,7 +590,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> findByHostInStates(final Long hostId, final State... states) {
-        final SearchCriteria<VMInstanceVO> sc = HostAndStateSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostAndStateSearch.create();
         sc.setParameters("host", hostId);
         sc.setParameters("states", (Object[]) states);
         return listBy(sc);
@@ -602,7 +598,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public List<VMInstanceVO> listStartingWithNoHostId() {
-        final SearchCriteria<VMInstanceVO> sc = StartingWithNoHostSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _startingWithNoHostSearch.create();
         sc.setParameters("state", State.Starting);
         return listBy(sc);
     }
@@ -711,7 +707,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
 
     @Override
     public VMInstanceVO findVMByHostNameInZone(final String hostName, final long zoneId) {
-        final SearchCriteria<VMInstanceVO> sc = HostNameAndZoneSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _hostNameAndZoneSearch.create();
         sc.setParameters("hostName", hostName);
         sc.setParameters("zone", zoneId);
         return findOneBy(sc);
@@ -751,7 +747,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
         // lock the target row at beginning to avoid lock-promotion caused deadlock
         lockRow(vm.getId(), true);
 
-        final SearchCriteria<VMInstanceVO> sc = StateChangeSearch.create();
+        final SearchCriteria<VMInstanceVO> sc = _stateChangeSearch.create();
         sc.setParameters("id", vmi.getId());
         sc.setParameters("states", oldState);
         sc.setParameters("host", vmi.getHostId());

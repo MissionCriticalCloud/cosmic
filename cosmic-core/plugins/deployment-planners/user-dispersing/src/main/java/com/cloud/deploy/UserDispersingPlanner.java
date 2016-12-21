@@ -19,7 +19,8 @@ import org.slf4j.LoggerFactory;
 public class UserDispersingPlanner extends FirstFitPlanner implements DeploymentClusterPlanner {
 
     private static final Logger s_logger = LoggerFactory.getLogger(UserDispersingPlanner.class);
-    float _userDispersionWeight;
+
+    private float _userDispersionWeight;
 
     /**
      * This method should reorder the given list of Cluster Ids by applying any necessary heuristic
@@ -83,7 +84,7 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
 
     protected Pair<List<Long>, Map<Long, Double>> listPodsByUserDispersion(final long dataCenterId, final long accountId) {
         if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Applying Userdispersion heuristic to pods for account: " + accountId);
+            s_logger.debug("Applying user dispersion heuristic to pods for account: " + accountId);
         }
         final Pair<List<Long>, Map<Long, Double>> podIdsVmCountInfo = vmInstanceDao.listPodIdsInZoneByVmCount(dataCenterId, accountId);
         if (s_logger.isTraceEnabled()) {
@@ -105,7 +106,7 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
 
     protected Pair<List<Long>, Map<Long, Double>> listClustersByUserDispersion(final long id, final boolean isZone, final long accountId) {
         if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Applying Userdispersion heuristic to clusters for account: " + accountId);
+            s_logger.debug("Applying user dispersion heuristic to clusters for account: " + accountId);
         }
         final Pair<List<Long>, Map<Long, Double>> clusterIdsVmCountInfo;
         if (isZone) {
@@ -141,7 +142,7 @@ public class UserDispersingPlanner extends FirstFitPlanner implements Deployment
         //normalize the vmCountMap
         final LinkedHashMap<Long, Double> normalisedVmCountIdMap = new LinkedHashMap<>();
 
-        final Long totalVmsOfAccount = vmInstanceDao.countRunningByAccount(accountId);
+        final Long totalVmsOfAccount = vmInstanceDao.countStartingOrRunningByAccount(accountId);
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Total VMs for account: " + totalVmsOfAccount);
         }
