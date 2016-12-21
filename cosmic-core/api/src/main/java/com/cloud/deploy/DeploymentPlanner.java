@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- */
 public interface DeploymentPlanner extends Adapter {
 
     /**

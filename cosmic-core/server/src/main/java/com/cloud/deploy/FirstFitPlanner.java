@@ -189,17 +189,14 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
             uniqueTags = (long) 0;
             final List<Long> hostList = capacityDao.listHostsWithEnoughCapacity(requiredCpu, requiredRam, clusterId, Host.Type.Routing.toString());
             if (!hostList.isEmpty() && implicitHostTags.length > 0) {
-                uniqueTags = new Long(hostTagsDao.getDistinctImplicitHostTags(hostList, implicitHostTags).size());
+                uniqueTags = (long) hostTagsDao.getDistinctImplicitHostTags(hostList, implicitHostTags).size();
             }
             UniqueTagsInClusterMap.put(clusterId, uniqueTags);
         }
-        Collections.sort(clusterList, new Comparator<Long>() {
-            @Override
-            public int compare(final Long o1, final Long o2) {
-                final Long t1 = UniqueTagsInClusterMap.get(o1);
-                final Long t2 = UniqueTagsInClusterMap.get(o2);
-                return t1.compareTo(t2);
-            }
+        clusterList.sort((o1, o2) -> {
+            final Long t1 = UniqueTagsInClusterMap.get(o1);
+            final Long t2 = UniqueTagsInClusterMap.get(o2);
+            return t1.compareTo(t2);
         });
     }
 
@@ -375,8 +372,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
             return null;
         }
         if (!prioritizedClusterIds.isEmpty()) {
-            final List<Long> clusterList = reorderClusters(id, isZone, clusterCapacityInfo, vmProfile, plan);
-            return clusterList; //return checkClustersforDestination(clusterList, vmProfile, plan, avoid, dc);
+            return reorderClusters(id, isZone, clusterCapacityInfo, vmProfile, plan); //return checkClustersforDestination(clusterList, vmProfile, plan, avoid, dc);
         } else {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("No clusters found after removing disabled clusters and clusters in avoid list, returning.");
@@ -395,8 +391,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
      */
     protected List<Long> reorderClusters(final long id, final boolean isZone, final Pair<List<Long>, Map<Long, Double>> clusterCapacityInfo, final VirtualMachineProfile vmProfile,
                                          final DeploymentPlan plan) {
-        final List<Long> reordersClusterIds = clusterCapacityInfo.first();
-        return reordersClusterIds;
+        return clusterCapacityInfo.first();
     }
 
     /**
@@ -408,8 +403,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
      * @return List<Long> ordered list of Pod Ids
      */
     protected List<Long> reorderPods(final Pair<List<Long>, Map<Long, Double>> podCapacityInfo, final VirtualMachineProfile vmProfile, final DeploymentPlan plan) {
-        final List<Long> podIdsByCapacity = podCapacityInfo.first();
-        return podIdsByCapacity;
+        return podCapacityInfo.first();
     }
 
     private List<Long> listDisabledClusters(final long zoneId, final Long podId) {
@@ -423,8 +417,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     }
 
     private List<Long> listDisabledPods(final long zoneId) {
-        final List<Long> disabledPods = podDao.listDisabledPods(zoneId);
-        return disabledPods;
+        return podDao.listDisabledPods(zoneId);
     }
 
     protected Pair<List<Long>, Map<Long, Double>> listClustersByCapacity(final long id, final int requiredCpu, final long requiredRam, final ExcludeList avoid, final boolean
@@ -496,14 +489,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     }
 
     private boolean isRootAdmin(final VirtualMachineProfile vmProfile) {
-        if (vmProfile != null) {
-            if (vmProfile.getOwner() != null) {
-                return accountMgr.isRootAdmin(vmProfile.getOwner().getId());
-            } else {
-                return false;
-            }
-        }
-        return false;
+        return vmProfile != null && vmProfile.getOwner() != null && accountMgr.isRootAdmin(vmProfile.getOwner().getId());
     }
 
     @Override
