@@ -13,7 +13,7 @@ public interface PrivateIpDao extends GenericDao<PrivateIpVO, Long> {
      * @param requestedIp TODO
      * @return
      */
-    PrivateIpVO allocateIpAddress(long dcId, long networkId, String requestedIp);
+    PrivateIpVO allocateIpAddress(long dcId, long networkId, Long vpcId, String requestedIp);
 
     /**
      * @param ipAddress
