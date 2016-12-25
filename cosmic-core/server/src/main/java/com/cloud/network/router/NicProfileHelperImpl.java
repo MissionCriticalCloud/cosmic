@@ -44,10 +44,11 @@ public class NicProfileHelperImpl implements NicProfileHelper {
     public NicProfile createPrivateNicProfileForGateway(final VpcGateway privateGateway, final VirtualRouter router) {
         final Network privateNetwork = _networkModel.getNetwork(privateGateway.getNetworkId());
 
-        PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(privateNetwork.getDataCenterId(), privateNetwork.getId(), privateGateway.getIp4Address());
-
         final Long vpcId = privateGateway.getVpcId();
         final Vpc activeVpc = _vpcMgr.getActiveVpc(vpcId);
+
+        PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(privateNetwork.getDataCenterId(), privateNetwork.getId(), vpcId, privateGateway.getIp4Address());
+
         if (activeVpc.isRedundant() && ipVO == null) {
             ipVO = _privateIpDao.findByIpAndVpcId(vpcId, privateGateway.getIp4Address());
         }

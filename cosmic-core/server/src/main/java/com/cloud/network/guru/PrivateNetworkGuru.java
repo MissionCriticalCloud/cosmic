@@ -138,7 +138,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     protected void getIp(final NicProfile nic, final DataCenter dc, final Network network) throws InsufficientVirtualNetworkCapacityException,
             InsufficientAddressCapacityException {
         if (nic.getIPv4Address() == null) {
-            final PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(network.getDataCenterId(), network.getId(), null);
+            final PrivateIpVO ipVO = _privateIpDao.allocateIpAddress(network.getDataCenterId(), network.getId(), network.getVpcId(), null);
             final String vlanTag = BroadcastDomainType.getValue(network.getBroadcastUri());
             final String netmask = NetUtils.getCidrNetmask(network.getCidr());
             final PrivateIpAddress ip =
