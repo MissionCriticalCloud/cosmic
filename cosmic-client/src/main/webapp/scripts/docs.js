@@ -1167,18 +1167,6 @@ cloudStack.docs = {
         desc: 'Use the hash that you created at the start of the volume upload procedure',
         externalLink: ''
     },
-    helpLdapGroupName: {
-        desc: 'The group name from which you want to import LDAP users',
-        externalLink: ''
-    },
-    helpSamlEnable: {
-        desc: 'Enable SAML Single Sign On for the user(s)',
-        externalLink: ''
-    },
-    helpSamlEntity: {
-        desc: 'Choose the SAML Identity Provider Entity ID with which you want to enable the Single Sign On for the user(s)',
-        externalLink: ''
-    },
     helpVpcOfferingName: {
         desc: 'Any desired name for the VPC offering',
         externalLink: ''

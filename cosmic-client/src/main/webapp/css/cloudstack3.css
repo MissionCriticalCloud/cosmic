@@ -438,25 +438,6 @@ body.login {
     text-shadow: 0px 1px 2px #000000;
 }
 
-.login .fields input[type=samlsubmit] {
-    background: transparent url(../images/sprites.png) -563px -747px;
-    cursor: pointer;
-    border: none;
-    text-align: center;
-    width: 60px;
-    height: 15px;
-    display: block;
-    color: #FFFFFF;
-    font-weight: bold;
-    text-indent: -1px;
-    /*+text-shadow:0px 1px 2px #000000;*/
-    -moz-text-shadow: 0px 1px 2px #000000;
-    -webkit-text-shadow: 0px 1px 2px #000000;
-    -o-text-shadow: 0px 1px 2px #000000;
-    text-shadow: 0px 1px 2px #000000;
-    font-size: 10px;
-}
-
 .login .fields input[type=submit]:hover {
     background-position: -563px -772px;
 }
@@ -12815,14 +12796,6 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 
 .unmanage:hover .icon {
     background-position: -196px -704px;
-}
-
-.configureSamlAuthorization .icon {
-    background-position: -165px -122px;
-}
-
-.configureSamlAuthorization:hover .icon {
-    background-position: -165px -704px;
 }
 
 .viewConsole .icon {
