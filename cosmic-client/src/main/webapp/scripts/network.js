@@ -1159,7 +1159,7 @@
             networks: {
                 id: 'networks',
                 type: 'select',
-                title: 'label.guest.networks',
+                title: 'label.networks.long',
                 listView: {
                     actions: {
                         add: {

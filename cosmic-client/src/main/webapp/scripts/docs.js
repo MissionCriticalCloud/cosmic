@@ -1185,5 +1185,8 @@ cloudStack.docs = {
     },
     helpLdapLinkDomainAdmin: {
         desc: 'domain admin of the linked domain. Specify a username in GROUP/OU of LDAP'
+    },
+    helpPrivateGatewayNetwork: {
+        desc: 'The private network the private gateway should be plugged in'
     }
 };
