@@ -344,37 +344,6 @@
                 });
             },
 
-            samlLoginAction: function (args) {
-                g_sessionKey = null;
-                g_username = null;
-                g_account = null;
-                g_domainid = null;
-                g_timezoneoffset = null;
-                g_timezone = null;
-                g_supportELB = null;
-                g_kvmsnapshotenabled = null;
-                g_regionsecondaryenabled = null;
-                g_loginCmdText = null;
-
-                // Remove any cookies
-                var cookies = document.cookie.split(";");
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookieName = $.trim(cookies[i].split("=")[0]);
-                    if (['login-option', 'lang'].indexOf(cookieName) < 0) {
-                        $.cookie(cookieName, null);
-                    }
-                }
-
-                var url = 'samlSso';
-                if (args.data.idpid) {
-                    url = url + '&idpid=' + args.data.idpid;
-                }
-                if (args.data.domain) {
-                    url = url + '&domain=' + args.data.domain;
-                }
-                window.location.href = createURL(url);
-            },
-
             // Show cloudStack main UI widget
             complete: function (args) {
                 var context = {

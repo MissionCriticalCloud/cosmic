@@ -103,11 +103,6 @@
                         }
                     }
                 });
-            } else if (selectedLogin === 'saml') {
-                // SAML
-                args.samlLoginAction({
-                    data: {'idpid': $login.find('#login-options').find(':selected').val()}
-                });
             }
             return false;
         });
@@ -122,9 +117,6 @@
             } else if (selectedOption === 'cloudstack-login') {
                 $login.find('#cloudstack-login').show();
                 selectedLogin = 'cloudstack';
-            } else {
-                $login.find('#cloudstack-login').hide();
-                selectedLogin = 'saml';
             }
         };
 
@@ -140,37 +132,6 @@
         $login.find('#login-dropdown').hide();
         $login.find('#login-submit').show();
         $login.find('#cloudstack-login').show();
-
-        // If any IdP servers were set, SAML is enabled
-        if (g_idpList && g_idpList.length > 0) {
-            $login.find('#login-dropdown').show();
-            $login.find('#login-submit').hide();
-            $login.find('#cloudstack-login').hide();
-
-            $login.find('#login-options')
-                .append($('<option>', {
-                    value: '',
-                    text: '--- Select Identity Provider -- ',
-                    selected: true
-                }));
-
-            $.each(g_idpList, function (index, idp) {
-                $login.find('#login-options')
-                    .append($('<option>', {
-                        value: idp.id,
-                        text: idp.orgName
-                    }));
-            });
-
-            var loginOption = $.cookie('login-option');
-            if (loginOption) {
-                var option = $login.find('#login-options option[value="' + loginOption + '"]');
-                if (option.length > 0) {
-                    option.prop('selected', true);
-                    toggleLoginView(loginOption);
-                }
-            }
-        }
 
         // Select language
         var $languageSelect = $login.find('select[name=language]');
