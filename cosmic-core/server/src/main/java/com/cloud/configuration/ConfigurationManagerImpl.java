@@ -3895,10 +3895,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     @Override
     @DB
-    public Vlan createVlanAndPublicIpRange(final long zoneId, final long networkId, final long physicalNetworkId, final boolean forVirtualNetwork, final Long podId, final String
-            startIP, final String endIP,
-                                           final String vlanGateway, final String vlanNetmask, String vlanId, final Domain domain, final Account vlanOwner, final String
-                                                   startIPv6, final String endIPv6, final String vlanIp6Gateway, final String vlanIp6Cidr) {
+    public Vlan createVlanAndPublicIpRange(final long zoneId, final long networkId, final long physicalNetworkId, final boolean forVirtualNetwork, final Long podId,
+                                           final String startIP, final String endIP, final String vlanGateway, final String vlanNetmask, String vlanId, final Domain domain,
+                                           final Account vlanOwner, final String startIPv6, final String endIPv6, final String vlanIp6Gateway, final String vlanIp6Cidr) {
         final Network network = _networkModel.getNetwork(networkId);
 
         boolean ipv4 = false, ipv6 = false;

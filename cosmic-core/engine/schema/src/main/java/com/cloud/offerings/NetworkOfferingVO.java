@@ -134,11 +134,10 @@ public class NetworkOfferingVO implements NetworkOffering {
         this.supportsStrechedL2 = supportsStrechedL2;
     }
 
-    public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan, final Integer
-            rateMbps,
-                             final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags, final Network.GuestType guestType,
-                             final boolean conserveMode,
-                             final boolean specifyIpRanges, final boolean isPersistent, final boolean internalLb, final boolean publicLb) {
+    public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan,
+                             final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
+                             final Network.GuestType guestType, final boolean conserveMode, final boolean specifyIpRanges, final boolean isPersistent, final boolean internalLb,
+                             final boolean publicLb) {
         this.name = name;
         this.displayText = displayText;
         this.rateMbps = rateMbps;
@@ -185,17 +184,17 @@ public class NetworkOfferingVO implements NetworkOffering {
         this(name,
                 "System Offering for " + name,
                 TrafficType.Guest,
-                true,
-                true,
+                false,
+                false,
                 0,
                 0,
                 true,
                 Availability.Optional,
                 null,
-                Network.GuestType.Isolated,
+                guestType,
                 true,
                 false,
-                false,
+                true,
                 false,
                 false);
         this.state = State.Enabled;

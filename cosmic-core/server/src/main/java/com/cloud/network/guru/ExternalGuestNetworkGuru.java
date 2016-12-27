@@ -69,7 +69,7 @@ public class ExternalGuestNetworkGuru extends GuestNetworkGuru {
 
     public ExternalGuestNetworkGuru() {
         super();
-        _isolationMethods = new IsolationMethod[]{IsolationMethod.GRE, IsolationMethod.L3, IsolationMethod.VLAN};
+        _isolationMethods = new IsolationMethod[]{IsolationMethod.L3, IsolationMethod.VLAN};
     }
 
     @Override

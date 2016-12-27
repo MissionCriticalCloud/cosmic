@@ -85,7 +85,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     protected boolean canHandle(final NetworkOffering offering, final DataCenter.NetworkType networkType, final PhysicalNetwork physicalNetwork) {
         s_logger.debug("Checking of guru can handle request");
         // This guru handles only Guest Isolated network that supports Source nat service
-        if (networkType == DataCenter.NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated
+        if (networkType == DataCenter.NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() != Network.GuestType.Shared
                 && isMyIsolationMethod(physicalNetwork) && ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;
         } else {
@@ -173,7 +173,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
         // Name is either the given name or the uuid
         String name = network.getName();
         if (name == null || name.isEmpty()) {
-            name = ((NetworkVO) network).getUuid();
+            name = network.getUuid();
         }
         if (name.length() > MAX_NAME_LENGTH) {
             name = name.substring(0, MAX_NAME_LENGTH - 1);
