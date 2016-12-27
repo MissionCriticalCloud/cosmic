@@ -82,8 +82,9 @@ class Services:
             "redundant_vpc_offering": {
                 "name": 'Redundant VPC off',
                 "displaytext": 'Redundant VPC off',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
+                "supportedservices": 'Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
                 "serviceProviderList": {
+                    "Gateway": 'VpcVirtualRouter',
                     "Vpn": 'VpcVirtualRouter',
                     "Dhcp": 'VpcVirtualRouter',
                     "Dns": 'VpcVirtualRouter',
@@ -104,7 +105,7 @@ class Services:
                 "name": "VPC off",
                 "displaytext": "VPC off",
                 "supportedservices":
-                    "Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat,NetworkACL"
+                    "Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat,NetworkACL"
             },
             "vpc": {
                 "name": "TestVPC",

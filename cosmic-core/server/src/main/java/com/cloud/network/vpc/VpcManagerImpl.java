@@ -445,7 +445,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             svcProviderMap.put(Service.NetworkACL, defaultProviders);
         }
 
-        svcProviderMap.put(Service.Gateway, defaultProviders);
+        // we should make the gateway service addition explicit
+        // will probably break the tests!
+        //svcProviderMap.put(Service.Gateway, defaultProviders);
 
         if (serviceProviders != null) {
             for (final Entry<String, List<String>> serviceEntry : serviceProviders.entrySet()) {

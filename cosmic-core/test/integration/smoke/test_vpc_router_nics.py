@@ -89,7 +89,7 @@ class Services:
             "vpc_offering": {
                 "name": 'VPC off',
                 "displaytext": 'VPC off',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
+                "supportedservices": 'Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
             },
             "vpc": {
                 "name": "TestVPC",
