@@ -9,7 +9,7 @@ import com.cloud.api.BaseAsyncCreateCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkACLResponse;
-import com.cloud.api.response.NetworkOfferingResponse;
+import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.VpcResponse;
@@ -22,7 +22,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
@@ -39,30 +38,21 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
 
-    @Parameter(name = ApiConstants.PHYSICAL_NETWORK_ID,
-            type = CommandType.UUID,
-            entityType = PhysicalNetworkResponse.class,
-            description = "the Physical Network ID the network belongs to")
-    private Long physicalNetworkId;
-
-    @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, required = true, description = "the gateway of the Private gateway")
+    @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, description = "the gateway of the Private gateway (DEPRECATED!).")
     private String gateway;
 
-    @Parameter(name = ApiConstants.NETMASK, type = CommandType.STRING, required = true, description = "the netmask of the Private gateway")
+    @Parameter(name = ApiConstants.NETMASK, type = CommandType.STRING, description = "the netmask of the Private gateway (DEPRECATED!).")
     private String netmask;
 
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, required = true, description = "the IP address of the Private gateaway")
     private String ipAddress;
 
-    @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, required = true, description = "the network implementation uri for the private gateway")
-    private String broadcastUri;
-
-    @Parameter(name = ApiConstants.NETWORK_OFFERING_ID,
+    @Parameter(name = ApiConstants.NETWORK_ID,
             type = CommandType.UUID,
-            required = false,
-            entityType = NetworkOfferingResponse.class,
-            description = "the uuid of the network offering to use for the private gateways network connection")
-    private Long networkOfferingId;
+            required = true,
+            entityType = NetworkResponse.class,
+            description = "the uuid of the private network to use for the private gateway")
+    private Long networkId;
 
     @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, required = true, description = "the VPC network belongs to")
     private Long vpcId;
@@ -83,11 +73,11 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void create() throws ResourceAllocationException {
-        PrivateGateway result = null;
+        PrivateGateway result;
         try {
             result =
-                    _vpcService.createVpcPrivateGateway(getVpcId(), getPhysicalNetworkId(), getBroadcastUri(), getStartIp(), getGateway(), getNetmask(), getEntityOwnerId(),
-                            getNetworkOfferingId(), getIsSourceNat(), getAclId());
+                    _vpcService.createVpcPrivateGateway(getVpcId(), getStartIp(), getGateway(), getNetmask(), getEntityDomainId(),
+                            getNetworkId(), getIsSourceNat(), getAclId());
         } catch (final InsufficientCapacityException ex) {
             s_logger.info(ex.toString());
             throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
@@ -108,14 +98,6 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
         return vpcId;
     }
 
-    public Long getPhysicalNetworkId() {
-        return physicalNetworkId;
-    }
-
-    public String getBroadcastUri() {
-        return broadcastUri;
-    }
-
     public String getStartIp() {
         return ipAddress;
     }
@@ -128,8 +110,8 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
         return netmask;
     }
 
-    private Long getNetworkOfferingId() {
-        return networkOfferingId;
+    private Long getNetworkId() {
+        return networkId;
     }
 
     public Boolean getIsSourceNat() {
@@ -166,6 +148,10 @@ public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
     @Override
     public long getEntityOwnerId() {
         return CallContext.current().getCallingAccount().getId();
+    }
+
+    private long getEntityDomainId() {
+        return CallContext.current().getCallingAccount().getDomainId();
     }
 
     @Override

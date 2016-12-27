@@ -320,6 +320,12 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
         return null;
     }
 
+    @Override
+    public NetworkVO findByIdAndDomainId(final Long networkId, final long domainId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see com.cloud.network.dao.NetworkDao#countVpcNetworks(long)
      */

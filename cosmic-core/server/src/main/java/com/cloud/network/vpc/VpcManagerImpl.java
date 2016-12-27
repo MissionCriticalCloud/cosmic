@@ -1349,40 +1349,49 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_PRIVATE_GATEWAY_CREATE, eventDescription = "creating VPC private gateway",
             create = true)
-    public PrivateGateway createVpcPrivateGateway(final long vpcId, Long physicalNetworkId, final String broadcastUri,
-                                                  final String ipAddress, final String gateway,
-                                                  final String netmask, final long gatewayOwnerId, final Long networkOfferingId, final Boolean isSourceNat,
-                                                  final Long aclId) throws ResourceAllocationException,
-            ConcurrentOperationException, InsufficientCapacityException {
+    public PrivateGateway createVpcPrivateGateway(final long vpcId, final String ipAddress, final String gateway,
+                                                  final String netmask, final long gatewayDomainId, final Long networkId, final Boolean isSourceNat, final Long aclId)
+            throws ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException {
 
         // Validate parameters
         final Vpc vpc = getActiveVpc(vpcId);
         if (vpc == null) {
-            final InvalidParameterValueException ex = new InvalidParameterValueException(
-                    "Unable to find Enabled VPC by id specified");
+            final InvalidParameterValueException ex = new InvalidParameterValueException("Unable to find Enabled VPC by id specified");
             ex.addProxyObject(String.valueOf(vpcId), "VPC");
             throw ex;
         }
 
-        PhysicalNetwork physNet = null;
-        // Validate physical network
-        if (physicalNetworkId == null) {
-            final List<? extends PhysicalNetwork> pNtwks = _ntwkModel.getPhysicalNtwksSupportingTrafficType(vpc.getZoneId(),
-                    TrafficType.Guest);
-            if (pNtwks.isEmpty() || pNtwks.size() != 1) {
-                throw new InvalidParameterValueException("Physical network can't be determined; pass physical network id");
+        if (gateway != null || netmask != null) {
+            throw new InvalidParameterValueException("Gateway/netmask fields are not supported anymore");
+        }
+
+        Network privateNtwk = _ntwkDao.findByIdAndDomainId(networkId, gatewayDomainId);
+        if (privateNtwk == null) {
+            throw new InvalidParameterValueException("Unable to find private network based on the network ID");
+        }
+
+        if (NetUtils.isNetworkAWithinNetworkB(privateNtwk.getCidr(), vpc.getCidr())) {
+            throw new InvalidParameterValueException(
+                    "CIDR of the private network to be connected " + privateNtwk.getCidr() +
+                            " should be outside of the VPC super CIDR " + vpc.getCidr());
+        }
+
+        if (! NetUtils.isIpWithtInCidrRange(ipAddress, privateNtwk.getCidr())) {
+            throw new InvalidParameterValueException(
+                    "The specified ip address for the private network " + ipAddress +
+                            " should be within the CIDR of the private network " + privateNtwk.getCidr());
+        }
+
+        final Long privateNetworkId = privateNtwk.getId();
+        final List<PrivateGateway> privateGateways = getVpcPrivateGateways(vpcId);
+        for (final PrivateGateway privateGateway : privateGateways) {
+            if (privateNetworkId == privateGateway.getNetworkId()) {
+                throw new InvalidParameterValueException(
+                        "VPC with uuid " + vpc.getUuid() + " is already connected to network '"
+                                + privateNtwk.getName() + "'");
             }
-            physNet = pNtwks.get(0);
-            physicalNetworkId = physNet.getId();
-        }
+         }
 
-        if (physNet == null) {
-            physNet = _entityMgr.findById(PhysicalNetwork.class, physicalNetworkId);
-        }
-        final Long dcId = physNet.getDataCenterId();
-
-        final Long physicalNetworkIdFinal = physicalNetworkId;
-        final PhysicalNetwork physNetFinal = physNet;
         final VpcGatewayVO gatewayVO;
         try {
             gatewayVO = Transaction.execute(new TransactionCallbackWithException<VpcGatewayVO, Exception>() {
@@ -1390,46 +1399,29 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 public VpcGatewayVO doInTransaction(final TransactionStatus status)
                         throws ResourceAllocationException, ConcurrentOperationException,
                         InsufficientCapacityException {
-                    s_logger.debug("Creating Private gateway for VPC " + vpc);
-                    // 1) create private network unless it is existing and
-                    // lswitch'd
-                    Network privateNtwk = null;
-                    if (BroadcastDomainType.getSchemeValue(
-                            BroadcastDomainType.fromString(broadcastUri)) == BroadcastDomainType.Lswitch) {
-                        final String cidr = NetUtils.ipAndNetMaskToCidr(gateway, netmask);
-                        privateNtwk = _ntwkDao.getPrivateNetwork(broadcastUri, cidr, gatewayOwnerId, dcId, networkOfferingId);
-                        // if the dcid is different we get no network so next we
-                        // try to create it
+
+                    // create the nic/ip as createPrivateNetwork doesn't do that work for us now
+                    s_logger.info("found and using existing network for vpc " + vpc + ": " + privateNtwk.getBroadcastUri());
+                    final DataCenterVO dc = _dcDao.lockRow(vpc.getZoneId(), true);
+
+                    // add entry to private_ip_address table
+                    PrivateIpVO privateIp = _privateIpDao.findByIpAndSourceNetworkId(privateNtwk.getId(), ipAddress);
+                    if (privateIp != null) {
+                        throw new InvalidParameterValueException(
+                                "Private IP address " + ipAddress + " already used for private gateway in zone "
+                                        + _entityMgr.findById(DataCenter.class, vpc.getZoneId()).getName());
                     }
-                    if (privateNtwk == null) {
-                        s_logger.info("creating new network for vpc " + vpc + " using broadcast uri: " + broadcastUri);
-                        final String networkName = "vpc-" + vpc.getName() + "-privateNetwork";
-                        privateNtwk = _ntwkSvc.createPrivateNetwork(networkName, networkName, physicalNetworkIdFinal, broadcastUri,
-                                ipAddress, null, gateway, netmask, gatewayOwnerId, vpcId, isSourceNat, networkOfferingId);
-                    } else { // create the nic/ip as createPrivateNetwork
-                        // doesn''t do that work for us now
-                        s_logger.info("found and using existing network for vpc " + vpc + ": " + broadcastUri);
-                        final DataCenterVO dc = _dcDao.lockRow(physNetFinal.getDataCenterId(), true);
 
-                        // add entry to private_ip_address table
-                        PrivateIpVO privateIp = _privateIpDao.findByIpAndSourceNetworkId(privateNtwk.getId(), ipAddress);
-                        if (privateIp != null) {
-                            throw new InvalidParameterValueException(
-                                    "Private ip address " + ipAddress + " already used for private gateway" + " in zone "
-                                            + _entityMgr.findById(DataCenter.class, dcId).getName());
-                        }
+                    final Long mac = dc.getMacAddress();
+                    final Long nextMac = mac + 1;
+                    dc.setMacAddress(nextMac);
 
-                        final Long mac = dc.getMacAddress();
-                        final Long nextMac = mac + 1;
-                        dc.setMacAddress(nextMac);
+                    s_logger.info("creating private IP address for VPC (" + ipAddress + ", " + privateNtwk.getId() + ", "
+                            + nextMac + ", " + vpcId + ", " + isSourceNat + ")");
+                    privateIp = new PrivateIpVO(ipAddress, privateNtwk.getId(), nextMac, vpcId, isSourceNat);
+                    _privateIpDao.persist(privateIp);
 
-                        s_logger.info("creating private ip adress for vpc (" + ipAddress + ", " + privateNtwk.getId() + ", "
-                                + nextMac + ", " + vpcId + ", " + isSourceNat + ")");
-                        privateIp = new PrivateIpVO(ipAddress, privateNtwk.getId(), nextMac, vpcId, isSourceNat);
-                        _privateIpDao.persist(privateIp);
-
-                        _dcDao.update(dc.getId(), dc);
-                    }
+                    _dcDao.update(dc.getId(), dc);
 
                     long networkAclId = NetworkACL.DEFAULT_DENY;
                     if (aclId != null) {
@@ -1444,24 +1436,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                         networkAclId = aclId;
                     }
 
-                    { // experimental block, this is a hack
-                        // set vpc id in network to null
-                        // might be needed for all types of broadcast domains
-                        // the ugly hack is that vpc gateway nets are created as
-                        // guest network
-                        // while they are not.
-                        // A more permanent solution would be to define a type of
-                        // 'gatewaynetwork'
-                        // so that handling code is not mixed between the two
-                        final NetworkVO gatewaynet = _ntwkDao.findById(privateNtwk.getId());
-                        gatewaynet.setVpcId(null);
-                        _ntwkDao.persist(gatewaynet);
-                    }
-
                     // 2) create gateway entry
                     final VpcGatewayVO gatewayVO = new VpcGatewayVO(ipAddress, VpcGateway.Type.Private, vpcId,
-                            privateNtwk.getDataCenterId(), privateNtwk.getId(), broadcastUri,
-                            gateway, netmask, vpc.getAccountId(), vpc.getDomainId(), isSourceNat, networkAclId);
+                            privateNtwk.getDataCenterId(), privateNtwk.getId(),
+                            vpc.getAccountId(), vpc.getDomainId(), isSourceNat, networkAclId);
                     _vpcGatewayDao.persist(gatewayVO);
 
                     s_logger.debug("Created vpc gateway entry " + gatewayVO);
@@ -1513,7 +1491,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 return null;
             }
         } finally {
-            // do cleanup
             if (!success) {
                 if (destroyOnFailure) {
                     s_logger.debug("Destroying private gateway " + vo + " that failed to start");
@@ -1532,9 +1509,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_PRIVATE_GATEWAY_DELETE, eventDescription = "deleting private gateway")
     @DB
-    public boolean deleteVpcPrivateGateway(final long gatewayId)
-            throws ConcurrentOperationException, ResourceUnavailableException {
-
+    public boolean deleteVpcPrivateGateway(final long gatewayId) throws ConcurrentOperationException, ResourceUnavailableException {
         final VpcGatewayVO gatewayVO = _vpcGatewayDao.acquireInLockTable(gatewayId);
         if (gatewayVO == null || gatewayVO.getType() != VpcGateway.Type.Private) {
             throw new ConcurrentOperationException("Unable to lock gateway " + gatewayId);
@@ -1546,12 +1521,11 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 public void doInTransactionWithoutResult(final TransactionStatus status) {
                     // don't allow to remove gateway when there are static routes pointing to an ipaddress in the private gateway CIDR.
                     final List<? extends StaticRoute> routes = _staticRouteDao.listByVpcIdAndNotRevoked(gatewayVO.getVpcId());
-                    final String GatewayCidr = NetUtils.ipAndNetMaskToCidr(gatewayVO.getGateway(), gatewayVO.getNetmask());
-
+                    final NetworkVO network = _ntwkDao.findById(gatewayVO.getNetworkId());
                     for (final StaticRoute route : routes) {
-                        if (NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), GatewayCidr)) {
+                        if (NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), network.getCidr())) {
                             throw new CloudRuntimeException("Can't delete private gateway " + gatewayVO + " as it has static routes " +
-                                    "applied pointing to the CIDR of the gateway (" + GatewayCidr + "). Example static route: " +
+                                    "applied pointing to the CIDR of the network (" + network.getCidr() + "). Example static route: " +
                                     route.getCidr() + " to " + route.getGwIpAddress() + ". Please remove all the routes pointing to the " +
                                     "private gateway CIDR before attempting to delete it.");
                         }
@@ -1563,7 +1537,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 }
             });
 
-            // 1) delete the gateway on the backend
+            // Delete the gateway on the backend
             final List<Provider> providersToImplement = getVpcProviders(gatewayVO.getVpcId());
             final PrivateGateway gateway = getVpcPrivateGateway(gatewayId);
             for (final VpcProvider provider : getVpcElements()) {
@@ -1581,19 +1555,30 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 }
             }
 
-            // 2) Delete private gateway from the DB
             return deletePrivateGatewayFromTheDB(gateway);
         } finally {
-            if (gatewayVO != null) {
-                _vpcGatewayDao.releaseFromLockTable(gatewayId);
-            }
+            _vpcGatewayDao.releaseFromLockTable(gatewayId);
         }
+    }
+
+    private boolean deletePrivateGatewayFromTheDB(final PrivateGateway gateway) {
+        try {
+            vpcTxCallable.setGateway(gateway);
+            final ExecutorService txExecutor = Executors.newSingleThreadExecutor();
+            final Future<Boolean> futureResult = txExecutor.submit(vpcTxCallable);
+
+            final boolean deleted = futureResult.get();
+            s_logger.info("Delete Private Gateway succeeded? " + deleted);
+        } catch (InterruptedException | ExecutionException e) {
+            s_logger.error("Delete Private Gateway failed due to => ", e);
+        }
+        return true;
     }
 
     @Override
     public Pair<List<PrivateGateway>, Integer> listPrivateGateway(final ListPrivateGatewaysCmd cmd) {
         final String ipAddress = cmd.getIpAddress();
-        final String vlan = cmd.getVlan();
+        final String networkId = cmd.getNetworkId();
         final Long vpcId = cmd.getVpcId();
         final Long id = cmd.getId();
         Boolean isRecursive = cmd.isRecursive();
@@ -1617,12 +1602,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final SearchBuilder<VpcGatewayVO> sb = _vpcGatewayDao.createSearchBuilder();
         _accountMgr.buildACLSearchBuilder(sb, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
-        if (vlan != null) {
-            final SearchBuilder<NetworkVO> ntwkSearch = _ntwkDao.createSearchBuilder();
-            ntwkSearch.and("vlan", ntwkSearch.entity().getBroadcastUri(), SearchCriteria.Op.EQ);
-            sb.join("networkSearch", ntwkSearch, sb.entity().getNetworkId(), ntwkSearch.entity().getId(),
-                    JoinBuilder.JoinType.INNER);
-        }
 
         final SearchCriteria<VpcGatewayVO> sc = sb.create();
         _accountMgr.buildACLSearchCriteria(sc, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
@@ -1642,8 +1621,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             sc.addAnd("vpcId", Op.EQ, vpcId);
         }
 
-        if (vlan != null) {
-            sc.setJoinParameters("networkSearch", "vlan", BroadcastDomainType.Vlan.toUri(vlan));
+        if (networkId != null) {
+            sc.addAnd("networkId", Op.EQ, networkId);
         }
 
         final Pair<List<VpcGatewayVO>, Integer> vos = _vpcGatewayDao.searchAndCount(sc, searchFilter);
@@ -1853,7 +1832,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Override
     public Pair<List<? extends StaticRoute>, Integer> listStaticRoutes(final ListStaticRoutesCmd cmd) {
         final Long id = cmd.getId();
-        final String gwIpAddress = cmd.getGwIpAddress();
+        final String nextHop = cmd.getNextHop();
         final String cidr = cmd.getCidr();
         final Long vpcId = cmd.getVpcId();
         Long domainId = cmd.getDomainId();
@@ -1907,8 +1886,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             sc.addAnd("vpcId", Op.EQ, vpcId);
         }
 
-        if (gwIpAddress != null) {
-            sc.addAnd("gwIpAddress", Op.EQ, gwIpAddress);
+        if (nextHop != null) {
+            sc.addAnd("gwIpAddress", Op.EQ, nextHop);
         }
 
         if (cidr != null) {
@@ -2274,47 +2253,13 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     }
 
     private PrivateGateway getPrivateGatewayProfile(final VpcGateway gateway) {
-        final Network network = _ntwkModel.getNetwork(gateway.getNetworkId());
-        return new PrivateGatewayProfile(gateway, network.getPhysicalNetworkId());
+        return new PrivateGatewayProfile(gateway);
     }
 
-    @DB
-    private boolean deletePrivateGatewayFromTheDB(final PrivateGateway gateway) {
-        // check if there are ips allocted in the network
-        final long networkId = gateway.getNetworkId();
-
-        vpcTxCallable.setGateway(gateway);
-
-        final ExecutorService txExecutor = Executors.newSingleThreadExecutor();
-        final Future<Boolean> futureResult = txExecutor.submit(vpcTxCallable);
-
-        final boolean deleteNetworkFinal;
-        try {
-            deleteNetworkFinal = futureResult.get();
-            if (deleteNetworkFinal) {
-                final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
-                final Account owner = _accountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM);
-                final ReservationContext context = new ReservationContextImpl(null, null, callerUser, owner);
-                _ntwkMgr.destroyNetwork(networkId, context, false);
-                s_logger.debug("Deleted private network id=" + networkId);
-            }
-        } catch (final InterruptedException | ExecutionException e) {
-            s_logger.error("deletePrivateGatewayFromTheDB failed to delete network id " + networkId + "due to => ", e);
-        }
-
-        return true;
-    }
-
-    private boolean applyStaticRoutes(final List<? extends StaticRoute> routes, final Account caller,
-                                      final boolean updateRoutesInDB) throws ResourceUnavailableException {
-        final boolean success = true;
+    private boolean applyStaticRoutes(final List<? extends StaticRoute> routes, final Account caller, final boolean updateRoutesInDB) throws ResourceUnavailableException {
         final List<StaticRouteProfile> staticRouteProfiles = new ArrayList<>(routes.size());
 
-        final Map<String, String> cidrGwIpMap = new HashMap<>();
-
         for (final StaticRoute route : routes) {
-            cidrGwIpMap.put(route.getCidr(), route.getGwIpAddress());
-
             staticRouteProfiles.add(new StaticRouteProfile(route));
         }
         if (!applyStaticRoutes(staticRouteProfiles)) {
@@ -2336,7 +2281,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         }
 
-        return success;
+        return true;
     }
 
     private boolean applyStaticRoutes(final List<StaticRouteProfile> routes) throws ResourceUnavailableException {

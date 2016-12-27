@@ -1,17 +1,15 @@
 package com.cloud.network.vpc;
 
 public class PrivateGatewayProfile implements PrivateGateway {
-    VpcGateway vpcGateway;
-    long physicalNetworkId;
+
+    private final VpcGateway vpcGateway;
 
     /**
      * @param vpcGateway
-     * @param physicalNetworkId TODO
      */
-    public PrivateGatewayProfile(final VpcGateway vpcGateway, final long physicalNetworkId) {
+    public PrivateGatewayProfile(final VpcGateway vpcGateway) {
         super();
         this.vpcGateway = vpcGateway;
-        this.physicalNetworkId = physicalNetworkId;
     }
 
     @Override
@@ -45,21 +43,6 @@ public class PrivateGatewayProfile implements PrivateGateway {
     }
 
     @Override
-    public String getGateway() {
-        return vpcGateway.getGateway();
-    }
-
-    @Override
-    public String getNetmask() {
-        return vpcGateway.getNetmask();
-    }
-
-    @Override
-    public String getBroadcastUri() {
-        return vpcGateway.getBroadcastUri();
-    }
-
-    @Override
     public State getState() {
         return vpcGateway.getState();
     }
@@ -77,11 +60,6 @@ public class PrivateGatewayProfile implements PrivateGateway {
     @Override
     public String getUuid() {
         return vpcGateway.getUuid();
-    }
-
-    @Override
-    public long getPhysicalNetworkId() {
-        return physicalNetworkId;
     }
 
     @Override

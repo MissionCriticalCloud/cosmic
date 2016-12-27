@@ -104,7 +104,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
                 network.setCidr(userSpecified.getCidr());
                 network.setGateway(userSpecified.getGateway());
             } else {
-                throw new InvalidParameterValueException("Can't design network " + network + "; netmask/gateway must be passed in");
+                throw new InvalidParameterValueException("Can't design network " + network + "; netmask/gateway or cidr must be passed in");
             }
 
             if (offering.getSpecifyVlan()) {
@@ -112,7 +112,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
                 network.setState(State.Setup);
             }
         } else {
-            throw new CloudRuntimeException("Can't design network " + network + "; netmask/gateway must be passed in");
+            throw new CloudRuntimeException("Can't design network " + network + "; netmask/gateway or cidr must be passed in");
         }
 
         return network;

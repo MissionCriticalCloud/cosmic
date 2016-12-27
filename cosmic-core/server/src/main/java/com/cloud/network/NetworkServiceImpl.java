@@ -696,8 +696,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw ex;
         }
 
-        if (GuestType.Private.equals(ntwkOff.getGuestType()) && (startIP != null || endIP != null || vpcId != null || gateway != null)) {
-            throw new InvalidParameterValueException("StartIp/endIp/vpcId/gateway can't be specified for guest type " + GuestType.Private);
+        if (GuestType.Private.equals(ntwkOff.getGuestType()) && (startIP != null || endIP != null || vpcId != null || gateway != null || netmask != null)) {
+            throw new InvalidParameterValueException("StartIp/endIp/vpcId/gateway/netmask can't be specified for guest type " + GuestType.Private);
         }
 
         // validate physical network and zone
@@ -820,7 +820,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
 
-        String cidr = null;
+        String cidr = cmd.getCidr();
         if (ipv4) {
             // if end ip is not specified, default it to startIp
             if (startIP != null) {

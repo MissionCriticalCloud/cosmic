@@ -29,7 +29,6 @@ import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -128,11 +127,8 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
             final String netmask = NetUtils.getCidrNetmask(network.getCidr());
             final PrivateIpAddress ip = new PrivateIpAddress(ipVO, network.getBroadcastUri().toString(), network.getGateway(), netmask, nicProfile.getMacAddress());
 
-            final List<PrivateIpAddress> privateIps = new ArrayList<>(1);
-            privateIps.add(ip);
-
             final Commands cmds = new Commands(Command.OnError.Stop);
-            _commandSetupHelper.createVpcAssociatePrivateIPCommands(router, privateIps, cmds, nicProfile, isAddOperation);
+            _commandSetupHelper.createSetupPrivateGatewayCommand(router, ip, cmds, nicProfile, isAddOperation);
 
             try {
                 if (_networkGeneralHelper.sendCommandsToRouter(router, cmds)) {

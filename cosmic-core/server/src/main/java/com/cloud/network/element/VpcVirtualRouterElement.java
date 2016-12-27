@@ -168,8 +168,6 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        s_logger.info("Adding VPC routers to Guest Network: " + routers.size() + " to be added!");
-
         final DataCenterVO dcVO = _dcDao.findById(gateway.getZoneId());
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
 
@@ -205,8 +203,6 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        s_logger.info("Adding VPC routers to Guest Network: " + routers.size() + " to be added!");
-
         int result = 0;
         for (final DomainRouterVO domainRouterVO : routers) {
             if (_vpcRouterMgr.destroyPrivateGateway(gateway, domainRouterVO)) {
@@ -214,7 +210,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             }
         }
 
-        return result == routers.size() ? true : false;
+        return result == routers.size();
     }
 
     @Override

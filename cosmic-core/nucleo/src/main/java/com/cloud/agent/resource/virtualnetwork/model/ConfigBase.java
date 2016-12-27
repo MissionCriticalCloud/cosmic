@@ -5,6 +5,7 @@ public abstract class ConfigBase {
     public final static String VM_DHCP = "dhcpentry";
     public final static String IP_ASSOCIATION = "ips";
     public final static String GUEST_NETWORK = "guestnetwork";
+    public final static String PRIVATE_GATEWAY = "privategateway";
     public static final String NETWORK_ACL = "networkacl";
     public static final String VM_METADATA = "vmdata";
     public static final String VM_PASSWORD = "vmpassword";

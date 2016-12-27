@@ -18,7 +18,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
@@ -32,14 +31,15 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.VPC_ID,
             type = CommandType.UUID,
             entityType = VpcResponse.class,
+            required = true,
             description = "The VPC id we are creating static route for.")
     private Long vpcId;
 
     @Parameter(name = ApiConstants.CIDR, required = true, type = CommandType.STRING, description = "The CIDR to create the static route for")
     private String cidr;
 
-    @Parameter(name = ApiConstants.NEXT_HOP, type = CommandType.STRING, description = "Ip address of the nexthop to route the CIDR to")
-    private String gwIpAddress;
+    @Parameter(name = ApiConstants.NEXT_HOP, required = true, type = CommandType.STRING, description = "IP address of the nexthop to route the CIDR to")
+    private String nextHop;
 
     @Parameter(name = ApiConstants.GATEWAY_ID,
             type = CommandType.UUID,
@@ -51,9 +51,8 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
         return cidr;
     }
 
-    public String getGwIpAddress() {
-        Compatibility();
-        return gwIpAddress;
+    public String getNextHop() {
+        return nextHop;
     }
 
     /////////////////////////////////////////////////////
@@ -62,7 +61,8 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
     @Override
     public void create() throws ResourceAllocationException {
         try {
-            final StaticRoute result = _vpcService.createStaticRoute(getVpcId(), getCidr(), getGwIpAddress());
+            checkDeprecatedParameters();
+            final StaticRoute result = _vpcService.createStaticRoute(getVpcId(), getCidr(), getNextHop());
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
         } catch (final NetworkRuleConflictException ex) {
@@ -101,32 +101,12 @@ public class CreateStaticRouteCmd extends BaseAsyncCreateCmd {
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
     public Long getVpcId() {
-        Compatibility();
         return vpcId;
     }
 
-    // Compatibility with < 5.2
-    private void Compatibility() {
-        if (getGatewayId() != null) {
-            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(getGatewayId());
-            gwIpAddress = gateway.getGateway();
-            vpcId = gateway.getVpcId();
-        }
-        CheckParameters();
-    }
-
-    public Long getGatewayId() {
-        return gatewayId;
-    }
-
-    private void CheckParameters() throws InvalidParameterValueException {
-        if (vpcId == null) {
-            throw new InvalidParameterValueException(
-                    "VpcId should not be empty. Either specify VpcId (recommended) or specify gatewayId (deprecated).");
-        }
-        if (gwIpAddress == null) {
-            throw new InvalidParameterValueException(
-                    "Parameter nexthop should not be empty. Either specify nexthop ip address (recommended) or specify gatewayId (deprecated).");
+    private void checkDeprecatedParameters() throws InvalidParameterValueException {
+        if (gatewayId != null) {
+            throw new InvalidParameterValueException("Parameter gatewayId is DEPRECATED, use vpcId and nextHop instead.");
         }
     }
 

@@ -9,14 +9,11 @@ import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.network.vpc.StaticRoute;
-import com.cloud.network.vpc.VpcGateway;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @APICommand(name = "listStaticRoutes", description = "Lists all static routes", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -36,7 +33,7 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
     private Long gatewayId;
 
     @Parameter(name = ApiConstants.NEXT_HOP, type = CommandType.STRING, entityType = VpcResponse.class, description = "list static routes by nexthop ip address")
-    private String gwIpAddress;
+    private String nextHop;
 
     @Parameter(name = ApiConstants.CIDR, type = CommandType.STRING, entityType = VpcResponse.class, description = "list static routes by cidr")
     private String cidr;
@@ -53,8 +50,8 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
         return gatewayId;
     }
 
-    public String getGwIpAddress() {
-        return gwIpAddress;
+    public String getNextHop() {
+        return nextHop;
     }
 
     public String getCidr() {
@@ -63,29 +60,26 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
 
     @Override
     public void execute() {
-        // When we specify a gateway id, limit the search to the corresponding vpcId
-        if (vpcId == null) {
-            vpcId = retrieveVpcId();
-        }
+        checkDeprecatedParameters();
 
         final Pair<List<? extends StaticRoute>, Integer> result = _vpcService.listStaticRoutes(this);
         final ListResponse<StaticRouteResponse> response = new ListResponse<>();
         final List<StaticRouteResponse> routeResponses = new ArrayList<>();
 
-        // Compatibility with pre 5.1
-        // If gatewayId was passed, lookup its CIDR and match static routes to it
-        final Optional<String> gatewayCidr = retrieveGatewayCidr();
-
-        result.first().stream()
-              .filter(route -> NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), gatewayCidr.get()))
-              .forEach(route -> {
-                  final StaticRouteResponse ruleData = _responseGenerator.createStaticRouteResponse(route);
-                  routeResponses.add(ruleData);
-              });
+        result.first().forEach(route -> {
+            final StaticRouteResponse ruleData = _responseGenerator.createStaticRouteResponse(route);
+            routeResponses.add(ruleData);
+        });
 
         response.setResponses(routeResponses, result.second());
         response.setResponseName(getCommandName());
         setResponseObject(response);
+    }
+
+    private void checkDeprecatedParameters() throws InvalidParameterValueException {
+        if (gatewayId != null) {
+            throw new InvalidParameterValueException("Parameter gatewayId is DEPRECATED, use vpcId and nextHop instead.");
+        }
     }
 
     /////////////////////////////////////////////////////
@@ -96,23 +90,4 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
         return s_name;
     }
 
-    private Optional<String> retrieveGatewayCidr() {
-        final Optional<String> gatewayCidr = Optional.of("0.0.0.0/0");
-        if (gatewayId != null) {
-            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
-            gatewayCidr.of(NetUtils.ipAndNetMaskToCidr(gateway.getGateway(), gateway.getNetmask()));
-        }
-        return gatewayCidr;
-    }
-
-    private Long retrieveVpcId() {
-        if (gatewayId != null) {
-            final VpcGateway gateway = _vpcService.getVpcPrivateGateway(gatewayId);
-            if (gateway == null) {
-                throw new InvalidParameterValueException("Private gateway with id " + gatewayId + " cannot be found");
-            }
-            return gateway.getVpcId();
-        }
-        return null;
-    }
 }
