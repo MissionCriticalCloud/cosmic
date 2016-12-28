@@ -181,6 +181,11 @@ class CsInterface:
             return True
         return False
 
+    def is_privategateway(self):
+        if "nw_type" in self.address and self.address['nw_type'] in ['privategateway']:
+            return True
+        return False
+
     def is_added(self):
         return self.get_attr("add")
 
@@ -293,13 +298,13 @@ class CsIP:
             # The code looks redundant here, but we actually have to cater for routers and
             # VPC routers in a different manner. Please do not remove this block otherwise
             # The VPC default route will be broken.
-            if self.get_type() in ["public"] and address["device"] == CsHelper.PUBLIC_INTERFACES[self.cl.get_type()]:
+            if self.get_type() in ["public"]:
                 gateway = str(address["gateway"])
                 route.add_defaultroute(gateway)
         else:
             # once we start processing public ip's we need to verify there
             # is a default route and add if needed
-            if (self.cl.get_gateway()):
+            if self.cl.get_gateway():
                 route.add_defaultroute(self.cl.get_gateway())
 
     def set_mark(self):
