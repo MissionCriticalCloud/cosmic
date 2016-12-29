@@ -12599,7 +12599,7 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 .addNew .icon,
 .addLdapAccount .icon,
 .assignVm .icon,
-.rootAdminAddGuestNetwork .icon {
+.domainAdminAddPrivateNetwork .icon {
     background-position: -37px -61px;
 }
 
@@ -12607,7 +12607,7 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 .addNew:hover .icon,
 .addLdapAccount:hover .icon,
 .assignVm:hover .icon,
-.rootAdminAddGuestNetwork:hover .icon {
+.domainAdminAddPrivateNetwork:hover .icon {
     background-position: -37px -643px;
 }
 

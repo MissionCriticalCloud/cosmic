@@ -1466,7 +1466,7 @@
                                         //scope: { label: 'label.scope' }
                                     },
                                     actions: {
-                                        add: addGuestNetworkDialog.def
+                                        add: addPrivateNetworkDialog.def
                                     },
 
                                     dataProvider: function (args) {
