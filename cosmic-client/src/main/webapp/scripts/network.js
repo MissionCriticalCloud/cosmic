@@ -880,9 +880,7 @@
 
                         tabFilter: function (args) {
                             var hiddenTabs = [];
-                            var isRouterOwner = isAdmin();
-                            if (!isRouterOwner)
-                                hiddenTabs.push("router");
+                            if (!isAdmin() && !isDomainAdmin()) hiddenTabs.push("router");
                             return hiddenTabs;
                         },
 
