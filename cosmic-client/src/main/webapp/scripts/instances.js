@@ -367,11 +367,40 @@
                     });
                 }
 
-                $.ajax({
-                    url: createURL('listVirtualMachines'),
-                    data: data,
-                    success: function (json) {
-                        var items = json.listvirtualmachinesresponse.virtualmachine;
+                $.when(
+                    $.ajax({
+                        url: createURL('listVirtualMachines'),
+                        async: true,
+                        data: data,
+                        error: function (XMLHttpResponse) {
+                            cloudStack.dialog.notice({
+                                message: parseXMLHttpResponse(XMLHttpResponse)
+                            });
+                            args.response.error();
+                        }
+                    }),
+                    $.ajax({
+                        url: createURL('listVirtualMachines&projectid=-1'),
+                        async: true,
+                        data: data,
+                        error: function (XMLHttpResponse) {
+                            cloudStack.dialog.notice({
+                                message: parseXMLHttpResponse(XMLHttpResponse)
+                            });
+                            args.response.error();
+                        }
+                    })).done(function(jsonvm, jsonvmp) {
+                        var items = jsonvm[0].listvirtualmachinesresponse.virtualmachine;
+                        if (args.context.projects == null) {
+                            var pitems = jsonvmp[0].listvirtualmachinesresponse.virtualmachine;
+                            if (pitems) {
+                                if (items) {
+                                    items.push(pitems[0]);
+                                } else {
+                                    items = pitems;
+                                }
+                            }
+                        }
                         if (items) {
                             $.each(items, function (idx, vm) {
                                 if (vm.nic && vm.nic.length > 0 && vm.nic[0].ipaddress) {
@@ -382,14 +411,7 @@
                         args.response.success({
                             data: items
                         });
-                    },
-                    error: function (XMLHttpResponse) {
-                        cloudStack.dialog.notice({
-                            message: parseXMLHttpResponse(XMLHttpResponse)
-                        });
-                        args.response.error();
-                    }
-                });
+                    });
             },
 
             detailView: {
