@@ -4,6 +4,11 @@ from netaddr import *
 
 
 def merge(dbag, ip):
+
+    # Private gateway ip address needs to be in ips.json too, but doesn't have 'public_ip' field
+    if 'public_ip' not in ip:
+        ip['public_ip'] = ip['ip_address']
+
     for dev in dbag:
         if dev == "id":
             continue
