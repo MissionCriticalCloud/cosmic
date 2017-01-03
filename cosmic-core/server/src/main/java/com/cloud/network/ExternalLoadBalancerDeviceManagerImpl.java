@@ -1072,7 +1072,7 @@ public abstract class ExternalLoadBalancerDeviceManagerImpl extends AdapterBase 
         // It's a hack, using isOneToOneNat field for indicate if it's inline or not
         final boolean inline = _networkMgr.isNetworkInlineMode(guestConfig);
         final IpAddressTO ip =
-                new IpAddressTO(guestConfig.getAccountId(), null, add, false, true, guestVlanTag, selfIp, guestVlanNetmask, null, networkRate, inline);
+                new IpAddressTO(guestConfig.getAccountId(), null, add, false, true, guestVlanTag, selfIp, guestVlanNetmask, null, null, networkRate, inline);
         final IpAddressTO[] ips = new IpAddressTO[1];
         ips[0] = ip;
         final IpAssocCommand cmd = new IpAssocCommand(ips);

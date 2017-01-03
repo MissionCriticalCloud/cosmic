@@ -9,6 +9,7 @@ public class IpAddress {
     private String gateway;
     private String netmask;
     private String vifMacAddress;
+    private String deviceMacAddress;
     private Integer nicDevId;
     private boolean newNic;
     private String nwType;
@@ -17,8 +18,9 @@ public class IpAddress {
         // Empty constructor for (de)serialization
     }
 
-    public IpAddress(final String publicIp, final boolean sourceNat, final boolean add, final boolean oneToOneNat, final boolean firstIP, final String gateway,
-                     final String netmask, final String vifMacAddress, final Integer nicDevId, final boolean newNic, final String nwType) {
+    public IpAddress(final String publicIp, final boolean sourceNat, final boolean add, final boolean oneToOneNat,
+                     final boolean firstIP, final String gateway, final String netmask, final String vifMacAddress,
+                     final String deviceMacAddress, final Integer nicDevId, final boolean newNic, final String nwType) {
         super();
         this.publicIp = publicIp;
         this.sourceNat = sourceNat;
@@ -28,6 +30,7 @@ public class IpAddress {
         this.gateway = gateway;
         this.netmask = netmask;
         this.vifMacAddress = vifMacAddress;
+        this.deviceMacAddress = deviceMacAddress;
         this.nicDevId = nicDevId;
         this.newNic = newNic;
         this.nwType = nwType;
@@ -119,5 +122,13 @@ public class IpAddress {
 
     public void setNwType(final String nwType) {
         this.nwType = nwType;
+    }
+
+    public String getDeviceMacAddress() {
+        return deviceMacAddress;
+    }
+
+    public void setDeviceMacAddress(final String deviceMacAddress) {
+        this.deviceMacAddress = deviceMacAddress;
     }
 }
