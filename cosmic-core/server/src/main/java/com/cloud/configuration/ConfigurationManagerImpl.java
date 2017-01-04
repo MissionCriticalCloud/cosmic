@@ -2573,10 +2573,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                             throw new InvalidParameterValueException("Invalid service provider: " + prvNameStr);
                         }
 
-                        if (provider == Provider.JuniperSRX || provider == Provider.CiscoVnmc) {
-                            firewallProvider = provider;
-                        }
-
                         if ((service == Service.PortForwarding || service == Service.StaticNat) && provider == Provider.VirtualRouter) {
                             firewallProvider = Provider.VirtualRouter;
                         }
@@ -2673,8 +2669,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             final Set<Provider> firewallProviderSet = new HashSet<>();
             firewallProviderSet.add(firewallProvider);
             serviceProviderMap.put(Service.Firewall, firewallProviderSet);
-            if (!(firewallProvider.getName().equals(Provider.JuniperSRX.getName()) || firewallProvider.getName()
-                                                                                                      .equals(Provider.VirtualRouter.getName())) && egressDefaultPolicy == false) {
+            if (!firewallProvider.getName().equals(Provider.VirtualRouter.getName()) && !egressDefaultPolicy) {
                 throw new InvalidParameterValueException("Firewall egress with default policy " + egressDefaultPolicy + " is not supported by the provider "
                         + firewallProvider.getName());
             }
@@ -3198,12 +3193,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     @Override
     public boolean isOfferingForVpc(final NetworkOffering offering) {
-        final boolean vpcProvider = _ntwkOffServiceMapDao.isProviderForNetworkOffering(offering.getId(), Provider.VPCVirtualRouter) ||
-                _ntwkOffServiceMapDao.isProviderForNetworkOffering(offering.getId(), Provider.JuniperContrailVpcRouter);
-        final boolean nuageVpcProvider = _ntwkOffServiceMapDao.getDistinctProviders(offering.getId()).contains(Provider.NuageVsp.getName())
-                && offering.getIsPersistent();
-
-        return vpcProvider || nuageVpcProvider;
+        return _ntwkOffServiceMapDao.isProviderForNetworkOffering(offering.getId(), Provider.VPCVirtualRouter);
     }
 
     @Override

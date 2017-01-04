@@ -2336,9 +2336,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ProviderResponse> serviceProvidersResponses = new ArrayList<>();
         for (final Network.Provider serviceProvider : serviceProviders) {
             // return only Virtual Router/JuniperSRX/CiscoVnmc as a provider for the firewall
-            if (service == Service.Firewall
-                    && !(serviceProvider == Provider.VirtualRouter || serviceProvider == Provider.JuniperSRX || serviceProvider == Provider.CiscoVnmc || serviceProvider ==
-                    Provider.NuageVsp)) {
+            if (service == Service.Firewall && serviceProvider != Provider.VirtualRouter) {
                 continue;
             }
 

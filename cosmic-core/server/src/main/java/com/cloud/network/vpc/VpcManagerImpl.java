@@ -134,9 +134,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("VpcChecker"));
     private final List<Service> nonSupportedServices = Arrays.asList(Service.SecurityGroup, Service.Firewall);
-    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter,
-            Provider.NiciraNvp, Provider.InternalLbVm, Provider.JuniperContrailVpcRouter,
-            Provider.NuageVsp);
+    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp, Provider.InternalLbVm);
     @Inject
     EntityManager _entityMgr;
     @Inject
@@ -417,8 +415,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         // Just here for 4.1, replaced by commit 836ce6c1 in newer versions
         final Set<Network.Provider> sdnProviders = new HashSet<>();
         sdnProviders.add(Provider.NiciraNvp);
-        sdnProviders.add(Provider.JuniperContrailVpcRouter);
-        sdnProviders.add(Provider.NuageVsp);
 
         boolean firewallSvs = false;
         // populate the services first
