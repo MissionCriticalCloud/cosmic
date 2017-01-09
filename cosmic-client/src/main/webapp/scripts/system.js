@@ -7829,7 +7829,7 @@
                         name: 'label.nicira.nvp.details',
                         actions: {
                             'remove': {
-                                label: 'label.delete.NiciraNvp',
+                                label: 'label.delete.NiciaNvp',
                                 messages: {
                                     confirm: function (args) {
                                         return 'message.confirm.delete.NiciraNvp';
@@ -13830,7 +13830,6 @@
 
     cloudStack.actionFilter.physicalNetwork = function (args) {
         var state = args.context.item.state;
-
 
         if (state != 'Destroyed') {
             return ['remove'];
