@@ -829,7 +829,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();
         final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) vol.getDataStore();
         final String vmName = cmd.getVmName();
-        final String serial = disk.getDiskSeq() + "-" + resource.diskUuidToSerial(vol.getUuid());
+        final String serial = resource.diskUuidToSerial(vol.getUuid());
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(vmName);
 
