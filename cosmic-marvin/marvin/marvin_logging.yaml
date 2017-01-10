@@ -1,0 +1,44 @@
+---
+
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+      format: "[%(levelname)s] %(asctime)s - %(name)s - %(message)s"
+  full:
+      format: "[%(levelname)s] %(asctime)s - %(filename)s (line %(lineno)s) - %(message)s"
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: INFO
+        formatter: simple
+        stream: ext://sys.stdout
+    file_run_info:
+        class: logging.FileHandler
+        level: DEBUG
+        formatter: full
+        filename: runinfo.txt
+    file_failed_plus_exceptions:
+        class: logging.FileHandler
+        level: ERROR
+        formatter: full
+        filename: failed_plus_exceptions.txt
+
+loggers:
+  root:
+    level: DEBUG
+    handlers: [console, file_run_info]
+  marvin:
+    level: DEBUG
+    handlers: [console, file_run_info, file_failed_plus_exceptions]
+    propagate: yes
+  ssh:
+    level: DEBUG
+    handlers: [console, file_run_info]
+    propagate: yes
+  test:
+    level: DEBUG
+    handlers: [console, file_run_info]
+    propagate: yes
