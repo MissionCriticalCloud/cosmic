@@ -1,0 +1,16 @@
+# InteliJ
+/.idea/
+**/*.iml
+
+# Marvin Logs
+**/runinfo.txt
+**/failed_plus_exceptions.txt
+
+# Python binaries
+**/*.pyc
+
+/marvin/cloudstackAPI/
+/Marvin.egg-info/
+/dist/
+setuptools-22.0.0.zip
+nosetests.xml
