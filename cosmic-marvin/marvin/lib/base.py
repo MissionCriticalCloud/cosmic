@@ -4191,12 +4191,19 @@ class StaticRoute:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, apiclient, cidr, gatewayid):
+    def create(cls, apiclient, services, vpcid, cidr=None, nexthop=None):
         """Create static route"""
 
         cmd = createStaticRoute.createStaticRouteCmd()
-        cmd.cidr = cidr
-        cmd.gatewayid = gatewayid
+        if "cidr" in services:
+            cmd.cidr = services["cidr"]
+        elif cidr:
+            cmd.cidr = cidr
+        if "nexthop" in services:
+            cmd.nexthop = services["nexthop"]
+        elif nexthop:
+            cmd.nexthop = nexthop
+        cmd.vpcid = vpcid
         return StaticRoute(apiclient.createStaticRoute(cmd).__dict__)
 
     def delete(self, apiclient):
