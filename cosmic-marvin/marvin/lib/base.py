@@ -4112,21 +4112,15 @@ class PrivateGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, apiclient, gateway, ipaddress, netmask, vlan, vpcid,
-               physicalnetworkid=None, aclid=None, sourcenatsupported=None, networkofferingid=None):
+    def create(cls, apiclient, ipaddress, networkid, vpcid, sourcenatsupported=None, aclid=None):
         """Create private gateway"""
 
         cmd = createPrivateGateway.createPrivateGatewayCmd()
-        cmd.gateway = gateway
         cmd.ipaddress = ipaddress
-        cmd.netmask = netmask
-        cmd.vlan = vlan
+        cmd.networkid = networkid
         cmd.vpcid = vpcid
-        cmd.networkofferingid = networkofferingid
         if sourcenatsupported:
             cmd.sourcenatsupported = sourcenatsupported
-        if physicalnetworkid:
-            cmd.physicalnetworkid = physicalnetworkid
         if aclid:
             cmd.aclid = aclid
 
