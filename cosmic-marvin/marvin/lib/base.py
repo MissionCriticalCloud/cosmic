@@ -4092,11 +4092,12 @@ class VPC:
         cmd.id = self.id
         return apiclient.deleteVPC(cmd)
 
-    def restart(self, apiclient):
+    def restart(self, apiclient, cleanup=False):
         """Restarts the VPC connections"""
 
         cmd = restartVPC.restartVPCCmd()
         cmd.id = self.id
+        cmd.cleanup = cleanup
         return apiclient.restartVPC(cmd)
 
     @classmethod
