@@ -1048,7 +1048,7 @@
                                 }
                             },
                             staticRoutes: {
-                                title: 'label.static.routes',
+                                title: 'label.route.table',
                                 custom: function (args) {
                                     return $('<div>').multiEdit({
                                         noSelect: true,
