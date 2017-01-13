@@ -227,6 +227,9 @@ var addPrivateNetworkDialog = {
                         required: true
                     }
                 },
+                vlanId: {
+                    label: 'label.vlan',
+                },
                 zoneId: {
                     label: 'label.zone',
                     validation: {
@@ -385,6 +388,10 @@ var addPrivateNetworkDialog = {
             array1.push("&networkOfferingId=" + args.data.networkOfferingId);
             array1.push("&name=" + todb(args.data.name));
             array1.push("&displayText=" + todb(args.data.name));
+
+            if (($form.find('.form-item[rel=vlanId]').css("display") != "none")
+                && (args.data.vlanId != null && args.data.vlanId.length > 0))
+                array1.push("&vlan=" + todb(args.data.vlanId));
 
             if (args.data.ip4cidr != null && args.data.ip4cidr.length > 0)
                 array1.push("&cidr=" + args.data.ip4cidr);
