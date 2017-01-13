@@ -1,21 +1,20 @@
 package com.cloud.network.vpc;
 
 public class PrivateIpAddress implements PrivateIp {
-    String broadcastUri;
-    String gateway;
-    String netmask;
-    String ipAddress;
-    String macAddress;
-    long networkId;
-    boolean sourceNat;
+    private String broadcastUri;
+    private String gateway;
+    private String netmask;
+    private String ipAddress;
+    private String macAddress;
+    private long networkId;
+    private boolean sourceNat;
 
     /**
      * @param privateIp
      * @param broadcastUri
      * @param gateway
      * @param netmask
-     * @param macAddress        TODO
-     * @param physicalNetworkId TODO
+     * @param macAddress
      */
     public PrivateIpAddress(final PrivateIpVO privateIp, final String broadcastUri, final String gateway, final String netmask, final String macAddress) {
         super();

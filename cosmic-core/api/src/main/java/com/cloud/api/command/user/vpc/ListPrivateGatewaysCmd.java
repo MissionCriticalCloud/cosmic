@@ -27,16 +27,16 @@ public class ListPrivateGatewaysCmd extends BaseListProjectAndAccountResourcesCm
     /////////////////////////////////////////////////////
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
-    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = PrivateGatewayResponse.class, description = "list private gateway by id")
+    @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = PrivateGatewayResponse.class, description = "list private gateway by IP")
     private Long id;
 
-    @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "list gateways by ip address")
+    @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "list gateways by IP address")
     private String ipAddress;
 
-    @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "list gateways by vlan")
-    private String vlan;
+    @Parameter(name = ApiConstants.NETWORK_ID, type = CommandType.STRING, description = "list gateways by network ID")
+    private String networkId;
 
-    @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, description = "list gateways by vpc")
+    @Parameter(name = ApiConstants.VPC_ID, type = CommandType.UUID, entityType = VpcResponse.class, description = "list gateways by VPC")
     private Long vpcId;
 
     @Parameter(name = ApiConstants.STATE, type = CommandType.STRING, description = "list gateways by state")
@@ -46,8 +46,8 @@ public class ListPrivateGatewaysCmd extends BaseListProjectAndAccountResourcesCm
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
-    public String getVlan() {
-        return vlan;
+    public String getNetworkId() {
+        return networkId;
     }
 
     public String getIpAddress() {

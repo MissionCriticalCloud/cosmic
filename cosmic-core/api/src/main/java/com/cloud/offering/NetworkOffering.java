@@ -15,7 +15,7 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
     public final static String SystemControlNetwork = "System-Control-Network";
     public final static String SystemManagementNetwork = "System-Management-Network";
     public final static String SystemStorageNetwork = "System-Storage-Network";
-    public final static String SystemPrivateGatewayNetworkOffering = "System-Private-Gateway-Network-Offering";
+    public final static String DefaultPrivateGatewayNetworkOffering = "DefaultPrivateGatewayNetworkOffering";
     public final static String DefaultSharedNetworkOfferingWithSGService = "DefaultSharedNetworkOfferingWithSGService";
     public final static String DefaultIsolatedNetworkOfferingWithSourceNatService = "DefaultIsolatedNetworkOfferingWithSourceNatService";
     public final static String DefaultSharedNetworkOffering = "DefaultSharedNetworkOffering";

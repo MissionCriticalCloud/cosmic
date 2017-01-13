@@ -12,8 +12,7 @@ import subprocess
 from netaddr import *
 from subprocess import check_output
 
-PUBLIC_INTERFACES = { "router": "eth2", "vpcrouter": "eth1" }
-
+# @TODO fix hardcoded eth1 public interface -- is OK for now since it's for redundant VPCs and these have always a public interface. Although that is still an assumption and may not be true anymore some day
 STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
                    "vpcrouter": "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'" }
 
@@ -27,14 +26,15 @@ def reconfigure_interfaces(router_config, interfaces):
                 # If redundant only bring up public interfaces that are not eth1.
                 # Reason: private gateways are public interfaces.
                 # master.py and keepalived will deal with eth1 public interface.
-
-                if router_config.is_redundant() and interface.is_public():
+                if router_config.is_redundant() and interface.is_privategateway():
                     state_cmd = STATE_COMMANDS[router_config.get_type()]
                     logging.info("Check state command => %s" % state_cmd)
                     state = execute(state_cmd)[0]
-                    logging.info("Route state => %s" % state)
-                    if interface.get_device() != PUBLIC_INTERFACES[router_config.get_type()] and state == "MASTER":
+                    logging.info("Router state => %s" % state)
+                    if state == "MASTER":
                         execute(cmd)
+                elif router_config.is_redundant() and interface.is_public():
+                    pass
                 else:
                     execute(cmd)
 

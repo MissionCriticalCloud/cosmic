@@ -33,21 +33,6 @@ public interface VpcGateway extends Identity, ControlledEntity, InternalIdentity
     /**
      * @return
      */
-    String getGateway();
-
-    /**
-     * @return
-     */
-    String getNetmask();
-
-    /**
-     * @return
-     */
-    String getBroadcastUri();
-
-    /**
-     * @return
-     */
     State getState();
 
     /**
@@ -60,11 +45,11 @@ public interface VpcGateway extends Identity, ControlledEntity, InternalIdentity
      */
     long getNetworkACLId();
 
-    public enum Type {
-        Private, Public, Vpn
+    enum Type {
+        Private
     }
 
-    public enum State {
+    enum State {
         Creating, Ready, Deleting
     }
 }

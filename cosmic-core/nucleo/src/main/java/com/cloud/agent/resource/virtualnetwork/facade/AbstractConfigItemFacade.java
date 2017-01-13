@@ -20,6 +20,7 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
+import com.cloud.agent.api.routing.SetupPrivateGatewayCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
 import com.cloud.agent.api.routing.VmDataCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
@@ -73,6 +74,7 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
         flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem());
         flyweight.put(SetupGuestNetworkCommand.class, new SetGuestNetworkConfigItem());
+        flyweight.put(SetupPrivateGatewayCommand.class, new SetPrivateGatewayConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
         flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());
         flyweight.put(IpAssocCommand.class, new IpAssociationConfigItem());

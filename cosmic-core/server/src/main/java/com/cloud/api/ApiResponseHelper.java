@@ -2336,9 +2336,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ProviderResponse> serviceProvidersResponses = new ArrayList<>();
         for (final Network.Provider serviceProvider : serviceProviders) {
             // return only Virtual Router/JuniperSRX/CiscoVnmc as a provider for the firewall
-            if (service == Service.Firewall
-                    && !(serviceProvider == Provider.VirtualRouter || serviceProvider == Provider.JuniperSRX || serviceProvider == Provider.CiscoVnmc || serviceProvider ==
-                    Provider.NuageVsp)) {
+            if (service == Service.Firewall && serviceProvider != Provider.VirtualRouter) {
                 continue;
             }
 
@@ -2670,9 +2668,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     public PrivateGatewayResponse createPrivateGatewayResponse(final PrivateGateway result) {
         final PrivateGatewayResponse response = new PrivateGatewayResponse();
         response.setId(result.getUuid());
-        response.setBroadcastUri(result.getBroadcastUri());
-        response.setGateway(result.getGateway());
-        response.setNetmask(result.getNetmask());
         if (result.getVpcId() != null) {
             final Vpc vpc = ApiDBUtils.findVpcById(result.getVpcId());
             response.setVpcId(vpc.getUuid());
@@ -2684,10 +2679,11 @@ public class ApiResponseHelper implements ResponseGenerator {
             response.setZoneName(zone.getName());
         }
         response.setAddress(result.getIp4Address());
-        final PhysicalNetwork pnet = ApiDBUtils.findPhysicalNetworkById(result.getPhysicalNetworkId());
-        if (pnet != null) {
-            response.setPhysicalNetworkId(pnet.getUuid());
-        }
+
+        final Network network = ApiDBUtils.findNetworkById(result.getNetworkId());
+        response.setNetworkId(network.getUuid());
+        response.setNetworkName(network.getName());
+        response.setCidr(network.getCidr());
 
         populateAccount(response, result.getAccountId());
         populateDomain(response, result.getDomainId());

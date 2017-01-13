@@ -98,7 +98,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
     boolean isStrechedL2Network();
 
     enum GuestType {
-        Shared, Isolated
+        Shared, Isolated, Private
     }
 
     enum Event {
@@ -206,9 +206,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
         private static final List<Provider> supportedProviders = new ArrayList<>();
 
         public static final Provider VirtualRouter = new Provider("VirtualRouter", false, false);
-        public static final Provider JuniperContrailRouter = new Provider("JuniperContrailRouter", false);
-        public static final Provider JuniperContrailVpcRouter = new Provider("JuniperContrailVpcRouter", false);
-        public static final Provider JuniperSRX = new Provider("JuniperSRX", true);
         public static final Provider ExternalDhcpServer = new Provider("ExternalDhcpServer", true);
         public static final Provider ExternalGateWay = new Provider("ExternalGateWay", true);
         public static final Provider ElasticLoadBalancerVm = new Provider("ElasticLoadBalancerVm", false);
@@ -218,9 +215,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
         // NiciraNvp is not an "External" provider, otherwise we get in trouble with NetworkServiceImpl.providersConfiguredForExternalNetworking
         public static final Provider NiciraNvp = new Provider("NiciraNvp", false);
         public static final Provider InternalLbVm = new Provider("InternalLbVm", false);
-        public static final Provider CiscoVnmc = new Provider("CiscoVnmc", true);
-        // add Nuage Vsp Providers
-        public static final Provider NuageVsp = new Provider("NuageVsp", false);
         private final String name;
         private final boolean isExternal;
 

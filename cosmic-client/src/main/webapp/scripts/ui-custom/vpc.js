@@ -500,7 +500,7 @@
                 })
             });
 
-            if (!isAdmin()) $router.addClass('disabled');
+            if (!isAdmin() && !isDomainAdmin()) $router.addClass('disabled');
 
             var $chart = $('<div>').addClass('vpc-chart');
             var $title = $('<div>').addClass('vpc-title')

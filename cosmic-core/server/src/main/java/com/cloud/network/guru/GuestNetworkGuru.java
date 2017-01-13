@@ -163,7 +163,8 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), State.Allocated, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         if (userSpecified != null) {
-            if (userSpecified.getCidr() == null && userSpecified.getGateway() != null || userSpecified.getCidr() != null && userSpecified.getGateway() == null) {
+            if (!Network.GuestType.Private.equals(offering.getGuestType()) &&
+                    ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null))) {
                 throw new InvalidParameterValueException("cidr and gateway must be specified together.");
             }
 

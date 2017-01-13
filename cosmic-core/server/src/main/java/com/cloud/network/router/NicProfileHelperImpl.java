@@ -17,7 +17,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.ejb.Local;
 import javax.inject.Inject;
@@ -34,8 +33,6 @@ public class NicProfileHelperImpl implements NicProfileHelper {
     protected NicDao _nicDao;
     @Inject
     protected IpAddressManager _ipAddrMgr;
-    @Inject
-    private VMInstanceDao _vmDao;
     @Inject
     private PrivateIpDao _privateIpDao;
 

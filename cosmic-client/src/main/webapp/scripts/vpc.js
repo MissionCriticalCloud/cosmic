@@ -1864,45 +1864,19 @@
                     title: 'label.add.new.gateway',
                     desc: 'message.add.new.gateway.to.vpc',
                     fields: {
-                        physicalnetworkid: {
-                            docID: 'helpVPCGatewayPhysicalNetwork',
-                            label: 'label.physical.network',
+                        networkid: {
+                            docID: 'helpPrivateGatewayNetwork',
+                            label: 'label.network.name',
                             select: function (args) {
                                 $.ajax({
-                                    url: createURL("listPhysicalNetworks"),
-                                    data: {
-                                        zoneid: args.context.vpc[0].zoneid
-                                    },
-                                    success: function (json) {
-                                        var objs = json.listphysicalnetworksresponse.physicalnetwork;
-                                        var items = [];
-                                        $(objs).each(function () {
-                                            items.push({
-                                                id: this.id,
-                                                description: this.name
-                                            });
-                                        });
-                                        args.response.success({
-                                            data: items
-                                        });
-                                    }
-                                });
-                            }
-                        },
-                        networkofferingid: {
-                            docID: 'helpGuestNetworkNetworkOffering',
-                            label: 'label.network.offering',
-                            select: function (args) {
-                                $.ajax({
-                                    url: createURL("listNetworkOfferings"),
+                                    url: createURL("listNetworks"),
                                     data: {
                                         zoneid: args.context.vpc[0].zoneid,
                                         traffictype: "Guest",
-                                        specifyvlan: "true",
-                                        keyword: "private"
+                                        type: "private"
                                     },
                                     success: function (json) {
-                                        var objs = json.listnetworkofferingsresponse.networkoffering;
+                                        var objs = json.listnetworksresponse.network;
                                         var items = [];
                                         $(objs).each(function () {
                                             items.push({
@@ -1916,13 +1890,6 @@
                                     }
                                 });
                             }
-                        },
-                        vlan: {
-                            label: 'label.vlan',
-                            validation: {
-                                required: true
-                            },
-                            docID: 'helpVPCGatewayVLAN'
                         },
                         ipaddress: {
                             label: 'label.ip.address',
@@ -1930,20 +1897,6 @@
                                 required: true
                             },
                             docID: 'helpVPCGatewayIP'
-                        },
-                        gateway: {
-                            label: 'label.gateway',
-                            validation: {
-                                required: true
-                            },
-                            docID: 'helpVPCGatewayGateway'
-                        },
-                        netmask: {
-                            label: 'label.netmask',
-                            validation: {
-                                required: true
-                            },
-                            docID: 'helpVPCGatewayNetmask'
                         },
                         sourceNat: {
                             label: 'label.source.nat',
@@ -1997,13 +1950,9 @@
                     $.ajax({
                         url: createURL('createPrivateGateway' + array1.join("")),
                         data: {
-                            physicalnetworkid: args.data.physicalnetworkid,
-                            networkofferingid: args.data.networkofferingid,
+                            networkid: args.data.networkid,
                             vpcid: args.context.vpc[0].id,
                             ipaddress: args.data.ipaddress,
-                            gateway: args.data.gateway,
-                            netmask: args.data.netmask,
-                            vlan: args.data.vlan,
                             aclid: args.data.aclid
 
                         },
@@ -2032,89 +1981,87 @@
                     listView: {
                         id: 'vpcGateways',
                         fields: {
+                            networkname: {
+                                label: 'label.network.name',
+                                validation: {
+                                    required: true
+                                }
+                            },
+                            cidr: {
+                                label: 'label.cidr',
+                                validation: {
+                                    required: true
+                                }
+                            },
                             ipaddress: {
                                 label: 'label.ip.address',
                                 validation: {
                                     required: true
                                 }
                             },
-                            gateway: {
-                                label: 'label.gateway',
-                                validation: {
-                                    required: true
-                                }
-                            },
-                            netmask: {
-                                label: 'label.netmask',
-                                validation: {
-                                    required: true
-                                }
-                            },
-                            vlan: {
-                                label: 'label.vlan',
-                                validation: {
-                                    required: true
+                            state: {
+                                label: 'label.status',
+                                indicator: {
+                                    'Ready': 'on',
+                                    'Creating': 'on',
+                                    'Deleting': 'off'
                                 }
                             }
                         },
 
                         actions: {
                             add: {
-                                label: 'label.add.private.gateway',
-                                preFilter: function (args) {
-                                    if (isAdmin() || isDomainAdmin())
-                                        return true;
-                                    else
-                                        return false;
+                                preCheck: function (args) {
+                                    if (isAdmin() || isDomainAdmin()) { //root or domain-admin
+                                        var items;
+                                        $.ajax({
+                                            url: createURL('listPrivateGateways'),
+                                            async: false,
+                                            data: {
+                                                vpcid: args.context.vpc[0].id,
+                                                listAll: true
+                                            },
+                                            success: function (json) {
+                                                items = json.listprivategatewaysresponse.privategateway;
+                                            }
+                                        });
+                                        if (items && items.length) {
+                                            return true; //show private gateway listView
+                                        } else {
+                                            return false; //show create private gateway dialog
+                                        }
+                                    } else { //regular-user, domain-admin
+                                        return true; //show private gateway listView instead of create private gateway dialog because only root-admin is allowed to create private gateway
+                                    }
+                                },
+                                label: 'label.add.new.gateway',
+                                messages: {
+                                    notification: function (args) {
+                                        return 'label.add.new.gateway';
+                                    }
                                 },
                                 createForm: {
                                     title: 'label.add.new.gateway',
                                     desc: 'message.add.new.gateway.to.vpc',
                                     fields: {
-                                        physicalnetworkid: {
-                                            docID: 'helpVPCGatewayPhysicalNetwork',
-                                            label: 'label.physical.network',
+                                        networkid: {
+                                            docID: 'helpPrivateGatewayNetwork',
+                                            label: 'label.network.name',
                                             select: function (args) {
                                                 $.ajax({
-                                                    url: createURL("listPhysicalNetworks"),
-                                                    data: {
-                                                        zoneid: args.context.vpc[0].zoneid
-                                                    },
-                                                    success: function (json) {
-                                                        var objs = json.listphysicalnetworksresponse.physicalnetwork;
-                                                        var items = [];
-                                                        $(objs).each(function () {
-                                                            items.push({
-                                                                id: this.id,
-                                                                description: this.name
-                                                            });
-                                                        });
-                                                        args.response.success({
-                                                            data: items
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        },
-                                        networkofferingid: {
-                                            docID: 'helpGuestNetworkNetworkOffering',
-                                            label: 'label.network.offering',
-                                            select: function (args) {
-                                                $.ajax({
-                                                    url: createURL("listNetworkOfferings"),
+                                                    url: createURL("listNetworks"),
                                                     data: {
                                                         zoneid: args.context.vpc[0].zoneid,
                                                         traffictype: "Guest",
-                                                        specifyvlan: "true",
-                                                        keyword: "private"
+                                                        type: "private"
                                                     },
                                                     success: function (json) {
-                                                        var objs = json.listnetworkofferingsresponse.networkoffering;
+                                                        var objs = json.listnetworksresponse.network;
                                                         var items = [];
                                                         $(objs).each(function () {
                                                             items.push({
                                                                 id: this.id,
-                                                                description: this.name
+                                                                description: this.name + " (" + this.cidr + ")"
                                                             });
                                                         });
                                                         args.response.success({
@@ -2123,13 +2070,6 @@
                                                     }
                                                 });
                                             }
-                                        },
-                                        vlan: {
-                                            label: 'label.vlan',
-                                            validation: {
-                                                required: true
-                                            },
-                                            docID: 'helpVPCGatewayVLAN'
                                         },
                                         ipaddress: {
                                             label: 'label.ip.address',
@@ -2138,21 +2078,6 @@
                                             },
                                             docID: 'helpVPCGatewayIP'
                                         },
-                                        gateway: {
-                                            label: 'label.gateway',
-                                            validation: {
-                                                required: true
-                                            },
-                                            docID: 'helpVPCGatewayGateway'
-                                        },
-                                        netmask: {
-                                            label: 'label.netmask',
-                                            validation: {
-                                                required: true
-                                            },
-                                            docID: 'helpVPCGatewayNetmask'
-                                        },
-
                                         sourceNat: {
                                             label: 'label.source.nat',
                                             isBoolean: true,
@@ -2165,9 +2090,8 @@
                                             select: function (args) {
                                                 $.ajax({
                                                     url: createURL('listNetworkACLLists'),
-                                                    data: {
-                                                        vpcid: args.context.vpc[0].id
-                                                    },
+                                                    dataType: 'json',
+                                                    async: true,
                                                     success: function (json) {
                                                         var objs = json.listnetworkacllistsresponse.networkacllist;
                                                         var items = [];
@@ -2193,12 +2117,9 @@
 
                                             }
                                         }
-
                                     }
-
                                 },
                                 action: function (args) {
-
                                     var array1 = [];
                                     if (args.$form.find('.form-item[rel=sourceNat]').find('input[type=checkbox]').is(':Checked') == true) {
                                         array1.push("&sourcenatsupported=true");
@@ -2209,13 +2130,9 @@
                                     $.ajax({
                                         url: createURL('createPrivateGateway' + array1.join("")),
                                         data: {
-                                            physicalnetworkid: args.data.physicalnetworkid,
-                                            networkofferingid: args.data.networkofferingid,
+                                            networkid: args.data.networkid,
                                             vpcid: args.context.vpc[0].id,
                                             ipaddress: args.data.ipaddress,
-                                            gateway: args.data.gateway,
-                                            netmask: args.data.netmask,
-                                            vlan: args.data.vlan,
                                             aclid: args.data.aclid
 
                                         },
@@ -2235,12 +2152,9 @@
                                         }
                                     });
                                 },
-
                                 notification: {
                                     poll: pollAsyncJobResult
                                 }
-
-
                             }
                         },
 
@@ -2381,33 +2295,18 @@
                                 details: {
                                     title: 'label.details',
                                     fields: [{
-                                        ipaddress: {
-                                            label: 'label.ip.address'
+                                        networkname: {
+                                            label: 'label.network.name'
                                         }
                                     }, {
-                                        gateway: {
-                                            label: 'label.gateway'
+                                        ipaddress: {
+                                            label: 'label.ip.address'
                                         },
-                                        netmask: {
-                                            label: 'label.netmask'
-                                        },
-                                        vlan: {
-                                            label: 'label.vlan'
+                                        cidr: {
+                                            label: 'label.cidr'
                                         },
                                         state: {
                                             label: 'label.state'
-                                        },
-                                        id: {
-                                            label: 'label.id'
-                                        },
-                                        zonename: {
-                                            label: 'label.zone'
-                                        },
-                                        domain: {
-                                            label: 'label.domain'
-                                        },
-                                        account: {
-                                            label: 'label.account'
                                         },
                                         sourcenatsupported: {
                                             label: 'label.source.nat.supported',
@@ -2420,8 +2319,19 @@
                                         },
                                         aclid: {
                                             label: 'label.acl.id'
+                                        },
+                                        id: {
+                                            label: 'label.id'
+                                        },
+                                        zonename: {
+                                            label: 'label.zone'
+                                        },
+                                        domain: {
+                                            label: 'label.domain'
+                                        },
+                                        account: {
+                                            label: 'label.account'
                                         }
-
 
                                     }],
                                     dataProvider: function (args) {
@@ -2468,102 +2378,6 @@
                                         });
                                     }
                                 },
-                                staticRoutes: {
-                                    title: 'label.static.routes',
-                                    custom: function (args) {
-                                        return $('<div>').multiEdit({
-                                            noSelect: true,
-                                            context: args.context,
-                                            fields: {
-                                                cidr: {
-                                                    edit: true,
-                                                    label: 'label.CIDR.of.destination.network'
-                                                },
-                                                'add-rule': {
-                                                    label: 'label.add.route',
-                                                    addButton: true
-                                                }
-                                            },
-
-                                            tags: cloudStack.api.tags({
-                                                resourceType: 'StaticRoute',
-                                                contextId: 'multiRule'
-                                            }),
-
-                                            add: {
-                                                label: 'label.add',
-                                                action: function (args) {
-                                                    $.ajax({
-                                                        url: createURL('createStaticRoute'),
-                                                        data: {
-                                                            vpcid: args.context.vpc[0].id,
-                                                            cidr: args.data.cidr,
-                                                            nexthop: args.context.vpcGateways[0].gateway
-                                                        },
-                                                        success: function (data) {
-                                                            args.response.success({
-                                                                _custom: {
-                                                                    jobId: data.createstaticrouteresponse.jobid
-                                                                },
-                                                                notification: {
-                                                                    label: 'label.add.static.route',
-                                                                    poll: pollAsyncJobResult
-                                                                }
-                                                            });
-                                                        },
-                                                        error: function (data) {
-                                                            args.response.error(parseXMLHttpResponse(data));
-                                                        }
-                                                    });
-                                                }
-                                            },
-                                            actions: {
-                                                destroy: {
-                                                    label: 'label.remove.static.route',
-                                                    action: function (args) {
-                                                        $.ajax({
-                                                            url: createURL('deleteStaticRoute'),
-                                                            data: {
-                                                                id: args.context.multiRule[0].id
-                                                            },
-                                                            dataType: 'json',
-                                                            async: true,
-                                                            success: function (data) {
-                                                                var jobID = data.deletestaticrouteresponse.jobid;
-
-                                                                args.response.success({
-                                                                    _custom: {
-                                                                        jobId: jobID
-                                                                    },
-                                                                    notification: {
-                                                                        label: 'label.remove.static.route',
-                                                                        poll: pollAsyncJobResult
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            },
-                                            dataProvider: function (args) {
-                                                $.ajax({
-                                                    url: createURL('listStaticRoutes'),
-                                                    data: {
-                                                        gatewayid: args.context.vpcGateways[0].id,
-                                                        vpcid: args.context.vpc[0].id,
-                                                        listAll: true
-                                                    },
-                                                    success: function (json) {
-                                                        var items = json.liststaticroutesresponse.staticroute;
-                                                        args.response.success({
-                                                            data: items
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                }
                             }
                         }
                     }

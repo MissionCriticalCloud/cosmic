@@ -62,13 +62,16 @@ public class CreateNetworkCmd extends BaseCmd {
             description = "the physical network ID the network belongs to")
     private Long physicalNetworkId;
 
-    @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, description = "the gateway of the network. Required "
+    @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, description = "the gateway of the network. "
             + "for shared networks and isolated networks when it belongs to VPC")
     private String gateway;
 
-    @Parameter(name = ApiConstants.NETMASK, type = CommandType.STRING, description = "the netmask of the network. Required "
+    @Parameter(name = ApiConstants.NETMASK, type = CommandType.STRING, description = "the netmask of the network. "
             + "for shared networks and isolated networks when it belongs to VPC")
     private String netmask;
+
+    @Parameter(name = ApiConstants.CIDR, type = CommandType.STRING, description = "the CIDR of the network.")
+    private String cidr;
 
     @Parameter(name = ApiConstants.START_IP, type = CommandType.STRING, description = "the beginning IP address in the network IP range")
     private String startIp;
@@ -136,6 +139,10 @@ public class CreateNetworkCmd extends BaseCmd {
 
     public String getGateway() {
         return gateway;
+    }
+
+    public String getCidr() {
+        return cidr;
     }
 
     public String getIsolatedPvlan() {

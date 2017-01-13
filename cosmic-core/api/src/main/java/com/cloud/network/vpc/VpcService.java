@@ -129,23 +129,20 @@ public interface VpcService {
     /**
      * Persists VPC private gateway in the Database.
      *
-     * @param vpcId             TODO
-     * @param physicalNetworkId
-     * @param vlan
+     * @param vpcId
      * @param ipAddress
      * @param gateway
      * @param netmask
-     * @param gatewayOwnerId
-     * @param networkOfferingId
-     * @param isSourceNat
+     * @param gatewayDomainId
+     * @param networkId
      * @param aclId
      * @return
      * @throws InsufficientCapacityException
      * @throws ConcurrentOperationException
      * @throws ResourceAllocationException
      */
-    public PrivateGateway createVpcPrivateGateway(long vpcId, Long physicalNetworkId, String vlan, String ipAddress, String gateway, String netmask, long gatewayOwnerId,
-                                                  Long networkOfferingId, Boolean isSoruceNat, Long aclId) throws ResourceAllocationException, ConcurrentOperationException,
+    public PrivateGateway createVpcPrivateGateway(long vpcId, String ipAddress, String gateway, String netmask, long gatewayDomainId,
+                                                  Long networkId, Boolean isSourceNat, Long aclId) throws ResourceAllocationException, ConcurrentOperationException,
             InsufficientCapacityException;
 
     /**

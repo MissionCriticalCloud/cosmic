@@ -392,6 +392,14 @@ cloudStack.docs = {
         desc: 'The name of the zone this network applies to. The administrator must configure the IP range for the guest networks in each zone.',
         externalLink: ''
     },
+    helpPrivateNetworkZone: {
+        desc: 'The name of the zone this private network will be created in.',
+        externalLink: ''
+    },
+    helpPrivateNetworkCidr: {
+        desc: 'The CIDR that this private network will use.',
+        externalLink: ''
+    },
     helpGuestNetworkNetworkOffering: {
         desc: 'If the administrator has configured multiple network offerings, select the one you want to use for this network',
         externalLink: ''
@@ -423,6 +431,14 @@ cloudStack.docs = {
     },
     helpGuestNetworkZoneNetworkOffering: {
         desc: 'If the administrator has configured multiple network offerings, select the one you want to use for this network',
+        externalLink: ''
+    },
+    helpPrivateNetworkOffering: {
+        desc: 'Select the network offering for your new private network.',
+        externalLink: ''
+    },
+    helpPrivateNetworkName: {
+        desc: 'The name of the private network.',
         externalLink: ''
     },
     helpGuestNetworkZoneGateway: {
@@ -1185,5 +1201,8 @@ cloudStack.docs = {
     },
     helpLdapLinkDomainAdmin: {
         desc: 'domain admin of the linked domain. Specify a username in GROUP/OU of LDAP'
+    },
+    helpPrivateGatewayNetwork: {
+        desc: 'The private network the private gateway should be plugged in'
     }
 };

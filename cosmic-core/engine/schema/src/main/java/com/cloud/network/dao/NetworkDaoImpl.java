@@ -55,8 +55,8 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     GenericSearchBuilder<NetworkVO, Long> CountByZoneAndURI;
     GenericSearchBuilder<NetworkVO, Long> VpcNetworksCount;
     SearchBuilder<NetworkVO> OfferingAccountNetworkSearch;
-
     GenericSearchBuilder<NetworkVO, Long> GarbageCollectedSearch;
+    SearchBuilder<NetworkVO> IdAndDomainSearch;
 
     @Inject
     ResourceTagDao _tagsDao;
@@ -233,6 +233,11 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         join8.and("isPersistent", join8.entity().getIsPersistent(), Op.EQ);
         GarbageCollectedSearch.join("ntwkOffGC", join8, GarbageCollectedSearch.entity().getNetworkOfferingId(), join8.entity().getId(), JoinBuilder.JoinType.INNER);
         GarbageCollectedSearch.done();
+
+        IdAndDomainSearch = createSearchBuilder();
+        IdAndDomainSearch.and("id", IdAndDomainSearch.entity().getId(), Op.EQ);
+        IdAndDomainSearch.and("domainId", IdAndDomainSearch.entity().getDomainId(), Op.EQ);
+        IdAndDomainSearch.done();
     }
 
     public List<NetworkVO> findBy(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastType, final long networkOfferingId, final long dataCenterId) {
@@ -564,7 +569,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     @Override
     public NetworkVO getPrivateNetwork(final String broadcastUri, final String cidr, final long accountId, final long zoneId, Long networkOfferingId) {
         if (networkOfferingId == null) {
-            networkOfferingId = _ntwkOffDao.findByUniqueName(NetworkOffering.SystemPrivateGatewayNetworkOffering).getId();
+            networkOfferingId = _ntwkOffDao.findByUniqueName(NetworkOffering.DefaultPrivateGatewayNetworkOffering).getId();
         }
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("datacenter", zoneId);
@@ -572,6 +577,14 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         sc.setParameters("cidr", cidr);
         sc.setParameters("account", accountId);
         sc.setParameters("offering", networkOfferingId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public NetworkVO findByIdAndDomainId(final Long networkId, final long domainId) {
+        final SearchCriteria<NetworkVO> sc = IdAndDomainSearch.create();
+        sc.setParameters("id", networkId);
+        sc.setParameters("domainId", domainId);
         return findOneBy(sc);
     }
 

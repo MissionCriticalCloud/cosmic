@@ -587,13 +587,6 @@
                                             required: true
                                         }
                                     },
-                                    displaytext: {
-                                        label: 'label.description',
-                                        docID: 'helpVPCDescription',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
                                     zoneid: {
                                         label: 'label.zone',
                                         docID: 'helpVPCZone',
@@ -669,7 +662,7 @@
                                 var vpcOfferingName = args.data.vpcoffering
                                 var dataObj = {
                                     name: args.data.name,
-                                    displaytext: args.data.displaytext,
+                                    displaytext: args.data.name,
                                     zoneid: args.data.zoneid,
                                     cidr: args.data.cidr,
                                     vpcofferingid: args.data.vpcoffering
@@ -707,6 +700,9 @@
                             }
 
                         },
+                        domainAdminAddPrivateNetwork: $.extend({}, addPrivateNetworkDialog.def, {
+                            isHeader: true
+                        }),
                         configureVpc: {
                             label: 'label.configure.vpc',
                             textLabel: 'label.configure',
@@ -884,9 +880,7 @@
 
                         tabFilter: function (args) {
                             var hiddenTabs = [];
-                            var isRouterOwner = isAdmin();
-                            if (!isRouterOwner)
-                                hiddenTabs.push("router");
+                            if (!isAdmin() && !isDomainAdmin()) hiddenTabs.push("router");
                             return hiddenTabs;
                         },
 
@@ -1054,7 +1048,7 @@
                                 }
                             },
                             staticRoutes: {
-                                title: 'label.static.routes',
+                                title: 'label.route.table',
                                 custom: function (args) {
                                     return $('<div>').multiEdit({
                                         noSelect: true,
@@ -1159,7 +1153,7 @@
             networks: {
                 id: 'networks',
                 type: 'select',
-                title: 'label.guest.networks',
+                title: 'label.networks.long',
                 listView: {
                     actions: {
                         add: {
@@ -1502,7 +1496,7 @@
                             }
                         },
 
-                        rootAdminAddGuestNetwork: $.extend({}, addGuestNetworkDialog.def, {
+                        domainAdminAddPrivateNetwork: $.extend({}, addPrivateNetworkDialog.def, {
                             isHeader: true
                         })
 
@@ -1521,8 +1515,8 @@
                         cidr: {
                             label: 'label.cidr'
                         },
-                        ip6cidr: {
-                            label: 'label.ipv6.CIDR'
+                        broadcasturi: {
+                            label: 'label.vlan'
                         }
                     },
 

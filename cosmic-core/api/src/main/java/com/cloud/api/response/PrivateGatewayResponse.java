@@ -3,6 +3,7 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.network.Network;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.serializer.Param;
 
@@ -14,14 +15,6 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
     @SerializedName(ApiConstants.ID)
     @Param(description = "the id of the private gateway")
     private String id;
-
-    @SerializedName(ApiConstants.GATEWAY)
-    @Param(description = "the gateway")
-    private String gateway;
-
-    @SerializedName(ApiConstants.NETMASK)
-    @Param(description = "the private gateway's netmask")
-    private String netmask;
 
     @SerializedName(ApiConstants.IP_ADDRESS)
     @Param(description = "the private gateway's ip address")
@@ -43,9 +36,17 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
     @Param(description = "VPC the private gateaway belongs to")
     private String vpcId;
 
-    @SerializedName(ApiConstants.PHYSICAL_NETWORK_ID)
-    @Param(description = "the physical network id")
-    private String physicalNetworkId;
+    @SerializedName(ApiConstants.NETWORK_ID)
+    @Param(description = "the network id")
+    private String networkId;
+
+    @SerializedName(ApiConstants.NETWORK_NAME)
+    @Param(description = "the network name")
+    private String networkName;
+
+    @SerializedName(ApiConstants.CIDR)
+    @Param(description = "the CIDR of the private network")
+    private String cidr;
 
     @SerializedName(ApiConstants.ACCOUNT)
     @Param(description = "the account associated with the private gateway")
@@ -88,14 +89,6 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
         this.id = id;
     }
 
-    public void setGateway(final String gateway) {
-        this.gateway = gateway;
-    }
-
-    public void setNetmask(final String netmask) {
-        this.netmask = netmask;
-    }
-
     public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
@@ -112,12 +105,20 @@ public class PrivateGatewayResponse extends BaseResponse implements ControlledEn
         this.vpcId = vpcId;
     }
 
-    public void setAddress(final String address) {
-        this.address = address;
+    public void setNetworkId(final String networkId) {
+        this.networkId = networkId;
     }
 
-    public void setPhysicalNetworkId(final String physicalNetworkId) {
-        this.physicalNetworkId = physicalNetworkId;
+    public void setNetworkName(final String networkName) {
+        this.networkName = networkName;
+    }
+
+    public void setCidr(final String cidr) {
+        this.cidr = cidr;
+    }
+
+    public void setAddress(final String address) {
+        this.address = address;
     }
 
     @Override

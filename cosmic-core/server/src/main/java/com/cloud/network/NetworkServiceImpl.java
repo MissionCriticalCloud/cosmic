@@ -695,6 +695,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
             throw ex;
         }
+
+        if (GuestType.Private.equals(ntwkOff.getGuestType()) && (startIP != null || endIP != null || vpcId != null || gateway != null || netmask != null)) {
+            throw new InvalidParameterValueException("StartIp/endIp/vpcId/gateway/netmask can't be specified for guest type " + GuestType.Private);
+        }
+
         // validate physical network and zone
         // Check if physical network exists
         PhysicalNetwork pNtwk = null;
@@ -736,9 +741,9 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 throw new InvalidParameterValueException("Incorrect aclType specified. Check the API documentation for supported types");
             }
             // In 3.0 all Shared networks should have aclType == Domain, all Isolated networks aclType==Account
-            if (ntwkOff.getGuestType() == GuestType.Isolated) {
+            if (ntwkOff.getGuestType() != GuestType.Shared) {
                 if (aclType != ACLType.Account) {
-                    throw new InvalidParameterValueException("AclType should be " + ACLType.Account + " for network of type " + Network.GuestType.Isolated);
+                    throw new InvalidParameterValueException("AclType should be " + ACLType.Account + " for network of type " + ntwkOff.getGuestType());
                 }
             } else if (ntwkOff.getGuestType() == GuestType.Shared) {
                 if (!(aclType == ACLType.Domain || aclType == ACLType.Account)) {
@@ -746,11 +751,9 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 }
             }
         } else {
-            if (ntwkOff.getGuestType() == GuestType.Isolated) {
-                aclType = ACLType.Account;
-            } else if (ntwkOff.getGuestType() == GuestType.Shared) {
-                aclType = ACLType.Domain;
-            }
+            aclType = (ntwkOff.getGuestType() == GuestType.Shared)
+                    ? ACLType.Domain
+                    : ACLType.Account;
         }
 
         // Only Admin can create Shared networks
@@ -817,7 +820,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
 
-        String cidr = null;
+        String cidr = cmd.getCidr();
         if (ipv4) {
             // if end ip is not specified, default it to startIp
             if (startIP != null) {
@@ -879,7 +882,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (_accountMgr.isNormalUser(caller.getId())
                 && (ntwkOff.getTrafficType() != TrafficType.Guest || ntwkOff.getGuestType() != Network.GuestType.Isolated
                 && areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SourceNat))) {
-            throw new InvalidParameterValueException("Regular user can create a network only from the network" + " offering having traffic type " + TrafficType.Guest
+            throw new InvalidParameterValueException("Regular user can create a network only from the network offering having traffic type " + TrafficType.Guest
                     + " and network type " + Network.GuestType.Isolated + " with a service " + Service.SourceNat.getName() + " enabled");
         }
 
@@ -927,9 +930,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         // Vlan is created in 1 cases - works in Advance zone only:
         // 1) GuestType is Shared
         boolean createVlan = startIP != null && endIP != null && zone.getNetworkType() == NetworkType.Advanced
-                && (ntwkOff.getGuestType() == Network.GuestType.Shared
-                || ntwkOff.getGuestType() == GuestType.Isolated &&
-                !areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SourceNat));
+                && (ntwkOff.getGuestType() == Network.GuestType.Shared || !areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SourceNat));
 
         if (!createVlan) {
             // Only support advance shared network in IPv6, which means createVlan is a must
@@ -3049,7 +3050,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             ntwkOff = _networkOfferingDao.findById(networkOfferingId);
         }
         if (ntwkOff == null) {
-            ntwkOff = findSystemNetworkOffering(NetworkOffering.SystemPrivateGatewayNetworkOffering);
+            ntwkOff = findSystemNetworkOffering(NetworkOffering.DefaultPrivateGatewayNetworkOffering);
         }
 
         // Validate physical network
@@ -3809,13 +3810,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     }
 
     private Network commitNetwork(final Long networkOfferingId, final String gateway, final String startIP, final String endIP, final String netmask, final String networkDomain,
-                                  final String vlanId, final String name, final String displayText, final Account caller, final Long physicalNetworkId, final Long zoneId, final
-                                  Long domainId,
-                                  final boolean isDomainSpecific, final Boolean subdomainAccessFinal, final Long vpcId, final String startIPv6, final String endIPv6, final
-                                  String ip6Gateway,
-                                  final String ip6Cidr, final Boolean displayNetwork, final Long aclId, final String isolatedPvlan, final NetworkOfferingVO ntwkOff, final
-                                  PhysicalNetwork pNtwk,
-                                  final ACLType aclType, final Account ownerFinal, final String cidr, final boolean createVlan) throws InsufficientCapacityException,
+                                  final String vlanId, final String name, final String displayText, final Account caller, final Long physicalNetworkId, final Long zoneId,
+                                  final Long domainId, final boolean isDomainSpecific, final Boolean subdomainAccessFinal, final Long vpcId, final String startIPv6,
+                                  final String endIPv6, final String ip6Gateway, final String ip6Cidr, final Boolean displayNetwork, final Long aclId, final String isolatedPvlan,
+                                  final NetworkOfferingVO ntwkOff, final PhysicalNetwork pNtwk, final ACLType aclType, final Account ownerFinal, final String cidr,
+                                  final boolean createVlan) throws InsufficientCapacityException,
             ResourceAllocationException {
         try {
             final Network network = Transaction.execute(new TransactionCallbackWithException<Network, Exception>() {

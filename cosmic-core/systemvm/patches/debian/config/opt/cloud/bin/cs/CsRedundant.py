@@ -217,7 +217,8 @@ class CsRedundant(object):
         self.set_lock()
         logging.info("Router switched to fault mode")
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()
+                      or interface.is_privategateway()]
         for interface in interfaces:
             CsHelper.execute("ifconfig %s down" % interface.get_device())
 
@@ -236,7 +237,7 @@ class CsRedundant(object):
         self.release_lock()
         logging.info("Router switched to fault mode")
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_privategateway()]
         CsHelper.reconfigure_interfaces(self.cl, interfaces)
 
     def set_backup(self):
@@ -249,7 +250,8 @@ class CsRedundant(object):
         logging.debug("Setting router to backup")
 
         dev = ''
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()
+                      or interface.is_privategateway()]
         for interface in interfaces:
             if dev == interface.get_device():
                 continue
@@ -272,7 +274,7 @@ class CsRedundant(object):
         self.cl.save()
         self.release_lock()
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_privategateway()]
         CsHelper.reconfigure_interfaces(self.cl, interfaces)
         logging.info("Router switched to backup mode")
 
@@ -286,7 +288,8 @@ class CsRedundant(object):
         logging.debug("Setting router to master")
 
         dev = ''
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()
+                      or interface.is_privategateway()]
         route = CsRoute()
         for interface in interfaces:
             if dev == interface.get_device():
@@ -299,10 +302,13 @@ class CsRedundant(object):
                 logging.info("Bringing public interface %s up" % dev)
 
                 try:
-                    gateway = interface.get_gateway()
-                    logging.info("Adding gateway ==> %s to device ==> %s" % (gateway, dev))
-                    if dev == CsHelper.PUBLIC_INTERFACES[self.cl.get_type()]:
+                    if interface.is_public():
+                        gateway = interface.get_gateway()
+                        logging.info("Adding default gateway ==> %s to device ==> %s" % (gateway, dev))
                         route.add_defaultroute(gateway)
+                    else:
+                        logging.info("Not adding default gateway for device ==> %s (this is not a public nic)"
+                                     % (gateway, dev))
                 except:
                     logging.error("ERROR getting gateway from device %s" % dev)
             else:
@@ -328,7 +334,7 @@ class CsRedundant(object):
         self.cl.save()
         self.release_lock()
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_public()]
+        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_privategateway()]
         CsHelper.reconfigure_interfaces(self.cl, interfaces)
         logging.info("Router switched to master mode")
 

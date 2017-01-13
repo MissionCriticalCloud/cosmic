@@ -147,7 +147,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
     @Inject
     AutoScaleVmGroupVmMapDao _autoScaleVmGroupVmMapDao;
     @Inject
-    DataCenterDao _dcDao = null;
+    DataCenterDao _dcDao;
     @Inject
     UserDao _userDao;
     @Inject

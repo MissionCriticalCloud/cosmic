@@ -148,8 +148,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
 
     protected boolean canHandle(final NetworkOffering offering, final DataCenter dc) {
         // this guru handles only Guest networks in Advance zone with source nat service disabled
-        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == GuestType.Shared
-                && !_ntwkOfferingSrvcDao.isProviderForNetworkOffering(offering.getId(), Network.Provider.NuageVsp)) {
+        if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == GuestType.Shared) {
             return true;
         } else {
             s_logger.trace("We only take care of Guest networks of type " + GuestType.Shared);

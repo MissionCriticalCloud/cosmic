@@ -19,12 +19,6 @@ public class VpcGatewayVO implements VpcGateway {
 
     @Column(name = "ip4_address")
     String ip4Address;
-    @Column(name = "gateway")
-    String gateway;
-    @Column(name = "netmask")
-    String netmask;
-    @Column(name = "vlan_tag")
-    String broadcastUri;
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
     VpcGateway.Type type;
@@ -66,25 +60,18 @@ public class VpcGatewayVO implements VpcGateway {
      * @param vpcId
      * @param zoneId
      * @param networkId
-     * @param broadcastUri TODO
-     * @param gateway      TODO
-     * @param netmask      TODO
-     * @param accountId    TODO
-     * @param domainId     TODO
-     * @param account_id
+     * @param accountId
+     * @param domainId
      * @param sourceNat
+     * @param networkACLId
      */
-    public VpcGatewayVO(final String ip4Address, final Type type, final long vpcId, final long zoneId, final long networkId, final String broadcastUri, final String gateway,
-                        final String netmask, final long accountId,
+    public VpcGatewayVO(final String ip4Address, final Type type, final long vpcId, final long zoneId, final long networkId, final long accountId,
                         final long domainId, final boolean sourceNat, final long networkACLId) {
         this.ip4Address = ip4Address;
         this.type = type;
         this.vpcId = vpcId;
         this.zoneId = zoneId;
         this.networkId = networkId;
-        this.broadcastUri = broadcastUri;
-        this.gateway = gateway;
-        this.netmask = netmask;
         uuid = UUID.randomUUID().toString();
         this.accountId = accountId;
         this.domainId = domainId;
@@ -137,18 +124,6 @@ public class VpcGatewayVO implements VpcGateway {
         this.type = type;
     }
 
-    public void setBroadcastUri(final String broadcastUri) {
-        this.broadcastUri = broadcastUri;
-    }
-
-    public void setNetmask(final String netmask) {
-        this.netmask = netmask;
-    }
-
-    public void setGateway(final String gateway) {
-        this.gateway = gateway;
-    }
-
     public void setIp4Address(final String ip4Address) {
         this.ip4Address = ip4Address;
     }
@@ -186,21 +161,6 @@ public class VpcGatewayVO implements VpcGateway {
     @Override
     public long getNetworkId() {
         return networkId;
-    }
-
-    @Override
-    public String getGateway() {
-        return gateway;
-    }
-
-    @Override
-    public String getNetmask() {
-        return netmask;
-    }
-
-    @Override
-    public String getBroadcastUri() {
-        return broadcastUri;
     }
 
     @Override

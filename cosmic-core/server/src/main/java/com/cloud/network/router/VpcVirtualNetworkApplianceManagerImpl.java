@@ -39,7 +39,6 @@ import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGatewayVO;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.PrivateIpDao;
@@ -137,15 +136,6 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 buf.append(" dns1=").append(defaultDns1);
                 if (defaultDns2 != null) {
                     buf.append(" dns2=").append(defaultDns2);
-                }
-
-                final VpcGatewayVO privateGatewayForVpc = _vpcGatewayDao.getPrivateGatewayForVpc(domainRouterVO.getVpcId());
-                if (privateGatewayForVpc != null) {
-                    final String ip4Address = privateGatewayForVpc.getIp4Address();
-                    buf.append(" privategateway=").append(ip4Address);
-                    s_logger.debug("Set privategateway field in cmd_line.json to " + ip4Address);
-                } else {
-                    buf.append(" privategateway=None");
                 }
             }
         }
@@ -298,15 +288,12 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                         final String netmask = NetUtils.getCidrNetmask(network.getCidr());
                         final PrivateIpAddress ip = new PrivateIpAddress(ipVO, network.getBroadcastUri().toString(), network.getGateway(), netmask, guestNic.getMacAddress());
 
-                        final List<PrivateIpAddress> privateIps = new ArrayList<>(1);
-                        privateIps.add(ip);
-
                         final NicProfile privateNicProfile =
                                 new NicProfile(guestNic, network, network.getBroadcastUri(), network.getBroadcastUri(), _networkModel.getNetworkRate(
                                         guestNic.getNetworkId(), domainRouterVO.getId()), _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(
                                         domainRouterVO.getHypervisorType(), network));
 
-                        _commandSetupHelper.createVpcAssociatePrivateIPCommands(domainRouterVO, privateIps, cmds, privateNicProfile, true);
+                        _commandSetupHelper.createSetupPrivateGatewayCommand(domainRouterVO, ip, cmds, privateNicProfile, true);
 
                         final Long privateGwAclId = _vpcGatewayDao.getNetworkAclIdForPrivateIp(ipVO.getVpcId(), ipVO.getNetworkId(), ipVO.getIpAddress());
 
@@ -531,11 +518,11 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
     @Override
     public boolean destroyPrivateGateway(final PrivateGateway gateway, final VirtualRouter router) throws ConcurrentOperationException, ResourceUnavailableException {
-        boolean result = true;
+        boolean result;
 
         if (!_networkModel.isVmPartOfNetwork(router.getId(), gateway.getNetworkId())) {
             s_logger.debug("Router doesn't have nic for gateway " + gateway + " so no need to removed it");
-            return result;
+            return true;
         }
 
         final Network privateNetwork = _networkModel.getNetwork(gateway.getNetworkId());
@@ -555,7 +542,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         }
 
         s_logger.debug("Removing router " + router + " from private network " + privateNetwork + " as a part of delete private gateway");
-        result = result && _itMgr.removeVmFromNetwork(router, privateNetwork, null);
+        result = _itMgr.removeVmFromNetwork(router, privateNetwork, null);
         s_logger.debug("Private gateawy " + gateway + " is removed from router " + router);
         return result;
     }
@@ -575,10 +562,8 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             final String netmask = NetUtils.getCidrNetmask(network.getCidr());
             final PrivateIpAddress ip = new PrivateIpAddress(ipVO, network.getBroadcastUri().toString(), network.getGateway(), netmask, privateNic.getMacAddress());
 
-            final List<PrivateIpAddress> privateIps = new ArrayList<>(1);
-            privateIps.add(ip);
             final Commands cmds = new Commands(Command.OnError.Stop);
-            _commandSetupHelper.createVpcAssociatePrivateIPCommands(router, privateIps, cmds, privateNic, add);
+            _commandSetupHelper.createSetupPrivateGatewayCommand(router, ip, cmds, privateNic, add);
 
             try {
                 if (_nwHelper.sendCommandsToRouter(router, cmds)) {

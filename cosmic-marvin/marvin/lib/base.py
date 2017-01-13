@@ -2712,7 +2712,8 @@ class Network:
     def create(cls, apiclient, services, accountid=None, domainid=None,
                networkofferingid=None, projectid=None,
                subdomainaccess=None, zoneid=None,
-               gateway=None, netmask=None, vpcid=None, aclid=None, vlan=None):
+               gateway=None, netmask=None, cidr=None,
+               vpcid=None, aclid=None, vlan=None):
         """Create Network for account"""
         cmd = createNetwork.createNetworkCmd()
         cmd.name = services["name"]
@@ -2739,6 +2740,10 @@ class Network:
             cmd.netmask = netmask
         elif "netmask" in services:
             cmd.netmask = services["netmask"]
+        if cidr:
+            cmd.cidr = cidr
+        elif "cidr" in services:
+            cmd.cidr = services["cidr"]
         if "startip" in services:
             cmd.startip = services["startip"]
         if "endip" in services:
@@ -4087,11 +4092,12 @@ class VPC:
         cmd.id = self.id
         return apiclient.deleteVPC(cmd)
 
-    def restart(self, apiclient):
+    def restart(self, apiclient, cleanup=False):
         """Restarts the VPC connections"""
 
         cmd = restartVPC.restartVPCCmd()
         cmd.id = self.id
+        cmd.cleanup = cleanup
         return apiclient.restartVPC(cmd)
 
     @classmethod
@@ -4112,21 +4118,15 @@ class PrivateGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, apiclient, gateway, ipaddress, netmask, vlan, vpcid,
-               physicalnetworkid=None, aclid=None, sourcenatsupported=None, networkofferingid=None):
+    def create(cls, apiclient, ipaddress, networkid, vpcid, sourcenatsupported=None, aclid=None):
         """Create private gateway"""
 
         cmd = createPrivateGateway.createPrivateGatewayCmd()
-        cmd.gateway = gateway
         cmd.ipaddress = ipaddress
-        cmd.netmask = netmask
-        cmd.vlan = vlan
+        cmd.networkid = networkid
         cmd.vpcid = vpcid
-        cmd.networkofferingid = networkofferingid
         if sourcenatsupported:
             cmd.sourcenatsupported = sourcenatsupported
-        if physicalnetworkid:
-            cmd.physicalnetworkid = physicalnetworkid
         if aclid:
             cmd.aclid = aclid
 
@@ -4192,12 +4192,19 @@ class StaticRoute:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, apiclient, cidr, gatewayid):
+    def create(cls, apiclient, services, vpcid, cidr=None, nexthop=None):
         """Create static route"""
 
         cmd = createStaticRoute.createStaticRouteCmd()
-        cmd.cidr = cidr
-        cmd.gatewayid = gatewayid
+        if "cidr" in services:
+            cmd.cidr = services["cidr"]
+        elif cidr:
+            cmd.cidr = cidr
+        if "nexthop" in services:
+            cmd.nexthop = services["nexthop"]
+        elif nexthop:
+            cmd.nexthop = nexthop
+        cmd.vpcid = vpcid
         return StaticRoute(apiclient.createStaticRoute(cmd).__dict__)
 
     def delete(self, apiclient):

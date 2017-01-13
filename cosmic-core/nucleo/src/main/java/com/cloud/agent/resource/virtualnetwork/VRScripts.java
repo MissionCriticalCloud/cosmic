@@ -4,6 +4,7 @@ public class VRScripts {
     public final static String CONFIG_PERSIST_LOCATION = "/var/cache/cloud/";
     public final static String IP_ASSOCIATION_CONFIG = "ip_associations.json";
     public final static String GUEST_NETWORK_CONFIG = "guest_network.json";
+    public final static String PRIVATE_GATEWAY_CONFIG = "private_gateway.json";
     public final static String NETWORK_ACL_CONFIG = "network_acl.json";
     public final static String VM_METADATA_CONFIG = "vm_metadata.json";
     public final static String VM_DHCP_CONFIG = "vm_dhcp_entry.json";

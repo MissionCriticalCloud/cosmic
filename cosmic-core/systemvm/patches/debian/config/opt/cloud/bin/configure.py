@@ -15,6 +15,7 @@ from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
 from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
+from cs.CsPrivateGateway import CsPrivateGateway
 
 OCCURRENCES = 1
 
@@ -900,9 +901,6 @@ def main(argv):
         logging.debug("No file was received, do not go on processing the other actions. Just leave for now.")
         return
 
-    # Track if changes need to be committed to NetFilter
-    iptables_change = False
-
     # The "GLOBAL" Configuration object
     config = CsConfig()
 
@@ -910,7 +908,7 @@ def main(argv):
                         level=config.get_level(),
                         format=config.get_format())
 
-    # Load stored ip adresses from disk to CsConfig()
+    # Load stored ip addresses from disk to CsConfig()
     config.set_address()
 
     logging.debug("Configuring ip addresses")
@@ -930,7 +928,8 @@ def main(argv):
                                ("dhcp.json", { "process_iptables": False, "executor": CsDhcp("dhcpentry", config) }),
                                ("load_balancer.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("monitor_service.json", { "process_iptables": False, "executor": CsMonitor("monitorservice", config) }),
-                               ("static_routes.json", { "process_iptables": False, "executor": CsStaticRoutes("staticroutes", config) })
+                               ("static_routes.json", { "process_iptables": False, "executor": CsStaticRoutes("staticroutes", config) }),
+                               ("private_gateway.json", { "process_iptables": True, "executor": CsPrivateGateway("privategateway", config) })
                                ])
 
     if process_file.count("cmd_line.json") == OCCURRENCES:
