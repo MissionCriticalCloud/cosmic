@@ -886,9 +886,9 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     + " and network type " + Network.GuestType.Isolated + " with a service " + Service.SourceNat.getName() + " enabled");
         }
 
-        // Don't allow to specify vlan if the caller is not ROOT admin
-        if (!_accountMgr.isRootAdmin(caller.getId()) && (ntwkOff.getSpecifyVlan() || vlanId != null)) {
-            throw new InvalidParameterValueException("Only ROOT admin is allowed to specify vlanId");
+        // Don't allow to specify vlan if the caller is a normal user
+        if (_accountMgr.isNormalUser(caller.getId()) && (ntwkOff.getSpecifyVlan() || vlanId != null)) {
+            throw new InvalidParameterValueException("Only ROOT admin and domain admins are allowed to specify vlanId");
         }
 
         if (ipv4) {
