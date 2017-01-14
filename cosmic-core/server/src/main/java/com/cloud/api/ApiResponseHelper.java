@@ -1973,8 +1973,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
         response.setReservedIpRange(reservation);
 
-        // return vlan information only to Root admin
-        if (network.getBroadcastUri() != null && view == ResponseView.Full) {
+        if (network.getBroadcastUri() != null) {
             final String broadcastUri = network.getBroadcastUri().toString();
             response.setBroadcastUri(broadcastUri);
             String vlan = "N/A";
@@ -1984,7 +1983,6 @@ public class ApiResponseHelper implements ResponseGenerator {
                     vlan = BroadcastDomainType.getValue(network.getBroadcastUri());
                     break;
             }
-            // return vlan information only to Root admin
             response.setVlan(vlan);
         }
 
