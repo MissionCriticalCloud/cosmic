@@ -664,10 +664,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         String endIP = cmd.getEndIp();
         final String netmask = cmd.getNetmask();
         final String networkDomain = cmd.getNetworkDomain();
-        String vlanId = null;
-        if (cmd instanceof CreateNetworkCmdByAdmin) {
-            vlanId = ((CreateNetworkCmdByAdmin) cmd).getVlan();
-        }
+        String vlanId = cmd.getVlan();
         final String name = cmd.getNetworkName();
         final String displayText = cmd.getDisplayText();
         final Account caller = CallContext.current().getCallingAccount();
