@@ -1539,6 +1539,9 @@
                                                         }
                                                     }
                                                 }
+                                                if (selectedGuestNetworkObj.type == "Private") {
+                                                    return false;
+                                                }
                                                 return true;
                                             }
                                         },
