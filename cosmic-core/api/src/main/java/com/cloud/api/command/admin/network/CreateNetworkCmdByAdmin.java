@@ -21,16 +21,9 @@ import org.slf4j.LoggerFactory;
 public class CreateNetworkCmdByAdmin extends CreateNetworkCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkCmdByAdmin.class.getName());
 
-    @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "the ID or VID of the network")
-    private String vlan;
-
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
-
-    public String getVlan() {
-        return vlan;
-    }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
