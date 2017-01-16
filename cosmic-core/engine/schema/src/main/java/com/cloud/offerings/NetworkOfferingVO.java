@@ -180,12 +180,12 @@ public class NetworkOfferingVO implements NetworkOffering {
         this.state = State.Enabled;
     }
 
-    public NetworkOfferingVO(final String name, final Network.GuestType guestType) {
+    public NetworkOfferingVO(final String name, final Network.GuestType guestType, final boolean specifyVlan) {
         this(name,
                 "System Offering for " + name,
                 TrafficType.Guest,
                 false,
-                false,
+                specifyVlan,
                 0,
                 0,
                 true,
