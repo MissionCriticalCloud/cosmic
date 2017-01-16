@@ -471,3 +471,19 @@ VIEW `account_vmstats_view` AS
         (`vm_instance`.`vm_type` = 'User' and `vm_instance`.`removed` is NULL)
     GROUP BY `vm_instance`.`account_id` , `vm_instance`.`state`;
 
+
+-- backing up original network table
+CREATE TABLE networks_pre520 LIKE networks;
+INSERT networks_pre520 SELECT * FROM networks;
+
+-- Delegate private gateway permissions from SYSTEM user to actual DOMAIN/ACCOUNT gateway owner
+UPDATE networks N
+LEFT JOIN vpc_gateways V ON
+    V.`network_id` = N.`id`
+SET
+    N.`domain_id` = V.`domain_id`,
+    N.`account_id` = V.`account_id`
+WHERE V.`network_id` = N.`id`
+AND N.`name` like 'vpc-%-privateNetwork'
+AND N.`removed` is NULL
+AND (N.`domain_id` = 1 OR N.`account_id`= 1);
