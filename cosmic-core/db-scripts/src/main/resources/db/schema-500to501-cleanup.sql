@@ -3,6 +3,9 @@
 --;
 
 # Remove LXC templates
+DELETE FROM `template_store_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'LXC');
+DELETE FROM `template_host_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'LXC');
+DELETE FROM `template_spool_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'LXC');
 DELETE FROM `cloud`.`vm_template` WHERE hypervisor_type = 'LXC';
 DELETE FROM `cloud`.`hypervisor_capabilities` WHERE hypervisor_type = 'LXC';
 
@@ -16,7 +19,13 @@ ALTER TABLE `cloud`.`physical_network_traffic_types` DROP COLUMN `lxc_network_la
 DELETE FROM `cloud`.`guest_os_hypervisor` where hypervisor_type = 'LXC';
 
 # Remove HyperV and VMware templates
+DELETE FROM `template_store_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
+DELETE FROM `template_host_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
+DELETE FROM `template_spool_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
 DELETE FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv';
+DELETE FROM `template_store_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
+DELETE FROM `template_host_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
+DELETE FROM `template_spool_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
 DELETE FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware';
 DELETE FROM `cloud`.`hypervisor_capabilities` WHERE hypervisor_type = 'Hyperv';
 DELETE FROM `cloud`.`hypervisor_capabilities` WHERE hypervisor_type = 'VMware';
