@@ -4,6 +4,7 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.org.Cluster;
 import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -53,6 +55,9 @@ public class ClusterVO implements Cluster {
 
     @Column(name = "uuid")
     private String uuid;
+
+    @Column(name = GenericDao.REMOVED_COLUMN)
+    private Date removed;
 
     public ClusterVO() {
         clusterType = ClusterType.CloudManaged;
@@ -162,6 +167,10 @@ public class ClusterVO implements Cluster {
     @Override
     public String getUuid() {
         return this.uuid;
+    }
+
+    public Date getRemoved() {
+        return removed;
     }
 
     public void setUuid(final String uuid) {
