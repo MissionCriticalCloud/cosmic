@@ -1857,6 +1857,7 @@
                             var hasNetworkACL = false;
                             var hasSRXFirewall = false;
                             var isVPC = false;
+                            var isPrivateNet = false;
                             var isAdvancedSGZone = false;
                             var hiddenTabs = [];
                             var isSharedNetwork;
@@ -1867,6 +1868,9 @@
                             }
                             if (thisNetwork.type == 'Shared') {
                                 isSharedNetwork = true;
+                            }
+                            if (thisNetwork.type == 'Private') {
+                                isPrivateNet = true;
                             }
 
                             $(thisNetwork.service).each(function () {
@@ -1909,7 +1913,7 @@
                                 }
                             });
 
-                            if (isVPC || isAdvancedSGZone || isSharedNetwork) {
+                            if (isVPC || isAdvancedSGZone || isSharedNetwork || isPrivateNet) {
                                 hiddenTabs.push('egressRules');
                             }
 

@@ -322,7 +322,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         NetworkOfferingVO storageNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemStorageNetwork, TrafficType.Storage, true);
         storageNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(storageNetworkOffering);
         _systemNetworks.put(NetworkOffering.SystemStorageNetwork, storageNetworkOffering);
-        NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private);
+        NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
         privateGatewayNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOffering);
         _systemNetworks.put(NetworkOffering.DefaultPrivateGatewayNetworkOffering, privateGatewayNetworkOffering);
         s_privateOfferingId = privateGatewayNetworkOffering.getId();

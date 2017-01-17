@@ -130,6 +130,9 @@ public class CreateNetworkCmd extends BaseCmd {
     @Parameter(name = ApiConstants.ACL_ID, type = CommandType.UUID, entityType = NetworkACLResponse.class, description = "Network ACL ID associated for the network")
     private Long aclId;
 
+    @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "The VLAN of the network")
+    private String vlan;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -261,6 +264,10 @@ public class CreateNetworkCmd extends BaseCmd {
 
     public Long getAclId() {
         return aclId;
+    }
+
+    public String getVlan() {
+        return vlan;
     }
 
     @Override
