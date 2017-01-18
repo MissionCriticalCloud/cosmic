@@ -5,39 +5,39 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.3.0.0</version>
+        <version>5.3.0.1-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-api</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-events</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.3.0.0</version>
+            <version>5.3.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
