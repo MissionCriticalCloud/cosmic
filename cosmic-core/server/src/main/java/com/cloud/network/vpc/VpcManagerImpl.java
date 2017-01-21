@@ -1361,6 +1361,11 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw ex;
         }
 
+        // permission check on the VPC
+        final CallContext ctx = CallContext.current();
+        final Account caller = ctx.getCallingAccount();
+        _accountMgr.checkAccess(caller, null, false, vpc);
+
         if (gateway != null || netmask != null) {
             throw new InvalidParameterValueException("Gateway/netmask fields are not supported anymore");
         }
