@@ -195,7 +195,7 @@ class CsInterface:
         return self.get_attr("add")
 
     def to_str(self):
-        print(self.address)
+        return self.address
 
 
 class CsDevice:
@@ -290,7 +290,8 @@ class CsIP:
             CsHelper.reconfigure_interfaces(self.cl, interfaces)
 
             self.set_mark()
-            self.arpPing()
+            if 'gateway' in self.address:
+                self.arpPing()
 
             CsRpsrfs(self.dev).enable()
             self.post_config_change("add")
@@ -521,15 +522,19 @@ class CsIP:
         self.fw_vpcrouter()
 
         # On deletion nw_type will no longer be known
-        if self.get_type() in ["guest"] and self.config.is_vpc():
-            CsDevice(self.dev, self.config).configure_rp()
+        if self.get_type() in ('guest'):
+            if self.config.is_vpc() or self.config.is_router():
+                CsDevice(self.dev, self.config).configure_rp()
+                logging.error(
+                    "Not able to setup source-nat for a regular router yet")
 
-            logging.error(
-                "Not able to setup source-nat for a regular router yet")
-            dns = CsDnsmasq(self)
-            dns.add_firewall_rules()
-            app = CsApache(self)
-            app.setup()
+            if self.config.has_dns() or self.config.is_dhcp():
+                dns = CsDnsmasq(self)
+                dns.add_firewall_rules()
+
+            if self.config.has_metadata():
+                app = CsApache(self)
+                app.setup()
 
         cmdline = self.config.cmdline()
         # Start passwd server on non-redundant routers and on the master router of redundant pairs
