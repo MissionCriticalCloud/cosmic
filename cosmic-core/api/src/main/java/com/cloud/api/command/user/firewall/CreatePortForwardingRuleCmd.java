@@ -381,7 +381,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     }
 
     public Ip getVmSecondaryIp() {
-        if (vmSecondaryIp == null) {
+        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty() ) {
             return null;
         }
         return new Ip(vmSecondaryIp);
