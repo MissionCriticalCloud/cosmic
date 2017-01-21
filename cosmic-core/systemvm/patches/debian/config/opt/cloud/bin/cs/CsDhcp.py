@@ -53,23 +53,24 @@ class CsDhcp(CsDataBag):
 
     def configure_server(self):
         # self.conf.addeq("dhcp-hostsfile=%s" % DHCP_HOSTS)
+        idx = 0
         for i in self.devinfo:
             if not i['dnsmasq']:
                 continue
             device = i['dev']
             ip = i['ip'].split('/')[0]
-            sline = "dhcp-range=interface:%s,set:interface" % (device)
-            line = "dhcp-range=interface:%s,set:interface-%s,%s,static" % (device, device, ip)
+            sline = "dhcp-range=interface:%s,set:interface-%s-%s" % (device, device, idx)
+            line = "dhcp-range=interface:%s,set:interface-%s-%s,%s,static" % (device, device, idx, ip)
             self.conf.search(sline, line)
             gn = CsGuestNetwork(device, self.config)
-            sline = "dhcp-option=tag:interface-%s,15" % device
-            line = "dhcp-option=tag:interface-%s,15,%s" % (device, gn.get_domain())
+            sline = "dhcp-option=tag:interface-%s-%s,15" % (device, idx)
+            line = "dhcp-option=tag:interface-%s-%s,15,%s" % (device, idx, gn.get_domain())
             self.conf.search(sline, line)
             # DNS search order
             if gn.get_dns() and device:
-                sline = "dhcp-option=tag:interface-%s,6" % device
+                sline = "dhcp-option=tag:interface-%s-%s,6" % (device, idx)
                 dns_list = [x for x in gn.get_dns() if x is not None]
-                line = "dhcp-option=tag:interface-%s,6,%s" % (device, ','.join(dns_list))
+                line = "dhcp-option=tag:interface-%s-%s,6,%s" % (device, idx, ','.join(dns_list))
                 self.conf.search(sline, line)
             # Gateway
             gateway = ''
@@ -77,8 +78,8 @@ class CsDhcp(CsDataBag):
                 gateway = gn.get_gateway()
             else:
                 gateway = i['gateway']
-            sline = "dhcp-option=tag:interface-%s,3," % device
-            line = "dhcp-option=tag:interface-%s,3,%s" % (device, gateway)
+            sline = "dhcp-option=tag:interface-%s-%s,3," % (device, idx)
+            line = "dhcp-option=tag:interface-%s-%s,3,%s" % (device, idx, gateway)
             self.conf.search(sline, line)
             # Netmask
             netmask = ''
@@ -86,9 +87,10 @@ class CsDhcp(CsDataBag):
                 netmask = gn.get_netmask()
             else:
                 netmask = self.config.address().get_guest_netmask()
-            sline = "dhcp-option=tag:interface-%s,1," % device
-            line = "dhcp-option=tag:interface-%s,1,%s" % (device, netmask)
+            sline = "dhcp-option=tag:interface-%s-%s,1," % (device, idx)
+            line = "dhcp-option=tag:interface-%s-%s,1,%s" % (device, idx, netmask)
             self.conf.search(sline, line)
+            idx += 1
 
     def delete_leases(self):
         try:
