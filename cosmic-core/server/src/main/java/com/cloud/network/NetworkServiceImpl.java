@@ -943,6 +943,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw ex;
         }
 
+        if (ntwkOff.getGuestType() != GuestType.Private && gateway == null && netmask == null && cidr != null) {
+            gateway, netmask = NetUtils.getCidrSubNet(cidr)
+        }
+
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
                 createVlan);
