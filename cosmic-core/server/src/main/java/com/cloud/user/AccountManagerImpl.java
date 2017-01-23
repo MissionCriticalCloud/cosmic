@@ -2503,10 +2503,10 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         if (projectId != null) {
             if (!forProjectInvitation) {
                 if (projectId.longValue() == -1) {
-                    if (caller.getType() == Account.ACCOUNT_TYPE_NORMAL) {
+                    if (caller.getType() == Account.ACCOUNT_TYPE_ADMIN) {
                         permittedAccounts.addAll(_projectMgr.listPermittedProjectAccounts(caller.getId()));
                     } else {
-                        domainIdRecursiveListProject.third(Project.ListProjectResourcesCriteria.ListProjectResourcesOnly);
+                        domainIdRecursiveListProject.third(Project.ListProjectResourcesCriteria.SkipProjectResources);
                     }
                 } else {
                     final Project project = _projectMgr.getProject(projectId);
