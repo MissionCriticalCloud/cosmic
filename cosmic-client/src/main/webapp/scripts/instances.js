@@ -391,7 +391,7 @@
                         }
                     })).done(function(jsonvm, jsonvmp) {
                         var items = jsonvm[0].listvirtualmachinesresponse.virtualmachine;
-                        if (args.context.projects == null) {
+                        if (args.context.projects == null && isAdmin()) {
                             var pitems = jsonvmp[0].listvirtualmachinesresponse.virtualmachine;
                             if (pitems) {
                                 if (items) {
