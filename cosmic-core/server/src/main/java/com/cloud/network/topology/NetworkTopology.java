@@ -37,7 +37,7 @@ public interface NetworkTopology {
     boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules, final VirtualRouter router, final boolean isPrivateGateway) throws
             ResourceUnavailableException;
 
-    boolean applyPublicIpACLs(final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router)
+    boolean applyPublicIpACLs(final Network network, final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router)
             throws ResourceUnavailableException;
 
     boolean applyStaticRoutes(final List<StaticRouteProfile> staticRoutes, final List<DomainRouterVO> routers) throws ResourceUnavailableException;

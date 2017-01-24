@@ -56,6 +56,7 @@ import com.cloud.network.VpnUser;
 import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
@@ -518,8 +519,8 @@ public class CommandSetupHelper {
         }
     }
 
-    public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId, final boolean
-            privateGateway) {
+    public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId,
+                                          final boolean privateGateway) {
         final List<NetworkACLTO> rulesTO = new ArrayList<>();
         String guestVlan = null;
         final Network guestNtwk = _networkDao.findById(guestNetworkId);
@@ -560,7 +561,8 @@ public class CommandSetupHelper {
             }
         }
 
-        final SetPublicIpACLCommand cmd = new SetPublicIpACLCommand(rulesTO, publicIp.getAddress().toString());
+        final NicTO nicTO = _networkHelper.getNicTO(router, publicIp.getNetworkId(), null);
+        final SetPublicIpACLCommand cmd = new SetPublicIpACLCommand(rulesTO, nicTO, publicIp.getAddress().toString());
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         final DataCenterVO dcVo = _dcDao.findById(router.getDataCenterId());

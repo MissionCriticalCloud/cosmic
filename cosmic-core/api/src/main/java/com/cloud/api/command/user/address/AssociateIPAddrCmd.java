@@ -87,7 +87,6 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.REGION_ID,
             type = CommandType.INTEGER,
             entityType = RegionResponse.class,
-            required = false,
             description = "region ID from where portable IP is to be associated.")
     private Integer regionId;
 

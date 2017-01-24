@@ -2,6 +2,7 @@ package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
+import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
@@ -12,6 +13,7 @@ import com.cloud.agent.resource.virtualnetwork.model.ProtocolAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.PublicIpACL;
 import com.cloud.agent.resource.virtualnetwork.model.TcpAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.UdpAclRule;
+import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,9 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
 
         final String[][] rules = command.generateFwRules();
         final String[] aclRules = rules[0];
+        final NicTO nic = command.getNic();
+        final String dev = "eth" + nic.getDeviceId();
+        final String netmask = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
 
         final List<AclRule> ingressRules = new ArrayList<>();
         final List<AclRule> egressRules = new ArrayList<>();
@@ -70,6 +75,10 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
         }
 
         final PublicIpACL publicIpACL = new PublicIpACL(
+                dev,
+                nic.getMac(),
+                nic.getIp(),
+                netmask,
                 command.getPublicIp(),
                 ingressRules.toArray(new AclRule[ingressRules.size()]),
                 egressRules.toArray(new AclRule[egressRules.size()])

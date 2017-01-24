@@ -1,5 +1,6 @@
 package com.cloud.agent.api.routing;
 
+import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
 
 import java.util.Arrays;
@@ -8,13 +9,12 @@ import java.util.List;
 
 public class SetPublicIpACLCommand extends NetworkElementCommand {
     PublicIpACLTO[] rules;
+    NicTO nic;
     String publicIp;
 
-    protected SetPublicIpACLCommand() {
-    }
-
-    public SetPublicIpACLCommand(final List<PublicIpACLTO> rules, final String publicIp) {
+    public SetPublicIpACLCommand(final List<PublicIpACLTO> rules, final NicTO nic, final String publicIp) {
         this.rules = rules.toArray(new PublicIpACLTO[rules.size()]);
+        this.nic = nic;
         this.publicIp = publicIp;
     }
 
@@ -74,6 +74,10 @@ public class SetPublicIpACLCommand extends NetworkElementCommand {
 
     private void orderNetworkAclRulesByRuleNumber(final List<PublicIpACLTO> aclList) {
         Collections.sort(aclList, (acl1, acl2) -> acl1.getNumber() > acl2.getNumber() ? 1 : -1);
+    }
+
+    public NicTO getNic() {
+        return nic;
     }
 
     public String getPublicIp() {

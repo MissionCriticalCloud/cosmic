@@ -41,9 +41,9 @@ public class PublicIpACLTO implements InternalIdentity {
                 rule.getNumber());
     }
 
-    public PublicIpACLTO(final long id, final String publicIp, final String protocol, final Integer portStart, final Integer portEnd, final boolean revoked, final boolean
-            alreadyAdded, final List<String> cidrList,
-                         final Integer icmpType, final Integer icmpCode, final TrafficType trafficType, final boolean allow, final int number) {
+    public PublicIpACLTO(final long id, final String publicIp, final String protocol, final Integer portStart, final Integer portEnd, final boolean revoked,
+                         final boolean alreadyAdded, final List<String> cidrList, final Integer icmpType, final Integer icmpCode, final TrafficType trafficType,
+                         final boolean allow, final int number) {
         this.publicIp = publicIp;
         this.protocol = protocol;
 

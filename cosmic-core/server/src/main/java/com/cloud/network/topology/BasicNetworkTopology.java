@@ -99,7 +99,7 @@ public class BasicNetworkTopology implements NetworkTopology {
     }
 
     @Override
-    public boolean applyPublicIpACLs(final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
+    public boolean applyPublicIpACLs(final Network network, final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
         throw new CloudRuntimeException("applyPublicIpACLs not implemented in Basic Network Topology.");
     }
 

@@ -132,7 +132,8 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
     }
 
     @Override
-    public boolean applyPublicIpACLs(final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
+    public boolean applyPublicIpACLs(final Network network, final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router)
+            throws ResourceUnavailableException {
 
         if (rules == null || rules.isEmpty()) {
             s_logger.debug("No network ACLs to be applied for public ip " + publicIp.getId());
@@ -148,7 +149,7 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
 
         final PublicIpAclsRules aclsRules = new PublicIpAclsRules(publicIp, rules);
 
-        return applyRules(null, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(aclsRules));
+        return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(aclsRules));
     }
 
     @Override
