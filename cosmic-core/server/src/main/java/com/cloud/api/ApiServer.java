@@ -569,11 +569,6 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 SerializationContext.current().setUuidTranslation(true);
                 response = getBaseAsyncResponse(jobId, asyncCmd);
             }
-            // Always log response for async for now, I don't think any sensitive data will be in here.
-            // It might be nice to send this through scrubbing similar to how
-            // ApiResponseSerializer.toSerializedStringWithSecureLogs works. For now, this gets jobid's
-            // in the api logs.
-            log.append(response);
             return response;
         } else {
             _dispatcher.dispatch(cmdObj, params, false);
