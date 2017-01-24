@@ -476,26 +476,26 @@ class CsIP:
                             (guestNetworkCidr, self.dev, self.address['public_ip'])])
 
         if self.get_type() in ["public"]:
+            self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % self.dev])
+            self.fw.append(["mangle", "", "-A VPN_STATS_%s -o %s -m mark --mark 0x525/0xffffffff" % (self.dev, self.dev)])
+            self.fw.append(["mangle", "", "-A VPN_STATS_%s -i %s -m mark --mark 0x524/0xffffffff" % (self.dev, self.dev)])
+            self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
+            self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
+
+        if self.get_type() in ["privategateway"]:
             guestNetworkCidr = self.address['network']
-            if self.dev == 'eth1':
-                self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_eth1"])
-                self.fw.append(["mangle", "", "-A VPN_STATS_eth1 -o eth1 -m mark --mark 0x525/0xffffffff"])
-                self.fw.append(["mangle", "", "-A VPN_STATS_eth1 -i eth1 -m mark --mark 0x524/0xffffffff"])
-                self.fw.append(["", "front", "-A NETWORK_STATS -o eth1"])
-                self.fw.append(["", "front", "-A NETWORK_STATS -i eth1"])
-            else:
-                # create egress chain
-                self.fw.append(["mangle", "", "-N ACL_OUTBOUND_%s" % self.dev])
-                # jump to egress chain
-                self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
-                                (self.dev, guestNetworkCidr, self.dev)])
-                # create ingress chain
-                self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % self.dev])
-                # jump to ingress chain
-                self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
-                                (self.dev, self.dev)])
-                self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
-                self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
+            # create egress chain
+            self.fw.append(["mangle", "", "-N ACL_OUTBOUND_%s" % self.dev])
+            # jump to egress chain
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
+                            (self.dev, guestNetworkCidr, self.dev)])
+            # create ingress chain
+            self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % self.dev])
+            # jump to ingress chain
+            self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
+                            (self.dev, self.dev)])
+            self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
+            self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
 
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.18/32 -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.22/32 -j ACCEPT"])
