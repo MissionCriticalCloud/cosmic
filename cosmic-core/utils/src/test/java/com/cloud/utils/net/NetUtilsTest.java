@@ -414,6 +414,27 @@ public class NetUtilsTest {
     }
 
     @Test
+    public void testGetCidrHostAddress() {
+        final String cidr = "10.10.0.1/24";
+        final String address = NetUtils.getCidrHostAddress(cidr);
+        assertTrue(cidr + " does not generate valid network address: ", NetUtils.isValidIp(address));
+    }
+
+    @Test
+    public void testGetCidrHostAddressNetworkAddress() {
+        final String cidr = "10.10.0.0/24";
+        final String address = NetUtils.getCidrHostAddress(cidr);
+        assertFalse(address + " is a not the network address of CIDR:" + cidr, NetUtils.isValidIp(address));
+    }
+
+    @Test
+    public void testGetCidrHostAddressBroadcastAddress() {
+        final String cidr = "10.10.0.255/24";
+        final String address = NetUtils.getCidrHostAddress(cidr);
+        assertFalse(address + " is a not the broadcast address of CIDR:" + cidr, NetUtils.isValidIp(address));
+    }
+
+    @Test
     public void testGetCidrSubNet() {
         final String cidr = "10.10.0.0/16";
         final String subnet = NetUtils.getCidrSubNet("10.10.10.10/16");
@@ -481,7 +502,7 @@ public class NetUtilsTest {
 
     @Test
     public void testIsNetowrkASubsetOrSupersetOfNetworkBWithEmptyValues() {
-        assertEquals(SupersetOrSubset.errorInCidrFormat, NetUtils.isNetowrkASubsetOrSupersetOfNetworkB("", null));
+        assertEquals(SupersetOrSubset.errorInCidrFormat, NetUtils.isNetworkASubsetOrSupersetOfNetworkB("", null));
     }
 
     @Test

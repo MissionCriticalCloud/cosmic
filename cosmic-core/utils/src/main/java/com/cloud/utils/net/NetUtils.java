@@ -664,7 +664,7 @@ public class NetUtils {
         return new Pair<>(tokens[0], Integer.parseInt(tokens[1]));
     }
 
-    public static SupersetOrSubset isNetowrkASubsetOrSupersetOfNetworkB(final String cidrA, final String cidrB) {
+    public static SupersetOrSubset isNetworkASubsetOrSupersetOfNetworkB(final String cidrA, final String cidrB) {
         if (!areCidrsNotEmpty(cidrA, cidrB)) {
             return SupersetOrSubset.errorInCidrFormat;
         }
@@ -759,6 +759,19 @@ public class NetUtils {
         final String[] cidrPair = cidr.split("\\/");
         final long guestCidrSize = Long.parseLong(cidrPair[1]);
         return getCidrNetmask(guestCidrSize);
+    }
+
+    public static String getCidrHostAddress(final String cidr) {
+        final String[] cidrPair = cidr.split("\\/");
+        final String address = cidrPair[0];
+        final SubnetUtils subnetUtils = new SubnetUtils(cidr);
+        subnetUtils.setInclusiveHostCount(false);
+
+        if (isValidIp(address) && subnetUtils.getInfo().isInRange(address)) {
+            return address;
+        }
+
+        return null;
     }
 
     public static String cidr2Netmask(final String cidr) {

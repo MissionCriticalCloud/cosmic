@@ -659,7 +659,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_CREATE, eventDescription = "creating network")
     public Network createGuestNetwork(final CreateNetworkCmd cmd) throws InsufficientCapacityException, ConcurrentOperationException, ResourceAllocationException {
         final Long networkOfferingId = cmd.getNetworkOfferingId();
-        final String gateway = cmd.getGateway();
+        String gateway = cmd.getGateway();
         final String startIP = cmd.getStartIp();
         String endIP = cmd.getEndIp();
         final String netmask = cmd.getNetmask();
@@ -818,7 +818,12 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         String cidr = cmd.getCidr();
+
         if (ipv4) {
+            // validate the CIDR
+            if (cidr != null && !NetUtils.isValidCIDR(cidr)) {
+                throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
+            }
             // if end ip is not specified, default it to startIp
             if (startIP != null) {
                 if (!NetUtils.isValidIp(startIP)) {
@@ -857,6 +862,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         if (ipv6) {
+            // validate the ipv6 CIDR
+            if (ip6Cidr != null && !NetUtils.isValidCIDR(ip6Cidr)) {
+                throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
+            }
+
             if (endIPv6 == null) {
                 endIPv6 = startIPv6;
             }
@@ -943,8 +953,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw ex;
         }
 
-        if (ntwkOff.getGuestType() != GuestType.Private && gateway == null && netmask == null && cidr != null) {
-            gateway, netmask = NetUtils.getCidrSubNet(cidr)
+        if (ntwkOff.getGuestType() != GuestType.Private && gateway == null && cidr != null) {
+            gateway = NetUtils.getCidrHostAddress(cidr);
         }
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
