@@ -190,8 +190,9 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
         final String transportzoneuuid = niciraNvpHost.getDetail("transportzoneuuid");
         final String transportzoneisotype = niciraNvpHost.getDetail("transportzoneisotype");
 
-        final CreateLogicalSwitchCommand cmd = new CreateLogicalSwitchCommand(transportzoneuuid, transportzoneisotype, name, context.getDomain().getName() + "-"
-                + context.getAccount().getAccountName());
+        final CreateLogicalSwitchCommand cmd =
+                new CreateLogicalSwitchCommand(transportzoneuuid, transportzoneisotype, name, context.getDomain().getName() + "-" + context.getAccount()
+                                                                                                                                           .getAccountName(), network.getId());
         final CreateLogicalSwitchAnswer answer = (CreateLogicalSwitchAnswer) agentMgr.easySend(niciraNvpHost.getId(), cmd);
 
         if (answer == null || !answer.getResult()) {

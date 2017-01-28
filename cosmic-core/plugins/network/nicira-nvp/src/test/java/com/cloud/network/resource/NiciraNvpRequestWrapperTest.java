@@ -68,7 +68,7 @@ public class NiciraNvpRequestWrapperTest {
         final String name = "logicalswitch";
         final String ownerName = "owner";
 
-        final CreateLogicalSwitchCommand command = new CreateLogicalSwitchCommand(transportUuid, transportType, name, ownerName);
+        final CreateLogicalSwitchCommand command = new CreateLogicalSwitchCommand(transportUuid, transportType, name, ownerName, null);
 
         final String truncated = "lswitch-" + command.getName();
 

@@ -156,7 +156,7 @@ public class NiciraNvpResourceTest {
         when(ls.getUuid()).thenReturn("cccc").thenReturn("cccc");
         when(nvpApi.createLogicalSwitch((LogicalSwitch) any())).thenThrow(new NiciraNvpApiException()).thenThrow(new NiciraNvpApiException()).thenReturn(ls);
 
-        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner");
+        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner", null);
         final CreateLogicalSwitchAnswer clsa = (CreateLogicalSwitchAnswer) resource.executeRequest(clsc);
         assertTrue(clsa.getResult());
     }
@@ -169,7 +169,7 @@ public class NiciraNvpResourceTest {
         when(ls.getUuid()).thenReturn("cccc").thenReturn("cccc");
         when(nvpApi.createLogicalSwitch((LogicalSwitch) any())).thenReturn(ls);
 
-        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner");
+        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner", null);
         final CreateLogicalSwitchAnswer clsa = (CreateLogicalSwitchAnswer) resource.executeRequest(clsc);
         assertTrue(clsa.getResult());
         assertTrue("cccc".equals(clsa.getLogicalSwitchUuid()));
@@ -183,7 +183,7 @@ public class NiciraNvpResourceTest {
         when(ls.getUuid()).thenReturn("cccc").thenReturn("cccc");
         when(nvpApi.createLogicalSwitch((LogicalSwitch) any())).thenThrow(new NiciraNvpApiException());
 
-        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner");
+        final CreateLogicalSwitchCommand clsc = new CreateLogicalSwitchCommand((String) parameters.get("guid"), "stt", "loigicalswitch", "owner", null);
         final CreateLogicalSwitchAnswer clsa = (CreateLogicalSwitchAnswer) resource.executeRequest(clsc);
         assertFalse(clsa.getResult());
     }
