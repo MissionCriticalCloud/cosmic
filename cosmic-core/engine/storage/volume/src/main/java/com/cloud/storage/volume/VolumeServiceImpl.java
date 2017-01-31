@@ -571,6 +571,12 @@ public class VolumeServiceImpl implements VolumeService {
 
         final VolumeVO vol = volDao.findById(volume.getId());
 
+        if (vol == null) {
+            s_logger.debug("Volume " + volume.getId() + " is not found");
+            future.complete(result);
+            return future;
+        }
+
         final String volumePath = vol.getPath();
         final Long poolId = vol.getPoolId();
         if (poolId == null || volumePath == null || volumePath.trim().isEmpty()) {
