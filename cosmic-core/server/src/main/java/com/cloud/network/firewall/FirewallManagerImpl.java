@@ -545,9 +545,19 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                                                                                                                                                        .equalsIgnoreCase(
                                                                                                                                                                rule.getProtocol()));
                 final boolean allowStaticNat =
-                        (rule.getPurpose() == Purpose.StaticNat && newRule.getPurpose() == Purpose.StaticNat && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
+                        (rule.getPurpose() == Purpose.StaticNat
+                                && newRule.getPurpose() == Purpose.StaticNat
+                                && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
 
-                if (!(allowPf || allowStaticNat || oneOfRulesIsFirewall)) {
+                final boolean allowVpnPf = (rule.getPurpose() == Purpose.PortForwarding
+                        && newRule.getPurpose() == Purpose.Vpn
+                        && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
+
+                final boolean allowVpnLb = (rule.getPurpose() == Purpose.LoadBalancing
+                        && newRule.getPurpose() == Purpose.Vpn
+                        && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
+
+                if (!(allowPf || allowStaticNat || oneOfRulesIsFirewall || allowVpnPf || allowVpnLb)) {
                     throw new NetworkRuleConflictException("The range specified, " + newRule.getSourcePortStart() + "-" + newRule.getSourcePortEnd() +
                             ", conflicts with rule " + rule.getId() + " which has " + rule.getSourcePortStart() + "-" + rule.getSourcePortEnd());
                 }
