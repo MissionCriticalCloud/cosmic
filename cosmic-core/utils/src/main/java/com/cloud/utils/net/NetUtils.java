@@ -774,6 +774,17 @@ public class NetUtils {
         return null;
     }
 
+    public static String getCidrHostAddress6(final String cidrv6) {
+        final String[] cidrPair = cidrv6.split("\\/");
+        final String address = cidrPair[0];
+
+        if (isValidIpv6(address) && isIp6InNetwork(address, cidrv6, false)) {
+            return address;
+        }
+
+        return null;
+    }
+
     public static String cidr2Netmask(final String cidr) {
         final String[] tokens = cidr.split("\\/");
         return getCidrNetmask(Integer.parseInt(tokens[1]));
@@ -1224,6 +1235,21 @@ public class NetUtils {
         }
         final IPv6Address ip = IPv6Address.fromString(ip6);
         return network.contains(ip);
+    }
+
+    public static boolean isIp6InNetwork(final String ip6, final String ip6Cidr, final Boolean inclusiveHostCount) {
+        IPv6Network network = null;
+        try {
+            network = IPv6Network.fromString(ip6Cidr);
+        } catch (final IllegalArgumentException ex) {
+            return false;
+        }
+        final IPv6Address ip = IPv6Address.fromString(ip6);
+        if (inclusiveHostCount) {
+            return network.contains(ip);
+        } else {
+            return ((network.getFirst().compareTo(ip) < 0) && (network.getLast().compareTo(ip) > 0));
+        }
     }
 
     public static boolean isIp6RangeOverlap(final String ipRange1, final String ipRange2) {

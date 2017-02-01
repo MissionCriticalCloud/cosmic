@@ -106,12 +106,12 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
 
         if (userSpecified != null) {
             if ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null)) {
-                throw new InvalidParameterValueException("cidr and gateway must be specified together.");
+                throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
 
             if ((userSpecified.getIp6Cidr() == null && userSpecified.getIp6Gateway() != null) ||
                     (userSpecified.getIp6Cidr() != null && userSpecified.getIp6Gateway() == null)) {
-                throw new InvalidParameterValueException("cidrv6 and gatewayv6 must be specified together.");
+                throw new InvalidParameterValueException("CIDRv6 and gatewayv6 must be specified together or the CIDRv6 must represents the gateway.");
             }
 
             if (userSpecified.getCidr() != null) {

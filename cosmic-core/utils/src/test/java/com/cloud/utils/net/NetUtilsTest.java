@@ -417,7 +417,7 @@ public class NetUtilsTest {
     public void testGetCidrHostAddress() {
         final String cidr = "10.10.0.1/24";
         final String address = NetUtils.getCidrHostAddress(cidr);
-        assertTrue(cidr + " does not generate valid network address: ", NetUtils.isValidIp(address));
+        assertTrue(cidr + " does not generate valid gateway address.", NetUtils.isValidIp(address));
     }
 
     @Test
@@ -432,6 +432,27 @@ public class NetUtilsTest {
         final String cidr = "10.10.0.255/24";
         final String address = NetUtils.getCidrHostAddress(cidr);
         assertFalse(address + " is a not the broadcast address of CIDR:" + cidr, NetUtils.isValidIp(address));
+    }
+
+    @Test
+    public void testGetCidrHostAddressIPv6() {
+        final String cidr = "2a00:16:a::1/64";
+        final String address = NetUtils.getCidrHostAddress6(cidr);
+        assertTrue(cidr + " does not generate valid gateway address.", NetUtils.isValidIpv6(address));
+    }
+
+    @Test
+    public void testGetCidrHostAddressNetworkAddressIPv6() {
+        final String cidr = "2a00:16:a::/64";
+        final String address = NetUtils.getCidrHostAddress6(cidr);
+        assertFalse(address + " is a not the network address of CIDR:" + cidr, NetUtils.isValidIpv6(address));
+    }
+
+    @Test
+    public void testGetCidrHostAddressBroadcastAddressIPv6() {
+        final String cidr = "2a00:16:a::ffff:ffff:ffff:ffff/64";
+        final String address = NetUtils.getCidrHostAddress6(cidr);
+        assertFalse(address + " is a not the broadcast address of CIDR:" + cidr, NetUtils.isValidIpv6(address));
     }
 
     @Test

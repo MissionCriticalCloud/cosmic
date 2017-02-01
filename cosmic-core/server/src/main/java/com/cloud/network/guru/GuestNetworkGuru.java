@@ -165,7 +165,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         if (userSpecified != null) {
             if (!Network.GuestType.Private.equals(offering.getGuestType()) &&
                     ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null))) {
-                throw new InvalidParameterValueException("cidr and gateway must be specified together.");
+                throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
 
             if (userSpecified.getCidr() != null) {

@@ -677,7 +677,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         final Long vpcId = cmd.getVpcId();
         final String startIPv6 = cmd.getStartIpv6();
         String endIPv6 = cmd.getEndIpv6();
-        final String ip6Gateway = cmd.getIp6Gateway();
+        String ip6Gateway = cmd.getIp6Gateway();
         final String ip6Cidr = cmd.getIp6Cidr();
         Boolean displayNetwork = cmd.getDisplayNetwork();
         final Long aclId = cmd.getAclId();
@@ -901,7 +901,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (ipv4) {
             // For non-root admins check cidr limit - if it's allowed by global config value
             if (!_accountMgr.isRootAdmin(caller.getId()) && cidr != null) {
-
                 final String[] cidrPair = cidr.split("\\/");
                 final int cidrSize = Integer.parseInt(cidrPair[1]);
 
@@ -955,6 +954,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (ntwkOff.getGuestType() != GuestType.Private && gateway == null && cidr != null) {
             gateway = NetUtils.getCidrHostAddress(cidr);
+        }
+
+        if (ntwkOff.getGuestType() != GuestType.Private && ip6Gateway == null && ip6Cidr != null) {
+            ip6Gateway = NetUtils.getCidrHostAddress6(ip6Cidr);
         }
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
