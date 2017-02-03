@@ -64,6 +64,12 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
             description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
     private Boolean displayNetwork;
 
+    @Parameter(name = ApiConstants.DNS1, type = CommandType.STRING, description = "The first DNS server of the network")
+    private String dns1;
+
+    @Parameter(name = ApiConstants.DNS2, type = CommandType.STRING, description = "The second DNS server of the network")
+    private String dns2;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -79,7 +85,7 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
 
         final Network result =
                 _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
-                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId());
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2());
 
         if (result != null) {
             final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
@@ -108,6 +114,14 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
 
     public Long getNetworkOfferingId() {
         return networkOfferingId;
+    }
+
+    public String getDns1() {
+        return dns1;
+    }
+
+    public String getDns2() {
+        return dns2;
     }
 
     public Boolean getChangeCidr() {

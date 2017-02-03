@@ -133,6 +133,12 @@ public class CreateNetworkCmd extends BaseCmd {
     @Parameter(name = ApiConstants.VLAN, type = CommandType.STRING, description = "The VLAN of the network")
     private String vlan;
 
+    @Parameter(name = ApiConstants.DNS1, type = CommandType.STRING, description = "The first DNS server of the network")
+    private String dns1;
+
+    @Parameter(name = ApiConstants.DNS2, type = CommandType.STRING, description = "The second DNS server of the network")
+    private String dns2;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -268,6 +274,14 @@ public class CreateNetworkCmd extends BaseCmd {
 
     public String getVlan() {
         return vlan;
+    }
+
+    public String getDns1() {
+        return dns1;
+    }
+
+    public String getDns2() {
+        return dns2;
     }
 
     @Override

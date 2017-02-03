@@ -446,17 +446,18 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
     @DB
     protected void createDefaultNetworkOfferings() {
 
-        NetworkOfferingVO publicNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemPublicNetwork, TrafficType.Public, true);
+        final NetworkOfferingVO publicNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemPublicNetwork, TrafficType.Public, true);
         _networkOfferingDao.persistDefaultNetworkOffering(publicNetworkOffering);
-        NetworkOfferingVO managementNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemManagementNetwork, TrafficType.Management, false);
+        final NetworkOfferingVO managementNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemManagementNetwork, TrafficType.Management, false);
         _networkOfferingDao.persistDefaultNetworkOffering(managementNetworkOffering);
-        NetworkOfferingVO controlNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemControlNetwork, TrafficType.Control, false);
+        final NetworkOfferingVO controlNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemControlNetwork, TrafficType.Control, false);
         _networkOfferingDao.persistDefaultNetworkOffering(controlNetworkOffering);
-        NetworkOfferingVO storageNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemStorageNetwork, TrafficType.Storage, true);
+        final NetworkOfferingVO storageNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemStorageNetwork, TrafficType.Storage, true);
         _networkOfferingDao.persistDefaultNetworkOffering(storageNetworkOffering);
-        NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
+        final NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
         _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOffering);
-        NetworkOfferingVO privateGatewayNetworkOfferingSpecifyVlan = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOfferingSpecifyVlan, GuestType.Private, true);
+        final NetworkOfferingVO privateGatewayNetworkOfferingSpecifyVlan =
+                new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOfferingSpecifyVlan, GuestType.Private, true);
         _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOfferingSpecifyVlan);
 
         //populate providers
@@ -687,10 +688,9 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     if (broadcastDomainType != null) {
                         final NetworkVO network =
                                 new NetworkVO(id, trafficType, mode, broadcastDomainType, networkOfferingId, domainId, accountId, related, null, null, networkDomain,
-                                        Network.GuestType.Shared, zoneId, null, null, specifyIpRanges, null, offering.getRedundantRouter());
+                                        Network.GuestType.Shared, zoneId, null, null, specifyIpRanges, null, offering.getRedundantRouter(),
+                                        zone.getDns1(), zone.getDns2());
                         network.setGuruName(guruNames.get(network.getTrafficType()));
-                        network.setDns1(zone.getDns1());
-                        network.setDns2(zone.getDns2());
                         network.setState(State.Implemented);
                         _networkDao.persist(network, false, getServicesAndProvidersForNetwork(networkOfferingId));
                         id++;

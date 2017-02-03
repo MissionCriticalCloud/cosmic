@@ -73,7 +73,7 @@ public interface NetworkOrchestrationService {
     List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan,
                                          String name, String displayText,
                                          boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
-                                         Boolean isDisplayNetworkEnabled)
+                                         Boolean isDisplayNetworkEnabled, String dns1, String dns2)
             throws ConcurrentOperationException;
 
     void allocate(VirtualMachineProfile vm, LinkedHashMap<? extends Network, List<? extends NicProfile>> networks)
@@ -132,10 +132,9 @@ public interface NetworkOrchestrationService {
     boolean destroyNetwork(long networkId, ReservationContext context, boolean forced);
 
     Network createGuestNetwork(long networkOfferingId, String name, String displayText, String gateway, String cidr,
-                               String vlanId, String networkDomain, Account owner,
-                               Long domainId, PhysicalNetwork physicalNetwork, long zoneId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
-                               String ip6Gateway, String ip6Cidr,
-                               Boolean displayNetworkEnabled, String isolatedPvlan)
+                               String vlanId, String networkDomain, Account owner, Long domainId, PhysicalNetwork physicalNetwork,
+                               long zoneId, ACLType aclType, Boolean subdomainAccess, Long vpcId, String ip6Gateway, String ip6Cidr,
+                               Boolean displayNetworkEnabled, String isolatedPvlan, String dns1, String dns2)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
 
     UserDataServiceProvider getPasswordResetProvider(Network network);

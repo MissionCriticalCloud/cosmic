@@ -3047,7 +3047,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Don't return system network offerings to the user except for private gateway offerings
-        if (keyword == null || ! keyword.equals("private")) {
+        if (keyword == null || !keyword.equals("private")) {
             sc.addAnd("systemOnly", SearchCriteria.Op.EQ, false);
         }
 
@@ -4157,7 +4157,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                 userNetwork.setBroadcastDomainType(broadcastDomainType);
                 userNetwork.setNetworkDomain(networkDomain);
-                _networkMgr.setupNetwork(systemAccount, offering, userNetwork, plan, null, null, false, Domain.ROOT_DOMAIN, null, null, null, true);
+                _networkMgr.setupNetwork(systemAccount, offering, userNetwork, plan, null, null, false, Domain.ROOT_DOMAIN, null, null, null, true, null, null);
             }
         }
     }

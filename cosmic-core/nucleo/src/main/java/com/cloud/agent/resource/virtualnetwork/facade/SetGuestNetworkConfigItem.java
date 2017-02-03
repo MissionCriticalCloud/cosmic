@@ -23,12 +23,12 @@ public class SetGuestNetworkConfigItem extends AbstractConfigItemFacade {
         final String cidr = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
         final String netmask = nic.getNetmask();
         final String domainName = command.getNetworkDomain();
-        String dns = command.getDefaultDns1();
+        String dns = command.getNetworkDns1();
 
         if (dns == null || dns.isEmpty()) {
-            dns = command.getDefaultDns2();
+            dns = command.getNetworkDns2();
         } else {
-            final String dns2 = command.getDefaultDns2();
+            final String dns2 = command.getNetworkDns2();
             if (dns2 != null && !dns2.isEmpty()) {
                 dns += "," + dns2;
             }

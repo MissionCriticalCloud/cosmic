@@ -137,6 +137,8 @@ class updateDataBag:
         dp['nic_dev_id'] = d['device'][3]
         dp['nw_type'] = 'guest'
         dp['vif_mac_address'] = d['mac_address']
+        if 'dns' in d:
+            dp['dns'] = d['dns']
         qf = QueueFile()
         qf.load({ 'ip_address': [dp], 'type': 'ips' })
         if 'domain_name' not in d.keys() or d['domain_name'] == '':

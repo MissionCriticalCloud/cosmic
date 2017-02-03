@@ -122,9 +122,9 @@ public class NetworkVO implements Network {
 
     public NetworkVO(final long id, final Network that, final long offeringId, final String guruName, final long domainId, final long accountId, final long related,
                      final String name, final String displayText, final String networkDomain, final GuestType guestType, final long dcId, final Long physicalNetworkId,
-                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant) {
+                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant, final String dns1, final String dns2) {
         this(id, that.getTrafficType(), that.getMode(), that.getBroadcastDomainType(), offeringId, domainId, accountId, related, name, displayText, networkDomain, guestType,
-                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant);
+                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant, dns1, dns2);
         gateway = that.getGateway();
         cidr = that.getCidr();
         networkCidr = that.getNetworkCidr();
@@ -161,7 +161,7 @@ public class NetworkVO implements Network {
     public NetworkVO(final long id, final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
                      final long domainId, final long accountId, final long related, final String name, final String displayText, final String networkDomain,
                      final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges, final Long vpcId,
-                     final boolean isRedundant) {
+                     final boolean isRedundant, final String dns1, final String dns2) {
         this(trafficType, mode, broadcastDomainType, networkOfferingId, State.Allocated, dcId, physicalNetworkId, isRedundant);
         this.domainId = domainId;
         this.accountId = accountId;
@@ -175,6 +175,8 @@ public class NetworkVO implements Network {
         this.guestType = guestType;
         this.specifyIpRanges = specifyIpRanges;
         this.vpcId = vpcId;
+        this.dns1 = dns1;
+        this.dns2 = dns2;
     }
 
     /**

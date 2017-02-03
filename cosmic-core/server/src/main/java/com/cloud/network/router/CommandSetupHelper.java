@@ -992,8 +992,8 @@ public class CommandSetupHelper {
     public SetupGuestNetworkCommand createSetupGuestNetworkCommand(final DomainRouterVO router, final boolean add, final NicProfile guestNic) {
         final Network network = _networkModel.getNetwork(guestNic.getNetworkId());
 
-        String defaultDns1 = null;
-        String defaultDns2 = null;
+        String networkDns1 = null;
+        String networkDns2 = null;
 
         final boolean dnsProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dns, Provider.VPCVirtualRouter);
         final boolean dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dhcp, Provider.VPCVirtualRouter);
@@ -1001,8 +1001,8 @@ public class CommandSetupHelper {
         final boolean setupDns = dnsProvided || dhcpProvided;
 
         if (setupDns) {
-            defaultDns1 = guestNic.getIPv4Dns1();
-            defaultDns2 = guestNic.getIPv4Dns2();
+            networkDns1 = network.getDns1();
+            networkDns2 = network.getDns2();
         }
 
         final Nic nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
@@ -1011,9 +1011,8 @@ public class CommandSetupHelper {
 
         final NicProfile nicProfile = _networkModel.getNicProfile(router, nic.getNetworkId(), null);
 
-        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(dhcpRange, networkDomain, router.getIsRedundantRouter(), defaultDns1, defaultDns2, add, _itMgr
-                .toNicTO(nicProfile,
-                        router.getHypervisorType()));
+        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(dhcpRange, networkDomain, router.getIsRedundantRouter(), networkDns1, networkDns2, add, _itMgr
+                .toNicTO(nicProfile, router.getHypervisorType()));
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
         setupCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));

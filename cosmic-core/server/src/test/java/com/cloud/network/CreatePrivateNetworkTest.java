@@ -94,18 +94,18 @@ public class CreatePrivateNetworkTest {
         final PhysicalNetworkVO physicalNetwork = new PhysicalNetworkVO(1L, 1L, "2-5", "200", 1L, null, "testphysicalnetwork");
         when(networkService._physicalNetworkDao.findById(anyLong())).thenReturn(physicalNetwork);
 
-        final DataCenterVO dc = new DataCenterVO(1L, "hut", "op de hei", null, null, null, null, "10.1.1.0/24", "unreal.net", 1L, NetworkType.Advanced, null, null);
+        final DataCenterVO dc = new DataCenterVO(1L, "DC", "Datacenter", "1.2.3.4", null, null, null, "10.1.1.0/24", "unreal.net", 1L, NetworkType.Advanced, null, null);
         when(networkService._dcDao.lockRow(anyLong(), anyBoolean())).thenReturn(dc);
 
         when(networkService._networksDao.getPrivateNetwork(anyString(), anyString(), eq(1L), eq(1L), anyLong())).thenReturn(null);
 
         final Network net =
                 new NetworkVO(1L, TrafficType.Guest, Mode.None, BroadcastDomainType.Vlan, 1L, 1L, 1L, 1L, "bla", "fake", "eet.net", GuestType.Isolated, 1L, 1L,
-                        ACLType.Account, false, 1L, false);
+                        ACLType.Account, false, 1L, false, "1.2.3.4", null);
         when(
                 networkService._networkMgr.createGuestNetwork(eq(ntwkOff.getId()), eq("bla"), eq("fake"), eq("10.1.1.1"), eq("10.1.1.0/24"), anyString(), anyString(),
                         eq(account), anyLong(), eq(physicalNetwork), eq(physicalNetwork.getDataCenterId()), eq(ACLType.Account), anyBoolean(), eq(1L), anyString(), anyString(),
-                        anyBoolean(), anyString())).thenReturn(net);
+                        anyBoolean(), anyString(), eq("1.2.3.4"), eq(null))).thenReturn(net);
 
         when(networkService._privateIpDao.findByIpAndSourceNetworkId(net.getId(), "10.1.1.2")).thenReturn(null);
         when(networkService._privateIpDao.findByIpAndSourceNetworkIdAndVpcId(eq(1L), anyString(), eq(1L))).thenReturn(null);
