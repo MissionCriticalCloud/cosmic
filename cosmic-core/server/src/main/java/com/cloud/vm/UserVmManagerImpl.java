@@ -801,9 +801,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         DataCenterDeployment plan = null;
+        boolean deployOnGivenHost = false;
         if (destinationHost != null) {
             s_logger.debug("Destination Host to deploy the VM is specified, specifying a deployment plan to deploy the VM");
             plan = new DataCenterDeployment(vm.getDataCenterId(), destinationHost.getPodId(), destinationHost.getClusterId(), destinationHost.getId(), null, null);
+            deployOnGivenHost = true;
         }
 
         // Set parameters
@@ -851,7 +853,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final String reservationId = vmEntity.reserve(planner, plan, new ExcludeList(), Long.toString(callerUser.getId()));
-        vmEntity.deploy(reservationId, Long.toString(callerUser.getId()), params);
+        vmEntity.deploy(reservationId, Long.toString(callerUser.getId()), params, deployOnGivenHost);
 
         final Pair<UserVmVO, Map<VirtualMachineProfile.Param, Object>> vmParamPair = new Pair(vm, params);
         if (vm != null && vm.isUpdateParameters()) {

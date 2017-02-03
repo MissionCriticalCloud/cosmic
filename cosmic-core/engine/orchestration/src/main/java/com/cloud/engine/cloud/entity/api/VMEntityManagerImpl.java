@@ -214,10 +214,10 @@ public class VMEntityManagerImpl implements VMEntityManager {
     }
 
     @Override
-    public void deployVirtualMachine(final String reservationId, final VMEntityVO vmEntityVO, final String caller, final Map<VirtualMachineProfile.Param, Object> params)
-            throws InsufficientCapacityException, ResourceUnavailableException {
-        //grab the VM Id and destination using the reservationId.
+    public void deployVirtualMachine(final String reservationId, final VMEntityVO vmEntityVO, final String caller, final Map<VirtualMachineProfile.Param, Object> params,
+                                     final boolean deployOnGivenHost) throws InsufficientCapacityException, ResourceUnavailableException {
 
+        //grab the VM Id and destination using the reservationId.
         final VMInstanceVO vm = _vmDao.findByUuid(vmEntityVO.getUuid());
 
         final VMReservationVO vmReservation = _reservationDao.findByReservationId(reservationId);
@@ -229,13 +229,15 @@ public class VMEntityManagerImpl implements VMEntityManager {
                 _itMgr.start(vm.getUuid(), params, reservedPlan, _planningMgr.getDeploymentPlannerByName(vmReservation.getDeploymentPlanner()));
             } catch (final Exception ex) {
                 // Retry the deployment without using the reservation plan
-                final DataCenterDeployment plan = new DataCenterDeployment(0, null, null, null, null, null);
-
-                if (reservedPlan.getAvoids() != null) {
-                    plan.setAvoids(reservedPlan.getAvoids());
+                // Retry is only done if host id is not passed in deploy virtual machine api. Otherwise
+                // the instance may be started on another host instead of the intended one.
+                if (!deployOnGivenHost) {
+                    final DataCenterDeployment plan = new DataCenterDeployment(0, null, null, null, null, null);
+                    if (reservedPlan.getAvoids() != null) {
+                        plan.setAvoids(reservedPlan.getAvoids());
+                    }
+                    _itMgr.start(vm.getUuid(), params, plan, null);
                 }
-
-                _itMgr.start(vm.getUuid(), params, plan, null);
             }
         } else {
             // no reservation found. Let VirtualMachineManager retry
