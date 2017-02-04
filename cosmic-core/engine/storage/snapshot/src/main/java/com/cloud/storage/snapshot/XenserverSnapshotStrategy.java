@@ -1,5 +1,6 @@
 package com.cloud.storage.snapshot;
 
+import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
@@ -235,8 +236,24 @@ public class XenserverSnapshotStrategy extends SnapshotStrategyBase {
 
             snapshot = result.getSnashot();
             final DataStore primaryStore = snapshot.getDataStore();
+            final boolean backupFlag = Boolean.parseBoolean(configDao.getValue(Config.BackupSnapshotAfterTakingSnapshot.toString()));
 
-            final SnapshotInfo backupedSnapshot = backupSnapshot(snapshot);
+            final SnapshotInfo backupedSnapshot;
+            if (backupFlag) {
+                backupedSnapshot = backupSnapshot(snapshot);
+            } else {
+                // Fake it to get the transitions to fire in the proper order
+                s_logger.debug("skipping backup of snapshot due to configuration " + Config.BackupSnapshotAfterTakingSnapshot.toString());
+                final SnapshotObject snapObj = (SnapshotObject) snapshot;
+
+                try {
+                    snapObj.processEvent(Snapshot.Event.OperationNotPerformed);
+                } catch (final NoTransitionException e) {
+                    s_logger.debug("Failed to change state: " + snapshot.getId() + ": " + e.toString());
+                    throw new CloudRuntimeException(e.toString());
+                }
+                backupedSnapshot = snapshot;
+            }
 
             try {
                 final SnapshotInfo parent = snapshot.getParent();

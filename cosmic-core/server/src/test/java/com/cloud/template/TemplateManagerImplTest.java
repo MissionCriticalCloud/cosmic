@@ -24,6 +24,7 @@ import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.StorageCacheManager;
+import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
@@ -144,6 +145,9 @@ public class TemplateManagerImplTest {
 
     @Inject
     SnapshotDao snapshotDao;
+
+    @Inject
+    StorageStrategyFactory storageStrategyFactory;
 
     @Before
     public void setUp() {
@@ -410,6 +414,11 @@ public class TemplateManagerImplTest {
         @Bean
         public VMTemplateDao vmTemplateDao() {
             return Mockito.mock(VMTemplateDao.class);
+        }
+
+        @Bean
+        public StorageStrategyFactory storageStrategyFactory() {
+            return Mockito.mock(StorageStrategyFactory.class);
         }
 
         @Bean
