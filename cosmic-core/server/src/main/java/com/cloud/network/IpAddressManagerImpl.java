@@ -477,6 +477,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                     }
                 } else {
                     if (activeCount != null && activeCount > 0) {
+                        if (network.getVpcId() != null) {
+                            // If there are more than one ip in the vpc tier network with services configured on it,
+                            // then in case of restart network with cleanup this needs to be return true, because due
+                            // to the cleanup all configuration is gone and needs to be resent.
+                            return true;
+                        }
                         continue;
                     } else if (addCount != null && addCount.longValue() == totalCount.longValue()) {
                         s_logger.trace("All rules are in Add state, have to assiciate IP with the backend");
