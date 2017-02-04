@@ -99,7 +99,10 @@ public abstract class AbstractConfigItemFacade {
         final String remoteFilename = appendUuidToJsonFiles(destinationFile);
         s_logger.debug("Transformed filename " + destinationFile + " to " + remoteFilename);
 
-        final ConfigItem configFile = new FileConfigItem(VRScripts.CONFIG_PERSIST_LOCATION, remoteFilename, gson.toJson(configuration));
+        final String jsonConfigCommand = gson.toJson(configuration);
+        s_logger.debug("Contents of jsonConfigCommand " + remoteFilename + " is: " + jsonConfigCommand);
+
+        final ConfigItem configFile = new FileConfigItem(VRScripts.CONFIG_PERSIST_LOCATION, remoteFilename, jsonConfigCommand);
         cfg.add(configFile);
 
         final ConfigItem updateCommand = new ScriptConfigItem(VRScripts.UPDATE_CONFIG, remoteFilename);
