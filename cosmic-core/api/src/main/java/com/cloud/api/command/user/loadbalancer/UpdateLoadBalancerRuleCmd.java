@@ -50,6 +50,16 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
+    @Parameter(name = ApiConstants.CLIENT_TIMEOUT,
+            type = CommandType.INTEGER,
+            description = "the HAProxy client_timeout setting for this load balancing rule (in ms).")
+    private Integer clientTimeout;
+
+    @Parameter(name = ApiConstants.SERVER_TIMEOUT,
+            type = CommandType.INTEGER,
+            description = "the HAProxy server_timeout setting for this load balancing rule (in ms).")
+    private Integer serverTimeout;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -68,6 +78,22 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
 
     public Boolean getDisplay() {
         return display;
+    }
+
+    public Integer getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final Integer clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    public Integer getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final Integer serverTimeout) {
+        this.serverTimeout = serverTimeout;
     }
 
     @Override

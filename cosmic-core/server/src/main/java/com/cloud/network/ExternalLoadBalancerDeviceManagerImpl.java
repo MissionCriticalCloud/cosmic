@@ -943,9 +943,14 @@ public abstract class ExternalLoadBalancerDeviceManagerImpl extends AdapterBase 
 
             if ((destinations != null && !destinations.isEmpty()) || rule.isAutoScaleConfig()) {
                 final boolean inline = _networkMgr.isNetworkInlineMode(network);
+
+                // Load default values and fallback to hardcoded if not available
+                final Integer defaultClientTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerClientTimeout.key()), 60000);
+                final Integer defaultServerTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerServerTimeout.key()), 60000);
+
                 final LoadBalancerTO loadBalancer =
                         new LoadBalancerTO(uuid, srcIp, srcPort, protocol, algorithm, revoked, false, inline, destinations, rule.getStickinessPolicies(),
-                                rule.getHealthCheckPolicies(), rule.getLbSslCert(), rule.getLbProtocol());
+                                rule.getHealthCheckPolicies(), rule.getLbSslCert(), rule.getLbProtocol(), defaultClientTimeout, defaultServerTimeout);
                 if (rule.isAutoScaleConfig()) {
                     loadBalancer.setAutoScaleVmGroup(rule.getAutoScaleVmGroup());
                 }
@@ -1162,9 +1167,14 @@ public abstract class ExternalLoadBalancerDeviceManagerImpl extends AdapterBase 
 
             if ((destinations != null && !destinations.isEmpty()) || !rule.isAutoScaleConfig()) {
                 final boolean inline = _networkMgr.isNetworkInlineMode(network);
+
+                // Load default values and fallback to hardcoded if not available
+                final Integer defaultClientTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerClientTimeout.key()), 60000);
+                final Integer defaultServerTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerServerTimeout.key()), 60000);
+
                 final LoadBalancerTO loadBalancer =
                         new LoadBalancerTO(uuid, srcIp, srcPort, protocol, algorithm, revoked, false, inline, destinations, rule.getStickinessPolicies(),
-                                rule.getHealthCheckPolicies(), rule.getLbSslCert(), rule.getLbProtocol());
+                                rule.getHealthCheckPolicies(), rule.getLbSslCert(), rule.getLbProtocol(), defaultClientTimeout, defaultServerTimeout);
                 loadBalancersToApply.add(loadBalancer);
             }
         }

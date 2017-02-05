@@ -90,6 +90,14 @@ public class LoadBalancerResponse extends BaseResponse implements ControlledEnti
     @Param(description = "is rule for display to the regular user", since = "4.4", authorized = {RoleType.Admin})
     private Boolean forDisplay;
 
+    @SerializedName(ApiConstants.CLIENT_TIMEOUT)
+    @Param(description = "the HAProxy client_timeout setting for this load balancing rule.")
+    private Integer clientTimeout;
+
+    @SerializedName(ApiConstants.SERVER_TIMEOUT)
+    @Param(description = "the HAProxy server_timeout setting for this load balancing rule.")
+    private Integer serverTimeout;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -120,6 +128,22 @@ public class LoadBalancerResponse extends BaseResponse implements ControlledEnti
 
     public void setAlgorithm(final String algorithm) {
         this.algorithm = algorithm;
+    }
+
+    public Integer getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final Integer clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    public Integer getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final Integer serverTimeout) {
+        this.serverTimeout = serverTimeout;
     }
 
     @Override

@@ -38,13 +38,16 @@ public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
     private int defaultPortStart;
     @Column(name = "default_port_end")
     private int defaultPortEnd;
+    @Column(name = "client_timeout")
+    private int clientTimeout;
+    @Column(name = "server_timeout")
+    private int serverTimeout;
 
     public LoadBalancerVO() {
     }
 
-    public LoadBalancerVO(final String xId, final String name, final String description, final long srcIpId, final int srcPort, final int dstPort, final String algorithm, final
-    long networkId, final long accountId,
-                          final long domainId, final String lbProtocol) {
+    public LoadBalancerVO(final String xId, final String name, final String description, final long srcIpId, final int srcPort, final int dstPort, final String algorithm,
+                          final long networkId, final long accountId, final long domainId, final String lbProtocol, final int clientTimeout, final int serverTimeout) {
         super(xId, srcIpId, srcPort, NetUtils.TCP_PROTO, networkId, accountId, domainId, Purpose.LoadBalancing, null, null, null, null);
         this.name = name;
         this.description = description;
@@ -53,6 +56,8 @@ public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
         this.defaultPortEnd = dstPort;
         this.scheme = Scheme.Public;
         this.lbProtocol = lbProtocol;
+        this.clientTimeout = clientTimeout;
+        this.serverTimeout = serverTimeout;
     }
 
     @Override
@@ -104,5 +109,23 @@ public class LoadBalancerVO extends FirewallRuleVO implements LoadBalancer {
     @Override
     public int getDefaultPortEnd() {
         return defaultPortEnd;
+    }
+
+    @Override
+    public int getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final int clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    @Override
+    public int getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final int serverTimeout) {
+        this.serverTimeout = serverTimeout;
     }
 }

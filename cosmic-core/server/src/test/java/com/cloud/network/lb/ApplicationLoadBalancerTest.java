@@ -119,7 +119,7 @@ public class ApplicationLoadBalancerTest extends TestCase {
 
         final ApplicationLoadBalancerRuleVO lbRule =
                 new ApplicationLoadBalancerRuleVO("new", "new", 22, 22, "roundrobin", validGuestNetworkId, validAccountId, 1L, new Ip(validRequestedIp), validGuestNetworkId,
-                        Scheme.Internal);
+                        Scheme.Internal, 60000, 60000);
         Mockito.when(_lbDao.persist(Matchers.any(ApplicationLoadBalancerRuleVO.class))).thenReturn(lbRule);
 
         Mockito.when(_lbMgr.validateLbRule(Matchers.any(LoadBalancingRule.class))).thenReturn(true);

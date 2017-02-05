@@ -11,6 +11,7 @@ import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRulesCmd;
 import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.api.response.ServiceResponse;
 import com.cloud.config.ApiServiceConfiguration;
+import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -110,6 +111,7 @@ import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.uservm.UserVm;
+import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
@@ -341,11 +343,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             _firewallMgr.removeRule(lb);
         }
 
-        // FIXME: breaking the dependency on ELB manager. This breaks
-        // functionality of ELB using virtual router
-        // Bug CS-15411 opened to document this
-        // _elbMgr.handleDeleteLoadBalancerRule(lb, callerUserId, caller);
-
         s_logger.debug("Load balancer with id " + lb.getId() + " is removed successfully");
 
         return true;
@@ -353,11 +350,10 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_LOAD_BALANCER_CREATE, eventDescription = "creating load balancer")
-    public LoadBalancer createPublicLoadBalancerRule(final String xId, final String name, final String description, final int srcPortStart, final int srcPortEnd, final int
-            defPortStart, final int defPortEnd,
-                                                     final Long ipAddrId, final String protocol, final String algorithm, final long networkId, final long lbOwnerId, final
-                                                     boolean openFirewall, final String lbProtocol, final Boolean forDisplay) throws NetworkRuleConflictException,
-            InsufficientAddressCapacityException {
+    public LoadBalancer createPublicLoadBalancerRule(final String xId, final String name, final String description, final int srcPortStart, final int srcPortEnd,
+                                                     final int defPortStart, final int defPortEnd, final Long ipAddrId, final String protocol, final String algorithm,
+                                                     final long networkId, final long lbOwnerId, final boolean openFirewall, final String lbProtocol, final Boolean forDisplay,
+                                                     Integer clientTimeout, Integer serverTimeout) throws NetworkRuleConflictException, InsufficientAddressCapacityException {
         final Account lbOwner = _accountMgr.getAccount(lbOwnerId);
 
         if (srcPortStart != srcPortEnd) {
@@ -371,11 +367,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
         final Network network = _networkModel.getNetwork(networkId);
 
-        // FIXME: breaking the dependency on ELB manager. This breaks
-        // functionality of ELB using virtual router
-        // Bug CS-15411 opened to document this
-        // LoadBalancer result = _elbMgr.handleCreateLoadBalancerRule(lb,
-        // lbOwner, lb.getNetworkId());
         LoadBalancer result = null;
         if (result == null) {
             IpAddress systemIp = null;
@@ -414,8 +405,24 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
                     throw new InvalidParameterValueException("Ip address " + ipVO + " is not assigned to the network " + network);
                 }
 
+                // Load default values and fallback to hardcoded if not available
+                final Integer defaultClientTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerClientTimeout.key()), 60000);
+                final Integer defaultServerTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerServerTimeout.key()), 60000);
+
+                // set timeouts, use defaults if not available
+                if (clientTimeout != null) {
+                    clientTimeout = NumbersUtil.parseInt(clientTimeout.toString(), defaultClientTimeout);
+                } else {
+                    clientTimeout = defaultClientTimeout;
+                }
+                if (serverTimeout != null) {
+                    serverTimeout = NumbersUtil.parseInt(serverTimeout.toString(), defaultServerTimeout);
+                } else {
+                    serverTimeout = defaultServerTimeout;
+                }
+
                 result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, openFirewall, CallContext.current(),
-                        lbProtocol, forDisplay);
+                        lbProtocol, forDisplay, clientTimeout, serverTimeout);
             } catch (final Exception ex) {
                 s_logger.warn("Failed to create load balancer due to ", ex);
                 if (ex instanceof NetworkRuleConflictException) {
@@ -447,10 +454,9 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
     @DB
     @Override
-    public LoadBalancer createPublicLoadBalancer(final String xId, final String name, final String description, final int srcPort, final int destPort,
-                                                 final long sourceIpId,
+    public LoadBalancer createPublicLoadBalancer(final String xId, final String name, final String description, final int srcPort, final int destPort, final long sourceIpId,
                                                  final String protocol, final String algorithm, final boolean openFirewall, final CallContext caller, final String lbProtocol,
-                                                 final Boolean forDisplay)
+                                                 final Boolean forDisplay, final int clientTimeout, final int serverTimeout)
             throws NetworkRuleConflictException {
 
         if (!NetUtils.isValidPort(destPort)) {
@@ -494,7 +500,7 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
         final LoadBalancerVO newRule =
                 new LoadBalancerVO(xId, name, description, sourceIpId, srcPort, destPort, algorithm, networkId, ipAddr.getAllocatedToAccountId(),
-                        ipAddr.getAllocatedInDomainId(), lbProtocol);
+                        ipAddr.getAllocatedInDomainId(), lbProtocol, clientTimeout, serverTimeout);
 
         // verify rule is supported by Lb provider of the network
         final Ip sourceIp = getSourceIp(newRule);
@@ -510,7 +516,7 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             public LoadBalancerVO doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                 LoadBalancerVO newRule =
                         new LoadBalancerVO(xId, name, description, sourceIpId, srcPort, destPort, algorithm, networkId, ipAddr.getAllocatedToAccountId(),
-                                ipAddr.getAllocatedInDomainId(), lbProtocol);
+                                ipAddr.getAllocatedInDomainId(), lbProtocol, clientTimeout, serverTimeout);
 
                 if (forDisplay != null) {
                     newRule.setDisplay(forDisplay);
@@ -1297,6 +1303,8 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
         final LoadBalancerVO lbBackup = _lbDao.findById(lbRuleId);
         final String customId = cmd.getCustomId();
         final Boolean forDisplay = cmd.getDisplay();
+        final Integer clientTimeout = cmd.getClientTimeout();
+        final Integer serverTimeout = cmd.getServerTimeout();
 
         if (lb == null) {
             throw new InvalidParameterValueException("Unable to find lb rule by id=" + lbRuleId);
@@ -1325,6 +1333,14 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             lb.setDisplay(forDisplay);
         }
 
+        if (clientTimeout != null) {
+            lb.setClientTimeout(clientTimeout);
+        }
+
+        if (serverTimeout != null) {
+            lb.setServerTimeout(serverTimeout);
+        }
+
         // Validate rule in LB provider
         final LoadBalancingRule rule = getLoadBalancerRuleToApply(lb);
         if (!validateLbRule(rule)) {
@@ -1333,8 +1349,8 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
         boolean success = _lbDao.update(lbRuleId, lb);
 
-        // If algorithm is changed, have to reapply the lb config
-        if (algorithm != null) {
+        // If algorithm or timeout is changed, have to reapply the lb config
+        if (algorithm != null || clientTimeout != null || serverTimeout != null) {
             try {
                 lb.setState(FirewallRule.State.Add);
                 _lbDao.persist(lb);

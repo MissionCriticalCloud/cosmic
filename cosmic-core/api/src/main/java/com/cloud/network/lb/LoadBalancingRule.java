@@ -22,6 +22,8 @@ public class LoadBalancingRule {
     private List<LbHealthCheckPolicy> healthCheckPolicies;
     private LbSslCert sslCert;
     private String lbProtocol;
+    private int clientTimeout;
+    private int serverTimeout;
 
     public LoadBalancingRule(final LoadBalancer lb, final List<LbDestination> destinations, final List<LbStickinessPolicy> stickinessPolicies,
                              final List<LbHealthCheckPolicy> healthCheckPolicies, final Ip sourceIp) {
@@ -41,6 +43,10 @@ public class LoadBalancingRule {
         this.sourceIp = sourceIp;
         this.sslCert = sslCert;
         this.lbProtocol = lbProtocol;
+        if (lb != null) {
+            this.clientTimeout = lb.getClientTimeout();
+            this.serverTimeout = lb.getServerTimeout();
+        }
     }
 
     public long getId() {
@@ -135,6 +141,22 @@ public class LoadBalancingRule {
         this.autoScaleVmGroup = autoScaleVmGroup;
     }
 
+    public int getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final int clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    public int getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final int serverTimeout) {
+        this.serverTimeout = serverTimeout;
+    }
+
     public boolean isAutoScaleConfig() {
         return this.autoScaleVmGroup != null;
     }
@@ -202,8 +224,7 @@ public class LoadBalancingRule {
         }
 
         public LbHealthCheckPolicy(final String pingpath, final String description, final int responseTime, final int healthcheckInterval, final int healthcheckThresshold, final
-        int unhealthThresshold,
-                                   final boolean revoke) {
+        int unhealthThresshold, final boolean revoke) {
             this.pingpath = pingpath;
             this.description = description;
             this.responseTime = responseTime;

@@ -84,6 +84,7 @@ import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
+import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.net.NetUtils;
@@ -224,7 +225,26 @@ public class CommandSetupHelper {
             final int srcPort = rule.getSourcePortStart();
             final List<LbDestination> destinations = rule.getDestinations();
             final List<LbStickinessPolicy> stickinessPolicies = rule.getStickinessPolicies();
-            final LoadBalancerTO lb = new LoadBalancerTO(uuid, srcIp, srcPort, protocol, algorithm, revoked, false, inline, destinations, stickinessPolicies);
+
+            // Load default values and fallback to hardcoded if not available
+            final Integer defaultClientTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerClientTimeout.key()), 60000);
+            final Integer defaultServerTimeout = NumbersUtil.parseInt(_configDao.getValue(Config.DefaultLoadBalancerServerTimeout.key()), 60000);
+
+            // set timeouts, use defaults if not available
+            Integer clientTimeout = rule.getClientTimeout();
+            if (clientTimeout != null) {
+                clientTimeout = NumbersUtil.parseInt(clientTimeout.toString(), defaultClientTimeout);
+            } else {
+                clientTimeout = defaultClientTimeout;
+            }
+            Integer serverTimeout = rule.getServerTimeout();
+            if (serverTimeout != null) {
+                serverTimeout = NumbersUtil.parseInt(serverTimeout.toString(), defaultServerTimeout);
+            } else {
+                serverTimeout = defaultServerTimeout;
+            }
+            final LoadBalancerTO lb = new LoadBalancerTO(uuid, srcIp, srcPort, protocol, algorithm, revoked, false, inline, destinations, stickinessPolicies,
+                    clientTimeout, serverTimeout);
             lb.setLbProtocol(lb_protocol);
             lbs[i++] = lb;
         }

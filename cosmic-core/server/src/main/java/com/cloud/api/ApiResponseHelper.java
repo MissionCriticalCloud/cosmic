@@ -968,6 +968,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         lbResponse.setAlgorithm(loadBalancer.getAlgorithm());
         lbResponse.setLbProtocol(loadBalancer.getLbProtocol());
         lbResponse.setForDisplay(loadBalancer.isDisplay());
+        lbResponse.setClientTimeout(loadBalancer.getClientTimeout());
+        lbResponse.setServerTimeout(loadBalancer.getServerTimeout());
+
         final FirewallRule.State state = loadBalancer.getState();
         String stateToSet = state.toString();
         if (state.equals(FirewallRule.State.Revoke)) {

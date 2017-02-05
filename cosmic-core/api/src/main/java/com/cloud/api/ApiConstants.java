@@ -24,6 +24,7 @@ public class ApiConstants {
     public static final String CERTIFICATE_CHAIN = "certchain";
     public static final String CERTIFICATE_FINGERPRINT = "fingerprint";
     public static final String CERTIFICATE_ID = "certid";
+    public static final String CLIENT_TIMEOUT = "clienttimeout";
     public static final String PRIVATE_KEY = "privatekey";
     public static final String DOMAIN_SUFFIX = "domainsuffix";
     public static final String DNS_SEARCH_ORDER = "dnssearchorder";
@@ -212,6 +213,7 @@ public class ApiConstants {
     public static final String SECURITY_GROUP_ID = "securitygroupid";
     public static final String SENT = "sent";
     public static final String SENT_BYTES = "sentbytes";
+    public static final String SERVER_TIMEOUT = "servertimeout";
     public static final String SERVICE_OFFERING_ID = "serviceofferingid";
     public static final String SESSIONKEY = "sessionkey";
     public static final String SHOW_CAPACITIES = "showcapacities";
