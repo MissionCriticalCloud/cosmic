@@ -97,6 +97,8 @@ import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpDao;
 import com.cloud.region.PortableIpVO;
 import com.cloud.region.Region;
+import com.cloud.server.ResourceTag;
+import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
@@ -263,6 +265,9 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     PortableIpDao _portableIpDao;
     @Inject
     VpcDao _vpcDao;
+    @Inject
+    ResourceTagDao _resourceTagDao;
+
     SearchBuilder<IPAddressVO> AssignIpAddressSearch;
     SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
     Random _rand = new Random(System.currentTimeMillis());
@@ -434,6 +439,11 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         } catch (final ResourceUnavailableException e) {
             s_logger.warn("Unable to destroy remote access vpn for ip id=" + ipId + " as a part of ip release", e);
             success = false;
+        }
+
+        // Remove the tags corresponding to IP.
+        if(success) {
+            _resourceTagDao.removeByIdAndType(ipId, ResourceTag.ResourceObjectType.PublicIpAddress);
         }
 
         return success;
