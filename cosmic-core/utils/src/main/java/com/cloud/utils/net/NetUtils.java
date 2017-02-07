@@ -664,7 +664,7 @@ public class NetUtils {
         return new Pair<>(tokens[0], Integer.parseInt(tokens[1]));
     }
 
-    public static SupersetOrSubset isNetowrkASubsetOrSupersetOfNetworkB(final String cidrA, final String cidrB) {
+    public static SupersetOrSubset isNetworkASubsetOrSupersetOfNetworkB(final String cidrA, final String cidrB) {
         if (!areCidrsNotEmpty(cidrA, cidrB)) {
             return SupersetOrSubset.errorInCidrFormat;
         }
@@ -759,6 +759,30 @@ public class NetUtils {
         final String[] cidrPair = cidr.split("\\/");
         final long guestCidrSize = Long.parseLong(cidrPair[1]);
         return getCidrNetmask(guestCidrSize);
+    }
+
+    public static String getCidrHostAddress(final String cidr) {
+        final String[] cidrPair = cidr.split("\\/");
+        final String address = cidrPair[0];
+        final SubnetUtils subnetUtils = new SubnetUtils(cidr);
+        subnetUtils.setInclusiveHostCount(false);
+
+        if (isValidIp(address) && subnetUtils.getInfo().isInRange(address)) {
+            return address;
+        }
+
+        return null;
+    }
+
+    public static String getCidrHostAddress6(final String cidrv6) {
+        final String[] cidrPair = cidrv6.split("\\/");
+        final String address = cidrPair[0];
+
+        if (isValidIpv6(address) && isIp6InNetwork(address, cidrv6, false)) {
+            return address;
+        }
+
+        return null;
     }
 
     public static String cidr2Netmask(final String cidr) {
@@ -1211,6 +1235,21 @@ public class NetUtils {
         }
         final IPv6Address ip = IPv6Address.fromString(ip6);
         return network.contains(ip);
+    }
+
+    public static boolean isIp6InNetwork(final String ip6, final String ip6Cidr, final Boolean inclusiveHostCount) {
+        IPv6Network network = null;
+        try {
+            network = IPv6Network.fromString(ip6Cidr);
+        } catch (final IllegalArgumentException ex) {
+            return false;
+        }
+        final IPv6Address ip = IPv6Address.fromString(ip6);
+        if (inclusiveHostCount) {
+            return network.contains(ip);
+        } else {
+            return ((network.getFirst().compareTo(ip) < 0) && (network.getLast().compareTo(ip) > 0));
+        }
     }
 
     public static boolean isIp6RangeOverlap(final String ipRange1, final String ipRange2) {

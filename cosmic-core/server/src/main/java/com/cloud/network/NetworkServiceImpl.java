@@ -659,7 +659,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_CREATE, eventDescription = "creating network")
     public Network createGuestNetwork(final CreateNetworkCmd cmd) throws InsufficientCapacityException, ConcurrentOperationException, ResourceAllocationException {
         final Long networkOfferingId = cmd.getNetworkOfferingId();
-        final String gateway = cmd.getGateway();
+        String gateway = cmd.getGateway();
         final String startIP = cmd.getStartIp();
         String endIP = cmd.getEndIp();
         final String netmask = cmd.getNetmask();
@@ -677,7 +677,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         final Long vpcId = cmd.getVpcId();
         final String startIPv6 = cmd.getStartIpv6();
         String endIPv6 = cmd.getEndIpv6();
-        final String ip6Gateway = cmd.getIp6Gateway();
+        String ip6Gateway = cmd.getIp6Gateway();
         final String ip6Cidr = cmd.getIp6Cidr();
         Boolean displayNetwork = cmd.getDisplayNetwork();
         final Long aclId = cmd.getAclId();
@@ -818,7 +818,12 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         String cidr = cmd.getCidr();
+
         if (ipv4) {
+            // validate the CIDR
+            if (cidr != null && !NetUtils.isValidCIDR(cidr)) {
+                throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
+            }
             // if end ip is not specified, default it to startIp
             if (startIP != null) {
                 if (!NetUtils.isValidIp(startIP)) {
@@ -857,6 +862,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         if (ipv6) {
+            // validate the ipv6 CIDR
+            if (ip6Cidr != null && !NetUtils.isValidCIDR(ip6Cidr)) {
+                throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
+            }
+
             if (endIPv6 == null) {
                 endIPv6 = startIPv6;
             }
@@ -891,7 +901,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (ipv4) {
             // For non-root admins check cidr limit - if it's allowed by global config value
             if (!_accountMgr.isRootAdmin(caller.getId()) && cidr != null) {
-
                 final String[] cidrPair = cidr.split("\\/");
                 final int cidrSize = Integer.parseInt(cidrPair[1]);
 
@@ -941,6 +950,14 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             final InvalidParameterValueException ex = new InvalidParameterValueException("Network offering with specified id doesn't support adding multiple ip ranges");
             ex.addProxyObject(ntwkOff.getUuid(), "networkOfferingId");
             throw ex;
+        }
+
+        if (ntwkOff.getGuestType() != GuestType.Private && gateway == null && cidr != null) {
+            gateway = NetUtils.getCidrHostAddress(cidr);
+        }
+
+        if (ntwkOff.getGuestType() != GuestType.Private && ip6Gateway == null && ip6Cidr != null) {
+            ip6Gateway = NetUtils.getCidrHostAddress6(ip6Cidr);
         }
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,

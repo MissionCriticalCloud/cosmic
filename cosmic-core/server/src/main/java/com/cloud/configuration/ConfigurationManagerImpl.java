@@ -2039,7 +2039,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final String cidrnew = NetUtils.getCidrFromGatewayAndNetmask(newVlanGateway, newVlanNetmask);
         final String existing_cidr = NetUtils.getCidrFromGatewayAndNetmask(vlan.getVlanGateway(), vlan.getVlanNetmask());
 
-        return NetUtils.isNetowrkASubsetOrSupersetOfNetworkB(cidrnew, existing_cidr);
+        return NetUtils.isNetworkASubsetOrSupersetOfNetworkB(cidrnew, existing_cidr);
     }
 
     private void checkPublicIpRangeErrors(final long zoneId, final String vlanId, final String vlanGateway, final String vlanNetmask, final String startIP, final String endIP) {

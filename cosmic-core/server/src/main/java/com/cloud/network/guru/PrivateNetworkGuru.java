@@ -97,7 +97,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
         if (userSpecified != null) {
             if (!GuestType.Private.equals(offering.getGuestType()) &&
                     ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null))) {
-                throw new InvalidParameterValueException("cidr and gateway must be specified together.");
+                throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
 
             if (userSpecified.getCidr() != null) {
