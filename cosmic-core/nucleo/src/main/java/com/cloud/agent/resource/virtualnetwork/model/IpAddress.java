@@ -11,14 +11,14 @@ public class IpAddress {
     private String vifMacAddress;
     private Integer nicDevId;
     private boolean newNic;
+    private String nwType;
 
     public IpAddress() {
         // Empty constructor for (de)serialization
     }
 
-    public IpAddress(final String publicIp, final boolean sourceNat, final boolean add, final boolean oneToOneNat, final boolean firstIP, final String gateway, final String
-            netmask, final String vifMacAddress,
-                     final Integer nicDevId, final boolean newNic) {
+    public IpAddress(final String publicIp, final boolean sourceNat, final boolean add, final boolean oneToOneNat, final boolean firstIP, final String gateway,
+                     final String netmask, final String vifMacAddress, final Integer nicDevId, final boolean newNic, final String nwType) {
         super();
         this.publicIp = publicIp;
         this.sourceNat = sourceNat;
@@ -30,6 +30,7 @@ public class IpAddress {
         this.vifMacAddress = vifMacAddress;
         this.nicDevId = nicDevId;
         this.newNic = newNic;
+        this.nwType = nwType;
     }
 
     public String getPublicIp() {
@@ -110,5 +111,13 @@ public class IpAddress {
 
     public void setNewNic(final boolean newNic) {
         this.newNic = newNic;
+    }
+
+    public String getNwType() {
+        return nwType;
+    }
+
+    public void setNwType(final String nwType) {
+        this.nwType = nwType;
     }
 }
