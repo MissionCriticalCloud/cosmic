@@ -4,6 +4,7 @@ import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
@@ -15,6 +16,7 @@ import com.cloud.network.rules.DhcpPvlanRules;
 import com.cloud.network.rules.NetworkAclsRules;
 import com.cloud.network.rules.NicPlugInOutRules;
 import com.cloud.network.rules.PrivateGatewayRules;
+import com.cloud.network.rules.PublicIpAclsRules;
 import com.cloud.network.rules.RuleApplierWrapper;
 import com.cloud.network.rules.StaticRoutesRules;
 import com.cloud.network.rules.UserdataPwdRules;
@@ -127,6 +129,26 @@ public class AdvancedNetworkTopology extends BasicNetworkTopology {
         final NetworkAclsRules aclsRules = new NetworkAclsRules(network, rules, isPrivateGateway);
 
         return applyRules(network, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(aclsRules));
+    }
+
+    @Override
+    public boolean applyPublicIpACLs(final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
+
+        if (rules == null || rules.isEmpty()) {
+            s_logger.debug("No network ACLs to be applied for public ip " + publicIp.getId());
+            return true;
+        }
+
+        s_logger.debug("APPLYING PUBLIC IP ACLs RULES");
+
+        final String typeString = "network acls";
+        final boolean isPodLevelException = false;
+        final boolean failWhenDisconnect = false;
+        final Long podId = null;
+
+        final PublicIpAclsRules aclsRules = new PublicIpAclsRules(publicIp, rules);
+
+        return applyRules(null, router, typeString, isPodLevelException, podId, failWhenDisconnect, new RuleApplierWrapper<>(aclsRules));
     }
 
     @Override

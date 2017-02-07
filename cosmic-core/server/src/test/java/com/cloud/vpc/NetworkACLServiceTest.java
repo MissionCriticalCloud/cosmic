@@ -5,6 +5,7 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.network.NetworkModel;
+import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.NetworkACLItemDao;
@@ -60,6 +61,8 @@ public class NetworkACLServiceTest extends TestCase {
     private static final Logger s_logger = LoggerFactory.getLogger(NetworkACLServiceTest.class);
     @Inject
     NetworkACLService _aclService;
+    @Inject
+    IPAddressDao _ipAddressDao;
     @Inject
     AccountManager _accountMgr;
     @Inject
@@ -188,6 +191,11 @@ public class NetworkACLServiceTest extends TestCase {
         @Bean
         public AccountManager accountManager() {
             return Mockito.mock(AccountManager.class);
+        }
+
+        @Bean
+        public IPAddressDao ipAddressDao() {
+            return Mockito.mock(IPAddressDao.class);
         }
 
         @Bean

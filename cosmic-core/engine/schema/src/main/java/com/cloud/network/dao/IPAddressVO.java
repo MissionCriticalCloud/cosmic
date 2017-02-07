@@ -62,6 +62,8 @@ public class IPAddressVO implements IpAddress {
     private String uuid;
     @Column(name = "physical_network_id")
     private Long physicalNetworkId;
+    @Column(name = "ip_acl_id")
+    private Long ipACLId;
     @Column(name = "is_system")
     private boolean system;
     @Column(name = "account_id")
@@ -84,6 +86,7 @@ public class IPAddressVO implements IpAddress {
 
     protected IPAddressVO() {
         uuid = UUID.randomUUID().toString();
+        ipACLId = 2L; // Default Allow ACL
     }
 
     public IPAddressVO(final Ip address, final long dataCenterId, final long macAddress, final long vlanDbId, final boolean sourceNat) {
@@ -97,6 +100,7 @@ public class IPAddressVO implements IpAddress {
         state = State.Free;
         this.macAddress = macAddress;
         uuid = UUID.randomUUID().toString();
+        ipACLId = 2L; // Default Allow ACL
     }
 
     public IPAddressVO(final Ip address, final long dataCenterId, final Long networkId, final Long vpcId, final long physicalNetworkId, final long sourceNetworkId, final long
@@ -110,6 +114,7 @@ public class IPAddressVO implements IpAddress {
         vlanId = vlanDbId;
         this.portable = portable;
         uuid = UUID.randomUUID().toString();
+        ipACLId = 2L; // Default Allow ACL
     }
 
     public void setId(final long id) {
@@ -354,5 +359,14 @@ public class IPAddressVO implements IpAddress {
     @Override
     public Class<?> getEntityType() {
         return IpAddress.class;
+    }
+
+    @Override
+    public Long getIpACLId() {
+        return ipACLId;
+    }
+
+    public void setIpACLId(final Long ipACLId) {
+        this.ipACLId = ipACLId;
     }
 }

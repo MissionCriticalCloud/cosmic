@@ -1,6 +1,7 @@
 package com.cloud.network.vpc;
 
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
 
 import java.util.List;
@@ -52,6 +53,8 @@ public interface NetworkACLManager {
      */
     boolean replaceNetworkACL(NetworkACL acl, NetworkVO network) throws ResourceUnavailableException;
 
+    boolean replacePublicIpACL(NetworkACL acl, IPAddressVO publicIp) throws ResourceUnavailableException;
+
     /**
      * Creates a Network ACL Item within an ACL and applies it to associated networks
      *
@@ -98,6 +101,8 @@ public interface NetworkACLManager {
      */
     boolean revokeACLItemsForNetwork(long networkId) throws ResourceUnavailableException;
 
+    boolean revokeACLItemsForPublicIp(long publicIpId) throws ResourceUnavailableException;
+
     /**
      * List network ACL items by network
      *
@@ -114,6 +119,8 @@ public interface NetworkACLManager {
      * @throws ResourceUnavailableException
      */
     boolean applyACLToNetwork(long networkId) throws ResourceUnavailableException;
+
+    boolean applyACLToPublicIp(long publicIpId) throws ResourceUnavailableException;
 
     /**
      * Updates and existing network ACL Item

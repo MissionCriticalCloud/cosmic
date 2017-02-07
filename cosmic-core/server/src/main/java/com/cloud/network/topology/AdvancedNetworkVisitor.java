@@ -15,6 +15,7 @@ import com.cloud.network.rules.DhcpPvlanRules;
 import com.cloud.network.rules.NetworkAclsRules;
 import com.cloud.network.rules.NicPlugInOutRules;
 import com.cloud.network.rules.PrivateGatewayRules;
+import com.cloud.network.rules.PublicIpAclsRules;
 import com.cloud.network.rules.StaticRoutesRules;
 import com.cloud.network.rules.UserdataPwdRules;
 import com.cloud.network.rules.VpcIpAssociationRules;
@@ -77,6 +78,17 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final Commands commands = new Commands(Command.OnError.Continue);
         final List<? extends NetworkACLItem> rules = acls.getRules();
         _commandSetupHelper.createNetworkACLsCommands(rules, router, commands, network.getId(), acls.isPrivateGateway());
+
+        return _networkGeneralHelper.sendCommandsToRouter(router, commands);
+    }
+
+    @Override
+    public boolean visit(final PublicIpAclsRules acls) throws ResourceUnavailableException {
+        final VirtualRouter router = acls.getRouter();
+
+        final Commands commands = new Commands(Command.OnError.Continue);
+        final List<? extends NetworkACLItem> rules = acls.getRules();
+        _commandSetupHelper.createPublicIpACLsCommands(rules, router, commands, acls.getPublicIp());
 
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }

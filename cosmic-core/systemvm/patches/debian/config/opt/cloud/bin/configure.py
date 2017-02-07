@@ -919,6 +919,7 @@ def main(argv):
     databag_map = OrderedDict([("guest_network.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("vm_metadata.json", { "process_iptables": False, "executor": CsVmMetadata('vmdata', config) }),
                                ("network_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
+                               ("public_ip_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("firewall_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("forwarding_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("staticnat_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),

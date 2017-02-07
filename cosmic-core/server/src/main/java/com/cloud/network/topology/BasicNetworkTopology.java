@@ -10,6 +10,7 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
@@ -92,9 +93,14 @@ public class BasicNetworkTopology implements NetworkTopology {
     }
 
     @Override
-    public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules, final VirtualRouter router, final boolean isPrivateGateway)
-            throws ResourceUnavailableException {
+    public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules, final VirtualRouter router, final boolean isPrivateGateway) throws
+            ResourceUnavailableException {
         throw new CloudRuntimeException("applyNetworkACLs not implemented in Basic Network Topology.");
+    }
+
+    @Override
+    public boolean applyPublicIpACLs(final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("applyPublicIpACLs not implemented in Basic Network Topology.");
     }
 
     @Override

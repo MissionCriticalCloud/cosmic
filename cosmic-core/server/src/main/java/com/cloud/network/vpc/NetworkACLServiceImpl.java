@@ -13,6 +13,8 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks;
+import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.vpc.dao.NetworkACLDao;
@@ -52,6 +54,8 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
     @Inject
     AccountManager _accountMgr;
+    @Inject
+    IPAddressDao _ipAddressDao;
     @Inject
     NetworkModel _networkMgr;
     @Inject
@@ -245,6 +249,41 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
         }
 
         return _networkAclMgr.replaceNetworkACL(acl, network);
+    }
+
+    @Override
+    public boolean replacePublicIpACL(final long aclId, final long publicIpId) throws ResourceUnavailableException {
+        final Account caller = CallContext.current().getCallingAccount();
+
+        final IPAddressVO publicIp = _ipAddressDao.findById(publicIpId);
+        if (publicIp == null) {
+            throw new InvalidParameterValueException("Unable to find specified IP address");
+        }
+
+        final NetworkACL acl = _networkACLDao.findById(aclId);
+        if (acl == null) {
+            throw new InvalidParameterValueException("Unable to find specified NetworkACL");
+        }
+
+        if (publicIp.getVpcId() == null) {
+            throw new InvalidParameterValueException("IP address is not part of a VPC: " + publicIp.getUuid());
+        }
+
+        if (aclId != NetworkACL.DEFAULT_DENY && aclId != NetworkACL.DEFAULT_ALLOW) {
+            // ACL is not default DENY/ALLOW
+            // ACL should be associated with a VPC
+            final Vpc vpc = _entityMgr.findById(Vpc.class, acl.getVpcId());
+            if (vpc == null) {
+                throw new InvalidParameterValueException("Unable to find Vpc associated with the NetworkACL");
+            }
+
+            _accountMgr.checkAccess(caller, null, true, vpc);
+            if (!publicIp.getVpcId().equals(acl.getVpcId())) {
+                throw new InvalidParameterValueException("IP address: " + publicIpId + " and ACL: " + aclId + " do not belong to the same VPC");
+            }
+        }
+
+        return _networkAclMgr.replacePublicIpACL(acl, publicIp);
     }
 
     @Override

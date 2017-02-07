@@ -127,6 +127,11 @@ public class PublicIp implements PublicIpAddress {
     }
 
     @Override
+    public Long getIpACLId() {
+        return _addr.getIpACLId();
+    }
+
+    @Override
     public Long getAllocatedToAccountId() {
         return _addr.getAllocatedToAccountId();
     }

@@ -261,6 +261,32 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     }
 
     @Override
+    public boolean applyACLItemsToPublicIp(final IpAddress publicIp, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
+
+        final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(publicIp.getVpcId());
+        if (routers == null || routers.isEmpty()) {
+            s_logger.debug("Virtual router element doesn't need to apply network acl rules on the backend; virtual router doesn't exist for the public ip " + publicIp.getId());
+            return true;
+        }
+
+        final DataCenterVO dcVO = _dcDao.findById(publicIp.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+
+        final Network publicNetwork = _networkModel.getNetwork(publicIp.getNetworkId());
+
+        boolean result = true;
+        for (final DomainRouterVO domainRouterVO : routers) {
+            final NicProfile nicProfile = _networkModel.getNicProfile(domainRouterVO, publicNetwork.getId(), null);
+            if (nicProfile != null) {
+                result = result && networkTopology.applyPublicIpACLs(publicIp, rules, domainRouterVO);
+            } else {
+                s_logger.warn("Nic Profile for router '" + domainRouterVO + "' has already been removed. Router is redundant = " + domainRouterVO.getIsRedundantRouter());
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
         boolean result = true;
         if (canHandle(network, Service.NetworkACL)) {

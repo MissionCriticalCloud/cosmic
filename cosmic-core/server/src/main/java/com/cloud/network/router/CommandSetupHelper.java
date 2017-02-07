@@ -16,6 +16,7 @@ import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
+import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
@@ -30,6 +31,7 @@ import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
+import com.cloud.agent.api.to.PublicIpACLTO;
 import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
@@ -516,8 +518,8 @@ public class CommandSetupHelper {
         }
     }
 
-    public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId,
-                                          final boolean privateGateway) {
+    public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId, final boolean
+            privateGateway) {
         final List<NetworkACLTO> rulesTO = new ArrayList<>();
         String guestVlan = null;
         final Network guestNtwk = _networkDao.findById(guestNetworkId);
@@ -544,6 +546,25 @@ public class CommandSetupHelper {
         if (privateGateway) {
             cmd.setAccessDetail(NetworkElementCommand.VPC_PRIVATE_GATEWAY, String.valueOf(VpcGateway.Type.Private));
         }
+
+        cmds.addCommand(cmd);
+    }
+
+    public void createPublicIpACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final IpAddress publicIp) {
+        final List<PublicIpACLTO> rulesTO = new ArrayList<>();
+
+        if (rules != null) {
+            for (final NetworkACLItem rule : rules) {
+                final PublicIpACLTO ruleTO = new PublicIpACLTO(rule, publicIp.getAddress().toString(), rule.getTrafficType());
+                rulesTO.add(ruleTO);
+            }
+        }
+
+        final SetPublicIpACLCommand cmd = new SetPublicIpACLCommand(rulesTO, publicIp.getAddress().toString());
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
+        final DataCenterVO dcVo = _dcDao.findById(router.getDataCenterId());
+        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, dcVo.getNetworkType().toString());
 
         cmds.addCommand(cmd);
     }
