@@ -106,6 +106,10 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     @Param(description = "the ID of the Network where ip belongs to")
     private String networkId;
 
+    @SerializedName(ApiConstants.ACL_ID)
+    @Param(description = "the ID of the ACL applied to this IP")
+    private String aclId;
+
     @SerializedName(ApiConstants.STATE)
     @Param(description = "State of the ip address. Can be: Allocatin, Allocated and Releasing")
     private String state;
@@ -219,6 +223,10 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
 
     public void setNetworkId(final String networkId) {
         this.networkId = networkId;
+    }
+
+    public void setAclId(final String aclId) {
+        this.aclId = aclId;
     }
 
     public void setVirtualMachineId(final String virtualMachineId) {
