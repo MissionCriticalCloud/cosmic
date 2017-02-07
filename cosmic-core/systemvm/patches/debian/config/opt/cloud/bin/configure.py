@@ -619,6 +619,7 @@ class CsRemoteAccessVpn(CsDataBag):
         file.commit()
 
         secret = CsFile(vpnsecretfilte)
+        secret.empty()
         secret.addeq(": PSK \"%s\"" % psk)
         secret.commit()
 
