@@ -115,12 +115,12 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
         final Site2SiteVpnGatewayVO gws = _vpnGatewayDao.findByVpcId(vpcId);
         if (gws != null) {
-            throw new InvalidParameterValueException("The VPN gateway of VPC " + vpcId + " already existed!");
+            throw new InvalidParameterValueException("The VPN gateway of VPC " + vpcId + " already exists!");
         }
         //Use source NAT ip for VPC
         final List<IPAddressVO> ips = _ipAddressDao.listByAssociatedVpc(vpcId, true);
         if (ips.size() != 1) {
-            throw new CloudRuntimeException("Cannot found source nat ip of vpc " + vpcId);
+            throw new CloudRuntimeException("Vpc " + vpcId + " does not have a Public IP address with SourceNat, so no VPN is possible.");
         }
 
         final Site2SiteVpnGatewayVO gw = new Site2SiteVpnGatewayVO(owner.getAccountId(), owner.getDomainId(), ips.get(0).getId(), vpcId);
@@ -405,9 +405,8 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
 
         _accountMgr.checkAccess(caller, null, false, conn);
 
-        if (conn.getState() == State.Connected) {
-            stopVpnConnection(id);
-        }
+        stopVpnConnection(id);
+
         _vpnConnectionDao.remove(id);
         return true;
     }
