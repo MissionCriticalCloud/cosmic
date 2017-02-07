@@ -24,7 +24,10 @@ import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.SnapshotService;
+import com.cloud.engine.subsystem.api.storage.SnapshotStrategy;
+import com.cloud.engine.subsystem.api.storage.SnapshotStrategy.SnapshotOperation;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
+import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
@@ -165,6 +168,9 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     SnapshotService _snapshotSrv;
     @Inject
     ClusterManager clusterManager;
+
+    @Inject
+    StorageStrategyFactory _storageStrategyFactory;
 
     protected VolumeOrchestrator() {
         _volStateMachine = Volume.State.getStateMachine();
@@ -368,7 +374,24 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         final VolumeInfo vol = volFactory.getVolume(volume.getId());
         final DataStore store = dataStoreMgr.getDataStore(pool.getId(), DataStoreRole.Primary);
         final DataStoreRole dataStoreRole = getDataStoreRole(snapshot);
-        final SnapshotInfo snapInfo = snapshotFactory.getSnapshot(snapshot.getId(), dataStoreRole);
+        SnapshotInfo snapInfo = snapshotFactory.getSnapshot(snapshot.getId(), dataStoreRole);
+
+        if (snapInfo == null && dataStoreRole == DataStoreRole.Image) {
+            // snapshot is not backed up to secondary, let's do that now.
+            snapInfo = snapshotFactory.getSnapshot(snapshot.getId(), DataStoreRole.Primary);
+            if (snapInfo == null) {
+                throw new CloudRuntimeException("Cannot find snapshot " + snapshot.getId());
+            }
+            // We need to copy the snapshot onto secondary.
+            final SnapshotStrategy snapshotStrategy = _storageStrategyFactory.getSnapshotStrategy(snapshot, SnapshotOperation.BACKUP);
+            snapshotStrategy.backupSnapshot(snapInfo);
+
+            // Attempt to grab it again.
+            snapInfo = snapshotFactory.getSnapshot(snapshot.getId(), dataStoreRole);
+            if (snapInfo == null) {
+                throw new CloudRuntimeException("Cannot find snapshot " + snapshot.getId() + " on secondary and could not create backup");
+            }
+        }
 
         // don't try to perform a sync if the DataStoreRole of the snapshot is equal to DataStoreRole.Primary
         if (!DataStoreRole.Primary.equals(dataStoreRole)) {
