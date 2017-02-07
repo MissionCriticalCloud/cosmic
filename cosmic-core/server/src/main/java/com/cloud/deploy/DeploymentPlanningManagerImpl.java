@@ -367,6 +367,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                         final Float memoryOvercommitRatio = Float.parseFloat(cluster_detail_ram.getValue());
 
                         final boolean hostHasCpuCapability;
+                        boolean clusterSuitable = true;
                         boolean hostHasCapacity = false;
                         hostHasCpuCapability = _capacityMgr.checkIfHostHasCpuCapability(host.getId(), offering.getCpu(), offering.getSpeed());
 
@@ -382,8 +383,18 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                             }
                         }
 
-                        if (hostHasCapacity
-                                && hostHasCpuCapability) {
+                        final DataCenterDeployment lastPlan = new DataCenterDeployment(host.getDataCenterId(),
+                                host.getPodId(), host.getClusterId(), host.getId(), plan.getPoolId(), null);
+                        if (planner != null && planner.canHandle(vmProfile, lastPlan, avoids) && planner instanceof DeploymentClusterPlanner) {
+
+                            final List<Long> cls = ((DeploymentClusterPlanner) planner).orderClusters(vmProfile, lastPlan, avoids);
+                            if (cls == null || cls.isEmpty()) {
+                                clusterSuitable = false;
+                                s_logger.debug("The last cluster: " + lastPlan.getClusterId() + " does not have enough capacity for VM: " + vmProfile.getHostName());
+                            }
+                        }
+
+                        if (hostHasCapacity && hostHasCpuCapability && clusterSuitable) {
                             s_logger.debug("The last host of this VM is UP and has enough capacity");
                             s_logger.debug("Now checking for suitable pools under zone: " + host.getDataCenterId()
                                     + ", pod: " + host.getPodId() + ", cluster: " + host.getClusterId());
@@ -391,18 +402,13 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                             final Pod pod = _podDao.findById(host.getPodId());
                             final Cluster cluster = _clusterDao.findById(host.getClusterId());
 
-                            // search for storage under the zone, pod, cluster
-                            // of
-                            // the last host.
-                            final DataCenterDeployment lastPlan = new DataCenterDeployment(host.getDataCenterId(),
-                                    host.getPodId(), host.getClusterId(), host.getId(), plan.getPoolId(), null);
+                            // search for storage under the zone, pod, cluster of the last host.
                             final Pair<Map<Volume, List<StoragePool>>, List<Volume>> result = findSuitablePoolsForVolumes(
                                     vmProfile, lastPlan, avoids, HostAllocator.RETURN_UPTO_ALL);
                             final Map<Volume, List<StoragePool>> suitableVolumeStoragePools = result.first();
                             final List<Volume> readyAndReusedVolumes = result.second();
 
-                            // choose the potential pool for this VM for this
-                            // host
+                            // choose the potential pool for this VM for this host
                             if (!suitableVolumeStoragePools.isEmpty()) {
                                 final List<Host> suitableHosts = new ArrayList<>();
                                 suitableHosts.add(host);
@@ -411,10 +417,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                                         getPlannerUsage(planner, vmProfile, plan, avoids), readyAndReusedVolumes);
                                 if (potentialResources != null) {
                                     final Map<Volume, StoragePool> storageVolMap = potentialResources.second();
-                                    // remove the reused vol<->pool from
-                                    // destination, since we don't have to
-                                    // prepare
-                                    // this volume.
+                                    // remove the reused vol<->pool from destination, since we don't have to prepare this volume.
                                     for (final Volume vol : readyAndReusedVolumes) {
                                         storageVolMap.remove(vol);
                                     }
