@@ -3237,6 +3237,90 @@
                                     poll: pollAsyncJobResult
                                 }
                             },
+                            replaceACL: {
+                                label: 'label.replace.acl',
+                                createForm: {
+                                    title: 'label.replace.acl',
+                                    label: 'label.replace.acl',
+                                    fields: {
+                                        aclid: {
+                                            label: 'label.acl',
+                                            select: function (args) {
+                                                $.ajax({
+                                                    url: createURL('listNetworkACLLists'),
+                                                    data: {
+                                                        vpcid: args.context.vpc[0].id
+                                                    },
+                                                    dataType: 'json',
+                                                    async: true,
+                                                    success: function (json) {
+                                                        var objs = json.listnetworkacllistsresponse.networkacllist;
+                                                        var items = [];
+
+                                                        $(objs).each(function () {
+                                                            if (this.id == args.context.ipAddresses[0].aclid) {
+                                                                return true;
+                                                            }
+
+                                                            items.push({
+                                                                id: this.id,
+                                                                description: this.name
+                                                            });
+
+                                                            return true;
+                                                        });
+
+                                                        args.response.success({
+                                                            data: items
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                },
+
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL("replaceNetworkACLList&publicipid=" + args.context.ipAddresses[0].id + "&aclid=" + args.data.aclid),
+                                        dataType: "json",
+                                        success: function (json) {
+                                            var jid = json.replacenetworkacllistresponse.jobid;
+                                            args.response.success(
+                                                {
+                                                    _custom: {
+                                                        jobId: jid,
+                                                        getUpdatedItem: function (json) {
+                                                            var item = json.queryasyncjobresultresponse.jobresult.aclid;
+                                                            return {
+                                                                aclid: args.data.aclid
+                                                            };
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        },
+
+                                        error: function (json) {
+
+                                            args.response.error(parseXMLHttpResponse(json));
+                                        }
+                                    });
+                                },
+
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                },
+
+                                messages: {
+                                    confirm: function (args) {
+                                        return 'message.confirm.replace.acl.new.one';
+                                    },
+                                    notification: function (args) {
+                                        return 'label.acl.replaced';
+                                    }
+                                }
+                            },
                             remove: {
                                 label: 'label.action.release.ip',
                                 action: function (args) {
@@ -3333,6 +3417,9 @@
                                     },
                                     state: {
                                         label: 'label.state'
+                                    },
+                                    aclid: {
+                                        label: 'label.acl.id'
                                     },
                                     networkid: {
                                         label: 'label.network.id'
