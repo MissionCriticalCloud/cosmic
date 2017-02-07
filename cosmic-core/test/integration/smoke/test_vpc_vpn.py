@@ -24,7 +24,8 @@ from marvin.lib.common import (
     get_zone,
     get_domain,
     list_hosts,
-    list_routers
+    list_routers,
+    get_template
 )
 from marvin.lib.utils import (
     validateList,
@@ -184,17 +185,6 @@ class Services:
                 "privateport": 22,
                 "publicport": 22,
                 "protocol": 'TCP',
-            },
-            "template": {
-                "kvm": {
-                    "name": "tiny-kvm",
-                    "displaytext": "new tiny kvm",
-                    "format": "qcow2",
-                    "hypervisor": "kvm",
-                    "ostype": "Other PV (64-bit)",
-                    "url": "http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-kvm.qcow2.bz2",
-                    "requireshvm": "True",
-                }
             }
         }
 
@@ -218,15 +208,11 @@ class TestVpcVpn(cloudstackTestCase):
 
         cls.hypervisor = test_client.getHypervisorInfo()
 
-        template = cls.services["template"][cls.hypervisor.lower()]
-        cls.logger.debug("Downloading Template: %s from: %s" % (template, template["url"]))
-        cls.template = Template.register(cls.apiclient, template, cls.zone.id, hypervisor=cls.hypervisor.lower(), account=cls.account.name, domainid=cls.domain.id)
-        cls.template.download(cls.apiclient)
+        cls._cleanup = [cls.account, cls.compute_offering]
 
-        cls._cleanup = [cls.template, cls.account, cls.compute_offering]
-
-        if cls.template == FAILED:
-            raise Exception("Failed to register template")
+        cls.template = get_template(
+            cls.apiclient,
+            cls.zone.id)
 
         cls.logger.debug("Retrieving default Network offering for VPCs")
         cls.network_offerings = NetworkOffering.list(cls.apiclient, name="DefaultIsolatedNetworkOfferingForVpcNetworks")
