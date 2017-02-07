@@ -8,7 +8,9 @@ import com.cloud.agent.api.CreateLogicalSwitchCommand;
 import com.cloud.network.nicira.LogicalSwitch;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
+import com.cloud.network.nicira.NiciraNvpBindingConfig;
 import com.cloud.network.nicira.NiciraNvpTag;
+import com.cloud.network.nicira.NiciraNvpVxlanTransport;
 import com.cloud.network.nicira.TransportZoneBinding;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.resource.NiciraNvpUtilities;
@@ -32,7 +34,11 @@ public final class NiciraNvpCreateLogicalSwitchCommandWrapper extends CommandWra
 
         // Set transport binding
         final List<TransportZoneBinding> ltzb = new ArrayList<>();
-        ltzb.add(new TransportZoneBinding(command.getTransportUuid(), command.getTransportType()));
+        final List<NiciraNvpVxlanTransport> vxlanTransport = new ArrayList<>();
+        vxlanTransport.add(new NiciraNvpVxlanTransport(command.getVni()));
+        final NiciraNvpBindingConfig bindingConfig = new NiciraNvpBindingConfig(vxlanTransport);
+
+        ltzb.add(new TransportZoneBinding(command.getTransportUuid(), command.getTransportType(), bindingConfig));
         logicalSwitch.setTransportZones(ltzb);
 
         // Tags set to scope cs_account and account name

@@ -6,12 +6,15 @@ public class CreateLogicalSwitchCommand extends Command {
     private final String transportType;
     private final String name;
     private final String ownerName;
+    private transient final Long vni;
 
-    public CreateLogicalSwitchCommand(final String transportUuid, final String transportType, final String name, final String ownerName) {
+    public CreateLogicalSwitchCommand(final String transportUuid, final String transportType, final String name,
+                                      final String ownerName, final Long vni) {
         this.transportUuid = transportUuid;
         this.transportType = transportType;
         this.name = name;
         this.ownerName = ownerName;
+        this.vni = vni;
     }
 
     @Override
@@ -33,5 +36,9 @@ public class CreateLogicalSwitchCommand extends Command {
 
     public String getOwnerName() {
         return ownerName;
+    }
+
+    public Long getVni() {
+        return vni;
     }
 }
