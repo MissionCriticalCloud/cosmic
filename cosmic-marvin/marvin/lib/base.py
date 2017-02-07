@@ -1270,6 +1270,9 @@ class Template:
             if isinstance(template_response, list):
 
                 template = template_response[0]
+                if not template.isready:
+                    continue
+
                 if template.status == 'Download Complete':
                     break
 
