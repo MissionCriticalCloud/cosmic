@@ -381,9 +381,9 @@ public class VolumeObject implements VolumeInfo {
             s_logger.debug("Failed to update state", e);
             throw new CloudRuntimeException("Failed to update state:" + e.toString());
         } finally {
-            // in case of OperationFailed, expunge the entry
+            // state transit call reloads the volume from DB and so check for null as well
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed &&
-                    (volumeVO.getState() != Volume.State.Copying && volumeVO.getState() != Volume.State.Uploaded && volumeVO.getState() != Volume.State.UploadError)) {
+                    (volumeVO != null && volumeVO.getState() != Volume.State.Copying && volumeVO.getState() != Volume.State.Uploaded && volumeVO.getState() != Volume.State.UploadError)) {
                 objectInStoreMgr.deleteIfNotReady(this);
             }
         }

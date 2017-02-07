@@ -501,10 +501,15 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
                     cleanupSecondaryStorage(recurring);
 
-                    final List<VolumeVO> vols = _volsDao.listVolumesToBeDestroyed(new Date(System.currentTimeMillis() - ((long) StorageCleanupDelay.value() << 10)));
+                    final List<VolumeVO> vols = _volsDao.listNonRootVolumesToBeDestroyed(new Date(System.currentTimeMillis() - ((long) StorageCleanupDelay.value() << 10)));
                     for (final VolumeVO vol : vols) {
                         try {
-                            volService.expungeVolumeAsync(volFactory.getVolume(vol.getId()));
+                            VolumeInfo volumeInfo = volFactory.getVolume(vol.getId());
+                            if (volumeInfo != null) {
+                                volService.expungeVolumeAsync(volumeInfo);
+                            } else {
+                                s_logger.debug("Volume " + vol.getUuid() + " is already destroyed");
+                            }
                         } catch (final Exception e) {
                             s_logger.warn("Unable to destroy volume " + vol.getUuid(), e);
                         }
