@@ -37,8 +37,6 @@ import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
@@ -285,7 +283,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return true;
     }
 
-    private Map<Service, Set<Provider>> getServiceSetMap(List<Service> serviceToAdd) {
+    private Map<Service, Set<Provider>> getServiceSetMap(final List<Service> serviceToAdd) {
         final Map<Service, Set<Provider>> svcProviderMap = new HashMap<>();
         final Set<Provider> defaultProviders = new HashSet<>();
         defaultProviders.add(Provider.VPCVirtualRouter);
@@ -351,10 +349,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @DB
     private VpcOffering createVpcOffering(final String name, final String displayText,
-                                            final Map<Network.Service, Set<Network.Provider>> svcProviderMap,
-                                            final boolean isDefault, final State state, final Long serviceOfferingId, final boolean supportsDistributedRouter,
-                                            final boolean offersRegionLevelVPC,
-                                            final boolean redundantRouter) {
+                                          final Map<Network.Service, Set<Network.Provider>> svcProviderMap,
+                                          final boolean isDefault, final State state, final Long serviceOfferingId, final boolean supportsDistributedRouter,
+                                          final boolean offersRegionLevelVPC,
+                                          final boolean redundantRouter) {
 
         return Transaction.execute(new TransactionCallback<VpcOffering>() {
             @Override
@@ -1370,7 +1368,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw new InvalidParameterValueException("Gateway/netmask fields are not supported anymore");
         }
 
-        Network privateNtwk = _ntwkDao.findByIdAndDomainId(networkId, gatewayDomainId);
+        final Network privateNtwk = _ntwkDao.findByIdAndDomainId(networkId, gatewayDomainId);
         if (privateNtwk == null) {
             throw new InvalidParameterValueException("Unable to find private network based on the network ID");
         }
@@ -1381,7 +1379,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                             " should be outside of the VPC super CIDR " + vpc.getCidr());
         }
 
-        if (! NetUtils.isIpWithtInCidrRange(ipAddress, privateNtwk.getCidr())) {
+        if (!NetUtils.isIpWithtInCidrRange(ipAddress, privateNtwk.getCidr())) {
             throw new InvalidParameterValueException(
                     "The specified ip address for the private network " + ipAddress +
                             " should be within the CIDR of the private network " + privateNtwk.getCidr());
@@ -1395,7 +1393,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                         "VPC with uuid " + vpc.getUuid() + " is already connected to network '"
                                 + privateNtwk.getName() + "'");
             }
-         }
+        }
 
         final VpcGatewayVO gatewayVO;
         try {
@@ -1973,7 +1971,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @DB
     private void validateNewVpcGuestNetwork(final String cidr, final String gateway, final Account networkOwner,
-                                              final Vpc vpc, final String networkDomain) {
+                                            final Vpc vpc, final String networkDomain) {
 
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
@@ -2067,7 +2065,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     }
 
     private List<IPAddressVO> listPublicIpsAssignedToVpc(final long accountId, final Boolean sourceNat,
-                                                           final long vpcId) {
+                                                         final long vpcId) {
         final SearchCriteria<IPAddressVO> sc = IpAddressSearch.create();
         sc.setParameters("accountId", accountId);
         sc.setParameters("vpcId", vpcId);
@@ -2394,11 +2392,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @DB
     @Override
-    public Network createVpcGuestNetwork(final long ntwkOffId, final String name, final String displayText,
-                                         final String gateway, final String cidr, final String vlanId,
-                                         String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork pNtwk, final long zoneId,
-                                         final ACLType aclType, final Boolean subdomainAccess,
-                                         final long vpcId, final Long aclId, final Account caller, final Boolean isDisplayNetworkEnabled)
+    public Network createVpcGuestNetwork(final long ntwkOffId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,
+                                         String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork pNtwk, final long zoneId, final ACLType aclType,
+                                         final Boolean subdomainAccess, final long vpcId, final Long aclId, final Account caller, final Boolean isDisplayNetworkEnabled,
+                                         final String dns1, final String dns2)
             throws ConcurrentOperationException, InsufficientCapacityException,
             ResourceAllocationException {
 
@@ -2424,8 +2421,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         // 2) Create network
         final Network guestNetwork = _ntwkMgr.createGuestNetwork(ntwkOffId, name, displayText, gateway, cidr, vlanId,
-                networkDomain, owner, domainId, pNtwk, zoneId, aclType,
-                subdomainAccess, vpcId, null, null, isDisplayNetworkEnabled, null);
+                networkDomain, owner, domainId, pNtwk, zoneId, aclType, subdomainAccess, vpcId, null, null,
+                isDisplayNetworkEnabled, null, dns1, dns2);
 
         if (guestNetwork != null) {
             guestNetwork.setNetworkACLId(aclId);

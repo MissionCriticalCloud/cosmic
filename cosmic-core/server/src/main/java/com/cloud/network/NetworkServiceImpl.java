@@ -3,7 +3,6 @@ package com.cloud.network;
 import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ApiDBUtils;
-import com.cloud.api.command.admin.network.CreateNetworkCmdByAdmin;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
 import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
@@ -664,7 +663,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         String endIP = cmd.getEndIp();
         final String netmask = cmd.getNetmask();
         final String networkDomain = cmd.getNetworkDomain();
-        String vlanId = cmd.getVlan();
+        final String vlanId = cmd.getVlan();
         final String name = cmd.getNetworkName();
         final String displayText = cmd.getDisplayText();
         final Account caller = CallContext.current().getCallingAccount();
@@ -682,6 +681,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         Boolean displayNetwork = cmd.getDisplayNetwork();
         final Long aclId = cmd.getAclId();
         final String isolatedPvlan = cmd.getIsolatedPvlan();
+        final String dns1 = cmd.getDns1();
+        final String dns2 = cmd.getDns2();
 
         // Validate network offering
         final NetworkOfferingVO ntwkOff = _networkOfferingDao.findById(networkOfferingId);
@@ -962,7 +963,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
-                createVlan);
+                createVlan, dns1, dns2);
 
         // if the network offering has persistent set to true, implement the network
         if (ntwkOff.getIsPersistent()) {
@@ -1522,9 +1523,9 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_UPDATE, eventDescription = "updating network", async = true)
-    public Network updateGuestNetwork(final long networkId, final String name, final String displayText, final Account callerAccount, final User callerUser, final String
-            domainSuffix,
-                                      final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork, final String customId) {
+    public Network updateGuestNetwork(final long networkId, final String name, final String displayText, final Account callerAccount, final User callerUser,
+                                      final String domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork,
+                                      final String customId, final String dns1, final String dns2) {
 
         boolean restartNetwork = false;
 
@@ -1571,6 +1572,16 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (customId != null) {
             network.setUuid(customId);
+        }
+
+        if (dns1 != null) {
+            network.setDns1(dns1);
+            restartNetwork = true;
+        }
+
+        if (dns2 != null) {
+            network.setDns2(dns2);
+            restartNetwork = true;
         }
 
         // display flag is not null and has changed
@@ -3051,9 +3062,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @Override
     @DB
     public Network createPrivateNetwork(final String networkName, final String displayText, final long physicalNetworkId, final String broadcastUriString, final String startIp,
-                                        String endIp,
-                                        final String gateway, final String netmask, final long networkOwnerId, final Long vpcId, final Boolean sourceNat, final Long
-                                                networkOfferingId)
+                                        String endIp, final String gateway, final String netmask, final long networkOwnerId, final Long vpcId, final Boolean sourceNat,
+                                        final Long networkOfferingId)
             throws ResourceAllocationException, ConcurrentOperationException, InsufficientCapacityException {
 
         final Account owner = _accountMgr.getAccount(networkOwnerId);
@@ -3117,7 +3127,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     if (privateNetwork == null) {
                         //create Guest network
                         privateNetwork = _networkMgr.createGuestNetwork(ntwkOffFinal.getId(), networkName, displayText, gateway, cidr, uriString, null, owner, null, pNtwk,
-                                pNtwk.getDataCenterId(), ACLType.Account, null, vpcId, null, null, true, null);
+                                pNtwk.getDataCenterId(), ACLType.Account, null, vpcId, null, null, true, null,
+                                dc.getDns1(), dc.getDns2());
                         if (privateNetwork != null) {
                             s_logger.debug("Successfully created guest network " + privateNetwork);
                         } else {
@@ -3828,7 +3839,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                   final Long domainId, final boolean isDomainSpecific, final Boolean subdomainAccessFinal, final Long vpcId, final String startIPv6,
                                   final String endIPv6, final String ip6Gateway, final String ip6Cidr, final Boolean displayNetwork, final Long aclId, final String isolatedPvlan,
                                   final NetworkOfferingVO ntwkOff, final PhysicalNetwork pNtwk, final ACLType aclType, final Account ownerFinal, final String cidr,
-                                  final boolean createVlan) throws InsufficientCapacityException,
+                                  final boolean createVlan, final String dns1, final String dns2) throws InsufficientCapacityException,
             ResourceAllocationException {
         try {
             final Network network = Transaction.execute(new TransactionCallbackWithException<Network, Exception>() {
@@ -3874,7 +3885,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                             }
                         }
                         network = _vpcMgr.createVpcGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork);
+                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork, dns1, dns2);
                     } else {
                         if (_configMgr.isOfferingForVpc(ntwkOff)) {
                             throw new InvalidParameterValueException("Network offering can be used for VPC networks only");
@@ -3884,7 +3895,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                         }
 
                         network = _networkMgr.createGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan);
+                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2);
                     }
 
                     if (_accountMgr.isRootAdmin(caller.getId()) && createVlan && network != null) {

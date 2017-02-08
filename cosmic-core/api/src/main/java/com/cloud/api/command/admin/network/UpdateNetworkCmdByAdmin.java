@@ -31,8 +31,9 @@ public class UpdateNetworkCmdByAdmin extends UpdateNetworkCmd {
             throw new InvalidParameterValueException("Couldn't find network by id");
         }
 
-        final Network result = _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount,
-                callerUser, getNetworkDomain(), getNetworkOfferingId(), getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId());
+        final Network result =
+                _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2());
 
         if (result != null) {
             final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Full, result);

@@ -47,6 +47,10 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
     String getIp6Cidr();
 
+    String getDns1();
+
+    String getDns2();
+
     long getDataCenterId();
 
     long getNetworkOfferingId();

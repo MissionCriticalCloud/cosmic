@@ -23,11 +23,14 @@ class CsGuestNetwork:
             return self.config.get_dns()
 
         dns = []
-        if not self.config.use_extdns() and 'router_guest_gateway' in self.data:
-            dns.append(self.data['router_guest_gateway'])
-
+        # If the guestnetwork has a DNS parameter, then use it (and only this)
         if 'dns' in self.data:
             dns.extend(self.data['dns'].split(','))
+            return dns
+
+        # Use the router vm as DNS server
+        if not self.config.use_extdns() and 'router_guest_gateway' in self.data:
+            dns.append(self.data['router_guest_gateway'])
 
         return dns or ['']
 

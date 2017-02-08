@@ -168,6 +168,14 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
 
+            if (userSpecified.getDns1() != null) {
+                network.setDns1(userSpecified.getDns1());
+            }
+
+            if (userSpecified.getDns2() != null) {
+                network.setDns2(userSpecified.getDns2());
+            }
+
             if (userSpecified.getCidr() != null) {
                 network.setCidr(userSpecified.getCidr());
                 network.setGateway(userSpecified.getGateway());
@@ -308,8 +316,17 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 nic.setIPv4Address(guestIp);
                 nic.setIPv4Netmask(NetUtils.cidr2Netmask(network.getCidr()));
 
-                nic.setIPv4Dns1(dc.getDns1());
-                nic.setIPv4Dns2(dc.getDns2());
+                if (network.getDns1() != null && network.getDns1().equals("")) {
+                    nic.setIPv4Dns1(dc.getDns1());
+                } else {
+                    nic.setIPv4Dns1(network.getDns1());
+                }
+                if (network.getDns2() != null && network.getDns2().equals("")) {
+                    nic.setIPv4Dns2(dc.getDns2());
+                } else {
+                    nic.setIPv4Dns2(network.getDns2());
+                }
+
                 nic.setFormat(AddressFormat.Ip4);
             }
         }
@@ -398,8 +415,12 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     @Override
     public void updateNetworkProfile(final NetworkProfile networkProfile) {
         final DataCenter dc = _dcDao.findById(networkProfile.getDataCenterId());
-        networkProfile.setDns1(dc.getDns1());
-        networkProfile.setDns2(dc.getDns2());
+        if (networkProfile.getDns1() != null && networkProfile.getDns1().equals("")) {
+            networkProfile.setDns1(dc.getDns1());
+        }
+        if (networkProfile.getDns2() != null && networkProfile.getDns2().equals("")) {
+            networkProfile.setDns2(dc.getDns2());
+        }
     }
 
     @Override
