@@ -36,22 +36,24 @@ public class LoadBalancerTO {
     private HealthCheckPolicyTO[] healthCheckPolicies;
     private LbSslCert sslCert; /* XXX: Should this be SslCertTO?  */
     private AutoScaleVmGroupTO autoScaleVmGroupTO;
+    private int clientTimeout;
+    private int serverTimeout;
 
-    public LoadBalancerTO(final String id, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked, final boolean
-            alreadyAdded, final boolean inline,
-                          final List<LbDestination> argDestinations, final List<LbStickinessPolicy> stickinessPolicies) {
+    public LoadBalancerTO(final String id, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked,
+                          final boolean alreadyAdded, final boolean inline, final List<LbDestination> argDestinations, final List<LbStickinessPolicy> stickinessPolicies,
+                          final int clientTimeout, final int serverTimeout) {
 
-        this(id, srcIp, srcPort, protocol, algorithm, revoked, alreadyAdded, inline, argDestinations, stickinessPolicies, null, null, null);
+        this(id, srcIp, srcPort, protocol, algorithm, revoked, alreadyAdded, inline, argDestinations, stickinessPolicies, null, null, null, clientTimeout, serverTimeout);
     }
 
-    public LoadBalancerTO(final String id, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked, final boolean
-            alreadyAdded, final boolean inline,
-                          final List<LbDestination> argDestinations, final List<LbStickinessPolicy> stickinessPolicies, final List<LbHealthCheckPolicy> healthCheckPolicies,
-                          final LbSslCert sslCert,
-                          final String lbProtocol) {
-        this(id, srcIp, srcPort, protocol, algorithm, revoked, alreadyAdded, inline, argDestinations);
+    public LoadBalancerTO(final String id, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked,
+                          final boolean alreadyAdded, final boolean inline, final List<LbDestination> argDestinations, final List<LbStickinessPolicy> stickinessPolicies,
+                          final List<LbHealthCheckPolicy> healthCheckPolicies, final LbSslCert sslCert, final String lbProtocol, final int clientTimeout, final int serverTimeout) {
+        this(id, srcIp, srcPort, protocol, algorithm, revoked, alreadyAdded, inline, argDestinations, clientTimeout, serverTimeout);
         this.stickinessPolicies = null;
         this.healthCheckPolicies = null;
+        this.clientTimeout = clientTimeout;
+        this.serverTimeout = serverTimeout;
         if (stickinessPolicies != null && stickinessPolicies.size() > 0) {
             this.stickinessPolicies = new StickinessPolicyTO[MAX_STICKINESS_POLICIES];
             int index = 0;
@@ -91,9 +93,8 @@ public class LoadBalancerTO {
         this.lbProtocol = lbProtocol;
     }
 
-    public LoadBalancerTO(final String uuid, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked, final boolean
-            alreadyAdded, final boolean inline,
-                          List<LbDestination> destinations) {
+    public LoadBalancerTO(final String uuid, final String srcIp, final int srcPort, final String protocol, final String algorithm, final boolean revoked,
+                          final boolean alreadyAdded, final boolean inline, List<LbDestination> destinations, final Integer clientTimeout, final Integer serverTimeout) {
         if (destinations == null) { // for autoscaleconfig destinations will be null;
             destinations = new ArrayList<>();
         }
@@ -109,6 +110,8 @@ public class LoadBalancerTO {
         this.stickinessPolicies = null;
         this.sslCert = null;
         this.lbProtocol = null;
+        this.clientTimeout = clientTimeout;
+        this.serverTimeout = serverTimeout;
         int i = 0;
         for (final LbDestination destination : destinations) {
             this.destinations[i++] = new DestinationTO(destination.getIpAddress(), destination.getDestinationPortStart(), destination.isRevoked(), false);
@@ -184,6 +187,22 @@ public class LoadBalancerTO {
 
     public LbSslCert getSslCert() {
         return this.sslCert;
+    }
+
+    public int getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final int clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    public int getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final int serverTimeout) {
+        this.serverTimeout = serverTimeout;
     }
 
     public void setAutoScaleVmGroup(final LbAutoScaleVmGroup lbAutoScaleVmGroup) {

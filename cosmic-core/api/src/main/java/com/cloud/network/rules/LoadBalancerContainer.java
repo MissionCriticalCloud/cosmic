@@ -10,6 +10,10 @@ public interface LoadBalancerContainer {
 
     String getLbProtocol();
 
+    int getServerTimeout();
+
+    int getClientTimeout();
+
     Scheme getScheme();
 
     public enum Scheme {

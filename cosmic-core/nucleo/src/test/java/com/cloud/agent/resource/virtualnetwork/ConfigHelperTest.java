@@ -81,7 +81,7 @@ public class ConfigHelperTest {
         final List<LbDestination> dests = new ArrayList<>();
         dests.add(new LbDestination(80, 8080, "10.1.10.2", false));
         dests.add(new LbDestination(80, 8080, "10.1.10.2", true));
-        lbs.add(new LoadBalancerTO(UUID.randomUUID().toString(), "64.10.1.10", 80, "tcp", "algo", false, false, false, dests));
+        lbs.add(new LoadBalancerTO(UUID.randomUUID().toString(), "64.10.1.10", 80, "tcp", "algo", false, false, false, dests, 60000, 60000));
 
         final LoadBalancerTO[] arrayLbs = new LoadBalancerTO[lbs.size()];
         lbs.toArray(arrayLbs);

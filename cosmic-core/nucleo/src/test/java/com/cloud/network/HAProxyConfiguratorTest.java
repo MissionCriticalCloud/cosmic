@@ -15,9 +15,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- * @author dhoogland
- */
 public class HAProxyConfiguratorTest {
 
     /**
@@ -53,7 +50,7 @@ public class HAProxyConfiguratorTest {
      */
     @Test
     public void testGenerateConfigurationLoadBalancerConfigCommand() {
-        final LoadBalancerTO lb = new LoadBalancerTO("1", "10.2.0.1", 80, "http", "bla", false, false, false, null);
+        final LoadBalancerTO lb = new LoadBalancerTO("1", "10.2.0.1", 80, "http", "bla", false, false, false, null, 60000, 60000);
         final LoadBalancerTO[] lba = new LoadBalancerTO[1];
         lba[0] = lb;
         final HAProxyConfigurator hpg = new HAProxyConfigurator();
@@ -88,7 +85,7 @@ public class HAProxyConfiguratorTest {
         final List<LbDestination> dests = new ArrayList<>();
         dests.add(new LbDestination(443, 8443, "10.1.10.2", false));
         dests.add(new LbDestination(443, 8443, "10.1.10.2", true));
-        final LoadBalancerTO lb = new LoadBalancerTO("1", "10.2.0.1", 443, "tcp", "http", false, false, false, dests);
+        final LoadBalancerTO lb = new LoadBalancerTO("1", "10.2.0.1", 443, "tcp", "http", false, false, false, dests, 60000, 60000);
         lb.setLbProtocol("tcp-proxy");
         final LoadBalancerTO[] lba = new LoadBalancerTO[1];
         lba[0] = lb;

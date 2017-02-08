@@ -325,7 +325,8 @@ public class InternalLBVMManagerTest extends TestCase {
         vms.add(vm);
 
         final List<LoadBalancingRule> rules = new ArrayList<>();
-        final ApplicationLoadBalancerRuleVO lb = new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip(requestedIp), 1L, Scheme.Internal);
+        final ApplicationLoadBalancerRuleVO lb =
+                new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip(requestedIp), 1L, Scheme.Internal, 60000, 60000);
         lb.setState(FirewallRule.State.Add);
 
         final LoadBalancingRule rule = new LoadBalancingRule(lb, null, null, null, new Ip(requestedIp));

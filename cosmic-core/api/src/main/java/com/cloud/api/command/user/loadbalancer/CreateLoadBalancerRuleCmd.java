@@ -106,6 +106,16 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
+    @Parameter(name = ApiConstants.CLIENT_TIMEOUT,
+            type = CommandType.INTEGER,
+            description = "the HAProxy client_timeout setting for this load balancing rule (in ms).")
+    private Integer clientTimeout;
+
+    @Parameter(name = ApiConstants.SERVER_TIMEOUT,
+            type = CommandType.INTEGER,
+            description = "the HAProxy server_timeout setting for this load balancing rule (in ms).")
+    private Integer serverTimeout;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -128,6 +138,22 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
 
     public Integer getPublicPort() {
         return publicPort;
+    }
+
+    public Integer getClientTimeout() {
+        return clientTimeout;
+    }
+
+    public void setClientTimeout(final Integer clientTimeout) {
+        this.clientTimeout = clientTimeout;
+    }
+
+    public Integer getServerTimeout() {
+        return serverTimeout;
+    }
+
+    public void setServerTimeout(final Integer serverTimeout) {
+        this.serverTimeout = serverTimeout;
     }
 
     public List<String> getSourceCidrList() {
@@ -261,7 +287,7 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
             final LoadBalancer result =
                     _lbService.createPublicLoadBalancerRule(getXid(), getName(), getDescription(), getSourcePortStart(), getSourcePortEnd(), getDefaultPortStart(),
                             getDefaultPortEnd(), getSourceIpAddressId(), getProtocol(), getAlgorithm(), getNetworkId(), getEntityOwnerId(), getOpenFirewall(), getLbProtocol(),
-                            isDisplay());
+                            isDisplay(), getClientTimeout(), getServerTimeout());
             this.setEntityId(result.getId());
             this.setEntityUuid(result.getUuid());
         } catch (final NetworkRuleConflictException e) {

@@ -193,7 +193,8 @@ public class InternalLbElementTest {
     //TEST FOR validateLBRule METHOD
     @Test
     public void verifyValidateLBRule() throws ResourceUnavailableException {
-        final ApplicationLoadBalancerRuleVO lb = new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip("10.10.10.1"), 1L, Scheme.Internal);
+        final ApplicationLoadBalancerRuleVO lb =
+                new ApplicationLoadBalancerRuleVO(null, null, 22, 22, "roundrobin", 1L, 1L, 1L, new Ip("10.10.10.1"), 1L, Scheme.Internal, 5000, 5000);
         lb.setState(FirewallRule.State.Add);
 
         final LoadBalancingRule rule = new LoadBalancingRule(lb, null, null, null, new Ip("10.10.10.1"));

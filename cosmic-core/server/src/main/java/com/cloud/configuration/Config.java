@@ -258,6 +258,22 @@ public enum Config {
             "4096",
             "Load Balancer(haproxy) maximum number of concurrent connections(global max)",
             null),
+    DefaultLoadBalancerServerTimeout(
+            "Network",
+            ManagementServer.class,
+            Integer.class,
+            "network.loadbalancer.haproxy.default.timeout.server",
+            "60000",
+            "Load Balancer(haproxy) default server timeout setting (in ms)",
+            null),
+    DefaultLoadBalancerClientTimeout(
+            "Network",
+            ManagementServer.class,
+            Integer.class,
+            "network.loadbalancer.haproxy.default.timeout.client",
+            "60000",
+            "Load Balancer(haproxy) default client timeout setting (in ms)",
+            null),
     NetworkRouterRpFilter(
             "Network",
             ManagementServer.class,
