@@ -90,15 +90,17 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
 
     @Override
     public boolean applyNetworkACL(final long aclId) throws ResourceUnavailableException {
-        boolean handled = true;
-        boolean aclApplyStatus = true;
+        boolean applyToNetworksFailed = false;
+        boolean applyToPrivateGatewaysFailed = false;
+        boolean applyToIpAddressesFailed = false;
 
         final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(aclId);
-        //Find all networks using this ACL and apply the ACL
+
         final List<NetworkVO> networks = _networkDao.listByAclId(aclId);
         for (final NetworkVO network : networks) {
             if (!applyACLItemsToNetwork(network.getId(), rules)) {
-                handled = false;
+                applyToNetworksFailed = true;
+                s_logger.debug("Failed to apply ACL item to Network [" + network.getId() + "], ACL [" + aclId + "]");
                 break;
             }
         }
@@ -106,15 +108,23 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         final List<VpcGatewayVO> vpcGateways = _vpcGatewayDao.listByAclIdAndType(aclId, VpcGateway.Type.Private);
         for (final VpcGatewayVO vpcGateway : vpcGateways) {
             final PrivateGateway privateGateway = _vpcSvc.getVpcPrivateGateway(vpcGateway.getId());
-
             if (!applyACLToPrivateGw(privateGateway)) {
-                aclApplyStatus = false;
-                s_logger.debug("failed to apply network acl item on private gateway " + privateGateway.getId() + "acl id " + aclId);
+                applyToPrivateGatewaysFailed = true;
+                s_logger.debug("Failed to apply ACL item to Private Gateway [" + privateGateway.getId() + "], ACL [" + aclId + "]");
                 break;
             }
         }
 
-        if (handled && aclApplyStatus) {
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByAclId(aclId);
+        for (final IPAddressVO ipAddress : ipAddresses) {
+            if (!applyACLItemsToPublicIp(ipAddress.getId(), rules)) {
+                applyToIpAddressesFailed = true;
+                s_logger.debug("Failed to apply ACL item to IP Address [" + ipAddress.getId() + "], ACL [" + aclId + "]");
+                break;
+            }
+        }
+
+        if (!applyToNetworksFailed && !applyToPrivateGatewaysFailed && !applyToIpAddressesFailed) {
             for (final NetworkACLItem rule : rules) {
                 if (rule.getState() == NetworkACLItem.State.Revoke) {
                     removeRule(rule);
@@ -125,7 +135,8 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
                 }
             }
         }
-        return handled && aclApplyStatus;
+
+        return !applyToNetworksFailed && !applyToPrivateGatewaysFailed && !applyToIpAddressesFailed;
     }
 
     @Override

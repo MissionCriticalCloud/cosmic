@@ -632,7 +632,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("aclId", aclId);
 
-        return listBy(sc, null);
+        return listBy(sc);
     }
 
     @Override
