@@ -7,6 +7,7 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
+import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.element.NetworkACLServiceProvider;
@@ -63,6 +64,8 @@ public class NetworkACLManagerTest extends TestCase {
     @Inject
     NetworkACLManager _aclMgr;
 
+    @Inject
+    IPAddressDao _ipAddressDao;
     @Inject
     AccountManager _accountMgr;
     @Inject
@@ -243,6 +246,11 @@ public class NetworkACLManagerTest extends TestCase {
         @Bean
         public NetworkOrchestrationService networkManager() {
             return Mockito.mock(NetworkOrchestrationService.class);
+        }
+
+        @Bean
+        public IPAddressDao ipAddressDao() {
+            return Mockito.mock(IPAddressDao.class);
         }
 
         @Bean

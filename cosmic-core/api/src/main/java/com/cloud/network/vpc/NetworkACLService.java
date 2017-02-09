@@ -44,15 +44,9 @@ public interface NetworkACLService {
      */
     boolean deleteNetworkACL(long id);
 
-    /**
-     * Associates ACL with specified Network
-     *
-     * @param aclId
-     * @param networkId
-     * @return
-     * @throws ResourceUnavailableException
-     */
     boolean replaceNetworkACL(long aclId, long networkId) throws ResourceUnavailableException;
+
+    boolean replacePublicIpACL(long aclId, long publicIpId) throws ResourceUnavailableException;
 
     /**
      * Applied ACL to associated networks

@@ -6,6 +6,7 @@ public class VRScripts {
     public final static String GUEST_NETWORK_CONFIG = "guest_network.json";
     public final static String PRIVATE_GATEWAY_CONFIG = "private_gateway.json";
     public final static String NETWORK_ACL_CONFIG = "network_acl.json";
+    public final static String PUBLIC_IP_ACL_CONFIG = "public_ip_acl.json";
     public final static String VM_METADATA_CONFIG = "vm_metadata.json";
     public final static String VM_DHCP_CONFIG = "vm_dhcp_entry.json";
     public final static String VM_PASSWORD_CONFIG = "vm_password.json";

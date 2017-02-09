@@ -8,9 +8,12 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
+import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
+import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.element.NetworkACLServiceProvider;
@@ -41,6 +44,8 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
 
     @Inject
     AccountManager _accountMgr;
+    @Inject
+    IPAddressDao _ipAddressDao;
     @Inject
     NetworkModel _networkMgr;
     @Inject
@@ -85,15 +90,17 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
 
     @Override
     public boolean applyNetworkACL(final long aclId) throws ResourceUnavailableException {
-        boolean handled = true;
-        boolean aclApplyStatus = true;
+        boolean applyToNetworksFailed = false;
+        boolean applyToPrivateGatewaysFailed = false;
+        boolean applyToIpAddressesFailed = false;
 
         final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(aclId);
-        //Find all networks using this ACL and apply the ACL
+
         final List<NetworkVO> networks = _networkDao.listByAclId(aclId);
         for (final NetworkVO network : networks) {
             if (!applyACLItemsToNetwork(network.getId(), rules)) {
-                handled = false;
+                applyToNetworksFailed = true;
+                s_logger.debug("Failed to apply ACL item to Network [" + network.getId() + "], ACL [" + aclId + "]");
                 break;
             }
         }
@@ -101,15 +108,23 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         final List<VpcGatewayVO> vpcGateways = _vpcGatewayDao.listByAclIdAndType(aclId, VpcGateway.Type.Private);
         for (final VpcGatewayVO vpcGateway : vpcGateways) {
             final PrivateGateway privateGateway = _vpcSvc.getVpcPrivateGateway(vpcGateway.getId());
-
             if (!applyACLToPrivateGw(privateGateway)) {
-                aclApplyStatus = false;
-                s_logger.debug("failed to apply network acl item on private gateway " + privateGateway.getId() + "acl id " + aclId);
+                applyToPrivateGatewaysFailed = true;
+                s_logger.debug("Failed to apply ACL item to Private Gateway [" + privateGateway.getId() + "], ACL [" + aclId + "]");
                 break;
             }
         }
 
-        if (handled && aclApplyStatus) {
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByAclId(aclId);
+        for (final IPAddressVO ipAddress : ipAddresses) {
+            if (!applyACLItemsToPublicIp(ipAddress.getId(), rules)) {
+                applyToIpAddressesFailed = true;
+                s_logger.debug("Failed to apply ACL item to IP Address [" + ipAddress.getId() + "], ACL [" + aclId + "]");
+                break;
+            }
+        }
+
+        if (!applyToNetworksFailed && !applyToPrivateGatewaysFailed && !applyToIpAddressesFailed) {
             for (final NetworkACLItem rule : rules) {
                 if (rule.getState() == NetworkACLItem.State.Revoke) {
                     removeRule(rule);
@@ -120,7 +135,8 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
                 }
             }
         }
-        return handled && aclApplyStatus;
+
+        return !applyToNetworksFailed && !applyToPrivateGatewaysFailed && !applyToIpAddressesFailed;
     }
 
     @Override
@@ -183,6 +199,31 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
                 _messageBus.publish(_name, "Network_ACL_Replaced", PublishScope.LOCAL, network);
             }
             return result;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean replacePublicIpACL(final NetworkACL acl, final IPAddressVO publicIp) throws ResourceUnavailableException {
+
+        if (publicIp.getIpACLId() != null) {
+            // Revoke ACL Items of the existing ACL if the new ACL is empty
+            // Existing rules won't be removed otherwise
+            final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(acl.getId());
+            if (aclItems == null || aclItems.isEmpty()) {
+                s_logger.debug("New network ACL is empty. Revoke existing rules before applying ACL");
+                if (!revokeACLItemsForPublicIp(publicIp.getId())) {
+                    throw new CloudRuntimeException("Failed to replace network ACL. Error while removing existing ACL items for public ip: " + publicIp.getId());
+                }
+            }
+        }
+
+        publicIp.setIpACLId(acl.getId());
+        //Update Public IP ACL
+        if (_ipAddressDao.update(publicIp.getId(), publicIp)) {
+            s_logger.debug("Updated public ip address: " + publicIp.getId() + " with ACL Id: " + acl.getId() + ", Applying ACL items");
+            //Apply ACL to public ip
+            return applyACLToPublicIp(publicIp.getId());
         }
         return false;
     }
@@ -285,6 +326,38 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
     }
 
     @Override
+    public boolean revokeACLItemsForPublicIp(final long publicIpId) throws ResourceUnavailableException {
+        final IpAddress publicIp = _ipAddressDao.findById(publicIpId);
+        if (publicIp.getIpACLId() == null) {
+            return true;
+        }
+        final List<NetworkACLItemVO> aclItems = _networkACLItemDao.listByACL(publicIp.getIpACLId());
+        if (aclItems.isEmpty()) {
+            s_logger.debug("Found no network ACL Items for public ip id=" + publicIpId);
+            return true;
+        }
+
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Releasing " + aclItems.size() + " Network ACL Items for public ip id=" + publicIpId);
+        }
+
+        for (final NetworkACLItemVO aclItem : aclItems) {
+            // Mark all Network ACLs rules as Revoke, but don't update in DB
+            if (aclItem.getState() == State.Add || aclItem.getState() == State.Active) {
+                aclItem.setState(State.Revoke);
+            }
+        }
+
+        final boolean success = applyACLItemsToPublicIp(publicIp.getId(), aclItems);
+
+        if (s_logger.isDebugEnabled() && success) {
+            s_logger.debug("Successfully released Network ACLs for public ip id=" + publicIp + " and # of rules now = " + aclItems.size());
+        }
+
+        return success;
+    }
+
+    @Override
     public List<NetworkACLItemVO> listNetworkACLItems(final long guestNtwkId) {
         final Network network = _networkMgr.getNetwork(guestNtwkId);
         if (network.getNetworkACLId() == null) {
@@ -301,6 +374,16 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
         }
         final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(network.getNetworkACLId());
         return applyACLItemsToNetwork(networkId, rules);
+    }
+
+    @Override
+    public boolean applyACLToPublicIp(final long publicIpId) throws ResourceUnavailableException {
+        final IpAddress publicIp = _ipAddressDao.findById(publicIpId);
+        if (publicIp.getIpACLId() == null) {
+            return true;
+        }
+        final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(publicIp.getIpACLId());
+        return applyACLItemsToPublicIp(publicIpId, rules);
     }
 
     @Override
@@ -462,6 +545,20 @@ public class NetworkACLManagerImpl extends ManagerBase implements NetworkACLMana
             s_logger.debug("Unable to find NetworkACL service provider for network: " + network.getId());
         }
         return handled;
+    }
+
+    public boolean applyACLItemsToPublicIp(final long publicIpId, final List<NetworkACLItemVO> rules) throws ResourceUnavailableException {
+        final IpAddress publicIp = _ipAddressDao.findById(publicIpId);
+
+        final VpcProvider provider = (VpcProvider) _ntwkModel.getElementImplementingProvider(Network.Provider.VPCVirtualRouter.getName());
+
+        try {
+            return provider.applyACLItemsToPublicIp(publicIp, rules);
+        } catch (final Exception ex) {
+            s_logger.debug("Failed to apply acl to public ip: " + publicIpId);
+        }
+
+        return false;
     }
 
     private void removeRule(final NetworkACLItem rule) {

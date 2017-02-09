@@ -5,8 +5,8 @@ import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
 
 public interface NetworkACL extends InternalIdentity, Identity, Displayable {
-    public static final long DEFAULT_DENY = 1;
-    public static final long DEFAULT_ALLOW = 2;
+    long DEFAULT_DENY = 1;
+    long DEFAULT_ALLOW = 2;
 
     String getDescription();
 

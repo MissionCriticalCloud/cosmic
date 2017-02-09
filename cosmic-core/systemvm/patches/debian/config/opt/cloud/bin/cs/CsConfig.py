@@ -86,21 +86,3 @@ class CsConfig(object):
 
     def get_format(self):
         return self.__LOG_FORMAT
-
-    def get_ingress_chain(self, device, ip):
-        if self.is_vpc():
-            return "ACL_INBOUND_%s" % device
-        else:
-            return "FIREWALL_%s" % ip
-
-    def get_egress_chain(self, device, ip):
-        if self.is_vpc():
-            return "ACL_OUTBOUND_%s" % device
-        else:
-            return "FW_EGRESS_RULES"
-
-    def get_egress_table(self):
-        if self.is_vpc():
-            return 'mangle'
-        else:
-            return ""

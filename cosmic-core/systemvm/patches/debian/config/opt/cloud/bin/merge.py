@@ -17,6 +17,7 @@ import cs_ip
 import cs_loadbalancer
 import cs_monitorservice
 import cs_network_acl
+import cs_public_ip_acl
 import cs_remoteaccessvpn
 import cs_site2sitevpn
 import cs_staticroutes
@@ -91,6 +92,8 @@ class updateDataBag:
             dbag = self.processCL(self.db.getDataBag())
         elif self.qFile.type == 'networkacl':
             dbag = self.process_network_acl(self.db.getDataBag())
+        elif self.qFile.type == 'publicipacl':
+            dbag = self.process_public_ip_acl(self.db.getDataBag())
         elif self.qFile.type == 'firewallrules':
             dbag = self.process_firewallrules(self.db.getDataBag())
         elif self.qFile.type == 'loadbalancer':
@@ -160,6 +163,9 @@ class updateDataBag:
 
     def process_network_acl(self, dbag):
         return cs_network_acl.merge(dbag, self.qFile.data)
+
+    def process_public_ip_acl(self, dbag):
+        return cs_public_ip_acl.merge(dbag, self.qFile.data)
 
     def process_firewallrules(self, dbag):
         return cs_firewallrules.merge(dbag, self.qFile.data)

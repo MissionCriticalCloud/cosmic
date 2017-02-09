@@ -164,7 +164,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
 
         final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(gateway.getVpcId());
         if (routers == null || routers.isEmpty()) {
-            s_logger.debug(getName() + " element doesn't need to create Private gateway on the backend; VPC virtual " + "router doesn't exist in the vpc id=" + gateway.getVpcId());
+            s_logger.debug(getName() + " element doesn't need to create Private gateway on the backend; VPC virtual router doesn't exist in the vpc id=" + gateway.getVpcId());
             return true;
         }
 
@@ -199,7 +199,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
 
         final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(gateway.getVpcId());
         if (routers == null || routers.isEmpty()) {
-            s_logger.debug(getName() + " element doesn't need to delete Private gateway on the backend; VPC virtual " + "router doesn't exist in the vpc id=" + gateway.getVpcId());
+            s_logger.debug(getName() + " element doesn't need to delete Private gateway on the backend; VPC virtual router doesn't exist in the vpc id=" + gateway.getVpcId());
             return true;
         }
 
@@ -217,7 +217,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     public boolean applyStaticRoutes(final Vpc vpc, final List<StaticRouteProfile> routes) throws ResourceUnavailableException {
         final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
         if (routers == null || routers.isEmpty()) {
-            s_logger.debug("Virtual router elemnt doesn't need to static routes on the backend; virtual " + "router doesn't exist in the vpc " + vpc);
+            s_logger.debug("Virtual router element doesn't need to static routes on the backend; virtual router doesn't exist in the vpc " + vpc);
             return true;
         }
 
@@ -239,7 +239,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
 
         final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(gateway.getVpcId());
         if (routers == null || routers.isEmpty()) {
-            s_logger.debug("Virtual router element doesn't need to apply network acl rules on the backend; virtual " + "router doesn't exist in the network " + network.getId());
+            s_logger.debug("Virtual router element doesn't need to apply network acl rules on the backend; virtual router doesn't exist in the network " + network.getId());
             return true;
         }
 
@@ -261,12 +261,38 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     }
 
     @Override
+    public boolean applyACLItemsToPublicIp(final IpAddress publicIp, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
+
+        final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(publicIp.getVpcId());
+        if (routers == null || routers.isEmpty()) {
+            s_logger.debug("Virtual router element doesn't need to apply network acl rules on the backend; virtual router doesn't exist for the public ip " + publicIp.getId());
+            return true;
+        }
+
+        final DataCenterVO dcVO = _dcDao.findById(publicIp.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+
+        final Network publicNetwork = _networkModel.getNetwork(publicIp.getNetworkId());
+
+        boolean result = true;
+        for (final DomainRouterVO domainRouterVO : routers) {
+            final NicProfile nicProfile = _networkModel.getNicProfile(domainRouterVO, publicNetwork.getId(), null);
+            if (nicProfile != null) {
+                result = result && networkTopology.applyPublicIpACLs(publicNetwork, publicIp, rules, domainRouterVO);
+            } else {
+                s_logger.warn("Nic Profile for router '" + domainRouterVO + "' has already been removed. Router is redundant = " + domainRouterVO.getIsRedundantRouter());
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean applyNetworkACLs(final Network network, final List<? extends NetworkACLItem> rules) throws ResourceUnavailableException {
         boolean result = true;
         if (canHandle(network, Service.NetworkACL)) {
             final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
             if (routers == null || routers.isEmpty()) {
-                s_logger.debug("Virtual router elemnt doesn't need to apply firewall rules on the backend; virtual " + "router doesn't exist in the network " + network.getId());
+                s_logger.debug("Virtual router element doesn't need to apply firewall rules on the backend; virtual router doesn't exist in the network " + network.getId());
                 return true;
             }
 
@@ -627,7 +653,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         if (canHandle) {
             final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
             if (routers == null || routers.isEmpty()) {
-                s_logger.debug(getName() + " element doesn't need to associate ip addresses on the backend; VPC virtual " + "router doesn't exist in the network "
+                s_logger.debug(getName() + " element doesn't need to associate ip addresses on the backend; VPC virtual router doesn't exist in the network "
                         + network.getId());
                 return false;
             }

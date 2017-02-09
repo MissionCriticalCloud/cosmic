@@ -24,6 +24,8 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
 
     List<IPAddressVO> listStaticNatPublicIps(long networkId);
 
+    List<IPAddressVO> listByAclId(long aclId);
+
     int countIPs(long dcId, boolean onlyCountAllocated);
 
     int countIPs(long dcId, long vlanDbId, boolean onlyCountAllocated);

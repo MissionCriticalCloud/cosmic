@@ -6,7 +6,7 @@ from marvin.lib.common import *
 from marvin.lib.utils import *
 from nose.plugins.attrib import attr
 
-class TestPrivateGateway(cloudstackTestCase):
+class TestPublicIpAcl(cloudstackTestCase):
 
     attributes = {
         'template_name': 'tiny linux kvm',
@@ -21,19 +21,13 @@ class TestPrivateGateway(cloudstackTestCase):
             'vpc': 'Default VPC offering',
             'redundant_vpc': 'Redundant VPC offering',
             'network': 'DefaultIsolatedNetworkOfferingForVpcNetworks',
-            'virtual_machine': 'Small Instance',
-            'private_network': 'DefaultPrivateGatewayNetworkOffering'
+            'virtual_machine': 'Small Instance'
         },
         'vpcs': {
             'vpc1': {
                 'name': 'vpc1',
                 'displaytext': 'vpc1',
                 'cidr': '10.1.0.0/16'
-            },
-            'vpc2': {
-                'name': 'vpc2',
-                'displaytext': 'vpc2',
-                'cidr': '10.2.0.0/16'
             }
         },
         'networks': {
@@ -42,47 +36,18 @@ class TestPrivateGateway(cloudstackTestCase):
                 'displaytext': 'network1',
                 'gateway': '10.1.1.1',
                 'netmask': '255.255.255.0'
-            },
-            'network2': {
-                'name': 'network2',
-                'displaytext': 'network2',
-                'gateway': '10.2.1.1',
-                'netmask': '255.255.255.0'
-            },
-            'private_gateways_network': {
-                'name': 'private_gateways_network',
-                'displaytext': 'private_gateways_network',
-                'cidr': '172.16.1.0/24'
             }
         },
         'vms': {
             'vm1': {
                 'name': 'vm1',
                 'displayname': 'vm1'
-            },
-            'vm2': {
-                'name': 'vm2',
-                'displayname': 'vm2'
             }
-        },
-        'private_gateways': {
-            'private_gateway1': '172.16.1.1',
-            'private_gateway2': '172.16.1.2'
         },
         'nat_rule': {
             'protocol': 'TCP',
             'publicport': 22,
             'privateport': 22
-        },
-        'static_routes': {
-            'static_route1': {
-                'cidr': '10.2.0.0/16',
-                'nexthop': '172.16.1.2'
-            },
-            'static_route2': {
-                'cidr': '10.1.0.0/16',
-                'nexthop': '172.16.1.1'
-            }
         },
         'acls': {
             'acl1': {
@@ -90,9 +55,11 @@ class TestPrivateGateway(cloudstackTestCase):
                 'description': 'acl1',
                 'entries': {
                     'entry1': {
-                        'protocol': 'All',
+                        'protocol': 'TCP',
                         'action': 'Allow',
-                        'traffictype': 'Ingress'
+                        'traffictype': 'Ingress',
+                        'startport': 22,
+                        'endport': 22
                     }
                 }
             },
@@ -101,9 +68,11 @@ class TestPrivateGateway(cloudstackTestCase):
                 'description': 'acl2',
                 'entries': {
                     'entry2': {
-                        'protocol': 'All',
-                        'action': 'Allow',
-                        'traffictype': 'Ingress'
+                        'protocol': 'TCP',
+                        'action': 'Deny',
+                        'traffictype': 'Ingress',
+                        'startport': 22,
+                        'endport': 22
                     }
                 }
             }
@@ -113,12 +82,12 @@ class TestPrivateGateway(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
+        cls.test_client = super(TestPublicIpAcl, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
 
-        cls.logger = logging.getLogger('TestPrivateGateway')
+        cls.logger = logging.getLogger('TestPublicIpAcl')
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(logging.StreamHandler())
 
@@ -159,11 +128,11 @@ class TestPrivateGateway(cloudstackTestCase):
         cls.virtual_machine_offering = cls.get_default_virtual_machine_offering()
         cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
-        cls.private_network_offering = cls.get_default_private_network_offering()
-        cls.logger.debug("[TEST] Private Network Offering '%s' selected", cls.private_network_offering.name)
-
-        cls.default_allow_acl = cls.get_default_allow_acl()
+        cls.default_allow_acl = cls.get_default_acl('default_allow')
         cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
+
+        cls.default_deny_acl = cls.get_default_acl('default_deny')
+        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
             cls.attributes['vpcs']['vpc1'],
@@ -213,87 +182,6 @@ class TestPrivateGateway(cloudstackTestCase):
             cls.nat_rule1.publicport,
             cls.nat_rule1.privateport)
 
-        cls.vpc2 = VPC.create(cls.api_client,
-            cls.attributes['vpcs']['vpc2'],
-            vpcofferingid=cls.vpc_offering.id,
-            zoneid=cls.zone.id,
-            domainid=cls.domain.id,
-            account=cls.account.name)
-        cls.logger.debug("[TEST] VPC '%s' created, CIDR: %s", cls.vpc2.name, cls.vpc2.cidr)
-
-        cls.network2 = Network.create(cls.api_client,
-            cls.attributes['networks']['network2'],
-            networkofferingid=cls.network_offering.id,
-            aclid=cls.default_allow_acl.id,
-            vpcid=cls.vpc2.id,
-            zoneid=cls.zone.id,
-            domainid=cls.domain.id,
-            accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s", cls.network2.name, cls.network2.cidr, cls.network2.gateway)
-
-        cls.vm2 = VirtualMachine.create(cls.api_client,
-            cls.attributes['vms']['vm2'],
-            templateid=cls.template.id,
-            serviceofferingid=cls.virtual_machine_offering.id,
-            networkids=[cls.network2.id],
-            zoneid=cls.zone.id,
-            domainid=cls.domain.id,
-            accountid=cls.account.name)
-        cls.logger.debug("[TEST] VM '%s' created, Network: %s, IP: %s", cls.vm2.name, cls.network2.name, cls.vm2.nic[0].ipaddress)
-
-        cls.public_ip2 = PublicIPAddress.create(cls.api_client,
-            zoneid=cls.zone.id,
-            domainid=cls.account.domainid,
-            accountid=cls.account.name,
-            vpcid=cls.vpc2.id,
-            networkid=cls.network2.id)
-        cls.logger.debug("[TEST] Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip2.ipaddress.ipaddress, cls.vpc2.name, cls.network2.name)
-
-        cls.nat_rule2 = NATRule.create(cls.api_client,
-            cls.vm2,
-            cls.attributes['nat_rule'],
-            vpcid=cls.vpc2.id,
-            networkid=cls.network2.id,
-            ipaddressid=cls.public_ip2.ipaddress.id)
-        cls.logger.debug("[TEST] Port Forwarding Rule '%s (%s) %s => %s' created",
-            cls.nat_rule2.ipaddress,
-            cls.nat_rule2.protocol,
-            cls.nat_rule2.publicport,
-            cls.nat_rule2.privateport)
-
-        cls.private_gateways_network = Network.create(cls.api_client,
-            cls.attributes['networks']['private_gateways_network'],
-            networkofferingid=cls.private_network_offering.id,
-            aclid=cls.default_allow_acl.id,
-            zoneid=cls.zone.id,
-            domainid=cls.domain.id,
-            accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s", cls.private_gateways_network.name, cls.private_gateways_network.cidr)
-
-        cls.private_gateway1 = PrivateGateway.create(cls.api_client,
-            ipaddress=cls.attributes['private_gateways']['private_gateway1'],
-            networkid=cls.private_gateways_network.id,
-            aclid=cls.default_allow_acl.id,
-            vpcid=cls.vpc1.id)
-        cls.logger.debug("[TEST] Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway1.ipaddress, cls.private_gateways_network.name, cls.vpc1.name)
-
-        cls.static_route1 = StaticRoute.create(cls.api_client,
-            cls.attributes['static_routes']['static_route1'],
-            vpcid=cls.vpc1.id)
-        cls.logger.debug("[TEST] Static Route '%s => %s' created, VPC: %s", cls.static_route1.cidr, cls.static_route1.nexthop, cls.vpc1.name)
-
-        cls.private_gateway2 = PrivateGateway.create(cls.api_client,
-            ipaddress=cls.attributes['private_gateways']['private_gateway2'],
-            networkid=cls.private_gateways_network.id,
-            aclid=cls.default_allow_acl.id,
-            vpcid=cls.vpc2.id)
-        cls.logger.debug("[TEST] Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway2.ipaddress, cls.private_gateways_network.name, cls.vpc2.name)
-
-        cls.static_route2 = StaticRoute.create(cls.api_client,
-            cls.attributes['static_routes']['static_route2'],
-            vpcid=cls.vpc2.id)
-        cls.logger.debug("[TEST] Static Route '%s => %s' created, VPC: %s", cls.static_route2.cidr, cls.static_route2.nexthop, cls.vpc2.name)
-
     @classmethod
     def tearDownClass(cls):
 
@@ -315,120 +203,101 @@ class TestPrivateGateway(cloudstackTestCase):
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
+    def test_acls(self, first_time_retries=2):
+        self.define_acl(self.default_allow_acl)
+        self.test_connectivity(retries=first_time_retries)
+        self.define_acl(self.default_deny_acl)
+        self.test_no_connectivity()
+        self.define_custom_acl('acl1', 'entry1')
+        self.test_connectivity()
+        self.define_custom_acl('acl2', 'entry2')
+        self.test_no_connectivity()
+        self.define_acl(self.default_allow_acl)
+        self.test_connectivity()
+
     @attr(tags=['advanced'], required_hardware='true')
     def test_01(self):
 
         self.setup_infra(redundant=False)
-        self.test_connectivity()
+        self.test_acls(first_time_retries=10)
 
     @attr(tags=['advanced'], required_hardware='true')
     def test_02(self):
 
-        self.cleanup_vpcs()
-        self.test_connectivity()
+        self.cleanup_vpc()
+        self.test_acls()
 
     @attr(tags=['advanced'], required_hardware='true')
     def test_03(self):
 
-        self.define_custom_acl()
-        self.test_connectivity()
+        self.setup_infra(redundant=True)
+        self.test_acls(first_time_retries=10)
 
     @attr(tags=['advanced'], required_hardware='true')
     def test_04(self):
 
-        self.setup_infra(redundant=True)
-        self.test_connectivity()
+        self.cleanup_vpc()
+        self.test_acls()
 
     @attr(tags=['advanced'], required_hardware='true')
     def test_05(self):
 
-        self.cleanup_vpcs()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'], required_hardware='true')
-    def test_06(self):
-
-        self.define_custom_acl()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'], required_hardware='true')
-    def test_07(self):
-
         self.stop_master_router(self.vpc1)
-        self.stop_master_router(self.vpc2)
-        self.test_connectivity()
+        self.test_acls()
 
-    def test_connectivity(self):
+    def test_connectivity(self, retries=2):
 
         try:
-            ping_count = 3
-            ssh_client = self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress.ipaddress, reconnect=True)
-
-            ping_vm1_command = "ping -c %s %s" % (ping_count, self.vm1.nic[0].ipaddress)
-            ping_vm1_command_output = str(ssh_client.execute(ping_vm1_command))
-            self.logger.debug("[SSH COMMAND] [%s]: %s", ping_vm1_command, ping_vm1_command_output)
-
-            ping_vm2_command = "ping -c %s %s" % (ping_count, self.vm2.nic[0].ipaddress)
-            ping_vm2_command_output = str(ssh_client.execute(ping_vm2_command))
-            self.logger.debug("[SSH COMMAND] [%s]: %s", ping_vm2_command, ping_vm2_command_output)
+            self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress.ipaddress, reconnect=True, retries=retries)
+            self.logger.debug('[TEST] Ensure connectivity: OK')
 
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
-        self.assertEqual(ping_vm1_command_output.count("%s packets transmitted, %s packets received" % (ping_count, ping_count)), 1)
-        self.assertEqual(ping_vm2_command_output.count("%s packets transmitted, %s packets received" % (ping_count, ping_count)), 1)
+    def test_no_connectivity(self):
 
-    def cleanup_vpcs(self):
+        failed = False
+        try:
+            self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress.ipaddress, reconnect=True, retries=2)
 
-        self.logger.debug("[TEST] Restarting VPCs '%s' and '%s' with 'cleanup=True'", self.vpc1.name, self.vpc2.name)
+        except Exception as e:
+            self.logger.debug('[TEST] Ensure no connectivity: OK')
+            failed = True
+
+        self.assertTrue(failed)
+
+    def cleanup_vpc(self):
+
+        self.logger.debug("[TEST] Restarting VPC '%s' with 'cleanup=True'", self.vpc1.name)
         self.vpc1.restart(self.api_client, True)
         self.logger.debug("[TEST] VPC '%s' restarted", self.vpc1.name)
-        self.vpc2.restart(self.api_client, True)
-        self.logger.debug("[TEST] VPC '%s' restarted", self.vpc2.name)
 
-    def define_custom_acl(self):
-
-        acl1 = NetworkACLList.create(self.api_client,
-            self.attributes['acls']['acl1'],
-            vpcid=self.vpc1.id)
-
-        NetworkACL.create(self.api_client,
-            self.attributes['acls']['acl1']['entries']['entry1'],
-            networkid=self.network1.id,
-            aclid=acl1.id)
+    def define_acl(self, acl):
 
         try:
             command = replaceNetworkACLList.replaceNetworkACLListCmd()
-            command.aclid = acl1.id
-            command.gatewayid = self.private_gateway1.id
+            command.aclid = acl.id
+            command.publicipid = self.public_ip1.ipaddress.id
             response = self.api_client.replaceNetworkACLList(command)
 
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
         self.assertTrue(response.success)
-        self.logger.debug("[TEST] Private Gateway '%s' ACL replaced", self.private_gateway1.ipaddress)
+        self.logger.debug("[TEST] Public IP '%s' ACL replaced with '%s'", self.public_ip1.ipaddress.ipaddress, acl.name)
 
-        acl2 = NetworkACLList.create(self.api_client,
-            self.attributes['acls']['acl2'],
-            vpcid=self.vpc2.id)
+    def define_custom_acl(self, acl_config, acl_entry_config):
+
+        acl = NetworkACLList.create(self.api_client,
+            self.attributes['acls'][acl_config],
+            vpcid=self.vpc1.id)
 
         NetworkACL.create(self.api_client,
-            self.attributes['acls']['acl2']['entries']['entry2'],
-            networkid=self.network2.id,
-            aclid=acl2.id)
+            self.attributes['acls'][acl_config]['entries'][acl_entry_config],
+            networkid=self.network1.id,
+            aclid=acl.id)
 
-        try:
-            command2 = replaceNetworkACLList.replaceNetworkACLListCmd()
-            command2.aclid = acl2.id
-            command2.gatewayid = self.private_gateway2.id
-            response2 = self.api_client.replaceNetworkACLList(command2)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-        self.assertTrue(response2.success)
-        self.logger.debug("[TEST] Private Gateway '%s' ACL replaced", self.private_gateway2.ipaddress)
+        self.define_acl(acl)
 
     def stop_master_router(self, vpc):
 
@@ -486,17 +355,10 @@ class TestPrivateGateway(cloudstackTestCase):
         return next(iter(offerings or []), None)
 
     @classmethod
-    def get_default_private_network_offering(cls):
-
-        offerings = list_network_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['private_network']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_allow_acl(cls):
+    def get_default_acl(cls, name):
 
         acls = NetworkACLList.list(cls.api_client)
-        acls = [acl for acl in acls if acl.name == 'default_allow']
+        acls = [acl for acl in acls if acl.name == name]
         return next(iter(acls or []), None)
 
     @classmethod

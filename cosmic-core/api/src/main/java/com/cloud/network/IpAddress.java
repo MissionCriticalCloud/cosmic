@@ -41,7 +41,9 @@ public interface IpAddress extends ControlledEntity, Identity, InternalIdentity,
 
     Long getAssociatedWithVmId();
 
-    public Long getPhysicalNetworkId();
+    Long getPhysicalNetworkId();
+
+    Long getIpACLId();
 
     Long getAllocatedToAccountId();
 

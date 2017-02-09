@@ -6,6 +6,7 @@ import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
+import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
@@ -37,6 +38,9 @@ public class ReplaceNetworkACLListCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.GATEWAY_ID, type = CommandType.UUID, entityType = PrivateGatewayResponse.class, description = "the ID of the private gateway")
     private Long privateGatewayId;
 
+    @Parameter(name = ApiConstants.PUBLIC_IP_ID, type = CommandType.UUID, entityType = IPAddressResponse.class, description = "the ID of the public ip")
+    private Long publicIpId;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -57,20 +61,16 @@ public class ReplaceNetworkACLListCmd extends BaseAsyncCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException {
-        if (getNetworkId() == null && getPrivateGatewayId() == null) {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Network ID and private gateway can't be null at the same time");
-        }
-
-        if (getNetworkId() != null && getPrivateGatewayId() != null) {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Network ID and private gateway can't be passed at the same time");
-        }
+        validateAPICall();
 
         CallContext.current().setEventDetails("Network ACL ID: " + aclId);
         boolean result = false;
         if (getPrivateGatewayId() != null) {
             result = _networkACLService.replaceNetworkACLonPrivateGw(aclId, privateGatewayId);
-        } else {
+        } else if (getNetworkId() != null) {
             result = _networkACLService.replaceNetworkACL(aclId, networkId);
+        } else if (getPublicIpId() != null) {
+            result = _networkACLService.replacePublicIpACL(aclId, publicIpId);
         }
 
         if (result) {
@@ -87,6 +87,27 @@ public class ReplaceNetworkACLListCmd extends BaseAsyncCmd {
 
     public Long getNetworkId() {
         return networkId;
+    }
+
+    public Long getPublicIpId() {
+        return publicIpId;
+    }
+
+    void validateAPICall() {
+        int noIds = 0;
+        if (getNetworkId() != null) {
+            noIds++;
+        }
+        if (getPrivateGatewayId() != null) {
+            noIds++;
+        }
+        if (getPublicIpId() != null) {
+            noIds++;
+        }
+
+        if (noIds != 1) {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Make sure that one and only one Private Gateway, Network or Public IP ID is passed.");
+        }
     }
 
     /////////////////////////////////////////////////////

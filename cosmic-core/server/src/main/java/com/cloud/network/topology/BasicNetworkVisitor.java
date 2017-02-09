@@ -27,6 +27,7 @@ import com.cloud.network.rules.NicPlugInOutRules;
 import com.cloud.network.rules.PasswordToRouterRules;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PrivateGatewayRules;
+import com.cloud.network.rules.PublicIpAclsRules;
 import com.cloud.network.rules.SshKeyToRouterRules;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
@@ -217,6 +218,11 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     @Override
     public boolean visit(final NetworkAclsRules aclsRules) throws ResourceUnavailableException {
         throw new CloudRuntimeException("NetworkAclsRules not implemented in Basic Network Topology.");
+    }
+
+    @Override
+    public boolean visit(final PublicIpAclsRules aclsRules) throws ResourceUnavailableException {
+        throw new CloudRuntimeException("PublicIpAclsRules not implemented in Basic Network Topology.");
     }
 
     @Override

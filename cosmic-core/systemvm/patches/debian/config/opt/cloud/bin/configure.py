@@ -138,6 +138,8 @@ class CsAcl(CsDataBag):
             self.netmask = obj['nic_netmask']
             self.config = config
             self.cidr = "%s/%s" % (self.ip, self.netmask)
+            if 'public_ip' in obj.keys():
+                self.public_ip = obj['public_ip']
             if "ingress_rules" in obj.keys():
                 self.ingress = obj['ingress_rules']
                 config.set_ingress_rules(self.ip, obj['ingress_rules'])
@@ -146,18 +148,26 @@ class CsAcl(CsDataBag):
             self.fw = config.get_fw()
 
         def create(self):
-            self.process("ingress", self.ingress, self.FIXED_RULES_INGRESS)
-            self.process("egress", self.egress, self.FIXED_RULES_EGRESS)
+            if hasattr(self, 'public_ip'):
+                self.process("ingress", 'ACL_PUBLIC_IP', self.ingress, self.FIXED_RULES_INGRESS)
+                self.process("egress", 'ACL_PUBLIC_IP', self.ingress, self.FIXED_RULES_INGRESS)
+            else:
+                self.process("ingress", 'ACL_INBOUND', self.ingress, self.FIXED_RULES_INGRESS)
+                self.process("egress", 'ACL_OUTBOUND', self.egress, self.FIXED_RULES_EGRESS)
+
+            # to drop traffic destined to public ips
+            if hasattr(self, 'public_ip'):
+                self.fw.append(["mangle", "", "-A ACL_PUBLIC_IP_%s -d %s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [public ip] \" --log-level 4" % (self.device, self.public_ip)])
+                self.fw.append(["mangle", "", "-A ACL_PUBLIC_IP_%s -d %s -j DROP" % (self.device, self.public_ip)])
             # rule below moved from CsAddress to replicate default behaviour
             # default behaviour is that only if one or more egress rules exist
             # we will drop everything else, otherwise we will allow all egress traffic
             # now also with logging
-            if len(self.egress) > 0:
+            elif len(self.egress) > 0:
                 self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [egress] \" --log-level 4" % self.device])
-                # intermediate deploy will not DROP because this is the current configuration. First only adding logging.
                 self.fw.append(["mangle", "", "-A ACL_OUTBOUND_%s -j DROP" % self.device])
 
-        def process(self, direction, rule_list, base):
+        def process(self, direction, acl_chain, rule_list, base):
             count = base
             rule_list_splitted = []
             for rule in rule_list:
@@ -184,28 +194,31 @@ class CsAcl(CsDataBag):
                     rule_list_splitted.append(rule)
 
             for i in rule_list_splitted:
-                r = self.AclRule(direction, self, i, self.config, count)
+                r = self.AclRule(direction, acl_chain, self, i, self.config, count)
                 r.create()
                 count += 1
 
         class AclRule():
 
-            def __init__(self, direction, acl, rule, config, count):
+            def __init__(self, direction, acl_chain, acl, rule, config, count):
                 self.count = count
                 if config.is_vpc():
-                    self.init_vpc(direction, acl, rule, config)
+                    self.init_vpc(direction, acl_chain, acl, rule, config)
 
-            def init_vpc(self, direction, acl, rule, config):
+            def init_vpc(self, direction, acl_chain, acl, rule, config):
                 self.table = ""
                 self.device = acl.device
                 self.direction = direction
                 # acl is an object of the AclDevice type. So, its fw attribute is already a list.
                 self.fw = acl.fw
-                self.chain = config.get_ingress_chain(self.device, acl.ip)
+                self.chain = "%s_%s" % (acl_chain, self.device)
                 self.dest = "-s %s" % rule['cidr']
-                if direction == "egress":
-                    self.table = config.get_egress_table()
-                    self.chain = config.get_egress_chain(self.device, acl.ip)
+                if hasattr(acl, 'public_ip'):
+                    if direction == "ingress":
+                        self.table = 'mangle'
+                    self.dest = "-s %s -d %s" % (rule['cidr'], acl.public_ip)
+                elif direction == "egress":
+                    self.table = 'mangle'
                     self.dest = "-d %s" % rule['cidr']
                 self.type = ""
                 self.type = rule['type']
@@ -868,6 +881,9 @@ class IpTablesExecutor:
         acls = CsAcl('networkacl', self.config)
         acls.process()
 
+        acls = CsAcl('publicipacl', self.config)
+        acls.process()
+
         acls = CsAcl('firewallrules', self.config)
         acls.process()
 
@@ -919,6 +935,7 @@ def main(argv):
     databag_map = OrderedDict([("guest_network.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("vm_metadata.json", { "process_iptables": False, "executor": CsVmMetadata('vmdata', config) }),
                                ("network_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
+                               ("public_ip_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("firewall_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("forwarding_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("staticnat_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),

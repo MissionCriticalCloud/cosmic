@@ -319,8 +319,8 @@ public class IPRangeConfig {
     public Vector<String> savePublicIPRange(final TransactionLegacy txn, long startIP, final long endIP, final long zoneId, final long vlanDbId, final Long sourceNetworkId,
                                             final long physicalNetworkId) {
         final String insertSql =
-                "INSERT INTO `cloud`.`user_ip_address` (public_ip_address, data_center_id, vlan_db_id, mac_address, source_network_id, physical_network_id, uuid) VALUES (?, ?, " +
-                        "?, (select mac_address from `cloud`.`data_center` where id=?), ?, ?, ?)";
+                "INSERT INTO `cloud`.`user_ip_address` (public_ip_address, data_center_id, vlan_db_id, mac_address, source_network_id, physical_network_id, ip_acl_id, uuid) " +
+                        "VALUES (?, ?, ?, (select mac_address from `cloud`.`data_center` where id=?), ?, ?, ?, ?)";
         final String updateSql = "UPDATE `cloud`.`data_center` set mac_address = mac_address+1 where id=?";
         final Vector<String> problemIPs = new Vector<>();
 
@@ -340,7 +340,8 @@ public class IPRangeConfig {
                 insert_stmt.setLong(4, zoneId);
                 insert_stmt.setLong(5, sourceNetworkId);
                 insert_stmt.setLong(6, physicalNetworkId);
-                insert_stmt.setString(7, UUID.randomUUID().toString());
+                insert_stmt.setLong(7, 2L);
+                insert_stmt.setString(8, UUID.randomUUID().toString());
                 insert_stmt.executeUpdate();
                 update_stmt.setLong(1, zoneId);
                 update_stmt.executeUpdate();

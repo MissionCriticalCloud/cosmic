@@ -867,6 +867,11 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
         ipResponse.setState(ipAddr.getState().toString());
 
+        final NetworkACL acl = ApiDBUtils.findByNetworkACLId(ipAddr.getIpACLId());
+        if (acl != null) {
+            ipResponse.setAclId(acl.getUuid());
+        }
+
         if (ipAddr.getPhysicalNetworkId() != null) {
             final PhysicalNetworkVO pnw = ApiDBUtils.findPhysicalNetworkById(ipAddr.getPhysicalNetworkId());
             if (pnw != null) {

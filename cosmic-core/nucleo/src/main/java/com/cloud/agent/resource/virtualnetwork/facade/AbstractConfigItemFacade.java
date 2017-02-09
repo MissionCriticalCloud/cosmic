@@ -17,6 +17,7 @@ import com.cloud.agent.api.routing.SetMonitorServiceCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
+import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
@@ -76,6 +77,7 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SetupGuestNetworkCommand.class, new SetGuestNetworkConfigItem());
         flyweight.put(SetupPrivateGatewayCommand.class, new SetPrivateGatewayConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
+        flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem());
         flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());
         flyweight.put(IpAssocCommand.class, new IpAssociationConfigItem());
         flyweight.put(IpAssocVpcCommand.class, new IpAssociationConfigItem());
