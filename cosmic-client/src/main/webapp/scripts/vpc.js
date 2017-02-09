@@ -3774,16 +3774,16 @@
                                 },
                                 isHidden: true
                             },
-                            gateway: {
-                                label: 'label.gateway',
+                            cidr: {
+                                label: 'label.cidr',
                                 docID: 'helpTierGateway',
                                 validation: {
                                     required: true
                                 }
                             },
-                            netmask: {
-                                label: 'label.netmask',
-                                docID: 'helpTierNetmask',
+                            gateway: {
+                                label: 'label.gateway',
+                                docID: 'helpTierGateway',
                                 validation: {
                                     required: true
                                 }
@@ -3867,8 +3867,8 @@
                             networkOfferingId: args.data.networkOfferingId,
                             name: args.data.name,
                             displayText: args.data.name,
+                            cidr: args.data.cidr,
                             gateway: args.data.gateway,
-                            netmask: args.data.netmask
                         };
 
                         if (args.context.regions)
@@ -4168,13 +4168,13 @@
                                         return service.name == 'Lb';
                                     }
                                 ).length ? $.grep($.grep(
-                                    tier.service,
-                                    function (service) {
-                                        return service.name == 'Lb';
-                                    }
-                                )[0].capability, function (capability) {
-                                    return capability.name == 'LbSchemes';
-                                }) : [];
+                                        tier.service,
+                                        function (service) {
+                                            return service.name == 'Lb';
+                                        }
+                                    )[0].capability, function (capability) {
+                                        return capability.name == 'LbSchemes';
+                                    }) : [];
 
                                 /*      var lbSchemes = $.grep(
                                  $.grep(
