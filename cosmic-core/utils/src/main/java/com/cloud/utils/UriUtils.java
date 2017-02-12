@@ -222,33 +222,6 @@ public class UriUtils {
         }
     }
 
-    public static InputStream getInputStreamFromUrl(final String url, final String user, final String password) {
-
-        try {
-            final Pair<String, Integer> hostAndPort = validateUrl(url);
-            final HttpClient httpclient = new HttpClient(new MultiThreadedHttpConnectionManager());
-            if ((user != null) && (password != null)) {
-                httpclient.getParams().setAuthenticationPreemptive(true);
-                final Credentials defaultcreds = new UsernamePasswordCredentials(user, password);
-                httpclient.getState().setCredentials(new AuthScope(hostAndPort.first(), hostAndPort.second(), AuthScope.ANY_REALM), defaultcreds);
-                s_logger.info("Added username=" + user + ", password=" + password + "for host " + hostAndPort.first() + ":" + hostAndPort.second());
-            }
-            // Execute the method.
-            final GetMethod method = new GetMethod(url);
-            final int statusCode = httpclient.executeMethod(method);
-
-            if (statusCode != HttpStatus.SC_OK) {
-                s_logger.error("Failed to read from URL: " + url);
-                return null;
-            }
-
-            return method.getResponseBodyAsStream();
-        } catch (final Exception ex) {
-            s_logger.error("Failed to read from URL: " + url);
-            return null;
-        }
-    }
-
     public static Pair<String, Integer> validateUrl(final String url) throws IllegalArgumentException {
         return validateUrl(null, url);
     }
