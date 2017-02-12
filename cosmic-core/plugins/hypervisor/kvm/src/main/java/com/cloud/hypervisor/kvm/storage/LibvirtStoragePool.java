@@ -130,7 +130,11 @@ public class LibvirtStoragePool implements KvmStoragePool {
         return capacity;
     }
 
-    public void setCapacity(final long capacity) {
+    public void setCapacity(long capacity) {
+        // Safe guard as the DB values are BIGINT unsigned so cannot be below zero
+        if (capacity < 0) {
+            capacity = 0;
+        }
         this.capacity = capacity;
     }
 
@@ -139,7 +143,11 @@ public class LibvirtStoragePool implements KvmStoragePool {
         return used;
     }
 
-    public void setUsed(final long used) {
+    public void setUsed(long used) {
+        // Safe guard as the DB values are BIGINT unsigned so cannot be below zero
+        if (used < 0) {
+            used = 0;
+        }
         this.used = used;
     }
 
@@ -148,7 +156,11 @@ public class LibvirtStoragePool implements KvmStoragePool {
         return available;
     }
 
-    public void setAvailable(final long available) {
+    public void setAvailable(long available) {
+        // Safe guard as the DB values are BIGINT unsigned so cannot be below zero
+        if (available < 0) {
+            available = 0;
+        }
         this.available = available;
     }
 
