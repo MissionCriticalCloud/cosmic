@@ -3,7 +3,6 @@ package com.cloud.utils;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,36 +181,26 @@ public class UriUtils {
 
     // Get the size of a file from URL response header.
     public static Long getRemoteSize(final String url) {
-        Long remoteSize = (long) 0;
+        long remoteSize = 0L;
         HttpURLConnection httpConn = null;
-        HttpsURLConnection httpsConn = null;
         try {
             final URI uri = new URI(url);
-            if (uri.getScheme().equalsIgnoreCase("http")) {
-                httpConn = (HttpURLConnection) uri.toURL().openConnection();
-                if (httpConn != null) {
-                    httpConn.setConnectTimeout(2000);
-                    httpConn.setReadTimeout(5000);
-                    final String contentLength = httpConn.getHeaderField("content-length");
-                    if (contentLength != null) {
-                        remoteSize = Long.parseLong(contentLength);
-                    }
-                    httpConn.disconnect();
-                }
-            } else if (uri.getScheme().equalsIgnoreCase("https")) {
-                httpsConn = (HttpsURLConnection) uri.toURL().openConnection();
-                if (httpsConn != null) {
-                    final String contentLength = httpsConn.getHeaderField("content-length");
-                    if (contentLength != null) {
-                        remoteSize = Long.parseLong(contentLength);
-                    }
-                    httpsConn.disconnect();
-                }
+            httpConn = (HttpURLConnection) uri.toURL().openConnection();
+            httpConn.setRequestMethod("HEAD");
+            httpConn.setConnectTimeout(2000);
+            httpConn.setReadTimeout(5000);
+            final String contentLength = httpConn.getHeaderField("Content-Length");
+            if (contentLength != null) {
+                remoteSize = Long.parseLong(contentLength);
             }
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException("Invalid URL " + url);
         } catch (final IOException e) {
             throw new IllegalArgumentException("Unable to establish connection with URL " + url);
+        } finally {
+            if (httpConn != null) {
+                httpConn.disconnect();
+            }
         }
         return remoteSize;
     }
