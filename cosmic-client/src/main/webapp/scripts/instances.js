@@ -389,29 +389,29 @@
                             });
                             args.response.error();
                         }
-                    })).done(function(jsonvm, jsonvmp) {
-                        var items = jsonvm[0].listvirtualmachinesresponse.virtualmachine;
-                        if (args.context.projects == null && isAdmin()) {
-                            var pitems = jsonvmp[0].listvirtualmachinesresponse.virtualmachine;
-                            if (pitems) {
-                                if (items) {
-                                    items.push(pitems[0]);
-                                } else {
-                                    items = pitems;
-                                }
+                    })).done(function (jsonvm, jsonvmp) {
+                    var items = jsonvm[0].listvirtualmachinesresponse.virtualmachine;
+                    if (args.context.projects == null && isAdmin()) {
+                        var pitems = jsonvmp[0].listvirtualmachinesresponse.virtualmachine;
+                        if (pitems) {
+                            if (items) {
+                                items.push(pitems[0]);
+                            } else {
+                                items = pitems;
                             }
                         }
-                        if (items) {
-                            $.each(items, function (idx, vm) {
-                                if (vm.nic && vm.nic.length > 0 && vm.nic[0].ipaddress) {
-                                    items[idx].ipaddress = vm.nic[0].ipaddress;
-                                }
-                            });
-                        }
-                        args.response.success({
-                            data: items
+                    }
+                    if (items) {
+                        $.each(items, function (idx, vm) {
+                            if (vm.nic && vm.nic.length > 0 && vm.nic[0].ipaddress) {
+                                items[idx].ipaddress = vm.nic[0].ipaddress;
+                            }
                         });
+                    }
+                    args.response.success({
+                        data: items
                     });
+                });
             },
 
             detailView: {
@@ -419,9 +419,6 @@
                 viewAll: [{
                     path: 'storage.volumes',
                     label: 'label.volumes'
-                }, {
-                    path: 'vmsnapshots',
-                    label: 'label.snapshots'
                 }, {
                     path: 'affinityGroups',
                     label: 'label.affinity.groups'
@@ -2519,7 +2516,7 @@
                             broadcasturi: {
                                 label: 'label.broadcast.uri'
                             },
-                            isolationuri : {
+                            isolationuri: {
                                 label: 'label.isolation.uri'
                             },
                             ip6address: {
