@@ -2,7 +2,7 @@ from netaddr import *
 
 
 def merge(dbag, data):
-    search(dbag, data['host_name'])
+    search(dbag, data['mac_address'])
     # A duplicate ip address wil clobber the old value
     # This seems desirable ....
     if "add" in data and data['add'] is False and \
@@ -15,7 +15,7 @@ def merge(dbag, data):
     return dbag
 
 
-def search(dbag, name):
+def search(dbag, mac_address):
     """
     Dirty hack because CS does not deprovision hosts
     """
@@ -23,8 +23,8 @@ def search(dbag, name):
     for o in dbag:
         if o == 'id':
             continue
-        print "%s %s" % (dbag[o]['host_name'], name)
-        if dbag[o]['host_name'] == name:
+        print "%s %s" % (dbag[o]['mac_address'], mac_address)
+        if dbag[o]['mac_address'] == mac_address:
             hosts.append(o)
     for o in hosts:
         del (dbag[o])
