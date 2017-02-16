@@ -4428,6 +4428,7 @@ public class LibvirtComputingResourceTest {
 
         final NicTO nic = Mockito.mock(NicTO.class);
         final NicTO[] nics = new NicTO[]{nic};
+        final int[] vms = new int[0];
 
         final String vmName = "Test";
         final String controlIp = "127.0.0.1";
@@ -4441,6 +4442,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
         try {
             when(libvirtUtilitiesHelper.getConnectionByType(vmDef.getHvsType())).thenReturn(conn);
+            when(conn.listDomains()).thenReturn(vms);
             doNothing().when(libvirtComputingResource).createVbd(conn, vmSpec, vmName, vmDef);
         } catch (final LibvirtException e) {
             fail(e.getMessage());
@@ -4500,6 +4502,7 @@ public class LibvirtComputingResourceTest {
 
         final NicTO nic = Mockito.mock(NicTO.class);
         final NicTO[] nics = new NicTO[]{nic};
+        final int[] vms = new int[0];
 
         final String vmName = "Test";
         final String controlIp = "127.0.0.1";
@@ -4513,6 +4516,7 @@ public class LibvirtComputingResourceTest {
         when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
         try {
             when(libvirtUtilitiesHelper.getConnectionByType(vmDef.getHvsType())).thenReturn(conn);
+            when(conn.listDomains()).thenReturn(vms);
             doNothing().when(libvirtComputingResource).createVbd(conn, vmSpec, vmName, vmDef);
         } catch (final LibvirtException e) {
             fail(e.getMessage());
@@ -4559,6 +4563,56 @@ public class LibvirtComputingResourceTest {
         } catch (final LibvirtException e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testStartCommandHostMemory() {
+        final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
+        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final boolean executeInSequence = false;
+
+        final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
+
+        final KvmStoragePoolManager storagePoolMgr = Mockito.mock(KvmStoragePoolManager.class);
+        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
+        final Connect conn = Mockito.mock(Connect.class);
+        final LibvirtVmDef vmDef = Mockito.mock(LibvirtVmDef.class);
+
+        final NicTO nic = Mockito.mock(NicTO.class);
+        final NicTO[] nics = new NicTO[]{nic};
+        final int vmId = 1;
+        final int[] vms = new int[]{vmId};
+        final Domain dm = Mockito.mock(Domain.class);
+
+        final String vmName = "Test";
+
+        when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
+        when(vmSpec.getNics()).thenReturn(nics);
+        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.User);
+        when(vmSpec.getName()).thenReturn(vmName);
+        when(vmSpec.getMaxRam()).thenReturn(512L);
+        when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
+
+        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
+        try {
+            when(libvirtUtilitiesHelper.getConnectionByType(vmDef.getHvsType())).thenReturn(conn);
+            when(conn.listDomains()).thenReturn(vms);
+            when(conn.domainLookupByID(vmId)).thenReturn(dm);
+            when(dm.getMaxMemory()).thenReturn(1024L);
+            when(dm.getName()).thenReturn(vmName);
+            when(libvirtComputingResource.getTotalMemory()).thenReturn(2048 * 1024L);
+            doNothing().when(libvirtComputingResource).createVbd(conn, vmSpec, vmName, vmDef);
+        } catch (final LibvirtException | InternalErrorException | URISyntaxException e) {
+            fail(e.getMessage());
+        }
+
+        when(storagePoolMgr.connectPhysicalDisksViaVmSpec(vmSpec)).thenReturn(true);
+
+        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
+        assertNotNull(wrapper);
+
+        final Answer answer = wrapper.execute(command, libvirtComputingResource);
+        assertTrue(answer.getResult());
     }
 
     @Test
