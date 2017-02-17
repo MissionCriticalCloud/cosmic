@@ -240,6 +240,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     private VifDriver defaultVifDriver;
     private Map<TrafficType, VifDriver> trafficTypeVifDrivers;
     private boolean canBridgeFirewall;
+    private long totalMemory;
 
     @Override
     public ExecutionResult executeInVR(final String routerIp, final String script, final String args) {
@@ -1979,6 +1980,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     public StartupCommand[] initialize() {
 
         final List<Object> info = getHostInfo();
+        totalMemory = (Long) info.get(2);
 
         final StartupRoutingCommand cmd = new StartupRoutingCommand((Integer) info.get(0), (Long) info.get(1),
                 (Long) info.get(2), (Long) info.get(4), (String) info.get(3), getHypervisorType(),
@@ -2966,5 +2968,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public void setRunLevel(final int level) {
+    }
+
+    public long getTotalMemory() {
+        return totalMemory;
     }
 }

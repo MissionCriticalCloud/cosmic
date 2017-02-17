@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.libvirt.Connect;
+import org.libvirt.Domain;
 import org.libvirt.DomainInfo.DomainState;
 import org.libvirt.LibvirtException;
 import org.slf4j.Logger;
@@ -42,10 +43,18 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
         final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
         Connect conn = null;
         try {
-            final NicTO[] nics = vmSpec.getNics();
-
             vm = libvirtComputingResource.createVmFromSpec(vmSpec);
             conn = libvirtUtilitiesHelper.getConnectionByType(vm.getHvsType());
+
+            final Long remainingMem = getFreeMemory(conn, libvirtComputingResource);
+            if (remainingMem == null) {
+                return new StartAnswer(command, "Failed to get free memory");
+            } else if (remainingMem < vmSpec.getMinRam()) {
+                return new StartAnswer(command, "Not enough memory on the host, remaining: " + remainingMem + ", asking: " + vmSpec.getMinRam());
+            }
+
+            final NicTO[] nics = vmSpec.getNics();
+
             libvirtComputingResource.createVbd(conn, vmSpec, vmName, vm);
 
             if (!storagePoolMgr.connectPhysicalDisksViaVmSpec(vmSpec)) {
@@ -125,6 +134,24 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
             if (state != DomainState.VIR_DOMAIN_RUNNING) {
                 storagePoolMgr.disconnectPhysicalDisksViaVmSpec(vmSpec);
             }
+        }
+    }
+
+    private Long getFreeMemory(final Connect conn, final LibvirtComputingResource libvirtComputingResource) {
+        try {
+            long allocatedMem = 0;
+            final int[] ids = conn.listDomains();
+            for (final int id : ids) {
+                final Domain dm = conn.domainLookupByID(id);
+                allocatedMem += dm.getMaxMemory() * 1024L;
+                s_logger.debug("vm: " + dm.getName() + " mem: " + dm.getMaxMemory() * 1024L);
+            }
+            final Long remainingMem = libvirtComputingResource.getTotalMemory() - allocatedMem;
+            s_logger.debug("remaining mem" + remainingMem);
+            return remainingMem;
+        } catch (final Exception e) {
+            s_logger.debug("failed to get free memory", e);
+            return null;
         }
     }
 }
