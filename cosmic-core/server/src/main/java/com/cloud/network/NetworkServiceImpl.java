@@ -825,6 +825,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             if (cidr != null && !NetUtils.isValidCIDR(cidr)) {
                 throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
             }
+            // validate gateway with cidr
+            if (cidr != null && gateway != null && !NetUtils.isIpWithtInCidrRange(gateway, cidr)) {
+                throw new InvalidParameterValueException("The gateway ip " + gateway + " should be part of the CIDR of the network " + cidr);
+            }
             // if end ip is not specified, default it to startIp
             if (startIP != null) {
                 if (!NetUtils.isValidIp(startIP)) {
