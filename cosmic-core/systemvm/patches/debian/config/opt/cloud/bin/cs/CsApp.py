@@ -1,6 +1,8 @@
 # -- coding: utf-8 --
 
 import os
+import glob
+import logging
 
 import CsHelper
 from CsFile import CsFile
@@ -19,13 +21,45 @@ class CsApp:
 class CsApache(CsApp):
     """ Set up Apache """
 
+    # Make sure Apache config files that are not used any more (they were created before Cosmic 5.3) are deleted
+    def remove_legacy_apache_config_files(self):
+        legacy_file_patterns = [
+            '/etc/apache2/ports.conf',
+            '/etc/apache2/sites-available/default',
+            '/etc/apache2/sites-available/default-ssl',
+            '/etc/apache2/conf.d/ports.*.meta-data.conf',
+            '/etc/apache2/sites-available/ipAlias*',
+            '/etc/apache2/sites-enabled/ipAlias*',
+            '/etc/apache2/conf.d/vhost*.conf',
+            '/etc/apache2/ports.conf',
+            '/etc/apache2/vhostexample.conf',
+            '/etc/apache2/sites-available/default',
+            '/etc/apache2/sites-available/default-ssl',
+            '/etc/apache2/sites-enabled/default'
+        ]
+
+        for legacy_file_pattern in legacy_file_patterns:
+            for legacy_file in glob.glob(legacy_file_pattern):
+                if os.path.isfile(legacy_file):
+                    os.remove(legacy_file)
+                    logging.debug("Found and removed legacy Apache config file '%s'" % legacy_file)
+
+        # Remove legacy ports.conf include
+        apache_config = CsFile("/etc/apache2/apache2.conf")
+        apache_config.deleteLine("Include ports.conf", False)
+        if apache_config.is_changed():
+            logging.debug("Found and removed legacy Apache ports.conf inclusion")
+            apache_config.commit()
+
     def remove(self):
+        self.remove_legacy_apache_config_files()
         file = "/etc/apache2/sites-enabled/vhost-%s.conf" % self.dev
         if os.path.isfile(file):
             os.remove(file)
             CsHelper.service("apache2", "restart")
 
     def setup(self):
+        self.remove_legacy_apache_config_files()
         CsHelper.copy_if_needed("/etc/apache2/vhost.template",
                                 "/etc/apache2/sites-enabled/vhost-%s.conf" % self.ip)
 

@@ -131,12 +131,12 @@ class CsFile:
 
         return found
 
-    def deleteLine(self, search):
+    def deleteLine(self, search, remove_hashes=True):
         found = False
         logging.debug("Searching for %s to remove the line " % search)
         temp_config = []
         for index, line in enumerate(self.new_config):
-            if line.lstrip().startswith("#"):
+            if line.lstrip().startswith("#") and remove_hashes:
                 continue
             if search not in line:
                 temp_config.append(line)
