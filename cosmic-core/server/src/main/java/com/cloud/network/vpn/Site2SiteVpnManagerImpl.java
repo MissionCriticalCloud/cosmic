@@ -1,5 +1,7 @@
 package com.cloud.network.vpn;
 
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vpn.CreateVpnConnectionCmd;
 import com.cloud.api.command.user.vpn.CreateVpnCustomerGatewayCmd;
 import com.cloud.api.command.user.vpn.CreateVpnGatewayCmd;
@@ -55,8 +57,10 @@ import com.cloud.vm.DomainRouterVO;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,10 +154,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         if (name == null) {
             name = "VPN-" + gatewayIp;
         }
-        final String peerCidrList = cmd.getGuestCidrList();
-        if (!NetUtils.isValidCidrList(peerCidrList)) {
-            throw new InvalidParameterValueException("The customer gateway peer cidr list " + peerCidrList + " contains an invalid cidr!");
-        }
+        final String peerCidrList = getPeerCidrListString(cmd.getPeerCidrList());
         final String ipsecPsk = cmd.getIpsecPsk();
         final String ikePolicy = cmd.getIkePolicy();
         final String espPolicy = cmd.getEspPolicy();
@@ -204,6 +205,30 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
                 new Site2SiteCustomerGatewayVO(name, accountId, owner.getDomainId(), gatewayIp, peerCidrList, ipsecPsk, ikePolicy, espPolicy, ikeLifetime, espLifetime, dpd, encap);
         _customerGatewayDao.persist(gw);
         return gw;
+    }
+
+    private String getPeerCidrListString(final List<String> peerList) {
+        final StringJoiner peerCidrListJoiner = new StringJoiner(",");
+        final List<String> wrongCidrs = new LinkedList<>();
+        String peerCidrList = "";
+
+        if (peerList != null && !peerList.isEmpty()) {
+            for (String cidr : peerList) {
+                cidr = cidr.trim();
+                if (!NetUtils.isValidCIDR(cidr)) {
+                    wrongCidrs.add(cidr);
+                    continue;
+                }
+                peerCidrListJoiner.add(cidr);
+            }
+            peerCidrList = peerCidrListJoiner.toString();
+        }
+
+        if (!wrongCidrs.isEmpty()) {
+            throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Site2Site VPN CIDR formatting error " + wrongCidrs);
+        }
+
+        return peerCidrList;
     }
 
     protected void checkCustomerGatewayCidrList(final String guestCidrList) {
@@ -631,10 +656,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         if (name == null) {
             name = "VPN-" + gatewayIp;
         }
-        final String guestCidrList = cmd.getGuestCidrList();
-        if (!NetUtils.validateGuestCidrList(guestCidrList)) {
-            throw new InvalidParameterValueException("The customer gateway guest cidr list " + guestCidrList + " contains invalid guest cidr!");
-        }
+        final String guestCidrList = getPeerCidrListString(cmd.getPeerCidrList());
         final String ipsecPsk = cmd.getIpsecPsk();
         final String ikePolicy = cmd.getIkePolicy();
         final String espPolicy = cmd.getEspPolicy();

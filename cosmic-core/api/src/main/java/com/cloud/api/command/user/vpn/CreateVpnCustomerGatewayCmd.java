@@ -13,6 +13,8 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.network.Site2SiteCustomerGateway;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +35,9 @@ public class CreateVpnCustomerGatewayCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, required = true, description = "public ip address id of the customer gateway")
     private String gatewayIp;
 
-    @Parameter(name = ApiConstants.CIDR_LIST, type = CommandType.STRING, required = true, description = "guest cidr list of the customer gateway")
-    private String peerCidrList;
+    @Parameter(name = ApiConstants.CIDR_LIST, type = CommandType.LIST, collectionType = CommandType.STRING, required = true, description = "guest cidr list of the customer " +
+            "gateway")
+    private List<String> peerCidrList;
 
     @Parameter(name = ApiConstants.IPSEC_PSK, type = CommandType.STRING, required = true, description = "IPsec Preshared-Key of the customer gateway. Cannot contain newline or " +
             "double quotes.")
@@ -90,7 +93,7 @@ public class CreateVpnCustomerGatewayCmd extends BaseAsyncCmd {
         return ipsecPsk;
     }
 
-    public String getGuestCidrList() {
+    public List<String> getPeerCidrList() {
         return peerCidrList;
     }
 

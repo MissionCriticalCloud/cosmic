@@ -30,7 +30,7 @@ public class Site2SiteCustomerGatewayVO implements Site2SiteCustomerGateway {
     @Column(name = "gateway_ip")
     private String gatewayIp;
 
-    @Column(name = "guest_cidr_list")
+    @Column(name = "guest_cidr_list", length = 4096)
     private String guestCidrList;
 
     @Encrypt

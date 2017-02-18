@@ -12,3 +12,6 @@ VALUES ('Network', 'DEFAULT', 'management-server', 'network.loadbalancer.haproxy
 -- Add reference to ACLs for Public IPs
 ALTER TABLE `cloud`.`user_ip_address` ADD COLUMN `ip_acl_id` bigint(20) unsigned NOT NULL AFTER `physical_network_id`;
 UPDATE `cloud`.`user_ip_address` SET `cloud`.`user_ip_address`.`ip_acl_id` = 2;
+
+-- Bump site2site VPN CIDR list length
+ALTER TABLE `s2s_customer_gateway` MODIFY `guest_cidr_list` VARCHAR(4096);
