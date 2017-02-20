@@ -1943,6 +1943,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
         final StartupSecondaryStorageCommand cmd = new StartupSecondaryStorageCommand();
         fillNetworkInformation(cmd);
+        cmd.setVersion(NfsSecondaryStorageResource.class.getPackage().getImplementationVersion());
         if (_publicIp != null) {
             cmd.setPublicIpAddress(_publicIp);
         }

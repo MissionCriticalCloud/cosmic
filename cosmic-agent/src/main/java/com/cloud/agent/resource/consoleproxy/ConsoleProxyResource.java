@@ -78,6 +78,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
         fillNetworkInformation(cmd);
         cmd.setProxyPort(_proxyPort);
         cmd.setProxyVmId(_proxyVmId);
+        cmd.setVersion(ConsoleProxyResource.class.getPackage().getImplementationVersion());
         if (_pubIp != null) {
             cmd.setPublicIpAddress(_pubIp);
         }

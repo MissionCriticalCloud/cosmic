@@ -243,7 +243,9 @@ public class Agent implements HandlerFactory, IAgentControl {
         startup.setPod(agentProperties.getPod());
         startup.setGuid(getResourceGuid());
         startup.setResourceName(getResourceName());
-        startup.setVersion(agentProperties.getVersion());
+        if (startup.getVersion() == null) {
+            startup.setVersion(agentProperties.getVersion());
+        }
     }
 
     protected synchronized long getNextSequence() {
