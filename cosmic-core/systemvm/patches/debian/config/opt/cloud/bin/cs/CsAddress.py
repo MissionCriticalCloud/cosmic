@@ -108,6 +108,14 @@ class CsAddress(CsDataBag):
                     if CsDevice(dev, self.config).waitfordevice():
                         ip.configure(address)
 
+        cmdline = self.config.cmdline()
+        if self.config.is_vpc():
+            vpccidr = cmdline.get_vpccidr()
+            self.fw.append(["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
+            # adding logging here for all ingress traffic at once
+            self.fw.append(["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
+
+
 
 class CsInterface:
     """ Hold one single ip """
@@ -557,14 +565,6 @@ class CsIP:
         elif self.get_type() in ["guest"]:
             # Or else make sure it's stopped
             CsPasswdSvc(self.address['public_ip']).stop()
-
-        if self.config.is_vpc():
-            vpccidr = cmdline.get_vpccidr()
-            self.fw.append(
-                ["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
-            # adding logging here for all ingress traffic at once
-            self.fw.append(
-                ["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
 
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:
