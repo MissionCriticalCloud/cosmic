@@ -58,6 +58,11 @@ class CsDhcp(CsDataBag):
             if not i['dnsmasq']:
                 continue
             device = i['dev']
+            # Listen only on the interfaces we configure VMs on
+            sline = "interface=%s" % (device)
+            line = "interface=%s" % (device)
+            self.conf.search(sline, line)
+            # Ip address
             ip = i['ip'].split('/')[0]
             sline = "dhcp-range=interface:%s,set:interface-%s-%s" % (device, device, idx)
             line = "dhcp-range=interface:%s,set:interface-%s-%s,%s,static" % (device, device, idx, ip)
