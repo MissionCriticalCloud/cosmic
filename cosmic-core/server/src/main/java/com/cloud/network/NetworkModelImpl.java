@@ -1751,12 +1751,8 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     @Override
     public boolean isPrivateGateway(final long ntwkId) {
         final Network network = getNetwork(ntwkId);
-        if (network.getGuestType() != null && network.getGuestType().equals(Network.GuestType.Private)) {
-            s_logger.debug("Network " + network.getName() + " is a private gateway network.");
-            return true;
-        }
-        s_logger.debug("Network " + network.getName() + " is NOT a private gateway network.");
-        return false;
+        s_logger.debug("Network [" + network.getName() + "] is of type [" + network.getGuestType() + "].");
+        return Network.GuestType.Private.equals(network.getGuestType());
     }
 
     @Override
