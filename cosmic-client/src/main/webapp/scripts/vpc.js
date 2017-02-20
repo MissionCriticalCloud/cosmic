@@ -3774,15 +3774,15 @@
                                 },
                                 isHidden: true
                             },
-                            cidr: {
-                                label: 'label.cidr',
+                            gateway: {
+                                label: 'label.gateway',
                                 docID: 'helpTierGateway',
                                 validation: {
                                     required: true
                                 }
                             },
-                            gateway: {
-                                label: 'label.gateway',
+                            cidr: {
+                                label: 'label.cidr',
                                 docID: 'helpTierGateway',
                                 validation: {
                                     required: true
