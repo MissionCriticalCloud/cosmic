@@ -357,7 +357,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     public void addRouterToGuestNetwork(final VirtualRouter router, final Network guestNetwork) {
         if (_routerNetworkDao.findByRouterAndNetwork(router.getId(), guestNetwork.getId()) == null) {
             final NetworkOffering off = _offDao.findById(guestNetwork.getNetworkOfferingId());
-            if (!off.getName().equalsIgnoreCase(NetworkOffering.DefaultPrivateGatewayNetworkOffering)) {
+            if (!off.getGuestType().equals(Network.GuestType.Private)) {
                 final TransactionLegacy txn = TransactionLegacy.currentTxn();
                 txn.start();
                 //1) add router to network
