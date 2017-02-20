@@ -560,6 +560,13 @@
                                                 success: function (json) {
                                                     if (json.listhostsresponse.host != undefined) {
                                                         hostObjs = json.listhostsresponse.host;
+                                                        hostObjs.sort(function(a,b) {
+                                                            if (a.name < b.name)
+                                                                return -1;
+                                                            if (a.name > b.name)
+                                                                return 1;
+                                                            return 0;
+                                                        });
                                                         var items = [{
                                                             id: -1,
                                                             description: 'Default'
@@ -1492,6 +1499,13 @@
                                             success: function (json) {
                                                 if (json.findhostsformigrationresponse.host != undefined) {
                                                     vmMigrationHostObjs = json.findhostsformigrationresponse.host;
+                                                    vmMigrationHostObjs.sort(function(a,b) {
+                                                        if (a.name < b.name)
+                                                            return -1;
+                                                        if (a.name > b.name)
+                                                            return 1;
+                                                        return 0;
+                                                    });
                                                     var items = [];
                                                     $(vmMigrationHostObjs).each(function () {
                                                         if (this.requiresStorageMotion == true) {
@@ -1608,6 +1622,13 @@
                                             async: true,
                                             success: function (json) {
                                                 var pools = json.liststoragepoolsresponse.storagepool;
+                                                pools.sort(function(a,b) {
+                                                    if (a.name < b.name)
+                                                        return -1;
+                                                    if (a.name > b.name)
+                                                        return 1;
+                                                    return 0;
+                                                });
                                                 var items = [];
                                                 $(pools).each(function () {
                                                     items.push({
@@ -1672,6 +1693,13 @@
                                             async: true,
                                             success: function (json) {
                                                 serviceofferingObjs = json.listserviceofferingsresponse.serviceoffering;
+                                                serviceofferingObjs.sort(function(a,b) {
+                                                    if (a.name < b.name)
+                                                        return -1;
+                                                    if (a.name > b.name)
+                                                        return 1;
+                                                    return 0;
+                                                });
                                                 var items = [];
                                                 if (serviceofferingObjs != null) {
                                                     for (var i = 0; i < serviceofferingObjs.length; i++) {
