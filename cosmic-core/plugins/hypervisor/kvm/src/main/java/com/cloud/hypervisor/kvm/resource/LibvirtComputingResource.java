@@ -1993,6 +1993,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         cmd.setCluster(getCluster());
         cmd.setGatewayIpAddress(localGateway);
         cmd.setIqn(getIqn());
+        cmd.setVersion(LibvirtComputingResource.class.getPackage().getImplementationVersion());
 
         StartupStorageCommand sscmd = null;
         try {
