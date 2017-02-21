@@ -1090,7 +1090,7 @@ public class NetUtils {
         final Long[] cidrBLong = cidrToLong(cidrB);
 
         final long shift = MAX_CIDR - cidrBLong[1];
-        return cidrALong[0] >> shift == cidrBLong[0] >> shift;
+        return (cidrALong[0] >> shift == cidrBLong[0] >> shift) && (cidrALong[1] >= cidrBLong[1]);
     }
 
     public static boolean validateIcmpType(final long icmpType) {
