@@ -544,17 +544,36 @@ public class LibvirtVmDef {
 
         /* skip iso label */
         private String getDevLabel(int devId, final DiskBus bus) {
+            if (devId < 0) {
+                return "";
+            }
+
             if (devId == 2) {
                 devId++;
             }
 
-            final char suffix = (char) ('a' + devId);
             if (bus == DiskBus.SCSI) {
-                return "sd" + suffix;
+                return "sd" + getDevLabelSuffix(devId);
             } else if (bus == DiskBus.VIRTIO) {
-                return "vd" + suffix;
+                return "vd" + getDevLabelSuffix(devId);
             }
-            return "hd" + suffix;
+            return "hd" + getDevLabelSuffix(devId);
+        }
+
+        private String getDevLabelSuffix(int deviceIndex) {
+            if (deviceIndex < 0) {
+                return "";
+            }
+
+            int base = 'z' - 'a' + 1;
+            String labelSuffix = "";
+            do {
+                char suffix = (char)('a' + (deviceIndex % base));
+                labelSuffix = suffix + labelSuffix;
+                deviceIndex = (deviceIndex / base) - 1;
+            } while (deviceIndex >= 0);
+
+            return labelSuffix;
         }
 
         public void defIsoDisk(final String volPath) {
@@ -667,11 +686,6 @@ public class LibvirtVmDef {
 
         public DiskFmtType getDiskFormatType() {
             return diskFmtType;
-        }
-
-        public int getDiskSeq() {
-            final char suffix = diskLabel.charAt(diskLabel.length() - 1);
-            return suffix - 'a';
         }
 
         public void setBytesReadRate(final Long bytesReadRate) {
