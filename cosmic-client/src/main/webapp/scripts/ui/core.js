@@ -289,7 +289,7 @@
         })
             .appendTo($('#user'));
 
-        $(['label.logout', 'label.help', 'label.about']).each(function () {
+        $(['label.logout', 'label.issue', 'label.changelog', 'label.about.app']).each(function () {
             var $link = $('<a>')
                 .attr({
                     href: '#'
@@ -297,7 +297,7 @@
                 .text(_l(this.toString()))
                 .appendTo($options);
 
-            if (this == 'label.help') {
+            if (this == 'label.issue') {
                 $link.addClass('help').click(function () {
                     var helpURL = 'https://github.com/MissionCriticalCloud/cosmic/issues';
 
@@ -306,7 +306,16 @@
                     return false;
                 });
             }
-            if (this == 'label.about') {
+            if (this == 'label.changelog') {
+                $link.addClass('help').click(function () {
+                    var helpURL = 'https://github.com/MissionCriticalCloud/cosmic/releases';
+
+                    window.open(helpURL, '_blank');
+
+                    return false;
+                });
+            }
+            if (this == 'label.about.app') {
                 $link.addClass('about').click(function () {
                     var $logo = $('<div>').addClass('logo').text(_l('label.app.name')),
                         $version = $('<div>').addClass('version').text(g_cloudstackversion),
