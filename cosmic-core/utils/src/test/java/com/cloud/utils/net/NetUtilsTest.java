@@ -12,14 +12,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.googlecode.ipv6.IPv6Address;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -565,5 +568,18 @@ public class NetUtilsTest {
 
         assertTrue(NetUtils.isNetworkorBroadcastIP("192.168.0.63", "255.255.255.192"));
         assertFalse(NetUtils.isNetworkorBroadcastIP("192.168.0.63", "255.255.255.128"));
+    }
+
+    @Test
+    public void testGetAllIpsFromRange() {
+        List<String> ips = NetUtils.getAllIpsFromRange("10.0.0.1-10.0.0.3");
+        Assert.assertEquals(ips.get(0), "10.0.0.1");
+        Assert.assertEquals(ips.get(1), "10.0.0.2");
+        Assert.assertEquals(ips.get(2), "10.0.0.3");
+        assertTrue(ips.size() == 3);
+
+        ips = NetUtils.getAllIpsFromRange("10.0.1.254-10.0.2.2");
+        assertTrue(ips.size() == 5);
+
     }
 }

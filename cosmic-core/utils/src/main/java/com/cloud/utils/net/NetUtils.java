@@ -1168,6 +1168,19 @@ public class NetUtils {
         return null;
     }
 
+    public static List<String> getAllIpsFromRange(final String range) {
+        String[] ips = range.split("-");
+        List<String> result = new ArrayList<>();
+        long startIp = ip2Long(ips[0]);
+        long endIp = ip2Long(ips[1]);
+
+        for (long tmpIp = startIp; tmpIp<=endIp; tmpIp++) {
+            result.add(long2Ip(tmpIp));
+        }
+
+        return result;
+    }
+
     // Can cover 127 bits
     public static BigInteger countIp6InRange(final String ip6Range) {
         if (ip6Range == null) {

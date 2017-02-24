@@ -566,5 +566,11 @@ public class NetworkVO implements Network {
         this.isRedundant = redundant;
     }
 
-    public void setIpExclusionList(final String ipExclusionList) { this.ipExclusionList = ipExclusionList; }
+    public void setIpExclusionList(final String ipExclusionList) {
+        this.ipExclusionList = ipExclusionList;
+    }
+
+    public String getIpExclusionList() {
+        return ipExclusionList;
+    }
 }
