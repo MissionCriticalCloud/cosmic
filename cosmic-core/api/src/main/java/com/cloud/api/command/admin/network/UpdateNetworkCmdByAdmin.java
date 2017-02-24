@@ -33,7 +33,7 @@ public class UpdateNetworkCmdByAdmin extends UpdateNetworkCmd {
 
         final Network result =
                 _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
-                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2());
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2(), getIpExclusionList());
 
         if (result != null) {
             final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Full, result);
