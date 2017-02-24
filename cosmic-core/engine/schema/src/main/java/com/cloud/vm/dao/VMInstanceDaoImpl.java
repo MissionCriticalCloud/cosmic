@@ -59,7 +59,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             "host_pod_ref` pod LEFT JOIN `cloud`.`vm_instance` vm ON pod.id = vm.pod_id WHERE pod.data_center_id = ? AND pod.removed is null "
             + " GROUP BY pod.id ORDER BY 2 ASC ";
     private static final String ORDER_HOSTS_NUMBER_OF_VMS_FOR_ACCOUNT =
-            "SELECT host.id, SUM(IF(vm.state='Running' AND vm.account_id = ?, 1, 0)) FROM `cloud`.`host` host LEFT JOIN `cloud`.`vm_instance` vm ON host.id = vm.host_id " +
+            "SELECT host.id, SUM(IF(vm.state IN ('Starting', 'Running') AND vm.account_id = ?, 1, 0)) FROM `cloud`.`host` host LEFT JOIN `cloud`.`vm_instance` vm ON host.id = vm.host_id " +
                     "WHERE host.data_center_id = ? AND host.type = 'Routing' AND host.removed is null ";
     private static final String ORDER_HOSTS_NUMBER_OF_VMS_FOR_ACCOUNT_PART2 = " GROUP BY host.id ORDER BY 2 ASC ";
     private static final String COUNT_VMS_BASED_ON_VGPU_TYPES1 =
