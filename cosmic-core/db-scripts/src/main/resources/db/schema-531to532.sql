@@ -15,3 +15,7 @@ UPDATE `cloud`.`user_ip_address` SET `cloud`.`user_ip_address`.`ip_acl_id` = 2;
 
 -- Bump site2site VPN CIDR list length
 ALTER TABLE `s2s_customer_gateway` MODIFY `guest_cidr_list` VARCHAR(4096);
+
+
+-- Add ip exclusion list
+ALTER TABLE `cloud`.`networks` ADD COLUMN `ip_exclusion_list` varchar(255) DEFAULT NULL COMMENT 'IP list excluded from assignment' AFTER `redundant`;
