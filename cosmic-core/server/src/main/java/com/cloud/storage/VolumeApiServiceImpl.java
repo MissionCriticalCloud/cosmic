@@ -1015,7 +1015,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
             final DataTO volTO = volFactory.getVolume(volumeToAttach.getId()).getTO();
 
-            deviceId = getDeviceId(vm.getId(), deviceId);
+            deviceId = getDeviceId(vm, deviceId);
 
             final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType());
 
@@ -1071,7 +1071,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     _volsDao.update(volumeToAttach.getId(), volumeToAttach);
                 }
             } else {
-                deviceId = getDeviceId(vm.getId(), deviceId);
+                deviceId = getDeviceId(vm, deviceId);
 
                 _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), deviceId);
             }
@@ -1098,22 +1098,23 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
     }
 
-    private Long getDeviceId(final long vmId, Long deviceId) {
+    private Long getDeviceId(final UserVmVO vm, Long deviceId) {
         // allocate deviceId
-        final List<VolumeVO> vols = _volsDao.findByInstance(vmId);
+        final int maxDataVolumesSupported = getMaxDataVolumesSupported(vm);
+        final List<VolumeVO> vols = _volsDao.findByInstance(vm.getId());
         if (deviceId != null) {
-            if (deviceId.longValue() > 15 || deviceId.longValue() == 3) {
-                throw new RuntimeException("deviceId should be 1,2,4-15");
+            if (deviceId.longValue() > maxDataVolumesSupported || deviceId.longValue() == 3) {
+                throw new RuntimeException("deviceId should be 1,2,4-" + maxDataVolumesSupported);
             }
             for (final VolumeVO vol : vols) {
                 if (vol.getDeviceId().equals(deviceId)) {
-                    throw new RuntimeException("deviceId " + deviceId + " is used by vm" + vmId);
+                    throw new RuntimeException("deviceId " + deviceId + " is used by vm" + vm.getId());
                 }
             }
         } else {
             // allocate deviceId here
             final List<String> devIds = new ArrayList<>();
-            for (int i = 1; i < 15; i++) {
+            for (int i = 1; i < maxDataVolumesSupported; i++) {
                 devIds.add(String.valueOf(i));
             }
             devIds.remove("3");
