@@ -10179,23 +10179,20 @@
                                     }
                                 },
                                     {
-                                        id: {
-                                            label: 'label.id'
-                                        },
                                         resourcestate: {
                                             label: 'label.resource.state'
                                         },
                                         state: {
                                             label: 'label.state'
                                         },
-                                        type: {
-                                            label: 'label.type'
-                                        },
                                         hypervisor: {
                                             label: 'label.hypervisor'
                                         },
                                         hypervisorversion: {
                                             label: 'label.hypervisor.version'
+                                        },
+                                        version: {
+                                            label: 'label.agent.version'
                                         },
                                         hosttags: {
                                             label: 'label.host.tags',
@@ -10263,6 +10260,9 @@
                                                 });
                                             }
                                         },
+                                        type: {
+                                            label: 'label.type'
+                                        },
                                         zonename: {
                                             label: 'label.zone'
                                         },
@@ -10280,6 +10280,9 @@
                                         },
                                         cpusockets: {
                                             label: 'label.number.of.cpu.sockets'
+                                        },
+                                        id: {
+                                            label: 'label.id'
                                         }
                                     }, {
 

@@ -383,6 +383,7 @@ var dictionary = {
     "label.agent.port": "Agent Port",
     "label.agent.state": "Agent State",
     "label.agent.username": "Agent Username",
+    "label.agent.version": "Agent Version",
     "label.agree": "Agree",
     "label.alert": "Alert",
     "label.alert.archived": "Alert Archived",

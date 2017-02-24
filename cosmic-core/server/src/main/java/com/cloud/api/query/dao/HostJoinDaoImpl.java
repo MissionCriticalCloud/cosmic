@@ -173,6 +173,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                     final Map<String, String> hostVoDetails;
                     hostVoDetails = h.getDetails();
                     hostResponse.setDetails(hostVoDetails);
+                    hostResponse.setHypervisorVersion(h.getDetail("Host.OS") + " " + h.getDetail("Host.OS.Version") + " with kernel " + h.getDetail("Host.OS.Kernel.Version"));
                 } catch (final Exception e) {
                     s_logger.debug("failed to get host details", e);
                 }
