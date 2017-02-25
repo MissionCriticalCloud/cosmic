@@ -33,10 +33,10 @@ public class RestartVPCCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = VpcResponse.class, required = true, description = "the id of the VPC")
     private Long id;
 
-    @Parameter(name = ApiConstants.CLEANUP, type = CommandType.BOOLEAN, required = false, description = "If cleanup old network elements")
+    @Parameter(name = ApiConstants.CLEANUP, type = CommandType.BOOLEAN, required = false, description = "Cleanup old network elements (defaults to true)")
     private Boolean cleanup;
 
-    @Parameter(name = ApiConstants.MAKEREDUNDANTE, type = CommandType.BOOLEAN, required = false, description = "Turn a single VPC into a redundant one.")
+    @Parameter(name = ApiConstants.MAKEREDUNDANTE, type = CommandType.BOOLEAN, required = false, description = "Turn a single VPC into a redundant one (defaults to false).")
     private Boolean makeredundant;
 
     /////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ public class RestartVPCCmd extends BaseAsyncCmd {
         if (makeredundant != null) {
             return makeredundant;
         }
-        return true;
+        return false;
     }
 
     @Override
