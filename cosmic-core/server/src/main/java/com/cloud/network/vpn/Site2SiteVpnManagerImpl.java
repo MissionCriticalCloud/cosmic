@@ -640,14 +640,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
         _accountMgr.checkAccess(caller, null, false, gw);
 
-        final List<Site2SiteVpnConnectionVO> conns = _vpnConnectionDao.listByCustomerGatewayId(id);
-        if (conns != null) {
-            for (final Site2SiteVpnConnection conn : conns) {
-                if (conn.getState() != State.Error) {
-                    throw new InvalidParameterValueException("Unable to update customer gateway with connections in non-Error state!");
-                }
-            }
-        }
         String name = cmd.getName();
         final String gatewayIp = cmd.getGatewayIp();
         if (!NetUtils.isValidIp(gatewayIp)) {
