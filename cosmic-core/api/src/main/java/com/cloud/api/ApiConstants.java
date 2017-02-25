@@ -133,7 +133,7 @@ public class ApiConstants {
     public static final String IS_READY = "isready";
     public static final String IS_RECURSIVE = "isrecursive";
     public static final String ISO_FILTER = "isofilter";
-    public static final String ISO_GUEST_OS_NONE = "None";
+    public static final String ISO_GUEST_OS_NONE = "Non-bootable ISO";
     public static final String JOB_ID = "jobid";
     public static final String JOB_STATUS = "jobstatus";
     public static final String LASTNAME = "lastname";
