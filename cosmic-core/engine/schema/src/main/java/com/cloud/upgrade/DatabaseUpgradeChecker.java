@@ -48,11 +48,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,12 +234,13 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
         }
 
         for (final DbUpgrade upgrade : upgrades) {
+            VersionVO version;
             if (Version.compare(upgrade.getUpgradedVersion(), trimmedCurrentVersion) > 0) {
                 break;
             }
             s_logger.debug("Running upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
                     upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
-            final TransactionLegacy txn = TransactionLegacy.open("Upgrade");
+            TransactionLegacy txn = TransactionLegacy.open("Upgrade");
             txn.start();
             try {
                 final Connection conn;
@@ -261,12 +259,8 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
                 }
 
                 upgrade.performDataMigration(conn);
-                final boolean upgradeVersion = true;
-
-                if (upgradeVersion) {
-                    final VersionVO version = new VersionVO(upgrade.getUpgradedVersion());
-                    _dao.persist(version);
-                }
+                version = new VersionVO(upgrade.getUpgradedVersion());
+                version = _dao.persist(version);
 
                 txn.commit();
             } catch (final CloudRuntimeException e) {
@@ -276,64 +270,38 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
             } finally {
                 txn.close();
             }
-        }
 
-        s_logger.info("Cleaning upgrades because all management server are now at the same version");
-        final TreeMap<String, List<DbUpgrade>> upgradedVersions = new TreeMap<>();
-
-        for (final DbUpgrade upgrade : upgrades) {
-            if (Version.compare(upgrade.getUpgradedVersion(), trimmedCurrentVersion) > 0) {
-                break;
-            }
-            final String upgradedVerson = upgrade.getUpgradedVersion();
-            List<DbUpgrade> upgradeList = upgradedVersions.get(upgradedVerson);
-            if (upgradeList == null) {
-                upgradeList = new ArrayList<>();
-            }
-            upgradeList.add(upgrade);
-            upgradedVersions.put(upgradedVerson, upgradeList);
-        }
-
-        for (final String upgradedVersion : upgradedVersions.keySet()) {
-            final List<DbUpgrade> versionUpgrades = upgradedVersions.get(upgradedVersion);
-            final VersionVO version = _dao.findByVersion(upgradedVersion, Step.Upgrade);
-            s_logger.debug("Upgrading to version " + upgradedVersion + "...");
-
-            final TransactionLegacy txn = TransactionLegacy.open("Cleanup");
+            // Run the corresponding '-cleanup.sql' script
+            txn = TransactionLegacy.open("Cleanup");
             try {
-                if (version != null) {
-                    for (final DbUpgrade upgrade : versionUpgrades) {
-                        s_logger.info("Cleanup upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
-                                upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
+                s_logger.info("Cleanup upgrade " + upgrade.getClass().getSimpleName() + " to upgrade from " + upgrade.getUpgradableVersionRange()[0] + "-" +
+                        upgrade.getUpgradableVersionRange()[1] + " to " + upgrade.getUpgradedVersion());
 
-                        txn.start();
+                txn.start();
 
-                        final Connection conn;
-                        try {
-                            conn = txn.getConnection();
-                        } catch (final SQLException e) {
-                            final String errorMessage = "Unable to cleanup the database";
-                            s_logger.error(errorMessage, e);
-                            throw new CloudRuntimeException(errorMessage, e);
-                        }
-
-                        final File[] scripts = upgrade.getCleanupScripts();
-                        if (scripts != null) {
-                            for (final File script : scripts) {
-                                runScript(conn, script);
-                                s_logger.debug("Cleanup script " + script.getAbsolutePath() + " is executed successfully");
-                            }
-                        }
-                        txn.commit();
-                    }
-
-                    txn.start();
-                    version.setStep(Step.Complete);
-                    s_logger.debug("Upgrade completed for version " + upgradedVersion);
-                    version.setUpdated(new Date());
-                    _dao.update(version.getId(), version);
-                    txn.commit();
+                Connection conn;
+                try {
+                    conn = txn.getConnection();
+                } catch (SQLException e) {
+                    s_logger.error("Unable to cleanup the database", e);
+                    throw new CloudRuntimeException("Unable to cleanup the database", e);
                 }
+
+                File[] scripts = upgrade.getCleanupScripts();
+                if (scripts != null) {
+                    for (File script : scripts) {
+                        runScript(conn, script);
+                        s_logger.debug("Cleanup script " + script.getAbsolutePath() + " is executed successfully");
+                    }
+                }
+                txn.commit();
+
+                txn.start();
+                version.setStep(Step.Complete);
+                version.setUpdated(new Date());
+                _dao.update(version.getId(), version);
+                txn.commit();
+                s_logger.debug("Upgrade completed for version " + version.getVersion());
             } finally {
                 txn.close();
             }
