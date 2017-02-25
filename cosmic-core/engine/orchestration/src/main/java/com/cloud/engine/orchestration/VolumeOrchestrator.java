@@ -1109,7 +1109,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                                 } else {
                                     storageMigrationEnabled = StorageMigrationEnabled.value();
                                 }
-                                if (storageMigrationEnabled) {
+                                // Always allow ISOs volumes to be "migrated"
+                                if (storageMigrationEnabled || vol.getIsoId() != null) {
                                     if (s_logger.isDebugEnabled()) {
                                         s_logger.debug("Shared volume " + vol + " will be migrated on storage pool " + assignedPool + " assigned by deploymentPlanner");
                                     }
