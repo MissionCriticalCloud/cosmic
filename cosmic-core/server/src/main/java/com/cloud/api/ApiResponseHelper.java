@@ -1838,14 +1838,7 @@ public class ApiResponseHelper implements ResponseGenerator {
                 continue;
             }
             svcRsp.setName(service.getName());
-            final List<ProviderResponse> providers = new ArrayList<>();
-            for (final Provider provider : srvc_providers) {
-                if (provider != null) {
-                    final ProviderResponse providerRsp = new ProviderResponse();
-                    providerRsp.setName(provider.getName());
-                    providers.add(providerRsp);
-                }
-            }
+            final List<ProviderResponse> providers = getProviderResponses(srvc_providers);
             svcRsp.setProviders(providers);
 
             if (Service.Lb == service) {
@@ -1910,6 +1903,18 @@ public class ApiResponseHelper implements ResponseGenerator {
 
         response.setObjectName("networkoffering");
         return response;
+    }
+
+    private List<ProviderResponse> getProviderResponses(final Set<Provider> srvc_providers) {
+        final List<ProviderResponse> providers = new ArrayList<>();
+        for (final Provider provider : srvc_providers) {
+            if (provider != null) {
+                final ProviderResponse providerRsp = new ProviderResponse();
+                providerRsp.setName(provider.getName());
+                providers.add(providerRsp);
+            }
+        }
+        return providers;
     }
 
     @Override
@@ -2505,29 +2510,8 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setSupportsRegionLevelVpc(offering.offersRegionLevelVPC());
 
         final Map<Service, Set<Provider>> serviceProviderMap = ApiDBUtils.listVpcOffServices(offering.getId());
-        final List<ServiceResponse> serviceResponses = new ArrayList<>();
-        for (final Map.Entry<Service, Set<Provider>> entry : serviceProviderMap.entrySet()) {
-            final Service service = entry.getKey();
-            final Set<Provider> srvc_providers = entry.getValue();
+        final List<ServiceResponse> serviceResponses = getServiceResponses(serviceProviderMap);
 
-            final ServiceResponse svcRsp = new ServiceResponse();
-            // skip gateway service
-            if (service == Service.Gateway) {
-                continue;
-            }
-            svcRsp.setName(service.getName());
-            final List<ProviderResponse> providers = new ArrayList<>();
-            for (final Provider provider : srvc_providers) {
-                if (provider != null) {
-                    final ProviderResponse providerRsp = new ProviderResponse();
-                    providerRsp.setName(provider.getName());
-                    providers.add(providerRsp);
-                }
-            }
-            svcRsp.setProviders(providers);
-
-            serviceResponses.add(svcRsp);
-        }
         response.setServices(serviceResponses);
         response.setObjectName("vpcoffering");
         return response;
@@ -2553,28 +2537,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setRegionLevelVpc(vpc.isRegionLevelVpc());
 
         final Map<Service, Set<Provider>> serviceProviderMap = ApiDBUtils.listVpcOffServices(vpc.getVpcOfferingId());
-        final List<ServiceResponse> serviceResponses = new ArrayList<>();
-        for (final Map.Entry<Service, Set<Provider>> entry : serviceProviderMap.entrySet()) {
-            final Service service = entry.getKey();
-            final Set<Provider> serviceProviders = entry.getValue();
-            final ServiceResponse svcRsp = new ServiceResponse();
-            // skip gateway service
-            if (service == Service.Gateway) {
-                continue;
-            }
-            svcRsp.setName(service.getName());
-            final List<ProviderResponse> providers = new ArrayList<>();
-            for (final Provider provider : serviceProviders) {
-                if (provider != null) {
-                    final ProviderResponse providerRsp = new ProviderResponse();
-                    providerRsp.setName(provider.getName());
-                    providers.add(providerRsp);
-                }
-            }
-            svcRsp.setProviders(providers);
-
-            serviceResponses.add(svcRsp);
-        }
+        final List<ServiceResponse> serviceResponses = getServiceResponses(serviceProviderMap);
 
         final List<NetworkResponse> networkResponses = new ArrayList<>();
         final List<? extends Network> networks = ApiDBUtils.listVpcNetworks(vpc.getId());
@@ -2603,6 +2566,25 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setTags(tagResponses);
         response.setObjectName("vpc");
         return response;
+    }
+
+    private List<ServiceResponse> getServiceResponses(final Map<Service, Set<Provider>> serviceProviderMap) {
+        final List<ServiceResponse> serviceResponses = new ArrayList<>();
+        for (final Map.Entry<Service, Set<Provider>> entry : serviceProviderMap.entrySet()) {
+            final Service service = entry.getKey();
+            final Set<Provider> serviceProviders = entry.getValue();
+            final ServiceResponse svcRsp = new ServiceResponse();
+            // skip gateway service
+            if (service == Service.Gateway) {
+                continue;
+            }
+            svcRsp.setName(service.getName());
+            final List<ProviderResponse> providers = getProviderResponses(serviceProviders);
+            svcRsp.setProviders(providers);
+
+            serviceResponses.add(svcRsp);
+        }
+        return serviceResponses;
     }
 
     @Override
