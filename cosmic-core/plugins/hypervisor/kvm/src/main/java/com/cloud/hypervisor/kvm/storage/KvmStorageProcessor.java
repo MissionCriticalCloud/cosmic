@@ -15,6 +15,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DeviceType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiskProtocol;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.Storage.ImageFormat;
@@ -1123,13 +1124,13 @@ public class KvmStorageProcessor implements StorageProcessor {
         DiskDef diskdef = null;
         final KvmStoragePool attachingPool = attachingDisk.getPool();
         try {
-            if (!attach) {
-                dm = conn.domainLookupByName(vmName);
-                final LibvirtDomainXmlParser parser = new LibvirtDomainXmlParser();
-                final String xml = dm.getXMLDesc(0);
-                parser.parseDomainXml(xml);
-                disks = parser.getDisks();
+            dm = conn.domainLookupByName(vmName);
+            final LibvirtDomainXmlParser parser = new LibvirtDomainXmlParser();
+            final String domXml = dm.getXMLDesc(0);
+            parser.parseDomainXml(domXml);
+            disks = parser.getDisks();
 
+            if (!attach) {
                 for (final DiskDef disk : disks) {
                     final String file = disk.getDiskPath();
                     if (file != null && file.equalsIgnoreCase(attachingDisk.getPath())) {
@@ -1141,23 +1142,34 @@ public class KvmStorageProcessor implements StorageProcessor {
                     throw new InternalErrorException("disk: " + attachingDisk.getPath() + " is not attached before");
                 }
             } else {
+                DiskDef.DiskBus diskBusType = DiskDef.DiskBus.VIRTIO;
+                for (final DiskDef disk : disks) {
+                    logger.debug("disk is type : " + disk.toString());
+                    if (disk.getDeviceType() == DeviceType.DISK) {
+                        if (disk.getBusType() == DiskDef.DiskBus.SCSI) {
+                            diskBusType = DiskDef.DiskBus.SCSI;
+                        }
+                        logger.debug("Disk bus type: " + disk.getDeviceType().toString() + ", diskBusType: " + diskBusType.toString());
+                        break;
+                    }
+                }
                 diskdef = new DiskDef();
                 diskdef.setSerial(serial);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
-                            attachingPool.getUuid(), devId, DiskDef.DiskBus.VIRTIO, DiskProtocol.RBD, DiskDef.DiskFmtType.RAW);
+                            attachingPool.getUuid(), devId, diskBusType, DiskProtocol.RBD, DiskDef.DiskFmtType.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
                     diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), null,
-                            null, devId, DiskDef.DiskBus.VIRTIO, DiskProtocol.GLUSTER, DiskDef.DiskFmtType.QCOW2);
+                            null, devId, diskBusType, DiskProtocol.GLUSTER, DiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, DiskDef.DiskBus.VIRTIO, DiskDef.DiskFmtType.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskBusType, DiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, DiskDef.DiskBus.VIRTIO);
+                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskBusType);
                 }
             }
 

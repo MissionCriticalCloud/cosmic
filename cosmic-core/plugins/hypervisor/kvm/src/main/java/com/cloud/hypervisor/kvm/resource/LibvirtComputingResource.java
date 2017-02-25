@@ -64,6 +64,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GuestResourceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InputDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef.GuestNetType;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.QemuGuestAgentDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
@@ -1702,6 +1703,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final InputDef input = new InputDef("tablet", "usb");
         devices.addDevice(input);
 
+        // If we're using virtio scsi, then we need to add a virtual scsi controller
+        if (getGuestDiskModel(vmTo.getPlatformEmulator()) == DiskDef.DiskBus.SCSI) {
+            vmTo.getName();
+            final ScsiDef sd = new ScsiDef((short)0, 0, 0, 9, 0);
+            devices.addDevice(sd);
+            logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
+        }
         vm.addComp(devices);
 
         return vm;
@@ -1737,13 +1745,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     boolean isGuestVirtIoCapable(final String guestOsName) {
-        if (guestOsName == null) {
-            return true;
-        }
-        if (guestOsName.startsWith("Non-VirtIO")) {
-            return false;
-        }
-        return true;
+        DiskDef.DiskBus db = getGuestDiskModel(guestOsName);
+        return db != DiskDef.DiskBus.IDE;
     }
 
     public void createVifs(final VirtualMachineTO vmSpec, final LibvirtVmDef vm)
@@ -1873,6 +1876,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
             if (diskBusType == null) {
                 diskBusType = getGuestDiskModel(vmSpec.getPlatformEmulator());
+                logger.debug("disk bus type for " + vmName + " derived from getPlatformEmulator: " + vmSpec.getPlatformEmulator() + ", diskbustype is: " + diskBusType.toString());
             }
             final DiskDef disk = new DiskDef();
             if (volume.getType() == Volume.Type.ISO) {
@@ -1930,6 +1934,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                     disk.setCacheMode(DiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
                 }
             }
+            logger.debug("Adding disk: " + disk.toString());
             vm.getDevices().addDevice(disk);
         }
 
@@ -1953,10 +1958,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     private DiskDef.DiskBus getGuestDiskModel(final String platformEmulator) {
-        if (isGuestVirtIoCapable(platformEmulator)) {
-            return DiskDef.DiskBus.VIRTIO;
-        } else {
+        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
             return DiskDef.DiskBus.IDE;
+        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
+            return DiskDef.DiskBus.SCSI;
+        } else {
+            return DiskDef.DiskBus.VIRTIO;
         }
     }
 
