@@ -97,13 +97,6 @@
                                 docID: 'helpNetworkOfferingName',
                                 preFilter: cloudStack.preFilter.createTemplate,
                                 fields: {
-                                    url: {
-                                        label: 'label.url',
-                                        docID: 'helpRegisterTemplateURL',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
                                     name: {
                                         label: 'label.name',
                                         docID: 'helpRegisterTemplateName',
@@ -114,6 +107,13 @@
                                     description: {
                                         label: 'label.description',
                                         docID: 'helpRegisterTemplateDescription',
+                                        validation: {
+                                            required: true
+                                        }
+                                    },
+                                    url: {
+                                        label: 'label.url',
+                                        docID: 'helpRegisterTemplateURL',
                                         validation: {
                                             required: true
                                         }
@@ -169,8 +169,7 @@
 
                                             var apiCmd;
                                             if (args.zone == -1) { //All Zones
-                                                //apiCmd = "listHypervisors&zoneid=-1"; //"listHypervisors&zoneid=-1" has been changed to return only hypervisors available in all zones (bug 8809)
-                                                apiCmd = "listHypervisors";
+                                                apiCmd = "listHypervisors&zoneid=-1";
                                             }
                                             else {
                                                 apiCmd = "listHypervisors&zoneid=" + args.zone;
