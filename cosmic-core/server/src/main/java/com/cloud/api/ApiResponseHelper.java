@@ -2527,6 +2527,8 @@ public class ApiResponseHelper implements ResponseGenerator {
         final VpcOffering voff = ApiDBUtils.findVpcOfferingById(vpc.getVpcOfferingId());
         if (voff != null) {
             response.setVpcOfferingId(voff.getUuid());
+            response.setVpcOfferingName(voff.getName());
+            response.setVpcOfferingDisplayText(voff.getDisplayText());
         }
         response.setCidr(vpc.getCidr());
         response.setRestartRequired(vpc.isRestartRequired());
