@@ -15,14 +15,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1166,6 +1159,24 @@ public class NetUtils {
             return ip.toString();
         }
         return null;
+    }
+
+    public static List<String> getAllExcludedIps(final String excludedIpsS) {
+
+        if (excludedIpsS == null) {
+            return Collections.emptyList();
+        }
+
+        final List<String> ips = Arrays.asList(excludedIpsS.split(","));
+        List<String> result = new ArrayList<>();
+        for (String ip : ips) {
+            if (ip.contains("-")) {
+                result.addAll(getAllIpsFromRange(ip));
+            } else {
+                result.add(ip);
+            }
+        }
+        return result;
     }
 
     public static List<String> getAllIpsFromRange(final String range) {

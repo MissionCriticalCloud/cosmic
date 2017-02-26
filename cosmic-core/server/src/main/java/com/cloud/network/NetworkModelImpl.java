@@ -1835,16 +1835,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     public List<String> getExcludedIpsInNetwork(Network network) {
-        final List<String> ips = Arrays.asList(((NetworkVO)network).getIpExclusionList().split(","));
-        List<String> result = new ArrayList<>();
-        for (String ip: ips) {
-            if (ip.contains("-")) {
-                 result.addAll(NetUtils.getAllIpsFromRange(ip));
-            } else {
-                result.add(ip);
-            }
-        }
-        return result;
+        return NetUtils.getAllExcludedIps(((NetworkVO) network).getIpExclusionList());
     }
 
     @Override

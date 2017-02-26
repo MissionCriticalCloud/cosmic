@@ -105,5 +105,12 @@ public class NetworkModelTest {
         possibleAddresses = modelImpl.getAvailableIps(network, "10.0.0.6");
         org.junit.Assert.assertEquals(possibleAddresses.size(), 2);
 
+        network = new NetworkVO(1L, null, null,null, 1L, 1L, 1L, 1L,
+                null, null, null,null, 1L, null, null,
+                false, null, false, null,null, null);
+        ((NetworkVO)network).setCidr("10.0.0.0/29");
+        possibleAddresses = modelImpl.getAvailableIps(network, "10.0.0.6");
+        org.junit.Assert.assertEquals(possibleAddresses.size(), 6);
+
     }
 }
