@@ -67,8 +67,7 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
             routerResponse.setRequiresUpgrade(true);
         }
 
-        if (caller.getType() == Account.ACCOUNT_TYPE_RESOURCE_DOMAIN_ADMIN
-                || _accountMgr.isRootAdmin(caller.getId())) {
+        if (_accountMgr.isRootAdmin(caller.getId()) || (_accountMgr.isDomainAdmin(caller.getId()))) {
             if (router.getHostId() != null) {
                 routerResponse.setHostId(router.getHostUuid());
                 routerResponse.setHostName(router.getHostName());
