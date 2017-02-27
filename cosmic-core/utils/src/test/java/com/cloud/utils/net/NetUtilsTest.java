@@ -16,6 +16,7 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -602,7 +603,6 @@ public class NetUtilsTest {
 
         ips = NetUtils.getAllIpsFromRange("10.0.1.254-10.0.2.2");
         assertTrue(ips.size() == 5);
-
     }
 
     @Test
@@ -616,6 +616,44 @@ public class NetUtilsTest {
 
         ips = NetUtils.getAllIpsFromRangeList(null);
         assertTrue(ips.isEmpty());
+    }
 
+    @Test
+    public void testValidIpRangeList() {
+
+        assertFalse(NetUtils.validIpRangeList(""));
+        assertFalse(NetUtils.validIpRangeList(null));
+
+        // Test (specifically/single) address
+        assertTrue(NetUtils.validIpRangeList("1.2.3.4"));
+        assertFalse(NetUtils.validIpRangeList("256.2.3.4"));
+
+        // Test range addresses
+        assertTrue(NetUtils.validIpRangeList("1.2.3.4-2.3.4.5"));
+        assertFalse(NetUtils.validIpRangeList("1.2.3.4-"));
+
+        //Test collection addresses
+        assertTrue(NetUtils.validIpRangeList("1.1.1.1,2.2.2.2-3.3.3.3,4.4.4.4"));
+    }
+
+    @Test
+    public void testIsIpRangeListInCidr() {
+        assertTrue(NetUtils.isIpRangeListInCidr("10.0.0.1,10.0.0.3-10.0.0.6", "10.0.0.0/29"));
+        assertFalse(NetUtils.isIpRangeListInCidr("10.0.0.1-10.0.0.8", "10.0.0.0/29"));
+    }
+
+    @Test
+    public void testListIp2LongList() {
+        List<String> stringList = new ArrayList<>();
+        stringList.add("10.0.0.1");
+        stringList.add("10.0.0.2");
+        stringList.add("10.0.0.3");
+
+        SortedSet<Long> longList = NetUtils.listIp2LongList(stringList);
+
+        assertTrue(stringList.size() == longList.size());
+        assertTrue(longList.contains(167772161L));
+        assertTrue(longList.contains(167772162L));
+        assertTrue(longList.contains(167772163L));
     }
 }

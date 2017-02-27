@@ -1,5 +1,7 @@
 package com.cloud.utils.net;
 
+import static org.apache.commons.lang.StringUtils.split;
+
 import com.cloud.utils.IteratorUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -31,6 +33,7 @@ import java.util.regex.Pattern;
 import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6AddressRange;
 import com.googlecode.ipv6.IPv6Network;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -510,6 +513,16 @@ public class NetUtils {
         return startIPLong <= endIPLong;
     }
 
+    public static boolean validIpRange(final String ipRange) {
+        if (StringUtils.isEmpty(ipRange)) {
+            return false;
+        }
+
+        final String[] ipAddresses = ipRange.split("-");
+
+        return (ipAddresses.length == 2) && isValidIp(ipAddresses[0]) && isValidIp(ipAddresses[1]) && validIpRange(ipAddresses[0], ipAddresses[1]);
+    }
+
     public static boolean is31PrefixCidr(final String cidr) {
         final boolean isValidCird = isValidCIDR(cidr);
         if (isValidCird) {
@@ -562,7 +575,7 @@ public class NetUtils {
     public static SortedSet<Long> getAllIpsFromCidr(final String cidr_ip, final long size, final Set<Long> usedIps) {
         final SortedSet<Long> result = new TreeSet<>();
         long start = ip2Long(getIpRangeStartIpFromCidr(cidr_ip, size));
-        long end = ip2Long(getIpRangeEndIpFromCidr(cidr_ip,size));
+        long end = ip2Long(getIpRangeEndIpFromCidr(cidr_ip, size));
 
         while (start <= end) {
             if (!usedIps.contains(start)) {
@@ -572,6 +585,14 @@ public class NetUtils {
         }
 
         return result;
+    }
+
+    public static SortedSet<Long> listIp2LongList(final List<String> ipStringList) {
+        SortedSet<Long> ipLongList = new TreeSet<>();
+        for (String ip : ipStringList) {
+            ipLongList.add(ip2Long(ip));
+        }
+        return ipLongList;
     }
 
     /**
@@ -1199,11 +1220,22 @@ public class NetUtils {
         long startIp = ip2Long(ips[0]);
         long endIp = ip2Long(ips[1]);
 
-        for (long tmpIp = startIp; tmpIp<=endIp; tmpIp++) {
+        for (long tmpIp = startIp; tmpIp <= endIp; tmpIp++) {
             result.add(long2Ip(tmpIp));
         }
 
         return result;
+    }
+
+    public static Boolean isIpRangeListInCidr(final String ipRangeListExpression, final String cidr) {
+        final String[] excludedIpsRangeDelimiters = ipRangeListExpression.split("[,-]");
+
+        for (String ip : excludedIpsRangeDelimiters) {
+            if (!NetUtils.isIpWithtInCidrRange(ip, cidr)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // Can cover 127 bits
@@ -1535,5 +1567,20 @@ public class NetUtils {
 
     public static enum SupersetOrSubset {
         isSuperset, isSubset, neitherSubetNorSuperset, sameSubnet, errorInCidrFormat
+    }
+
+    public static Boolean validIpRangeList(final String ipRangeList) {
+        if (StringUtils.isEmpty(ipRangeList)) {
+            return false;
+        }
+
+        String[] ipRanges = ipRangeList.split(",");
+
+        for (String ipRange : ipRanges) {
+            if (!(ipRange.contains("-") && validIpRange(ipRange) || isValidIp(ipRange))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
