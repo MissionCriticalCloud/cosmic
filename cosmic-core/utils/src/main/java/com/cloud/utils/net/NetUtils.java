@@ -15,7 +15,16 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1163,7 +1172,7 @@ public class NetUtils {
 
     public static List<String> getAllExcludedIps(final String excludedIpsS) {
 
-        if (excludedIpsS == null) {
+        if (StringUtils.isEmpty(excludedIpsS)) {
             return Collections.emptyList();
         }
 
