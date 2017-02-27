@@ -966,6 +966,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             ip6Gateway = NetUtils.getCidrHostAddress6(ip6Cidr);
         }
 
+        if (!org.apache.commons.lang.StringUtils.isEmpty(ipExclusionList) &&  !NetUtils.validIpRangeList(ipExclusionList)) {
+            throw new InvalidParameterValueException("Syntax error in ipExclusionList");
+        }
+
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
                 createVlan, dns1, dns2, ipExclusionList);
