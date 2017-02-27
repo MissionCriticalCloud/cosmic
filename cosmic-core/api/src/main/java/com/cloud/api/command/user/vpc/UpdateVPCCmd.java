@@ -11,6 +11,7 @@ import com.cloud.api.BaseAsyncCustomIdCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
+import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.Vpc;
@@ -42,13 +43,17 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
+    @Parameter(name = ApiConstants.VPC_OFF_ID, type = CommandType.UUID, entityType = VpcOfferingResponse.class, description = "The new VPC offering ID to switch to. This will result " +
+            "in a restart+cleanup of the VPC")
+    private Long vpcOfferingId;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
-        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc());
+        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId());
         if (result != null) {
             final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -90,6 +95,10 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
 
     public Boolean getDisplayVpc() {
         return display;
+    }
+
+    public Long getVpcOfferingId() {
+        return vpcOfferingId;
     }
 
     @Override

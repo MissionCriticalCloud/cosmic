@@ -50,6 +50,14 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "vpc offering id the VPC is created from")
     private String vpcOfferingId;
 
+    @SerializedName(ApiConstants.VPC_OFF_NAME)
+    @Param(description = "name of the vpc offering the vpc is created from")
+    private String vpcOfferingName;
+
+    @SerializedName(ApiConstants.VPC_OFF_DISPLAYTEXT)
+    @Param(description = "display text of the vpc offering the vpc is created from")
+    private String vpcOfferingDisplayText;
+
     @SerializedName(ApiConstants.CREATED)
     @Param(description = "the date this VPC was created")
     private Date created;
@@ -205,5 +213,13 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
 
     public void setRedundantRouter(final Boolean redundantRouter) {
         this.redundantRouter = redundantRouter;
+    }
+
+    public void setVpcOfferingName(final String vpcOfferingName) {
+        this.vpcOfferingName = vpcOfferingName;
+    }
+
+    public void setVpcOfferingDisplayText(final String vpcOfferingDisplayText) {
+        this.vpcOfferingDisplayText = vpcOfferingDisplayText;
     }
 }

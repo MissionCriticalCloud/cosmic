@@ -1,8 +1,11 @@
 package com.cloud.network.vpc;
 
 import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.api.ApiErrorCode;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vpc.ListPrivateGatewaysCmd;
 import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
+import com.cloud.api.response.SuccessResponse;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
@@ -107,6 +110,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -620,17 +624,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             Service[] supportedServices = null;
 
             if (listBySupportedServices) {
-                supportedServices = new Service[supportedServicesStr.size()];
-                int i = 0;
-                for (final String supportedServiceStr : supportedServicesStr) {
-                    final Service service = Service.getService(supportedServiceStr);
-                    if (service == null) {
-                        throw new InvalidParameterValueException("Invalid service specified " + supportedServiceStr);
-                    } else {
-                        supportedServices[i] = service;
-                    }
-                    i++;
-                }
+                supportedServices = getServices(supportedServicesStr);
             }
 
             for (final VpcOfferingVO offering : offerings) {
@@ -917,8 +911,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
-    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId,
-                         final Boolean displayVpc) {
+    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -931,6 +924,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         _accountMgr.checkAccess(caller, null, false, vpcToUpdate);
 
         final VpcVO vpc = _vpcDao.createForUpdate(vpcId);
+        boolean restartWithCleanupRequired = false;
 
         if (vpcName != null) {
             vpc.setName(vpcName);
@@ -948,11 +942,71 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             vpc.setDisplay(displayVpc);
         }
 
+        if (vpcOfferingId != null) {
+            final VpcOfferingVO newVpcOffering = _vpcOffDao.findById(vpcOfferingId);
+            if (newVpcOffering == null) {
+                throw new InvalidParameterValueException("Unable to find vpc offering by id " + vpcOfferingId);
+            }
+
+            if (vpcOfferingId == vpcToUpdate.getVpcOfferingId()) {
+                throw new InvalidParameterValueException("The vpc already has the specified offering, so not upgrading. Use restart+cleanup to rebuild.");
+            }
+
+            checkVpcOfferingServicesWithCurrentOffering(vpcOfferingId, vpcToUpdate);
+
+            vpc.setVpcOfferingId(vpcOfferingId);
+            vpc.setRedundant(newVpcOffering.getRedundantRouter());
+            restartWithCleanupRequired = true;
+        }
+        vpc.setRestartRequired(restartWithCleanupRequired);
+
+        // Save the new config
         if (_vpcDao.update(vpcId, vpc)) {
             s_logger.debug("Updated VPC id=" + vpcId);
-            return _vpcDao.findById(vpcId);
         } else {
             return null;
+        }
+
+        // Restart the VPC when required
+        if (restartWithCleanupRequired) {
+            s_logger.debug("Will now restart+cleanup VPC id=" + vpcId);
+            try {
+                final boolean result = restartVpc(vpcToUpdate.getId(), true, false);
+                if (!result) {
+                    throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to restart VPC");
+                }
+            } catch (final ResourceUnavailableException ex) {
+                s_logger.warn("Exception: ", ex);
+                throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
+            } catch (final ConcurrentOperationException ex) {
+                s_logger.warn("Exception: ", ex);
+                throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, ex.getMessage());
+            } catch (final InsufficientCapacityException ex) {
+                s_logger.info(ex.toString());
+                throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
+            }
+        }
+        return _vpcDao.findById(vpcId);
+    }
+
+    private void checkVpcOfferingServicesWithCurrentOffering(final Long vpcOfferingId, final VpcVO currentVpc) {
+        // Services that the current offering supports
+        final List<String> currentOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(currentVpc.getVpcOfferingId());
+
+        // Services that the new offering supports
+        final List<String> newOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
+
+        final List<String> notSupportedServices = new LinkedList<>();
+
+        for (final String serviceName : currentOfferingSupportedServicesStr) {
+            if (! newOfferingSupportedServicesStr.contains(serviceName)) {
+                notSupportedServices.add(serviceName);
+            }
+        }
+
+        if (!notSupportedServices.isEmpty()) {
+            throw new InvalidParameterValueException("The new vpc offering does not support these service(s) that this vpc requires for proper operation: " +
+                    notSupportedServices + ". " + "Please select an offering with compatible services.");
         }
     }
 
@@ -1070,17 +1124,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             Service[] supportedServices = null;
 
             if (listBySupportedServices) {
-                supportedServices = new Service[supportedServicesStr.size()];
-                int i = 0;
-                for (final String supportedServiceStr : supportedServicesStr) {
-                    final Service service = Service.getService(supportedServiceStr);
-                    if (service == null) {
-                        throw new InvalidParameterValueException("Invalid service specified " + supportedServiceStr);
-                    } else {
-                        supportedServices[i] = service;
-                    }
-                    i++;
-                }
+                supportedServices = getServices(supportedServicesStr);
             }
 
             for (final VpcVO vpc : vpcs) {
@@ -1105,6 +1149,22 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
             return new Pair<>(vpcs, vpcs.size());
         }
+    }
+
+    private Service[] getServices(final List<String> supportedServicesStr) {
+        final Service[] supportedServices;
+        supportedServices = new Service[supportedServicesStr.size()];
+        int i = 0;
+        for (final String supportedServiceStr : supportedServicesStr) {
+            final Service service = Service.getService(supportedServiceStr);
+            if (service == null) {
+                throw new InvalidParameterValueException("Invalid service specified " + supportedServiceStr);
+            } else {
+                supportedServices[i] = service;
+            }
+            i++;
+        }
+        return supportedServices;
     }
 
     @Override

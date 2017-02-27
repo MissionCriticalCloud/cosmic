@@ -731,28 +731,62 @@
                             edit: {
                                 label: 'label.edit',
                                 action: function (args) {
-                                    $.ajax({
-                                        url: createURL('updateVPC'),
-                                        data: {
-                                            id: args.context.vpc[0].id,
-                                            name: args.data.name,
-                                            displaytext: args.data.displaytext
-                                        },
-                                        success: function (json) {
-                                            var jid = json.updatevpcresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        return json.queryasyncjobresultresponse.jobresult.vpc;
+                                    // should we update the vpc offering
+                                    if (args.data.vpcofferingid != null && args.data.vpcofferingid != args.context.vpc[0].vpcofferingid) {
+                                        cloudStack.dialog.confirm({
+                                            message: 'message.confirm.change.vpcoffering',
+                                            action: function () { //"Yes"    button is clicked
+                                                $.ajax({
+                                                    url: createURL('updateVPC'),
+                                                    data: {
+                                                        id: args.context.vpc[0].id,
+                                                        name: args.data.name,
+                                                        displaytext: args.data.displaytext,
+                                                        vpcofferingid: args.data.vpcofferingid
+                                                    },
+                                                    success: function (json) {
+                                                        var jid = json.updatevpcresponse.jobid;
+                                                        args.response.success({
+                                                            _custom: {
+                                                                jobId: jid,
+                                                                getUpdatedItem: function (json) {
+                                                                    return json.queryasyncjobresultresponse.jobresult.vpc;
+                                                                }
+                                                            }
+                                                        });
+                                                    },
+                                                    error: function (data) {
+                                                        args.response.error(parseXMLHttpResponse(data));
                                                     }
-                                                }
-                                            });
-                                        },
-                                        error: function (data) {
-                                            args.response.error(parseXMLHttpResponse(data));
-                                        }
-                                    });
+                                                });
+                                            },
+                                            cancelAction: function () { //"Cancel" button is clicked
+                                            }
+                                        });
+                                    } else {
+                                        $.ajax({
+                                            url: createURL('updateVPC'),
+                                            data: {
+                                                id: args.context.vpc[0].id,
+                                                name: args.data.name,
+                                                displaytext: args.data.displaytext
+                                            },
+                                            success: function (json) {
+                                                var jid = json.updatevpcresponse.jobid;
+                                                args.response.success({
+                                                    _custom: {
+                                                        jobId: jid,
+                                                        getUpdatedItem: function (json) {
+                                                            return json.queryasyncjobresultresponse.jobresult.vpc;
+                                                        }
+                                                    }
+                                                });
+                                            },
+                                            error: function (data) {
+                                                args.response.error(parseXMLHttpResponse(data));
+                                            }
+                                        });
+                                    }
                                 },
                                 notification: {
                                     poll: pollAsyncJobResult
@@ -876,6 +910,44 @@
                                     displaytext: {
                                         label: 'label.description',
                                         isEditable: true
+                                    },
+                                    vpcofferingid: {
+                                        label: 'label.vpc.offering',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            if (args.context.vpc[0].state == 'Destroyed') {
+                                                args.response.success({
+                                                    data: []
+                                                });
+                                                return;
+                                            }
+
+                                            var items = [];
+                                            $.ajax({
+                                                url: createURL("listVPCOfferings"),
+                                                dataType: "json",
+                                                async: false,
+                                                success: function (json) {
+                                                    var vpcOfferingObjs = json.listvpcofferingsresponse.vpcoffering;
+                                                    $(vpcOfferingObjs).each(function () {
+                                                        items.push({
+                                                            id: this.id,
+                                                            description: this.displaytext
+                                                        });
+                                                    });
+                                                }
+                                            });
+
+                                            //include currently selected vpc offering to dropdown
+                                            items.push({
+                                                id: args.context.vpc[0].vpcofferingid,
+                                                description: args.context.vpc[0].vpcofferingdisplaytext + " (Current offering)"
+                                            });
+
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
                                     },
                                     account: {
                                         label: 'label.account'
