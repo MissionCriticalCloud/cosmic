@@ -43,7 +43,7 @@ body.install-wizard {
 
 #main-area {
     width: 1224px;
-    height: 729px;
+    height: 829px;
     margin: auto;
     border: 1px solid #D4D4D4;
     /*+box-shadow:0px -5px 11px #B7B7B7;*/
@@ -1256,7 +1256,7 @@ div.notification.corner-alert div.message span {
 div.panel div.list-view {
     overflow: auto;
     overflow-x: hidden;
-    height: 632px;
+    height: 732px;
     margin-top: 30px;
 }
 
@@ -1831,17 +1831,16 @@ span.compact {
 .ui-tabs div.ui-tabs-panel {
     border: 1px solid #D9D9D9;
     clear: both;
-    height: 78%;
     width: 97%;
     padding-top: 7px;
     overflow: auto;
     overflow-x: hidden;
-    height: 591px;
+    height: 680px;
     margin: -5px 0 0;
 }
 
 .detail-view .main-groups {
-    max-height: 407px;
+    max-height: 550px;
     overflow: auto;
     overflow-x: hidden;
     width: 100%;
@@ -1850,7 +1849,7 @@ span.compact {
 }
 
 .detail-view.edit-mode .main-groups {
-    max-height: 360px;
+    max-height: 440px;
 }
 
 .detail-group table {
@@ -4381,7 +4380,7 @@ textarea {
 /**** Head*/
 .dashboard.admin .dashboard-container.head {
     width: 966px;
-    height: 331px;
+    height: 451px;
     margin: 9px 0 0;
     float: left;
 }
@@ -4441,7 +4440,7 @@ textarea {
 /**** Charts / stats*/
 .dashboard.admin .zone-stats {
     width: 974px;
-    height: 316px;
+    height: 366px;
     overflow: auto;
     overflow-x: hidden;
     /*+placement:shift 0px 0px;*/
