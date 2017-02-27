@@ -764,11 +764,7 @@
                                 createForm: {
                                     title: 'label.restart.vpc',
                                     desc: function (args) {
-                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
                                             return 'message.restart.vpc';
-                                        } else {
-                                            return 'message.restart.vpc.remark';
-                                        }
                                     },
 
                                     preFilter: function (args) {
@@ -785,24 +781,9 @@
 
                                         args.$form.find('.form-item[rel=cleanup]').find('input').attr('checked', 'checked'); //checked
                                         args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
-                                        args.$form.find('.form-item[rel=makeredundant]').find('input').attr('checked', 'checked'); //checked
-                                        args.$form.find('.form-item[rel=makeredundant]').css('display', 'inline-block'); //shown
 
-                                        if (Boolean(args.context.vpc[0].redundantvpcrouter)) {
-                                            args.$form.find('.form-item[rel=makeredundant]').hide();
-                                        } else {
-                                            args.$form.find('.form-item[rel=makeredundant]').show();
-                                        }
                                     },
                                     fields: {
-                                        cleanup: {
-                                            label: 'label.clean.up',
-                                            isBoolean: true
-                                        },
-                                        makeredundant: {
-                                            label: 'label.make.redundant',
-                                            isBoolean: true
-                                        }
                                     }
                                 },
                                 messages: {
@@ -819,8 +800,7 @@
                                         url: createURL("restartVPC"),
                                         data: {
                                             id: args.context.vpc[0].id,
-                                            cleanup: (args.data.cleanup == "on"),
-                                            makeredundant: (args.data.makeredundant == "on")
+                                            cleanup: true
                                         },
                                         success: function (json) {
                                             var jid = json.restartvpcresponse.jobid;
