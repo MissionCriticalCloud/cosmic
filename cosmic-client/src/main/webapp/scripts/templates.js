@@ -108,7 +108,7 @@
                                         label: 'label.description',
                                         docID: 'helpRegisterTemplateDescription',
                                         validation: {
-                                            required: true
+                                            required: false
                                         }
                                     },
                                     url: {
@@ -343,9 +343,16 @@
                             },
 
                             action: function (args) {
+
+                                if (args.data.description != "") {
+                                    displayText = args.data.description
+                                } else {
+                                    displayText = args.data.name
+                                }
+
                                 var data = {
                                     name: args.data.name,
-                                    displayText: args.data.description,
+                                    displayText: displayText,
                                     url: args.data.url,
                                     zoneid: args.data.zone,
                                     format: args.data.format,
@@ -514,7 +521,7 @@
                                         label: 'label.description',
                                         docID: 'helpRegisterTemplateDescription',
                                         validation: {
-                                            required: true
+                                            required: false
                                         }
                                     },
 
