@@ -596,4 +596,23 @@ public class NetUtilsTest {
         assertTrue(ips.isEmpty());
 
     }
+
+    @Test
+    public void testValidIpRangeList() {
+
+        assertFalse(NetUtils.validIpRangeList(""));
+        assertFalse(NetUtils.validIpRangeList(null));
+
+        // Test (specifically/single) address
+        assertTrue(NetUtils.validIpRangeList("1.2.3.4"));
+        assertFalse(NetUtils.validIpRangeList("256.2.3.4"));
+
+        // Test range addresses
+        assertTrue(NetUtils.validIpRangeList("1.2.3.4-2.3.4.5"));
+        assertFalse(NetUtils.validIpRangeList("1.2.3.4-"));
+
+        //Test collection addresses
+        assertTrue(NetUtils.validIpRangeList("1.1.1.1,2.2.2.2-3.3.3.3,4.4.4.4"));
+
+    }
 }

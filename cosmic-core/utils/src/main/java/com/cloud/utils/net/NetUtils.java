@@ -1,5 +1,7 @@
 package com.cloud.utils.net;
 
+import static org.apache.commons.lang.StringUtils.split;
+
 import com.cloud.utils.IteratorUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -31,6 +33,7 @@ import java.util.regex.Pattern;
 import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6AddressRange;
 import com.googlecode.ipv6.IPv6Network;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -508,6 +511,23 @@ public class NetUtils {
         final long startIPLong = NetUtils.ip2Long(startIP);
         final long endIPLong = NetUtils.ip2Long(endIP);
         return startIPLong <= endIPLong;
+    }
+
+    public static boolean validIpRange(final String ipRange) {
+        if(StringUtils.isEmpty(ipRange)) {
+            return false;
+        }
+
+        final String[] ipAddresses = ipRange.split("-");
+
+        if(!(ipAddresses.length == 2)) {
+            return false;
+        }
+
+        if (!isValidIp(ipAddresses[0]) || !isValidIp(ipAddresses[1]) || !validIpRange(ipAddresses[0], ipAddresses[1]) ){
+                return false;
+         }
+        return true;
     }
 
     public static boolean is31PrefixCidr(final String cidr) {
@@ -1530,5 +1550,26 @@ public class NetUtils {
 
     public static enum SupersetOrSubset {
         isSuperset, isSubset, neitherSubetNorSuperset, sameSubnet, errorInCidrFormat
+    }
+
+    public static Boolean validIpRangeList( final String ipRangeList ) {
+        if(StringUtils.isEmpty(ipRangeList)) {
+            return false;
+        }
+
+        String[] ipRanges = ipRangeList.split(",");
+
+        for (String ipRange : ipRanges) {
+            if(ipRange.contains("-")) {
+                if( !validIpRange(ipRange) ) {
+                    return false;
+                }
+            } else {
+                if( !isValidIp(ipRange)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
