@@ -2368,7 +2368,7 @@
                                                     data: item,
                                                     actionFilter: function (args) {
                                                         var allowedActions = [];
-                                                        if (isAdmin()) {
+                                                        if (isAdmin() || isDomainAdmin()) {
                                                             allowedActions.push("remove");
                                                             allowedActions.push("replaceACL");
 
