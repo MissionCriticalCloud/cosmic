@@ -1872,6 +1872,7 @@
                                     url: createURL("listNetworks"),
                                     data: {
                                         zoneid: args.context.vpc[0].zoneid,
+                                        domainid: args.context.vpc[0].domainid,
                                         traffictype: "Guest",
                                         type: "private"
                                     },
@@ -2052,6 +2053,7 @@
                                                     url: createURL("listNetworks"),
                                                     data: {
                                                         zoneid: args.context.vpc[0].zoneid,
+                                                        domainid: args.context.vpc[0].domainid,
                                                         traffictype: "Guest",
                                                         type: "private"
                                                     },
