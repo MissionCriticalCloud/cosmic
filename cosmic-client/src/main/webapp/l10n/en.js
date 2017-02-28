@@ -763,7 +763,7 @@ var dictionary = {
     "label.host.tags": "Host Tags",
     "label.hosts": "Hosts",
     "label.hourly": "Hourly",
-    "label.hvm": "HVM",
+    "label.hvm": "Requires HVM",
     "label.hypervisor": "Hypervisor",
     "label.hypervisor.capabilities": "Hypervisor capabilities",
     "label.hypervisor.snapshot.reserve": "Hypervisor Snapshot Reserve",
