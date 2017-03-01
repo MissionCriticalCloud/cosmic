@@ -93,6 +93,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         deployment.serviceOfferingId = null;
         assertNull(deployment.getServiceOfferingId());
         deployment.serviceOfferingId = OFFERING_ID;
+        deployment.secondaryServiceOfferingId = OFFERING_ID;
         assertEquals(OFFERING_ID, deployment.getServiceOfferingId().longValue());
         assertNotNull(deployment.getRouters());
         assertNotNull(deployment.getGuestNetwork());
@@ -641,9 +642,11 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         when(mockNw.getNetworkOfferingId()).thenReturn(OFFERING_ID);
         when(mockNetworkOfferingDao.findById(OFFERING_ID)).thenReturn(mockNwOfferingVO);
         when(mockNwOfferingVO.getServiceOfferingId()).thenReturn(OFFERING_ID);
+        when(mockNwOfferingVO.getSecondaryServiceOfferingId()).thenReturn(OFFERING_ID);
 
         // Execute
         deployment.findServiceOfferingId();
+        deployment.findSecondaryServiceOfferingId();
 
         // Assert
         assertEquals("Service offering id not matching the one associated with network offering",
@@ -657,11 +660,13 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         when(mockNw.getNetworkOfferingId()).thenReturn(OFFERING_ID);
         when(mockNetworkOfferingDao.findById(OFFERING_ID)).thenReturn(mockNwOfferingVO);
         when(mockNwOfferingVO.getServiceOfferingId()).thenReturn(null);
+        when(mockNwOfferingVO.getSecondaryServiceOfferingId()).thenReturn(null);
         when(mockServiceOfferingDao.findDefaultSystemOffering(Matchers.anyString(), Matchers.anyBoolean())).thenReturn(mockSvcOfferingVO);
         when(mockSvcOfferingVO.getId()).thenReturn(DEFAULT_OFFERING_ID);
 
         // Execute
         deployment.findServiceOfferingId();
+        deployment.findSecondaryServiceOfferingId();
 
         // Assert
         assertEquals("Since there is no service offering associated with network offering, offering id should have matched default one",
@@ -781,6 +786,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         doReturn(passPreparation).when(deploymentUT).prepareDeployment();
         doNothing().when(deploymentUT).findVirtualProvider();
         doNothing().when(deploymentUT).findServiceOfferingId();
+        doNothing().when(deploymentUT).findSecondaryServiceOfferingId();
         doNothing().when(deploymentUT).findSourceNatIP();
         doNothing().when(deploymentUT).deployAllVirtualRouters();
 
@@ -798,6 +804,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         }
         verify(deploymentUT, times(proceedToDeployment)).findVirtualProvider();
         verify(deploymentUT, times(proceedToDeployment)).findServiceOfferingId();
+        verify(deploymentUT, times(proceedToDeployment)).findSecondaryServiceOfferingId();
         verify(deploymentUT, times(proceedToDeployment)).findSourceNatIP();
         verify(deploymentUT, times(proceedToDeployment)).deployAllVirtualRouters();
     }

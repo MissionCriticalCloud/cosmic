@@ -42,6 +42,8 @@ public class NetworkOfferingVO implements NetworkOffering {
     boolean systemOnly;
     @Column(name = "service_offering_id")
     Long serviceOfferingId;
+    @Column(name = "secondary_service_offering_id")
+    Long secondaryServiceOfferingId;
     @Column(name = "tags", length = 4096)
     String tags;
     @Column(name = "default")
@@ -426,6 +428,18 @@ public class NetworkOfferingVO implements NetworkOffering {
 
     public Date getRemoved() {
         return removed;
+    }
+
+    public Long getSecondaryServiceOfferingId() {
+        if (secondaryServiceOfferingId != null) {
+            return secondaryServiceOfferingId;
+        } else {
+            return getServiceOfferingId();
+        }
+    }
+
+    public void setSecondaryServiceOfferingId(final Long secondaryServiceOfferingId) {
+        this.secondaryServiceOfferingId = secondaryServiceOfferingId;
     }
 
     @Override

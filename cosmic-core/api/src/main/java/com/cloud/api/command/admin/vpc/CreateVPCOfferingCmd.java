@@ -59,6 +59,12 @@ public class CreateVPCOfferingCmd extends BaseAsyncCreateCmd {
             description = "the ID of the service offering for the VPC router appliance")
     private Long serviceOfferingId;
 
+    @Parameter(name = ApiConstants.SECONDARY_SERVICE_OFFERING_ID,
+            type = CommandType.UUID,
+            entityType = ServiceOfferingResponse.class,
+            description = "the ID of the service offering for the second VPC router appliance (in case of redundancy)")
+    private Long secondaryServiceOfferingId;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -66,7 +72,7 @@ public class CreateVPCOfferingCmd extends BaseAsyncCreateCmd {
     @Override
     public void create() throws ResourceAllocationException {
         final VpcOffering vpcOff = _vpcProvSvc.createVpcOffering(getVpcOfferingName(), getDisplayText(),
-                getSupportedServices(), getServiceProviders(), getServiceCapabilitystList(), getServiceOfferingId());
+                getSupportedServices(), getServiceProviders(), getServiceCapabilitystList(), getServiceOfferingId(), getSecondaryServiceOfferingId());
         if (vpcOff != null) {
             setEntityId(vpcOff.getId());
             setEntityUuid(vpcOff.getUuid());
@@ -121,6 +127,10 @@ public class CreateVPCOfferingCmd extends BaseAsyncCreateCmd {
 
     public Long getServiceOfferingId() {
         return serviceOfferingId;
+    }
+
+    public Long getSecondaryServiceOfferingId() {
+        return secondaryServiceOfferingId;
     }
 
     @Override

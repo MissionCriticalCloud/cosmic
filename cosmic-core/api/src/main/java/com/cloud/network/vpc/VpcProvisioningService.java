@@ -12,7 +12,8 @@ public interface VpcProvisioningService {
     public VpcOffering createVpcOffering(String name, String displayText, List<String> supportedServices,
                                          Map<String, List<String>> serviceProviders,
                                          Map serviceCapabilitystList,
-                                         Long serviceOfferingId);
+                                         Long serviceOfferingId,
+                                         Long secondaryServiceOfferingId);
 
     Pair<List<? extends VpcOffering>, Integer> listVpcOfferings(Long id, String name, String displayText, List<String> supportedServicesStr, Boolean isDefault, String keyword,
                                                                 String state, Long startIndex, Long pageSizeVal);

@@ -10,3 +10,8 @@ INSERT IGNORE INTO `cloud`.`guest_os_hypervisor` (uuid,hypervisor_type, hypervis
 
 -- URL field length
 ALTER TABLE `cloud`.`template_store_ref` MODIFY COLUMN `download_url` varchar(2048);
+
+-- Redundant routers separate offering for second router
+ALTER table vpc_offerings ADD `secondary_service_offering_id` bigint(20) unsigned DEFAULT NULL COMMENT 'service offering id that a secondary virtual router is tied to';
+ALTER table network_offerings ADD `secondary_service_offering_id` bigint(20) unsigned DEFAULT NULL COMMENT 'service offering id that a secondary virtual router is tied to';
+

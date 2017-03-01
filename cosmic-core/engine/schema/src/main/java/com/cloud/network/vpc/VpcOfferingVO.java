@@ -38,6 +38,8 @@ public class VpcOfferingVO implements VpcOffering {
     Date created;
     @Column(name = "service_offering_id")
     Long serviceOfferingId;
+    @Column(name = "secondary_service_offering_id")
+    Long secondaryServiceOfferingId;
     @Column(name = "supports_distributed_router")
     boolean supportsDistributedRouter = false;
     @Column(name = "supports_region_level_vpc")
@@ -51,28 +53,29 @@ public class VpcOfferingVO implements VpcOffering {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId,
+    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
                          final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC,
                          final boolean redundantRouter) {
-        this(name, displayText, serviceOfferingId);
+        this(name, displayText, serviceOfferingId, secondaryServiceOfferingId);
         this.isDefault = isDefault;
         this.supportsDistributedRouter = supportsDistributedRouter;
         this.offersRegionLevelVPC = offersRegionLevelVPC;
         this.redundantRouter = redundantRouter;
     }
 
-    public VpcOfferingVO(final String name, final String displayText, final Long serviceOfferingId) {
+    public VpcOfferingVO(final String name, final String displayText, final Long serviceOfferingId, final Long secondaryServiceOfferingId) {
         this.name = name;
         this.displayText = displayText;
         this.uniqueName = name;
         this.serviceOfferingId = serviceOfferingId;
+        this.secondaryServiceOfferingId = secondaryServiceOfferingId;
         this.uuid = UUID.randomUUID().toString();
         this.state = State.Disabled;
     }
 
-    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId,
+    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
                          final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC) {
-        this(name, displayText, serviceOfferingId);
+        this(name, displayText, serviceOfferingId, secondaryServiceOfferingId);
         this.isDefault = isDefault;
         this.supportsDistributedRouter = supportsDistributedRouter;
         this.offersRegionLevelVPC = offersRegionLevelVPC;
@@ -162,6 +165,18 @@ public class VpcOfferingVO implements VpcOffering {
     @Override
     public boolean getRedundantRouter() {
         return this.redundantRouter;
+    }
+
+    public Long getSecondaryServiceOfferingId() {
+        if (secondaryServiceOfferingId != null) {
+            return secondaryServiceOfferingId;
+        } else {
+            return getServiceOfferingId();
+        }
+    }
+
+    public void setSecondaryServiceOfferingId(final Long secondaryServiceOfferingId) {
+        this.secondaryServiceOfferingId = secondaryServiceOfferingId;
     }
 
     public void setState(final State state) {

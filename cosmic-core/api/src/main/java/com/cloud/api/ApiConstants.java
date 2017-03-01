@@ -215,6 +215,7 @@ public class ApiConstants {
     public static final String SENT_BYTES = "sentbytes";
     public static final String SERVER_TIMEOUT = "servertimeout";
     public static final String SERVICE_OFFERING_ID = "serviceofferingid";
+    public static final String SECONDARY_SERVICE_OFFERING_ID = "secondaryserviceofferingid";
     public static final String SESSIONKEY = "sessionkey";
     public static final String SHOW_CAPACITIES = "showcapacities";
     public static final String SHOW_REMOVED = "showremoved";
