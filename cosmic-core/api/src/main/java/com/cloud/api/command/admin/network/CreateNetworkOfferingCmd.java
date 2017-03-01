@@ -61,6 +61,11 @@ public class CreateNetworkOfferingCmd extends BaseCmd {
             entityType = ServiceOfferingResponse.class,
             description = "the service offering ID used by virtual router provider")
     private Long serviceOfferingId;
+    @Parameter(name = ApiConstants.SECONDARY_SERVICE_OFFERING_ID,
+            type = CommandType.UUID,
+            entityType = ServiceOfferingResponse.class,
+            description = "the ID of the service offering for the second VPC router appliance (in case of redundancy)")
+    private Long secondaryServiceOfferingId;
     @Parameter(name = ApiConstants.GUEST_IP_TYPE, type = CommandType.STRING, required = true, description = "guest type of the network offering: Shared or Isolated")
     private String guestIptype;
     @Parameter(name = ApiConstants.SUPPORTED_SERVICES,
@@ -138,6 +143,10 @@ public class CreateNetworkOfferingCmd extends BaseCmd {
 
     public Long getServiceOfferingId() {
         return serviceOfferingId;
+    }
+
+    public Long getSecondaryServiceOfferingId() {
+        return secondaryServiceOfferingId;
     }
 
     public List<String> getSupportedServices() {

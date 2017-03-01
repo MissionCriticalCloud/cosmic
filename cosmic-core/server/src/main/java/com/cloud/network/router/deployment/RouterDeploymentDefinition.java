@@ -394,9 +394,9 @@ public class RouterDeploymentDefinition {
     }
 
     protected void findSecondaryServiceOfferingId() {
-        serviceOfferingId = networkOfferingDao.findById(guestNetwork.getNetworkOfferingId()).getSecondaryServiceOfferingId();
-        if (serviceOfferingId == null) {
-            findServiceOfferingId();
+        secondaryServiceOfferingId = networkOfferingDao.findById(guestNetwork.getNetworkOfferingId()).getSecondaryServiceOfferingId();
+        if (secondaryServiceOfferingId == null) {
+            secondaryServiceOfferingId = serviceOfferingId;
         }
     }
 

@@ -408,7 +408,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 //SG enabled network offering
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSharedNetworkOfferingWithSGService) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultSharedNetworkOfferingWithSGService, "Offering for Shared Security group enabled networks",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedNetworkOfferingProviders, true, GuestType.Shared, false, null, true,
+                            TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedNetworkOfferingProviders, true, GuestType.Shared, false, null, null, true,
                             null, true, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -417,7 +417,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 //Shared network offering with no SG service
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSharedNetworkOffering) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultSharedNetworkOffering, "Offering for Shared networks", TrafficType.Guest, null, true,
-                            Availability.Optional, null, defaultSharedNetworkOfferingProviders, true, GuestType.Shared, false, null, true, null, true, false, null, false,
+                            Availability.Optional, null, defaultSharedNetworkOfferingProviders, true, GuestType.Shared, false, null, null, true, null, true, false, null, false,
                             null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -427,7 +427,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingWithSourceNatService) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingWithSourceNatService,
                             "Offering for Isolated networks with Source Nat service enabled", TrafficType.Guest, null, false, Availability.Required, null,
-                            defaultIsolatedSourceNatEnabledNetworkOfferingProviders, true, GuestType.Isolated, false, null, true, null, false, false, null, false, null,
+                            defaultIsolatedSourceNatEnabledNetworkOfferingProviders, true, GuestType.Isolated, false, null, null, true, null, false, false, null, false, null,
                             true);
 
                     offering.setState(NetworkOffering.State.Enabled);
@@ -438,7 +438,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks,
                             "Offering for Isolated VPC networks with Source Nat service enabled", TrafficType.Guest, null, false, Availability.Optional, null,
-                            defaultVPCOffProviders, true, GuestType.Isolated, false, null, false, null, false, false, null, false, null, true);
+                            defaultVPCOffProviders, true, GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
@@ -449,7 +449,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     defaultVPCOffProviders.remove(Service.Lb);
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksNoLB,
                             "Offering for Isolated VPC networks with Source Nat service enabled and LB service disabled", TrafficType.Guest, null, false, Availability.Optional,
-                            null, defaultVPCOffProviders, true, GuestType.Isolated, false, null, false, null, false, false, null, false, null, true);
+                            null, defaultVPCOffProviders, true, GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
@@ -464,7 +464,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     defaultVPCOffProviders.remove(Service.Vpn);
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat,
                             "Offering for Isolated VPC networks without Source Nat service enabled and LB service disabled", TrafficType.Guest, null, false, Availability.Optional,
-                            null, defaultVPCOffProviders, true, GuestType.Isolated, false, null, false, null, false, false, null, false, null, true);
+                            null, defaultVPCOffProviders, true, GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
@@ -472,7 +472,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 //Isolated offering with source nat disabled
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOffering) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOffering, "Offering for Isolated networks with no Source Nat service",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null,
+                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
                             true, null, true, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -497,7 +497,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB) == null) {
                     offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
                             "Offering for Isolated VPC networks with Internal Lb support", TrafficType.Guest, null, false, Availability.Optional, null, internalLbOffProviders,
-                            true, GuestType.Isolated, false, null, false, null, false, false, null, false, null, true);
+                            true, GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     offering.setInternalLb(true);
                     offering.setPublicLb(false);
