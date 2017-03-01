@@ -7,3 +7,6 @@ INSERT IGNORE INTO `cloud`.`guest_os` (id, uuid, category_id, display_name, crea
 INSERT IGNORE INTO `cloud`.`guest_os_hypervisor` (uuid,hypervisor_type, hypervisor_version, guest_os_name, guest_os_id, created, is_user_defined) VALUES (UUID(),'KVM', 'default', 'VirtIO-SCSI capable OS', 1002, utc_timestamp(), 0);
 INSERT IGNORE INTO `cloud`.`guest_os` (id, uuid, category_id, display_name, created) VALUES (1023, UUID(), 6, 'Windows VirtIO-SCSI', utc_timestamp());
 INSERT IGNORE INTO `cloud`.`guest_os_hypervisor` (uuid,hypervisor_type, hypervisor_version, guest_os_name, guest_os_id, created, is_user_defined) VALUES (UUID(),'KVM', 'default', 'Windows VirtIO-SCSI', 1023, utc_timestamp(), 0);
+
+-- URL field length
+ALTER TABLE `cloud`.`template_store_ref` MODIFY COLUMN `download_url` varchar(2048);
