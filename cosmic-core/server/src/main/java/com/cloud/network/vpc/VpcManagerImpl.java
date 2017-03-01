@@ -1428,9 +1428,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw new InvalidParameterValueException("Gateway/netmask fields are not supported anymore");
         }
 
-        final Network privateNtwk = _ntwkDao.findByIdAndDomainId(networkId, gatewayDomainId);
+        final Network privateNtwk = _ntwkDao.findById(networkId);
         if (privateNtwk == null) {
-            throw new InvalidParameterValueException("Unable to find private network based on the network ID");
+            throw new InvalidParameterValueException("The private network specified could not be found.");
+        }
+
+        if (privateNtwk.getDomainId() != vpc.getDomainId() && !_accountMgr.isRootAdmin(caller.getId())) {
+            throw new InvalidParameterValueException("VPC '" + vpc.getName() + "' does not have permission to operate on private network '" + privateNtwk.getName()
+                    + "' as they need to belong to the same domain.");
         }
 
         if (NetUtils.isNetworkAWithinNetworkB(privateNtwk.getCidr(), vpc.getCidr())) {
