@@ -552,6 +552,9 @@ cloudStack.actionFilter = {
                 allowedActions.push('restart');
                 allowedActions.push('remove');
             }
+        } else if (jsonObj.type == 'Private') {
+            allowedActions.push('edit');
+            allowedActions.push('remove');
         }
         return allowedActions;
     }

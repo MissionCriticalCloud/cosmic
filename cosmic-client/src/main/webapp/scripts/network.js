@@ -1685,7 +1685,7 @@
                             path: 'network.ipAddresses',
                             label: 'label.menu.ipaddresses',
                             preFilter: function (args) {
-                                if (args.context.networks[0].state == 'Destroyed')
+                                if (args.context.networks[0].state == 'Destroyed' || args.context.networks[0].type == 'Private' )
                                     return false;
 
                                 return true;
@@ -2125,7 +2125,13 @@
                                     //netmask: { label: 'label.netmask' },
                                     cidr: {
                                         label: 'label.cidr',
-                                        isEditable: true
+                                        isEditable: function (ctx) {
+                                            if (ctx.networks[0].type == 'Private')
+                                                return false;
+                                            else
+                                                return true;
+                                        }
+
                                     },
 
                                     networkcidr: {
