@@ -74,6 +74,18 @@ public class NetworkOfferingResponse extends BaseResponse {
     @Param(description = "the ID of the service offering used by virtual router provider")
     private String serviceOfferingId;
 
+    @SerializedName(ApiConstants.SERVICE_OFFERING_NAME)
+    @Param(description = "the name of the service offering used by virtual router provider")
+    private String serviceOfferingName;
+
+    @SerializedName(ApiConstants.SECONDARY_SERVICE_OFFERING_ID)
+    @Param(description = "the ID of the secondary service offering used by virtual router provider")
+    private String secondaryServiceOfferingId;
+
+    @SerializedName(ApiConstants.SECONDARY_SERVICE_OFFERING_NAME)
+    @Param(description = "the name of the secondary service offering used by virtual router provider")
+    private String secondaryServiceOfferingName;
+
     @SerializedName(ApiConstants.SERVICE)
     @Param(description = "the list of supported services", responseObject = ServiceResponse.class)
     private List<ServiceResponse> services;
@@ -160,6 +172,18 @@ public class NetworkOfferingResponse extends BaseResponse {
 
     public void setServiceOfferingId(final String serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
+    }
+
+    public void setServiceOfferingName(final String serviceOfferingName) {
+        this.serviceOfferingName = serviceOfferingName;
+    }
+
+    public void setSecondaryServiceOfferingId(final String secondaryServiceOfferingId) {
+        this.secondaryServiceOfferingId = secondaryServiceOfferingId;
+    }
+
+    public void setSecondaryServiceOfferingName(final String secondaryServiceOfferingName) {
+        this.secondaryServiceOfferingName = secondaryServiceOfferingName;
     }
 
     public void setSpecifyIpRanges(final Boolean specifyIpRanges) {

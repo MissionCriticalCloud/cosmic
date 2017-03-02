@@ -49,6 +49,22 @@ public class VpcOfferingResponse extends BaseResponse {
     @Param(description = " indicated if the offering can support region level vpc", since = "4.4")
     private Boolean supportsRegionLevelVpc;
 
+    @SerializedName(ApiConstants.SERVICE_OFFERING_ID)
+    @Param(description = "The primary system compute offering id used for the virtual router")
+    private String serviceOfferingId;
+
+    @SerializedName(ApiConstants.SERVICE_OFFERING_NAME)
+    @Param(description = "The primary system compute offering name used for the virtual router")
+    private String serviceOfferingName;
+
+    @SerializedName(ApiConstants.SECONDARY_SERVICE_OFFERING_ID)
+    @Param(description = "The secondary system compute offering id used for the virtual router")
+    private String secondaryServiceOfferingId;
+
+    @SerializedName(ApiConstants.SECONDARY_SERVICE_OFFERING_NAME)
+    @Param(description = "The secondary system compute offering name used for the virtual router")
+    private String secondaryServiceOfferingName;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -83,5 +99,37 @@ public class VpcOfferingResponse extends BaseResponse {
 
     public void setSupportsRegionLevelVpc(final Boolean supports) {
         this.supportsRegionLevelVpc = supports;
+    }
+
+    public String getServiceOfferingId() {
+        return serviceOfferingId;
+    }
+
+    public void setServiceOfferingId(final String serviceOfferingId) {
+        this.serviceOfferingId = serviceOfferingId;
+    }
+
+    public String getServiceOfferingName() {
+        return serviceOfferingName;
+    }
+
+    public void setServiceOfferingName(final String serviceOfferingName) {
+        this.serviceOfferingName = serviceOfferingName;
+    }
+
+    public String getSecondaryServiceOfferingId() {
+        return secondaryServiceOfferingId;
+    }
+
+    public void setSecondaryServiceOfferingId(final String secondaryServiceOfferingId) {
+        this.secondaryServiceOfferingId = secondaryServiceOfferingId;
+    }
+
+    public String getSecondaryServiceOfferingName() {
+        return secondaryServiceOfferingName;
+    }
+
+    public void setSecondaryServiceOfferingName(final String secondaryServiceOfferingName) {
+        this.secondaryServiceOfferingName = secondaryServiceOfferingName;
     }
 }

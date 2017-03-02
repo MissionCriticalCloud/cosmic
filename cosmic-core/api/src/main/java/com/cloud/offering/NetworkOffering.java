@@ -68,6 +68,8 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
 
     Long getServiceOfferingId();
 
+    Long getSecondaryServiceOfferingId();
+
     boolean getDedicatedLB();
 
     boolean getSharedSourceNat();
