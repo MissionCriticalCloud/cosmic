@@ -456,9 +456,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
                 //Default vpc offering without SourceNat and without LB service
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat) == null) {
-                    //remove LB service
+                    //remove services this VPC does not need
                     defaultVPCOffProviders.remove(Service.Lb);
                     defaultVPCOffProviders.remove(Service.SourceNat);
+                    defaultVPCOffProviders.remove(Service.StaticNat);
                     defaultVPCOffProviders.remove(Service.PortForwarding);
                     defaultVPCOffProviders.remove(Service.Gateway);
                     defaultVPCOffProviders.remove(Service.Vpn);
