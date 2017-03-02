@@ -62,12 +62,14 @@ import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
 import com.cloud.network.vpc.dao.VpcServiceMapDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
+import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.org.Grouping;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ResourceTag.ResourceObjectType;
+import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
@@ -203,6 +205,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     IpAddressManager _ipAddrMgr;
     @Inject
     ConfigDepot _configDepot;
+    @Inject
+    ServiceOfferingDao _serviceOfferingDao;
     int _cleanupInterval;
     int _maxNetworks;
     SearchBuilder<IPAddressVO> IpAddressSearch;
@@ -259,9 +263,21 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 if (_vpcOffDao.findByUniqueName(VpcOffering.redundantVPCOfferingName) == null) {
                     s_logger.debug("Creating VPC offering " + VpcOffering.redundantVPCOfferingName);
 
+                    // Link the default Redundant VPC offering to the two default router offerings
+                    final ServiceOffering serviceOffering = _serviceOfferingDao.findByName(ServiceOffering.routerDefaultOffUniqueName);
+                    final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findByName(ServiceOffering.routerDefaultSecondaryOffUniqueName);
+                    Long serviceOfferingId = null;
+                    Long secondaryServiceOfferingId = null;
+                    if (serviceOffering != null) {
+                        serviceOfferingId = serviceOffering.getId();
+                    }
+                    if (secondaryServiceOffering != null) {
+                        secondaryServiceOfferingId = secondaryServiceOffering.getId();
+                    }
+
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.redundantVPCOfferingName, VpcOffering.redundantVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, null, false, false, true);
+                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId, false, false, true);
                 }
             }
         });
