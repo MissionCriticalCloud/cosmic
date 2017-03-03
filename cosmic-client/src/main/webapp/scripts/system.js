@@ -5952,6 +5952,12 @@
                                             networkid: args.context.networks[0].id
                                         })
                                     }
+                                    if ("vpc" in args.context) {
+                                        $.extend(data2, {
+                                            vpcid: args.context.vpc[0].id
+                                        })
+                                    }
+
                                 }
 
                                 var routers = [];
