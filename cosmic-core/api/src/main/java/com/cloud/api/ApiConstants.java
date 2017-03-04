@@ -33,7 +33,6 @@ public class ApiConstants {
     public static final String IP6_CIDR = "ip6cidr";
     public static final String CIDR_LIST = "cidrlist";
     public static final String CLEANUP = "cleanup";
-    public static final String MAKEREDUNDANTE = "makeredundant";
     public static final String CLUSTER_ID = "clusterid";
     public static final String CLUSTER_NAME = "clustername";
     public static final String CLUSTER_TYPE = "clustertype";
