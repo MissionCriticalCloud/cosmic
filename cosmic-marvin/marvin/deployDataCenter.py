@@ -577,9 +577,7 @@ class DeployDataCenters(object):
         except Exception as e:
             self.__logger.exception("=== Create Zones Failed: %e ===" % e)
 
-    @staticmethod
-    @staticmethod
-    def isEipElbZone():
+    def isEipElbZone(self, zone):
         if zone.networktype == "Basic" and len(
                 filter(lambda x: x.typ == 'Public', zone.physical_networks[0].traffictypes)) > 0:
             return True
