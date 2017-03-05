@@ -1836,10 +1836,6 @@
                                         args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
                                     },
                                     fields: {
-                                        cleanup: {
-                                            label: 'label.clean.up',
-                                            isBoolean: true
-                                        }
                                     }
                                 },
                                 messages: {
@@ -1849,9 +1845,8 @@
                                 },
                                 action: function (args) {
                                     var array1 = [];
-                                    array1.push("&cleanup=" + (args.data.cleanup == "on"));
                                     $.ajax({
-                                        url: createURL("restartNetwork&id=" + args.context.networks[0].id + array1.join("")),
+                                        url: createURL("restartNetwork&cleanup=true&id=" + args.context.networks[0].id + array1.join("")),
                                         dataType: "json",
                                         async: true,
                                         success: function (json) {

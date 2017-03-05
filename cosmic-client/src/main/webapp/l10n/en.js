@@ -2059,7 +2059,7 @@ var dictionary = {
     "message.reset.password.warning.notStopped": "Your instance must be stopped before attempting to change its current password",
     "message.restart.mgmt.server": "Please restart your management server(s) for your new settings to take effect.",
     "message.restart.mgmt.usage.server": "Please restart your management server(s) and usage server(s) for your new settings to take effect.",
-    "message.restart.network": "All services provided by this network will be interrupted. Please confirm that you want to restart this network.",
+    "message.restart.network": "Please confirm that you want to restart the network with cleanup. This causes a few minutes of downtime.",
     "message.restart.vpc": "Please confirm that you want to restart the VPC with cleanup. This causes a few minutes of downtime.",
     "message.restoreVM": "Do you want to restore the VM ?",
     "message.security.group.usage": "(Use <strong>Ctrl-click</strong> to select all applicable security groups)",
