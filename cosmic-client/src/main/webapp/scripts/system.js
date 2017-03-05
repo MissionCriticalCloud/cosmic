@@ -5947,6 +5947,17 @@
                                             domainid: args.context.routerGroupByAccount[0].domainid
                                         })
                                     }
+                                    if ("networks" in args.context) {
+                                        $.extend(data2, {
+                                            networkid: args.context.networks[0].id
+                                        })
+                                    }
+                                    if ("vpc" in args.context) {
+                                        $.extend(data2, {
+                                            vpcid: args.context.vpc[0].id
+                                        })
+                                    }
+
                                 }
 
                                 var routers = [];
@@ -13640,13 +13651,13 @@
 
         if (jsonObj.state == 'Running') {
             allowedActions.push("stop");
-
             allowedActions.push("restart");
             allowedActions.push("remove");
-            allowedActions.push("viewConsole");
 
-            if (isAdmin())
+            if (isAdmin()) {
+                allowedActions.push("viewConsole");
                 allowedActions.push("migrate");
+            }
         } else if (jsonObj.state == 'Stopped') {
             allowedActions.push("start");
 
