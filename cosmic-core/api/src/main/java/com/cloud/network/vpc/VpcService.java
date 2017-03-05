@@ -112,11 +112,10 @@ public interface VpcService {
      *
      * @param id
      * @param cleanUp
-     * @param makeredundant
      * @return
      * @throws InsufficientCapacityException
      */
-    boolean restartVpc(long id, boolean cleanUp, boolean makeredundant) throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;
+    boolean restartVpc(long id, boolean cleanUp) throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;
 
     /**
      * Returns a Private gateway found in the VPC by id
