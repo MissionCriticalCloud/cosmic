@@ -75,6 +75,7 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.network.RemoteAccessVpn;
+import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
@@ -103,6 +104,7 @@ import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.lb.LoadBalancingRulesManager;
+import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
@@ -150,6 +152,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.net.NetUtils;
+import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
 import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicIpAlias;
@@ -162,6 +165,7 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
+import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicIpAliasVO;
@@ -297,6 +301,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     PortableIpDao _portableIpDao;
     @Inject
     ConfigDepot _configDepot;
+    @Inject
+    DomainRouterDao _routerDao;
+    @Inject
+    VpcVirtualNetworkApplianceService _routerService;
+
     ScheduledExecutorService _executor;
     SearchBuilder<IPAddressVO> AssignIpAddressSearch;
     SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
@@ -2323,6 +2332,12 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser, callerAccount);
 
         if (cleanup) {
+            if (_networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId()).getRedundantRouter()) {
+                List<DomainRouterVO> routers = _routerDao.findByNetwork(network.getId());
+                if (routers != null && !routers.isEmpty())
+                    return rollingRestartIsolatedNetwork(network, routers, context);
+            }
+
             // shutdown the network
             s_logger.debug("Shutting down the network id=" + networkId + " as a part of network restart");
 
@@ -2349,6 +2364,62 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             s_logger.warn("Failed to implement network " + network + " elements and resources as a part of network restart due to ", ex);
             return false;
         }
+    }
+
+    private boolean rollingRestartIsolatedNetwork(NetworkVO network, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException, ConcurrentOperationException, InsufficientCapacityException {
+        Account caller = CallContext.current().getCallingAccount();
+        long callerUserId = CallContext.current().getCallingUserId();
+
+        final int sleepTimeInMsAfterRouterStart = 10000;
+        final int numberOfRoutersWhenSingle = 1;
+        final int numberOfRoutersWhenRedundant = 2;
+
+        // check the master and backup redundant state
+        DomainRouterVO masterRouter = null;
+        DomainRouterVO backupRouter = null;
+        if (routers != null && routers.size() == numberOfRoutersWhenSingle) {
+            masterRouter = routers.get(0);
+        } if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
+            DomainRouterVO router1 = routers.get(0);
+            DomainRouterVO router2 = routers.get(1);
+            if (router1.getRedundantState() == RedundantState.MASTER || router2.getRedundantState() == RedundantState.BACKUP) {
+                masterRouter = router1;
+                backupRouter = router2;
+            } else if (router1.getRedundantState() == RedundantState.BACKUP || router2.getRedundantState() == RedundantState.MASTER) {
+                masterRouter = router2;
+                backupRouter = router1;
+            } else {
+                // both routers are in UNKNOWN state or in the same state. Order doesn't matter.
+                masterRouter = router1;
+                backupRouter = router2;
+            }
+        }
+
+        NetworkOfferingVO offering = _networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId());
+        DeployDestination dest = new DeployDestination(_dcDao.findById(network.getDataCenterId()), null, null, null);
+        List<Provider> providersToImplement = getNetworkProviders(network.getId());
+
+        // destroy backup router
+        if (backupRouter != null) {
+            _routerService.destroyRouter(backupRouter.getId(), caller, callerUserId);
+        }
+        // create new backup router
+        implementNetworkElements(dest, context, network, offering, providersToImplement);
+
+        // destroy master router
+        if (masterRouter != null) {
+            try {
+                // wait for the keepalived/conntrackd on router
+                Thread.sleep(sleepTimeInMsAfterRouterStart);
+            } catch (InterruptedException e) {
+                s_logger.trace("Ignoring InterruptedException.", e);
+            }
+            _routerService.destroyRouter(masterRouter.getId(), caller, callerUserId);
+            // create a new router
+            implementNetworkElements(dest, context, network, offering, providersToImplement);
+        }
+
+        return true;
     }
 
     @Override
@@ -2441,29 +2512,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
         // get providers to implement
         final List<Provider> providersToImplement = getNetworkProviders(network.getId());
-        for (final NetworkElement element : networkElements) {
-            if (providersToImplement.contains(element.getProvider())) {
-                if (!_networkModel.isProviderEnabledInPhysicalNetwork(_networkModel.getPhysicalNetworkId(network), element.getProvider().getName())) {
-                    // The physicalNetworkId will not get translated into a uuid by the reponse serializer,
-                    // because the serializer would look up the NetworkVO class's table and retrieve the
-                    // network id instead of the physical network id.
-                    // So just throw this exception as is. We may need to TBD by changing the serializer.
-                    throw new CloudRuntimeException("Service provider " + element.getProvider().getName() + " either doesn't exist or is not enabled in physical network id: "
-                            + network.getPhysicalNetworkId());
-                }
-
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Asking " + element.getName() + " to implemenet " + network);
-                }
-
-                if (!element.implement(network, offering, dest, context)) {
-                    final CloudRuntimeException ex = new CloudRuntimeException("Failed to implement provider " + element.getProvider().getName() + " for network with specified " +
-                            "id");
-                    ex.addProxyObject(network.getUuid(), "networkId");
-                    throw ex;
-                }
-            }
-        }
+        implementNetworkElements(dest, context, network, offering, providersToImplement);
 
         for (final NetworkElement element : networkElements) {
             if (element instanceof AggregatedCommandExecutor && providersToImplement.contains(element.getProvider())) {
@@ -2499,6 +2548,32 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             for (final NetworkElement element : networkElements) {
                 if (element instanceof AggregatedCommandExecutor && providersToImplement.contains(element.getProvider())) {
                     ((AggregatedCommandExecutor) element).cleanupAggregatedExecution(network, dest);
+                }
+            }
+        }
+    }
+
+    private void implementNetworkElements(final DeployDestination dest, final ReservationContext context, final Network network, final NetworkOffering offering, final List<Provider> providersToImplement) throws ResourceUnavailableException, InsufficientCapacityException {
+        for (final NetworkElement element : networkElements) {
+            if (providersToImplement.contains(element.getProvider())) {
+                if (!_networkModel.isProviderEnabledInPhysicalNetwork(_networkModel.getPhysicalNetworkId(network), element.getProvider().getName())) {
+                    // The physicalNetworkId will not get translated into a uuid by the reponse serializer,
+                    // because the serializer would look up the NetworkVO class's table and retrieve the
+                    // network id instead of the physical network id.
+                    // So just throw this exception as is. We may need to TBD by changing the serializer.
+                    throw new CloudRuntimeException("Service provider " + element.getProvider().getName() + " either doesn't exist or is not enabled in physical network id: "
+                            + network.getPhysicalNetworkId());
+                }
+
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Asking " + element.getName() + " to implemenet " + network);
+                }
+
+                if (!element.implement(network, offering, dest, context)) {
+                    final CloudRuntimeException ex = new CloudRuntimeException("Failed to implement provider " + element.getProvider().getName() + " for network with specified " +
+                            "id");
+                    ex.addProxyObject(network.getUuid(), "networkId");
+                    throw ex;
                 }
             }
         }
