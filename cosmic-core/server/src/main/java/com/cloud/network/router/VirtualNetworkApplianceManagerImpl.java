@@ -447,6 +447,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final List<ServiceOfferingVO> offerings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Software Router",
                 ServiceOffering.routerDefaultOffUniqueName, 1, _routerRamSize, _routerCpuMHz, null,
                 null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
+
+        final List<ServiceOfferingVO> SecondaryOfferings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Secundary Software Router",
+                ServiceOffering.routerDefaultSecondaryOffUniqueName, 1, _routerRamSize, _routerCpuMHz, null,
+                null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
+
         // this can sometimes happen, if DB is manually or programmatically manipulated
         if (offerings == null || offerings.size() < 2) {
             final String msg = "Data integrity problem : System Offering For Software router VM has been removed?";

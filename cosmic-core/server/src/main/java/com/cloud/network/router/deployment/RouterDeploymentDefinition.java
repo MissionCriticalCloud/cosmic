@@ -86,6 +86,7 @@ public class RouterDeploymentDefinition {
     protected DeploymentPlan plan;
     protected List<DomainRouterVO> routers = new ArrayList<>();
     protected Long serviceOfferingId;
+    protected Long secondaryServiceOfferingId;
     protected Long tableLockId;
     protected boolean isPublicNetwork;
     protected boolean isGateway = true;
@@ -100,6 +101,14 @@ public class RouterDeploymentDefinition {
 
     public Long getServiceOfferingId() {
         return serviceOfferingId;
+    }
+
+    public Long getSecondaryServiceOfferingId() {
+        if (secondaryServiceOfferingId != null) {
+            return secondaryServiceOfferingId;
+        } else {
+            return getServiceOfferingId();
+        }
     }
 
     public Vpc getVpc() {
@@ -358,6 +367,7 @@ public class RouterDeploymentDefinition {
         if (getNumberOfRoutersToDeploy() > 0 && prepareDeployment()) {
             findVirtualProvider();
             findServiceOfferingId();
+            findSecondaryServiceOfferingId();
             findSourceNatIP();
             deployAllVirtualRouters();
         }
@@ -380,6 +390,13 @@ public class RouterDeploymentDefinition {
         serviceOfferingId = networkOfferingDao.findById(guestNetwork.getNetworkOfferingId()).getServiceOfferingId();
         if (serviceOfferingId == null) {
             findDefaultServiceOfferingId();
+        }
+    }
+
+    protected void findSecondaryServiceOfferingId() {
+        secondaryServiceOfferingId = networkOfferingDao.findById(guestNetwork.getNetworkOfferingId()).getSecondaryServiceOfferingId();
+        if (secondaryServiceOfferingId == null) {
+            secondaryServiceOfferingId = serviceOfferingId;
         }
     }
 

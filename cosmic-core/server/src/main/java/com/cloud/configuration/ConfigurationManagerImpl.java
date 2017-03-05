@@ -2508,15 +2508,14 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         final Long serviceOfferingId = cmd.getServiceOfferingId();
+        final Long secondaryServiceOfferingId = cmd.getSecondaryServiceOfferingId();
 
         if (serviceOfferingId != null) {
-            final ServiceOfferingVO offering = _serviceOfferingDao.findById(serviceOfferingId);
-            if (offering == null) {
-                throw new InvalidParameterValueException("Cannot find specified service offering: " + serviceOfferingId);
-            }
-            if (!VirtualMachine.Type.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
-                throw new InvalidParameterValueException("The specified service offering " + serviceOfferingId + " cannot be used by virtual router!");
-            }
+            checkServiceOffering(serviceOfferingId);
+        }
+
+        if (secondaryServiceOfferingId != null) {
+            checkServiceOffering(secondaryServiceOfferingId);
         }
 
         // configure service provider map
@@ -2693,10 +2692,20 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         final NetworkOffering offering = createNetworkOffering(name, displayText, trafficType, tags, specifyVlan, availability, networkRate, serviceProviderMap, false,
-                guestType, false,
-                serviceOfferingId, conserveMode, serviceCapabilityMap, specifyIpRanges, isPersistent, details, egressDefaultPolicy, maxconn, enableKeepAlive);
+                guestType, false, serviceOfferingId, secondaryServiceOfferingId, conserveMode, serviceCapabilityMap, specifyIpRanges, isPersistent, details,
+                egressDefaultPolicy, maxconn, enableKeepAlive);
         CallContext.current().setEventDetails(" Id: " + offering.getId() + " Name: " + name);
         return offering;
+    }
+
+    private void checkServiceOffering(final Long serviceOfferingId) {
+        final ServiceOfferingVO offering = _serviceOfferingDao.findById(serviceOfferingId);
+        if (offering == null) {
+            throw new InvalidParameterValueException("Cannot find specified service offering: " + serviceOfferingId);
+        }
+        if (!VirtualMachine.Type.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
+            throw new InvalidParameterValueException("The specified service offering " + serviceOfferingId + " cannot be used by virtual router!");
+        }
     }
 
     void validateLoadBalancerServiceCapabilities(final Map<Capability, String> lbServiceCapabilityMap) {
@@ -3682,13 +3691,10 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @Override
     @DB
     public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan, final
-    Availability availability,
-                                                   final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap, final boolean isDefault, final Network
-            .GuestType type, final boolean systemOnly, final Long serviceOfferingId,
-                                                   final boolean conserveMode, final Map<Service, Map<Capability, String>> serviceCapabilityMap, final boolean specifyIpRanges,
-                                                   final boolean isPersistent,
-                                                   final Map<NetworkOffering.Detail, String> details, final boolean egressDefaultPolicy, final Integer maxconn, final boolean
-                                                           enableKeepAlive) {
+    Availability availability,  final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap, final boolean isDefault, final Network
+            .GuestType type, final boolean systemOnly, final Long serviceOfferingId, final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service,
+            Map<Capability, String>> serviceCapabilityMap, final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,
+            final boolean egressDefaultPolicy, final Integer maxconn, final boolean enableKeepAlive) {
 
         final String multicastRateStr = _configDao.getValue("multicast.throttling.rate");
         final int multicastRate = multicastRateStr == null ? 10 : Integer.parseInt(multicastRateStr);
@@ -3833,6 +3839,10 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (serviceOfferingId != null) {
             offeringFinal.setServiceOfferingId(serviceOfferingId);
+        }
+
+        if (secondaryServiceOfferingId != null) {
+            offeringFinal.setSecondaryServiceOfferingId(secondaryServiceOfferingId);
         }
 
         // validate the details

@@ -415,7 +415,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
                                                    final Availability availability,
                                                    final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap, final boolean isDefault, final GuestType
                                                            type, final boolean systemOnly,
-                                                   final Long serviceOfferingId,
+                                                   final Long serviceOfferingId, final Long secondaryServiceOfferingId,
                                                    final boolean conserveMode, final Map<Service, Map<Capability, String>> serviceCapabilityMap, final boolean specifyIpRanges,
                                                    final boolean isPersistent,
                                                    final Map<NetworkOffering.Detail, String> details, final boolean egressDefaultPolicy, final Integer maxconn, final boolean

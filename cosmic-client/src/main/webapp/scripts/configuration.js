@@ -3359,15 +3359,17 @@
                                     traffictype: {
                                         label: 'label.traffic.type'
                                     },
-                                    supportsstrechedl2subnet: {
-                                        label: 'label.supportsstrechedl2subnet',
-                                        converter: cloudStack.converters.toBooleanText
-                                    },
                                     supportedServices: {
                                         label: 'label.supported.services'
                                     },
                                     serviceCapabilities: {
                                         label: 'label.service.capabilities'
+                                    },
+                                    serviceofferingname: {
+                                        label: 'label.service.offering'
+                                    },
+                                    secondaryserviceofferingname: {
+                                        label: 'label.service.offering.secondary'
                                     },
                                     tags: {
                                         label: 'label.tags'
@@ -3929,21 +3931,15 @@
                                     serviceCapabilities: {
                                         label: 'label.service.capabilities'
                                     },
-                                    distributedvpcrouter: {
-                                        label: 'label.vpc.distributedvpcrouter',
-                                        converter: cloudStack.converters.toBooleanText
-                                    },
-                                    supportsregionLevelvpc: {
-                                        label: 'label.vpc.supportsregionlevelvpc',
-                                        converter: cloudStack.converters.toBooleanText
-                                    },
-                                    serviceCapabilities: {
-                                        label: 'label.service.capabilities'
-                                    },
                                     tags: {
                                         label: 'label.tags'
+                                    },
+                                    serviceofferingname: {
+                                        label: 'label.service.offering'
+                                    },
+                                    secondaryserviceofferingname: {
+                                        label: 'label.service.offering.secondary'
                                     }
-
                                 }],
 
                                 dataProvider: function (args) {

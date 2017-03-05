@@ -39,6 +39,7 @@ import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.resource.ResourceManager;
@@ -422,7 +423,24 @@ public class NetworkHelperImpl implements NetworkHelper {
             throws InsufficientAddressCapacityException, InsufficientServerCapacityException, InsufficientCapacityException, StorageUnavailableException,
             ResourceUnavailableException {
 
-        final ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
+        final List<DomainRouterVO> routers;
+        final boolean isRedundant;
+
+        if (routerDeploymentDefinition.isVpcRouter()) {
+            final Vpc vpc = routerDeploymentDefinition.getVpc();
+            routers = _routerDao.listByVpcId(vpc.getId());
+            isRedundant = vpc.isRedundant();
+        } else {
+            final Network guestnetwork = routerDeploymentDefinition.getGuestNetwork();
+            routers = _routerDao.listByNetworkAndRole(guestnetwork.getId(), Role.VIRTUAL_ROUTER);
+            isRedundant = guestnetwork.isRedundant();
+        }
+
+        ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
+        if (isRedundant && routers.size() % 2 == 0) {
+            routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getSecondaryServiceOfferingId());
+        }
+
         _serviceOfferingDao.loadDetails(routerOffering);
         final String serviceofferingHypervisor = routerOffering.getDetail("hypervisor");
         if (serviceofferingHypervisor != null && !serviceofferingHypervisor.isEmpty()) {

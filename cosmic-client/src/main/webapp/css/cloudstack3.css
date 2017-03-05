@@ -1909,7 +1909,7 @@ span.compact {
     position: relative;
     top: 9px;
     float: left;
-    width: 345px;
+    width: 95%;
 }
 
 .detail-group .main-groups table td.value > span.copypasteenabledvalue {
@@ -6365,11 +6365,11 @@ label.error {
 }
 
 .instance-wizard .step.service-offering.custom-size .select-container {
-    height: 235px;
+    height: 400px;
 }
 
 .instance-wizard .step.service-offering.custom-iops .select-container {
-    height: 235px;
+    height: 400px;
 }
 
 .instance-wizard .step.service-offering .custom-size {
@@ -10859,7 +10859,7 @@ div.container div.panel div#details-tab-addloadBalancer.detail-group div.loadBal
 }
 
 .tagger ul li span.label > span.value {
-    max-width: 160px;
+    max-width: 300px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

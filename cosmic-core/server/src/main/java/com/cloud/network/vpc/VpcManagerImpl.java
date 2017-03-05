@@ -62,12 +62,14 @@ import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
 import com.cloud.network.vpc.dao.VpcServiceMapDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
+import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.org.Grouping;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ResourceTag.ResourceObjectType;
+import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
@@ -203,6 +205,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     IpAddressManager _ipAddrMgr;
     @Inject
     ConfigDepot _configDepot;
+    @Inject
+    ServiceOfferingDao _serviceOfferingDao;
     int _cleanupInterval;
     int _maxNetworks;
     SearchBuilder<IPAddressVO> IpAddressSearch;
@@ -229,7 +233,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.defaultVPCOfferingName, VpcOffering.defaultVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, false, false, false);
+                            true, State.Enabled, null, null, false, false, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayVPCOfferingName) == null) {
@@ -237,7 +241,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_SERVICES);
                     createVpcOffering(VpcOffering.defaultRemoteGatewayVPCOfferingName, VpcOffering.defaultRemoteGatewayVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, false, false, false);
+                            true, State.Enabled, null, null, false, false, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName) == null) {
@@ -245,7 +249,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_WITH_VPN_SERVICES);
                     createVpcOffering(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, false, false, false);
+                            true, State.Enabled, null, null, false, false, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultInternalVPCOfferingName) == null) {
@@ -253,15 +257,27 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(INTERNAL_VPC_SERVICES);
                     createVpcOffering(VpcOffering.defaultInternalVPCOfferingName, VpcOffering.defaultInternalVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, false, false, false);
+                            true, State.Enabled, null, null, false, false, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.redundantVPCOfferingName) == null) {
                     s_logger.debug("Creating VPC offering " + VpcOffering.redundantVPCOfferingName);
 
+                    // Link the default Redundant VPC offering to the two default router offerings
+                    final ServiceOffering serviceOffering = _serviceOfferingDao.findByName(ServiceOffering.routerDefaultOffUniqueName);
+                    final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findByName(ServiceOffering.routerDefaultSecondaryOffUniqueName);
+                    Long serviceOfferingId = null;
+                    Long secondaryServiceOfferingId = null;
+                    if (serviceOffering != null) {
+                        serviceOfferingId = serviceOffering.getId();
+                    }
+                    if (secondaryServiceOffering != null) {
+                        secondaryServiceOfferingId = secondaryServiceOffering.getId();
+                    }
+
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.redundantVPCOfferingName, VpcOffering.redundantVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, false, false, true);
+                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId, false, false, true);
                 }
             }
         });
@@ -354,15 +370,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @DB
     private VpcOffering createVpcOffering(final String name, final String displayText,
                                           final Map<Network.Service, Set<Network.Provider>> svcProviderMap,
-                                          final boolean isDefault, final State state, final Long serviceOfferingId, final boolean supportsDistributedRouter,
-                                          final boolean offersRegionLevelVPC,
-                                          final boolean redundantRouter) {
+                                          final boolean isDefault, final State state, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
+                                          final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC, final boolean redundantRouter) {
 
         return Transaction.execute(new TransactionCallback<VpcOffering>() {
             @Override
             public VpcOffering doInTransaction(final TransactionStatus status) {
                 // create vpc offering object
-                VpcOfferingVO offering = new VpcOfferingVO(name, displayText, isDefault, serviceOfferingId,
+                VpcOfferingVO offering = new VpcOfferingVO(name, displayText, isDefault, serviceOfferingId, secondaryServiceOfferingId,
                         supportsDistributedRouter, offersRegionLevelVPC, redundantRouter);
 
                 if (state != null) {
@@ -409,7 +424,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             create = true)
     public VpcOffering createVpcOffering(final String name, final String displayText,
                                          final List<String> supportedServices, final Map<String, List<String>> serviceProviders,
-                                         final Map serviceCapabilitystList, final Long serviceOfferingId) {
+                                         final Map serviceCapabilitystList, final Long serviceOfferingId, final Long secondaryServiceOfferingId) {
 
         final Map<Network.Service, Set<Network.Provider>> svcProviderMap = new HashMap<>();
         final Set<Network.Provider> defaultProviders = new HashSet<>();
@@ -474,9 +489,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final boolean supportsDistributedRouter = isVpcOfferingSupportsDistributedRouter(serviceCapabilitystList);
         final boolean offersRegionLevelVPC = isVpcOfferingForRegionLevelVpc(serviceCapabilitystList);
         final boolean redundantRouter = isVpcOfferingRedundantRouter(serviceCapabilitystList);
-        final VpcOffering offering = createVpcOffering(name, displayText, svcProviderMap, false, null, serviceOfferingId,
-                supportsDistributedRouter, offersRegionLevelVPC,
-                redundantRouter);
+        final VpcOffering offering = createVpcOffering(name, displayText, svcProviderMap, false, null, serviceOfferingId, secondaryServiceOfferingId,
+                supportsDistributedRouter, offersRegionLevelVPC, redundantRouter);
         CallContext.current().setEventDetails(" Id: " + offering.getId() + " Name: " + name);
 
         return offering;
