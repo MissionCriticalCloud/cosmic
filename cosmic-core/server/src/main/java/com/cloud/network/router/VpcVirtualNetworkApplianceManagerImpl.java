@@ -560,7 +560,11 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             final PrivateIpVO ipVO = _privateIpDao.findByIpAndSourceNetworkId(privateNic.getNetworkId(), privateNic.getIPv4Address());
             final Network network = _networkDao.findById(privateNic.getNetworkId());
             final String netmask = NetUtils.getCidrNetmask(network.getCidr());
-            final PrivateIpAddress ip = new PrivateIpAddress(ipVO, network.getBroadcastUri().toString(), network.getGateway(), netmask, privateNic.getMacAddress());
+            String broadcastUri = "";
+            if (network.getBroadcastUri() != null) {
+                broadcastUri = network.getBroadcastUri().toString();
+            }
+            final PrivateIpAddress ip = new PrivateIpAddress(ipVO, broadcastUri, network.getGateway(), netmask, privateNic.getMacAddress());
 
             final Commands cmds = new Commands(Command.OnError.Stop);
             _commandSetupHelper.createSetupPrivateGatewayCommand(router, ip, cmds, privateNic, add);
