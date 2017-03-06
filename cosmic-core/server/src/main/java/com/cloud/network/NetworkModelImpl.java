@@ -1835,7 +1835,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     public List<String> getExcludedIpsInNetwork(Network network) {
-        return NetUtils.getAllExcludedIps(((NetworkVO) network).getIpExclusionList());
+        return NetUtils.getAllIpsFromRangeList(((NetworkVO) network).getIpExclusionList());
     }
 
     @Override

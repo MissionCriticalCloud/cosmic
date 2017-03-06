@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 
@@ -584,15 +583,15 @@ public class NetUtilsTest {
     }
 
     @Test
-    public void testGetAllExcludedIps() {
-        List<String> ips = NetUtils.getAllExcludedIps("10.0.0.1-10.0.0.3,10.0.0.7");
+    public void testGetAllIpsFromRangeList() {
+        List<String> ips = NetUtils.getAllIpsFromRangeList("10.0.0.1-10.0.0.3,10.0.0.7");
         Assert.assertEquals(ips.get(0), "10.0.0.1");
         Assert.assertEquals(ips.get(1), "10.0.0.2");
         Assert.assertEquals(ips.get(2), "10.0.0.3");
         Assert.assertEquals(ips.get(3), "10.0.0.7");
         assertTrue(ips.size() == 4);
 
-        ips = NetUtils.getAllExcludedIps(null);
+        ips = NetUtils.getAllIpsFromRangeList(null);
         assertTrue(ips.isEmpty());
 
     }

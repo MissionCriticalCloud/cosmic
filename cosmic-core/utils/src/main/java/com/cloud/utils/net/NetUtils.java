@@ -1190,7 +1190,7 @@ public class NetUtils {
         return null;
     }
 
-    public static List<String> getAllExcludedIps(final String excludedIpsS) {
+    public static List<String> getAllIpsFromRangeList(final String excludedIpsS) {
 
         if (StringUtils.isEmpty(excludedIpsS)) {
             return Collections.emptyList();
