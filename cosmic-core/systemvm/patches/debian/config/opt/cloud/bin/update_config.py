@@ -56,87 +56,12 @@ def process_vmpasswd():
     print("[INFO] Sending password to password server")
     CsPassword(qf.getData())
 
-
-def is_guestnet_configured(guestnet_dict):
-    existing_keys = []
-
-    # Any interface is OK, except the control interface
-    for k1, v1 in guestnet_dict.iteritems():
-        if k1 is not "eth0" and len(v1) > 0:
-            existing_keys.append(k1)
-
-    if not existing_keys:
-        '''
-        It seems all the interfaces have been removed. Let's allow a new configuration to come in.
-        '''
-        print("[WARN] update_config.py :: Reconfiguring guest network...")
-        return False
-
-    fn = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
-    file = open(fn)
-    new_guestnet_dict = json.load(file)
-
-    if not new_guestnet_dict['add']:
-        '''
-        Guest network has to be removed.
-        '''
-        print("[INFO] update_config.py :: Removing guest network...")
-        return False
-
-    '''
-    Check if we have a new guest network ready to be setup
-    '''
-    device = new_guestnet_dict['device']
-
-    if device in existing_keys:
-        '''
-        Device already configured, ignore.
-        '''
-        return True
-
-    exists = False
-
-    for key in existing_keys:
-        for interface in guestnet_dict[key]:
-            if type(interface) is dict and type(new_guestnet_dict) is dict:
-                new_mac = new_guestnet_dict["mac_address"].encode('utf-8')
-                old_mac = interface["mac_address"].encode('utf-8')
-                new_ip = new_guestnet_dict["router_guest_ip"].encode('utf-8')
-                old_ip = interface["router_guest_ip"].encode('utf-8')
-
-                if (new_mac == old_mac) and (new_ip == old_ip):
-                    exists = True
-                    break
-
-        if exists:
-            break
-
-    return exists
-
-
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
 if not (os.path.isfile(filename) and os.access(filename, os.R_OK)):
     print("[ERROR] update_config.py :: You are telling me to process %s, but i can't access it" % jsonCmdConfigPath)
     sys.exit(1)
 
-# If the guest network is already configured and have the same IP,
-# do not try to configure it again otherwise it will break
-if sys.argv[1] and sys.argv[1].count("guest_network.json") == OCCURRENCES:
-    if os.path.isfile(currentGuestNetConfig):
-        file = open(currentGuestNetConfig)
-        guestnet_dict = json.load(file)
-
-        if not is_guestnet_configured(guestnet_dict):
-            print("[INFO] update_config.py :: Processing Guest Network.")
-            process_file()
-        else:
-            print("[INFO] update_config.py :: No need to process Guest Network.")
-            finish_config()
-    else:
-        print("[INFO] update_config.py :: No GuestNetwork configured yet. Configuring first one now.")
-        process_file()
-# Bypass saving passwords and running full config/convergence, just feed passwd to passwd server and stop
-elif sys.argv[1].startswith("vm_password.json"):
+if sys.argv[1].startswith("vm_password.json"):
     print("[INFO] update_config.py :: Processing incoming vm_passwd file => %s" % sys.argv[1])
     process_vmpasswd()
 else:
