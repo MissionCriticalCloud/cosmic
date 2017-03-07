@@ -6,34 +6,34 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>5.3.3.0-SNAPSHOT</version>
+        <version>5.3.3.0</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-nucleo</artifactId>
-            <version>5.3.3.0-SNAPSHOT</version>
+            <version>5.3.3.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.3.3.0-SNAPSHOT</version>
+            <version>5.3.3.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
-            <version>5.3.3.0-SNAPSHOT</version>
+            <version>5.3.3.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-secondary-storage</artifactId>
-            <version>5.3.3.0-SNAPSHOT</version>
+            <version>5.3.3.0</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-console-proxy</artifactId>
-            <version>5.3.3.0-SNAPSHOT</version>
+            <version>5.3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
