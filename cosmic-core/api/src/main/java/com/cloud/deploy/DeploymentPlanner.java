@@ -196,11 +196,11 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (! podIds.isEmpty() && podIds.contains(podId)) {
+            if (podId != null && ! podIds.isEmpty() && podIds.contains(podId)) {
                 return true;
             }
 
-            if (! clusterIds.isEmpty() && clusterIds.contains(clusterId)) {
+            if (clusterId != null && ! clusterIds.isEmpty() && clusterIds.contains(clusterId)) {
                 return true;
             }
 
