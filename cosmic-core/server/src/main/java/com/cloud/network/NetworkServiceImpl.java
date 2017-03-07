@@ -867,7 +867,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 cidr = NetUtils.ipAndNetMaskToCidr(gateway, netmask);
             }
 
-            checkIpExclusionList(ipExclusionList, cidr);
+            checkIpExclusionList(ipExclusionList, cidr, null);
         }
 
         if (ipv6) {
@@ -1000,7 +1000,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return network;
     }
 
-    private void checkIpExclusionList(final String ipExclusionList, final String cidr) {
+    public void checkIpExclusionList(final String ipExclusionList, final String cidr, List<NicVO> nicsPresent) {
         if (!org.apache.commons.lang.StringUtils.isEmpty(ipExclusionList)) {
             // validate ipExclusionList
             // Perform a "syntax" check on the list
@@ -1009,7 +1009,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             final List<String> excludedIps = NetUtils.getAllIpsFromRangeList(ipExclusionList);
-            final String[] excludedIpsRangeDelimiters = ipExclusionList.split(",-");
+            final String[] excludedIpsRangeDelimiters = ipExclusionList.split("[,-]");
 
             if (cidr != null) {
                 //Check that ipExclusionList (delimiters) is within the CIDR
@@ -1022,6 +1022,19 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 //Check that at least one IP (gateway) is available after exclusion?
                 if( NetUtils.countIpsInCidr(cidr) <= excludedIps.size() ){
                     throw new InvalidParameterValueException("More IPs in exclusion list then available in CIDR; at least one needs to be available");
+                }
+            }
+
+            if (nicsPresent != null) {
+                // Check that no existing nics/ips are part of the exclusion list
+                for (final NicVO nic : nicsPresent) {
+                    final String nicIp = nic.getIPv4Address();
+                    //check if nic IP is exclusionList
+                    if (excludedIps.contains(nicIp)) {
+                        if (!(nic.getState() == Nic.State.Deallocating)) {
+                            throw new InvalidParameterValueException("Active IP " + nic.getIPv4Address() + " exist in ipExclusionList.");
+                        }
+                    }
                 }
             }
 
@@ -1621,6 +1634,13 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         if (ipExclusionList != null) {
+            String networkCidr = null;
+            if (guestVmCidr == null) {
+                networkCidr = network.getNetworkCidr();
+            }
+
+            final List<NicVO> nicsPresent = _nicDao.listByNetworkId(networkId);
+            checkIpExclusionList(ipExclusionList, networkCidr, nicsPresent);
             network.setIpExclusionList(ipExclusionList);
         }
 
@@ -1814,6 +1834,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 s_logger.warn("Guest VM CIDR and Network CIDR both are same, reservation will reset.");
                 network.setNetworkCidr(null);
             }
+            checkIpExclusionList(ipExclusionList, guestVmCidr, null);
             // Finally update "cidr" with the guestVmCidr
             // which becomes the effective address space for CloudStack guest VMs
             network.setCidr(guestVmCidr);
