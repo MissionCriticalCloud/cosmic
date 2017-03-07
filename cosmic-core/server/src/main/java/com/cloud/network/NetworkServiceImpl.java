@@ -1009,14 +1009,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             final List<String> excludedIps = NetUtils.getAllIpsFromRangeList(ipExclusionList);
-            final String[] excludedIpsRangeDelimiters = ipExclusionList.split("[,-]");
 
             if (cidr != null) {
                 //Check that ipExclusionList (delimiters) is within the CIDR
-                for (String ip : excludedIpsRangeDelimiters){
-                    if(!NetUtils.isIpWithtInCidrRange(ip, cidr)){
-                        throw new InvalidParameterValueException("An IP in the ipExclusionList " + ip + " is not part of the CIDR of the network " + cidr);
-                    }
+                if(!NetUtils.isIpRangeListInCidr(ipExclusionList,cidr)){
+                    throw new InvalidParameterValueException("An IP in the ipExclusionList is not part of the CIDR of the network " + cidr);
                 }
 
                 //Check that at least one IP (gateway) is available after exclusion?

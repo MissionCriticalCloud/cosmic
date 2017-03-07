@@ -643,4 +643,11 @@ public class NetUtilsTest {
         assertTrue(NetUtils.validIpRangeList("1.1.1.1,2.2.2.2-3.3.3.3,4.4.4.4"));
 
     }
+
+    @Test
+    public void testIsIpRangeListInCidr() {
+        assertTrue(NetUtils.isIpRangeListInCidr("10.0.0.1,10.0.0.3-10.0.0.6", "10.0.0.0/29"));
+        assertFalse(NetUtils.isIpRangeListInCidr("10.0.0.1-10.0.0.8", "10.0.0.0/29"));
+
+    }
 }

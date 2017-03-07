@@ -1225,6 +1225,17 @@ public class NetUtils {
         return result;
     }
 
+    public static Boolean isIpRangeListInCidr( final String ipRangeListS, final String cidr ) {
+        final String[] excludedIpsRangeDelimiters = ipRangeListS.split("[,-]");
+
+        for (String ip : excludedIpsRangeDelimiters){
+            if(!NetUtils.isIpWithtInCidrRange(ip, cidr)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Can cover 127 bits
     public static BigInteger countIp6InRange(final String ip6Range) {
         if (ip6Range == null) {
