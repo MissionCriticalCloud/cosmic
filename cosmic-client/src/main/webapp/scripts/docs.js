@@ -883,6 +883,10 @@ cloudStack.docs = {
         externalLink: ''
     },
     // Add tier
+    helpTierIpExclusionList: {
+        desc: 'A comma separated list of IP addresses ("ip,ip,...") or ranges ("ip_start-ip_end,ip_start-ip_end,..."), or any combination. For example "10.0.0.1,10.0.0.3-10.0.0.5,10.0.0.8"',
+        externalLink: ''
+    },
     helpTierName: {
         desc: 'A unique name for the tier',
         externalLink: ''
