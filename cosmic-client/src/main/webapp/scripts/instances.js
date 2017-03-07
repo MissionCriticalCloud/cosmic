@@ -148,8 +148,8 @@
                 ipaddress: {
                     label: 'label.ip.address'
                 },
-                zonename: {
-                    label: 'label.zone.name'
+                hostname: {
+                        label: 'label.hypervisor'
                 },
                 state: {
                     label: 'label.state',
