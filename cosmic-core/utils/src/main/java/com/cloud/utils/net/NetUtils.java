@@ -1,7 +1,5 @@
 package com.cloud.utils.net;
 
-import static org.apache.commons.lang.StringUtils.split;
-
 import com.cloud.utils.IteratorUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -33,7 +31,6 @@ import java.util.regex.Pattern;
 import com.googlecode.ipv6.IPv6Address;
 import com.googlecode.ipv6.IPv6AddressRange;
 import com.googlecode.ipv6.IPv6Network;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -573,28 +570,35 @@ public class NetUtils {
     }
 
     public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final long size, final Set<Long> usedIps) {
-        assert size < MAX_CIDR : "You do know this is not for ipv6 right?  Keep it smaller than 32 but you have " + size;
         final SortedSet<Long> result = new TreeSet<>();
-        final long ip = ip2Long(cidr);
-        final long startNetMask = ip2Long(getCidrNetmask(size));
-        long start = (ip & startNetMask) + 1;
-        long end = start;
+        long start = ip2Long( getIpRangeStartIpFromCidr(cidr, size) );
+        long end = ip2Long( getIpRangeEndIpFromCidr(cidr,size));
 
-        end = end >> MAX_CIDR - size;
-
-        end++;
-        end = (end << MAX_CIDR - size) - 2;
-        int maxIps = 255; // get 255 ips as maximum
-        while (start <= end && maxIps > 0) {
+        while (start <= end ) {
             if (!usedIps.contains(start)) {
                 result.add(start);
-                maxIps--;
             }
             start++;
         }
 
         return result;
     }
+
+    public static Long countIpsInCidr(final String cidr) {
+        final String cidrNet = cidr.split("/")[0];
+        final Long cidrMask = Long.parseLong(cidr.split("/")[1]);
+
+        return countIpsInCidr(cidrNet, cidrMask);
+    }
+
+    public static Long countIpsInCidr(final String cidr_ip, final long size) {
+        long start = ip2Long( getIpRangeStartIpFromCidr(cidr_ip, size) );
+        long end = ip2Long( getIpRangeEndIpFromCidr(cidr_ip,size));
+
+        return end-start+1;
+    }
+
+
 
     /**
      * Given a cidr, this method returns an ip address within the range but

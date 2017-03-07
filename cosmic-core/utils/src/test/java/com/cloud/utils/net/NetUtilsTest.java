@@ -16,7 +16,9 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -233,6 +235,33 @@ public class NetUtilsTest {
         assertTrue(NetUtils.isValidCIDR(cidrSecond));
         assertTrue(NetUtils.isValidCIDR(cidrThird));
     }
+
+    @Test
+    public void testGetAllIpsFromCidr() throws Exception {
+        final Set<Long> emptyList = new HashSet<>();
+
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 24L, emptyList).size() == 254);
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 25L, emptyList).size() == 126);
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 30L, emptyList).size() == 2);
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 31L, emptyList).size() == 0);
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 32L, emptyList).size() == 0);
+
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 23L, emptyList).size() == 510);
+        assertTrue(NetUtils.getAllIpsFromCidr( "10.0.0.0", 16L, emptyList).size() == 65534);
+
+    }
+
+    @Test
+    public void testCountIpsInCidr() throws Exception {
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0/24") == 254);
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0/30") == 2);
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0/31") == 0);
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0", 32L) == 0);
+
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0", 23L) == 510);
+        assertTrue(NetUtils.countIpsInCidr( "10.0.0.0", 16L) == 65534);
+    }
+
 
     @Test
     public void testIsValidCidrList() throws Exception {
