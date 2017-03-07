@@ -23,49 +23,6 @@ import java.util.Map;
 public class Zone extends com.cloud.model.Zone {
 
     @Access(AccessType.PROPERTY)
-    @Column(name = "allocation_state")
-    @Enumerated(value = EnumType.STRING)
-    public AllocationState getAllocationState() {
-        return super.getAllocationState();
-    }
-
-    @Access(AccessType.PROPERTY)
-    @Column(name = "is_local_storage_enabled")
-    public boolean isLocalStorageEnabled() {
-        return super.isLocalStorageEnabled();
-    }
-
-    @Access(AccessType.PROPERTY)
-    @Column(name = "is_security_group_enabled")
-    public boolean isSecurityGroupEnabled() {
-        return super.isSecurityGroupEnabled();
-    }
-
-    @Transient
-    public Map<String, String> getDetails() {
-        return super.getDetails();
-    }
-
-    @Access(AccessType.PROPERTY)
-    @Column(name = "networktype")
-    @Enumerated(EnumType.STRING)
-    public NetworkType getNetworkType() {
-        return super.getNetworkType();
-    }
-
-    @Access(AccessType.PROPERTY)
-    @Column(name = "removed")
-    public Date getRemoved() {
-        return super.getRemoved();
-    }
-
-    @Access(AccessType.PROPERTY)
-    @Column(name = "domain_id")
-    public Long getDomainId() {
-        return super.getDomainId();
-    }
-
-    @Access(AccessType.PROPERTY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -74,9 +31,15 @@ public class Zone extends com.cloud.model.Zone {
     }
 
     @Access(AccessType.PROPERTY)
-    @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
-    public long getMacAddress() {
-        return super.getMacAddress();
+    @Column(name = "allocation_state")
+    @Enumerated(value = EnumType.STRING)
+    public AllocationState getAllocationState() {
+        return super.getAllocationState();
+    }
+
+    @Transient
+    public Map<String, String> getDetails() {
+        return super.getDetails();
     }
 
     @Access(AccessType.PROPERTY)
@@ -107,6 +70,12 @@ public class Zone extends com.cloud.model.Zone {
     @Column(name = "dns_provider")
     public String getDnsProvider() {
         return super.getDnsProvider();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "domain_id")
+    public Long getDomainId() {
+        return super.getDomainId();
     }
 
     @Access(AccessType.PROPERTY)
@@ -164,9 +133,47 @@ public class Zone extends com.cloud.model.Zone {
     }
 
     @Access(AccessType.PROPERTY)
+    @Column(name = "is_local_storage_enabled")
+    public boolean isLocalStorageEnabled() {
+        return super.isLocalStorageEnabled();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "mac_address", nullable = false)
+    @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
+    public long getMacAddress() {
+        return super.getMacAddress();
+    }
+
+    @Access(AccessType.PROPERTY)
     @Column(name = "name")
     public String getName() {
         return super.getName();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "networktype")
+    @Enumerated(EnumType.STRING)
+    public NetworkType getNetworkType() {
+        return super.getNetworkType();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "removed")
+    public Date getRemoved() {
+        return super.getRemoved();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "router_mac_address", updatable = false, nullable = false)
+    public String getRouterMacAddress() {
+        return super.getRouterMacAddress();
+    }
+
+    @Access(AccessType.PROPERTY)
+    @Column(name = "is_security_group_enabled")
+    public boolean isSecurityGroupEnabled() {
+        return super.isSecurityGroupEnabled();
     }
 
     @Access(AccessType.PROPERTY)

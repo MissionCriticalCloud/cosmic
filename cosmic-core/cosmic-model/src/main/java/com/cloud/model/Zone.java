@@ -8,20 +8,15 @@ import java.util.Map;
 
 public class Zone {
 
-    AllocationState allocationState;
-    boolean localStorageEnabled;
-    boolean securityGroupEnabled;
-    Map<String, String> details;
-    NetworkType networkType;
-    private Date removed;
-    private Long domainId;
     private long id;
-    private long macAddress;
+    private AllocationState allocationState;
+    private Map<String, String> details;
     private String description;
     private String dhcpProvider;
     private String dns1;
     private String dns2;
     private String dnsProvider;
+    private Long domainId;
     private String domain;
     private String firewallProvider;
     private String gatewayProvider;
@@ -31,49 +26,24 @@ public class Zone {
     private String ip6Dns1;
     private String ip6Dns2;
     private String loadBalancerProvider;
+    private boolean localStorageEnabled;
+    private long macAddress = 1;
     private String name;
+    private NetworkType networkType;
+    private Date removed;
+    private String routerMacAddress = "02:00:00:00:00:01";
+    private boolean securityGroupEnabled;
     private String userDataProvider;
     private String uuid;
     private String vpnProvider;
     private String zoneToken;
 
-    public Zone() {
+    public long getId() {
+        return id;
     }
 
-    public Zone(final AllocationState allocationState, final boolean localStorageEnabled, final boolean securityGroupEnabled, final Map<String, String> details, final
-    NetworkType networkType, final Date removed, final Long domainId, final long id, final long macAddress, final String description, final String dhcpProvider, final String
-                        dns1, final String dns2, final String dnsProvider, final String domain, final String firewallProvider, final String gatewayProvider, final String
-                        guestNetworkCidr,
-                final String internalDns1, final String internalDns2, final String ip6Dns1, final String ip6Dns2, final String loadBalancerProvider, final String name, final
-                String userDataProvider, final String uuid, final String vpnProvider, final String zoneToken) {
-        this.allocationState = allocationState;
-        this.localStorageEnabled = localStorageEnabled;
-        this.securityGroupEnabled = securityGroupEnabled;
-        this.details = details;
-        this.networkType = networkType;
-        this.removed = removed;
-        this.domainId = domainId;
+    public void setId(final long id) {
         this.id = id;
-        this.macAddress = macAddress;
-        this.description = description;
-        this.dhcpProvider = dhcpProvider;
-        this.dns1 = dns1;
-        this.dns2 = dns2;
-        this.dnsProvider = dnsProvider;
-        this.domain = domain;
-        this.firewallProvider = firewallProvider;
-        this.gatewayProvider = gatewayProvider;
-        this.guestNetworkCidr = guestNetworkCidr;
-        this.internalDns1 = internalDns1;
-        this.internalDns2 = internalDns2;
-        this.ip6Dns1 = ip6Dns1;
-        this.ip6Dns2 = ip6Dns2;
-        this.loadBalancerProvider = loadBalancerProvider;
-        this.name = name;
-        this.userDataProvider = userDataProvider;
-        this.uuid = uuid;
-        this.vpnProvider = vpnProvider;
-        this.zoneToken = zoneToken;
     }
 
     public AllocationState getAllocationState() {
@@ -84,68 +54,12 @@ public class Zone {
         this.allocationState = allocationState;
     }
 
-    public boolean isLocalStorageEnabled() {
-        return localStorageEnabled;
-    }
-
-    public void setLocalStorageEnabled(final boolean localStorageEnabled) {
-        this.localStorageEnabled = localStorageEnabled;
-    }
-
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
-
-    public void setSecurityGroupEnabled(final boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
-    }
-
     public Map<String, String> getDetails() {
         return details;
     }
 
     public void setDetails(final Map<String, String> details) {
         this.details = details;
-    }
-
-    public NetworkType getNetworkType() {
-        return networkType;
-    }
-
-    public void setNetworkType(final NetworkType networkType) {
-        this.networkType = networkType;
-    }
-
-    public Date getRemoved() {
-        return removed;
-    }
-
-    public void setRemoved(final Date removed) {
-        this.removed = removed;
-    }
-
-    public Long getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(final Long domainId) {
-        this.domainId = domainId;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    public long getMacAddress() {
-        return macAddress;
-    }
-
-    public void setMacAddress(final long macAddress) {
-        this.macAddress = macAddress;
     }
 
     public String getDescription() {
@@ -186,6 +100,14 @@ public class Zone {
 
     public void setDnsProvider(final String dnsProvider) {
         this.dnsProvider = dnsProvider;
+    }
+
+    public Long getDomainId() {
+        return domainId;
+    }
+
+    public void setDomainId(final Long domainId) {
+        this.domainId = domainId;
     }
 
     public String getDomain() {
@@ -260,12 +182,60 @@ public class Zone {
         this.loadBalancerProvider = loadBalancerProvider;
     }
 
+    public boolean isLocalStorageEnabled() {
+        return localStorageEnabled;
+    }
+
+    public void setLocalStorageEnabled(final boolean localStorageEnabled) {
+        this.localStorageEnabled = localStorageEnabled;
+    }
+
+    public long getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(final long macAddress) {
+        this.macAddress = macAddress;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public NetworkType getNetworkType() {
+        return networkType;
+    }
+
+    public void setNetworkType(final NetworkType networkType) {
+        this.networkType = networkType;
+    }
+
+    public Date getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(final Date removed) {
+        this.removed = removed;
+    }
+
+    public String getRouterMacAddress() {
+        return routerMacAddress;
+    }
+
+    public void setRouterMacAddress(final String routerMacAddress) {
+        this.routerMacAddress = routerMacAddress;
+    }
+
+    public boolean isSecurityGroupEnabled() {
+        return securityGroupEnabled;
+    }
+
+    public void setSecurityGroupEnabled(final boolean securityGroupEnabled) {
+        this.securityGroupEnabled = securityGroupEnabled;
     }
 
     public String getUserDataProvider() {

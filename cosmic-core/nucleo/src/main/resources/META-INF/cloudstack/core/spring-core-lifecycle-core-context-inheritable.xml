@@ -1,7 +1,10 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"
 >
 
     <bean class="com.cloud.spring.lifecycle.registry.RegistryLifecycle">
@@ -11,8 +14,29 @@
 
     <bean class="com.cloud.spring.lifecycle.registry.PluggableServiceLifecycle">
         <property name="registry" ref="apiCommandsRegistry" />
-        <property name="typeClass"
-                  value="com.cloud.utils.component.PluggableService" />
+        <property name="typeClass" value="com.cloud.utils.component.PluggableService" />
+    </bean>
+
+    <context:property-placeholder location="file:///etc/cosmic/management/db.properties" />
+    <jpa:repositories base-package="com.cloud.db.repository" />
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+        <property name="url" value="jdbc:mariadb://${db.cloud.host}:${db.cloud.port}/${db.cloud.name}" />
+        <property name="username" value="${db.cloud.username}" />
+        <property name="password" value="${db.cloud.password}" />
+    </bean>
+
+    <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+        <property name="packagesToScan" value="com.cloud.db.model" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
 
 </beans>
