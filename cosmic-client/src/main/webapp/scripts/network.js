@@ -1661,6 +1661,12 @@
                                         });
                                     }
 
+                                    if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.networks[0].ipexclusionlist) {
+                                        $.extend(data, {
+                                            ipexclusionlist: args.data.ipexclusionlist
+                                        });
+                                    }
+
                                     var oldcidr;
                                     $.ajax({
                                         url: createURL("listNetworks&id=" + args.context.networks[0].id + "&listAll=true"),
@@ -2078,6 +2084,11 @@
 
                                     networkcidr: {
                                         label: 'label.network.cidr'
+                                    },
+
+                                    ipexclusionlist: {
+                                        label: 'label.ipexclusionlist',
+                                        isEditable: true
                                     },
 
                                     ip6gateway: {
