@@ -159,6 +159,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -865,6 +866,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
                 cidr = NetUtils.ipAndNetMaskToCidr(gateway, netmask);
             }
+
+            checkIpExclusionList(ipExclusionList, cidr);
         }
 
         if (ipv6) {
@@ -966,10 +969,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             ip6Gateway = NetUtils.getCidrHostAddress6(ip6Cidr);
         }
 
-        if (!org.apache.commons.lang.StringUtils.isEmpty(ipExclusionList) &&  !NetUtils.validIpRangeList(ipExclusionList)) {
-            throw new InvalidParameterValueException("Syntax error in ipExclusionList");
-        }
-
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
                 createVlan, dns1, dns2, ipExclusionList);
@@ -999,6 +998,34 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
         return network;
+    }
+
+    private void checkIpExclusionList(final String ipExclusionList, final String cidr) {
+        if (!org.apache.commons.lang.StringUtils.isEmpty(ipExclusionList)) {
+            // validate ipExclusionList
+            // Perform a "syntax" check on the list
+            if (!NetUtils.validIpRangeList(ipExclusionList)) {
+                throw new InvalidParameterValueException("Syntax error in ipExclusionList");
+            }
+
+            final List<String> excludedIps = NetUtils.getAllIpsFromRangeList(ipExclusionList);
+            final String[] excludedIpsRangeDelimiters = ipExclusionList.split(",-");
+
+            if (cidr != null) {
+                //Check that ipExclusionList (delimiters) is within the CIDR
+                for (String ip : excludedIpsRangeDelimiters){
+                    if(!NetUtils.isIpWithtInCidrRange(ip, cidr)){
+                        throw new InvalidParameterValueException("An IP in the ipExclusionList " + ip + " is not part of the CIDR of the network " + cidr);
+                    }
+                }
+
+                //Check that at least one IP (gateway) is available after exclusion?
+                if( NetUtils.countIpsInCidr(cidr) <= excludedIps.size() ){
+                    throw new InvalidParameterValueException("More IPs in exclusion list then available in CIDR; at least one needs to be available");
+                }
+            }
+
+        }
     }
 
     @Override
