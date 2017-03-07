@@ -7,6 +7,7 @@ import logging
 import os
 import shutil
 import uuid
+import sys
 
 import cs_cmdline
 import cs_dhcp
@@ -24,6 +25,7 @@ import cs_staticroutes
 import cs_vmdata
 import cs_vpnusers
 import cs_privategateway
+import cs.CsHelper as csHelper
 
 
 class DataBag:
@@ -72,22 +74,22 @@ class updateDataBag:
     def __init__(self, qFile):
         self.qFile = qFile
         self.fpath = ''
-        self.bdata = { }
+        self.bdata = {}
         self.process()
 
     def process(self):
         self.db = DataBag()
-        if (self.qFile.type == "staticnatrules" or self.qFile.type == "forwardrules"):
+        if self.qFile.type == "staticnatrules" or self.qFile.type == "forwardrules":
             self.db.setKey("forwardingrules")
         else:
             self.db.setKey(self.qFile.type)
-        dbag = self.db.load()
+        self.db.load()
         logging.info("Command of type %s received", self.qFile.type)
 
         if self.qFile.type == 'ips':
-            dbag = self.processIP(self.db.getDataBag())
+            dbag = self.process_ip(self.db.getDataBag())
         elif self.qFile.type == 'guestnetwork':
-            dbag = self.processGuestNetwork(self.db.getDataBag())
+            dbag = self.process_guestnetwork(self.db.getDataBag())
         elif self.qFile.type == 'cmdline':
             dbag = self.processCL(self.db.getDataBag())
         elif self.qFile.type == 'networkacl':
@@ -128,26 +130,132 @@ class updateDataBag:
             return
         self.db.save(dbag)
 
-    def processGuestNetwork(self, dbag):
-        d = self.qFile.data
-        dp = { }
-        dp['public_ip'] = d['router_guest_ip']
-        dp['netmask'] = d['router_guest_netmask']
-        dp['source_nat'] = False
-        dp['add'] = d['add']
-        dp['one_to_one_nat'] = False
-        dp['gateway'] = d['router_guest_gateway']
-        dp['nic_dev_id'] = d['device'][3]
-        dp['nw_type'] = 'guest'
-        dp['vif_mac_address'] = d['mac_address']
-        if 'dns' in d:
-            dp['dns'] = d['dns']
-        qf = QueueFile()
-        qf.load({ 'ip_address': [dp], 'type': 'ips' })
-        if 'domain_name' not in d.keys() or d['domain_name'] == '':
-            d['domain_name'] = "cloudnine.internal"
+    def process_guestnetwork(self, dbag):
+        d = self.update_dbag_contents()
+        self.save_ip_dbag(d['d_ip_to_save'])
+        return cs_guestnetwork.merge(dbag, d['d_to_merge'])
 
-        return cs_guestnetwork.merge(dbag, d)
+    def process_privategateway(self, dbag):
+        d = self.update_dbag_contents()
+        self.save_ip_dbag(d['d_ip_to_save'])
+        return cs_privategateway.merge(dbag, d['d_to_merge'])
+
+        # Networks of type Guest and Private are stored in their own json but in order for interfaces to work properly these need to be
+        # stored in ips.json as well.
+    def save_ip_dbag(self, dbag):
+        qf = QueueFile()
+        qf.load({'ip_address': [dbag], 'type': 'ips'})
+
+    # Based on mac address, find the device we should use
+    def validate_device_based_on_mac_address(self):
+        d_to_merge = self.qFile.data
+
+        mac_address_to_find_device_for = self.get_macaddress_from_databag(d_to_merge)
+        if not mac_address_to_find_device_for:
+            return d_to_merge
+        if 'device' not in d_to_merge and 'nic_dev_id' in d_to_merge:
+            d_to_merge['device'] = "eth" + str(d_to_merge['nic_dev_id'])
+        elif 'device' not in d_to_merge:
+            logging.warning("Unable to validate mac_address / device because we couldn't locate the device in the json (need 'device' or 'nic_dev_id' property.")
+            return d_to_merge
+
+        device_name = csHelper.get_device_from_mac_address(mac_address_to_find_device_for)
+        if not device_name:
+            return d_to_merge
+        if device_name != d_to_merge['device']:
+            log_message = "Found device %s based on macaddress %s so updating databag accordingly. " \
+                          "Ignoring device %s sent by mgt server, as it is not the right one." \
+                          % (device_name, mac_address_to_find_device_for, d_to_merge['device'])
+            logging.warning(log_message)
+            # Keep whatever was sent (for debug purposes)
+            if 'device' in d_to_merge:
+                d_to_merge['device_as_sent_by_mgtserver'] = d_to_merge['device']
+            if 'dev_id' in d_to_merge:
+                d_to_merge['dev_id_as_sent_by_mgtserver'] = d_to_merge['dev_id']
+            # Use the device we found from now on
+            d_to_merge['device'] = device_name
+        return d_to_merge
+
+    @staticmethod
+    def get_macaddress_from_databag(d_to_merge):
+        # Find mac address
+        if 'mac_address' in d_to_merge:
+            return d_to_merge['mac_address']
+        elif 'vif_mac_address' in d_to_merge:
+            return d_to_merge['vif_mac_address']
+        logging.warning("Unable to validate mac_address / device because we couldn't locate the mac_address in the json (need 'mac_address' or 'vif_mac_address' property.")
+        return False
+
+    def update_dbag_contents(self):
+        d_to_merge = self.validate_device_based_on_mac_address()
+        d_ip_to_save = {}
+
+        # Find mac address
+        if 'mac_address' in d_to_merge:
+            d_to_merge['vif_mac_address'] = d_to_merge['mac_address']
+            d_ip_to_save['vif_mac_address'] = d_to_merge['mac_address']
+        elif 'vif_mac_address' in d_to_merge:
+            d_ip_to_save['vif_mac_address'] = d_to_merge['vif_mac_address']
+
+        # device and device id
+        d_ip_to_save['device'] = d_to_merge['device']
+        d_to_merge['nic_dev_id'] = d_to_merge['device'].replace("eth", "")
+        d_ip_to_save['nic_dev_id'] = d_to_merge['nic_dev_id']
+
+        # public_ip
+        if 'router_guest_ip' in d_to_merge:
+            d_ip_to_save['public_ip'] = d_to_merge['router_guest_ip']
+        elif 'type' in d_to_merge and d_to_merge['type'] == "guestnetwork":
+            d_to_merge['public_ip'] = d_to_merge['ip_address']
+            d_ip_to_save['public_ip'] = d_to_merge['ip_address']
+        else:
+            d_ip_to_save['ip_address'] = d_to_merge['ip_address']
+
+        # netmask
+        if 'router_guest_netmask' in d_to_merge:
+            d_to_merge['netmask'] = d_to_merge['router_guest_netmask']
+            d_ip_to_save['netmask'] = d_to_merge['router_guest_netmask']
+        else:
+            d_to_merge['netmask'] = d_to_merge['netmask']
+            d_ip_to_save['netmask'] = d_to_merge['netmask']
+
+        # sourcenat
+        if 'source_nat' in d_to_merge:
+            d_ip_to_save['source_nat'] = d_to_merge['source_nat']
+        else:
+            d_ip_to_save['source_nat'] = False
+
+        # one-to-one nat
+        if 'one_to_one_nat' in d_to_merge:
+            d_to_merge['one_to_one_nat'] = d_to_merge['one_to_one_nat']
+        else:
+            d_ip_to_save['one_to_one_nat'] = False
+
+        # gateway
+        if 'router_guest_gateway' in d_to_merge:
+            d_to_merge['gateway'] = d_to_merge['router_guest_gateway']
+            d_ip_to_save['gateway'] = d_to_merge['router_guest_gateway']
+        elif 'gateway' in d_to_merge:
+            d_to_merge['gateway'] = d_to_merge['gateway']
+            d_ip_to_save['gateway'] = d_to_merge['gateway']
+        elif 'type' in d_to_merge and d_to_merge['type'] == "guestnetwork":
+            d_to_merge['gateway'] = ''
+            d_ip_to_save['gateway'] = ''
+
+        # Network type
+        if d_to_merge['type'] == "guestnetwork":
+            d_ip_to_save['nw_type'] = 'guest'
+        elif 'type' in d_to_merge:
+            d_ip_to_save['nw_type'] = d_to_merge['type']
+
+        # Set default domain
+        if 'domain_name' not in d_to_merge.keys() or d_to_merge['domain_name'] == '':
+            d_to_merge['domain_name'] = "cloudnine.internal"
+
+        # Pass the add boolean
+        d_ip_to_save['add'] = d_to_merge['add']
+
+        return {'d_ip_to_save': d_ip_to_save, 'd_to_merge': d_to_merge}
 
     def process_dhcp_entry(self, dbag):
         return cs_dhcp.merge(dbag, self.qFile.data)
@@ -162,10 +270,12 @@ class updateDataBag:
         return cs_vpnusers.merge(dbag, self.qFile.data)
 
     def process_network_acl(self, dbag):
-        return cs_network_acl.merge(dbag, self.qFile.data)
+        d_to_merge = self.validate_device_based_on_mac_address()
+        return cs_network_acl.merge(dbag, d_to_merge)
 
     def process_public_ip_acl(self, dbag):
-        return cs_public_ip_acl.merge(dbag, self.qFile.data)
+        d_to_merge = self.validate_device_based_on_mac_address()
+        return cs_public_ip_acl.merge(dbag, d_to_merge)
 
     def process_firewallrules(self, dbag):
         return cs_firewallrules.merge(dbag, self.qFile.data)
@@ -179,31 +289,39 @@ class updateDataBag:
     def process_staticroutes(self, dbag):
         return cs_staticroutes.merge(dbag, self.qFile.data)
 
-    def process_privategateway(self, dbag):
-        d = self.qFile.data
-        dp = { }
-        dp['public_ip'] = d['ip_address']
-        dp['netmask'] = d['netmask']
-        dp['source_nat'] = d['source_nat']
-        dp['add'] = d['add']
-        dp['one_to_one_nat'] = False
-        dp['gateway'] = ''
-        dp['nic_dev_id'] = d['nic_dev_id']
-        dp['nw_type'] = d['type']
-        dp['vif_mac_address'] = d['vif_mac_address']
-        qf = QueueFile()
-        qf.load({ 'ip_address': [dp], 'type': 'ips' })
-        if 'domain_name' not in d.keys() or d['domain_name'] == '':
-            d['domain_name'] = "cloudnine.internal"
-
-        return cs_privategateway.merge(dbag, d)
-
     def processForwardingRules(self, dbag):
         # to be used by both staticnat and portforwarding
         return cs_forwardingrules.merge(dbag, self.qFile.data)
 
-    def processIP(self, dbag):
+    def process_ip(self, dbag):
         for ip in self.qFile.data["ip_address"]:
+            # Find the right device we should use to configure the ip address
+            # vif_mac_address is a mac address per ip-address, based on the mac address of the device
+            # The original macaddress of the device is sent as device_mac_address, so we will check based
+            # on that macaddress.
+            if 'device_mac_address' in ip:
+                device_name = csHelper.get_device_from_mac_address(ip['device_mac_address'])
+                if not device_name:
+                    log_message = "Cannot find device while looking for %s. Ignoring for now, it may arrive later.." \
+                                  % ip['device_mac_address']
+                    logging.warning(log_message)
+                    print("Warning! " + log_message)
+                else:
+                    if ip['vif_mac_address'] != ip['device_mac_address']:
+                        log_message = "Found device %s based on macaddress %s so updating databag accordingly. " \
+                                      "Ignoring macaddress %s sent by mgt server, as it is not the right one." \
+                                      % (device_name, ip['device_mac_address'], ip['vif_mac_address'])
+                        ip['vif_mac_address_as_sent_by_mgt_server'] = ip['vif_mac_address']
+                    else:
+                        log_message = "The mac address as sent by the management server %s matches the one we found (%s) on device %s so that's good"\
+                                      % (ip['vif_mac_address'], ip['device_mac_address'], device_name)
+                        logging.info(log_message)
+
+                    logging.warning(log_message)
+                    print("[INFO] " + log_message)
+                    ip['vif_mac_address'] = ip['device_mac_address']
+                    ip['device'] = device_name
+                    ip['nic_dev_id'] = device_name.replace("eth","")
             dbag = cs_ip.merge(dbag, ip)
         return dbag
 

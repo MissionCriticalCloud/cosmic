@@ -39,6 +39,15 @@ def reconfigure_interfaces(router_config, interfaces):
                     execute(cmd)
 
 
+def get_device_from_mac_address(macaddress):
+    logging.info("Looking for interface with macaddress " + macaddress)
+    device = execute("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
+    if not device:
+        return False
+    logging.info("Looking for mac address " + macaddress + " we found matching interface => " + str(device))
+    return device[0]
+
+
 def is_mounted(name):
     for i in execute("mount"):
         vals = i.lstrip().split()

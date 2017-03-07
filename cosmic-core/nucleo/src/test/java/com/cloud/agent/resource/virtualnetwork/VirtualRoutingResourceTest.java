@@ -440,9 +440,9 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
 
     protected IpAssocCommand generateIpAssocCommand() {
         final List<IpAddressTO> ips = new ArrayList<>();
-        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, false, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false));
+        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
+        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, false, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
+        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
         final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
         final IpAssocCommand cmd = new IpAssocCommand(ipArray);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
@@ -464,9 +464,9 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
 
     protected IpAssocVpcCommand generateIpAssocVpcCommand() {
         final List<IpAddressTO> ips = new ArrayList<>();
-        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false));
-        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false));
+        ips.add(new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
+        ips.add(new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
+        ips.add(new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false));
         final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
         final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipArray);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
@@ -483,7 +483,7 @@ public class VirtualRoutingResourceTest implements VirtualRouterDeployer {
     }
 
     protected SetSourceNatCommand generateSetSourceNatCommand() {
-        final IpAddressTO ip = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
+        final IpAddressTO ip = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false);
         final SetSourceNatCommand cmd = new SetSourceNatCommand(ip, true);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         return cmd;

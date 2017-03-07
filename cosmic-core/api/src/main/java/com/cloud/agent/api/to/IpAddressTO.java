@@ -14,15 +14,17 @@ public class IpAddressTO {
     private String vlanGateway;
     private String vlanNetmask;
     private String vifMacAddress;
+    private String deviceMacAddress;
     private Integer networkRate;
     private TrafficType trafficType;
     private String networkName;
     private Integer nicDevId;
     private boolean newNic;
 
-    public IpAddressTO(final long accountId, final String ipAddress, final boolean add, final boolean firstIP, final boolean sourceNat, final String broadcastUri, final String
-            vlanGateway, final String vlanNetmask,
-                       final String vifMacAddress, final Integer networkRate, final boolean isOneToOneNat) {
+    public IpAddressTO(final long accountId, final String ipAddress, final boolean add, final boolean firstIP,
+                       final boolean sourceNat, final String broadcastUri, final String vlanGateway,
+                       final String vlanNetmask, final String vifMacAddress, final String deviceMacAddress,
+                       final Integer networkRate, final boolean isOneToOneNat) {
         this.accountId = accountId;
         this.publicIp = ipAddress;
         this.add = add;
@@ -32,6 +34,7 @@ public class IpAddressTO {
         this.vlanGateway = vlanGateway;
         this.vlanNetmask = vlanNetmask;
         this.vifMacAddress = vifMacAddress;
+        this.deviceMacAddress = deviceMacAddress;
         this.networkRate = networkRate;
         this.oneToOneNat = isOneToOneNat;
     }
@@ -118,4 +121,13 @@ public class IpAddressTO {
     public void setNewNic(final boolean newNic) {
         this.newNic = newNic;
     }
+
+    public String getDeviceMacAddress() {
+        return deviceMacAddress;
+    }
+
+    public void setDeviceMacAddress(String deviceMacAddress) {
+        this.deviceMacAddress = deviceMacAddress;
+    }
+
 }

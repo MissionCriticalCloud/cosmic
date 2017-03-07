@@ -17,6 +17,7 @@ class CsConfig(object):
     def __init__(self):
         self.fw = []
         self.ingress_rules = {}
+        self.ips = None
 
     def set_address(self):
         self.ips = CsAddress("ips", self)

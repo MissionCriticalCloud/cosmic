@@ -21,8 +21,9 @@ public class IpAssociationConfigItem extends AbstractConfigItemFacade {
         final List<IpAddress> ips = new LinkedList<>();
 
         for (final IpAddressTO ip : command.getIpAddresses()) {
-            final IpAddress ipAddress = new IpAddress(ip.getPublicIp(), ip.isSourceNat(), ip.isAdd(), ip.isOneToOneNat(), ip.isFirstIP(), ip.getVlanGateway(), ip.getVlanNetmask(),
-                    ip.getVifMacAddress(), ip.getNicDevId(), ip.isNewNic(), ip.getTrafficType().toString().toLowerCase());
+            final IpAddress ipAddress = new IpAddress(ip.getPublicIp(), ip.isSourceNat(), ip.isAdd(),
+                    ip.isOneToOneNat(), ip.isFirstIP(), ip.getVlanGateway(), ip.getVlanNetmask(), ip.getVifMacAddress(),
+                    ip.getDeviceMacAddress(), ip.getNicDevId(), ip.isNewNic(), ip.getTrafficType().toString().toLowerCase());
             ips.add(ipAddress);
         }
 

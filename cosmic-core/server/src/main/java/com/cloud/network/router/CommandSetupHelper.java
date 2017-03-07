@@ -48,7 +48,6 @@ import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
@@ -56,7 +55,6 @@ import com.cloud.network.VpnUser;
 import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
@@ -428,33 +426,7 @@ public class CommandSetupHelper {
 
     public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand, final
     long vmId) {
-        // Ensure that in multiple vlans case we first send all ip addresses of
-        // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<>();
-        for (final PublicIpAddress ipAddress : ips) {
-            final String vlanTag = ipAddress.getVlanTag();
-            ArrayList<PublicIpAddress> ipList = vlanIpMap.get(vlanTag);
-            if (ipList == null) {
-                ipList = new ArrayList<>();
-            }
-            // domR doesn't support release for sourceNat IP address; so reset
-            // the state
-            if (ipAddress.isSourceNat() && ipAddress.getState() == IpAddress.State.Releasing) {
-                ipAddress.setState(IpAddress.State.Allocated);
-            }
-            ipList.add(ipAddress);
-            vlanIpMap.put(vlanTag, ipList);
-        }
-
-        final List<NicVO> nics = _nicDao.listByVmId(router.getId());
-        String baseMac = null;
-        for (final NicVO nic : nics) {
-            final NetworkVO nw = _networkDao.findById(nic.getNetworkId());
-            if (nw.getTrafficType() == TrafficType.Public) {
-                baseMac = nic.getMacAddress();
-                break;
-            }
-        }
+        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = getVlanIpMap(ips);
 
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
             final List<PublicIpAddress> ipAddrList = vlanAndIp.getValue();
@@ -474,12 +446,15 @@ public class CommandSetupHelper {
 
             for (final PublicIpAddress ipAddr : ipAddrList) {
 
-                final boolean add = ipAddr.getState() == IpAddress.State.Releasing ? false : true;
+                final boolean add = ipAddr.getState() != IpAddress.State.Releasing;
                 final boolean sourceNat = ipAddr.isSourceNat();
                 final String vlanId = ipAddr.getVlanTag();
                 final String vlanGateway = ipAddr.getGateway();
                 final String vlanNetmask = ipAddr.getNetmask();
                 final String vifMacAddress;
+
+                final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
+
                 // For non-source nat IP, set the mac to be something based on
                 // first public nic's MAC
                 // We cannot depend on first ip because we need to deal with
@@ -488,15 +463,15 @@ public class CommandSetupHelper {
                     vifMacAddress = ipAddr.getMacAddress();
                 } else {
                     if (!sourceNat && ipAddr.getVlanId() != 0) {
-                        vifMacAddress = NetUtils.generateMacOnIncrease(baseMac, ipAddr.getVlanId());
+                        vifMacAddress = NetUtils.generateMacOnIncrease(deviceMacAddress, ipAddr.getVlanId());
                     } else {
                         vifMacAddress = ipAddr.getMacAddress();
                     }
                 }
 
                 final String ipAddress = ipAddr.getAddress().addr();
-                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, false, sourceNat, vlanId, vlanGateway, vlanNetmask,
-                        vifMacAddress, networkRate, ipAddr.isOneToOneNat());
+                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, false, sourceNat,
+                        vlanId, vlanGateway, vlanNetmask, vifMacAddress, deviceMacAddress, networkRate, ipAddr.isOneToOneNat());
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
@@ -517,6 +492,39 @@ public class CommandSetupHelper {
 
             cmds.addCommand(ipAssocCommand, cmd);
         }
+    }
+
+    protected Map<String, ArrayList<PublicIpAddress>> getVlanIpMap(final List<? extends PublicIpAddress> ips) {
+        // Ensure that in multiple vlans case we first send all ip addresses of
+        // vlan1, then all ip addresses of vlan2, etc..
+        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<>();
+        for (final PublicIpAddress ipAddress : ips) {
+            final String vlanTag = ipAddress.getVlanTag();
+            ArrayList<PublicIpAddress> ipList = vlanIpMap.get(vlanTag);
+            if (ipList == null) {
+                ipList = new ArrayList<>();
+            }
+            // domR doesn't support release for sourceNat IP address; so reset
+            // the state
+            if (ipAddress.isSourceNat() && ipAddress.getState() == IpAddress.State.Releasing) {
+                ipAddress.setState(IpAddress.State.Allocated);
+            }
+            ipList.add(ipAddress);
+            vlanIpMap.put(vlanTag, ipList);
+        }
+        return vlanIpMap;
+    }
+
+    protected String getMacAddressOfPluggedNic(final VirtualRouter router, final Long networkId) {
+        final List<NicVO> nics = _nicDao.listByVmId(router.getId());
+        String deviceMacAddress = null;
+        for (final NicVO nic : nics) {
+            if (nic.getNetworkId() == networkId) {
+                deviceMacAddress = nic.getMacAddress();
+                break;
+            }
+        }
+        return deviceMacAddress;
     }
 
     public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId,
@@ -855,21 +863,7 @@ public class CommandSetupHelper {
         Boolean addSourceNat = null;
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = new HashMap<>();
-        for (final PublicIpAddress ipAddress : ips) {
-            final String vlanTag = ipAddress.getVlanTag();
-            ArrayList<PublicIpAddress> ipList = vlanIpMap.get(vlanTag);
-            if (ipList == null) {
-                ipList = new ArrayList<>();
-            }
-            // VR doesn't support release for sourceNat IP address; so reset the
-            // state
-            if (ipAddress.isSourceNat() && ipAddress.getState() == IpAddress.State.Releasing) {
-                ipAddress.setState(IpAddress.State.Allocated);
-            }
-            ipList.add(ipAddress);
-            vlanIpMap.put(vlanTag, ipList);
-        }
+        final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = getVlanIpMap(ips);
 
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
             final List<PublicIpAddress> ipAddrList = vlanAndIp.getValue();
@@ -882,13 +876,16 @@ public class CommandSetupHelper {
             int i = 0;
 
             for (final PublicIpAddress ipAddr : ipAddrList) {
-                final boolean add = ipAddr.getState() == IpAddress.State.Releasing ? false : true;
+                final boolean add = ipAddr.getState() != IpAddress.State.Releasing;
+
+                final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
 
                 final String macAddress = vlanMacAddress.get(BroadcastDomainType.getValue(BroadcastDomainType.fromString(ipAddr.getVlanTag())));
 
-                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddr.getAddress().addr(), add, false, ipAddr.isSourceNat(), BroadcastDomainType.fromString(ipAddr
-                        .getVlanTag()).toString(), ipAddr.getGateway(),
-                        ipAddr.getNetmask(), macAddress, networkRate, ipAddr.isOneToOneNat());
+                final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddr.getAddress().addr(), add, false,
+                        ipAddr.isSourceNat(), BroadcastDomainType.fromString(ipAddr.getVlanTag()).toString(),
+                        ipAddr.getGateway(), ipAddr.getNetmask(), macAddress, deviceMacAddress, networkRate,
+                        ipAddr.isOneToOneNat());
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
@@ -981,8 +978,10 @@ public class CommandSetupHelper {
 
             for (final PrivateIpAddress ipAddr : ipAddrList) {
                 final Network network = _networkModel.getNetwork(ipAddr.getNetworkId());
-                final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false, ipAddr.getSourceNat(), ipAddr.getBroadcastUri(),
-                        ipAddr.getGateway(), ipAddr.getNetmask(), ipAddr.getMacAddress(), null, false);
+                final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
+                final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false,
+                        ipAddr.getSourceNat(), ipAddr.getBroadcastUri(), ipAddr.getGateway(), ipAddr.getNetmask(),
+                        ipAddr.getMacAddress(), deviceMacAddress, null, false);
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
@@ -1010,7 +1009,7 @@ public class CommandSetupHelper {
     public void createSetupPrivateGatewayCommand(final VirtualRouter router, final PrivateIpAddress ipAddr, final Commands cmds, final NicProfile nicProfile, final boolean add) {
         final Network network = _networkModel.getNetwork(ipAddr.getNetworkId());
         final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false, ipAddr.getSourceNat(), ipAddr.getBroadcastUri(),
-                ipAddr.getGateway(), ipAddr.getNetmask(), ipAddr.getMacAddress(), null, false);
+                ipAddr.getGateway(), ipAddr.getNetmask(), ipAddr.getMacAddress(), null, null, false);
 
         ip.setTrafficType(network.getTrafficType());
         ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
