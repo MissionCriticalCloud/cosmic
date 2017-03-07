@@ -168,6 +168,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -1016,9 +1017,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     throw new InvalidParameterValueException("An IP in the ipExclusionList is not part of the CIDR of the network " + cidr);
                 }
 
-                //Check that at least one IP (gateway) is available after exclusion?
-                if( NetUtils.countIpsInCidr(cidr) <= excludedIps.size() ){
-                    throw new InvalidParameterValueException("More IPs in exclusion list then available in CIDR; at least one needs to be available");
+                //Check that at least one IP is available after exclusion for the router interface
+                final SortedSet<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr, NetUtils.listIp2LongList(excludedIps));
+                if( allPossibleIps.size() == 0 ){
+                    throw new InvalidParameterValueException("The ipExclusionList excludes all IPs in the CIDR; at least one needs to be available");
                 }
             }
 

@@ -569,10 +569,17 @@ public class NetUtils {
         return true;
     }
 
-    public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final long size, final Set<Long> usedIps) {
+    public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final Set<Long> usedIps) {
+        final String cidrIp = getCidr(cidr).first();
+        final Integer cidrSize = getCidr(cidr).second();
+
+        return getAllIpsFromCidr(cidrIp, cidrSize, usedIps);
+    }
+
+    public static SortedSet<Long> getAllIpsFromCidr(final String cidr_ip, final long size, final Set<Long> usedIps) {
         final SortedSet<Long> result = new TreeSet<>();
-        long start = ip2Long( getIpRangeStartIpFromCidr(cidr, size) );
-        long end = ip2Long( getIpRangeEndIpFromCidr(cidr,size));
+        long start = ip2Long( getIpRangeStartIpFromCidr(cidr_ip, size) );
+        long end = ip2Long( getIpRangeEndIpFromCidr(cidr_ip,size));
 
         while (start <= end ) {
             if (!usedIps.contains(start)) {
@@ -584,11 +591,19 @@ public class NetUtils {
         return result;
     }
 
-    public static Long countIpsInCidr(final String cidr) {
-        final String cidrNet = cidr.split("/")[0];
-        final Long cidrMask = Long.parseLong(cidr.split("/")[1]);
+    public static SortedSet<Long> listIp2LongList(final List<String> ipStringList) {
+        SortedSet<Long> ipLongList = new TreeSet<>();
+        for( String ip : ipStringList) {
+            ipLongList.add(ip2Long(ip));
+        }
+        return ipLongList;
+    }
 
-        return countIpsInCidr(cidrNet, cidrMask);
+    public static Long countIpsInCidr(final String cidr) {
+        final String cidrIp = getCidr(cidr).first();
+        final Integer cidrSize = getCidr(cidr).second();
+
+        return countIpsInCidr(cidrIp, cidrSize);
     }
 
     public static Long countIpsInCidr(final String cidr_ip, final long size) {
