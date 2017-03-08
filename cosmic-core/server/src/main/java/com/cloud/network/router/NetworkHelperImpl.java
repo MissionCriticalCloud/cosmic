@@ -437,7 +437,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         }
 
         ServiceOfferingVO routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getServiceOfferingId());
-        if (isRedundant && routers.size() % 2 == 0) {
+        if (isRedundant && routers != null && routers.size() == 1 && routers.get(0).getServiceOfferingId() == routerDeploymentDefinition.getServiceOfferingId()) {
             routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getSecondaryServiceOfferingId());
         }
 
