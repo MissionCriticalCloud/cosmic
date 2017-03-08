@@ -17,6 +17,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
@@ -215,6 +217,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     EntityManager _entityMgr;
     @Inject
     DataCenterDao _dcDao = null;
+    @Inject
+    ZoneRepository _zoneRepository;
     @Inject
     VlanDao _vlanDao = null;
     @Inject
@@ -879,8 +883,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         if (state == Network.State.Implemented) {
             return true;
         } else if (state == Network.State.Setup) {
-            final DataCenterVO zone = _dcDao.findById(network.getDataCenterId());
-            if (!isSharedNetworkOfferingWithServices(network.getNetworkOfferingId()) || zone.getNetworkType() == NetworkType.Basic) {
+            final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+            if (!isSharedNetworkOfferingWithServices(network.getNetworkOfferingId()) || zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic) {
                 return true;
             }
         }
