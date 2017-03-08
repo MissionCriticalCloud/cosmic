@@ -16,6 +16,8 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Random;
@@ -1172,6 +1174,38 @@ public class NetUtils {
             return ip.toString();
         }
         return null;
+    }
+
+    public static List<String> getAllIpsFromRangeList(final String excludedIpsExpression) {
+
+        if (StringUtils.isEmpty(excludedIpsExpression)) {
+
+            return Collections.emptyList();
+        }
+
+        final List<String> ips = Arrays.asList(excludedIpsExpression.split(","));
+        List<String> result = new ArrayList<>();
+        for (String ip : ips) {
+            if (ip.contains("-")) {
+                result.addAll(getAllIpsFromRange(ip));
+            } else {
+                result.add(ip);
+            }
+        }
+        return result;
+    }
+
+    public static List<String> getAllIpsFromRange(final String range) {
+        String[] ips = range.split("-");
+        List<String> result = new ArrayList<>();
+        long startIp = ip2Long(ips[0]);
+        long endIp = ip2Long(ips[1]);
+
+        for (long tmpIp = startIp; tmpIp<=endIp; tmpIp++) {
+            result.add(long2Ip(tmpIp));
+        }
+
+        return result;
     }
 
     // Can cover 127 bits
