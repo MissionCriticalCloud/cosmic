@@ -2616,6 +2616,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 if (network == null) {
                     throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0).longValue());
                 }
+                if (Network.GuestType.Private.equals(network.getGuestType())) {
+                    throw new InvalidParameterValueException("Deploying VMs in a network of type " + Network.GuestType.Private + " is not possible.");
+                }
                 if (network.getVpcId() != null) {
                     // Only ISOs, XenServer, KVM and template types are
                     // supported for vpc networks

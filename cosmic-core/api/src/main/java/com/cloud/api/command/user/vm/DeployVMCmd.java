@@ -337,6 +337,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                 final HashMap<String, String> ips = (HashMap<String, String>) iter.next();
                 final Long networkId;
                 final Network network = _networkService.getNetwork(ips.get("networkid"));
+                if (Network.GuestType.Private.equals(network.getGuestType())) {
+                    throw new InvalidParameterValueException("Deploying VMs in a network of type " + Network.GuestType.Private + " is not possible.");
+                }
                 if (network != null) {
                     networkId = network.getId();
                 } else {
