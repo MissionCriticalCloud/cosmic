@@ -552,23 +552,21 @@ public class NetUtils {
         return true;
     }
 
-    public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final long size, final Set<Long> usedIps) {
-        assert size < MAX_CIDR : "You do know this is not for ipv6 right?  Keep it smaller than 32 but you have " + size;
+    public static SortedSet<Long> getAllIpsFromCidr(final String cidr, final Set<Long> usedIps) {
+        final String cidrIp = getCidr(cidr).first();
+        final Integer cidrSize = getCidr(cidr).second();
+
+        return getAllIpsFromCidr(cidrIp, cidrSize, usedIps);
+    }
+
+    public static SortedSet<Long> getAllIpsFromCidr(final String cidr_ip, final long size, final Set<Long> usedIps) {
         final SortedSet<Long> result = new TreeSet<>();
-        final long ip = ip2Long(cidr);
-        final long startNetMask = ip2Long(getCidrNetmask(size));
-        long start = (ip & startNetMask) + 1;
-        long end = start;
+        long start = ip2Long(getIpRangeStartIpFromCidr(cidr_ip, size));
+        long end = ip2Long(getIpRangeEndIpFromCidr(cidr_ip,size));
 
-        end = end >> MAX_CIDR - size;
-
-        end++;
-        end = (end << MAX_CIDR - size) - 2;
-        int maxIps = 255; // get 255 ips as maximum
-        while (start <= end && maxIps > 0) {
+        while (start <= end) {
             if (!usedIps.contains(start)) {
                 result.add(start);
-                maxIps--;
             }
             start++;
         }
