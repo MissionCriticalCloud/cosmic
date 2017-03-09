@@ -57,7 +57,7 @@ def get_systemvm_version():
         for line in version_data.split("."):
             version += str(line).zfill(2)
         logging.info("This systemvm has version " + str(version))
-        return version
+        return int(version)
     except:
         logging.info("Got an exception while trying to find systemvm version. Returning version 0")
         return 0

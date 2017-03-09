@@ -158,11 +158,11 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         final String ipsecPsk = cmd.getIpsecPsk();
         final String ikePolicy = cmd.getIkePolicy();
         final String espPolicy = cmd.getEspPolicy();
-        if (!NetUtils.isValidS2SVpnPolicy(ikePolicy)) {
-            throw new InvalidParameterValueException("The customer gateway IKE policy " + ikePolicy + " is invalid!");
+        if (!NetUtils.isValidS2SVpnPolicy("ike", ikePolicy)) {
+            throw new InvalidParameterValueException("The customer gateway IKE policy " + ikePolicy + " is invalid! Verify the required Diffie Hellman (DH) group is specified.");
         }
-        if (!NetUtils.isValidS2SVpnPolicy(espPolicy)) {
-            throw new InvalidParameterValueException("The customer gateway ESP policy " + espPolicy + " is invalid!");
+        if (!NetUtils.isValidS2SVpnPolicy("esp", espPolicy)) {
+            throw new InvalidParameterValueException("The customer gateway ESP policy " + espPolicy + " is invalid! Verify the required Diffie Hellman (DH) group is specified.");
         }
         Long ikeLifetime = cmd.getIkeLifetime();
         if (ikeLifetime == null) {
@@ -443,10 +443,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
             throw new CloudRuntimeException("Unable to acquire lock on " + conn);
         }
         try {
-            if (conn.getState() != State.Connected && conn.getState() != State.Error) {
-                throw new InvalidParameterValueException("Site to site VPN connection with specified id is not in correct state(connected) to process disconnect!");
-            }
-
             conn.setState(State.Disconnected);
             _vpnConnectionDao.persist(conn);
 
@@ -652,10 +648,10 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         final String ipsecPsk = cmd.getIpsecPsk();
         final String ikePolicy = cmd.getIkePolicy();
         final String espPolicy = cmd.getEspPolicy();
-        if (!NetUtils.isValidS2SVpnPolicy(ikePolicy)) {
+        if (!NetUtils.isValidS2SVpnPolicy("ike", ikePolicy)) {
             throw new InvalidParameterValueException("The customer gateway IKE policy" + ikePolicy + " is invalid!");
         }
-        if (!NetUtils.isValidS2SVpnPolicy(espPolicy)) {
+        if (!NetUtils.isValidS2SVpnPolicy("esp", espPolicy)) {
             throw new InvalidParameterValueException("The customer gateway ESP policy" + espPolicy + " is invalid!");
         }
         Long ikeLifetime = cmd.getIkeLifetime();
