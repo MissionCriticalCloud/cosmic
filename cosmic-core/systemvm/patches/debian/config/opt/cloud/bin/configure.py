@@ -16,6 +16,7 @@ from cs.CsNetfilter import CsNetfilters
 from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsPrivateGateway import CsPrivateGateway
+from cs.CsHelper import get_systemvm_version
 
 OCCURRENCES = 1
 
@@ -521,6 +522,115 @@ class CsSite2SiteVpn(CsDataBag):
         hrs = int(val) / 3600
         return "%sh" % hrs
 
+class CsSite2SiteVpnOpenSwan(CsDataBag):
+    """
+    Setup any configured vpns (using swan)
+    left is the local machine
+    right is where the clients connect from
+    """
+
+    VPNCONFDIR = "/etc/ipsec.d"
+
+    def process(self):
+        self.confips = []
+        # collect a list of configured vpns
+        for file in os.listdir(self.VPNCONFDIR):
+            m = re.search("^ipsec.vpn-(.*).conf", file)
+            if m:
+                self.confips.append(m.group(1))
+
+        for vpn in self.dbag:
+            if vpn == "id":
+                continue
+
+            local_ip = self.dbag[vpn]['local_public_ip']
+            dev = CsHelper.get_device(local_ip)
+
+            if dev == "":
+                logging.error("Request for ipsec to %s not possible because ip is not configured", local_ip)
+                continue
+
+            CsHelper.start_if_stopped("ipsec")
+            self.configure_iptables(dev, self.dbag[vpn])
+            self.configure_ipsec(self.dbag[vpn])
+
+        # Delete vpns that are no longer in the configuration
+        for ip in self.confips:
+            self.deletevpn(ip)
+
+    def deletevpn(self, ip):
+        logging.info("Removing VPN configuration for %s", ip)
+        CsHelper.execute("ipsec auto --down vpn-%s" % ip)
+        CsHelper.execute("ipsec auto --delete vpn-%s" % ip)
+        vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, ip)
+        vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, ip)
+        os.remove(vpnconffile)
+        os.remove(vpnsecretsfile)
+        CsHelper.execute("ipsec auto --rereadall")
+
+    def configure_iptables(self, dev, obj):
+        self.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 500 -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
+        self.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 4500 -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
+        self.fw.append(["", "front", "-A INPUT -i %s -p esp -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
+        self.fw.append(["nat", "front", "-A POSTROUTING -o %s -m mark --mark 0x525 -j ACCEPT" % dev])
+        for net in obj['peer_guest_cidr_list'].lstrip().rstrip().split(','):
+            self.fw.append(["mangle", "front",
+                            "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (obj['local_guest_cidr'], net)])
+            self.fw.append(["mangle", "",
+                            "-A OUTPUT -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (obj['local_guest_cidr'], net)])
+            self.fw.append(["mangle", "front",
+                            "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (net, obj['local_guest_cidr'])])
+            self.fw.append(["mangle", "",
+                            "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (net, obj['local_guest_cidr'])])
+
+    def configure_ipsec(self, obj):
+        leftpeer = obj['local_public_ip']
+        rightpeer = obj['peer_gateway_ip']
+        peerlist = obj['peer_guest_cidr_list'].lstrip().rstrip().replace(',', ' ')
+        vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, rightpeer)
+        vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, rightpeer)
+        if rightpeer in self.confips:
+            self.confips.remove(rightpeer)
+        file = CsFile(vpnconffile)
+        file.search("conn ", "conn vpn-%s" % rightpeer)
+        file.addeq(" left=%s" % leftpeer)
+        file.addeq(" leftsubnet=%s" % obj['local_guest_cidr'])
+        file.addeq(" leftnexthop=%s" % obj['local_public_gateway'])
+        file.addeq(" right=%s" % rightpeer)
+        file.addeq(" rightsubnets={%s}" % peerlist)
+        file.addeq(" type=tunnel")
+        file.addeq(" authby=secret")
+        file.addeq(" keyexchange=ike")
+        file.addeq(" ike=%s" % obj['ike_policy'])
+        file.addeq(" ikelifetime=%s" % self.convert_sec_to_h(obj['ike_lifetime']))
+        file.addeq(" esp=%s" % obj['esp_policy'])
+        file.addeq(" salifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']))
+        file.addeq(" pfs=%s" % CsHelper.bool_to_yn(obj['dpd']))
+        file.addeq(" keyingtries=%forever")
+        file.addeq(" auto=start")
+        if not obj.has_key('encap'):
+            obj['encap'] = False
+        file.addeq(" forceencaps=%s" % CsHelper.bool_to_yn(obj['encap']))
+        if obj['dpd']:
+            file.addeq("  dpddelay=30")
+            file.addeq("  dpdtimeout=120")
+            file.addeq("  dpdaction=restart")
+        secret = CsFile(vpnsecretsfile)
+        secret.search("%s " % leftpeer, "%s %s: PSK \"%s\"" % (leftpeer, rightpeer, obj['ipsec_psk']))
+        if secret.is_changed() or file.is_changed():
+            secret.commit()
+            file.commit()
+            logging.info("Configured vpn %s %s", leftpeer, rightpeer)
+            CsHelper.execute("ipsec auto --rereadall")
+            CsHelper.execute("ipsec auto --add vpn-%s" % rightpeer)
+            if not obj['passive']:
+                CsHelper.execute("ipsec auto --up vpn-%s" % rightpeer)
+        os.chmod(vpnsecretsfile, 0o400)
+
+    def convert_sec_to_h(self, val):
+        hrs = int(val) / 3600
+        return "%sh" % hrs
+
 
 class CsVpnUser(CsDataBag):
     PPP_CHAP = '/etc/ppp/chap-secrets'
@@ -889,8 +999,15 @@ class IpTablesExecutor:
         fwd = CsForwardingRules("forwardingrules", self.config)
         fwd.process()
 
-        vpns = CsSite2SiteVpn("site2sitevpn", self.config)
-        vpns.process()
+        # Strongswan is included in the systemvm template 17.3.9 and newer
+        if get_systemvm_version() > 170309:
+            logging.debug("Configuring Strongswan VPN")
+            vpns = CsSite2SiteVpn("site2sitevpn", self.config)
+            vpns.process()
+        else:
+            logging.debug("Configuring Openswan VPN")
+            vpns = CsSite2SiteVpnOpenSwan("site2sitevpn", self.config)
+            vpns.process()
 
         rvpn = CsRemoteAccessVpn("remoteaccessvpn", self.config)
         rvpn.process()
