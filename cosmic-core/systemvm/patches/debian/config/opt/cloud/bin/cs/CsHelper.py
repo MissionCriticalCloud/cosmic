@@ -48,6 +48,20 @@ def get_device_from_mac_address(macaddress):
     return device[0]
 
 
+def get_systemvm_version():
+    try:
+        with open("/etc/cloudstack-release") as file:
+            content = file.readlines()
+        version_data = content[0].split(" ")[2]
+        version = ""
+        for line in version_data.split("."):
+            version += str(line).zfill(2)
+        logging.info("This systemvm has version " + str(version))
+        return version
+    except:
+        logging.info("Got an exception while trying to find systemvm version. Returning version 0")
+        return 0
+
 def is_mounted(name):
     for i in execute("mount"):
         vals = i.lstrip().split()
