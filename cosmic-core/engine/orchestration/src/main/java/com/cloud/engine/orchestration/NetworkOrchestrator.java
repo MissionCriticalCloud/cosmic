@@ -21,7 +21,6 @@ import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenter.NetworkType;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.PodVlanMapVO;
 import com.cloud.dc.Vlan;
@@ -217,6 +216,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     EntityManager _entityMgr;
     @Inject
     DataCenterDao _dcDao = null;
+    @Inject
+    DataCenterVnetDao _dcVnetDao = null;
     @Inject
     ZoneRepository _zoneRepository;
     @Inject
@@ -893,8 +894,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     protected boolean isSharedNetworkWithServices(final Network network) {
         assert network != null;
-        final DataCenter zone = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
-        if (network.getGuestType() == GuestType.Shared && zone.getNetworkType() == NetworkType.Advanced
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+        if (network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Advanced
                 && isSharedNetworkOfferingWithServices(network.getNetworkOfferingId())) {
             return true;
         }
@@ -925,9 +926,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         //Apply egress rules first to effect the egress policy early on the guest traffic
         final List<FirewallRuleVO> firewallEgressRulesToApply = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Egress);
         final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-        final DataCenter zone = _dcDao.findById(network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
         if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall) && _networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall)
-                && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == NetworkType.Advanced)) {
+                && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration
+                .NetworkType.Advanced)) {
             // add default egress rule to accept the traffic
             _firewallMgr.applyDefaultEgressFirewallRule(network.getId(), offering.getEgressDefaultPolicy(), true);
         }
@@ -1112,9 +1114,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
         try {
             // delete default egress rule
-            final DataCenter zone = _dcDao.findById(network.getDataCenterId());
+            final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
             if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall)
-                    && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == NetworkType
+                    && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration
+                    .NetworkType
                     .Advanced)) {
                 // add default egress rule to accept the traffic
                 _firewallMgr.applyDefaultEgressFirewallRule(network.getId(), _networkModel.getNetworkEgressDefaultPolicy(networkId), false);
@@ -1590,8 +1593,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                         guru.shutdown(profile, _networkOfferingDao.findById(networkFinal.getNetworkOfferingId()));
 
                         applyProfileToNetwork(networkFinal, profile);
-                        final DataCenterVO zone = _dcDao.findById(networkFinal.getDataCenterId());
-                        if (isSharedNetworkOfferingWithServices(networkFinal.getNetworkOfferingId()) && zone.getNetworkType() == NetworkType.Advanced) {
+                        final Zone zone = _zoneRepository.findOne(networkFinal.getDataCenterId());
+                        if (isSharedNetworkOfferingWithServices(networkFinal.getNetworkOfferingId()) && zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Advanced) {
                             networkFinal.setState(Network.State.Setup);
                         } else {
                             try {
@@ -1660,8 +1663,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         //In Basic zone, make sure that there are no non-removed console proxies and SSVMs using the network
-        final DataCenter zone = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
-        if (zone.getNetworkType() == NetworkType.Basic) {
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+        if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic) {
             final List<VMInstanceVO> systemVms = _vmDao.listNonRemovedVmsByTypeAndNetwork(network.getId(), Type.ConsoleProxy, Type.SecondaryStorageVm);
             if (systemVms != null && !systemVms.isEmpty()) {
                 s_logger.warn("Can't delete the network, not all consoleProxy/secondaryStorage vms are expunged");
@@ -1813,8 +1816,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             ipv6 = true;
         }
         // Validate zone
-        final DataCenterVO zone = _dcDao.findById(zoneId);
-        if (zone.getNetworkType() == NetworkType.Basic) {
+        final Zone zone = _zoneRepository.findOne(zoneId);
+        if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic) {
             if (ipv6) {
                 throw new InvalidParameterValueException("IPv6 is not supported in Basic zone");
             }
@@ -1853,7 +1856,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     throw new InvalidParameterValueException("Only vlan " + Vlan.UNTAGGED + " can be created in " + "the zone of type " + NetworkType.Basic);
                 }
             }
-        } else if (zone.getNetworkType() == NetworkType.Advanced) {
+        } else if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Advanced) {
             if (zone.isSecurityGroupEnabled()) {
                 if (ipv6) {
                     throw new InvalidParameterValueException("IPv6 is not supported with security group!");
@@ -1893,7 +1896,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
         if (vlanSpecified) {
             //don't allow to specify vlan tag used by physical network for dynamic vlan allocation
-            if (_dcDao.findVnet(zoneId, pNtwk.getId(), vlanId).size() > 0) {
+            if (_dcVnetDao.findVnet(zoneId, pNtwk.getId(), vlanId).size() > 0) {
                 throw new InvalidParameterValueException("The VLAN tag " + vlanId + " is already being used for dynamic vlan allocation for the guest network in zone "
                         + zone.getName());
             }
@@ -1976,7 +1979,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         // In Advance zone Cidr for Shared networks and Isolated networks w/o source nat service can't be NULL - 2.2.x
         // limitation, remove after we introduce support for multiple ip ranges
         // with different Cidrs for the same Shared network
-        final boolean cidrRequired = zone.getNetworkType() == NetworkType.Advanced
+        final boolean cidrRequired = zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Advanced
                 && ntwkOff.getTrafficType() == TrafficType.Guest
                 && (ntwkOff.getGuestType() == GuestType.Shared
                 || (ntwkOff.getGuestType() == GuestType.Isolated && !_networkModel.areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SourceNat)));
@@ -1986,7 +1989,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         // No cidr can be specified in Basic zone
-        if (zone.getNetworkType() == NetworkType.Basic && cidr != null) {
+        if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic && cidr != null) {
             throw new InvalidParameterValueException("StartIp/endIp/gateway/netmask can't be specified for zone of type " + NetworkType.Basic);
         }
 
@@ -2130,8 +2133,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     @Override
     public boolean reallocate(final VirtualMachineProfile vm, final DataCenterDeployment dest) throws InsufficientCapacityException, ConcurrentOperationException {
         final VMInstanceVO vmInstance = _vmDao.findById(vm.getId());
-        final DataCenterVO dc = _dcDao.findById(vmInstance.getDataCenterId());
-        if (dc.getNetworkType() == NetworkType.Basic) {
+        final Zone dc = _zoneRepository.findOne(vmInstance.getDataCenterId());
+        if (dc.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic) {
             final List<NicVO> nics = _nicDao.listByVmId(vmInstance.getId());
             final NetworkVO network = _networksDao.findById(nics.get(0).getNetworkId());
             final LinkedHashMap<Network, List<? extends NicProfile>> profiles = new LinkedHashMap<>();
@@ -2338,8 +2341,9 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         if (cleanup) {
             if (_networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId()).getRedundantRouter()) {
                 List<DomainRouterVO> routers = _routerDao.findByNetwork(network.getId());
-                if (routers != null && !routers.isEmpty())
+                if (routers != null && !routers.isEmpty()) {
                     return rollingRestartIsolatedNetwork(network, routers, context);
+                }
             }
 
             // shutdown the network
@@ -2370,7 +2374,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
     }
 
-    private boolean rollingRestartIsolatedNetwork(NetworkVO network, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException, ConcurrentOperationException, InsufficientCapacityException {
+    private boolean rollingRestartIsolatedNetwork(NetworkVO network, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException,
+            ConcurrentOperationException, InsufficientCapacityException {
         Account caller = CallContext.current().getCallingAccount();
         long callerUserId = CallContext.current().getCallingUserId();
 
@@ -2383,7 +2388,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         DomainRouterVO backupRouter = null;
         if (routers != null && routers.size() == numberOfRoutersWhenSingle) {
             masterRouter = routers.get(0);
-        } if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
+        }
+        if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
             DomainRouterVO router1 = routers.get(0);
             DomainRouterVO router2 = routers.get(1);
             if (router1.getRedundantState() == RedundantState.MASTER || router2.getRedundantState() == RedundantState.BACKUP) {
@@ -2492,10 +2498,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         //     3) network offering does not support a shared source NAT rule
 
         final boolean sharedSourceNat = offering.getSharedSourceNat();
-        final DataCenter zone = _dcDao.findById(network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
 
         if (!sharedSourceNat && _networkModel.areServicesSupportedInNetwork(network.getId(), Service.SourceNat)
-                && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == NetworkType.Advanced)) {
+                && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration
+                .NetworkType.Advanced)) {
 
             List<IPAddressVO> ips = null;
             final Account owner = _entityMgr.findById(Account.class, network.getAccountId());
@@ -2557,7 +2564,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
     }
 
-    private void implementNetworkElements(final DeployDestination dest, final ReservationContext context, final Network network, final NetworkOffering offering, final List<Provider> providersToImplement) throws ResourceUnavailableException, InsufficientCapacityException {
+    private void implementNetworkElements(final DeployDestination dest, final ReservationContext context, final Network network, final NetworkOffering offering, final
+    List<Provider> providersToImplement) throws ResourceUnavailableException, InsufficientCapacityException {
         for (final NetworkElement element : networkElements) {
             if (providersToImplement.contains(element.getProvider())) {
                 if (!_networkModel.isProviderEnabledInPhysicalNetwork(_networkModel.getPhysicalNetworkId(network), element.getProvider().getName())) {
@@ -3204,11 +3212,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final String dataCenter = startup.getDataCenter();
 
         long dcId = -1;
-        DataCenterVO dc = _dcDao.findByName(dataCenter);
+        Zone dc = _zoneRepository.findByName(dataCenter);
         if (dc == null) {
             try {
                 dcId = Long.parseLong(dataCenter);
-                dc = _dcDao.findById(dcId);
+                dc = _zoneRepository.findOne(dcId);
             } catch (final NumberFormatException e) {
             }
         }

@@ -1,7 +1,9 @@
 package com.cloud.network.guru;
 
+import com.cloud.db.repository.ZoneRepository;
+import com.cloud.dc.DataCenterIpAddressVO;
 import com.cloud.dc.Pod;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.dc.dao.DataCenterIpAddressDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -26,7 +28,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +36,11 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     private static final Logger s_logger = LoggerFactory.getLogger(PodBasedNetworkGuru.class);
     private static final TrafficType[] TrafficTypes = {TrafficType.Management};
     @Inject
-    DataCenterDao _dcDao;
+    DataCenterIpAddressDao _ipAllocDao;
+    @Inject
+    ZoneRepository _zoneRepository;
     @Inject
     StorageNetworkManager _sNwMgr;
-    Random _rand = new Random(System.currentTimeMillis());
 
     protected PodBasedNetworkGuru() {
         super();
@@ -85,9 +87,18 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
     @Override
     public void reserve(final NicProfile nic, final Network config, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
+
         final Pod pod = dest.getPod();
 
-        final Pair<String, Long> ip = _dcDao.allocatePrivateIpAddress(dest.getDataCenter().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
+        Pair<String, Long> ip = null;
+
+        _ipAllocDao.releaseIpAddress(nic.getId());
+        final DataCenterIpAddressVO vo = _ipAllocDao.takeIpAddress(dest.getDataCenter().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
+
+        if (vo != null) {
+            ip = new Pair<>(vo.getIpAddress(), vo.getMacAddress());
+        }
+
         if (ip == null) {
             throw new InsufficientAddressCapacityException("Unable to get a management ip address", Pod.class, pod.getId());
         }
@@ -107,7 +118,7 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
 
     @Override
     public boolean release(final NicProfile nic, final VirtualMachineProfile vm, final String reservationId) {
-        _dcDao.releasePrivateIpAddress(nic.getId(), nic.getReservationId());
+        _ipAllocDao.releaseIpAddress(nic.getId(), nic.getReservationId());
 
         nic.deallocate();
 
