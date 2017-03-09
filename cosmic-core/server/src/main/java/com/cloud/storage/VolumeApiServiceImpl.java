@@ -1043,7 +1043,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             }
             _userVmDao.loadDetails(vm);
             final Map<String, String> controllerInfo = new HashMap<>();
-            controllerInfo.put(VmDetailConstants.ROOK_DISK_CONTROLLER, vm.getDetail(VmDetailConstants.ROOK_DISK_CONTROLLER));
+            controllerInfo.put(VmDetailConstants.ROOT_DISK_CONTROLLER, vm.getDetail(VmDetailConstants.ROOT_DISK_CONTROLLER));
             controllerInfo.put(VmDetailConstants.DATA_DISK_CONTROLLER, vm.getDetail(VmDetailConstants.DATA_DISK_CONTROLLER));
             cmd.setControllerInfo(controllerInfo);
 
