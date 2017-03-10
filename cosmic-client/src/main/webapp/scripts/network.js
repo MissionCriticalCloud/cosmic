@@ -5864,6 +5864,18 @@
                                                 id: 'sha1',
                                                 description: 'sha1'
                                             });
+                                            items.push({
+                                                id: 'sha256',
+                                                description: 'sha256'
+                                            });
+                                            items.push({
+                                                id: 'sha384',
+                                                description: 'sha384'
+                                            });
+                                            items.push({
+                                                id: 'sha512',
+                                                description: 'sha512'
+                                            });
                                             args.response.success({
                                                 data: items
                                             });
@@ -5885,6 +5897,26 @@
                                             items.push({
                                                 id: 'modp1536',
                                                 description: 'Group 5(modp1536)'
+                                            });
+                                            items.push({
+                                                id: 'modp2048',
+                                                description: 'Group 14(modp2048)'
+                                            });
+                                            items.push({
+                                                id: 'modp3072',
+                                                description: 'Group 15(modp3072)'
+                                            });
+                                            items.push({
+                                                id: 'modp4096',
+                                                description: 'Group 16(modp4096)'
+                                            });
+                                            items.push({
+                                                id: 'modp6144',
+                                                description: 'Group 17(modp6144)'
+                                            });
+                                            items.push({
+                                                id: 'modp8192',
+                                                description: 'Group 18(modp8192)'
                                             });
                                             args.response.success({
                                                 data: items
@@ -5932,6 +5964,18 @@
                                                 id: 'sha1',
                                                 description: 'sha1'
                                             });
+                                            items.push({
+                                                id: 'sha256',
+                                                description: 'sha256'
+                                            });
+                                            items.push({
+                                                id: 'sha384',
+                                                description: 'sha384'
+                                            });
+                                            items.push({
+                                                id: 'sha512',
+                                                description: 'sha512'
+                                            });
                                             args.response.success({
                                                 data: items
                                             });
@@ -5953,6 +5997,26 @@
                                             items.push({
                                                 id: 'modp1536',
                                                 description: 'Group 5(modp1536)'
+                                            });
+                                           items.push({
+                                                id: 'modp2048',
+                                                description: 'Group 14(modp2048)'
+                                            });
+                                            items.push({
+                                                id: 'modp3072',
+                                                description: 'Group 15(modp3072)'
+                                            });
+                                            items.push({
+                                                id: 'modp4096',
+                                                description: 'Group 16(modp4096)'
+                                            });
+                                            items.push({
+                                                id: 'modp6144',
+                                                description: 'Group 17(modp6144)'
+                                            });
+                                            items.push({
+                                                id: 'modp8192',
+                                                description: 'Group 18(modp8192)'
                                             });
                                             args.response.success({
                                                 data: items
