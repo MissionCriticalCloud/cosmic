@@ -1,20 +1,3 @@
-// Licensed to the Apacohe Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.cloud.vm;
 
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
@@ -1471,14 +1454,18 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     protected <T extends VMInstanceVO> boolean changeState(final T vm, final Event event, final Long hostId, final ItWorkVO work, final Step step) throws NoTransitionException {
         // FIXME: We should do this better.
-        final Step previousStep = work.getStep();
-        _workDao.updateStep(work, step);
+        Step previousStep = null;
+        if (work != null) {
+            previousStep = work.getStep();
+            _workDao.updateStep(work, step);
+        }
+
         boolean result = false;
         try {
             result = stateTransitTo(vm, event, hostId);
             return result;
         } finally {
-            if (!result) {
+            if (!result && work != null) {
                 _workDao.updateStep(work, previousStep);
             }
         }
@@ -3239,8 +3226,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             if (doCleanup) {
                 if (cleanup(vmGuru, new VirtualMachineProfileImpl(vm), work, Event.StopRequested, cleanUpEvenIfUnableToStop)) {
                     try {
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Updating work item to Done, id:" + work.getId());
+                        if (work != null) {
+                            if (s_logger.isDebugEnabled()) {
+                                s_logger.debug("Updating work item to Done, id:" + work.getId());
+                            }
                         }
                         if (!changeState(vm, Event.AgentReportStopped, null, work, Step.Done)) {
                             throw new CloudRuntimeException("Unable to stop " + vm);
