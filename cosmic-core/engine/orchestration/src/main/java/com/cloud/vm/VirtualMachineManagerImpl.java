@@ -384,9 +384,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findVMByInstanceName(vmInstanceName);
         final Account owner = _entityMgr.findById(Account.class, vm.getAccountId());
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Allocating entries for VM: " + vm);
-        }
+        s_logger.debug("Allocating entries for VM: " + vm);
 
         vm.setDataCenterId(plan.getDataCenterId());
         if (plan.getPodId() != null) {
@@ -400,9 +398,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientCapacityException>() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) throws InsufficientCapacityException {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Allocating nics for " + vmFinal);
-                }
+                s_logger.debug(" nics Allocatingfor " + vmFinal);
 
                 try {
                     _networkMgr.allocate(vmProfile, auxiliaryNetworks);
@@ -410,9 +406,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     throw new CloudRuntimeException("Concurrent operation while trying to allocate resources for the VM", e);
                 }
 
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Allocating disks for " + vmFinal);
-                }
+                s_logger.debug("Allocating disks for " + vmFinal);
 
                 if (template.getFormat() == ImageFormat.ISO) {
                     volumeMgr.allocateRawVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
@@ -431,9 +425,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
         });
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Allocation completed for VM: " + vmFinal);
-        }
+        s_logger.debug("Allocation completed for VM: " + vmFinal);
     }
 
     @Override
@@ -772,13 +764,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
 
             if (dest != null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Found destination " + dest + " for migrating to.");
-                }
+                s_logger.debug("Found destination " + dest + " for migrating to.");
             } else {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Unable to find destination for migrating the vm " + profile);
-                }
+                s_logger.debug("Unable to find destination for migrating the vm " + profile);
                 throw new InsufficientServerCapacityException("Unable to find a server to migrate to.", host.getClusterId());
             }
 
@@ -818,9 +806,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         // grab outstanding work item if any
         final ItWorkVO work = _workDao.findByOutstandingWork(vm.getId(), vm.getState());
         if (work != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Found an outstanding work item for this vm " + vm + " in state:" + vm.getState() + ", work id:" + work.getId());
-            }
+            s_logger.debug("Found an outstanding work item for this vm " + vm + " in state:" + vm.getState() + ", work id:" + work.getId());
         }
 
         try {
@@ -861,9 +847,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         if (work != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Updating outstanding work item to Done, id:" + work.getId());
-            }
+            s_logger.debug("Updating outstanding work item to Done, id:" + work.getId());
             work.setStep(Step.Done);
             _workDao.update(work.getId(), work);
         }
@@ -910,9 +894,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     protected void advanceExpunge(VMInstanceVO vm) throws ResourceUnavailableException, OperationTimedoutException, ConcurrentOperationException {
         if (vm == null || vm.getRemoved() != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to find vm or vm is destroyed: " + vm);
-            }
+            s_logger.debug("Unable to find vm or vm is destroyed: " + vm);
             return;
         }
 
@@ -929,9 +911,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             throw new CloudRuntimeException("Unable to destroy " + vm, e);
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Destroying vm " + vm);
-        }
+        s_logger.debug("Destroying vm " + vm);
 
         final VirtualMachineProfile profile = new VirtualMachineProfileImpl(vm);
 
@@ -1003,10 +983,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
         }
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Expunged " + vm);
-        }
+        s_logger.debug("Expunged " + vm);
     }
 
     @Override
@@ -1020,9 +997,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             return;
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Received startup command from hypervisor host. host id: " + agent.getId());
-        }
+        s_logger.debug("Received startup command from hypervisor host. host id: " + agent.getId());
 
         _syncMgr.resetHostSyncState(agent.getId());
 
@@ -1249,25 +1224,19 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         while (true) {
             final ItWorkVO vo = _workDao.findByOutstandingWork(vm.getId(), state);
             if (vo == null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Unable to find work for VM: " + vm + " and state: " + state);
-                }
+                s_logger.debug("Unable to find work for VM: " + vm + " and state: " + state);
                 return true;
             }
 
             if (vo.getStep() == Step.Done) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Work for " + vm + " is " + vo.getStep());
-                }
+                s_logger.debug("Work for " + vm + " is " + vo.getStep());
                 return true;
             }
 
             // also check DB to get latest VM state to detect vm update from concurrent process before idle waiting to get an early exit
             final VMInstanceVO instance = _vmDao.findById(vm.getId());
             if (instance != null && instance.getState() == State.Running) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("VM is already started in DB: " + vm);
-                }
+                s_logger.debug("VM is already started in DB: " + vm);
                 return true;
             }
 
@@ -1387,9 +1356,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                 final ReservationContextImpl context = new ReservationContextImpl(work.getId(), journal, caller, account);
 
                                 if (stateTransitTo(vm, Event.StartRequested, null, work.getId())) {
-                                    if (s_logger.isDebugEnabled()) {
-                                        s_logger.debug("Successfully transitioned to start state for " + vm + " reservation id = " + work.getId());
-                                    }
+                                    s_logger.debug("Successfully transitioned to start state for " + vm + " reservation id = " + work.getId());
                                     return new Ternary<>(vm, context, work);
                                 }
 
@@ -1402,9 +1369,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     return result;
                 }
             } catch (final NoTransitionException e) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Unable to transition into Starting state due to " + e.getMessage());
-                }
+                s_logger.debug("Unable to transition into Starting state due to " + e.getMessage());
             }
 
             final VMInstanceVO instance = _vmDao.findById(vmId);
@@ -1412,15 +1377,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 throw new ConcurrentOperationException("Unable to acquire lock on " + vm);
             }
 
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Determining why we're unable to update the state to Starting for " + instance + ".  Retry=" + retry);
-            }
+            s_logger.debug("Determining why we're unable to update the state to Starting for " + instance + ".  Retry=" + retry);
 
             final State state = instance.getState();
             if (state == State.Running) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("VM is already started: " + vm);
-                }
+                s_logger.debug("VM is already started: " + vm);
                 return null;
             }
 
@@ -1782,16 +1743,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         VMInstanceVO startedVm = null;
         final ServiceOfferingVO offering = _offeringDao.findById(vm.getId(), vm.getServiceOfferingId());
         final VirtualMachineTemplate template = _entityMgr.findByIdIncludingRemoved(VirtualMachineTemplate.class, vm.getTemplateId());
+        s_logger.debug("Trying to deploy VM, vm has dcId: " + vm.getDataCenterId() + " and podId: " + vm.getPodIdToDeployIn());
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Trying to deploy VM, vm has dcId: " + vm.getDataCenterId() + " and podId: " + vm.getPodIdToDeployIn());
-        }
         DataCenterDeployment plan = new DataCenterDeployment(vm.getDataCenterId(), vm.getPodIdToDeployIn(), null, null, null, null, ctx);
         if (planToDeploy != null && planToDeploy.getDataCenterId() != 0) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("advanceStart: DeploymentPlan is provided, using dcId:" + planToDeploy.getDataCenterId() + ", podId: " + planToDeploy.getPodId() +
-                        ", clusterId: " + planToDeploy.getClusterId() + ", hostId: " + planToDeploy.getHostId() + ", poolId: " + planToDeploy.getPoolId());
-            }
+            s_logger.debug("advanceStart: DeploymentPlan is provided, using dcId:" + planToDeploy.getDataCenterId() + ", podId: " + planToDeploy.getPodId()
+                    + ", clusterId: " + planToDeploy.getClusterId() + ", hostId: " + planToDeploy.getHostId() + ", poolId: " + planToDeploy.getPoolId());
             plan =
                     new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
                             planToDeploy.getPoolId(), planToDeploy.getPhysicalNetworkId(), ctx);
@@ -1828,17 +1785,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         // reassign pool for the volume even if it ready.
                         final Long volTemplateId = vol.getTemplateId();
                         if (volTemplateId != null && volTemplateId.longValue() != template.getId()) {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug(vol + " of " + vm + " is READY, but template ids don't match, let the planner reassign a new pool");
-                            }
+                            s_logger.debug(vol + " of " + vm + " is READY, but template ids don't match, let the planner reassign a new pool");
                             continue;
                         }
 
                         final StoragePool pool = (StoragePool) dataStoreMgr.getPrimaryDataStore(vol.getPoolId());
                         if (!pool.isInMaintenance()) {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Root volume is ready, need to place VM in volume's cluster");
-                            }
+                            s_logger.debug("Root volume is ready, need to place VM in volume's cluster");
                             final long rootVolDcId = pool.getDataCenterId();
                             final Long rootVolPodId = pool.getPodId();
                             final Long rootVolClusterId = pool.getClusterId();
@@ -1852,10 +1805,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                                 planToDeploy.getHostId(), vol.getPoolId(), null, ctx);
                             } else {
                                 plan = new DataCenterDeployment(rootVolDcId, rootVolPodId, rootVolClusterId, null, vol.getPoolId(), null, ctx);
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug(vol + " is READY, changing deployment plan to use this pool's dcId: " + rootVolDcId + " , podId: " + rootVolPodId +
+                                s_logger.debug(vol + " is READY, changing deployment plan to use this pool's dcId: " + rootVolDcId + " , podId: " + rootVolPodId +
                                             " , and clusterId: " + rootVolClusterId);
-                                }
                                 planChangedByVolume = true;
                             }
                         }
@@ -1917,9 +1868,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
 
                 try {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("VM is being created in podId: " + vm.getPodIdToDeployIn());
-                    }
+                    s_logger.debug("VM is being created in podId: " + vm.getPodIdToDeployIn());
                     _networkMgr.prepare(vmProfile, dest, ctx);
                     volumeMgr.prepare(vmProfile, dest);
                     //since StorageMgr succeeded in volume creation, reuse Volume for further tries until current cluster has capacity
@@ -1979,14 +1928,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             }
 
                             startedVm = vm;
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Start completed for VM " + vm);
-                            }
+                            s_logger.debug("Start completed for VM " + vm);
                             return;
                         } else {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.info("The guru did not like the answers so stopping " + vm);
-                            }
+                            s_logger.info("The guru did not like the answers so stopping " + vm);
 
                             final StopCommand cmd = new StopCommand(vm, getExecuteInSequence(vm.getHypervisorType()), false);
                             final Answer answer = _agentMgr.easySend(destHostId, cmd);
@@ -2115,10 +2060,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             final String errorMsg;
             errorMsg = String.format("Root volume is ready in cluster '%s' while VM is to be started in cluster '%s'. Make sure these match. Unable to create a deployment for %s",
                     volumeCluster.getName(), vmCluster.getName(), vm);
-
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(errorMsg);
-            }
+            s_logger.debug(errorMsg);
             throw new ResourceUnavailableException(errorMsg, Cluster.class, clusterIdSpecified);
         }
     }
@@ -2126,9 +2068,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     private void orchestrateMigrate(final String vmUuid, final long srcHostId, final DeployDestination dest) throws ResourceUnavailableException, ConcurrentOperationException {
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
         if (vm == null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to find the vm " + vmUuid);
-            }
+            s_logger.debug("Unable to find the vm " + vmUuid);
             throw new CloudRuntimeException("Unable to find a virtual machine with id " + vmUuid);
         }
         migrate(vm, srcHostId, dest);
@@ -2160,9 +2100,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VirtualMachineGuru vmGuru = getVmGuru(vm);
 
         if (vm.getState() != State.Running) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("VM is not Running, unable to migrate the vm " + vm);
-            }
+            s_logger.debug("VM is not Running, unable to migrate the vm " + vm);
             throw new CloudRuntimeException("VM is not Running, unable to migrate the vm currently " + vm + " , current state: " + vm.getState().toString());
         }
 
@@ -2457,16 +2395,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final long vmId = vm.getId();
         vm = _vmDao.findByUuid(vmUuid);
         if (vm == null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to find the vm " + vm);
-            }
+            s_logger.debug("Unable to find the vm " + vm);
             throw new CloudRuntimeException("Unable to find a virtual machine with id " + vmId);
         }
 
         if (vm.getState() != State.Running) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("VM is not Running, unable to migrate the vm " + vm);
-            }
+            s_logger.debug("VM is not Running, unable to migrate the vm " + vm);
             throw new CloudRuntimeException("VM is not Running, unable to migrate the vm currently " + vm + " , current state: " + vm.getState().toString());
         }
 
@@ -3095,17 +3029,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         if (lock == null) {
             //check if nic is still there. Return if it was released already
             if (_nicsDao.findById(nic.getId()) == null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Not need to remove the vm " + vm + " from network " + network + " as the vm doesn't have nic in this network");
-                }
+                s_logger.debug("Not need to remove the vm " + vm + " from network " + network + " as the vm doesn't have nic in this network");
                 return true;
             }
             throw new ConcurrentOperationException("Unable to lock nic " + nic.getId());
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Lock is acquired for nic id " + lock.getId() + " as a part of remove vm " + vm + " from network " + network);
-        }
+        s_logger.debug("Lock is acquired for nic id " + lock.getId() + " as a part of remove vm " + vm + " from network " + network);
 
         try {
             final NicProfile nicProfile =
@@ -3138,9 +3068,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         } finally {
             if (lock != null) {
                 _nicsDao.releaseFromLockTable(lock.getId());
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Lock is released for nic id " + lock.getId() + " as a part of remove vm " + vm + " from network " + network);
-                }
+                s_logger.debug("Lock is released for nic id " + lock.getId() + " as a part of remove vm " + vm + " from network " + network);
             }
         }
     }
@@ -3164,31 +3092,23 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             ConcurrentOperationException {
         final State state = vm.getState();
         if (state == State.Stopped) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("VM is already stopped: " + vm);
-            }
+            s_logger.debug("VM is already stopped: " + vm);
             return;
         }
 
         if (state == State.Destroyed || state == State.Expunging || state == State.Error) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Stopped called on " + vm + " but the state is " + state);
-            }
+            s_logger.debug("Stopped called on " + vm + " but the state is " + state);
             return;
         }
         // grab outstanding work item if any
         final ItWorkVO work = _workDao.findByOutstandingWork(vm.getId(), vm.getState());
         if (work != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Found an outstanding work item for this vm " + vm + " with state:" + vm.getState() + ", work id:" + work.getId());
-            }
+            s_logger.debug("Found an outstanding work item for this vm " + vm + " with state:" + vm.getState() + ", work id:" + work.getId());
         }
         final Long hostId = vm.getHostId();
         if (hostId == null) {
             if (!cleanUpEvenIfUnableToStop) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("HostId is null but this is not a forced stop, cannot stop vm " + vm + " with state:" + vm.getState());
-                }
+                s_logger.debug("HostId is null but this is not a forced stop, cannot stop vm " + vm + " with state:" + vm.getState());
                 throw new CloudRuntimeException("Unable to stop " + vm);
             }
             try {
@@ -3198,9 +3118,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
             // mark outstanding work item if any as done
             if (work != null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Updating work item to Done, id:" + work.getId());
-                }
+                s_logger.debug("Updating work item to Done, id:" + work.getId());
                 work.setStep(Step.Done);
                 _workDao.update(work.getId(), work);
             }
@@ -3219,17 +3137,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 throw new CloudRuntimeException("We cannot stop " + vm + " when it is in state " + vm.getState());
             }
             final boolean doCleanup = true;
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to transition the state but we're moving on because it's forced stop");
-            }
+            s_logger.debug("Unable to transition the state but we're moving on because it's forced stop");
 
             if (doCleanup) {
                 if (cleanup(vmGuru, new VirtualMachineProfileImpl(vm), work, Event.StopRequested, cleanUpEvenIfUnableToStop)) {
                     try {
                         if (work != null) {
-                            if (s_logger.isDebugEnabled()) {
-                                s_logger.debug("Updating work item to Done, id:" + work.getId());
-                            }
+                            s_logger.debug("Updating work item to Done, id:" + work.getId());
                         }
                         if (!changeState(vm, Event.AgentReportStopped, null, work, Step.Done)) {
                             throw new CloudRuntimeException("Unable to stop " + vm);
@@ -3239,9 +3153,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         throw new CloudRuntimeException("Unable to stop " + vm, e);
                     }
                 } else {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Failed to cleanup VM: " + vm);
-                    }
+                    s_logger.debug("Failed to cleanup VM: " + vm);
                     throw new CloudRuntimeException("Failed to cleanup " + vm + " , current state " + vm.getState());
                 }
             }
@@ -3305,9 +3217,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug(vm + " is stopped on the host.  Proceeding to release resource held.");
-        }
+        s_logger.debug(vm + " is stopped on the host.  Proceeding to release resource held.");
 
         try {
             _networkMgr.release(profile, cleanUpEvenIfUnableToStop);
@@ -3321,9 +3231,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         try {
             if (work != null) {
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Updating the outstanding work item to Done, id:" + work.getId());
-                }
+                s_logger.debug("Updating the outstanding work item to Done, id:" + work.getId());
                 work.setStep(Step.Done);
                 _workDao.update(work.getId(), work);
             }
@@ -3570,15 +3478,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     public void destroy(final String vmUuid) throws AgentUnavailableException, OperationTimedoutException, ConcurrentOperationException {
         VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
         if (vm == null || vm.getState() == State.Destroyed || vm.getState() == State.Expunging || vm.getRemoved() != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Unable to find vm or vm is destroyed: " + vm);
-            }
+            s_logger.debug("Unable to find vm or vm is destroyed: " + vm);
             return;
         }
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Destroying vm " + vm);
-        }
+        s_logger.debug("Destroying vm " + vm);
 
         advanceStop(vmUuid, VmDestroyForcestop.value());
 
@@ -4191,9 +4095,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         if (dest != null) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(" Found " + dest + " for scaling the vm to.");
-            }
+            s_logger.debug(" Found " + dest + " for scaling the vm to.");
         }
 
         if (dest == null) {
