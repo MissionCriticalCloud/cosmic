@@ -56,6 +56,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.CpuTuneDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DevicesDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DeviceType;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiscardType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiskProtocol;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.FeaturesDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GraphicDef;
@@ -1705,7 +1706,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final InputDef input = new InputDef("tablet", "usb");
         devices.addDevice(input);
 
-        DiskDef.DiskBus diskBusType = getDiskModelFromVMDetail(vmTo);
+        DiskDef.DiskBus diskBusType = getDiskModelFromVmDetail(vmTo);
         if (diskBusType == null) {
             diskBusType = getGuestDiskModel(vmTo.getPlatformEmulator());
         }
@@ -1867,7 +1868,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
 
             // if params contains a rootDiskController key, use its value (this is what other HVs are doing)
-            DiskDef.DiskBus diskBusType = getDiskModelFromVMDetail(vmSpec);
+            DiskDef.DiskBus diskBusType = getDiskModelFromVmDetail(vmSpec);
 
             if (diskBusType == null) {
                 diskBusType = getGuestDiskModel(vmSpec.getPlatformEmulator());
@@ -1883,6 +1884,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             } else {
                 final int devId = volume.getDiskSeq().intValue();
+
+                if (diskBusType == DiskDef.DiskBus.SCSI ) {
+                    disk.setQemuDriver(true);
+                    disk.setDiscard(DiscardType.UNMAP);
+                }
 
                 if (pool.getType() == StoragePoolType.RBD) {
           /*
@@ -1952,7 +1958,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return Type.Routing;
     }
 
-    public DiskDef.DiskBus getDiskModelFromVMDetail(final VirtualMachineTO vmTO) {
+    public DiskDef.DiskBus getDiskModelFromVmDetail(final VirtualMachineTO vmTO) {
         Map<String, String> details = vmTO.getDetails();
         if (details == null) {
             return null;
