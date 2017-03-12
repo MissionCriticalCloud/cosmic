@@ -18,18 +18,6 @@ public class SetSourceNatConfigItem extends AbstractConfigItemFacade {
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {
         final LinkedList<ConfigItem> cfg = new LinkedList<>();
 
-        /* FIXME This seems useless as we already pass this info with the ipassoc
-         * SetSourceNatCommand command = (SetSourceNatCommand) cmd;
-         * IpAddressTO pubIP = command.getIpAddress();
-         * String dev = "eth" + pubIP.getNicDevId();
-         * String args = "-A";
-         * args += " -l ";
-         * args += pubIP.getPublicIp();
-         * args += " -c ";
-         * args += dev;
-         * cfg.add(new ScriptConfigItem(VRScripts.VPC_SOURCE_NAT, args));
-         */
-
         return cfg;
     }
 }

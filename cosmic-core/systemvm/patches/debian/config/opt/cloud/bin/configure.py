@@ -267,7 +267,7 @@ class CsAcl(CsDataBag):
 class CsVmMetadata(CsDataBag):
     def process(self):
         for ip in self.dbag:
-            if ("id" == ip):
+            if "id" == ip:
                 continue
             logging.info("Processing metadata for %s" % ip)
             for item in self.dbag[ip]:

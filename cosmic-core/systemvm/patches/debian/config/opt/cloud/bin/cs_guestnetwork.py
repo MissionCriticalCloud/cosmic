@@ -7,6 +7,6 @@ def merge(dbag, ip):
             if address['router_guest_ip'] == ip['router_guest_ip']:
                 dbag[dev].remove(address)
 
-    dbag.setdefault('eth' + str(ip['nic_dev_id']), []).append(ip)
+    dbag.setdefault(ip['mac_address'], []).append(ip)
 
     return dbag

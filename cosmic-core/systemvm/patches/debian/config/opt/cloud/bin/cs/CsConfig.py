@@ -34,6 +34,12 @@ class CsConfig(object):
     def address(self):
         return self.ips
 
+    def get_device(self):
+        return self.device
+
+    def get_macaddress(self):
+        return self.macaddress
+
     def get_fw(self):
         return self.fw
 

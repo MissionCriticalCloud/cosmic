@@ -32,7 +32,6 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
         final String[][] rules = command.generateFwRules();
         final String[] aclRules = rules[0];
         final NicTO nic = command.getNic();
-        final String dev = "eth" + nic.getDeviceId();
         final String netmask = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
 
         final List<AclRule> ingressRules = new ArrayList<>();
@@ -74,7 +73,6 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
         }
 
         final PublicIpACL publicIpACL = new PublicIpACL(
-                dev,
                 nic.getMac(),
                 nic.getIp(),
                 netmask,

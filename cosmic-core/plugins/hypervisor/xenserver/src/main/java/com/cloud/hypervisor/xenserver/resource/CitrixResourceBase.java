@@ -328,7 +328,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 final VM router = getVM(conn, routerName);
 
                 final NicTO nic = new NicTO();
-                nic.setMac(ip.getVifMacAddress());
+                nic.setMac(ip.getMacAddress());
                 nic.setType(ip.getTrafficType());
                 if (ip.getBroadcastUri() == null) {
                     nic.setBroadcastType(BroadcastDomainType.Native);
@@ -4279,7 +4279,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 final VM router = getVM(conn, routerName);
 
                 final NicTO nic = new NicTO();
-                nic.setMac(ip.getVifMacAddress());
+                nic.setMac(ip.getMacAddress());
                 nic.setType(ip.getTrafficType());
                 if (ip.getBroadcastUri() == null) {
                     nic.setBroadcastType(BroadcastDomainType.Native);
@@ -4331,7 +4331,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     throw new InternalErrorException("Failed to find DomR VIF to associate/disassociate IP with.");
                 }
                 if (correctVif != null) {
-                    ip.setNicDevId(Integer.valueOf(correctVif.getDevice(conn)));
                     ip.setNewNic(addVif);
                 }
             }
@@ -4345,22 +4344,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     }
 
     protected ExecutionResult prepareNetworkElementCommand(final IpAssocVpcCommand cmd) {
-        final Connection conn = getConnection();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        try {
-            final IpAddressTO[] ips = cmd.getIpAddresses();
-            for (final IpAddressTO ip : ips) {
-
-                final VM router = getVM(conn, routerName);
-
-                final VIF correctVif = getVifByMac(conn, router, ip.getDeviceMacAddress());
-                setNicDevIdIfCorrectVifIsNotNull(conn, ip, correctVif);
-            }
-        } catch (final Exception e) {
-            s_logger.error("Ip Assoc failure on applying one ip due to exception:  ", e);
-            return new ExecutionResult(false, e.getMessage());
-        }
-
         return new ExecutionResult(true, null);
     }
 
@@ -4395,20 +4378,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     }
 
     protected ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
-        final Connection conn = getConnection();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        final IpAddressTO pubIp = cmd.getIpAddress();
-        try {
-            final VM router = getVM(conn, routerName);
-
-            final VIF correctVif = getCorrectVif(conn, router, pubIp);
-
-            pubIp.setNicDevId(Integer.valueOf(correctVif.getDevice(conn)));
-        } catch (final Exception e) {
-            final String msg = "Ip SNAT failure due to " + e.toString();
-            s_logger.error(msg, e);
-            return new ExecutionResult(false, msg);
-        }
         return new ExecutionResult(true, null);
     }
 
@@ -4579,20 +4548,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     protected void setMemory(final Connection conn, final VM vm, final long minMemsize, final long maxMemsize)
             throws XmlRpcException, XenAPIException {
         vm.setMemoryLimits(conn, mem_128m, maxMemsize, minMemsize, maxMemsize);
-    }
-
-    protected void setNicDevIdIfCorrectVifIsNotNull(final Connection conn, final IpAddressTO ip, final VIF correctVif)
-            throws InternalErrorException, BadServerResponse,
-            XenAPIException, XmlRpcException {
-        if (correctVif == null) {
-            if (ip.isAdd()) {
-                throw new InternalErrorException("Failed to find DomR VIF to associate IP with.");
-            } else {
-                s_logger.debug("VIF to deassociate IP with does not exist, return success");
-            }
-        } else {
-            ip.setNicDevId(Integer.valueOf(correctVif.getDevice(conn)));
-        }
     }
 
     public String setupHeartbeatSr(final Connection conn, final SR sr, final boolean force)

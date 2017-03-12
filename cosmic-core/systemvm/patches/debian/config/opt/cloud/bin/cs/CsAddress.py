@@ -16,11 +16,19 @@ VRRP_TYPES = ['guest']
 
 class CsAddress(CsDataBag):
     def compare(self):
-        for dev in CsDevice('', self.config).list():
-            ip = CsIP(dev, self.config)
-            # Process for all types, except the link local interface
-            if dev is not self.get_control_if():
-                ip.compare(self.dbag)
+        for dbag_data in self.config.ips.dbag.values():
+            if dbag_data == "ips":
+                continue
+            print dbag_data
+            try:
+                device_data = dbag_data[0]
+                #device_data = dbag_data
+                ip = CsIP(device_data['device'], device_data["mac_address"], self.config)
+                # Process for all types, except the link local interface
+                if device_data['device'] is not self.get_control_if():
+                    ip.compare(self.dbag)
+            except:
+                pass
 
     def get_interfaces(self):
         interfaces = []
@@ -87,40 +95,17 @@ class CsAddress(CsDataBag):
     def process(self):
         has_sourcenat = False
 
-        for dev in self.dbag:
-            if dev == "id":
+        for identifier in self.dbag:
+            if identifier == "id":
                 continue
-            ip = CsIP(dev, self.config)
 
-            for address in self.dbag[dev]:
-                # Double check interface name based on mac address. If it doesn't match, use discovered device name
-                if address['nw_type'] not in ["control"] and ('vif_mac_address' in address or 'device_mac_address' in address):
-                    if address['source_nat']:
-                        has_sourcenat = True
-                    if 'vif_mac_address' in address:
-                        mac_address_to_check = address['vif_mac_address']
-                    if 'device_mac_address' in address:
-                        mac_address_to_check = address['device_mac_address']
+            try:
+                dev = self.dbag[identifier][0]['device']
+                ip = CsIP(dev, identifier, self.config)
+            except:
+                continue
 
-                    found_device = CsHelper.get_device_from_mac_address(mac_address_to_check)
-                    if found_device is False:
-                        logging.warning("While setting up interface with macaddress %s, we couldn't find a "
-                                        "matching device at this time. To be backwards compatible, let's just continue and hope for the best."
-                                        % mac_address_to_check)
-
-                    elif found_device != address['device']:
-                        logging.warning("The mgt server sends us device %s for macaddress %s but we just found it's "
-                                        "actually on device %s. Will used discovered info instead!" %
-                                        (address['device'], mac_address_to_check, found_device))
-                        address['device'] = found_device
-                        address['nic_dev_id'] = found_device.replace("eth", "")
-                    else:
-                        logging.info("The device using macaddress %s is indeed found to be at %s (%s equals %s)"
-                                     % (mac_address_to_check, found_device, found_device, address['device']))
-                else:
-                    logging.info("Skipping macaddress checks for device of type %s due to known issues. "
-                                 "We'll trust it to be on device %s. " % (address['nw_type'], address['device']))
-
+            for address in self.dbag[identifier]:
                 ip.setAddress(address)
                 logging.info("Address found in DataBag ==> %s" % address)
 
@@ -129,15 +114,11 @@ class CsAddress(CsDataBag):
                     continue
 
                 if ip.configured():
-                    logging.info(
-                        "Address %s on device %s already configured", ip.ip(), dev)
-
+                    logging.info("Address %s on device %s already configured", ip.ip(), dev)
                     ip.post_configure(address)
                 else:
-                    logging.info(
-                        "Address %s on device %s not configured", ip.ip(), dev)
-
-                    if CsDevice(dev, self.config).waitfordevice():
+                    logging.info("Address %s on device %s not configured", ip.ip(), dev)
+                    if CsDevice(dev, identifier, self.config).waitfordevice():
                         ip.configure(address)
 
         cmdline = self.config.cmdline()
@@ -242,9 +223,10 @@ class CsInterface:
 class CsDevice:
     """ Configure Network Devices """
 
-    def __init__(self, dev, config):
+    def __init__(self, dev, macaddress, config):
         self.devlist = []
         self.dev = dev
+        self.macaddress = macaddress
         self.buildlist()
         self.table = ''
         self.tableNo = ''
@@ -289,11 +271,12 @@ class CsDevice:
 
 
 class CsIP:
-    def __init__(self, dev, config):
+    def __init__(self, dev, macaddress, config):
         self.dev = dev
+        self.macaddress = macaddress
         self.dnum = hex(int(dev[3:]))
-        self.iplist = { }
-        self.address = { }
+        self.iplist = {}
+        self.address = {}
         self.list()
         self.fw = config.get_fw()
         self.cl = config.cmdline()
@@ -545,9 +528,7 @@ class CsIP:
         # On deletion nw_type will no longer be known
         if self.get_type() in ('guest'):
             if self.config.is_vpc() or self.config.is_router():
-                CsDevice(self.dev, self.config).configure_rp()
-                logging.error(
-                    "Not able to setup source-nat for a regular router yet")
+                CsDevice(self.dev, self.macaddress, self.config).configure_rp()
 
             if self.config.has_dns() or self.config.is_dhcp():
                 dns = CsDnsmasq(self)
@@ -621,10 +602,11 @@ class CsIP:
 
     # Delete any ips that are configured but not in the bag
     def compare(self, bag):
-        if len(self.iplist) > 0 and (self.dev not in bag.keys() or len(bag[self.dev]) == 0):
+        if len(self.iplist) > 0 and (self.macaddress not in bag.keys() or len(bag[self.macaddress]) == 0):
             # Handle all except control nics
             if self.get_type() not in ["control"]:
                 # Remove all IPs on this device
+                logging.info("Device is of type %s" % self.get_type())
                 logging.info("Will remove all configured addresses on device %s", self.dev)
                 self.delete("all")
                 app = CsApache(self)
@@ -635,14 +617,14 @@ class CsIP:
         # This condition should not really happen but did :)
         # It means an apache file got orphaned after a guest network address
         # was deleted
-        if len(self.iplist) == 0 and (self.dev not in bag.keys() or len(bag[self.dev]) == 0):
+        if len(self.iplist) == 0 and (self.macaddress not in bag.keys() or len(bag[self.macaddress]) == 0):
             app = CsApache(self)
             app.remove()
 
         for ip in self.iplist:
             found = False
-            if self.dev in bag.keys():
-                for address in bag[self.dev]:
+            if self.macaddress in bag.keys():
+                for address in bag[self.macaddress]:
                     self.setAddress(address)
                     if (self.hasIP(ip) or self.is_guest_gateway(address, ip)) and address["add"]:
                         logging.debug("The IP address in '%s' will be configured" % address)
