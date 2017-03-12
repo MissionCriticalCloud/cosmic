@@ -171,9 +171,9 @@ public class ConfigHelperTest {
     protected IpAssocVpcCommand generateIpAssocVpcCommand() {
         final List<IpAddressTO> ips = new ArrayList<>();
 
-        final IpAddressTO ip1 = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false);
-        final IpAddressTO ip2 = new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false);
-        final IpAddressTO ip3 = new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", "00:01:23:45:67:89", 1000, false);
+        final IpAddressTO ip1 = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
+        final IpAddressTO ip2 = new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
+        final IpAddressTO ip3 = new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false);
         ip1.setTrafficType(TrafficType.Public);
         ip2.setTrafficType(TrafficType.Public);
         ip3.setTrafficType(TrafficType.Public);

@@ -3,7 +3,6 @@ package com.cloud.agent.resource.virtualnetwork.model;
 public class GuestNetwork extends ConfigBase {
     private boolean add;
     private String macAddress;
-    private String device;
     private String routerGuestIp;
     private String routerGuestNetmask;
     private String routerGuestGateway;
@@ -15,13 +14,12 @@ public class GuestNetwork extends ConfigBase {
         super(ConfigBase.GUEST_NETWORK);
     }
 
-    public GuestNetwork(final boolean add, final String macAddress, final String device, final String routerGuestIp, final String routerGuestNetmask, final String
+    public GuestNetwork(final boolean add, final String macAddress, final String routerGuestIp, final String routerGuestNetmask, final String
             routerGuestGateway,
                         final String cidr, final String dns, final String domainName) {
         super(ConfigBase.GUEST_NETWORK);
         this.add = add;
         this.macAddress = macAddress;
-        this.device = device;
         this.routerGuestIp = routerGuestIp;
         this.routerGuestNetmask = routerGuestNetmask;
         this.routerGuestGateway = routerGuestGateway;
@@ -44,14 +42,6 @@ public class GuestNetwork extends ConfigBase {
 
     public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
-    }
-
-    public String getDevice() {
-        return device;
-    }
-
-    public void setDevice(final String device) {
-        this.device = device;
     }
 
     public String getRouterGuestIp() {

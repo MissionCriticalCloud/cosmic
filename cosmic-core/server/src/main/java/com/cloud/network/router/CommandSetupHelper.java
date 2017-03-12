@@ -451,27 +451,11 @@ public class CommandSetupHelper {
                 final String vlanId = ipAddr.getVlanTag();
                 final String vlanGateway = ipAddr.getGateway();
                 final String vlanNetmask = ipAddr.getNetmask();
-                final String vifMacAddress;
-
                 final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
-
-                // For non-source nat IP, set the mac to be something based on
-                // first public nic's MAC
-                // We cannot depend on first ip because we need to deal with
-                // first ip of other nics
-                if (router.getVpcId() != null) {
-                    vifMacAddress = ipAddr.getMacAddress();
-                } else {
-                    if (!sourceNat && ipAddr.getVlanId() != 0) {
-                        vifMacAddress = NetUtils.generateMacOnIncrease(deviceMacAddress, ipAddr.getVlanId());
-                    } else {
-                        vifMacAddress = ipAddr.getMacAddress();
-                    }
-                }
-
                 final String ipAddress = ipAddr.getAddress().addr();
+
                 final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddress, add, false, sourceNat,
-                        vlanId, vlanGateway, vlanNetmask, vifMacAddress, deviceMacAddress, networkRate, ipAddr.isOneToOneNat());
+                        vlanId, vlanGateway, vlanNetmask, deviceMacAddress, networkRate, ipAddr.isOneToOneNat());
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
@@ -898,12 +882,9 @@ public class CommandSetupHelper {
                 final boolean add = ipAddr.getState() != IpAddress.State.Releasing;
 
                 final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
-
-                final String macAddress = vlanMacAddress.get(BroadcastDomainType.getValue(BroadcastDomainType.fromString(ipAddr.getVlanTag())));
-
                 final IpAddressTO ip = new IpAddressTO(ipAddr.getAccountId(), ipAddr.getAddress().addr(), add, false,
                         ipAddr.isSourceNat(), BroadcastDomainType.fromString(ipAddr.getVlanTag()).toString(),
-                        ipAddr.getGateway(), ipAddr.getNetmask(), macAddress, deviceMacAddress, networkRate,
+                        ipAddr.getGateway(), ipAddr.getNetmask(), deviceMacAddress, networkRate,
                         ipAddr.isOneToOneNat());
 
                 ip.setTrafficType(network.getTrafficType());
@@ -991,17 +972,10 @@ public class CommandSetupHelper {
                 final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
                 final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false,
                         ipAddr.getSourceNat(), ipAddr.getBroadcastUri(), ipAddr.getGateway(), ipAddr.getNetmask(),
-                        ipAddr.getMacAddress(), deviceMacAddress, null, false);
+                        deviceMacAddress, null, false);
 
                 ip.setTrafficType(network.getTrafficType());
                 ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
-
-                final String ipAddress = ipAddr.getIpAddress();
-                final Long networkId = network.getId();
-                final int deviceId = nicProfile.getDeviceId();
-                ip.setNicDevId(deviceId);
-
-                s_logger.debug("Nic device for IP address using: address = " + ipAddress + " and networkId = " + networkId + " is ==> " + deviceId);
 
                 ipsToSend[i++] = ip;
             }
@@ -1019,17 +993,10 @@ public class CommandSetupHelper {
     public void createSetupPrivateGatewayCommand(final VirtualRouter router, final PrivateIpAddress ipAddr, final Commands cmds, final NicProfile nicProfile, final boolean add) {
         final Network network = _networkModel.getNetwork(ipAddr.getNetworkId());
         final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false, ipAddr.getSourceNat(), ipAddr.getBroadcastUri(),
-                ipAddr.getGateway(), ipAddr.getNetmask(), ipAddr.getMacAddress(), null, null, false);
+                ipAddr.getGateway(), ipAddr.getNetmask(), ipAddr.getMacAddress(), null, false);
 
         ip.setTrafficType(network.getTrafficType());
         ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
-
-        final String ipAddress = ipAddr.getIpAddress();
-        final Long networkId = network.getId();
-        final int deviceId = nicProfile.getDeviceId();
-        ip.setNicDevId(deviceId);
-
-        s_logger.debug("Nic device for IP address using: address = " + ipAddress + " and networkId = " + networkId + " is ==> " + deviceId);
 
         final SetupPrivateGatewayCommand cmd = new SetupPrivateGatewayCommand(ip);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
