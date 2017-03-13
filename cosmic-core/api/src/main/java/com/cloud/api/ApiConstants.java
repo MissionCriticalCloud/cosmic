@@ -120,6 +120,7 @@ public class ApiConstants {
     public static final String IP_ADDRESS_ID = "ipaddressid";
     public static final String IS_ASYNC = "isasync";
     public static final String IP_AVAILABLE = "ipavailable";
+    public static final String IP_EXCLUSION_LIST = "ipexclusionlist";
     public static final String IP_LIMIT = "iplimit";
     public static final String IP_TOTAL = "iptotal";
     public static final String IS_CLEANUP_REQUIRED = "iscleanuprequired";

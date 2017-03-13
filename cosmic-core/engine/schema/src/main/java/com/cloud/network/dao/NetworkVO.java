@@ -116,15 +116,18 @@ public class NetworkVO implements Network {
     @Column(name = "streched_l2")
     boolean strechedL2Network = false;
 
+    @Column(name = "ip_exclusion_list")
+    String ipExclusionList;
+
     public NetworkVO() {
         uuid = UUID.randomUUID().toString();
     }
 
     public NetworkVO(final long id, final Network that, final long offeringId, final String guruName, final long domainId, final long accountId, final long related,
                      final String name, final String displayText, final String networkDomain, final GuestType guestType, final long dcId, final Long physicalNetworkId,
-                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant, final String dns1, final String dns2) {
+                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList) {
         this(id, that.getTrafficType(), that.getMode(), that.getBroadcastDomainType(), offeringId, domainId, accountId, related, name, displayText, networkDomain, guestType,
-                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant, dns1, dns2);
+                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant, dns1, dns2, ipExclusionList);
         gateway = that.getGateway();
         cidr = that.getCidr();
         networkCidr = that.getNetworkCidr();
@@ -161,7 +164,7 @@ public class NetworkVO implements Network {
     public NetworkVO(final long id, final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
                      final long domainId, final long accountId, final long related, final String name, final String displayText, final String networkDomain,
                      final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges, final Long vpcId,
-                     final boolean isRedundant, final String dns1, final String dns2) {
+                     final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList) {
         this(trafficType, mode, broadcastDomainType, networkOfferingId, State.Allocated, dcId, physicalNetworkId, isRedundant);
         this.domainId = domainId;
         this.accountId = accountId;
@@ -177,6 +180,7 @@ public class NetworkVO implements Network {
         this.vpcId = vpcId;
         this.dns1 = dns1;
         this.dns2 = dns2;
+        this.ipExclusionList = ipExclusionList;
     }
 
     /**
@@ -560,5 +564,13 @@ public class NetworkVO implements Network {
 
     public void setIsRedundant(final boolean redundant) {
         this.isRedundant = redundant;
+    }
+
+    public void setIpExclusionList(final String ipExclusionList) {
+        this.ipExclusionList = ipExclusionList;
+    }
+
+    public String getIpExclusionList() {
+        return ipExclusionList;
     }
 }

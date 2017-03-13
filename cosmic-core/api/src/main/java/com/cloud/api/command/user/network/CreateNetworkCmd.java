@@ -26,6 +26,7 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,6 +139,9 @@ public class CreateNetworkCmd extends BaseCmd {
 
     @Parameter(name = ApiConstants.DNS2, type = CommandType.STRING, description = "The second DNS server of the network")
     private String dns2;
+
+    @Parameter(name = ApiConstants.IP_EXCLUSION_LIST, type = CommandType.STRING, description = "IP exclusion list for private networks")
+    private String ipExclusionList;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -282,6 +286,13 @@ public class CreateNetworkCmd extends BaseCmd {
 
     public String getDns2() {
         return dns2;
+    }
+
+    public String getIpExclusionList() {
+        if (StringUtils.isEmpty(ipExclusionList)) {
+            return ipExclusionList;
+        }
+        return ipExclusionList.replaceAll("\\s", "");
     }
 
     @Override

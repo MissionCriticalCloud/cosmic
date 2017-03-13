@@ -23,6 +23,7 @@ import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,9 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.DNS2, type = CommandType.STRING, description = "The second DNS server of the network")
     private String dns2;
 
+    @Parameter(name = ApiConstants.IP_EXCLUSION_LIST, type = CommandType.STRING, description = "IP exclusion list for private networks")
+    private String ipExclusionList;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -85,7 +89,7 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
 
         final Network result =
                 _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
-                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2());
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2(), getIpExclusionList());
 
         if (result != null) {
             final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
@@ -122,6 +126,13 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
 
     public String getDns2() {
         return dns2;
+    }
+
+    public String getIpExclusionList() {
+        if (StringUtils.isEmpty(ipExclusionList)) {
+            return ipExclusionList;
+        }
+        return ipExclusionList.replaceAll("\\s", "");
     }
 
     public Boolean getChangeCidr() {
