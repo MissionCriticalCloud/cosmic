@@ -10,6 +10,7 @@ import os
 import json
 import base64
 import sys
+import time
 
 SOCK_FILE = "/var/lib/libvirt/qemu/{name}.agent"
 PUB_KEY_FILE = "/root/.ssh/id_rsa.pub.cloud"
@@ -18,6 +19,7 @@ CMDLINE_INCOMING = "/var/cache/cloud/cmdline_incoming"
 CMDLINE_FILE = "/var/cache/cloud/cmdline"
 AUTHORIZED_KEYS_FILE_ROOT = "/root/.ssh/authorized_keys"
 AUTHORIZED_KEYS_FILE_CACHE = "/var/cache/cloud/authorized_keys"
+SLEEP_TIME=15
 
 FILE_OPEN_WRITE = """{"execute":"guest-file-open", "arguments":{"path":"%s","mode":"w+"}}"""
 FILE_OPEN_READ = """{"execute":"guest-file-open", "arguments":{"path":"%s","mode":"r"}}"""
@@ -40,8 +42,7 @@ def write_guest_file(path, content):
         print "Write count: " + str(write_count)
     except Exception as ex:
         print Exception, ":", ex
-        print "ERROR: Something went wrong, exiting."
-        sys.exit(1)
+        exit_script()
     finally:
         if file_handle > -1:
             EXE(FILE_CLOSE % file_handle)
@@ -57,8 +58,7 @@ def read_guest_file(path, write_count):
         print "Content from read-back: " + base64.b64decode(result["return"]["buf-b64"])
     except Exception as ex:
         print Exception, ":", ex
-        print "ERROR: Something went wrong, exiting."
-        sys.exit(1)
+        exit_script()
     finally:
         if file_handle > -1:
             EXE(FILE_CLOSE % file_handle)
@@ -67,16 +67,13 @@ def read_guest_file(path, write_count):
 def get_key(key_file):
     if not os.path.exists(key_file):
         print("ERROR: ssh public key not found on host at {0}".format(key_file))
-        print "ERROR: Something went wrong, exiting."
-        sys.exit(1)
-
+        exit_script()
     try:
         with open(key_file, "r") as f:
             pub_key = f.read()
     except IOError as e:
         print("ERROR: unable to open {0} - {1}".format(key_file, e.strerror))
-        print "ERROR: Something went wrong, exiting."
-        sys.exit(1)
+        exit_script()
 
     return pub_key
 
@@ -93,9 +90,13 @@ def write_file(file_in_vm, data):
 def compare_write_read(file, write_count, read_count):
     print "Result for %s: write %d read %d" % (file, write_count, read_count)
     if write_count != read_count:
-        print "ERROR: Write count count doesn't match read count. File wasn't written successfully. Aborting."
-        sys.exit(1)
+        exit_script("ERROR: Write count count doesn't match read count. File wasn't written successfully. Aborting.")
     print "All fine for %s, read count matches write count." % (file)
+
+def exit_script(message="ERROR: Something went wrong, exiting.", sleep_time=SLEEP_TIME):
+    print message
+    time.sleep(sleep_time)
+    sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Send configuration to system VM socket")
