@@ -140,7 +140,7 @@ public class ListHostsCmd extends BaseListCmd {
         } else {
             final Pair<List<? extends Host>, Integer> result;
             final Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>> hostsForMigration =
-                    _mgr.listHostsForMigrationOfVM(getVirtualMachineId(), getStartIndex(), getPageSizeVal());
+                    _mgr.listHostsForMigrationOfVM(getVirtualMachineId(), getStartIndex(), getPageSizeVal(), null);
             result = hostsForMigration.first();
             final List<? extends Host> hostsWithCapacity = hostsForMigration.second();
 
