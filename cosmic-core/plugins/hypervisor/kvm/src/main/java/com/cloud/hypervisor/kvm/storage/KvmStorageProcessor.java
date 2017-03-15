@@ -16,6 +16,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DeviceType;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiscardType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiskProtocol;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.Storage.ImageFormat;
@@ -1154,6 +1155,10 @@ public class KvmStorageProcessor implements StorageProcessor {
                     }
                 }
                 diskdef = new DiskDef();
+                if (diskBusType == DiskDef.DiskBus.SCSI) {
+                    diskdef.setQemuDriver(true);
+                    diskdef.setDiscard(DiscardType.UNMAP);
+                }
                 diskdef.setSerial(serial);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),

@@ -521,6 +521,15 @@ public class LibvirtVmDef {
         private DiskCacheMode diskCacheMode;
         private String serial;
         private boolean qemuDriver = true;
+        private DiscardType discard = DiscardType.IGNORE;
+
+        public DiscardType getDiscard() {
+            return discard;
+        }
+
+        public void setDiscard(DiscardType discard) {
+            this.discard = discard;
+        }
 
         public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskBus bus, final DiskFmtType diskFmtType) {
             diskType = DiskType.FILE;
@@ -807,6 +816,22 @@ public class LibvirtVmDef {
             }
         }
 
+        public enum DiscardType {
+            IGNORE("ignore"), UNMAP("unmap");
+            String _discardType;
+            DiscardType(String discardType) {
+                _discardType = discardType;
+            }
+
+            @Override
+            public String toString() {
+                if (_discardType == null) {
+                    return "ignore";
+                }
+                return _discardType;
+            }
+        }
+
         @Override
         public String toString() {
             final StringBuilder diskBuilder = new StringBuilder();
@@ -818,7 +843,11 @@ public class LibvirtVmDef {
             diskBuilder.append(">\n");
             if (qemuDriver) {
                 diskBuilder.append("<driver name='qemu'" + " type='" + diskFmtType
-                        + "' cache='" + diskCacheMode + "' " + "/>\n");
+                        + "' cache='" + diskCacheMode + "' ");
+                if(discard != null && discard != DiscardType.IGNORE) {
+                    diskBuilder.append("discard='" + discard.toString() + "' ");
+                }
+                diskBuilder.append("/>\n");
             }
 
             if (diskType == DiskType.FILE) {
