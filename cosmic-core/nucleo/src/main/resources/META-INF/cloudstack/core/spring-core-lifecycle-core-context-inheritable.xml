@@ -17,7 +17,9 @@
         <property name="typeClass" value="com.cloud.utils.component.PluggableService" />
     </bean>
 
-    <context:property-placeholder location="file:///etc/cosmic/management/db.properties" />
+    <bean id="dbProperties" class="com.cloud.utils.db.DbProperties" factory-method="getDbProperties" />
+    <context:property-placeholder properties-ref="dbProperties" />
+
     <jpa:repositories base-package="com.cloud.db.repository" />
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
