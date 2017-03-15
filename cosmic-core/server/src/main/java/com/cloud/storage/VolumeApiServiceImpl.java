@@ -159,7 +159,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             "Interval in milliseconds to check if the job is complete", false);
     private final static Logger s_logger = LoggerFactory.getLogger(VolumeApiServiceImpl.class);
     @Inject
-    final DataCenterDao _dcDao = null;
+    DataCenterDao _dcDao = null;
     private final StateMachine2<Volume.State, Volume.Event, Volume> _volStateMachine;
     @Inject
     VolumeOrchestrationService _volumeMgr;
@@ -672,12 +672,15 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final Account owner = _accountDao.findById(volumeToAttach.getAccountId());
 
-        try {
-            _resourceLimitMgr.checkResourceLimit(owner, ResourceType.primary_storage, volumeToAttach.getSize());
-        } catch (final ResourceAllocationException e) {
-            s_logger.error("primary storage resource limit check failed", e);
-            throw new InvalidParameterValueException(e.getMessage());
+        if(!(volumeToAttach.getState() == Volume.State.Allocated || volumeToAttach.getState() == Volume.State.Ready)){
+            try {
+                _resourceLimitMgr.checkResourceLimit(owner, ResourceType.primary_storage, volumeToAttach.getSize());
+            } catch (final ResourceAllocationException e) {
+                s_logger.error("primary storage resource limit check failed", e);
+                throw new InvalidParameterValueException(e.getMessage());
+            }
         }
+
 
         final HypervisorType rootDiskHyperType = vm.getHypervisorType();
         final HypervisorType volumeToAttachHyperType = _volsDao.getHypervisorType(volumeToAttach.getId());
