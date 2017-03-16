@@ -1,13 +1,14 @@
 #!/bin/bash
 
+
 # As the last command send to router before any rules operation, wait until boot up done
 
 __TIMEOUT=240
 __FLAGFILE=/var/cache/cloud/boot_up_done
 done=0
-for i in `seq 1 $((${__TIMEOUT} * 10))`
+for i in `seq 1 $(($__TIMEOUT * 10))`
 do
-    if [ -e ${__FLAGFILE} ]
+    if [ -e $__FLAGFILE ]
     then
         done=1
         break
@@ -19,13 +20,12 @@ do
     fi
 done
 
-if [ -z ${done} ]
+if [ -z $done ]
 then
     # declare we failed booting process
     echo "Waited 60 seconds but boot up haven't been completed"
     exit
 fi
 
-release=$(cat /etc/cloudstack-release)
-sig=$(cat /var/cache/cloud/cloud-scripts-signature)
-echo "${release}&${sig}"
+echo -n `cat /etc/cloudstack-release`'&'
+cat /var/cache/cloud/cloud-scripts-signature
