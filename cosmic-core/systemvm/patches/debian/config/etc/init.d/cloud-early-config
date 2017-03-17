@@ -678,11 +678,46 @@ setup_sshd(){
   local ip=$1
   local eth=$2
   [ -f /etc/ssh/sshd_config ] && sed -i -e "s/^[#]*ListenAddress.*$/ListenAddress $ip/" /etc/ssh/sshd_config
+  [ -f /etc/ssh/sshd_config ] && sed -i -e "s/^[#]*PrintMotd.*$/PrintMotd no/" /etc/ssh/sshd_config
   sed -i "/3922/s/eth./$eth/" /etc/iptables/rules.v4
   sed -i "/3922/s/eth./$eth/" /etc/iptables/rules
   /etc/init.d/ssh force-reload
+
+  setup_motd $ip
 }
 
+setup_motd(){
+  local ip=$1
+
+  cat >/etc/issue <<EOL
+
+Debian GNU/Linux 7 \n \l
+  ____________________________________________
+ ( Void 100% of your warranty @ $ip )
+  --------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+           (__)\       )\/
+             ||----w |
+             ||     ||
+
+EOL
+
+  cat >/etc/motd <<EOL
+
+Cosmiccloud.io SystemVM powered by Debian GNU/Linux 7
+  ______________________________________
+ ( Booo! 0% of your warranty remaining! )
+  --------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/
+               ||----w |
+               ||     ||
+
+EOL
+
+}
 
 setup_apache2() {
   log_it "Setting up apache web server"
