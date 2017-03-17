@@ -484,18 +484,10 @@ class CsSite2SiteVpn(CsDataBag):
         esppolicy=obj['esp_policy'].replace(';','-')
 
         strokefile='/etc/strongswan.d/charon/stroke.conf'
-        ipsecconf='/etc/ipsec.conf'
 
         # Set timeout to 30s
         file = CsFile(strokefile)
         file.greplace("# timeout = 0", "timeout = 30000")
-        file.commit()
-
-        # Handle ipsec.conf
-        file = CsFile(ipsecconf)
-        file.empty()
-        file.addeq("# ipsec.conf - strongSwan IPsec configuration file")
-        file.addeq("include /etc/ipsec.d/*.conf")
         file.commit()
 
         pfs='no'
