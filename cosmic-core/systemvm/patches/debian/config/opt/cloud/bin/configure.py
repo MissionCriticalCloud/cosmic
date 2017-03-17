@@ -529,10 +529,8 @@ class CsSite2SiteVpn(CsDataBag):
             logging.info("Configured vpn %s %s", leftpeer, rightpeer)
             CsHelper.execute("ipsec rereadsecrets")
 
+        # This will load the new config and start the connection when needed since auto=start in the config
         CsHelper.execute("ipsec reload")
-        if not obj['passive']:
-            CsHelper.execute("sudo nohup ipsec down vpn-%s" % rightpeer)
-            CsHelper.execute("sudo nohup ipsec up vpn-%s &" % rightpeer)
         os.chmod(vpnsecretsfile, 0400)
 
     def convert_sec_to_h(self, val):
@@ -1142,7 +1140,7 @@ class IpTablesExecutor:
         fwd = CsForwardingRules("forwardingrules", self.config)
         fwd.process()
 
-        # Strongswan is included in the systemvm template 17.3.12 and newer
+        # Strongswan is included in the systemvm template 17.3.13 and newer
         if get_systemvm_version() > 170312:
             logging.debug("Found StrongSwan compatible systemvm template so let's configure VPN with it")
             vpns = CsSite2SiteVpn("site2sitevpn", self.config)
