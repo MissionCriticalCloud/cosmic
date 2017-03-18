@@ -95,7 +95,6 @@ class Services:
 class TestVpcVpn(cloudstackTestCase):
 
     attributes = {
-        'template_name': 'tiny linux kvm',
         'default_offerings': {
             'vpc': 'Default VPC offering',
             'redundant_vpc': 'Redundant VPC offering',
