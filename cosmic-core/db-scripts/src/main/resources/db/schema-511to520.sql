@@ -13,7 +13,7 @@ UPDATE `cloud`.`guest_os_hypervisor` SET removed=now() WHERE guest_os_id NOT IN 
 UPDATE `cloud`.`guest_os` SET removed=now() WHERE id NOT IN (SELECT DISTINCT guest_os_id FROM vm_template WHERE state = 'active');
 
 -- keep only the defaults, as the others are very old
-UPDATE `cloud`.`guest_os_hypervisor` SET removed=now() WHERE hypervisor_version <> 'default';
+UPDATE `cloud`.`guest_os_hypervisor` SET removed=now() WHERE hypervisor_version <> 'default' and hypervisor_type = 'KVM';
 
 UPDATE guest_os SET display_name = 'Non-bootable ISO' WHERE id = 1;
 UPDATE guest_os SET display_name = 'SystemVM Debian 7 (32 bit)' WHERE id = 183;
