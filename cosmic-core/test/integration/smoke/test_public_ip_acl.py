@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 class TestPublicIpAcl(cloudstackTestCase):
 
     attributes = {
-        'template_name': 'tiny linux kvm',
         'account': {
             'email': 'e.cartman@southpark.com',
             'firstname': 'Eric',
@@ -106,8 +105,8 @@ class TestPublicIpAcl(cloudstackTestCase):
 
         cls.template = get_template(
             cls.api_client,
-            cls.zone.id,
-            template_name=cls.attributes['template_name'])
+            cls.zone.id)
+
         cls.logger.debug("[TEST] Template '%s' selected" % cls.template.name)
 
         cls.account = Account.create(
