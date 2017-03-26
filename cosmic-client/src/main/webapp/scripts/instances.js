@@ -119,6 +119,9 @@
                 stopped: {
                     label: 'state.Stopped'
                 },
+                hostname: {
+                    label: 'label.hypervisor'
+                },
                 destroyed: {
                     preFilter: function (args) {
                         if (isAdmin() || isDomainAdmin())
@@ -149,7 +152,13 @@
                     label: 'label.ip.address'
                 },
                 hostname: {
-                        label: 'label.hypervisor'
+                        label: 'label.hypervisor',
+                        converter: function(args) {
+                            if (args)
+                                return args.split('.')[0];
+                            else
+                                return '';
+                        }
                 },
                 state: {
                     label: 'label.state',
