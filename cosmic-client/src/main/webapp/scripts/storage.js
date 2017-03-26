@@ -2363,8 +2363,9 @@
 
         if (jsonObj.state != "Creating") {
             if (jsonObj.type == "ROOT") {
-                if (jsonObj.vmstate == "Stopped") {
+                if (jsonObj.vmstate == "Stopped" || jsonObj.vmstate == "Destroyed") {
                     allowedActions.push("createTemplate");
+                    allowedActions.push("detachDisk");
                 }
             } else { //jsonObj.type == "DATADISK"
                 if (jsonObj.virtualmachineid != null) {
