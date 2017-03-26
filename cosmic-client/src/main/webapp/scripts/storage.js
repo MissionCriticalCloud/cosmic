@@ -1147,12 +1147,29 @@
                                                     data: items
                                                 });
                                             }
+                                        },
+                                        deviceid: {
+                                            label: 'label.device.id',
+                                            validation: {
+                                                required: false
+                                            }
                                         }
                                     }
                                 },
                                 action: function (args) {
+                                    var data = {
+                                        id: args.context.volumes[0].id,
+                                        virtualMachineId: args.data.virtualMachineId
+                                    };
+                                    // Check for integer to be used as deviceId, or just leave it out
+                                    if (args.data.deviceid != "" && typeof parseInt(args.data.deviceid, 10) === 'number' && args.data.deviceid % 1 === 0) {
+                                        $.extend(data, {
+                                            deviceid: args.data.deviceid
+                                        });
+                                    }
                                     $.ajax({
-                                        url: createURL("attachVolume&id=" + args.context.volumes[0].id + '&virtualMachineId=' + args.data.virtualMachineId),
+                                        url: createURL("attachVolume"),
+                                        data: data,
                                         dataType: "json",
                                         async: true,
                                         success: function (json) {
@@ -2363,8 +2380,9 @@
 
         if (jsonObj.state != "Creating") {
             if (jsonObj.type == "ROOT") {
-                if (jsonObj.vmstate == "Stopped") {
+                if (jsonObj.vmstate == "Stopped" || jsonObj.vmstate == "Destroyed") {
                     allowedActions.push("createTemplate");
+                    allowedActions.push("detachDisk");
                 }
             } else { //jsonObj.type == "DATADISK"
                 if (jsonObj.virtualmachineid != null) {
