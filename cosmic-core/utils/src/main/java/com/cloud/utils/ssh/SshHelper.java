@@ -16,12 +16,6 @@ public class SshHelper {
     private static final int DEFAULT_CONNECT_TIMEOUT = 180000;
     private static final int DEFAULT_KEX_TIMEOUT = 60000;
 
-    /**
-     * Waiting time to check if the SSH session was successfully opened. This value (of 1000
-     * milliseconds) represents one (1) second.
-     */
-    private static final long WAITING_OPEN_SSH_SESSION = 1000;
-
     private static final Logger s_logger = LoggerFactory.getLogger(SshHelper.class);
 
     public static Pair<Boolean, String> sshExecute(final String host, final int port, final String user, final File pemKeyFile, final String password, final String command)
@@ -119,15 +113,8 @@ public class SshHelper {
         }
     }
 
-    /**
-     * It gets a {@link Session} from the given {@link Connection}; then, it waits
-     * {@value #WAITING_OPEN_SSH_SESSION} milliseconds before returning the session, given a time to
-     * ensure that the connection is open before proceeding the execution.
-     */
-    protected static Session openConnectionSession(final Connection conn) throws IOException, InterruptedException {
-        final Session sess = conn.openSession();
-        Thread.sleep(WAITING_OPEN_SSH_SESSION);
-        return sess;
+    protected static Session openConnectionSession(final Connection conn) throws IOException {
+        return conn.openSession();
     }
 
     /**
