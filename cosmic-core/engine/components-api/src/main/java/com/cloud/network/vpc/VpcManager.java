@@ -84,6 +84,7 @@ public interface VpcManager {
      * @param vpcId
      * @param caller
      * @param displayNetworkEnabled
+     * @param ipExclusionList
      * @return
      * @throws ConcurrentOperationException
      * @throws InsufficientCapacityException
@@ -92,7 +93,7 @@ public interface VpcManager {
     Network
     createVpcGuestNetwork(long ntwkOffId, String name, String displayText, String gateway, String cidr, String vlanId, String networkDomain, Account owner,
                           Long domainId, PhysicalNetwork pNtwk, long zoneId, ACLType aclType, Boolean subdomainAccess, long vpcId, Long aclId, Account caller,
-                          Boolean displayNetworkEnabled, String dns1, String dns2)
+                          Boolean displayNetworkEnabled, String dns1, String dns2, final String ipExclusionList)
 
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
 

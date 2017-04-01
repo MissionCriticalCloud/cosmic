@@ -192,6 +192,10 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
     @Param(description = "the cidr of IPv6 network")
     private String ip6Cidr;
 
+    @SerializedName(ApiConstants.IP_EXCLUSION_LIST)
+    @Param(description = "list of ip addresses and/or ranges of addresses to be excluded from the network for assignment")
+    private String ipExclusionList;
+
     @SerializedName(ApiConstants.DISPLAY_NETWORK)
     @Param(description = "an optional field, whether to the display the network to the end user or not.", authorized = {RoleType.Admin})
     private Boolean displayNetwork;
@@ -266,6 +270,10 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
 
     public void setDns2(final String dns2) {
         this.dns2 = dns2;
+    }
+
+    public void setIpExclusionList(final String ipExclusionList) {
+        this.ipExclusionList = ipExclusionList;
     }
 
     public void setType(final String type) {

@@ -101,11 +101,11 @@ public class CreatePrivateNetworkTest {
 
         final Network net =
                 new NetworkVO(1L, TrafficType.Guest, Mode.None, BroadcastDomainType.Vlan, 1L, 1L, 1L, 1L, "bla", "fake", "eet.net", GuestType.Isolated, 1L, 1L,
-                        ACLType.Account, false, 1L, false, "1.2.3.4", null);
+                        ACLType.Account, false, 1L, false, "1.2.3.4", null, null);
         when(
                 networkService._networkMgr.createGuestNetwork(eq(ntwkOff.getId()), eq("bla"), eq("fake"), eq("10.1.1.1"), eq("10.1.1.0/24"), anyString(), anyString(),
                         eq(account), anyLong(), eq(physicalNetwork), eq(physicalNetwork.getDataCenterId()), eq(ACLType.Account), anyBoolean(), eq(1L), anyString(), anyString(),
-                        anyBoolean(), anyString(), eq("1.2.3.4"), eq(null))).thenReturn(net);
+                        anyBoolean(), anyString(), eq("1.2.3.4"), eq(null), eq(null))).thenReturn(net);
 
         when(networkService._privateIpDao.findByIpAndSourceNetworkId(net.getId(), "10.1.1.2")).thenReturn(null);
         when(networkService._privateIpDao.findByIpAndSourceNetworkIdAndVpcId(eq(1L), anyString(), eq(1L))).thenReturn(null);

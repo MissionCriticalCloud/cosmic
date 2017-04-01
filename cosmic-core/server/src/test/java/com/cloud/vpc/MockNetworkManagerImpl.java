@@ -241,7 +241,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     @Override
     public Network updateGuestNetwork(final long networkId, final String name, final String displayText, final Account callerAccount, final User callerUser, final String
             domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork, final String newUUID, final String
-                                              dns1, final String dns2) {
+                                              dns1, final String dns2, final String ipExclusionList) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -548,7 +548,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     @Override
     public List<NetworkVO> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                         final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType, final Boolean subdomainAccess,
-                                        final Long vpcId, final Boolean isNetworkDisplayEnabled, final String dns1, final String dns2)
+                                        final Long vpcId, final Boolean isNetworkDisplayEnabled, final String dns1, final String dns2, final String ipExclusionList)
             throws ConcurrentOperationException {
         // TODO Auto-generated method stub
         return null;
@@ -663,7 +663,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,
                                       final String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork physicalNetwork, final long zoneId,
                                       final ACLType aclType, final Boolean subdomainAccess, final Long vpcId, final String gatewayv6, final String cidrv6,
-                                      final Boolean displayNetworkEnabled, final String isolatedPvlan, final String dns1, final String dns2) throws
+                                      final Boolean displayNetworkEnabled, final String isolatedPvlan, final String dns1, final String dns2, final String ipExclusionList) throws
             ConcurrentOperationException,
             InsufficientCapacityException,
             ResourceAllocationException {

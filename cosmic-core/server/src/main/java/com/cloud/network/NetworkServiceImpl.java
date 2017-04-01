@@ -159,6 +159,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -167,6 +168,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -683,6 +685,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         final String isolatedPvlan = cmd.getIsolatedPvlan();
         final String dns1 = cmd.getDns1();
         final String dns2 = cmd.getDns2();
+        final String ipExclusionList = cmd.getIpExclusionList();
 
         // Validate network offering
         final NetworkOfferingVO ntwkOff = _networkOfferingDao.findById(networkOfferingId);
@@ -864,6 +867,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
                 cidr = NetUtils.ipAndNetMaskToCidr(gateway, netmask);
             }
+
+            checkIpExclusionList(ipExclusionList, cidr, null);
         }
 
         if (ipv6) {
@@ -967,7 +972,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
-                createVlan, dns1, dns2);
+                createVlan, dns1, dns2, ipExclusionList);
 
         // if the network offering has persistent set to true, implement the network
         if (ntwkOff.getIsPersistent()) {
@@ -994,6 +999,45 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
         return network;
+    }
+
+    public void checkIpExclusionList(final String ipExclusionList, final String cidr, List<NicVO> nicsPresent) {
+        if (!org.apache.commons.lang.StringUtils.isEmpty(ipExclusionList)) {
+            // validate ipExclusionList
+            // Perform a "syntax" check on the list
+            if (!NetUtils.validIpRangeList(ipExclusionList)) {
+                throw new InvalidParameterValueException("Syntax error in ipExclusionList");
+            }
+
+            final List<String> excludedIps = NetUtils.getAllIpsFromRangeList(ipExclusionList);
+
+            if (cidr != null) {
+                //Check that ipExclusionList (delimiters) is within the CIDR
+                if(!NetUtils.isIpRangeListInCidr(ipExclusionList,cidr)){
+                    throw new InvalidParameterValueException("An IP in the ipExclusionList is not part of the CIDR of the network " + cidr);
+                }
+
+                //Check that at least one IP is available after exclusion for the router interface
+                final SortedSet<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr, NetUtils.listIp2LongList(excludedIps));
+                if( allPossibleIps.size() == 0 ){
+                    throw new InvalidParameterValueException("The ipExclusionList excludes all IPs in the CIDR; at least one needs to be available");
+                }
+            }
+
+            if (nicsPresent != null) {
+                // Check that no existing nics/ips are part of the exclusion list
+                for (final NicVO nic : nicsPresent) {
+                    final String nicIp = nic.getIPv4Address();
+                    //check if nic IP is exclusionList
+                    if (excludedIps.contains(nicIp)) {
+                        if (!(nic.getState() == Nic.State.Deallocating)) {
+                            throw new InvalidParameterValueException("Active IP " + nic.getIPv4Address() + " exist in ipExclusionList.");
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     @Override
@@ -1520,7 +1564,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_UPDATE, eventDescription = "updating network", async = true)
     public Network updateGuestNetwork(final long networkId, final String name, final String displayText, final Account callerAccount, final User callerUser,
                                       final String domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork,
-                                      final String customId, final String dns1, final String dns2) {
+                                      final String customId, final String dns1, final String dns2, final String ipExclusionList) {
 
         boolean restartNetwork = false;
 
@@ -1577,6 +1621,17 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (dns2 != null) {
             network.setDns2(dns2);
             restartNetwork = true;
+        }
+
+        if (ipExclusionList != null) {
+            String networkCidr = null;
+            if (guestVmCidr == null) {
+                networkCidr = network.getNetworkCidr();
+            }
+
+            final List<NicVO> nicsPresent = _nicDao.listByNetworkId(networkId);
+            checkIpExclusionList(ipExclusionList, networkCidr, nicsPresent);
+            network.setIpExclusionList(ipExclusionList);
         }
 
         // display flag is not null and has changed
@@ -1769,6 +1824,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 s_logger.warn("Guest VM CIDR and Network CIDR both are same, reservation will reset.");
                 network.setNetworkCidr(null);
             }
+            checkIpExclusionList(ipExclusionList, guestVmCidr, null);
             // Finally update "cidr" with the guestVmCidr
             // which becomes the effective address space for CloudStack guest VMs
             network.setCidr(guestVmCidr);
@@ -3123,7 +3179,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                         //create Guest network
                         privateNetwork = _networkMgr.createGuestNetwork(ntwkOffFinal.getId(), networkName, displayText, gateway, cidr, uriString, null, owner, null, pNtwk,
                                 pNtwk.getDataCenterId(), ACLType.Account, null, vpcId, null, null, true, null,
-                                dc.getDns1(), dc.getDns2());
+                                dc.getDns1(), dc.getDns2(), null );
                         if (privateNetwork != null) {
                             s_logger.debug("Successfully created guest network " + privateNetwork);
                         } else {
@@ -3834,7 +3890,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                   final Long domainId, final boolean isDomainSpecific, final Boolean subdomainAccessFinal, final Long vpcId, final String startIPv6,
                                   final String endIPv6, final String ip6Gateway, final String ip6Cidr, final Boolean displayNetwork, final Long aclId, final String isolatedPvlan,
                                   final NetworkOfferingVO ntwkOff, final PhysicalNetwork pNtwk, final ACLType aclType, final Account ownerFinal, final String cidr,
-                                  final boolean createVlan, final String dns1, final String dns2) throws InsufficientCapacityException,
+                                  final boolean createVlan, final String dns1, final String dns2, final String ipExclusionList) throws InsufficientCapacityException,
             ResourceAllocationException {
         try {
             final Network network = Transaction.execute(new TransactionCallbackWithException<Network, Exception>() {
@@ -3880,7 +3936,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                             }
                         }
                         network = _vpcMgr.createVpcGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork, dns1, dns2);
+                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork, dns1, dns2, ipExclusionList);
                     } else {
                         if (_configMgr.isOfferingForVpc(ntwkOff)) {
                             throw new InvalidParameterValueException("Network offering can be used for VPC networks only");
@@ -3890,7 +3946,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                         }
 
                         network = _networkMgr.createGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2);
+                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2, ipExclusionList);
                     }
 
                     if (_accountMgr.isRootAdmin(caller.getId()) && createVlan && network != null) {

@@ -1964,6 +1964,8 @@ public class ApiResponseHelper implements ResponseGenerator {
             response.setNetmask(NetUtils.cidr2Netmask(network.getCidr()));
         }
 
+        response.setIpExclusionList(((NetworkVO)network).getIpExclusionList());
+
         response.setIp6Gateway(network.getIp6Gateway());
         response.setIp6Cidr(network.getIp6Cidr());
 
