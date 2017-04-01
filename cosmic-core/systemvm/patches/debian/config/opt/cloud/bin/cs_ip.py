@@ -28,7 +28,8 @@ def merge(dbag, ip):
         ip['nw_type'] = ip['nw_type'].lower()
     if ip['nw_type'] == 'control':
         dbag['eth' + str(ip['nic_dev_id'])] = [ip]
-    else:
+    # if ip['add'] is false, the IP will be removed from the databag
+    elif ip['add']:
         dbag.setdefault('eth' + str(ip['nic_dev_id']), []).append(ip)
 
     return dbag
