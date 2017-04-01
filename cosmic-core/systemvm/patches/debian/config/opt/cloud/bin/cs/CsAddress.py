@@ -101,9 +101,8 @@ class CsAddress(CsDataBag):
                     found_device = CsHelper.get_device_from_mac_address(mac_address_to_check)
                     if found_device is False:
                         logging.warning("While setting up interface with macaddress %s, we couldn't find a "
-                                        "matching device at this time. Skipping setting up for now."
+                                        "matching device at this time. To be backwards compatible, let's just continue and hope for the best."
                                         % mac_address_to_check)
-                        continue
 
                     elif found_device != address['device']:
                         logging.warning("The mgt server sends us device %s for macaddress %s but we just found it's "
@@ -597,8 +596,11 @@ class CsIP:
 
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:
+                logging.info("Adding SourceNAT for interface %s to %s" % (self.dev, self.address['public_ip']))
                 self.fw.append(
                     ["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
+            else:
+                logging.info("Not adding SourceNAT for interface %s to %s, because source_nat=False" % (self.dev, self.address['public_ip']))
 
     def list(self):
         self.iplist = { }
