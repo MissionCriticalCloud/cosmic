@@ -227,6 +227,10 @@ var addPrivateNetworkDialog = {
                         required: true
                     }
                 },
+                ipexclusionlist: {
+                    label: 'label.ipexclusionlist',
+                    docID: 'helpTierIpExclusionList'
+                },
                 vlanId: {
                     label: 'label.vlan',
                 },
@@ -388,6 +392,7 @@ var addPrivateNetworkDialog = {
             array1.push("&networkOfferingId=" + args.data.networkOfferingId);
             array1.push("&name=" + todb(args.data.name));
             array1.push("&displayText=" + todb(args.data.name));
+            array1.push("&ipexclusionlist=" + args.data.ipexclusionlist);
 
             if (($form.find('.form-item[rel=vlanId]').css("display") != "none")
                 && (args.data.vlanId != null && args.data.vlanId.length > 0))

@@ -120,6 +120,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1543,6 +1544,12 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw new InvalidParameterValueException(
                     "The specified ip address for the private network " + ipAddress +
                             " should be within the CIDR of the private network " + privateNtwk.getCidr());
+        }
+
+        final SortedSet<Long> availableIps = _ntwkModel.getAvailableIps(privateNtwk, ipAddress);
+
+        if (availableIps == null || availableIps.isEmpty()) {
+            throw new InvalidParameterValueException("The requested ip address " + ipAddress + " is not available in private network " + privateNtwk.getName());
         }
 
         final Long privateNetworkId = privateNtwk.getId();
