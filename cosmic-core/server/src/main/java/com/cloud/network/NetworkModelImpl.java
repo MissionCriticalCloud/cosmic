@@ -1804,17 +1804,26 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public SortedSet<Long> getAvailableIps(final Network network, final String requestedIp) {
         final String[] cidr = network.getCidr().split("/");
         final List<String> ips = getUsedIpsInNetwork(network);
+        final List<String> excludedIps = getExcludedIpsInNetwork(network);
         final SortedSet<Long> usedIps = new TreeSet<>();
 
         for (final String ip : ips) {
             if (requestedIp != null && requestedIp.equals(ip)) {
-                s_logger.warn("Requested ip address " + requestedIp + " is already in use in network" + network);
+                s_logger.warn("Requested ip address " + requestedIp + " is already in use in network " + network);
                 return null;
             }
 
             usedIps.add(NetUtils.ip2Long(ip));
         }
 
+        for (final String ip : excludedIps) {
+            if (requestedIp != null && requestedIp.equals(ip)) {
+                s_logger.warn("Requested ip address " + requestedIp + " is in excluded IPs range " + ((NetworkVO)network).getIpExclusionList());
+                return null;
+            }
+
+            usedIps.add(NetUtils.ip2Long(ip));
+        }
         final SortedSet<Long> allPossibleIps = NetUtils.getAllIpsFromCidr(cidr[0], Integer.parseInt(cidr[1]), usedIps);
 
         final String gateway = network.getGateway();
@@ -1823,6 +1832,10 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         }
 
         return allPossibleIps;
+    }
+
+    public List<String> getExcludedIpsInNetwork(Network network) {
+        return NetUtils.getAllIpsFromRangeList(((NetworkVO) network).getIpExclusionList());
     }
 
     @Override

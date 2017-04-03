@@ -2951,6 +2951,9 @@
                             if (args.data.networkdomain != null && args.data.networkdomain != args.context.networks[0].networkdomain)
                                 array1.push("&networkdomain=" + todb(args.data.networkdomain));
 
+                            if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.networks[0].ipexclusionlist)
+                                array1.push("&ipexclusionlist=" + todb(args.data.ipexclusionlist));
+
                             //args.data.networkofferingid is null when networkofferingid field is hidden
                             if (args.data.networkofferingid != null && args.data.networkofferingid != args.context.networks[0].networkofferingid) {
                                 array1.push("&networkofferingid=" + todb(args.data.networkofferingid));
@@ -3286,6 +3289,10 @@
                             },
                             cidr: {
                                 label: 'label.cidr'
+                            },
+                            ipexclusionlist: {
+                                label: 'label.ipexclusionlist',
+                                isEditable: true
                             },
                             gateway: {
                                 label: 'label.gateway'
@@ -3790,6 +3797,10 @@
                                     required: true
                                 }
                             },
+                            ipexclusionlist: {
+                                label: 'label.ipexclusionlist',
+                                docID: 'helpTierIpExclusionList',
+                            },
 
                             aclid: {
                                 label: 'label.acl',
@@ -3871,6 +3882,7 @@
                             displayText: args.data.name,
                             cidr: args.data.cidr,
                             gateway: args.data.gateway,
+                            ipexclusionlist: args.data.ipexclusionlist,
                         };
 
                         if (args.context.regions)

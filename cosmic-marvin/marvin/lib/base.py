@@ -2724,7 +2724,7 @@ class Network:
                networkofferingid=None, projectid=None,
                subdomainaccess=None, zoneid=None,
                gateway=None, netmask=None, cidr=None,
-               vpcid=None, aclid=None, vlan=None):
+               vpcid=None, aclid=None, vlan=None, ipexclusionlist=None):
         """Create Network for account"""
         cmd = createNetwork.createNetworkCmd()
         cmd.name = services["name"]
@@ -2739,6 +2739,11 @@ class Network:
             cmd.zoneid = zoneid
         elif "zoneid" in services:
             cmd.zoneid = services["zoneid"]
+
+        if ipexclusionlist:
+            cmd.ipexclusionlist = ipexclusionlist
+        elif "ipexclusionlist" in services:
+            cmd.ipexclusionlist = services["ipexclusionlist"]
 
         if subdomainaccess is not None:
             cmd.subdomainaccess = subdomainaccess
