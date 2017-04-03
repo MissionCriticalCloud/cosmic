@@ -73,19 +73,6 @@ class TestSSVMs(cloudstackTestCase):
         if timeout <= 0 and list_host_response[0].state != 'Up':
             self.fail("Timed out waiting for SVM agent to be Up")
 
-    def wait_for_svm_state(self, vmid, state, timeout, sleep_interval):
-        while timeout > 0:
-            list_svm_response = list_ssvms(self.apiclient, id=vmid)
-            if isinstance(list_svm_response, list) and list_svm_response[0].state == state:
-                self.logger.debug("SVM %s %s" % (vmid, state))
-                break
-
-            time.sleep(sleep_interval)
-            timeout -= sleep_interval
-
-        if timeout <= 0 and isinstance(list_svm_response, list) and list_svm_response[0].state != state:
-            self.fail("Timeout reached while waiting for system VM to be %s, actual state is %s" % (state, list_svm_response[0].state))
-
     def test_list_svm_vm(self, svm_type):
         # Validate the following:
         # 1. listSystemVM
@@ -425,80 +412,6 @@ class TestSSVMs(cloudstackTestCase):
             "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
         )
 
-        return
-
-    def test_stop_svm(self, svm_type):
-        # Validate the following
-        # 1. The SVM should go to stop state
-        # 2. The SVM should be restarted and return to Running state with the checks of the previous two test cases still passing
-        # 3. If either of the two above steps fail the test is a failure
-
-        list_svm_response = list_ssvms(
-            self.apiclient,
-            systemvmtype=svm_type,
-            state='Running',
-            zoneid=self.zone.id
-        )
-        self.assertEqual(
-            isinstance(list_svm_response, list),
-            True,
-            "Check list response returns a valid list"
-        )
-        svm = list_svm_response[0]
-
-        hosts = list_hosts(
-            self.apiclient,
-            id=svm.hostid
-        )
-        self.assertEqual(
-            isinstance(hosts, list),
-            True,
-            "Check list response returns a valid list"
-        )
-
-        self.logger.debug("Stopping System VM: %s" % svm.id)
-        cmd = stopSystemVm.stopSystemVmCmd()
-        cmd.id = svm.id
-        cmd.forced = "true"
-        self.apiclient.stopSystemVm(cmd)
-        self.wait_for_svm_state(svm.id, 'Stopped', self.services["timeout"], self.services["sleep"])
-
-        self.logger.debug("Starting System VM: %s" % svm.id)
-        cmd = startSystemVm.startSystemVmCmd()
-        cmd.id = svm.id
-        self.apiclient.startSystemVm(cmd)
-        self.wait_for_svm_state(svm.id, 'Running', self.services["timeout"], self.services["sleep"])
-        self.wait_for_system_vm_agent(svm.name)
-
-        return
-
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
-    def test_05_stop_ssvm(self):
-        self.test_stop_svm('secondarystoragevm')
-
-        # Call above tests to ensure SSVM is properly running
-        self.test_01_list_sec_storage_vm()
-
-        # Wait for some time before running diagnostic scripts on SSVM
-        # as it may take some time to start all service properly
-        time.sleep(int(self.services["configurableData"]["systemVmDelay"]))
-
-        self.test_03_ssvm_internals()
-
-        return
-
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"], required_hardware="true")
-    def test_06_stop_cpvm(self):
-        self.test_stop_svm('consoleproxy')
-
-        # Call above tests to ensure CPVM is properly running
-        self.test_02_list_cpvm_vm()
-
-        # Wait for some time before running diagnostic scripts on SSVM
-        # as it may take some time to start all service properly
-        time.sleep(int(self.services["configurableData"]["systemVmDelay"]))
-
-        self.test_04_cpvm_internals()
         return
 
     @attr(
