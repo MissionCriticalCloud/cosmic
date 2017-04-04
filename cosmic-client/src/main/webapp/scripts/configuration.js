@@ -13,7 +13,7 @@
                 if (isAdmin())
                     return ["serviceOfferings", "systemServiceOfferings", "diskOfferings", "networkOfferings", "vpcOfferings"];
                 else if (isDomainAdmin())
-                    return [""];
+                    return ["serviceOfferings", "diskOfferings", "networkOfferings", "vpcOfferings"];
                 else
                     return null;
             },
@@ -730,12 +730,8 @@
                         var data = {};
                         listViewDataProvider(args, data);
 
-                        $.extend(data, {
-                            issystem: false
-                        });
-
                         $.ajax({
-                            url: createURL('listServiceOfferings&isrecursive=true'),
+                            url: createURL('listServiceOfferings'),
                             data: data,
                             success: function (json) {
                                 var items = json.listserviceofferingsresponse.serviceoffering;
@@ -945,11 +941,10 @@
 
                                 dataProvider: function (args) {
                                     var data = {
-                                        issystem: false,
                                         id: args.context.serviceOfferings[0].id
                                     };
                                     $.ajax({
-                                        url: createURL('listServiceOfferings&isrecursive=true'),
+                                        url: createURL('listServiceOfferings'),
                                         data: data,
                                         async: true,
                                         success: function (json) {
@@ -1311,12 +1306,8 @@
                         var data = {};
                         listViewDataProvider(args, data);
 
-                        $.extend(data, {
-                            issystem: true
-                        });
-
                         $.ajax({
-                            url: createURL('listServiceOfferings&isrecursive=true'),
+                            url: createURL('listServiceOfferings'),
                             data: data,
                             success: function (json) {
                                 var items = json.listserviceofferingsresponse.serviceoffering;
@@ -1495,11 +1486,10 @@
 
                                 dataProvider: function (args) {
                                     var data = {
-                                        issystem: true,
                                         id: args.context.systemServiceOfferings[0].id
                                     };
                                     $.ajax({
-                                        url: createURL('listServiceOfferings&isrecursive=true'),
+                                        url: createURL('listServiceOfferings'),
                                         data: data,
                                         success: function (json) {
                                             var item = json.listserviceofferingsresponse.serviceoffering[0];
@@ -1551,7 +1541,7 @@
                         listViewDataProvider(args, data);
 
                         $.ajax({
-                            url: createURL('listDiskOfferings&isrecursive=true'),
+                            url: createURL('listDiskOfferings'),
                             data: data,
                             success: function (json) {
                                 var items = json.listdiskofferingsresponse.diskoffering;
@@ -2159,7 +2149,7 @@
                                         id: args.context.diskOfferings[0].id
                                     };
                                     $.ajax({
-                                        url: createURL('listDiskOfferings&isrecursive=true'),
+                                        url: createURL('listDiskOfferings'),
                                         data: data,
                                         success: function (json) {
                                             var item = json.listdiskofferingsresponse.diskoffering[0];
