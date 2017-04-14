@@ -4,6 +4,7 @@ import com.cloud.api.auth.APIAuthenticationManager;
 import com.cloud.api.auth.APIAuthenticationType;
 import com.cloud.api.auth.APIAuthenticator;
 import com.cloud.context.CallContext;
+import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.dao.EntityManager;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.user.Account;
@@ -43,6 +44,7 @@ public class ApiServlet extends HttpServlet {
     private final static List<String> s_clientAddressHeaders = Collections
             .unmodifiableList(Arrays.asList("X-Forwarded-For",
                     "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR", "Remote_Addr"));
+    private final static String adminCidrs = ApiServiceConfiguration.ManagementAdminCidr.value().replaceAll("\\s","");
 
     @Inject
     ApiServerService _apiServer;
@@ -223,6 +225,31 @@ public class ApiServlet extends HttpServlet {
             }
 
             if (_apiServer.verifyRequest(params, userId)) {
+
+                // Once authentication is OK, check if it is actually allowed for the ROOT admin account
+                // By doing this last, we are not leaking we're checking this to anyone with invalid credentials
+                if (CallContext.current().getCallingAccount().getType() == Account.ACCOUNT_TYPE_ADMIN) {
+                    s_logger.trace("CIDRs from which Admin accounts are allowed to perform API calls: " + adminCidrs);
+                    InetAddress hostName = null;
+                    try {
+                        hostName = InetAddress.getByName(remoteAddress);
+                    } catch (final UnknownHostException e) {
+                        s_logger.warn("UnknownHostException when trying to lookup ip-address. Something is seriously wrong here. Blocking access.", e);
+                    }
+
+                    // Block when is not in the list of allowed IPs, or when hostname is unknown (didn't resolve to ip address)
+                    if (hostName == null || !NetUtils.isIpInCidrList(hostName, adminCidrs.split(","))) {
+                        auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "Calls as ROOT admin are not allowed from ip address '" + remoteAddress + "'.");
+                        s_logger.warn("Request by accountId " + CallContext.current().getCallingAccount().getId() +
+                                " was denied since " + remoteAddress + " does not match " + adminCidrs);
+                        final String serializedResponse =
+                                _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "Calls as ROOT admin are not allowed from ip address '" + remoteAddress + "'.",
+                                        params, responseType);
+                        HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
+                        return;
+                    }
+                }
+
                 auditTrailSb.insert(0, "(userId=" + CallContext.current().getCallingUserId() + " accountId=" + CallContext.current().getCallingAccount().getId() +
                         " sessionId=" + (session != null ? session.getId() : null) + ")");
 
@@ -311,14 +338,14 @@ public class ApiServlet extends HttpServlet {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             return null;
         }
-        if (NetUtils.isValidIp(ip) || NetUtils.isValidIpv6(ip)) {
+        if (NetUtils.isValidIp4(ip) || NetUtils.isValidIp6(ip)) {
             return ip;
         }
         //it could be possible to have multiple IPs in HTTP header, this happens if there are multiple proxy in between
         //the client and the servlet, so parse the client IP
         final String[] ips = ip.split(",");
         for (final String i : ips) {
-            if (NetUtils.isValidIp(i.trim()) || NetUtils.isValidIpv6(i.trim())) {
+            if (NetUtils.isValidIp4(i.trim()) || NetUtils.isValidIp6(i.trim())) {
                 return i.trim();
             }
         }

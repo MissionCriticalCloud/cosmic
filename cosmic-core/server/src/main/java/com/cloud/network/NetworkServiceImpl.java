@@ -159,7 +159,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -825,7 +824,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (ipv4) {
             // validate the CIDR
-            if (cidr != null && !NetUtils.isValidCIDR(cidr)) {
+            if (cidr != null && !NetUtils.isValidIp4Cidr(cidr)) {
                 throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
             }
             // validate gateway with cidr
@@ -834,12 +833,12 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
             // if end ip is not specified, default it to startIp
             if (startIP != null) {
-                if (!NetUtils.isValidIp(startIP)) {
+                if (!NetUtils.isValidIp4(startIP)) {
                     throw new InvalidParameterValueException("Invalid format for the startIp parameter");
                 }
                 if (endIP == null) {
                     endIP = startIP;
-                } else if (!NetUtils.isValidIp(endIP)) {
+                } else if (!NetUtils.isValidIp4(endIP)) {
                     throw new InvalidParameterValueException("Invalid format for the endIp parameter");
                 }
             }
@@ -858,10 +857,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     throw new InvalidParameterValueException("Invalid gateway IP provided. Either the IP is broadcast or network IP.");
                 }
 
-                if (!NetUtils.isValidIp(gateway)) {
+                if (!NetUtils.isValidIp4(gateway)) {
                     throw new InvalidParameterValueException("Invalid gateway");
                 }
-                if (!NetUtils.isValidNetmask(netmask)) {
+                if (!NetUtils.isValidIp4Netmask(netmask)) {
                     throw new InvalidParameterValueException("Invalid netmask");
                 }
 
@@ -873,7 +872,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (ipv6) {
             // validate the ipv6 CIDR
-            if (ip6Cidr != null && !NetUtils.isValidCIDR(ip6Cidr)) {
+            if (ip6Cidr != null && !NetUtils.isValidIp4Cidr(ip6Cidr)) {
                 throw new InvalidParameterValueException("Invalid format for the CIDR parameter");
             }
 
@@ -1751,7 +1750,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 throw new InvalidParameterValueException("The network must be in " + Network.State.Implemented + " state. IP Reservation cannot be applied in "
                         + network.getState() + " state");
             }
-            if (!NetUtils.isValidCIDR(guestVmCidr)) {
+            if (!NetUtils.isValidIp4Cidr(guestVmCidr)) {
                 throw new InvalidParameterValueException("Invalid format of Guest VM CIDR.");
             }
             if (!NetUtils.validateGuestCidr(guestVmCidr)) {
@@ -3135,19 +3134,19 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         // VALIDATE IP INFO
         // if end ip is not specified, default it to startIp
-        if (!NetUtils.isValidIp(startIp)) {
+        if (!NetUtils.isValidIp4(startIp)) {
             throw new InvalidParameterValueException("Invalid format for the ip address parameter");
         }
         if (endIp == null) {
             endIp = startIp;
-        } else if (!NetUtils.isValidIp(endIp)) {
+        } else if (!NetUtils.isValidIp4(endIp)) {
             throw new InvalidParameterValueException("Invalid format for the endIp address parameter");
         }
 
-        if (!NetUtils.isValidIp(gateway)) {
+        if (!NetUtils.isValidIp4(gateway)) {
             throw new InvalidParameterValueException("Invalid gateway");
         }
-        if (!NetUtils.isValidNetmask(netmask)) {
+        if (!NetUtils.isValidIp4Netmask(netmask)) {
             throw new InvalidParameterValueException("Invalid netmask");
         }
 

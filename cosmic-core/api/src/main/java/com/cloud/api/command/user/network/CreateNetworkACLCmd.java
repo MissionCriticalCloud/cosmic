@@ -99,7 +99,7 @@ public class CreateNetworkACLCmd extends BaseAsyncCreateCmd {
             return cidrlist;
         } else {
             final List<String> oneCidrList = new ArrayList<>();
-            oneCidrList.add(NetUtils.ALL_CIDRS);
+            oneCidrList.add(NetUtils.ALL_IP4_CIDRS);
             return oneCidrList;
         }
     }

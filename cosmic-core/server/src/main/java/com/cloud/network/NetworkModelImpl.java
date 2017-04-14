@@ -2036,10 +2036,10 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public void checkIp6Parameters(final String startIPv6, final String endIPv6, final String ip6Gateway, final String ip6Cidr) throws InvalidParameterValueException {
-        if (!NetUtils.isValidIpv6(startIPv6)) {
+        if (!NetUtils.isValidIp6(startIPv6)) {
             throw new InvalidParameterValueException("Invalid format for the startIPv6 parameter");
         }
-        if (!NetUtils.isValidIpv6(endIPv6)) {
+        if (!NetUtils.isValidIp6(endIPv6)) {
             throw new InvalidParameterValueException("Invalid format for the endIPv6 parameter");
         }
 
@@ -2047,7 +2047,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             throw new InvalidParameterValueException("ip6Gateway and ip6Cidr should be defined when startIPv6/endIPv6 are passed in");
         }
 
-        if (!NetUtils.isValidIpv6(ip6Gateway)) {
+        if (!NetUtils.isValidIp6(ip6Gateway)) {
             throw new InvalidParameterValueException("Invalid ip6Gateway");
         }
         if (!NetUtils.isValidIp6Cidr(ip6Cidr)) {
@@ -2073,13 +2073,13 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     @Override
     public void checkRequestedIpAddresses(final long networkId, final String ip4, final String ip6) throws InvalidParameterValueException {
         if (ip4 != null) {
-            if (!NetUtils.isValidIp(ip4)) {
+            if (!NetUtils.isValidIp4(ip4)) {
                 throw new InvalidParameterValueException("Invalid specified IPv4 address " + ip4);
             }
             //Other checks for ipv4 are done in assignPublicIpAddress()
         }
         if (ip6 != null) {
-            if (!NetUtils.isValidIpv6(ip6)) {
+            if (!NetUtils.isValidIp6(ip6)) {
                 throw new InvalidParameterValueException("Invalid specified IPv6 address " + ip6);
             }
             if (_ipv6Dao.findByNetworkIdAndIp(networkId, ip6) != null) {

@@ -408,7 +408,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             }
             if (nic.getTrafficType() == TrafficType.Management) {
                 final String mgmt_cidr = _configDao.getValue(Config.ManagementNetwork.key());
-                if (NetUtils.isValidCIDR(mgmt_cidr)) {
+                if (NetUtils.isValidIp4Cidr(mgmt_cidr)) {
                     buf.append(" mgmtcidr=").append(mgmt_cidr);
                 }
                 buf.append(" localgw=").append(dest.getPod().getGateway());
@@ -974,7 +974,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final List<String> allowedCidrs = new ArrayList<>();
         final String[] cidrs = cidrList.split(",");
         for (final String cidr : cidrs) {
-            if (NetUtils.isValidCIDR(cidr) || NetUtils.isValidIp(cidr) || !cidr.startsWith("0.0.0.0")) {
+            if (NetUtils.isValidIp4Cidr(cidr) || NetUtils.isValidIp4(cidr) || !cidr.startsWith("0.0.0.0")) {
                 allowedCidrs.add(cidr);
             }
         }

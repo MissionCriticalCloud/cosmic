@@ -1667,7 +1667,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         if (defaultEgressPolicy) {
             final List<String> sourceCidr = new ArrayList<>();
 
-            sourceCidr.add(NetUtils.ALL_CIDRS);
+            sourceCidr.add(NetUtils.ALL_IP4_CIDRS);
             final FirewallRule rule = new FirewallRuleVO(null, null, null, null, "all", networkId, network.getAccountId(), network.getDomainId(), Purpose.Firewall, sourceCidr,
                     null, null, null, FirewallRule.TrafficType.Egress, FirewallRule.FirewallRuleType.System);
 

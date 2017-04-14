@@ -74,7 +74,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
     private List<String> getRulesForPool(final String poolName, final List<PortForwardingRuleTO> fwRules) {
         final PortForwardingRuleTO firstRule = fwRules.get(0);
         final String publicIP = firstRule.getSrcIp();
-        final String publicPort = Integer.toString(firstRule.getSrcPortRange()[0]);
+        final int publicPort = firstRule.getSrcPortRange()[0];
 
         final List<String> result = new ArrayList<>();
         // Add line like this: "listen  65_37_141_30-80 65.37.141.30:80"
@@ -84,7 +84,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
         sb = new StringBuilder();
         // FIXME sb.append("\t").append("balance ").append(algorithm);
         result.add(sb.toString());
-        if (publicPort.equals(NetUtils.HTTP_PORT)) {
+        if (publicPort == NetUtils.HTTP_PORT) {
             sb = new StringBuilder();
             sb.append("\t").append("mode http");
             result.add(sb.toString());
@@ -204,7 +204,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
         StringBuilder sb = new StringBuilder();
         final String poolName = sb.append(lbTO.getSrcIp().replace(".", "_")).append('-').append(lbTO.getSrcPort()).toString();
         final String publicIP = lbTO.getSrcIp();
-        final String publicPort = Integer.toString(lbTO.getSrcPort());
+        final int publicPort = lbTO.getSrcPort();
         final String algorithm = lbTO.getAlgorithm();
 
         final List<String> result = new ArrayList<>();
@@ -274,7 +274,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
         if (stickinessSubRule != null && !destsAvailable) {
             s_logger.warn("Haproxy stickiness policy for lb rule: " + lbTO.getSrcIp() + ":" + lbTO.getSrcPort() + ": Not Applied, cause:  backends are unavailable");
         }
-        if (publicPort.equals(NetUtils.HTTP_PORT) && !keepAliveEnabled || httpbasedStickiness) {
+        if (publicPort == NetUtils.HTTP_PORT && !keepAliveEnabled || httpbasedStickiness) {
             sb = new StringBuilder();
             sb.append("\t").append("mode http");
             result.add(sb.toString());

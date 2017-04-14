@@ -68,7 +68,7 @@ public class StorageNetworkManagerImpl extends ManagerBase implements StorageNet
             endIp = startIp;
         }
 
-        if (!NetUtils.isValidNetmask(netmask)) {
+        if (!NetUtils.isValidIp4Netmask(netmask)) {
             throw new CloudRuntimeException("Invalid netmask:" + netmask);
         }
 
@@ -183,7 +183,7 @@ public class StorageNetworkManagerImpl extends ManagerBase implements StorageNet
         String endIp = cmd.getEndIp();
         final String netmask = cmd.getNetmask();
 
-        if (netmask != null && !NetUtils.isValidNetmask(netmask)) {
+        if (netmask != null && !NetUtils.isValidIp4Netmask(netmask)) {
             throw new CloudRuntimeException("Invalid netmask:" + netmask);
         }
 
@@ -256,7 +256,7 @@ public class StorageNetworkManagerImpl extends ManagerBase implements StorageNet
             throw new CloudRuntimeException("Cannot find pod " + podId);
         }
         final String[] IpRange = pod.getDescription().split("-");
-        if ((IpRange[0] == null || IpRange[1] == null) || (!NetUtils.isValidIp(IpRange[0]) || !NetUtils.isValidIp(IpRange[1]))) {
+        if ((IpRange[0] == null || IpRange[1] == null) || (!NetUtils.isValidIp4(IpRange[0]) || !NetUtils.isValidIp4(IpRange[1]))) {
             return;
         }
         if (NetUtils.ipRangesOverlap(startIp, endIp, IpRange[0], IpRange[1])) {

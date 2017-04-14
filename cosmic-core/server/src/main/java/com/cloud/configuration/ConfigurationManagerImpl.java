@@ -635,7 +635,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     throw new InvalidParameterValueException("Error parsing ip address");
                 }
             } else if (range.equals("netmask")) {
-                if (!NetUtils.isValidNetmask(value)) {
+                if (!NetUtils.isValidIp4Netmask(value)) {
                     s_logger.error("netmask " + value + " is not a valid net mask for configuration variable " + name);
                     return "Please enter a valid netmask.";
                 }
@@ -667,7 +667,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 for (final String route : routes) {
                     if (route != null) {
                         final String routeToVerify = route.trim();
-                        if (!NetUtils.isValidCIDR(routeToVerify)) {
+                        if (!NetUtils.isValidIp4Cidr(routeToVerify)) {
                             throw new InvalidParameterValueException("Invalid value for blacklisted route: " + route + ". Valid format is list"
                                     + " of cidrs separated by coma. Example: 10.1.1.0/24,192.168.0.0/24");
                         }
@@ -1209,11 +1209,11 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @Override
     public Pod createPod(final long zoneId, final String name, final String startIp, final String endIp, final String gateway, final String netmask, String allocationState) {
         // Check if the gateway is a valid IP address
-        if (!NetUtils.isValidIp(gateway)) {
+        if (!NetUtils.isValidIp4(gateway)) {
             throw new InvalidParameterValueException("The gateway is invalid");
         }
 
-        if (!NetUtils.isValidNetmask(netmask)) {
+        if (!NetUtils.isValidIp4Netmask(netmask)) {
             throw new InvalidParameterValueException("The netmask is invalid");
         }
 
@@ -1970,7 +1970,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             if (IpRange[0] == null || IpRange[1] == null) {
                 continue;
             }
-            if (!NetUtils.isValidIp(IpRange[0]) || !NetUtils.isValidIp(IpRange[1])) {
+            if (!NetUtils.isValidIp4(IpRange[0]) || !NetUtils.isValidIp4(IpRange[1])) {
                 continue;
             }
             if (NetUtils.ipRangesOverlap(startIp, endIp, IpRange[0], IpRange[1])) {
@@ -2044,11 +2044,11 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     private void checkPublicIpRangeErrors(final long zoneId, final String vlanId, final String vlanGateway, final String vlanNetmask, final String startIP, final String endIP) {
         // Check that the start and end IPs are valid
-        if (!NetUtils.isValidIp(startIP)) {
+        if (!NetUtils.isValidIp4(startIP)) {
             throw new InvalidParameterValueException("Please specify a valid start IP");
         }
 
-        if (endIP != null && !NetUtils.isValidIp(endIP)) {
+        if (endIP != null && !NetUtils.isValidIp4(endIP)) {
             throw new InvalidParameterValueException("Please specify a valid end IP");
         }
 
@@ -3981,18 +3981,18 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (ipv4) {
             // Make sure the gateway is valid
-            if (!NetUtils.isValidIp(vlanGateway)) {
+            if (!NetUtils.isValidIp4(vlanGateway)) {
                 throw new InvalidParameterValueException("Please specify a valid gateway");
             }
 
             // Make sure the netmask is valid
-            if (!NetUtils.isValidNetmask(vlanNetmask)) {
+            if (!NetUtils.isValidIp4Netmask(vlanNetmask)) {
                 throw new InvalidParameterValueException("Please specify a valid netmask");
             }
         }
 
         if (ipv6) {
-            if (!NetUtils.isValidIpv6(vlanIp6Gateway)) {
+            if (!NetUtils.isValidIp6(vlanIp6Gateway)) {
                 throw new InvalidParameterValueException("Please specify a valid IPv6 gateway");
             }
             if (!NetUtils.isValidIp6Cidr(vlanIp6Cidr)) {
@@ -4584,7 +4584,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new InvalidParameterValueException("Invalid region ID: " + regionId);
         }
 
-        if (!NetUtils.isValidIp(startIP) || !NetUtils.isValidIp(endIP) || !NetUtils.validIpRange(startIP, endIP)) {
+        if (!NetUtils.isValidIp4(startIP) || !NetUtils.isValidIp4(endIP) || !NetUtils.validIpRange(startIP, endIP)) {
             throw new InvalidParameterValueException("Invalid portable ip  range: " + startIP + "-" + endIP);
         }
 
@@ -4742,27 +4742,27 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         // Check IP validity for DNS addresses
         // Empty strings is a valid input -- hence the length check
-        if (dns1 != null && dns1.length() > 0 && !NetUtils.isValidIp(dns1)) {
+        if (dns1 != null && dns1.length() > 0 && !NetUtils.isValidIp4(dns1)) {
             throw new InvalidParameterValueException("Please enter a valid IP address for DNS1");
         }
 
-        if (dns2 != null && dns2.length() > 0 && !NetUtils.isValidIp(dns2)) {
+        if (dns2 != null && dns2.length() > 0 && !NetUtils.isValidIp4(dns2)) {
             throw new InvalidParameterValueException("Please enter a valid IP address for DNS2");
         }
 
-        if (internalDns1 != null && internalDns1.length() > 0 && !NetUtils.isValidIp(internalDns1)) {
+        if (internalDns1 != null && internalDns1.length() > 0 && !NetUtils.isValidIp4(internalDns1)) {
             throw new InvalidParameterValueException("Please enter a valid IP address for internal DNS1");
         }
 
-        if (internalDns2 != null && internalDns2.length() > 0 && !NetUtils.isValidIp(internalDns2)) {
+        if (internalDns2 != null && internalDns2.length() > 0 && !NetUtils.isValidIp4(internalDns2)) {
             throw new InvalidParameterValueException("Please enter a valid IP address for internal DNS2");
         }
 
-        if (ip6Dns1 != null && ip6Dns1.length() > 0 && !NetUtils.isValidIpv6(ip6Dns1)) {
+        if (ip6Dns1 != null && ip6Dns1.length() > 0 && !NetUtils.isValidIp6(ip6Dns1)) {
             throw new InvalidParameterValueException("Please enter a valid IPv6 address for IP6 DNS1");
         }
 
-        if (ip6Dns2 != null && ip6Dns2.length() > 0 && !NetUtils.isValidIpv6(ip6Dns2)) {
+        if (ip6Dns2 != null && ip6Dns2.length() > 0 && !NetUtils.isValidIp6(ip6Dns2)) {
             throw new InvalidParameterValueException("Please enter a valid IPv6 address for IP6 DNS2");
         }
 
@@ -4872,7 +4872,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final long cidrSize;
         // Get the individual cidrAddress and cidrSize values, if the CIDR is
         // valid. If it's not valid, return an error.
-        if (NetUtils.isValidCIDR(cidr)) {
+        if (NetUtils.isValidIp4Cidr(cidr)) {
             cidrAddress = getCidrAddress(cidr);
             cidrSize = getCidrSize(cidr);
         } else {
@@ -4886,7 +4886,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         checkOverlapPublicIpRange(zoneId, startIp, endIp);
 
         // Check if the gateway is a valid IP address
-        if (!NetUtils.isValidIp(gateway)) {
+        if (!NetUtils.isValidIp4(gateway)) {
             throw new InvalidParameterValueException("The gateway is not a valid IP address.");
         }
 
@@ -4939,11 +4939,11 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     }
 
     private void checkIpRange(final String startIp, final String endIp, final String cidrAddress, final long cidrSize) {
-        if (!NetUtils.isValidIp(startIp)) {
+        if (!NetUtils.isValidIp4(startIp)) {
             throw new InvalidParameterValueException("The start address of the IP range is not a valid IP address.");
         }
 
-        if (endIp != null && !NetUtils.isValidIp(endIp)) {
+        if (endIp != null && !NetUtils.isValidIp4(endIp)) {
             throw new InvalidParameterValueException("The end address of the IP range is not a valid IP address.");
         }
 
