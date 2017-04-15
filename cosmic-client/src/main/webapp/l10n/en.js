@@ -7,7 +7,7 @@ var dictionary = {
     "error.could.not.change.your.password.because.ldap.is.enabled": "Error could not change your password because LDAP is enabled.",
     "error.could.not.enable.zone": "Could not enable zone",
     "error.installWizard.message": "Something went wrong; you may go back and correct any errors",
-    "error.invalid.username.password": "Invalid username or password",
+    "error.invalid.username.password": "Invalid username or password.<br/><br/>This could also be a restriction on the IP address you're connecting from.",
     "error.login": "Your username/password does not match our records.",
     "error.menu.select": "Unable to perform action due to no items being selected.",
     "error.mgmt.server.inaccessible": "The Management Server is unaccessible.  Please try again later.",

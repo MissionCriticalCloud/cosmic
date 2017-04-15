@@ -12,8 +12,10 @@ public class ApiServiceConfiguration implements Configurable {
             "API end point. Can be used by CS components/services deployed remotely, for sending CS API requests", true);
     public static final ConfigKey<Long> DefaultUIPageSize = new ConfigKey<>("Advanced", Long.class, "default.ui.page.size", "20",
             "The default pagesize to be used by UI and other clients when making list* API calls", true, ConfigKey.Scope.Global);
-    public static final ConfigKey<String> ManagementAdminCidr = new ConfigKey<String>("Advanced", String.class, "management.admin.cidr",
-            "0.0.0.0/0,::/0", "Comma separated list of IPv4/IPv6 CIDRs from which ROOT Admin accounts can perform API calls", true, ConfigKey.Scope.Global);
+    public static final ConfigKey<Boolean> ApiSourceCidrChecksEnabled = new ConfigKey<>("Advanced", Boolean.class, "api.source.cidr.checks.enabled",
+            "true", "Are the source checks on API calls enabled (true) or not (false)? See api.allowed.source.cidr.list", true, ConfigKey.Scope.Global);
+    public static final ConfigKey<String> ApiAllowedSourceCidrList = new ConfigKey<String>("Advanced", String.class, "api.allowed.source.cidr.list",
+            "0.0.0.0/0,::/0", "Comma separated list of IPv4/IPv6 CIDRs from which API calls can be performed. Can be set on Global and Account levels.", true, ConfigKey.Scope.Account);
 
     @Override
     public String getConfigComponentName() {
@@ -22,6 +24,6 @@ public class ApiServiceConfiguration implements Configurable {
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[]{ManagementHostIPAdr, ApiServletPath, DefaultUIPageSize, ManagementAdminCidr};
+        return new ConfigKey<?>[]{ManagementHostIPAdr, ApiServletPath, DefaultUIPageSize, ApiSourceCidrChecksEnabled, ApiAllowedSourceCidrList};
     }
 }

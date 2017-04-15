@@ -155,7 +155,7 @@ public class ApiServletTest {
     public void processRequestInContextUnauthorizedGET() {
         Mockito.when(request.getMethod()).thenReturn("GET");
         Mockito.when(
-                apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong()))
+                apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong(), Mockito.anyString()))
                .thenReturn(false);
         servlet.processRequestInContext(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -168,7 +168,7 @@ public class ApiServletTest {
     public void processRequestInContextAuthorizedGet() {
         Mockito.when(request.getMethod()).thenReturn("GET");
         Mockito.when(
-                apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong()))
+                apiServer.verifyRequest(Mockito.anyMap(), Mockito.anyLong(), Mockito.anyString()))
                .thenReturn(true);
         servlet.processRequestInContext(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);

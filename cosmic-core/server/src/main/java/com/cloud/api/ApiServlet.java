@@ -4,7 +4,6 @@ import com.cloud.api.auth.APIAuthenticationManager;
 import com.cloud.api.auth.APIAuthenticationType;
 import com.cloud.api.auth.APIAuthenticator;
 import com.cloud.context.CallContext;
-import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.dao.EntityManager;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.user.Account;
@@ -44,7 +43,6 @@ public class ApiServlet extends HttpServlet {
     private final static List<String> s_clientAddressHeaders = Collections
             .unmodifiableList(Arrays.asList("X-Forwarded-For",
                     "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR", "Remote_Addr"));
-    private final static String adminCidrs = ApiServiceConfiguration.ManagementAdminCidr.value().replaceAll("\\s","");
 
     @Inject
     ApiServerService _apiServer;
@@ -224,32 +222,7 @@ public class ApiServlet extends HttpServlet {
                 CallContext.register(_accountMgr.getSystemUser(), _accountMgr.getSystemAccount());
             }
 
-            if (_apiServer.verifyRequest(params, userId)) {
-
-                // Once authentication is OK, check if it is actually allowed for the ROOT admin account
-                // By doing this last, we are not leaking we're checking this to anyone with invalid credentials
-                if (CallContext.current().getCallingAccount().getType() == Account.ACCOUNT_TYPE_ADMIN) {
-                    s_logger.trace("CIDRs from which Admin accounts are allowed to perform API calls: " + adminCidrs);
-                    InetAddress hostName = null;
-                    try {
-                        hostName = InetAddress.getByName(remoteAddress);
-                    } catch (final UnknownHostException e) {
-                        s_logger.warn("UnknownHostException when trying to lookup ip-address. Something is seriously wrong here. Blocking access.", e);
-                    }
-
-                    // Block when is not in the list of allowed IPs, or when hostname is unknown (didn't resolve to ip address)
-                    if (hostName == null || !NetUtils.isIpInCidrList(hostName, adminCidrs.split(","))) {
-                        auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "Calls as ROOT admin are not allowed from ip address '" + remoteAddress + "'.");
-                        s_logger.warn("Request by accountId " + CallContext.current().getCallingAccount().getId() +
-                                " was denied since " + remoteAddress + " does not match " + adminCidrs);
-                        final String serializedResponse =
-                                _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "Calls as ROOT admin are not allowed from ip address '" + remoteAddress + "'.",
-                                        params, responseType);
-                        HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
-                        return;
-                    }
-                }
-
+            if (_apiServer.verifyRequest(params, userId, remoteAddress)) {
                 auditTrailSb.insert(0, "(userId=" + CallContext.current().getCallingUserId() + " accountId=" + CallContext.current().getCallingAccount().getId() +
                         " sessionId=" + (session != null ? session.getId() : null) + ")");
 
@@ -266,9 +239,10 @@ public class ApiServlet extends HttpServlet {
                     }
                 }
 
-                auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials and/or request signature");
+                final String errorMessage = "The given command either does not exist, is not available for user, or not available from ip address '" + remoteAddress + "'.";
+                auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + errorMessage);
                 final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params, responseType);
+                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage, params, responseType);
                 HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
             }
         } catch (final ServerApiException se) {
