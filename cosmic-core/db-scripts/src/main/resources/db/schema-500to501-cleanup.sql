@@ -22,11 +22,11 @@ DELETE FROM `cloud`.`guest_os_hypervisor` where hypervisor_type = 'LXC';
 DELETE FROM `template_store_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
 DELETE FROM `template_host_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
 DELETE FROM `template_spool_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv');
-DELETE FROM `cloud`.`vm_template` WHERE hypervisor_type = 'Hyperv';
+UPDATE `cloud`.`vm_template` SET `removed` = NOW() WHERE hypervisor_type = 'Hyperv';
 DELETE FROM `template_store_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
 DELETE FROM `template_host_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
 DELETE FROM `template_spool_ref` WHERE `template_id` IN (SELECT DISTINCT `id` FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware');
-DELETE FROM `cloud`.`vm_template` WHERE hypervisor_type = 'VMware';
+UPDATE `cloud`.`vm_template` SET `removed` = NOW() WHERE hypervisor_type = 'VMware';
 DELETE FROM `cloud`.`hypervisor_capabilities` WHERE hypervisor_type = 'Hyperv';
 DELETE FROM `cloud`.`hypervisor_capabilities` WHERE hypervisor_type = 'VMware';
 
