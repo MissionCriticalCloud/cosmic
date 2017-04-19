@@ -5,6 +5,7 @@ for i in $*
 do
     info=`/opt/cloud/bin/checks2svpn.sh $i`
     ret=$?
-    echo -n "$i:$ret:$info&"
+    batchInfo+="$i:$ret:$info&"
 done
 
+echo -n ${batchInfo}
