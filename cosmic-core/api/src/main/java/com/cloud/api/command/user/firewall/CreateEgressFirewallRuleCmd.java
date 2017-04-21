@@ -257,10 +257,10 @@ public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements F
             final String guestCidr = _networkService.getNetwork(getNetworkId()).getCidr();
 
             for (final String cidr : getSourceCidrList()) {
-                if (!NetUtils.isValidCIDR(cidr)) {
+                if (!NetUtils.isValidIp4Cidr(cidr) && !NetUtils.isValidIp6Cidr(cidr)) {
                     throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Source cidrs formatting error " + cidr);
                 }
-                if (cidr.equals(NetUtils.ALL_CIDRS)) {
+                if (cidr.equals(NetUtils.ALL_IP4_CIDRS)) {
                     continue;
                 }
                 if (!NetUtils.isNetworkAWithinNetworkB(cidr, guestCidr)) {

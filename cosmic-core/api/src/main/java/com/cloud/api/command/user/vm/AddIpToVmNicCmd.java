@@ -150,7 +150,7 @@ public class AddIpToVmNicCmd extends BaseAsyncCreateCmd {
         final NicSecondaryIp result;
         final String secondaryIp = null;
         if ((ip = getIpaddress()) != null) {
-            if (!NetUtils.isValidIp(ip)) {
+            if (!NetUtils.isValidIp4(ip)) {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Invalid ip address " + ip);
             }
         }

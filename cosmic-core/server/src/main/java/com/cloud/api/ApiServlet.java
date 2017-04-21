@@ -222,7 +222,7 @@ public class ApiServlet extends HttpServlet {
                 CallContext.register(_accountMgr.getSystemUser(), _accountMgr.getSystemAccount());
             }
 
-            if (_apiServer.verifyRequest(params, userId)) {
+            if (_apiServer.verifyRequest(params, userId, remoteAddress)) {
                 auditTrailSb.insert(0, "(userId=" + CallContext.current().getCallingUserId() + " accountId=" + CallContext.current().getCallingAccount().getId() +
                         " sessionId=" + (session != null ? session.getId() : null) + ")");
 
@@ -239,9 +239,10 @@ public class ApiServlet extends HttpServlet {
                     }
                 }
 
-                auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + "unable to verify user credentials and/or request signature");
+                final String errorMessage = "The given command either does not exist, is not available for user, or not available from ip address '" + remoteAddress + "'.";
+                auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + errorMessage);
                 final String serializedResponse =
-                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, "unable to verify user credentials and/or request signature", params, responseType);
+                        _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage, params, responseType);
                 HttpUtils.writeHttpResponse(resp, serializedResponse, HttpServletResponse.SC_UNAUTHORIZED, responseType, ApiServer.getJSONContentType());
             }
         } catch (final ServerApiException se) {
@@ -311,14 +312,14 @@ public class ApiServlet extends HttpServlet {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             return null;
         }
-        if (NetUtils.isValidIp(ip) || NetUtils.isValidIpv6(ip)) {
+        if (NetUtils.isValidIp4(ip) || NetUtils.isValidIp6(ip)) {
             return ip;
         }
         //it could be possible to have multiple IPs in HTTP header, this happens if there are multiple proxy in between
         //the client and the servlet, so parse the client IP
         final String[] ips = ip.split(",");
         for (final String i : ips) {
-            if (NetUtils.isValidIp(i.trim()) || NetUtils.isValidIpv6(i.trim())) {
+            if (NetUtils.isValidIp4(i.trim()) || NetUtils.isValidIp6(i.trim())) {
                 return i.trim();
             }
         }

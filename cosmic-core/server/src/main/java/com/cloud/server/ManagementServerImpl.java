@@ -968,6 +968,10 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Filter searchFilter = new Filter(ConfigurationVO.class, "name", true, cmd.getStartIndex(), cmd.getPageSizeVal());
         final SearchCriteria<ConfigurationVO> sc = _configDao.createSearchCriteria();
 
+        final Long userId = CallContext.current().getCallingUserId();
+        final Account caller = CallContext.current().getCallingAccount();
+        final User user = _userDao.findById(userId);
+
         final Object name = cmd.getConfigName();
         final Object category = cmd.getCategory();
         final Object keyword = cmd.getKeyword();
@@ -979,27 +983,37 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         Long id = null;
         int paramCountCheck = 0;
 
-        if (zoneId != null) {
-            scope = ConfigKey.Scope.Zone.toString();
-            id = zoneId;
-            paramCountCheck++;
+        if (! _accountMgr.isRootAdmin(caller.getId()) && accountId == null) {
+            throw new InvalidParameterValueException("Please specify AccountId to list the config for the given account.");
         }
-        if (clusterId != null) {
-            scope = ConfigKey.Scope.Cluster.toString();
-            id = clusterId;
-            paramCountCheck++;
-        }
+
         if (accountId != null) {
+            final Account accountToUpdate = _accountDao.findById(accountId);
+            _accountMgr.checkAccess(caller, null, true, accountToUpdate);
+
             scope = ConfigKey.Scope.Account.toString();
             id = accountId;
             paramCountCheck++;
         }
-        if (storagepoolId != null) {
-            scope = ConfigKey.Scope.StoragePool.toString();
-            id = storagepoolId;
-            paramCountCheck++;
-        }
 
+        if (_accountMgr.isRootAdmin(caller.getId())) {
+
+            if (zoneId != null) {
+                scope = ConfigKey.Scope.Zone.toString();
+                id = zoneId;
+                paramCountCheck++;
+            }
+            if (clusterId != null) {
+                scope = ConfigKey.Scope.Cluster.toString();
+                id = clusterId;
+                paramCountCheck++;
+            }
+            if (storagepoolId != null) {
+                scope = ConfigKey.Scope.StoragePool.toString();
+                id = storagepoolId;
+                paramCountCheck++;
+            }
+        }
         if (paramCountCheck > 1) {
             throw new InvalidParameterValueException("cannot handle multiple IDs, provide only one ID corresponding to the scope");
         }

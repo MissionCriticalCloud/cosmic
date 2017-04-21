@@ -845,7 +845,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     protected Vpc createVpc(final Boolean displayVpc, final VpcVO vpc) {
         final String cidr = vpc.getCidr();
         // Validate CIDR
-        if (!NetUtils.isValidCIDR(cidr)) {
+        if (!NetUtils.isValidIp4Cidr(cidr)) {
             throw new InvalidParameterValueException("Invalid CIDR specified " + cidr);
         }
 
@@ -1846,11 +1846,11 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
         _accountMgr.checkAccess(caller, null, false, vpc);
 
-        if (!NetUtils.isValidCIDR(cidr)) {
+        if (!NetUtils.isValidIp4Cidr(cidr)) {
             throw new InvalidParameterValueException("Invalid format for cidr " + cidr);
         }
 
-        if (!NetUtils.isValidIp(gwIpAddress)) {
+        if (!NetUtils.isValidIp4(gwIpAddress)) {
             throw new InvalidParameterValueException("Invalid format for ip address " + gwIpAddress);
         }
 

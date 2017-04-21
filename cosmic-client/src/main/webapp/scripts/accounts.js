@@ -623,7 +623,7 @@
 
                         tabFilter: function (args) {
                             var hiddenTabs = [];
-                            if (!isAdmin()) {
+                            if (!isAdmin() && !isDomainAdmin()) {
                                 hiddenTabs.push('settings');
                             }
                             return hiddenTabs;

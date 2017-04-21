@@ -32,6 +32,7 @@ import com.cloud.api.response.CreateCmdResponse;
 import com.cloud.api.response.ExceptionResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoginCmdResponse;
+import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -81,6 +82,7 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionProxyObject;
 import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.utils.net.NetUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -98,6 +100,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -671,7 +674,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     }
 
     @Override
-    public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId) throws ServerApiException {
+    public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId, String remoteAddress) throws ServerApiException {
         try {
             String apiKey = null;
             final String secretKey;
@@ -690,21 +693,17 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             if (userId != null) {
                 final User user = ApiDBUtils.findUserById(userId);
 
-                try {
-                    checkCommandAvailable(user, commandName);
-                } catch (final RequestLimitException ex) {
-                    s_logger.debug(ex.getMessage());
-                    throw new ServerApiException(ApiErrorCode.API_LIMIT_EXCEED, ex.getMessage());
-                } catch (final PermissionDeniedException ex) {
-                    s_logger.debug("The given command:" + commandName + " does not exist or it is not available for user with id:" + userId);
-                    throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, "The given command does not exist or it is not available for user");
+                if (! commandAvailable(remoteAddress, commandName, user)) {
+                    return false;
                 }
                 return true;
             } else {
                 // check against every available command to see if the command exists or not
                 if (!s_apiNameCmdClassMap.containsKey(commandName) && !commandName.equals("login") && !commandName.equals("logout")) {
-                    s_logger.debug("The given command:" + commandName + " does not exist or it is not available for user with id:" + userId);
-                    throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, "The given command does not exist or it is not available for user");
+                    final String errorMessage = "The given command '" + commandName + "' either does not exist, is not available" +
+                            " for user, or not available from ip address '" + remoteAddress + "'.";
+                    s_logger.debug(errorMessage);
+                    return false;
                 }
             }
 
@@ -792,15 +791,8 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 return false;
             }
 
-            try {
-                checkCommandAvailable(user, commandName);
-            } catch (final RequestLimitException ex) {
-                s_logger.debug(ex.getMessage());
-                throw new ServerApiException(ApiErrorCode.API_LIMIT_EXCEED, ex.getMessage());
-            } catch (final PermissionDeniedException ex) {
-                s_logger.debug("The given command:" + commandName + " does not exist or it is not available for user");
-                throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, "The given command:" + commandName + " does not exist or it is not available for user with id:"
-                        + userId);
+            if (! commandAvailable(remoteAddress, commandName, user)) {
+                return false;
             }
 
             // verify secret key exists
@@ -833,6 +825,21 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             s_logger.error("unable to verify request signature");
         }
         return false;
+    }
+
+    private boolean commandAvailable(final String remoteAddress, final String commandName, final User user) {
+        try {
+            checkCommandAvailable(user, commandName, remoteAddress);
+        } catch (final RequestLimitException ex) {
+            s_logger.debug(ex.getMessage());
+            throw new ServerApiException(ApiErrorCode.API_LIMIT_EXCEED, ex.getMessage());
+        } catch (final PermissionDeniedException ex) {
+            final String errorMessage = "The given command '" + commandName + "' either does not exist, is not available" +
+                    " for user, or not available from ip address '" + remoteAddress + "'.";
+            s_logger.debug(errorMessage);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -1229,11 +1236,32 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
         }
     }
 
-    private void checkCommandAvailable(final User user, final String commandName) throws PermissionDeniedException {
+    private void checkCommandAvailable(final User user, final String commandName, final String remoteAddress) throws PermissionDeniedException {
         if (user == null) {
             throw new PermissionDeniedException("User is null for role based API access check for command" + commandName);
         }
 
+        // Get the CIDRs from where this account is allowed to make calls
+        final Account account = _accountMgr.getAccount(user.getAccountId());
+        final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s","");
+        final Boolean ApiSourceCidrChecksEnabled = ApiServiceConfiguration.ApiSourceCidrChecksEnabled.value();
+
+        if (ApiSourceCidrChecksEnabled) {
+            s_logger.debug("CIDRs from which account '" + account.toString() + "' is allowed to perform API calls: " + accessAllowedCidrs);
+            InetAddress hostName = null;
+            try {
+                hostName = InetAddress.getByName(remoteAddress);
+            } catch (final UnknownHostException e) {
+                s_logger.warn("UnknownHostException when trying to lookup ip-address. Something is seriously wrong here. Blocking access.", e);
+            }
+
+            // Block when is not in the list of allowed IPs, or when hostname is unknown (didn't resolve to ip address)
+            if (hostName == null || !NetUtils.isIpInCidrList(hostName, accessAllowedCidrs.split(","))) {
+                s_logger.warn("Request by account '" + account.toString() + "' was denied since " + remoteAddress + " does not match " + accessAllowedCidrs);
+                throw new PermissionDeniedException("Calls for domain '" + account.getAccountName() + "' are not allowed from ip address '"
+                        + remoteAddress.replaceAll("/","") + "'.");
+            }
+        }
         for (final APIChecker apiChecker : _apiAccessCheckers) {
             apiChecker.checkAccess(user, commandName);
         }

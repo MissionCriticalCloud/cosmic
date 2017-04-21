@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.util.Map;
 
 public interface ApiServerService {
-    public boolean verifyRequest(Map<String, Object[]> requestParameters, Long userId) throws ServerApiException;
+    public boolean verifyRequest(Map<String, Object[]> requestParameters, Long userId, String remoteAddress) throws ServerApiException;
 
     public Long fetchDomainId(String domainUUID);
 

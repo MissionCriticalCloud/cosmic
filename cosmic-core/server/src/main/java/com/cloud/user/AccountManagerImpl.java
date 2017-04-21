@@ -13,6 +13,7 @@ import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.RegisterCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.query.vo.ControlledViewEntity;
+import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceOwnerType;
@@ -179,6 +180,8 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     int _cleanupInterval;
     @Inject
     private AccountDao _accountDao;
+    @Inject
+    private AccountManager _accountMgr;
     @Inject
     private ResourceCountDao _resourceCountDao;
     @Inject
@@ -2190,98 +2193,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
         UserAccount user = null;
         if (password != null && !password.isEmpty()) {
             user = getUserAccount(username, password, domainId, requestParameters);
-        } else {
-            final String key = _configDao.getValue("security.singlesignon.key");
-            if (key == null) {
-                // the SSO key is gone, don't authenticate
-                return null;
-            }
-
-            final String singleSignOnTolerance = _configDao.getValue("security.singlesignon.tolerance.millis");
-            if (singleSignOnTolerance == null) {
-                // the SSO tolerance is gone (how much time before/after system time we'll allow the login request to be
-                // valid),
-                // don't authenticate
-                return null;
-            }
-
-            final long tolerance = Long.parseLong(singleSignOnTolerance);
-            String signature = null;
-            long timestamp = 0L;
-            final String unsignedRequest;
-            final StringBuffer unsignedRequestBuffer = new StringBuffer();
-
-            // - build a request string with sorted params, make sure it's all lowercase
-            // - sign the request, verify the signature is the same
-            final List<String> parameterNames = new ArrayList<>();
-
-            for (final Object paramNameObj : requestParameters.keySet()) {
-                parameterNames.add((String) paramNameObj); // put the name in a list that we'll sort later
-            }
-
-            Collections.sort(parameterNames);
-
-            try {
-                for (final String paramName : parameterNames) {
-                    // parameters come as name/value pairs in the form String/String[]
-                    final String paramValue = ((String[]) requestParameters.get(paramName))[0];
-
-                    if ("signature".equalsIgnoreCase(paramName)) {
-                        signature = paramValue;
-                    } else {
-                        if ("timestamp".equalsIgnoreCase(paramName)) {
-                            final String timestampStr = paramValue;
-                            try {
-                                // If the timestamp is in a valid range according to our tolerance, verify the request
-                                // signature, otherwise return null to indicate authentication failure
-                                timestamp = Long.parseLong(timestampStr);
-                                final long currentTime = System.currentTimeMillis();
-                                if (Math.abs(currentTime - timestamp) > tolerance) {
-                                    if (s_logger.isDebugEnabled()) {
-                                        s_logger.debug("Expired timestamp passed in to login, current time = " + currentTime + ", timestamp = " + timestamp);
-                                    }
-                                    return null;
-                                }
-                            } catch (final NumberFormatException nfe) {
-                                if (s_logger.isDebugEnabled()) {
-                                    s_logger.debug("Invalid timestamp passed in to login: " + timestampStr);
-                                }
-                                return null;
-                            }
-                        }
-
-                        if (unsignedRequestBuffer.length() != 0) {
-                            unsignedRequestBuffer.append("&");
-                        }
-                        unsignedRequestBuffer.append(paramName).append("=").append(URLEncoder.encode(paramValue, "UTF-8"));
-                    }
-                }
-
-                if ((signature == null) || (timestamp == 0L)) {
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Missing parameters in login request, signature = " + signature + ", timestamp = " + timestamp);
-                    }
-                    return null;
-                }
-
-                unsignedRequest = unsignedRequestBuffer.toString().toLowerCase().replaceAll("\\+", "%20");
-
-                final Mac mac = Mac.getInstance("HmacSHA1");
-                final SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "HmacSHA1");
-                mac.init(keySpec);
-                mac.update(unsignedRequest.getBytes());
-                final byte[] encryptedBytes = mac.doFinal();
-                final String computedSignature = new String(Base64.encodeBase64(encryptedBytes));
-                final boolean equalSig = ConstantTimeComparator.compareStrings(signature, computedSignature);
-                if (!equalSig) {
-                    s_logger.info("User signature: " + signature + " is not equaled to computed signature: " + computedSignature);
-                } else {
-                    user = _userAccountDao.getUserAccount(username, domainId);
-                }
-            } catch (final Exception ex) {
-                s_logger.error("Exception authenticating user", ex);
-                return null;
-            }
         }
 
         if (user != null) {
@@ -2291,6 +2202,27 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 return null;
             }
 
+            // We authenticated successfully by now, let's check if we are allowed to login from the ip address the reqest comes from
+            final Account account = _accountMgr.getAccount(user.getAccountId());
+            final DomainVO domain = (DomainVO) _domainMgr.getDomain(account.getDomainId());
+
+            // Get the CIDRs from where this account is allowed to make calls
+            final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s","");
+            final Boolean ApiSourceCidrChecksEnabled = ApiServiceConfiguration.ApiSourceCidrChecksEnabled.value();
+
+            if (ApiSourceCidrChecksEnabled) {
+                s_logger.debug("CIDRs from which account '" + account.toString() + "' is allowed to perform API calls: " + accessAllowedCidrs);
+
+                // Block when is not in the list of allowed IPs
+                if (!NetUtils.isIpInCidrList(loginIpAddress, accessAllowedCidrs.split(","))) {
+                    s_logger.warn("Request by account '" + account.toString() + "' was denied since " + loginIpAddress.toString().replaceAll("/","")
+                            + " does not match " + accessAllowedCidrs);
+                    throw new CloudAuthenticationException("Failed to authenticate user '" + username + "' in domain '" + domain.getPath() + "' from ip "
+                            + loginIpAddress.toString().replaceAll("/","") + "; please provide valid credentials");
+                }
+            }
+
+            // Here all is fine!
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("User: " + username + " in domain " + domainId + " has successfully logged in");
             }
