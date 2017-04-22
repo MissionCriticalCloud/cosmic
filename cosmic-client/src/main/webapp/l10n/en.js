@@ -2177,5 +2177,5 @@ var dictionary = {
     "state.detached": "Detached",
     "title.upload.volume": "Upload Volume",
     "ui.listView.filters.all": "All",
-    "ui.listView.filters.mine": "Mine"
+    "ui.listView.filters.mine": "Domain"
 };
