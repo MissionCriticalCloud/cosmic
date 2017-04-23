@@ -1692,15 +1692,17 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                     // don't allow to remove gateway when there are static routes pointing to an ipaddress in the private gateway CIDR.
                     final List<? extends StaticRoute> routes = _staticRouteDao.listByVpcIdAndNotRevoked(gatewayVO.getVpcId());
                     final NetworkVO network = _ntwkDao.findById(gatewayVO.getNetworkId());
+                    final List<String> wrongCidrs = new LinkedList<>();
                     for (final StaticRoute route : routes) {
                         if (NetUtils.isIpWithtInCidrRange(route.getGwIpAddress(), network.getCidr())) {
-                            throw new CloudRuntimeException("Can't delete private gateway " + gatewayVO + " as it has static routes " +
-                                    "applied pointing to the CIDR of the network (" + network.getCidr() + "). Example static route: " +
-                                    route.getCidr() + " to " + route.getGwIpAddress() + ". Please remove all the routes pointing to the " +
-                                    "private gateway CIDR before attempting to delete it.");
+                            wrongCidrs.add(route.getCidr());
                         }
                     }
 
+                    if (!wrongCidrs.isEmpty()) {
+                        throw new InvalidParameterValueException("Unable to delete Private Gateway. Please remove these static routes pointing to the private gateway CIDR" +
+                                " before attempting to delete the gateway: " + wrongCidrs);
+                    }
                     gatewayVO.setState(VpcGateway.State.Deleting);
                     _vpcGatewayDao.update(gatewayVO.getId(), gatewayVO);
                     s_logger.debug("Marked gateway " + gatewayVO + " with state " + VpcGateway.State.Deleting);
