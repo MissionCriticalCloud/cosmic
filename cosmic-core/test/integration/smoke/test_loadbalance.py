@@ -1,9 +1,24 @@
+import time
 from nose.plugins.attrib import attr
 
-from marvin.cloudstackTestCase import *
-from marvin.lib.base import *
-from marvin.lib.common import *
-from marvin.lib.utils import *
+from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.codes import FAILED
+from marvin.lib.base import (
+    Account,
+    ServiceOffering,
+    VirtualMachine,
+    PublicIPAddress,
+    FireWallRule,
+    LoadBalancerRule
+)
+from marvin.lib.common import (
+    get_domain,
+    get_zone,
+    get_template,
+    list_lb_rules,
+    list_lb_instances,
+    get_default_virtual_machine_offering)
+from marvin.lib.utils import cleanup_resources
 from marvin.sshClient import SshClient
 
 
@@ -18,12 +33,12 @@ class TestLoadBalance(cloudstackTestCase):
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
-        template = get_template(
+        cls.template = get_template(
             cls.apiclient,
             cls.zone.id,
             cls.services["ostype"]
         )
-        if template == FAILED:
+        if cls.template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.services["ostype"]
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
@@ -35,14 +50,12 @@ class TestLoadBalance(cloudstackTestCase):
             admin=True,
             domainid=cls.domain.id
         )
-        cls.service_offering = ServiceOffering.create(
-            cls.apiclient,
-            cls.services["service_offerings"]["tiny"]
-        )
+        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+
         cls.vm_1 = VirtualMachine.create(
             cls.apiclient,
             cls.services["virtual_machine"],
-            templateid=template.id,
+            templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
             serviceofferingid=cls.service_offering.id
@@ -50,7 +63,7 @@ class TestLoadBalance(cloudstackTestCase):
         cls.vm_2 = VirtualMachine.create(
             cls.apiclient,
             cls.services["virtual_machine"],
-            templateid=template.id,
+            templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
             serviceofferingid=cls.service_offering.id
@@ -58,7 +71,7 @@ class TestLoadBalance(cloudstackTestCase):
         cls.vm_3 = VirtualMachine.create(
             cls.apiclient,
             cls.services["virtual_machine"],
-            templateid=template.id,
+            templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
             serviceofferingid=cls.service_offering.id
