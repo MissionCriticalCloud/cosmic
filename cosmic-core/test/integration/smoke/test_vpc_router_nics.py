@@ -3,26 +3,31 @@ import socket
 import time
 
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.base import (stopRouter,
-                             destroyRouter,
-                             Account,
-                             VpcOffering,
-                             VPC,
-                             ServiceOffering,
-                             NATRule,
-                             NetworkACL,
-                             PublicIPAddress,
-                             NetworkOffering,
-                             Network,
-                             VirtualMachine)
-from marvin.lib.common import (get_domain,
-                               get_zone,
-                               get_template,
-                               list_routers,
-                               list_networks,
-                               list_vlan_ipranges)
+
+from marvin.lib.base import (
+    NetworkACL,
+    NATRule,
+    PublicIPAddress,
+    VirtualMachine,
+    Network,
+    VPC,
+    Account,
+    stopRouter,
+    destroyRouter
+)
+from marvin.lib.common import (
+    get_default_network_offering_no_load_balancer,
+    get_default_network_offering,
+    list_routers,
+    list_vlan_ipranges,
+    list_networks,
+    get_default_vpc_offering,
+    get_default_virtual_machine_offering,
+    get_template,
+    get_zone,
+    get_domain
+)
 from marvin.lib.utils import cleanup_resources
 
 
@@ -40,56 +45,6 @@ class Services:
                 # Random characters are appended for unique
                 # username
                 "password": "password",
-            },
-            "service_offering": {
-                "name": "Tiny Instance",
-                "displaytext": "Tiny Instance",
-                "cpunumber": 1,
-                "cpuspeed": 100,
-                "memory": 128,
-            },
-            "network_offering": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "network_offering_no_lb": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "vpc_offering": {
-                "name": 'VPC off',
-                "displaytext": 'VPC off',
-                "supportedservices": 'Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
             },
             "vpc": {
                 "name": "TestVPC",
@@ -175,24 +130,13 @@ class TestVPCNics(cloudstackTestCase):
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"])
-        cls._cleanup = [cls.service_offering]
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
         cls.logger = logging.getLogger('TestVPCNics')
         cls.stream_handler = logging.StreamHandler()
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(cls.stream_handler)
 
-        return
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            cleanup_resources(cls.api_client, cls._cleanup)
-        except Exception as e:
-            raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     def setUp(self):
@@ -206,13 +150,7 @@ class TestVPCNics(cloudstackTestCase):
             admin=True,
             domainid=self.domain.id)
 
-        self.logger.debug("Creating a VPC offering..")
-        self.vpc_off = VpcOffering.create(
-            self.apiclient,
-            self.services["vpc_offering"])
-
-        self.logger.debug("Enabling the VPC offering created")
-        self.vpc_off.update(self.apiclient, state='Enabled')
+        self.vpc_off = get_default_vpc_offering(self.apiclient)
 
         self.logger.debug("Creating a VPC network in the account: %s" % self.account.name)
         self.services["vpc"]["cidr"] = '10.1.1.1/16'
@@ -224,7 +162,7 @@ class TestVPCNics(cloudstackTestCase):
             account=self.account.name,
             domainid=self.account.domainid)
 
-        self.cleanup = [self.vpc, self.vpc_off, self.account]
+        self.cleanup = [self.vpc, self.account]
         return
 
     def tearDown(self):
@@ -281,18 +219,8 @@ class TestVPCNics(cloudstackTestCase):
             self.apiclient.destroyRouter(cmd)
         self.routers = []
 
-    def create_network(self, net_offerring, gateway='10.1.1.1', vpc=None):
+    def create_network(self, network_offering, gateway='10.1.1.1', vpc=None):
         try:
-            self.logger.debug('Create NetworkOffering')
-            net_offerring["name"] = "NET_OFF-" + str(gateway)
-            nw_off = NetworkOffering.create(
-                self.apiclient,
-                net_offerring,
-                conservemode=False)
-
-            nw_off.update(self.apiclient, state='Enabled')
-            self.logger.debug('Created and Enabled NetworkOffering')
-
             self.services["network"]["name"] = "NETWORK-" + str(gateway)
             self.logger.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(
@@ -300,7 +228,7 @@ class TestVPCNics(cloudstackTestCase):
                 self.services["network"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
-                networkofferingid=nw_off.id,
+                networkofferingid=network_offering.id,
                 zoneid=self.zone.id,
                 gateway=gateway,
                 vpcid=vpc.id if vpc else self.vpc.id
@@ -308,13 +236,12 @@ class TestVPCNics(cloudstackTestCase):
 
             self.logger.debug("Created network with ID: %s" % obj_network.id)
         except Exception, e:
-            self.fail('Unable to create a Network with offering=%s because of %s ' % (net_offerring, e))
+            self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering, e))
         o = networkO(obj_network)
 
         vm1 = self.deployvm_in_network(obj_network)
 
         self.cleanup.insert(1, obj_network)
-        self.cleanup.insert(2, nw_off)
 
         o.add_vm(vm1)
         return o
@@ -382,8 +309,10 @@ class TestVPCNics(cloudstackTestCase):
         self.logger.debug("Starting test_01_VPC_nics_after_destroy")
         self.query_routers()
 
-        net1 = self.create_network(self.services["network_offering"], "10.1.1.1")
-        net2 = self.create_network(self.services["network_offering_no_lb"], "10.1.2.1")
+        net_off = get_default_network_offering(self.apiclient)
+        net1 = self.create_network(net_off, "10.1.1.1")
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
 
         self.networks.append(net1)
         self.networks.append(net2)
@@ -406,8 +335,10 @@ class TestVPCNics(cloudstackTestCase):
         self.logger.debug("Starting test_02_VPC_default_routes")
         self.query_routers()
 
-        net1 = self.create_network(self.services["network_offering"], "10.1.1.1")
-        net2 = self.create_network(self.services["network_offering_no_lb"], "10.1.2.1")
+        net_off = get_default_network_offering(self.apiclient)
+        net1 = self.create_network(net_off, "10.1.1.1")
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
 
         self.networks.append(net1)
         self.networks.append(net2)
