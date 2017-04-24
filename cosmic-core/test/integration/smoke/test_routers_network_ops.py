@@ -1,29 +1,35 @@
 import logging
 
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.base import (VirtualMachine,
-                             Account,
-                             ServiceOffering,
-                             NATRule,
-                             FireWallRule,
-                             NetworkOffering,
-                             Network,
-                             Router,
-                             EgressFireWallRule)
-from marvin.lib.common import (get_zone,
-                               get_template,
-                               get_domain,
-                               list_networks,
-                               list_routers,
-                               list_nat_rules,
-                               list_publicIP,
-                               list_hosts,
-                               list_vlan_ipranges)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
+
+from marvin.lib.base import (
+    EgressFireWallRule,
+    NATRule,
+    FireWallRule,
+    VirtualMachine,
+    Network,
+    NetworkOffering,
+    Account,
+    Router
+)
+from marvin.lib.common import (
+    list_nat_rules,
+    list_publicIP,
+    list_routers,
+    get_default_virtual_machine_offering,
+    get_template,
+    get_zone,
+    get_domain,
+    list_hosts,
+    list_vlan_ipranges,
+    list_networks
+)
+from marvin.lib.utils import (
+    cleanup_resources,
+    get_process_status,
+    get_host_credentials
+)
 
 
 def check_router_command(virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):
@@ -96,10 +102,7 @@ class TestRedundantIsolateNetworks(cloudstackTestCase):
             admin=True,
             domainid=cls.domain.id
         )
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"]
-        )
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
         cls.services["nw_off_persistent_RVR_egress_true"] = cls.services["nw_off_persistent_RVR"].copy()
         cls.services["nw_off_persistent_RVR_egress_true"]["egress_policy"] = "true"
@@ -656,10 +659,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
             admin=True,
             domainid=cls.domain.id
         )
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"]
-        )
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
         cls.services["network_offering_egress_true"] = cls.services["network_offering"].copy()
         cls.services["network_offering_egress_true"]["egress_policy"] = "true"
