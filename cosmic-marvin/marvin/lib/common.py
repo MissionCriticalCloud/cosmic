@@ -1676,3 +1676,52 @@ def verifyRouterState(apiclient, routerid, allowedstates):
         return [FAIL, "state of the router should be in %s but is %s" %
                 (allowedstates, routers[0].state)]
     return [PASS, None]
+
+
+def get_default_vpc_offering(api_client):
+
+    offerings = list_vpc_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Default VPC offering']
+    return next(iter(offerings or []), None)
+
+def get_default_redundant_vpc_offering(api_client):
+
+    offerings = list_vpc_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Redundant VPC offering']
+    return next(iter(offerings or []), None)
+
+def get_default_network_offering(api_client):
+
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworks']
+    return next(iter(offerings or []), None)
+
+def get_default_virtual_machine_offering(api_client):
+
+    offerings = list_service_offering(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Small Instance']
+    return next(iter(offerings or []), None)
+
+def get_default_acl(api_client, name):
+
+    acls = NetworkACLList.list(api_client)
+    acls = [acl for acl in acls if acl.name == name]
+    return next(iter(acls or []), None)
+
+def get_default_allow_vpc_acl(api_client, vpc):
+
+    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = [acl for acl in acls if acl.name == 'default_allow']
+    return next(iter(acls or []), None)
+
+def get_default_deny_vpc_acl(api_client, vpc):
+
+    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = [acl for acl in acls if acl.name == 'default_deny']
+    return next(iter(acls or []), None)
+
+def get_default_private_network_offering(api_client):
+
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultPrivateGatewayNetworkOffering']
+    return next(iter(offerings or []), None)

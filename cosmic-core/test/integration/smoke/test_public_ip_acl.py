@@ -18,12 +18,6 @@ class TestPublicIpAcl(cloudstackTestCase):
             'username': 'e.cartman',
             'password': 'southpark'
         },
-        'default_offerings': {
-            'vpc': 'Default VPC offering',
-            'redundant_vpc': 'Redundant VPC offering',
-            'network': 'DefaultIsolatedNetworkOfferingForVpcNetworks',
-            'virtual_machine': 'Small Instance'
-        },
         'vpcs': {
             'vpc1': {
                 'name': 'vpc1',
@@ -120,19 +114,19 @@ class TestPublicIpAcl(cloudstackTestCase):
         cls.class_cleanup += [cls.account]
         cls.logger.debug("[TEST] Account '%s' created", cls.account.name)
 
-        cls.vpc_offering = cls.get_default_redundant_vpc_offering() if redundant else cls.get_default_vpc_offering()
+        cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
         cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
 
-        cls.network_offering = cls.get_default_network_offering()
+        cls.network_offering = get_default_network_offering(cls.api_client)
         cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
 
-        cls.virtual_machine_offering = cls.get_default_virtual_machine_offering()
+        cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
-        cls.default_allow_acl = cls.get_default_acl('default_allow')
+        cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
         cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
 
-        cls.default_deny_acl = cls.get_default_acl('default_deny')
+        cls.default_deny_acl = get_default_acl(cls.api_client, 'default_deny')
         cls.logger.debug("[TEST] ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
@@ -326,45 +320,3 @@ class TestPublicIpAcl(cloudstackTestCase):
                     raise Exception("Exception: %s" % e)
 
         self.logger.debug("[TEST] Master Router of VPC '%s' stopped", vpc.name)
-
-    @classmethod
-    def get_default_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_redundant_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['redundant_vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_network_offering(cls):
-
-        offerings = list_network_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['network']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_virtual_machine_offering(cls):
-
-        offerings = list_service_offering(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['virtual_machine']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_acl(cls, name):
-
-        acls = NetworkACLList.list(cls.api_client)
-        acls = [acl for acl in acls if acl.name == name]
-        return next(iter(acls or []), None)
-
-    @classmethod
-    def get_default_allow_vpc_acl(cls, vpc): # check if it's better to get the ACL from the VPC
-
-        acls = NetworkACLList.list(cls.api_client, vpcid=vpc.id)
-        acls = [acl for acl in acls if acl.name == 'default_allow']
-        return next(iter(acls or []), None)

@@ -91,16 +91,6 @@ class Services:
 
 class TestVpcVpn(cloudstackTestCase):
 
-    attributes = {
-        'default_offerings': {
-            'vpc': 'Default VPC offering',
-            'redundant_vpc': 'Redundant VPC offering',
-            'network': 'DefaultIsolatedNetworkOfferingForVpcNetworks',
-            'virtual_machine': 'Small Instance',
-            'private_network': 'DefaultPrivateGatewayNetworkOffering'
-        }
-    }
-
     @classmethod
     def setUpClass(cls, redundant=False):
         cls.logger = logging.getLogger('TestVpcVpn')
@@ -114,13 +104,13 @@ class TestVpcVpn(cloudstackTestCase):
         cls.zone = get_zone(cls.apiclient, test_client.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
 
-        cls.vpc_offering = cls.get_default_redundant_vpc_offering() if redundant else cls.get_default_vpc_offering()
+        cls.vpc_offering = get_default_redundant_vpc_offering(cls.apiclient) if redundant else get_default_vpc_offering(cls.apiclient)
         cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
 
-        cls.network_offering = cls.get_default_network_offering()
+        cls.network_offering = get_default_network_offering(cls.apiclient)
         cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
 
-        cls.virtual_machine_offering = cls.get_default_virtual_machine_offering()
+        cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.apiclient)
         cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
         cls.account = Account.create(cls.apiclient, services=cls.services["account"])
@@ -465,38 +455,10 @@ class TestVpcVpn(cloudstackTestCase):
     def test_03_redundant_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across redundant VPCs"""
         # Set up 1 VPNs; needs 2 VPCs
-        self._test_vpc_site2site_vpn(self.get_default_redundant_vpc_offering(), 2)
+        self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.apiclient), 2)
 
     @attr(tags=["advanced"], required_hardware="true")
     def test_04_vpc_site2site_multiple_vpn(self):
         """Test Site 2 Site multiple VPNs Across VPCs"""
         # Set up 3 VPNs; needs 4 VPCs
         self._test_vpc_site2site_vpn(self.vpc_offering, 4)
-
-    @classmethod
-    def get_default_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.apiclient)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_redundant_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.apiclient)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['redundant_vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_network_offering(cls):
-
-        offerings = list_network_offerings(cls.apiclient)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['network']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_virtual_machine_offering(cls):
-
-        offerings = list_service_offering(cls.apiclient)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['virtual_machine']]
-        return next(iter(offerings or []), None)
