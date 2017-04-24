@@ -1,36 +1,43 @@
 import inspect
-import logging
 import socket
 import time
+import logging
 
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.lib.base import (stopRouter,
-                             startRouter,
-                             destroyRouter,
-                             rebootRouter,
-                             Account,
-                             VpcOffering,
-                             VPC,
-                             ServiceOffering,
-                             NATRule,
-                             NetworkACL,
-                             PublicIPAddress,
-                             NetworkOffering,
-                             Network,
-                             VirtualMachine,
-                             Configurations)
-from marvin.lib.common import (get_domain,
-                               get_zone,
-                               get_template,
-                               list_routers,
-                               list_hosts,
-                               list_networks,
-                               list_vlan_ipranges)
-from marvin.lib.utils import (cleanup_resources,
-                              get_process_status,
-                              get_host_credentials)
+
+from marvin.lib.base import (
+    Configurations,
+    NetworkACL,
+    NATRule,
+    PublicIPAddress,
+    VirtualMachine,
+    Network,
+    VPC,
+    Account,
+    startRouter,
+    stopRouter,
+    rebootRouter,
+    destroyRouter
+)
+from marvin.lib.common import (
+    get_default_network_offering_no_load_balancer,
+    get_default_network_offering,
+    list_hosts,
+    list_routers,
+    list_vlan_ipranges,
+    list_networks,
+    get_default_redundant_vpc_offering,
+    get_default_virtual_machine_offering,
+    get_template,
+    get_zone,
+    get_domain
+)
+from marvin.lib.utils import (
+    get_process_status,
+    get_host_credentials,
+    cleanup_resources
+)
 
 
 class Services:
@@ -50,72 +57,6 @@ class Services:
             },
             "host1": None,
             "host2": None,
-            "service_offering": {
-                "name": "Tiny Instance",
-                "displaytext": "Tiny Instance",
-                "cpunumber": 1,
-                "cpuspeed": 100,
-                "memory": 128,
-            },
-            "network_offering": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "network_offering_no_lb": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "vpc_offering": {
-                "name": 'Redundant VPC off',
-                "displaytext": 'Redundant VPC off',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-                "serviceCapabilityList": {
-                    "SourceNat": {
-                        "RedundantRouter": 'true'
-                    }
-                },
-            },
             "vpc": {
                 "name": "TestVPC",
                 "displaytext": "TestVPC",
@@ -200,24 +141,13 @@ class TestVPCRedundancy(cloudstackTestCase):
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"])
-        cls._cleanup = [cls.service_offering]
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
         cls.logger = logging.getLogger('TestVPCRedundancy')
         cls.stream_handler = logging.StreamHandler()
         cls.logger.setLevel(logging.DEBUG)
         cls.logger.addHandler(cls.stream_handler)
 
-        return
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            cleanup_resources(cls.api_client, cls._cleanup)
-        except Exception as e:
-            raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     def setUp(self):
@@ -234,13 +164,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             admin=True,
             domainid=self.domain.id)
 
-        self.logger.debug("Creating a VPC offering..")
-        self.vpc_off = VpcOffering.create(
-            self.apiclient,
-            self.services["vpc_offering"])
-
-        self.logger.debug("Enabling the VPC offering created")
-        self.vpc_off.update(self.apiclient, state='Enabled')
+        self.vpc_off = get_default_redundant_vpc_offering(self.apiclient)
 
         self.logger.debug("Creating a VPC network in the account: %s" % self.account.name)
         self.services["vpc"]["cidr"] = '10.1.1.1/16'
@@ -252,7 +176,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             account=self.account.name,
             domainid=self.account.domainid)
 
-        self.cleanup = [self.vpc, self.vpc_off, self.account]
+        self.cleanup = [self.vpc, self.account]
         return
 
     def tearDown(self):
@@ -436,21 +360,10 @@ class TestVPCRedundancy(cloudstackTestCase):
                 cmd.id = router.id
                 self.apiclient.startRouter(cmd)
 
-    def create_network(self, net_offerring, gateway='10.1.1.1', vpc=None, nr_vms=2, mark_net_cleanup=True):
+    def create_network(self, network_offering, gateway='10.1.1.1', vpc=None, nr_vms=2, mark_net_cleanup=True):
         if not nr_vms or nr_vms <= 0:
             self.fail("At least 1 VM has to be created. You informed nr_vms < 1")
         try:
-            self.logger.debug('Create NetworkOffering')
-            net_offerring["name"] = "NET_OFF-" + str(gateway)
-            nw_off = NetworkOffering.create(
-                self.apiclient,
-                net_offerring,
-                conservemode=False)
-
-            nw_off.update(self.apiclient, state='Enabled')
-
-            self.logger.debug('Created and Enabled NetworkOffering')
-
             self.services["network"]["name"] = "NETWORK-" + str(gateway)
             self.logger.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(
@@ -458,7 +371,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                 self.services["network"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
-                networkofferingid=nw_off.id,
+                networkofferingid=network_offering.id,
                 zoneid=self.zone.id,
                 gateway=gateway,
                 vpcid=vpc.id if vpc else self.vpc.id
@@ -466,10 +379,9 @@ class TestVPCRedundancy(cloudstackTestCase):
 
             self.logger.debug("Created network with ID: %s" % obj_network.id)
         except Exception, e:
-            self.fail('Unable to create a Network with offering=%s because of %s ' % (net_offerring, e))
+            self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
         o = networkO(obj_network)
 
-        self.cleanup.insert(0, nw_off)
         if mark_net_cleanup:
             self.cleanup.insert(0, obj_network)
 
@@ -565,8 +477,10 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
         self.query_routers()
-        self.networks.append(self.create_network(self.services["network_offering"], "10.1.1.1"))
-        self.networks.append(self.create_network(self.services["network_offering_no_lb"], "10.1.2.1"))
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
@@ -590,8 +504,10 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network and check default routes"""
         self.logger.debug("Starting test_02_redundant_VPC_default_routes")
         self.query_routers()
-        self.networks.append(self.create_network(self.services["network_offering"], "10.1.1.1"))
-        self.networks.append(self.create_network(self.services["network_offering_no_lb"], "10.1.2.1"))
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
         self.check_routers_state()
         self.add_nat_rules()
         self.do_default_routes_test()
@@ -601,7 +517,8 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
         self.query_routers()
-        self.networks.append(self.create_network(self.services["network_offering"], "10.1.1.1"))
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
@@ -619,7 +536,8 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with 1 Tier, 1 VM, 1 ACL, 1 PF and test Network GC Nics"""
         self.logger.debug("Starting test_04_rvpc_network_garbage_collector_nics")
         self.query_routers()
-        self.networks.append(self.create_network(self.services["network_offering"], "10.1.1.1", nr_vms=1))
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1", nr_vms=1))
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
@@ -651,10 +569,12 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.logger.debug("Starting test_05_rvpc_multi_tiers")
         self.query_routers()
 
-        network_to_delete_1 = self.create_network(self.services["network_offering"], "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
+        net_off = get_default_network_offering(self.apiclient)
+        network_to_delete_1 = self.create_network(net_off, "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
         self.networks.append(network_to_delete_1)
-        self.networks.append(self.create_network(self.services["network_offering_no_lb"], "10.1.2.1", nr_vms=1))
-        network_to_delete_2 = self.create_network(self.services["network_offering_no_lb"], "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1", nr_vms=1))
+        network_to_delete_2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
         self.networks.append(network_to_delete_2)
 
         self.check_routers_state()
