@@ -75,8 +75,6 @@ class trafficType(object):
         if labeldict:
             self.xen = labeldict['xen'] if 'xen' in labeldict.keys() else None
             self.kvm = labeldict['kvm'] if 'kvm' in labeldict.keys() else None
-            self.vmware = labeldict['vmware'] \
-                if 'vmware' in labeldict.keys() else None
             self.simulator = labeldict['simulator'] \
                 if 'simulator' in labeldict.keys() else None
 
@@ -90,18 +88,8 @@ class pod(object):
         self.endip = None
         self.zoneid = None
         self.clusters = []
-        self.vmwaredc = []
         '''Used in basic network mode'''
         self.guestIpRanges = []
-
-
-class VmwareDc(object):
-    def __init__(self):
-        self.zoneid = None
-        self.name = None
-        self.vcenter = None
-        self.username = None
-        self.password = None
 
 
 class cluster(object):

@@ -27,8 +27,7 @@ from marvin.lib.common import (get_domain,
                                list_routers,
                                list_virtual_machines,
                                list_lb_rules,
-                               list_configurations,
-                               verifyGuestTrafficPortGroups)
+                               list_configurations)
 from marvin.lib.utils import cleanup_resources, get_process_status
 from marvin.sshClient import SshClient
 from nose.plugins.attrib import attr
@@ -544,18 +543,6 @@ class TestPortForwarding(cloudstackTestCase):
                 delay=0
             )
         return
-
-    @attr(tags=["dvs"], required_hardware="true")
-    def test_guest_traffic_port_groups_isolated_network(self):
-        """ Verify port groups are created for guest traffic
-        used by isolated network """
-
-        if self.hypervisor.lower() == "vmware":
-            response = verifyGuestTrafficPortGroups(self.apiclient,
-                                                    self.config,
-                                                    self.zone)
-            assert response[0] == PASS, response[1]
-
 
 class TestRebootRouter(cloudstackTestCase):
     def setUp(self):
@@ -1089,38 +1076,28 @@ class TestRouterRules(cloudstackTestCase):
     def getCommandResultFromRouter(self, router, command):
         """Run given command on router and return the result"""
 
-        if (self.hypervisor.lower() == 'vmware'):
-            result = get_process_status(
-                self.apiclient.connection.mgtSvr,
-                22,
-                self.apiclient.connection.user,
-                self.apiclient.connection.passwd,
-                router.linklocalip,
-                command,
-                hypervisor=self.hypervisor
-            )
-        else:
-            hosts = list_hosts(
-                self.apiclient,
-                id=router.hostid,
-            )
-            self.assertEqual(
-                isinstance(hosts, list),
-                True,
-                "Check for list hosts response return valid data"
-            )
-            host = hosts[0]
-            host.user = self.services["configurableData"]["host"]["username"]
-            host.passwd = self.services["configurableData"]["host"]["password"]
+        hosts = list_hosts(
+            self.apiclient,
+            id=router.hostid,
+        )
+        self.assertEqual(
+            isinstance(hosts, list),
+            True,
+            "Check for list hosts response return valid data"
+        )
+        host = hosts[0]
+        host.user = self.services["configurableData"]["host"]["username"]
+        host.passwd = self.services["configurableData"]["host"]["password"]
 
-            result = get_process_status(
-                host.ipaddress,
-                22,
-                host.user,
-                host.passwd,
-                router.linklocalip,
-                command
-            )
+        result = get_process_status(
+            host.ipaddress,
+            22,
+            host.user,
+            host.passwd,
+            router.linklocalip,
+            command
+        )
+
         return result
 
     def createNetworkRules(self, rule, ipaddressobj, networkid):

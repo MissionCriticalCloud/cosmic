@@ -104,7 +104,7 @@ class DeployDataCenters(object):
                 if failed_cnt == len(hosts):
                     self.__cleanAndExit()
 
-    def createClusters(self, clusters, zoneId, podId, vmwareDc=None):
+    def createClusters(self, clusters, zoneId, podId):
         try:
             if clusters is None:
                 return
@@ -200,7 +200,7 @@ class DeployDataCenters(object):
                     self.__addToCleanUp("Pod", podId)
                 if pod.guestIpRanges is not None and networkId is not None:
                     self.createVlanIpRanges("Basic", pod.guestIpRanges, zoneId, podId, networkId)
-                self.createClusters(pod.clusters, zoneId, podId, vmwareDc=pod.vmwaredc)
+                self.createClusters(pod.clusters, zoneId, podId)
         except Exception as e:
             self.__logger.exception("=== Pod: %s Creation Failed: %s ===" % (str(pod.name), e))
             self.__cleanAndExit()
@@ -435,8 +435,6 @@ class DeployDataCenters(object):
                 if traffictype.kvm is not None else None
             traffic_type.xennetworklabel = traffictype.xen \
                 if traffictype.xen is not None else None
-            traffic_type.vmwarenetworklabel = traffictype.vmware \
-                if traffictype.vmware is not None else None
             traffic_type.simulatorlabel = traffictype.simulator \
                 if traffictype.simulator is not None else None
             ret = self.__apiClient.addTrafficType(traffic_type)
