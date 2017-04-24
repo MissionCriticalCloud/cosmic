@@ -1,5 +1,7 @@
-# Import Local Modules
 import logging
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (VirtualMachine,
                              Account,
@@ -22,7 +24,6 @@ from marvin.lib.common import (get_zone,
 from marvin.lib.utils import (cleanup_resources,
                               get_process_status,
                               get_host_credentials)
-from nose.plugins.attrib import attr
 
 
 def check_router_command(virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):

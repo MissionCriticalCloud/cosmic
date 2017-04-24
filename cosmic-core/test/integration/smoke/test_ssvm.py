@@ -1,11 +1,9 @@
-""" BVT tests for SSVM
-"""
-# Import Local Modules
 import telnetlib
 import time
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackAPI import (
-    stopSystemVm,
-    startSystemVm,
     rebootSystemVm,
     destroySystemVm
 )
@@ -23,9 +21,6 @@ from marvin.lib.utils import (
     get_host_credentials
 )
 from marvin.marvinLog import MarvinLog
-from nose.plugins.attrib import attr
-
-_multiprocess_shared_ = True
 
 
 class TestSSVMs(cloudstackTestCase):

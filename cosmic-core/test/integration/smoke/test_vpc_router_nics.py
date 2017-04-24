@@ -1,8 +1,9 @@
-""" Test VPC nics after router is destroyed """
-
 import logging
 import socket
 import time
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (stopRouter,
                              destroyRouter,
@@ -23,7 +24,6 @@ from marvin.lib.common import (get_domain,
                                list_networks,
                                list_vlan_ipranges)
 from marvin.lib.utils import cleanup_resources
-from nose.plugins.attrib import attr
 
 
 class Services:

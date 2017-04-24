@@ -1,12 +1,14 @@
-""" BVT tests for Network Life Cycle
-"""
-# Import Local Modules
+import logging
+import time
+
 from ddt import ddt, data
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackAPI import rebootRouter
 from marvin.cloudstackException import CloudstackAPIException
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import (FAILED, STATIC_NAT_RULE, LB_RULE,
-                          NAT_RULE, PASS)
+                          NAT_RULE)
 from marvin.lib.base import (Account,
                              VirtualMachine,
                              ServiceOffering,
@@ -30,13 +32,6 @@ from marvin.lib.common import (get_domain,
                                list_configurations)
 from marvin.lib.utils import cleanup_resources, get_process_status
 from marvin.sshClient import SshClient
-from nose.plugins.attrib import attr
-
-# Import System modules
-import time
-import logging
-
-_multiprocess_shared_ = True
 
 logger = logging.getLogger('TestNetworkOps')
 stream_handler = logging.StreamHandler()

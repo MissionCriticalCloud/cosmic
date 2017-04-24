@@ -1,16 +1,13 @@
-""" Tests for VPN in VPC
-"""
-# Import Local Modules
 import copy
-import time
 import logging
-from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.cloudstackAPI import *
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
 from marvin.lib.utils import *
-from nose.plugins.attrib import attr
+
 
 class Services:
     """Test VPC VPN Services.

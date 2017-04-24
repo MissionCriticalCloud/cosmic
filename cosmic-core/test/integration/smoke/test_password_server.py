@@ -1,14 +1,11 @@
-""" Tests for Password Service
-"""
-# Import Local Modules
 import logging
-import time
-from marvin.cloudstackAPI import *
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
 from marvin.lib.utils import *
-from nose.plugins.attrib import attr
 
 
 class Services:

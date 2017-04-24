@@ -1,14 +1,10 @@
-import time
-from marvin.cloudstackAPI import *
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import *
-from marvin.codes import FAILED
 from marvin.lib.base import *
 from marvin.lib.common import *
 from marvin.lib.utils import *
 from marvin.sshClient import SshClient
-from nose.plugins.attrib import attr
-
-_multiprocess_shared_ = True
 
 
 class TestLoadBalance(cloudstackTestCase):

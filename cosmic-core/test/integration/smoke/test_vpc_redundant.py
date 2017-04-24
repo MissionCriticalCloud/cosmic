@@ -1,10 +1,10 @@
-""" Test redundancy features for VPC routers
-"""
-
 import inspect
 import logging
 import socket
 import time
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (stopRouter,
                              startRouter,
@@ -31,7 +31,6 @@ from marvin.lib.common import (get_domain,
 from marvin.lib.utils import (cleanup_resources,
                               get_process_status,
                               get_host_credentials)
-from nose.plugins.attrib import attr
 
 
 class Services:
