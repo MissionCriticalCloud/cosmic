@@ -1696,6 +1696,12 @@ def get_default_network_offering(api_client):
     offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworks']
     return next(iter(offerings or []), None)
 
+def get_default_network_offering_no_load_balancer(api_client):
+
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
+    return next(iter(offerings or []), None)
+
 def get_default_virtual_machine_offering(api_client):
 
     offerings = list_service_offering(api_client)
