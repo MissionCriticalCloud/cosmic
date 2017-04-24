@@ -2,9 +2,10 @@ import base64
 import hashlib
 import hmac
 import pprint
-import requests
 import time
 import urllib
+
+import requests
 
 import jsonHelper
 from marvin.cloudstackAPI import queryAsyncJobResult

@@ -2,6 +2,10 @@
     -Virtual machine, Volume, Snapshot etc
 """
 
+import base64
+# Import System modules
+import time
+
 from marvin.cloudstackAPI import *
 from marvin.cloudstackException import (
     printException,
@@ -16,10 +20,6 @@ from utils import (
     is_server_ssh_ready,
     random_gen
 )
-
-# Import System modules
-import time
-import base64
 
 
 class Domain:

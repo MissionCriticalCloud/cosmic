@@ -3,9 +3,9 @@
 
 # Import Local Modules
 import hashlib
-import itertools
 import random
-import re
+# Import System modules
+import time
 
 from netaddr import IPAddress
 
@@ -23,14 +23,9 @@ from base import (
     FireWallRule,
     Template,
     Network,
-    PrivateGateway,
-    StaticRoute,
     Host,
     Resources,
-    Configurations,
-    PublicIpRange,
-    StorageNetworkIpRange,
-    TrafficType
+    Configurations
 )
 from marvin.cloudstackAPI import (
     listConfigurations,
@@ -44,8 +39,6 @@ from marvin.cloudstackAPI import (
     updateResourceLimit,
     listRouters,
     listNetworks,
-    listPrivateGateways,
-    listStaticRoutes,
     listClusters,
     listSystemVms,
     listStoragePools,
@@ -76,8 +69,7 @@ from marvin.cloudstackAPI import (
 from marvin.codes import (PASS, FAILED, ISOLATED_NETWORK, VPC_NETWORK,
                           BASIC_ZONE, FAIL, NAT_RULE, STATIC_NAT_RULE,
                           RESOURCE_PRIMARY_STORAGE, RESOURCE_SECONDARY_STORAGE,
-                          RESOURCE_CPU, RESOURCE_MEMORY, PUBLIC_TRAFFIC,
-                          GUEST_TRAFFIC, MANAGEMENT_TRAFFIC, STORAGE_TRAFFIC)
+                          RESOURCE_CPU, RESOURCE_MEMORY)
 from marvin.sshClient import SshClient
 from utils import (
     validateList,
@@ -86,9 +78,6 @@ from utils import (
     random_gen,
     format_volume_to_ext3
 )
-
-# Import System modules
-import time
 
 
 def is_config_suitable(apiclient, name, value):

@@ -6,12 +6,7 @@ from cloudstackAPI import (
     listTemplates
 )
 from cloudstackTestCase import cloudstackTestCase
-from codes import (
-    PUBLIC_TRAFFIC,
-    MANAGEMENT_TRAFFIC,
-    STORAGE_TRAFFIC,
-    PASS
-)
+
 
 class TestSetupSuccess(cloudstackTestCase):
     """
