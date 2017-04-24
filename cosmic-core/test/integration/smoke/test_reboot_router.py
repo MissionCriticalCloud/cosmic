@@ -114,7 +114,6 @@ class TestRebootRouter(cloudstackTestCase):
         self.cleanup = [self.nat_rule,
                         lb_rule,
                         self.vm_1,
-                        self.service_offering,
                         self.account,
                         ]
         return

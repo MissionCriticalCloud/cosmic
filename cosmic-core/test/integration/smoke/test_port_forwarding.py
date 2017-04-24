@@ -68,8 +68,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
         cls._cleanup = [
             cls.virtual_machine,
-            cls.account,
-            cls.service_offering
+            cls.account
         ]
 
     def setUp(self):

@@ -1,11 +1,11 @@
 import time
+
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import FAILED
 from marvin.lib.base import (
     Account,
-    ServiceOffering,
     VirtualMachine,
     PublicIPAddress,
     FireWallRule,
@@ -17,7 +17,8 @@ from marvin.lib.common import (
     get_template,
     list_lb_rules,
     list_lb_instances,
-    get_default_virtual_machine_offering)
+    get_default_virtual_machine_offering
+)
 from marvin.lib.utils import cleanup_resources
 from marvin.sshClient import SshClient
 
@@ -93,8 +94,7 @@ class TestLoadBalance(cloudstackTestCase):
             endport=cls.services["lbrule"]["publicport"]
         )
         cls._cleanup = [
-            cls.account,
-            cls.service_offering
+            cls.account
         ]
 
     def setUp(self):
