@@ -1,39 +1,38 @@
 import logging
-import time
 
 from ddt import ddt, data
 from nose.plugins.attrib import attr
 
-from marvin.cloudstackAPI import rebootRouter
-from marvin.cloudstackException import CloudstackAPIException
 from marvin.cloudstackTestCase import cloudstackTestCase
-from marvin.codes import (FAILED, STATIC_NAT_RULE, LB_RULE,
-                          NAT_RULE)
-from marvin.lib.base import (Account,
-                             VirtualMachine,
-                             ServiceOffering,
-                             NATRule,
-                             PublicIPAddress,
-                             StaticNATRule,
-                             FireWallRule,
-                             Network,
-                             NetworkOffering,
-                             LoadBalancerRule,
-                             Router)
-from marvin.lib.common import (get_domain,
-                               get_zone,
-                               get_template,
-                               list_hosts,
-                               list_publicIP,
-                               list_nat_rules,
-                               list_routers,
-                               list_virtual_machines,
-                               list_lb_rules,
-                               list_configurations)
-from marvin.lib.utils import cleanup_resources, get_process_status
+from marvin.codes import (
+    FAILED,
+    STATIC_NAT_RULE,
+    LB_RULE,
+    NAT_RULE
+)
+from marvin.lib.base import (
+    Account,
+    VirtualMachine,
+    NATRule,
+    PublicIPAddress,
+    StaticNATRule,
+    FireWallRule,
+    LoadBalancerRule,
+    Router
+)
+from marvin.lib.common import (
+    get_domain,
+    get_zone,
+    get_template,
+    list_hosts,
+    get_default_virtual_machine_offering)
+from marvin.lib.utils import (
+    cleanup_resources,
+    get_process_status
+)
 from marvin.sshClient import SshClient
 
-logger = logging.getLogger('TestNetworkOps')
+logger = logging.getLogger('TestRouterRules')
 stream_handler = logging.StreamHandler()
 logger.setLevel(logging.DEBUG)
 logger.addHandler(stream_handler)
@@ -68,10 +67,7 @@ class TestRouterRules(cloudstackTestCase):
             domainid=cls.domain.id
         )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
-        cls.service_offering = ServiceOffering.create(
-            cls.apiclient,
-            cls.services["service_offerings"]["tiny"]
-        )
+        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
         cls.virtual_machine = VirtualMachine.create(
             cls.apiclient,
             cls.services["virtual_machine"],
@@ -84,8 +80,7 @@ class TestRouterRules(cloudstackTestCase):
 
         cls._cleanup = [
             cls.virtual_machine,
-            cls.account,
-            cls.service_offering
+            cls.account
         ]
 
     def setUp(self):
