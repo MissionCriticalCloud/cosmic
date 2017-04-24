@@ -2,12 +2,12 @@ import telnetlib
 import time
 
 from nose.plugins.attrib import attr
+from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     rebootSystemVm,
     destroySystemVm
 )
-from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.common import (
     get_zone,
     list_hosts,
