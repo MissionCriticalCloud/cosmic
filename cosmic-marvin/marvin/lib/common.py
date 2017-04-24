@@ -25,8 +25,8 @@ from base import (
     Network,
     Host,
     Resources,
-    Configurations
-)
+    Configurations,
+    NetworkACLList)
 from marvin.cloudstackAPI import (
     listConfigurations,
     listPhysicalNetworks,
