@@ -15,7 +15,7 @@ from marvin.lib.base import (
 from marvin.lib.common import (
     list_lb_rules,
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     get_template,
     get_zone,
     get_domain,
@@ -70,7 +70,7 @@ class TestReleaseIP(cloudstackTestCase):
             self.account.domainid
         )
 
-        ip_addrs = list_publicIP(
+        ip_addrs = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,
@@ -115,7 +115,7 @@ class TestReleaseIP(cloudstackTestCase):
         retriesCount = 10
         isIpAddressDisassociated = False
         while retriesCount > 0:
-            listResponse = list_publicIP(
+            listResponse = list_public_ip(
                 self.apiclient,
                 id=self.ip_addr.id
             )

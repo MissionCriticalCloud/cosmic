@@ -5,7 +5,7 @@ from marvin.codes import (
     PASS
 )
 from marvin.lib.utils import (
-    validateState,
+    validate_state,
     key_maps_to_value
 )
 from mocks import MockApiClient
@@ -23,7 +23,7 @@ class TestUtils(unittest.TestCase):
         retries = 2
         timeout = 3
         api_client = MockApiClient(retries, 'initial state', 'final state')
-        state = validateState(api_client, self, 'final state', timeout=timeout, interval=1)
+        state = validate_state(api_client, self, 'final state', timeout=timeout, interval=1)
 
         self.assertEqual(state, [PASS, None])
         self.assertEqual(retries, api_client.retry_counter)
@@ -32,7 +32,7 @@ class TestUtils(unittest.TestCase):
         retries = 3
         timeout = 3
         api_client = MockApiClient(retries, 'initial state', 'final state')
-        state = validateState(api_client, self, 'final state', timeout=timeout, interval=1)
+        state = validate_state(api_client, self, 'final state', timeout=timeout, interval=1)
 
         self.assertEqual(state, [PASS, None])
         self.assertEqual(retries, api_client.retry_counter)
@@ -41,7 +41,7 @@ class TestUtils(unittest.TestCase):
         retries = 3
         timeout = 2
         api_client = MockApiClient(retries, 'initial state', 'final state')
-        state = validateState(api_client, self, 'final state', timeout=timeout, interval=1)
+        state = validate_state(api_client, self, 'final state', timeout=timeout, interval=1)
 
         self.assertEqual(state, [FAIL, 'TestUtils state not trasited to final state, operation timed out'])
         self.assertEqual(retries, api_client.retry_counter)

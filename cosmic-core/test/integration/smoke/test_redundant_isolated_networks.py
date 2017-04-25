@@ -17,7 +17,7 @@ from marvin.lib.common import (
     list_vlan_ipranges,
     list_networks,
     list_hosts,
-    list_publicIP,
+    list_public_ip,
     get_default_virtual_machine_offering,
     get_template,
     get_zone,
@@ -200,7 +200,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             "Length of the list router should be 2 (Backup & master)"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,
@@ -364,7 +364,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             "Length of the list router should be 2 (Backup & master)"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,

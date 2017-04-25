@@ -9,7 +9,7 @@ from marvin.lib.base import (
     Account
 )
 from marvin.lib.common import (
-    list_publicIP,
+    list_public_ip,
     get_zone,
     get_domain,
     get_default_network_offering
@@ -107,7 +107,7 @@ class TestPublicIP(cloudstackTestCase):
             self.zone.id,
             self.account.domainid
         )
-        list_pub_ip_addr_resp = list_publicIP(
+        list_pub_ip_addr_resp = list_public_ip(
             self.apiclient,
             id=ip_address.ipaddress.id
         )
@@ -133,7 +133,7 @@ class TestPublicIP(cloudstackTestCase):
 
         # Validate the following:
         # 1.listPublicIpAddresses should no more return the released address
-        list_pub_ip_addr_resp = list_publicIP(
+        list_pub_ip_addr_resp = list_public_ip(
             self.apiclient,
             id=ip_address.ipaddress.id
         )
@@ -163,7 +163,7 @@ class TestPublicIP(cloudstackTestCase):
         )
 
         # listPublicIpAddresses should return newly created public IP
-        list_pub_ip_addr_resp = list_publicIP(
+        list_pub_ip_addr_resp = list_public_ip(
             self.apiclient,
             id=ip_address.ipaddress.id
         )
@@ -185,7 +185,7 @@ class TestPublicIP(cloudstackTestCase):
 
         ip_address.delete(self.apiclient)
 
-        list_pub_ip_addr_resp = list_publicIP(
+        list_pub_ip_addr_resp = list_public_ip(
             self.apiclient,
             id=ip_address.ipaddress.id
         )

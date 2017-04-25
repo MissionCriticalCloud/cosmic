@@ -14,7 +14,7 @@ from marvin.lib.base import (
 )
 from marvin.lib.common import (
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     list_routers,
     get_default_virtual_machine_offering,
     get_template,
@@ -164,7 +164,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
             "Check list router response for router state"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,
@@ -319,7 +319,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
             "Check list router response for router state"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,
