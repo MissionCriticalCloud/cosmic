@@ -108,8 +108,7 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
         cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
         cls.template = get_template(
             cls.apiclient,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id

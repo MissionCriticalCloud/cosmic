@@ -126,15 +126,15 @@ class TestIpExclusionList(cloudstackTestCase):
             cls.class_cleanup = []
 
         cls.zone = get_zone(cls.api_client, cls.test_client.getZoneForTests())
-        cls.logger.debug("[TEST] Zone '%s' selected" % cls.zone.name)
+        cls.logger.debug("Zone '%s' selected" % cls.zone.name)
 
         cls.domain = get_domain(cls.api_client)
-        cls.logger.debug("[TEST] Domain '%s' selected" % cls.domain.name)
+        cls.logger.debug("Domain '%s' selected" % cls.domain.name)
 
         cls.template = get_template(
             cls.api_client,
             cls.zone.id)
-        cls.logger.debug("[TEST] Template '%s' selected" % cls.template.name)
+        cls.logger.debug("Template '%s' selected" % cls.template.name)
 
         cls.account = Account.create(
             cls.api_client,
@@ -143,22 +143,22 @@ class TestIpExclusionList(cloudstackTestCase):
             domainid=cls.domain.id)
 
         cls.class_cleanup += [cls.account]
-        cls.logger.debug("[TEST] Account '%s' created", cls.account.name)
+        cls.logger.debug("Account '%s' created", cls.account.name)
 
         cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
-        cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
+        cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
 
         cls.network_offering = get_default_network_offering(cls.api_client)
-        cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
+        cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
 
         cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
-        cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
+        cls.logger.debug("Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
         cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
-        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
+        cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
         cls.default_deny_acl = get_default_acl(cls.api_client, 'default_deny')
-        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_deny_acl.name)
+        cls.logger.debug("ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
             cls.attributes['vpcs']['vpc1'],
@@ -166,7 +166,7 @@ class TestIpExclusionList(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             account=cls.account.name)
-        cls.logger.debug("[TEST] VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
+        cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
 
         cls.network1 = Network.create(cls.api_client,
             cls.attributes['networks']['network1'],
@@ -176,7 +176,7 @@ class TestIpExclusionList(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
 
         cls.vm1 = VirtualMachine.create(cls.api_client,
             cls.attributes['vms']['vm1'],
@@ -186,7 +186,7 @@ class TestIpExclusionList(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
+        cls.logger.debug("VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
 
         cls.public_ip1 = PublicIPAddress.create(cls.api_client,
             zoneid=cls.zone.id,
@@ -194,7 +194,7 @@ class TestIpExclusionList(cloudstackTestCase):
             accountid=cls.account.name,
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id)
-        cls.logger.debug("[TEST] Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
 
         cls.nat_rule1 = NATRule.create(cls.api_client,
             cls.vm1,
@@ -202,7 +202,7 @@ class TestIpExclusionList(cloudstackTestCase):
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id,
             ipaddressid=cls.public_ip1.ipaddress.id)
-        cls.logger.debug("[TEST] Port Forwarding Rule '%s (%s) %s => %s' created",
+        cls.logger.debug("Port Forwarding Rule '%s (%s) %s => %s' created",
             cls.nat_rule1.ipaddress,
             cls.nat_rule1.protocol,
             cls.nat_rule1.publicport,
@@ -263,12 +263,12 @@ class TestIpExclusionList(cloudstackTestCase):
                                        domainid=self.domain.id,
                                        accountid=self.account.name,
                                        ipexclusionlist='10.1.2.2-10.1.2.5')
-        self.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s, Excluded IPs: %s",
+        self.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s, Excluded IPs: %s",
                           self.network2.name, self.network2.cidr, self.network2.gateway,
                           self.network2.ipexclusionlist)
 
     def deploy_new_vm(self, vm_name):
-        self.logger.debug('[TEST] Try to deploy new VM')
+        self.logger.debug('Try to deploy new VM')
 
         try:
             new_vm = VirtualMachine.create(self.api_client,
@@ -280,23 +280,23 @@ class TestIpExclusionList(cloudstackTestCase):
                                            domainid=self.domain.id,
                                            accountid=self.account.name,
                                            mode='advanced')
-            self.logger.debug("[TEST] VM '%s' created, Network: %s, IP %s", new_vm.name, self.network2.name,
+            self.logger.debug("VM '%s' created, Network: %s, IP %s", new_vm.name, self.network2.name,
                               new_vm.nic[0].ipaddress)
             return new_vm
         except Exception as e:
             if not 'Unable to acquire Guest IP address for network Ntwk' in str(e):
-                self.logger.debug('[TEST] Unexpected Exception: %s', e)
+                self.logger.debug('Unexpected Exception: %s', e)
                 raise Exception("Exception: %s" % e)
             return None
 
     def test_deploy_new_vm_failed(self, vm):
         self.assertTrue(vm is None, "VM deployment should fail due to no IPs available")
-        self.logger.debug('[TEST] Check (fail) VM deployment without available IPs: OK')
+        self.logger.debug('Check (fail) VM deployment without available IPs: OK')
 
     def expand_free_ips(self):
         self.network2.update(self.api_client,
                              ipexclusionlist='10.1.2.2-10.1.2.4')
-        self.logger.debug('[TEST] IP list expanded')
+        self.logger.debug('IP list expanded')
 
     def test_vm(self, vm, expected_value):
         self.assertTrue(vm.nic[0].ipaddress == expected_value, "VM should be assigned the only IP available")
@@ -304,4 +304,4 @@ class TestIpExclusionList(cloudstackTestCase):
         result = ssh_client.execute("/sbin/ip addr show")
         self.assertTrue(expected_value in str(result),
                         "VM should implement the only IP available, ip addr show: " + str(result))
-        self.logger.debug('[TEST] Check implemented IP: OK')
+        self.logger.debug('Check implemented IP: OK')

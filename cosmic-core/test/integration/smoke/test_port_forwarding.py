@@ -37,8 +37,7 @@ class TestPortForwarding(cloudstackTestCase):
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
         template = get_template(
             cls.apiclient,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
         if template == FAILED:
             assert False, "get_template() failed to return template with description %s" % cls.services[

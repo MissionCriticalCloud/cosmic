@@ -36,8 +36,7 @@ class TestReleaseIP(cloudstackTestCase):
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
         template = get_template(
             self.apiclient,
-            self.zone.id,
-            self.services["ostype"]
+            self.zone.id
         )
         self.services["virtual_machine"]["zoneid"] = self.zone.id
 
