@@ -236,7 +236,7 @@ class TestVpcVpn(cloudstackTestCase):
                 vpcservice_n[key] = vpcservice_n[key].format(N=`i`)
 
             vpc_n = VPC.create(
-                apiclient=self.apiclient,
+                api_client=self.apiclient,
                 services=vpcservice_n,
                 networkDomain="vpc%d.vpn" % i,
                 vpcofferingid=vpc_offering.id,
@@ -260,7 +260,7 @@ class TestVpcVpn(cloudstackTestCase):
                 ntwk_info_n[key] = ntwk_info_n[key].format(N=`i`)
 
             ntwk_n = Network.create(
-                apiclient=self.apiclient,
+                api_client=self.apiclient,
                 services=ntwk_info_n,
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -370,7 +370,7 @@ class TestVpcVpn(cloudstackTestCase):
         """Test Remote Access VPN in VPC"""
         # 1) Create VPC
         vpc = VPC.create(
-            apiclient=self.apiclient,
+            api_client=self.apiclient,
             services=self.services["vpc"],
             networkDomain="vpc.vpn",
             vpcofferingid=self.vpc_offering.id,
@@ -386,7 +386,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         # 2) Create network in VPC
         ntwk = Network.create(
-            apiclient=self.apiclient,
+            api_client=self.apiclient,
             services=self.services["network_1"],
             accountid=self.account.name,
             domainid=self.domain.id,
