@@ -1,6 +1,7 @@
 import contextlib
-import mysql
 import os
+
+import mysql
 from mysql.connector import errors
 
 from marvin import cloudstackException

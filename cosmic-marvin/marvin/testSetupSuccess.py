@@ -6,15 +6,6 @@ from cloudstackAPI import (
     listTemplates
 )
 from cloudstackTestCase import cloudstackTestCase
-from codes import (
-    PUBLIC_TRAFFIC,
-    MANAGEMENT_TRAFFIC,
-    STORAGE_TRAFFIC,
-    PASS,
-    VMWAREDVS
-)
-from lib.common import verifyVCenterPortGroups
-from lib.vcenter import Vcenter
 
 
 class TestSetupSuccess(cloudstackTestCase):
@@ -79,33 +70,6 @@ class TestSetupSuccess(cloudstackTestCase):
             self.assertNotEqual(retry, 0,
                                 "builtIn templates not ready in zone %s" %
                                 z.name)
-
-    def test_VCenterPorts(self):
-        """  Test if correct VCenter ports are created for all traffic types """
-
-        if self.hypervisor.lower() != "vmware":
-            self.skipTest("This test is intended only for vmware")
-
-        zoneDict = {}
-        for zone in self.config.zones:
-            zoneDict[zone.name] = zone.vmwaredc
-
-        for zone in self.zones_list:
-            vmwaredc = zoneDict[zone.name]
-            vcenterObj = Vcenter(
-                vmwaredc.vcenter,
-                vmwaredc.username,
-                vmwaredc.password)
-            response = verifyVCenterPortGroups(
-                self.apiClient,
-                vcenterObj,
-                traffic_types_to_validate=[
-                    PUBLIC_TRAFFIC,
-                    MANAGEMENT_TRAFFIC,
-                    STORAGE_TRAFFIC],
-                zoneid=zone.id,
-                switchTypes=[VMWAREDVS])
-            self.assertEqual(response[0], PASS, response[1])
 
     @classmethod
     def tearDownClass(cls):

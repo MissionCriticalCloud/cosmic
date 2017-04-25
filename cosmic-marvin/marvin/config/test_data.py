@@ -412,15 +412,7 @@ test_data = {
             "clustername": "KVM Cluster",
             "clustertype": "CloudManaged",
             "hypervisor": "KVM",
-        },
-        2: {
-            "hypervisor": 'VMware',
-            "clustertype": 'ExternalManaged',
-            "username": 'administrator',
-            "password": 'fr3sca',
-            "url": 'http://192.168.100.17/CloudStack-Clogeny-Pune/Pune-1',
-            "clustername": 'VMWare Cluster',
-        },
+        }
     },
     "hosts": {
         "xenserver": {
@@ -436,14 +428,7 @@ test_data = {
             "url": 'http://192.168.100.212',
             "username": "root",
             "password": "fr3sca",
-        },
-        "vmware": {
-            "hypervisor": 'VMware',
-            "clustertype": 'ExternalManaged',
-            "url": 'http://192.168.100.203',
-            "username": "administrator",
-            "password": "fr3sca",
-        },
+        }
     },
     "network_offering_shared": {
         "name": 'Test Network offering shared',
@@ -854,11 +839,7 @@ test_data = {
         "kvm": {"rootdiskdevice": "/dev/vda",
                 "datadiskdevice_1": "/dev/vdb",
                 "datadiskdevice_2": "/dev/vdc"
-                },
-        "vmware": {"rootdiskdevice": "/dev/hda",
-                   "datadiskdevice_1": "/dev/hdb",
-                   "datadiskdevice_2": "/dev/hdc"
-                   }
+                }
     },
     "data_write_paths": {
         "mount_dir": "/mnt/tmp",
@@ -1372,16 +1353,6 @@ test_data = {
         },
         "systemVmDelay": 120,
         "setUsageConfigurationThroughTestCase": False,
-        "vmware_cluster": {
-            "hypervisor": 'VMware',
-            "clustertype": 'ExternalManaged',
-            "username": '',
-            "password": '',
-            "url": '',
-            "clustername": 'VMWare Cluster with Space in DC name',
-            "startip": "10.223.1.2",
-            "endip": "10.223.1.100",
-        },
         # small service offering
         "service_offering": {
             "small": {
@@ -1424,50 +1395,11 @@ test_data = {
             }
         ]
     },
-
-    "interop":
-        {
-            "VHD":
-                {
-                    "displaytext": "Windows 8 (64-bit)",
-                    "name": "win8withpvxen",
-                    "passwordenabled": False,
-                    "url": "http://people.apache.org/~sanjeev/79211594-1d4a-4dee-ae6c-c5c315ded2be.vhd",
-                    "format": "VHD",
-                    "ostype": "Windows 8 (64-bit)",
-                    "ispublic": "true",
-                    "hypervisor": "XenServer"
-
-                },
-            "OVA":
-                {
-                    "displaytext": "Windows 8 (64-bit)",
-                    "name": "win8withpvvmware",
-                    "passwordenabled": False,
-                    "url": "http://pleaseupdateURL/",
-                    "format": "OVA",
-                    "ostype": "Windows 8 (64-bit)",
-                    "ispublic": "true",
-                    "hypervisor": "VMware"
-                },
-            "template": {
-                "displaytext": "windowsxdtemplate",
-                "name": "windowsxdtemplate",
-                "passwordenabled": False,
-                "ostype": "Windows 8 (64-bit)"
-            },
-        },
-
     "browser_upload_volume": {
         "VHD": {
             "diskname": "XenUploadVol",
             "url": "http://people.apache.org/~sanjeev/rajani-thin-volume.vhd",
             "checksum": "09b08b6abb1b903fca7711d3ac8d6598",
-        },
-        "OVA": {
-            "diskname": "VMwareUploadVol",
-            "url": "http://people.apache.org/~sanjeev/CentOS5.5(64bit)-vmware-autoscale.ova",
-            "checksum": "da997b697feaa2f1f6e0d4785b0cece2",
         },
         "QCOW2": {
             "diskname": "KVMUploadVol",
@@ -1489,17 +1421,9 @@ test_data = {
             "checksum": "09b08b6abb1b903fca7711d3ac8d6598",
             "ostypeid": "74affaea-c658-11e4-ad38-a6d1374244b4"
         },
-        "OVA": {
-            "templatename": "VMwareUploadtemplate",
-            "displaytext": "VMwareUploadtemplate",
-            "url": "http://people.apache.org/~sanjeev/CentOS5.3-x86_64.ova",
-            "checksum": "02de0576dd3a61ab59c03fd795fc86ac",
-            "hypervisor": "VMware",
-            "ostypeid": "74affaea-c658-11e4-ad38-a6d1374244b4"
-        },
         "QCOW2": {
             "templatename": "KVMUploadtemplate",
-            "displaytext": "VMwareUploadtemplate",
+            "displaytext": "KVMUploadtemplate",
             "url": "http://people.apache.org/~sanjeev/eec2209b-9875-3c8d-92be-c001bd8a0faf.qcow2.bz2",
             "checksum": "da997b697feaa2f1f6e0d4785b0cece2",
             "hypervisor": "KVM",
@@ -1543,14 +1467,6 @@ test_data = {
             },
             "systemVmDelay": 120,
             "setUsageConfigurationThroughTestCase": True,
-            "vmware_cluster": {
-                "hypervisor": 'VMware',
-                "clustertype": 'ExternalManaged',
-                "username": '',
-                "password": '',
-                "url": '',
-                "clustername": 'VMWare Cluster with Space in DC name',
-            },
             "upload_volume": {
                 "diskname": "UploadVol",
                 "format": "VHD",
@@ -1568,31 +1484,6 @@ test_data = {
                     "mode": 'HTTP_DOWNLOAD'
                 },
             "setHostConfigurationForIngressRule": False,
-            "restartManagementServerThroughTestCase": False,
-            "vmxnet3template": {
-                "displaytext": "VMXNET3 Template",
-                "name": "VMXNET3 template",
-                "ostype": "CentOS 5.6 (64-bit)",
-                "isfeatured": True,
-                "ispublic": False,
-                "isextractable": True,
-                "mode": "HTTP_DOWNLOAD",
-                "templatefilter": "self",
-                "url": "http://people.apache.org/~sanjeev/systemvm64template-2014-09-30-4.3-vmware.ova",
-                "hypervisor": "vmware",
-                "format": "OVA",
-                "nicadapter": "vmxnet3",
-                "kvm": {
-                    "url": ""
-                },
-                "vmware": {
-                    "url": ""
-                },
-                "xenserver": {
-                    "url": ""
-                },
-                "ostype": 'CentOS 5.3 (64-bit)',
-                "mode": 'HTTP_DOWNLOAD'
-            }
+            "restartManagementServerThroughTestCase": False
         }
 }

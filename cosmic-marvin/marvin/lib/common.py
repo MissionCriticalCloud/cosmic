@@ -3,9 +3,9 @@
 
 # Import Local Modules
 import hashlib
-import itertools
 import random
-import re
+# Import System modules
+import time
 
 from netaddr import IPAddress
 
@@ -23,15 +23,10 @@ from base import (
     FireWallRule,
     Template,
     Network,
-    PrivateGateway,
-    StaticRoute,
     Host,
     Resources,
     Configurations,
-    PublicIpRange,
-    StorageNetworkIpRange,
-    TrafficType
-)
+    NetworkACLList)
 from marvin.cloudstackAPI import (
     listConfigurations,
     listPhysicalNetworks,
@@ -44,8 +39,6 @@ from marvin.cloudstackAPI import (
     updateResourceLimit,
     listRouters,
     listNetworks,
-    listPrivateGateways,
-    listStaticRoutes,
     listClusters,
     listSystemVms,
     listStoragePools,
@@ -76,9 +69,7 @@ from marvin.cloudstackAPI import (
 from marvin.codes import (PASS, FAILED, ISOLATED_NETWORK, VPC_NETWORK,
                           BASIC_ZONE, FAIL, NAT_RULE, STATIC_NAT_RULE,
                           RESOURCE_PRIMARY_STORAGE, RESOURCE_SECONDARY_STORAGE,
-                          RESOURCE_CPU, RESOURCE_MEMORY, PUBLIC_TRAFFIC,
-                          GUEST_TRAFFIC, MANAGEMENT_TRAFFIC, STORAGE_TRAFFIC,
-                          VMWAREDVS)
+                          RESOURCE_CPU, RESOURCE_MEMORY)
 from marvin.sshClient import SshClient
 from utils import (
     validateList,
@@ -87,10 +78,6 @@ from utils import (
     random_gen,
     format_volume_to_ext3
 )
-from vcenter import Vcenter
-
-# Import System modules
-import time
 
 
 def is_config_suitable(apiclient, name, value):
@@ -1552,296 +1539,6 @@ def isIpRangeInUse(api_client, publicIpRange):
                         return True
     return False
 
-
-def verifyGuestTrafficPortGroups(api_client, config, setup_zone):
-    """ This function matches the given zone with
-    the zone in config file used to deploy the setup and
-    retrieves the corresponding vcenter details and forms
-    the vcenter connection object. It makes call to
-    verify the guest traffic for given zone """
-
-    try:
-        zoneDetailsInConfig = [zone for zone in config.zones
-                               if zone.name == setup_zone.name][0]
-        vcenterusername = zoneDetailsInConfig.vmwaredc.username
-        vcenterpassword = zoneDetailsInConfig.vmwaredc.password
-        vcenterip = zoneDetailsInConfig.vmwaredc.vcenter
-        vcenterObj = Vcenter(
-            vcenterip,
-            vcenterusername,
-            vcenterpassword)
-        response = verifyVCenterPortGroups(
-            api_client,
-            vcenterObj,
-            traffic_types_to_validate=[
-                GUEST_TRAFFIC],
-            zoneid=setup_zone.id,
-            switchTypes=[VMWAREDVS])
-        assert response[0] == PASS, response[1]
-    except Exception as e:
-        return [FAIL, e]
-    return [PASS, None]
-
-
-def analyzeTrafficType(trafficTypes, trafficTypeToFilter, switchTypes=None):
-    """ Analyze traffic types for given type and return
-        switch name and vlan Id from the
-        vmwarenetworklabel string of trafficTypeToFilter
-    """
-
-    try:
-        filteredList = [trafficType for trafficType in trafficTypes
-                        if trafficType.traffictype.lower() ==
-                        trafficTypeToFilter]
-
-        if not filteredList:
-            return [PASS, filteredList, None, None]
-
-        # Split string with , so as to extract the  switch Name and
-        # vlan ID
-        splitString = str(
-            filteredList[0].vmwarenetworklabel).split(",")
-        switchName = splitString[0]
-        vlanSpecified = splitString[1]
-        availableSwitchType = splitString[2]
-
-        if switchTypes and availableSwitchType.lower() not in switchTypes:
-            return [PASS, None, None, None]
-
-        return [PASS, filteredList, switchName, vlanSpecified]
-    except Exception as e:
-        return [FAIL, e, None, None]
-
-
-def getExpectedPortGroupNames(
-        api_client,
-        physical_network,
-        network_rate,
-        switch_name,
-        traffic_types,
-        switch_dict,
-        vcenter_conn,
-        specified_vlan,
-        traffic_type):
-    """ Return names of expected port groups that should be
-        present in vcenter
-
-        Parameters:
-        @physical_network: Physical Network of the @traffic_type
-        @network_rate:     as defined by network.throttling.rate
-        @switch_name:      Name of the switch used by the traffic in
-                           vcenter
-        @traffic_types:    List of all traffic types present in the physical
-                           network
-        @switch_dict:      Dictionary containing switch information in vcenter
-        @vcenter_conn:     vcenter connection object used to fetch information
-                           from vcenter
-        @specified_vlan:   The vlan for @traffic_type
-        @traffic_type:     Traffic type for which the port names are to be
-                           returned
-
-        Return value:
-        [PASS/FAIL, exception object if FAIL else expected port group names
-         for @traffic_type]
-        """
-
-    try:
-        expectedDVPortGroupNames = []
-
-        if traffic_type == PUBLIC_TRAFFIC:
-            publicIpRanges = PublicIpRange.list(
-                api_client,
-                physicalnetworkid=physical_network.id
-            )
-            if publicIpRanges is not None:
-                for publicIpRange in publicIpRanges:
-                    vlanInIpRange = re.findall(
-                        '\d+',
-                        str(publicIpRange.vlan))
-                    vlanId = "untagged"
-                    if len(vlanInIpRange) > 0:
-                        vlanId = vlanInIpRange[0]
-                    ipRangeInUse = isIpRangeInUse(api_client, publicIpRange)
-                    if ipRangeInUse:
-                        expectedDVPortGroupName = "cloud" + "." + \
-                                                  PUBLIC_TRAFFIC + "." + vlanId + "." + \
-                                                  network_rate + "." + "1" + "-" + \
-                                                  switch_name
-                        expectedDVPortGroupNames.append(
-                            expectedDVPortGroupName)
-
-                    expectedDVPortGroupName = "cloud" + "." + PUBLIC_TRAFFIC + "." + \
-                                              vlanId + "." + "0" + "." + "1" + "-" + switch_name
-                    expectedDVPortGroupNames.append(expectedDVPortGroupName)
-
-        if traffic_type == GUEST_TRAFFIC:
-
-            networks = Network.list(
-                api_client,
-                physicalnetworkid=physical_network.id,
-                listall=True
-            )
-            if networks is not None:
-                for network in networks:
-                    networkVlan = re.findall(
-                        '\d+', str(network.vlan))
-                    if len(networkVlan) > 0:
-                        vlanId = networkVlan[0]
-                        expectedDVPortGroupName = "cloud" + "." + GUEST_TRAFFIC + "." + \
-                                                  vlanId + "." + network_rate + "." + "1" + "-" + \
-                                                  switch_name
-                        expectedDVPortGroupNames.append(
-                            expectedDVPortGroupName)
-
-        if traffic_type == STORAGE_TRAFFIC:
-            vlanId = ""
-            storageIpRanges = StorageNetworkIpRange.list(
-                api_client,
-                zoneid=physical_network.zoneid
-            )
-            if storageIpRanges is not None:
-                for storageIpRange in storageIpRanges:
-                    vlanInIpRange = re.findall(
-                        '\d+',
-                        str(storageIpRange.vlan))
-                    if len(vlanInIpRange) > 0:
-                        vlanId = vlanInIpRange[0]
-                    else:
-                        vlanId = "untagged"
-                    expectedDVPortGroupName = "cloud" + "." + STORAGE_TRAFFIC + \
-                                              "." + vlanId + "." + "0" + "." + "1" + "-" + \
-                                              switch_name
-                    expectedDVPortGroupNames.append(
-                        expectedDVPortGroupName)
-
-            else:
-                response = analyzeTrafficType(
-                    traffic_types, MANAGEMENT_TRAFFIC)
-                assert response[0] == PASS, response[1]
-                filteredList, switchName, vlanSpecified = \
-                    response[1], response[2], response[3]
-
-                if not filteredList:
-                    raise Exception("No Management traffic present and\
-                                Storage traffic does not have any IP range,\
-                                Invalid zone setting")
-
-                if switchName not in switch_dict:
-                    dvswitches = vcenter_conn.get_dvswitches(
-                        name=switchName)
-                    switch_dict[switchName] = dvswitches[0][
-                        'dvswitch']['portgroupNameList']
-
-                if vlanSpecified:
-                    vlanId = vlanSpecified
-                else:
-                    vlanId = "untagged"
-                expectedDVPortGroupName = "cloud" + "." + STORAGE_TRAFFIC + \
-                                          "." + vlanId + "." + "0" + "." + "1" + "-" + switchName
-                expectedDVPortGroupNames.append(expectedDVPortGroupName)
-
-        if traffic_type == MANAGEMENT_TRAFFIC:
-            vlanId = "untagged"
-            if specified_vlan:
-                vlanId = specified_vlan
-            expectedDVPortGroupName = "cloud" + "." + "private" + "." + \
-                                      vlanId + "." + "0" + "." + "1" + "-" + switch_name
-            expectedDVPortGroupNames.append(expectedDVPortGroupName)
-
-    except Exception as e:
-        return [FAIL, e]
-    return [PASS, expectedDVPortGroupNames]
-
-
-def verifyVCenterPortGroups(
-        api_client,
-        vcenter_conn,
-        zoneid,
-        traffic_types_to_validate,
-        switchTypes):
-    """ Generate expected port groups for given traffic types and
-        verify they are present in the vcenter
-
-        Parameters:
-        @api_client:    API client of root admin account
-        @vcenter_conn:  connection object for vcenter used to fetch data
-                        using vcenterAPI
-        @zone_id:       Zone for which port groups are to be verified
-        @traffic_types_to_validate:
-                        Traffic types (public, guest, management, storage) for
-                        which verification is to be done
-        @switchTypes:   The switch types for which port groups
-                        are to be verified e.g vmwaredvs
-
-        Return value:
-        [PASS/FAIL, exception message if FAIL else None]
-    """
-    try:
-        expectedDVPortGroupNames = []
-        vcenterPortGroups = []
-        config = Configurations.list(
-            api_client,
-            name="network.throttling.rate"
-        )
-        networkRate = config[0].value
-        switchDict = {}
-        physicalNetworks = PhysicalNetwork.list(
-            api_client,
-            zoneid=zoneid
-        )
-
-        # If there are no physical networks in zone, return as PASS
-        # as there are no validations to make
-        if validateList(physicalNetworks)[0] != PASS:
-            return [PASS, None]
-
-        for physicalNetwork in physicalNetworks:
-            trafficTypes = TrafficType.list(
-                api_client,
-                physicalnetworkid=physicalNetwork.id)
-
-            for trafficType in traffic_types_to_validate:
-                response = analyzeTrafficType(
-                    trafficTypes, trafficType, switchTypes)
-                assert response[0] == PASS, response[1]
-                filteredList, switchName, vlanSpecified = \
-                    response[1], response[2], response[3]
-
-                if not filteredList:
-                    continue
-
-                if switchName not in switchDict:
-                    dvswitches = vcenter_conn.get_dvswitches(
-                        name=switchName)
-                    switchDict[switchName] = dvswitches[0][
-                        'dvswitch']['portgroupNameList']
-
-                response = getExpectedPortGroupNames(
-                    api_client,
-                    physicalNetwork,
-                    networkRate,
-                    switchName,
-                    trafficTypes,
-                    switchDict,
-                    vcenter_conn,
-                    vlanSpecified,
-                    trafficType)
-                assert response[0] == PASS, response[1]
-                dvPortGroups = response[1]
-                expectedDVPortGroupNames.extend(dvPortGroups)
-
-        vcenterPortGroups = list(itertools.chain(*(switchDict.values())))
-
-        for expectedDVPortGroupName in expectedDVPortGroupNames:
-            assert expectedDVPortGroupName in vcenterPortGroups, \
-                "Port group %s not present in VCenter DataCenter" % \
-                expectedDVPortGroupName
-
-    except Exception as e:
-        return [FAIL, e]
-    return [PASS, None]
-
-
 def get_hypervisor_type(apiclient):
     """Return the hypervisor type of the hosts in setup"""
 
@@ -1866,8 +1563,7 @@ def is_snapshot_on_nfs(apiclient, dbconn, config, zoneid, snapshotid):
     @return: True if snapshot is found, False otherwise
     """
     # snapshot extension to be appended to the snapshot path obtained from db
-    snapshot_extensions = {"vmware": ".ovf",
-                           "kvm": "",
+    snapshot_extensions = {"kvm": "",
                            "xenserver": ".vhd",
                            "simulator": ""}
 
@@ -1980,3 +1676,52 @@ def verifyRouterState(apiclient, routerid, allowedstates):
         return [FAIL, "state of the router should be in %s but is %s" %
                 (allowedstates, routers[0].state)]
     return [PASS, None]
+
+
+def get_default_vpc_offering(api_client):
+
+    offerings = list_vpc_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Default VPC offering']
+    return next(iter(offerings or []), None)
+
+def get_default_redundant_vpc_offering(api_client):
+
+    offerings = list_vpc_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Redundant VPC offering']
+    return next(iter(offerings or []), None)
+
+def get_default_network_offering(api_client):
+
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworks']
+    return next(iter(offerings or []), None)
+
+def get_default_virtual_machine_offering(api_client):
+
+    offerings = list_service_offering(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'Small Instance']
+    return next(iter(offerings or []), None)
+
+def get_default_acl(api_client, name):
+
+    acls = NetworkACLList.list(api_client)
+    acls = [acl for acl in acls if acl.name == name]
+    return next(iter(acls or []), None)
+
+def get_default_allow_vpc_acl(api_client, vpc):
+
+    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = [acl for acl in acls if acl.name == 'default_allow']
+    return next(iter(acls or []), None)
+
+def get_default_deny_vpc_acl(api_client, vpc):
+
+    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = [acl for acl in acls if acl.name == 'default_deny']
+    return next(iter(acls or []), None)
+
+def get_default_private_network_offering(api_client):
+
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultPrivateGatewayNetworkOffering']
+    return next(iter(offerings or []), None)

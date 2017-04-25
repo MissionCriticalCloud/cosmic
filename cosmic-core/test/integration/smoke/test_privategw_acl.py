@@ -1,10 +1,12 @@
 import logging
-from marvin.cloudstackAPI import *
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
 from marvin.lib.utils import *
-from nose.plugins.attrib import attr
+
 
 class TestPrivateGateway(cloudstackTestCase):
 
@@ -15,13 +17,6 @@ class TestPrivateGateway(cloudstackTestCase):
             'lastname': 'Cartman',
             'username': 'e.cartman',
             'password': 'southpark'
-        },
-        'default_offerings': {
-            'vpc': 'Default VPC offering',
-            'redundant_vpc': 'Redundant VPC offering',
-            'network': 'DefaultIsolatedNetworkOfferingForVpcNetworks',
-            'virtual_machine': 'Small Instance',
-            'private_network': 'DefaultPrivateGatewayNetworkOffering'
         },
         'vpcs': {
             'vpc1': {
@@ -149,19 +144,19 @@ class TestPrivateGateway(cloudstackTestCase):
         cls.class_cleanup += [cls.account]
         cls.logger.debug("[TEST] Account '%s' created", cls.account.name)
 
-        cls.vpc_offering = cls.get_default_redundant_vpc_offering() if redundant else cls.get_default_vpc_offering()
+        cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
         cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
 
-        cls.network_offering = cls.get_default_network_offering()
+        cls.network_offering = get_default_network_offering(cls.api_client)
         cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
 
-        cls.virtual_machine_offering = cls.get_default_virtual_machine_offering()
+        cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
-        cls.private_network_offering = cls.get_default_private_network_offering()
+        cls.private_network_offering = get_default_private_network_offering(cls.api_client)
         cls.logger.debug("[TEST] Private Network Offering '%s' selected", cls.private_network_offering.name)
 
-        cls.default_allow_acl = cls.get_default_allow_acl()
+        cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
         cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
@@ -455,52 +450,3 @@ class TestPrivateGateway(cloudstackTestCase):
                     raise Exception("Exception: %s" % e)
 
         self.logger.debug("[TEST] Master Router of VPC '%s' stopped", vpc.name)
-
-    @classmethod
-    def get_default_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_redundant_vpc_offering(cls):
-
-        offerings = list_vpc_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['redundant_vpc']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_network_offering(cls):
-
-        offerings = list_network_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['network']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_virtual_machine_offering(cls):
-
-        offerings = list_service_offering(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['virtual_machine']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_private_network_offering(cls):
-
-        offerings = list_network_offerings(cls.api_client)
-        offerings = [offering for offering in offerings if offering.name == cls.attributes['default_offerings']['private_network']]
-        return next(iter(offerings or []), None)
-
-    @classmethod
-    def get_default_allow_acl(cls):
-
-        acls = NetworkACLList.list(cls.api_client)
-        acls = [acl for acl in acls if acl.name == 'default_allow']
-        return next(iter(acls or []), None)
-
-    @classmethod
-    def get_default_allow_vpc_acl(cls, vpc): # check if it's better to get the ACL from the VPC
-
-        acls = NetworkACLList.list(cls.api_client, vpcid=vpc.id)
-        acls = [acl for acl in acls if acl.name == 'default_allow']
-        return next(iter(acls or []), None)

@@ -26,9 +26,6 @@ from marvin.sshClient import SshClient
 def _configure_ssh_credentials(hypervisor):
     ssh_command = "ssh -i ~/.ssh/id_rsa.cloud -ostricthostkeychecking=no "
 
-    if (str(hypervisor).lower() == 'vmware'):
-        ssh_command = "ssh -i /var/cloudstack/management/.ssh/id_rsa -ostricthostkeychecking=no "
-
     return ssh_command
 
 

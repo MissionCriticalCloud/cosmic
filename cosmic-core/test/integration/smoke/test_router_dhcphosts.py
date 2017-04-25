@@ -1,4 +1,7 @@
-# Import Local Modules
+import logging
+
+from nose.plugins.attrib import attr
+
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     VirtualMachine,
@@ -24,10 +27,6 @@ from marvin.lib.utils import (
     cleanup_resources,
     get_process_status
 )
-from nose.plugins.attrib import attr
-
-# Import System modules
-import logging
 
 
 class TestRouterDHCPHosts(cloudstackTestCase):
