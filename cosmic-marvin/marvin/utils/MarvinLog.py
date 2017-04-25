@@ -11,6 +11,11 @@ import marvin
 
 
 class MarvinLog:
+    LOGGER_ROOT = "root"
+    LOGGER_MARVIN = "marvin"
+    LOGGER_SSH = "ssh"
+    LOGGER_TEST = "test"
+
     def __init__(self, logger_name=__name__):
         self.__loggerName = logger_name
         self.__logger = None

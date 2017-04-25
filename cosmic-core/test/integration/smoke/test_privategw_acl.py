@@ -136,7 +136,7 @@ class TestPrivateGateway(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()

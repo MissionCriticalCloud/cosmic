@@ -27,7 +27,7 @@ from marvin.utils.SshClient import SshClient
 class TestLoadBalance(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
         testClient = super(TestLoadBalance, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()

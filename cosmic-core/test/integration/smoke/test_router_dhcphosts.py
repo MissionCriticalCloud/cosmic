@@ -31,7 +31,7 @@ from marvin.utils.MarvinLog import MarvinLog
 class TestRouterDHCPHosts(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.testClient = super(TestRouterDHCPHosts, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()

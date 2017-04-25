@@ -37,7 +37,7 @@ from marvin.utils.SshClient import SshClient
 class TestRouterRules(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestRouterRules, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
