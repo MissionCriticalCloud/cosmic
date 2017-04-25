@@ -20,12 +20,12 @@ from marvin.lib.utils import (
     get_process_status,
     get_host_credentials
 )
-from marvin.marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestSSVMs(cloudstackTestCase):
     def setUp(self):
-        self.logger = MarvinLog('test').getLogger()
+        self.logger = MarvinLog('test').get_logger()
         self.apiclient = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
         self.cleanup = []

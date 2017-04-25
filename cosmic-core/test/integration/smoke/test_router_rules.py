@@ -31,7 +31,7 @@ from marvin.lib.utils import (
     cleanup_resources,
     get_process_status
 )
-from marvin.sshClient import SshClient
+from marvin.utils.SshClient import SshClient
 
 logger = logging.getLogger('TestRouterRules')
 stream_handler = logging.StreamHandler()

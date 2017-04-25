@@ -10,7 +10,7 @@ from marvin.codes import (
     MATCH_NOT_FOUND,
     INVALID_INPUT,
     EMPTY_LIST)
-from marvin.sshClient import SshClient
+from marvin.utils.SshClient import SshClient
 
 
 def _configure_ssh_credentials():
@@ -71,8 +71,8 @@ def is_server_ssh_ready(ip_address, port, username, password, retries=20, retry_
             host=ip_address,
             port=port,
             user=username,
-            passwd=password,
-            keyPairFiles=key_pair_file_location,
+            password=password,
+            key_pair_files=key_pair_file_location,
             retries=retries,
             delay=retry_interval,
             timeout=timeout)
