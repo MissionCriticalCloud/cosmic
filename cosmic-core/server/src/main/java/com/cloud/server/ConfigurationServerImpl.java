@@ -554,6 +554,21 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 }
 
                 // Offering #5
+                NetworkOfferingVO defaultIsolatedEnabledNetworkOfferingWithEgress =
+                        new NetworkOfferingVO(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress, "Offering for Isolated networks with egress and no Source Nat service", TrafficType.Guest,
+                                false, true, null, null, true, Availability.Optional, null, Network.GuestType.Isolated, true, true, false, false, false);
+
+                defaultIsolatedEnabledNetworkOfferingWithEgress.setState(NetworkOffering.State.Enabled);
+                defaultIsolatedEnabledNetworkOfferingWithEgress = _networkOfferingDao.persistDefaultNetworkOffering(defaultIsolatedEnabledNetworkOfferingWithEgress);
+
+                for (final Service service : defaultIsolatedNetworkOfferingProviders.keySet()) {
+                    final NetworkOfferingServiceMapVO offService =
+                            new NetworkOfferingServiceMapVO(defaultIsolatedEnabledNetworkOfferingWithEgress.getId(), service, defaultIsolatedNetworkOfferingProviders.get(service));
+                    _ntwkOfferingServiceMapDao.persist(offService);
+                    s_logger.trace("Added service for the network offering: " + offService);
+                }
+
+                // Offering #6
                 NetworkOfferingVO defaultNetworkOfferingForVpcNetworks =
                         new NetworkOfferingVO(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks,
                                 "Offering for Isolated Vpc networks with Source Nat service enabled", TrafficType.Guest, false, false, null, null, true, Availability.Optional,
@@ -581,7 +596,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     s_logger.trace("Added service for the network offering: " + offService);
                 }
 
-                // Offering #6
+                // Offering #7
                 NetworkOfferingVO defaultNetworkOfferingForVpcNetworksNoLB =
                         new NetworkOfferingVO(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksNoLB,
                                 "Offering for Isolated Vpc networks with Source Nat service enabled and LB service Disabled", TrafficType.Guest, false, false, null, null, true,
@@ -608,7 +623,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     s_logger.trace("Added service for the network offering: " + offService);
                 }
 
-                //offering #7 - network offering with internal lb service
+                //offering #8 - network offering with internal lb service
                 NetworkOfferingVO internalLbOff =
                         new NetworkOfferingVO(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
                                 "Offering for Isolated Vpc networks with Internal LB support", TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
