@@ -2,8 +2,8 @@ import logging
 
 from ddt import ddt, data
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
+
 from marvin.codes import (
     FAILED,
     STATIC_NAT_RULE,
@@ -25,7 +25,8 @@ from marvin.lib.common import (
     get_zone,
     get_template,
     list_hosts,
-    get_default_virtual_machine_offering)
+    get_default_virtual_machine_offering
+)
 from marvin.lib.utils import (
     cleanup_resources,
     get_process_status

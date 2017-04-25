@@ -6,6 +6,12 @@ import logging
 from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackAPI import (
+    startRouter,
+    stopRouter,
+    rebootRouter,
+    destroyRouter
+)
 from marvin.lib.base import (
     Configurations,
     NetworkACL,
@@ -14,11 +20,7 @@ from marvin.lib.base import (
     VirtualMachine,
     Network,
     VPC,
-    Account,
-    startRouter,
-    stopRouter,
-    rebootRouter,
-    destroyRouter
+    Account
 )
 from marvin.lib.common import (
     get_default_network_offering_no_load_balancer,

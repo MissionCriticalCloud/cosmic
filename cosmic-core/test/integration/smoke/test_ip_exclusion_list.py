@@ -34,12 +34,6 @@ class TestIpExclusionList(cloudstackTestCase):
             'username': 'e.cartman',
             'password': 'southpark'
         },
-        'default_offerings': {
-            'vpc': 'Default VPC offering',
-            'redundant_vpc': 'Redundant VPC offering',
-            'network': 'DefaultIsolatedNetworkOfferingForVpcNetworks',
-            'virtual_machine': 'Small Instance'
-        },
         'vpcs': {
             'vpc1': {
                 'name': 'vpc1',

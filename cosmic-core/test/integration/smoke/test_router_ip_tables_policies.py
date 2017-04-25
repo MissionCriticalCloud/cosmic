@@ -4,10 +4,10 @@ import socket
 from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackAPI import stopRouter
 from marvin.lib.base import (
     VirtualMachine,
-    Account,
-    stopRouter
+    Account
 )
 from marvin.lib.common import (
     list_routers,

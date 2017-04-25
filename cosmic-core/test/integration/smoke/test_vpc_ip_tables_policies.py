@@ -5,6 +5,10 @@ import time
 from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackAPI import (
+    stopRouter,
+    destroyRouter
+)
 from marvin.lib.base import (
     PublicIPAddress,
     VirtualMachine,
@@ -12,9 +16,7 @@ from marvin.lib.base import (
     NetworkACL,
     NATRule,
     VPC,
-    Account,
-    stopRouter,
-    destroyRouter
+    Account
 )
 from marvin.lib.common import (
     list_routers,

@@ -1,8 +1,8 @@
 import time
 
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
+
 from marvin.lib.base import (
     PublicIPAddress,
     Network,
@@ -12,7 +12,8 @@ from marvin.lib.common import (
     list_publicIP,
     get_zone,
     get_domain,
-    get_default_network_offering)
+    get_default_network_offering
+)
 from marvin.lib.utils import cleanup_resources
 
 
@@ -151,7 +152,7 @@ class TestPublicIP(cloudstackTestCase):
         """Test for Associate/Disassociate public IP address for user account"""
 
         # Validate the following:
-        # 1. listPubliIpAddresses API returns the list of acquired addresses
+        # 1. listPublicIpAddresses API returns the list of acquired addresses
         # 2. the returned list should contain our acquired IP address
 
         ip_address = PublicIPAddress.create(
