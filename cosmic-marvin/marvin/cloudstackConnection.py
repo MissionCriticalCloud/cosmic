@@ -9,7 +9,7 @@ import requests
 
 import jsonHelper
 from marvin.cloudstackAPI import queryAsyncJobResult
-from marvin.cloudstackException import InvalidParameterException
+from marvin.cloudstackException import InvalidParameterException, CloudstackAPIException
 from marvin.codes import (
     FAILED,
     JOB_FAILED,
@@ -281,6 +281,11 @@ class CSConnection(object):
                 else:
                     self.logger.debug("Job command is %s and result is %s" % (response.cmd, response.jobresult))
                     return response.jobresult
+        except CloudstackAPIException as e:
+            """ CloudstackAPIException might be intentional. We don't log them on a debug level. """
+            self.__lastError = e
+            self.logger.debug("Exception: %s" % e)
+            return FAILED
         except Exception as e:
             self.__lastError = e
             self.logger.exception("Exception: %s" % e)
@@ -328,6 +333,10 @@ class CSConnection(object):
             if ret == FAILED:
                 raise self.__lastError
             return ret
+        except CloudstackAPIException as e:
+            """ CloudstackAPIException might be intentional. We don't log them on a debug level. """
+            self.logger.debug("marvinRequest : CmdName: %s Exception: %s" % (self.pretty_printer.pformat(cmd), e))
+            raise e
         except Exception as e:
             self.logger.exception("marvinRequest : CmdName: %s Exception: %s" % (self.pretty_printer.pformat(cmd), e))
             raise e
