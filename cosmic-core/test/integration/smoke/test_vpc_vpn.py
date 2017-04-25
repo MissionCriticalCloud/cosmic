@@ -1,10 +1,9 @@
 import copy
-import logging
 import time
 
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     VpnUser,
     Vpn,
@@ -31,6 +30,7 @@ from marvin.lib.utils import (
     get_process_status,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class Services:
@@ -108,9 +108,7 @@ class TestVpcVpn(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls, redundant=False):
-        cls.logger = logging.getLogger('TestVpcVpn')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
+        cls.logger = MarvinLog('test').get_logger()
 
         test_client = super(TestVpcVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()

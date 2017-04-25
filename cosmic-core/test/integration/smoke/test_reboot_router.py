@@ -1,4 +1,3 @@
-import logging
 import time
 
 from nose.plugins.attrib import attr
@@ -24,16 +23,13 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering
 )
 from marvin.lib.utils import cleanup_resources
+from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
-
-logger = logging.getLogger('TestRebootRouter')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
 
 
 class TestRebootRouter(cloudstackTestCase):
     def setUp(self):
+        self.logger = MarvinLog('test').get_logger()
 
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
@@ -126,7 +122,7 @@ class TestRebootRouter(cloudstackTestCase):
         #    if the router restarts while the VM has not finished starting,
         #    the VM will fail to get an IP from the router
         try:
-            logger.debug("SSH into VM (ID : %s ) before reboot of router" % self.vm_1.id)
+            self.logger.debug("SSH into VM (ID : %s ) before reboot of router" % self.vm_1.id)
 
             SshClient(
                 self.public_ip.ipaddress.ipaddress,
@@ -147,8 +143,8 @@ class TestRebootRouter(cloudstackTestCase):
 
         # Retrieve router for the user account
 
-        logger.debug("Public IP: %s" % self.vm_1.ssh_ip)
-        logger.debug("Public IP: %s" % self.public_ip.ipaddress.ipaddress)
+        self.logger.debug("Public IP: %s" % self.vm_1.ssh_ip)
+        self.logger.debug("Public IP: %s" % self.public_ip.ipaddress.ipaddress)
         routers = list_routers(
             self.apiclient,
             account=self.account.name,
@@ -162,7 +158,7 @@ class TestRebootRouter(cloudstackTestCase):
 
         router = routers[0]
 
-        logger.debug("Rebooting the router (ID: %s)" % router.id)
+        self.logger.debug("Rebooting the router (ID: %s)" % router.id)
 
         cmd = rebootRouter.rebootRouterCmd()
         cmd.id = router.id
@@ -182,7 +178,7 @@ class TestRebootRouter(cloudstackTestCase):
 
                 vm = list_vm_response[0]
                 if vm.state == 'Running':
-                    logger.debug("VM state: %s" % vm.state)
+                    self.logger.debug("VM state: %s" % vm.state)
                     break
 
             if timeout == 0:
@@ -195,7 +191,7 @@ class TestRebootRouter(cloudstackTestCase):
 
         # we should be able to SSH after successful reboot
         try:
-            logger.debug("SSH into VM (ID : %s ) after reboot" % self.vm_1.id)
+            self.logger.debug("SSH into VM (ID : %s ) after reboot" % self.vm_1.id)
 
             SshClient(
                 self.public_ip.ipaddress.ipaddress,

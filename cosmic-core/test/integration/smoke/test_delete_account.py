@@ -1,4 +1,3 @@
-import logging
 import time
 
 from nose.plugins.attrib import attr
@@ -23,16 +22,12 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering
 )
 from marvin.lib.utils import cleanup_resources
-
-logger = logging.getLogger('TestDeleteAccount')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestDeleteAccount(cloudstackTestCase):
     def setUp(self):
-
+        self.logger = MarvinLog('test').get_logger()
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
@@ -126,7 +121,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 domainid=self.account.domainid
             )
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # ListPortForwardingRules should not
         # list associated rules with deleted account
@@ -137,7 +132,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 domainid=self.account.domainid
             )
         except CloudstackAPIException:
-            logger.debug("NATRule is deleted")
+            self.logger.debug("NATRule is deleted")
 
         # Retrieve router for the user account
         try:
@@ -152,7 +147,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 "Check routers are properly deleted."
             )
         except CloudstackAPIException:
-            logger.debug("Router is deleted")
+            self.logger.debug("Router is deleted")
 
         except Exception as e:
             raise Exception(

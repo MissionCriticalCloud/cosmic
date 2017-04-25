@@ -1,5 +1,3 @@
-import logging
-
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import cloudstackTestCase
@@ -27,16 +25,13 @@ from marvin.lib.utils import (
     cleanup_resources,
     get_process_status
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestRouterDHCPHosts(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-
-        cls.logger = logging.getLogger('TestRouterDHCPHosts')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
+        cls.logger = MarvinLog('test').get_logger()
 
         cls.testClient = super(TestRouterDHCPHosts, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()

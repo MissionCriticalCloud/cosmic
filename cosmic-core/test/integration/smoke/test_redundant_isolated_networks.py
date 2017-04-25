@@ -1,5 +1,3 @@
-import logging
-
 from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
 
@@ -28,6 +26,7 @@ from marvin.lib.utils import (
     get_host_credentials,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestRedundantIsolatedNetworks(cloudstackTestCase):
@@ -39,11 +38,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
-
-        cls.logger = logging.getLogger('TestRedundantIsolatedNetworks')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
+        cls.logger = MarvinLog('test').get_logger()
 
         cls.testClient = super(TestRedundantIsolatedNetworks, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
@@ -235,10 +230,10 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         # Test SSH after closing port 22
         expected = 1
-        gateway = find_public_gateway(self)
+        gateway = self.find_public_gateway()
         ssh_command = "ping -c 3 %s" % gateway
         check_string = "3 packets received"
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -249,7 +244,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         expected = 1
         ssh_command = self.HTTP_COMMAND % gateway
         check_string = self.HTTP_CHECK_STRING
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -267,7 +262,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -398,10 +393,10 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        gateway = find_public_gateway(self)
+        gateway = self.find_public_gateway()
         ssh_command = "ping -c 3 %s" % gateway
         check_string = "3 packets received"
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -412,7 +407,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         expected = 0
         ssh_command = self.HTTP_COMMAND % gateway
         check_string = self.HTTP_CHECK_STRING
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -439,7 +434,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 1
-        result = check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
+        result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
         self.assertEqual(
             result,
@@ -583,35 +578,33 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         return
 
+    def check_router_command(self, virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):
+        result = 'failed'
+        try:
+            ssh = virtual_machine.get_ssh_client(ipaddress=public_ip, retries=retries)
+            result = str(ssh.execute(ssh_command))
+        except Exception as e:
+            test_case.fail("Failed to SSH into the Virtual Machine: %s" % e)
 
-def check_router_command(virtual_machine, public_ip, ssh_command, check_string, test_case, retries=5):
-    result = 'failed'
-    try:
-        ssh = virtual_machine.get_ssh_client(ipaddress=public_ip, retries=retries)
-        result = str(ssh.execute(ssh_command))
-    except Exception as e:
-        test_case.fail("Failed to SSH into the Virtual Machine: %s" % e)
+        self.logger.debug("Result from SSH into the Virtual Machine: %s" % result)
+        return result.count(check_string)
 
-    logging.debug("Result from SSH into the Virtual Machine: %s" % result)
-    return result.count(check_string)
+    def find_public_gateway(self):
+        networks = list_networks(self.apiclient,
+                                 zoneid=self.zone.id,
+                                 listall=True,
+                                 issystem=True,
+                                 traffictype="Public")
+        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
 
+        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
 
-def find_public_gateway(test_case):
-    networks = list_networks(test_case.apiclient,
-                             zoneid=test_case.zone.id,
-                             listall=True,
-                             issystem=True,
-                             traffictype="Public")
-    test_case.logger.debug('::: Public Networks ::: ==> %s' % networks)
+        ip_ranges = list_vlan_ipranges(self.apiclient,
+                                       zoneid=self.zone.id,
+                                       networkid=networks[0].id)
+        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
 
-    test_case.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
+        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
+        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
 
-    ip_ranges = list_vlan_ipranges(test_case.apiclient,
-                                   zoneid=test_case.zone.id,
-                                   networkid=networks[0].id)
-    test_case.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-    test_case.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-    test_case.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
-
-    return ip_ranges[0].gateway
+        return ip_ranges[0].gateway
