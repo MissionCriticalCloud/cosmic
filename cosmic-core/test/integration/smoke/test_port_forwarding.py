@@ -21,7 +21,7 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering
 )
 from marvin.lib.utils import cleanup_resources
-from marvin.sshClient import SshClient
+from marvin.utils.SshClient import SshClient
 
 logger = logging.getLogger('TestPortForwarding')
 stream_handler = logging.StreamHandler()

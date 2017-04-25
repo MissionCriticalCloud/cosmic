@@ -16,7 +16,7 @@ from dbConnection import DbConnection
 from lib.utils import (random_gen, validate_list)
 from marvin.cloudstackAPI import *
 from marvin.cloudstackAPI.cloudstackAPIClient import CloudStackAPIClient
-from marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class CSTestClient(object):
@@ -47,7 +47,7 @@ class CSTestClient(object):
         self.__dbConnection = None
         self.__testClient = None
         self.__asyncTimeOut = async_timeout
-        self.__logger = MarvinLog('marvin').getLogger()
+        self.__logger = MarvinLog('marvin').get_logger()
         self.__apiClient = None
         self.__userApiClient = None
         self.__asyncJobMgr = None

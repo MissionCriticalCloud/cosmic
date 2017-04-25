@@ -18,14 +18,14 @@ from marvin.codes import (
 )
 from marvin.configGenerator import getSetupConfig
 from marvin.deployDataCenter import DeployDataCenters
-from marvin.marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class MarvinInit:
     def __init__(self, config_file, deploy_dc_flag=False, test_mod_name="deploydc", zone=None, hypervisor_type=None):
         self.__configFile = config_file
         self.__deployFlag = deploy_dc_flag
-        self.__tcRunLogger = MarvinLog('marvin').getLogger()
+        self.__tcRunLogger = MarvinLog('marvin').get_logger()
         self.__tcRunLogger.info("=== Marvin Init Logging Successful ===")
         self.__testModName = test_mod_name
         self.__testClient = None
