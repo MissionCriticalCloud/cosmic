@@ -370,13 +370,10 @@ class VirtualMachine:
                     aclid=acl_list[0].id
                 )
 
-                services_acl = {}
-                services_acl["protocol"] = services["protocol"] if "protocol" in services else 'TCP'
-                services_acl["startport"] = services["publicport"] if "publicport" in services else 22
-                services_acl["endport"] = services["publicport"] if "publicport" in services else 22
-                services_acl["cidrlist"] = ['0.0.0.0/0']
-                services_acl["action"] = 'Allow'
-                services_acl["traffictype"] = 'Ingress'
+                services_acl = {"protocol": services["protocol"] if "protocol" in services else 'TCP',
+                                "startport": services["publicport"] if "publicport" in services else 22,
+                                "endport": services["publicport"] if "publicport" in services else 22,
+                                "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress'}
 
                 ace_number = 1
                 for ace in target_acl:
@@ -1219,7 +1216,7 @@ class Template:
 
     @classmethod
     def extract(cls, api_client, id, mode, zoneid=None):
-        "Extract template "
+        """Extract template """
 
         cmd = extractTemplate.extractTemplateCmd()
         cmd.id = id
@@ -1296,7 +1293,7 @@ class Template:
                 elif 'Downloaded' in template.status:
                     time.sleep(interval)
 
-                elif not template.status.strip(): # status is empty string
+                elif not template.status.strip():  # status is empty string
                     time.sleep(interval)
 
                 elif 'Installing' not in template.status:
@@ -1327,7 +1324,7 @@ class Template:
         return api_client.updateTemplate(cmd)
 
     def copy(self, api_client, sourcezoneid, destzoneid):
-        "Copy Template from source Zone to Destination Zone"
+        """Copy Template from source Zone to Destination Zone"""
 
         cmd = copyTemplate.copyTemplateCmd()
         cmd.id = self.id
@@ -1443,11 +1440,11 @@ class Iso:
                 raise Exception("ISO download Timeout Exception")
             else:
                 timeout = timeout - 1
-        return
+
 
     @classmethod
     def extract(cls, api_client, id, mode, zoneid=None):
-        "Extract ISO "
+        """Extract ISO """
 
         cmd = extractIso.extractIsoCmd()
         cmd.id = id
@@ -1466,7 +1463,7 @@ class Iso:
 
     @classmethod
     def copy(cls, api_client, id, sourcezoneid, destzoneid):
-        "Copy ISO from source Zone to Destination Zone"
+        """Copy ISO from source Zone to Destination Zone"""
 
         cmd = copyIso.copyIsoCmd()
         cmd.id = id
@@ -1686,7 +1683,7 @@ class StaticNATRule:
         return
 
     @classmethod
-    def disable(cls, api_client, ipaddressid, virtualmachineid=None):
+    def disable(cls, api_client, ipaddressid):
         """Disables Static NAT rule"""
 
         cmd = disableStaticNat.disableStaticNatCmd()
@@ -2836,9 +2833,11 @@ class NetworkACL:
     @classmethod
     def create(cls, api_client, services, networkid=None, protocol=None,
                number=None, aclid=None, action='Allow',
-               traffictype=None, cidrlist=[]):
+               traffictype=None, cidrlist=None):
         """Create network ACL rules(Ingress/Egress)"""
 
+        if cidrlist is None:
+            cidrlist = []
         cmd = createNetworkACL.createNetworkACLCmd()
         if "networkid" in services:
             cmd.networkid = services["networkid"]
@@ -3170,7 +3169,7 @@ class Pod:
 
     @classmethod
     def list(cls, api_client, **kwargs):
-        "Returns a default pod for specified zone"
+        """Returns a default pod for specified zone"""
 
         cmd = listPods.listPodsCmd()
         [setattr(cmd, k, v) for k, v in kwargs.items()]
@@ -3179,7 +3178,7 @@ class Pod:
         return api_client.listPods(cmd)
 
     @classmethod
-    def update(self, api_client, **kwargs):
+    def update(cls, api_client, **kwargs):
         """Update the pod"""
 
         cmd = updatePod.updatePodCmd()
@@ -3515,9 +3514,11 @@ class SecurityGroup:
         return api_client.revokeSecurityGroupIngress(cmd)
 
     def authorizeEgress(self, api_client, services, account=None, domainid=None,
-                        projectid=None, user_secgrp_list={}):
+                        projectid=None, user_secgrp_list=None):
         """Authorize Egress Rule"""
 
+        if user_secgrp_list is None:
+            user_secgrp_list = {}
         cmd = authorizeSecurityGroupEgress.authorizeSecurityGroupEgressCmd()
 
         if domainid:
@@ -4259,7 +4260,7 @@ class VNMC:
     def __init__(self, items):
         self.__dict__.update(items)
 
-    def create(cls, api_client, hostname, username, password,
+    def create(self, api_client, hostname, username, password,
                physicalnetworkid):
         """Registers VNMC appliance"""
 
@@ -4291,7 +4292,7 @@ class VNMC:
 class SSHKeyPair:
     """Manage SSH Key pairs"""
 
-    def __init__(self, items, services):
+    def __init__(self, items):
         self.__dict__.update(items)
 
     @classmethod
@@ -4453,41 +4454,6 @@ class InstanceGroup:
         cmd = recoverVirtualMachine.recoverVirtualMachineCmd()
         cmd.group = self.id
         api_client.recoverVirtualMachine(cmd)
-
-
-class ASA1000V:
-    """Manage ASA 1000v lifecycle"""
-
-    def __init__(self):
-        pass
-
-    def create(cls, api_client, hostname, insideportprofile,
-               clusterid, physicalnetworkid):
-        """Registers ASA 1000v appliance"""
-
-        cmd = addCiscoAsa1000vResource.addCiscoAsa1000vResourceCmd()
-        cmd.hostname = hostname
-        cmd.insideportprofile = insideportprofile
-        cmd.clusterid = clusterid
-        cmd.physicalnetworkid = physicalnetworkid
-        return ASA1000V(api_client.addCiscoAsa1000vResource(cmd))
-
-    def delete(self, api_client):
-        """Removes ASA 1000v appliance"""
-
-        cmd = deleteCiscoAsa1000vResource.deleteCiscoAsa1000vResourceCmd()
-        cmd.resourceid = self.resourceid
-        return api_client.deleteCiscoAsa1000vResource(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """List ASA 1000v appliances"""
-
-        cmd = listCiscoAsa1000vResources.listCiscoAsa1000vResourcesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listCiscoAsa1000vResources(cmd)
 
 
 class VmSnapshot:
@@ -4668,7 +4634,7 @@ class ApplicationLoadBalancer:
 class Resources:
     """Manage resource limits"""
 
-    def __init__(self, items, services):
+    def __init__(self, items):
         self.__dict__.update(items)
 
     @classmethod
@@ -4729,186 +4695,6 @@ class NIC:
         if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
             cmd.listall = True
         return api_client.listNics(cmd)
-
-
-class IAMGroup:
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, iam_grp, account=None, domainid=None):
-        cmd = createIAMGroup.createIAMGroupCmd()
-        cmd.name = iam_grp['name']
-        cmd.description = iam_grp['description']
-        if account:
-            cmd.account = account
-        if domainid:
-            cmd.domainid = domainid
-        return IAMGroup(api_client.createIAMGroup(cmd).__dict__)
-
-    def update(self, api_client):
-        pass
-
-    def delete(self, api_client):
-        cmd = deleteIAMGroup.deleteIAMGroupCmd()
-        cmd.id = self.id
-        return api_client.deleteIAMGroup(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        cmd = listIAMGroups.listIAMGroupsCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listIAMGroups(cmd)
-
-    def addAccount(self, api_client, accts):
-        """Add accounts to iam group"""
-        cmd = addAccountToIAMGroup.addAccountToIAMGroupCmd()
-        cmd.id = self.id
-        cmd.accounts = [str(acct.id) for acct in accts]
-        api_client.addAccountToIAMGroup(cmd)
-        return
-
-    def removeAccount(self, api_client, accts):
-        """ Remove accounts from iam group"""
-        cmd = removeAccountFromIAMGroup.removeAccountFromIAMGroupCmd()
-        cmd.id = self.id
-        cmd.accounts = [str(acct.id) for acct in accts]
-        api_client.removeAccountFromIAMGroup(cmd)
-        return
-
-    def attachPolicy(self, api_client, policies):
-        """Add policies to iam group"""
-        cmd = attachIAMPolicyToIAMGroup.attachIAMPolicyToIAMGroupCmd()
-        cmd.id = self.id
-        cmd.policies = [str(policy.id) for policy in policies]
-        api_client.attachIAMPolicyToIAMGroup(cmd)
-        return
-
-    def detachPolicy(self, api_client, policies):
-        """Remove policies from iam group"""
-        cmd = removeIAMPolicyFromIAMGroup.removeIAMPolicyFromIAMGroupCmd()
-        cmd.id = self.id
-        cmd.policies = [str(policy.id) for policy in policies]
-        api_client.removeIAMPolicyFromIAMGroup(cmd)
-        return
-
-
-class IAMPolicy:
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, iam_policy, account=None, domainid=None):
-        cmd = createIAMPolicy.createIAMPolicyCmd()
-        cmd.name = iam_policy['name']
-        cmd.description = iam_policy['description']
-        if account:
-            cmd.account = account
-        if domainid:
-            cmd.domainid = domainid
-        return IAMPolicy(api_client.createIAMPolicy(cmd).__dict__)
-
-    def update(self, api_client):
-        pass
-
-    def delete(self, api_client):
-        cmd = deleteIAMPolicy.deleteIAMPolicyCmd()
-        cmd.id = self.id
-        return api_client.deleteIAMPolicy(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        cmd = listIAMPolicies.listIAMPoliciesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listIAMPoliciesCmd(cmd)
-
-    def addPermission(self, api_client, permission):
-        """Add permission to iam policy"""
-        cmd = addIAMPermissionToIAMPolicy.addIAMPermissionToIAMPolicyCmd()
-        cmd.id = self.id
-        cmd.action = permission['action']
-        cmd.entitytype = permission['entitytype']
-        cmd.scope = permission['scope']
-        cmd.scopeid = permission['scopeid']
-        api_client.addIAMPermissionToIAMPolicy(cmd)
-        return
-
-    def removePermission(self, api_client, permission):
-        """Remove permission from iam policy"""
-        cmd = removeIAMPermissionFromIAMPolicy. \
-            removeIAMPermissionFromIAMPolicyCmd()
-        cmd.id = self.id
-        cmd.action = permission['action']
-        cmd.entitytype = permission['entitytype']
-        cmd.scope = permission['scope']
-        cmd.scopeid = permission['scopeid']
-        api_client.removeIAMPermissionFromIAMPolicy(cmd)
-        return
-
-    def attachAccount(self, api_client, accts):
-        """Attach iam policy to accounts"""
-        cmd = attachIAMPolicyToAccount.attachIAMPolicyToAccountCmd()
-        cmd.id = self.id
-        cmd.accounts = [str(acct.id) for acct in accts]
-        api_client.attachIAMPolicyToAccount(cmd)
-        return
-
-    def detachAccount(self, api_client, accts):
-        """Detach iam policy from accounts"""
-        cmd = removeIAMPolicyFromAccount.removeIAMPolicyFromAccountCmd()
-        cmd.id = self.id
-        cmd.accounts = [str(acct.id) for acct in accts]
-        api_client.removeIAMPolicyFromAccount(cmd)
-        return
-
-
-class SimulatorMock:
-    """Manage simulator mock lifecycle"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, command, zoneid=None, podid=None,
-               clusterid=None, hostid=None, value="result:fail",
-               count=None, jsonresponse=None, method="GET"):
-        """Creates simulator mock"""
-        cmd = configureSimulator.configureSimulatorCmd()
-        cmd.zoneid = zoneid
-        cmd.podid = podid
-        cmd.clusterid = clusterid
-        cmd.hostid = hostid
-        cmd.name = command
-        cmd.value = value
-        cmd.count = count
-        cmd.jsonresponse = jsonresponse
-        try:
-            simulatormock = api_client.configureSimulator(cmd, method=method)
-            if simulatormock is not None:
-                return SimulatorMock(simulatormock.__dict__)
-        except Exception as e:
-            raise e
-
-    def delete(self, api_client):
-        """Removes simulator mock"""
-        cmd = cleanupSimulatorMock.cleanupSimulatorMockCmd()
-        cmd.id = self.id
-        return api_client.cleanupSimulatorMock(cmd)
-
-    def query(self, api_client):
-        """Queries simulator mock"""
-        cmd = querySimulatorMock.querySimulatorMockCmd()
-        cmd.id = self.id
-        try:
-            simulatormock = api_client.querySimulatorMock(cmd)
-            if simulatormock is not None:
-                return SimulatorMock(simulatormock.__dict__)
-        except Exception as e:
-            raise e
 
 
 class Usage:
