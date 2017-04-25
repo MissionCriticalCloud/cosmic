@@ -2,7 +2,7 @@ import unittest
 
 from cloudstackTestClient import CSTestClient
 from codes import PASS
-from lib.utils import verifyElementInList
+from lib.utils import verify_element_in_list
 
 
 def user(Name, DomainName, AcctType):
@@ -32,7 +32,7 @@ class cloudstackTestCase(unittest.case.TestCase):
         Takes one additional argument of what message to assert with
         when failed
         '''
-        out = verifyElementInList(inp, toverify, responsevar, pos)
+        out = verify_element_in_list(inp, toverify, responsevar, pos)
         unittest.TestCase.assertEquals(out[0], PASS, "msg:%s" % out[1])
 
     @classmethod

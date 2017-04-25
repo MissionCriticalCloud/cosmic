@@ -1,12 +1,10 @@
-import logging
-
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     stopRouter,
     replaceNetworkACLList
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     NetworkACL,
     NetworkACLList,
@@ -34,6 +32,7 @@ from marvin.lib.utils import (
     get_host_credentials,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPublicIpAcl(cloudstackTestCase):
@@ -104,15 +103,12 @@ class TestPublicIpAcl(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestPublicIpAcl, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
-
-        cls.logger = logging.getLogger('TestPublicIpAcl')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
 
     @classmethod
     def setup_infra(cls, redundant=False):
@@ -122,16 +118,16 @@ class TestPublicIpAcl(cloudstackTestCase):
             cls.class_cleanup = []
 
         cls.zone = get_zone(cls.api_client, cls.test_client.getZoneForTests())
-        cls.logger.debug("[TEST] Zone '%s' selected" % cls.zone.name)
+        cls.logger.debug("Zone '%s' selected" % cls.zone.name)
 
         cls.domain = get_domain(cls.api_client)
-        cls.logger.debug("[TEST] Domain '%s' selected" % cls.domain.name)
+        cls.logger.debug("Domain '%s' selected" % cls.domain.name)
 
         cls.template = get_template(
             cls.api_client,
             cls.zone.id)
 
-        cls.logger.debug("[TEST] Template '%s' selected" % cls.template.name)
+        cls.logger.debug("Template '%s' selected" % cls.template.name)
 
         cls.account = Account.create(
             cls.api_client,
@@ -140,22 +136,22 @@ class TestPublicIpAcl(cloudstackTestCase):
             domainid=cls.domain.id)
 
         cls.class_cleanup += [cls.account]
-        cls.logger.debug("[TEST] Account '%s' created", cls.account.name)
+        cls.logger.debug("Account '%s' created", cls.account.name)
 
         cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
-        cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
+        cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
 
         cls.network_offering = get_default_network_offering(cls.api_client)
-        cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
+        cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
 
         cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
-        cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
+        cls.logger.debug("Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
         cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
-        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
+        cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
         cls.default_deny_acl = get_default_acl(cls.api_client, 'default_deny')
-        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_deny_acl.name)
+        cls.logger.debug("ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
             cls.attributes['vpcs']['vpc1'],
@@ -163,7 +159,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             account=cls.account.name)
-        cls.logger.debug("[TEST] VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
+        cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
 
         cls.network1 = Network.create(cls.api_client,
             cls.attributes['networks']['network1'],
@@ -173,7 +169,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
 
         cls.vm1 = VirtualMachine.create(cls.api_client,
             cls.attributes['vms']['vm1'],
@@ -183,7 +179,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
+        cls.logger.debug("VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
 
         cls.public_ip1 = PublicIPAddress.create(cls.api_client,
             zoneid=cls.zone.id,
@@ -191,7 +187,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             accountid=cls.account.name,
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id)
-        cls.logger.debug("[TEST] Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
 
         cls.nat_rule1 = NATRule.create(cls.api_client,
             cls.vm1,
@@ -199,7 +195,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id,
             ipaddressid=cls.public_ip1.ipaddress.id)
-        cls.logger.debug("[TEST] Port Forwarding Rule '%s (%s) %s => %s' created",
+        cls.logger.debug("Port Forwarding Rule '%s (%s) %s => %s' created",
             cls.nat_rule1.ipaddress,
             cls.nat_rule1.protocol,
             cls.nat_rule1.publicport,
@@ -272,7 +268,7 @@ class TestPublicIpAcl(cloudstackTestCase):
 
         try:
             self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress.ipaddress, reconnect=True, retries=retries)
-            self.logger.debug('[TEST] Ensure connectivity: OK')
+            self.logger.debug('Ensure connectivity: OK')
 
         except Exception as e:
             raise Exception("Exception: %s" % e)
@@ -284,16 +280,16 @@ class TestPublicIpAcl(cloudstackTestCase):
             self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress.ipaddress, reconnect=True, retries=2)
 
         except Exception as e:
-            self.logger.debug('[TEST] Ensure no connectivity: OK')
+            self.logger.debug('Ensure no connectivity: OK')
             failed = True
 
         self.assertTrue(failed)
 
     def cleanup_vpc(self):
 
-        self.logger.debug("[TEST] Restarting VPC '%s' with 'cleanup=True'", self.vpc1.name)
+        self.logger.debug("Restarting VPC '%s' with 'cleanup=True'", self.vpc1.name)
         self.vpc1.restart(self.api_client, True)
-        self.logger.debug("[TEST] VPC '%s' restarted", self.vpc1.name)
+        self.logger.debug("VPC '%s' restarted", self.vpc1.name)
 
     def define_acl(self, acl):
 
@@ -307,7 +303,7 @@ class TestPublicIpAcl(cloudstackTestCase):
             raise Exception("Exception: %s" % e)
 
         self.assertTrue(response.success)
-        self.logger.debug("[TEST] Public IP '%s' ACL replaced with '%s'", self.public_ip1.ipaddress.ipaddress, acl.name)
+        self.logger.debug("Public IP '%s' ACL replaced with '%s'", self.public_ip1.ipaddress.ipaddress, acl.name)
 
     def define_custom_acl(self, acl_config, acl_entry_config):
 
@@ -324,7 +320,7 @@ class TestPublicIpAcl(cloudstackTestCase):
 
     def stop_master_router(self, vpc):
 
-        self.logger.debug("[TEST] Stopping Master Router of VPC '%s'...", vpc.name)
+        self.logger.debug("Stopping Master Router of VPC '%s'...", vpc.name)
         routers = list_routers(self.api_client, domainid=self.domain.id, account=self.account.name, vpcid=vpc.id)
         for router in routers:
             if router.redundantstate == 'MASTER':
@@ -347,4 +343,4 @@ class TestPublicIpAcl(cloudstackTestCase):
                 except KeyError as e:
                     raise Exception("Exception: %s" % e)
 
-        self.logger.debug("[TEST] Master Router of VPC '%s' stopped", vpc.name)
+        self.logger.debug("Master Router of VPC '%s' stopped", vpc.name)

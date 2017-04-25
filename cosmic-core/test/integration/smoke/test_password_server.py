@@ -1,11 +1,10 @@
-import logging
-
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import *
 from marvin.lib.base import *
 from marvin.lib.common import *
 from marvin.lib.utils import *
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class Services:
@@ -159,6 +158,7 @@ class Services:
 class TestPasswordService(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.testClient = super(TestPasswordService, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
@@ -170,8 +170,8 @@ class TestPasswordService(cloudstackTestCase):
         cls.services['mode'] = cls.zone.networktype
         cls.template = get_template(
             cls.api_client,
-            cls.zone.id,
-            cls.services["ostype"])
+            cls.zone.id
+        )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
@@ -180,11 +180,6 @@ class TestPasswordService(cloudstackTestCase):
             cls.api_client,
             cls.services["service_offering"])
         cls._cleanup = [cls.service_offering]
-
-        cls.logger = logging.getLogger('TestPasswordService')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
 
     @classmethod
     def tearDownClass(cls):

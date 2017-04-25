@@ -20,12 +20,12 @@ from marvin.lib.utils import (
     get_process_status,
     get_host_credentials
 )
-from marvin.marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestSSVMs(cloudstackTestCase):
     def setUp(self):
-        self.logger = MarvinLog('test').getLogger()
+        self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
         self.apiclient = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
         self.cleanup = []
@@ -305,7 +305,8 @@ class TestSSVMs(cloudstackTestCase):
         self.assertEqual(
             linklocal_ip,
             res,
-            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
+            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
+            linklocal_ip, res)
         )
 
         return
@@ -404,7 +405,8 @@ class TestSSVMs(cloudstackTestCase):
         self.assertEqual(
             linklocal_ip,
             res,
-            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
+            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
+            linklocal_ip, res)
         )
 
         return
@@ -645,7 +647,8 @@ class TestSSVMs(cloudstackTestCase):
                 if list_ssvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                self.logger.debug("Warning: List SSVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
+                self.logger.debug(
+                    "Warning: List SSVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
                 return
 
             time.sleep(self.services["sleep"])
@@ -738,7 +741,8 @@ class TestSSVMs(cloudstackTestCase):
                 if list_cpvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                self.logger.debug("Warning: List CPVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
+                self.logger.debug(
+                    "Warning: List CPVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
                 return
 
             time.sleep(self.services["sleep"])

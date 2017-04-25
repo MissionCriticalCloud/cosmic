@@ -1,10 +1,9 @@
-import logging
 import socket
 
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import stopRouter
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     VirtualMachine,
     Account
@@ -21,6 +20,7 @@ from marvin.lib.utils import (
     get_process_status,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class Services:
@@ -82,6 +82,8 @@ class Services:
 class TestRouterIpTablesPolicies(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
+
         # We want to fail quicker if it's failure
         socket.setdefaulttimeout(60)
 
@@ -94,9 +96,8 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
         cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
         cls.template = get_template(
             cls.apiclient,
-            cls.zone.id,
-            cls.services["ostype"])
-
+            cls.zone.id
+        )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
@@ -107,11 +108,6 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             domainid=cls.domain.id)
 
         cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
-
-        cls.logger = logging.getLogger('TestRouterIpTablesPolicies')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
 
         cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
 

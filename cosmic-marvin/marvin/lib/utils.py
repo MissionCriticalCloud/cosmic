@@ -1,41 +1,25 @@
-"""Utilities functions
-"""
-
-import datetime
-import email
-import imaplib
 import random
 import socket
 import string
 import time
 import urlparse
-from platform import system
 
-from marvin.cloudstackException import printException
 from marvin.codes import (
-    SUCCESS,
     FAIL,
     PASS,
     MATCH_NOT_FOUND,
     INVALID_INPUT,
-    EMPTY_LIST,
-    FAILED)
-from marvin.sshClient import SshClient
+    EMPTY_LIST)
+from marvin.utils.SshClient import SshClient
 
 
-def _configure_ssh_credentials(hypervisor):
-    ssh_command = "ssh -i ~/.ssh/id_rsa.cloud -ostricthostkeychecking=no "
-
-    return ssh_command
-
-
-def _configure_timeout(hypervisor):
-    timeout = 5
-
-    return timeout
+def _configure_ssh_credentials():
+    return "ssh -i ~/.ssh/id_rsa.cloud -ostricthostkeychecking=no "
 
 
 def _execute_ssh_command(hostip, port, username, password, ssh_command):
+    # Timeout
+    timeout = 5
     # SSH to the machine
     ssh = SshClient(hostip, port, username, password)
     # Ensure the SSH login is successful
@@ -53,125 +37,49 @@ def _execute_ssh_command(hostip, port, username, password, ssh_command):
     return res
 
 
-def restart_mgmt_server(server):
-    """Restarts the management server"""
-
-    try:
-        # Get the SSH client
-        ssh = is_server_ssh_ready(
-            server["ipaddress"],
-            server["port"],
-            server["username"],
-            server["password"],
-        )
-        result = ssh.execute("/etc/init.d/cloud-management restart")
-        res = str(result)
-        # Server Stop - OK
-        # Server Start - OK
-        if res.count("OK") != 2:
-            raise ("ErrorInReboot!")
-    except Exception as e:
-        raise e
-    return
-
-
-def fetch_latest_mail(services, from_mail):
-    """Fetch mail"""
-
-    # Login to mail server to verify email
-    mail = imaplib.IMAP4_SSL(services["server"])
-    mail.login(
-        services["email"],
-        services["password"]
-    )
-    mail.list()
-    mail.select(services["folder"])
-    date = (datetime.date.today() - datetime.timedelta(1)).strftime("%d-%b-%Y")
-
-    result, data = mail.uid(
-        'search',
-        None,
-        '(SENTSINCE {date} HEADER FROM "{mail}")'.format(
-            date=date,
-            mail=from_mail
-        )
-    )
-    # Return False if email is not present
-    if data == []:
-        return False
-
-    latest_email_uid = data[0].split()[-1]
-    result, data = mail.uid('fetch', latest_email_uid, '(RFC822)')
-    raw_email = data[0][1]
-    email_message = email.message_from_string(raw_email)
-    result = get_first_text_block(email_message)
-    return result
-
-
-def get_first_text_block(email_message_instance):
-    """fetches first text block from the mail"""
-    maintype = email_message_instance.get_content_maintype()
-    if maintype == 'multipart':
-        for part in email_message_instance.get_payload():
-            if part.get_content_maintype() == 'text':
-                return part.get_payload()
-    elif maintype == 'text':
-        return email_message_instance.get_payload()
-
-
-def random_gen(id=None, size=6, chars=string.ascii_uppercase + string.digits):
+def random_gen(uuid=None, size=6, chars=string.ascii_uppercase + string.digits):
     """Generate Random Strings of variable length"""
-    randomstr = ''.join(random.choice(chars) for x in range(size))
-    if id:
-        return ''.join([id, '-', randomstr])
-    return randomstr
+    random_string = ''.join(random.choice(chars) for _ in range(size))
+    if uuid:
+        return ''.join([uuid, '-', random_string])
+    return random_string
 
 
 def cleanup_resources(api_client, resources, logger=None):
-    if logger is not None:
-        logger.debug("Cleaning up all resources: %s" % resources)
     """Delete resources"""
+    if logger is not None:
+        logger.debug("Cleaning up all resources:")
     for obj in resources:
         if logger is not None:
-            logger.debug("Deleting %s" % obj.id)
+            logger.debug(" -> %s %s" % (obj.__class__.__name__, obj.id))
         obj.delete(api_client)
 
 
-def is_server_ssh_ready(ipaddress, port, username, password, retries=20, retryinterv=30, timeout=10.0,
-                        keyPairFileLocation=None):
-    '''
+def is_server_ssh_ready(ip_address, port, username, password, retries=20, retry_interval=30, timeout=10.0,
+                        key_pair_file_location=None):
+    """
     @Name: is_server_ssh_ready
     @Input: timeout: tcp connection timeout flag,
             others information need to be added
     @Output:object for SshClient
     Name of the function is little misnomer and is not
               verifying anything as such mentioned
-    '''
+    """
 
     try:
         ssh = SshClient(
-            host=ipaddress,
+            host=ip_address,
             port=port,
             user=username,
-            passwd=password,
-            keyPairFiles=keyPairFileLocation,
+            password=password,
+            key_pair_files=key_pair_file_location,
             retries=retries,
-            delay=retryinterv,
+            delay=retry_interval,
             timeout=timeout)
     except Exception, e:
-        raise Exception("SSH connection has Failed. Waited %ss. Error is %s" % (retries * retryinterv, str(e)))
+        raise Exception("SSH connection has Failed. Waited %ss. Error is %s" % (retries * retry_interval, str(e)))
     else:
         return ssh
-
-
-def format_volume_to_ext3(ssh_client, device="/dev/sda"):
-    """Format attached storage to ext3 fs"""
-    cmds = [
-        "echo -e 'n\np\n1\n\n\nw' | fdisk %s" % device,
-        "mkfs.ext3 %s1" % device,
-    ]
-    for c in cmds:
-        ssh_client.execute(c)
 
 
 def get_host_credentials(config, hostip):
@@ -194,30 +102,11 @@ def get_host_credentials(config, hostip):
     raise KeyError("Please provide the marvin configuration file with credentials to your hosts")
 
 
-def get_process_status(hostip, port, username, password, linklocalip, command, hypervisor=None):
+def get_process_status(hostip, port, username, password, linklocalip, command):
     """Double hop and returns a command execution result"""
+    ssh_command = _configure_ssh_credentials() + "-oUserKnownHostsFile=/dev/null -p 3922 %s %s" % (linklocalip, command)
 
-    ssh_command = _configure_ssh_credentials(hypervisor)
-
-    ssh_command = ssh_command + \
-                  "-oUserKnownHostsFile=/dev/null -p 3922 %s %s" % (
-                      linklocalip,
-                      command)
-    timeout = _configure_timeout(hypervisor)
-
-    result = _execute_ssh_command(hostip, port, username, password, ssh_command)
-    return result
-
-
-def isAlmostEqual(first_digit, second_digit, range=0):
-    digits_equal_within_range = False
-
-    try:
-        if ((first_digit - range) < second_digit < (first_digit + range)):
-            digits_equal_within_range = True
-    except Exception as e:
-        raise e
-    return digits_equal_within_range
+    return _execute_ssh_command(hostip, port, username, password, ssh_command)
 
 
 def xsplit(txt, seps):
@@ -233,7 +122,7 @@ def xsplit(txt, seps):
     return [i.strip() for i in txt.split(default_sep)]
 
 
-def validateList(inp):
+def validate_list(inp):
     """
     @name: validateList
     @Description: 1. A utility function to validate
@@ -267,8 +156,8 @@ def validateList(inp):
     return [PASS, inp[0], None]
 
 
-def verifyElementInList(inp, toverify, responsevar=None, pos=0):
-    '''
+def verify_element_in_list(inp, toverify, responsevar=None, pos=0):
+    """
     @name: verifyElementInList
     @Description:
     1. A utility function to validate
@@ -295,11 +184,11 @@ def verifyElementInList(inp, toverify, responsevar=None, pos=0):
                                         INVALID_INPUT
                                         EMPTY_LIST
                                         MATCH_NOT_FOUND
-    '''
+    """
     if toverify is None or toverify == '' \
             or pos is None or pos < -1 or pos == '':
         return [FAIL, INVALID_INPUT]
-    out = validateList(inp)
+    out = validate_list(inp)
     if out[0] == FAIL:
         return [FAIL, out[2]]
     if len(inp) > pos:
@@ -315,43 +204,7 @@ def verifyElementInList(inp, toverify, responsevar=None, pos=0):
         return [FAIL, MATCH_NOT_FOUND]
 
 
-def checkVolumeSize(ssh_handle=None,
-                    volume_name="/dev/sda",
-                    cmd_inp="/sbin/fdisk -l | grep Disk",
-                    size_to_verify=0):
-    '''
-    @Name : getDiskUsage
-    @Desc : provides facility to verify the volume size against the size to verify
-    @Input: 1. ssh_handle : machine against which to execute the disk size cmd
-            2. volume_name : The name of the volume against which to verify the size
-            3. cmd_inp : Input command used to veify the size
-            4. size_to_verify: size against which to compare.
-    @Output: Returns FAILED in case of an issue, else SUCCESS
-    '''
-    try:
-        if ssh_handle is None or cmd_inp is None or volume_name is None:
-            return INVALID_INPUT
-
-        cmd = cmd_inp
-        '''
-        Retrieve the cmd output
-        '''
-        if system().lower() != "windows":
-            fdisk_output = ssh_handle.runCommand(cmd_inp)
-            if fdisk_output["status"] != SUCCESS:
-                return FAILED
-            for line in fdisk_output["stdout"]:
-                if volume_name in line:
-                    parts = line.strip().split()
-                    if str(parts[-2]) == str(size_to_verify):
-                        return [SUCCESS, str(parts[-2])]
-            return [FAILED, "Volume Not Found"]
-    except Exception, e:
-        printException(e)
-        return [FAILED, str(e)]
-
-
-def validateState(apiclient, obj, state, timeout=600, interval=5):
+def validate_state(api_client, obj, state, timeout=600, interval=5):
     """Check if an object is in the required state
        returnValue: List[Result, Reason]
              @Result: PASS if object is in required state,
@@ -359,43 +212,24 @@ def validateState(apiclient, obj, state, timeout=600, interval=5):
              @Reason: Reason for failure in case Result is FAIL
     """
 
-    returnValue = [FAIL, "%s state not trasited to %s, operation timed out" % (obj.__class__.__name__, state)]
+    return_value = [FAIL, "%s state not transited to %s, operation timed out" % (obj.__class__.__name__, state)]
 
     while timeout > 0:
         try:
-            objects = obj.__class__.list(apiclient, id=obj.id)
-            validationresult = validateList(objects)
-            if validationresult[0] == FAIL:
-                raise Exception("%s list validation failed: %s" % (obj.__class__.__name__, validationresult[2]))
+            objects = obj.__class__.list(api_client, id=obj.id)
+            validation_result = validate_list(objects)
+            if validation_result[0] == FAIL:
+                raise Exception("%s list validation failed: %s" % (obj.__class__.__name__, validation_result[2]))
             elif obj.state_check_function(objects, state):
-                returnValue = [PASS, None]
+                return_value = [PASS, None]
                 break
         except Exception as e:
-            returnValue = [FAIL, e]
+            return_value = [FAIL, e]
             break
         time.sleep(interval)
         timeout -= interval
-    return returnValue
+    return return_value
 
 
 def key_maps_to_value(dictionary, key):
     return key in dictionary and dictionary[key] is not None
-
-
-def wait_until(retry_interval=2, no_of_times=2, callback=None, *callback_args):
-    """ Utility method to try out the callback method at most no_of_times with a interval of retry_interval,
-        Will return immediately if callback returns True. The callback method should be written to return a list of values first being a boolean """
-
-    if callback is None:
-        raise ("Bad value for callback method !")
-
-    wait_result = False
-    for i in range(0,no_of_times):
-        time.sleep(retry_interval)
-        wait_result, return_val = callback(*callback_args)
-        if not(isinstance(wait_result, bool)):
-            raise ("Bad parameter returned from callback !")
-        if wait_result :
-            break
-
-    return wait_result, return_val

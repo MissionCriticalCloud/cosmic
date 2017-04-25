@@ -1,4 +1,3 @@
-import logging
 import time
 
 from nose.plugins.attrib import attr
@@ -16,22 +15,19 @@ from marvin.lib.common import (
     list_nat_rules,
     list_lb_rules,
     list_configurations,
-    list_publicIP,
+    list_public_ip,
     get_template,
     get_zone,
     get_domain,
     get_default_virtual_machine_offering
 )
 from marvin.lib.utils import cleanup_resources
-
-logger = logging.getLogger('TestDeleteAccount')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestDeleteAccount(cloudstackTestCase):
     def setUp(self):
+        self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
@@ -41,8 +37,7 @@ class TestDeleteAccount(cloudstackTestCase):
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
         template = get_template(
             self.apiclient,
-            self.zone.id,
-            self.services["ostype"]
+            self.zone.id
         )
         self.services["virtual_machine"]["zoneid"] = self.zone.id
 
@@ -63,7 +58,7 @@ class TestDeleteAccount(cloudstackTestCase):
             serviceofferingid=self.service_offering.id
         )
 
-        src_nat_ip_addrs = list_publicIP(
+        src_nat_ip_addrs = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid
@@ -126,7 +121,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 domainid=self.account.domainid
             )
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # ListPortForwardingRules should not
         # list associated rules with deleted account
@@ -137,7 +132,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 domainid=self.account.domainid
             )
         except CloudstackAPIException:
-            logger.debug("NATRule is deleted")
+            self.logger.debug("NATRule is deleted")
 
         # Retrieve router for the user account
         try:
@@ -152,7 +147,7 @@ class TestDeleteAccount(cloudstackTestCase):
                 "Check routers are properly deleted."
             )
         except CloudstackAPIException:
-            logger.debug("Router is deleted")
+            self.logger.debug("Router is deleted")
 
         except Exception as e:
             raise Exception(

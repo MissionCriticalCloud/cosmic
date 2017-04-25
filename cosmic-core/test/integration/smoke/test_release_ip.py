@@ -1,4 +1,3 @@
-import logging
 import time
 
 from nose.plugins.attrib import attr
@@ -15,22 +14,20 @@ from marvin.lib.base import (
 from marvin.lib.common import (
     list_lb_rules,
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     get_template,
     get_zone,
     get_domain,
     get_default_virtual_machine_offering)
 from marvin.lib.utils import cleanup_resources
-from marvin.sshClient import SshClient
-
-logger = logging.getLogger('TestReleaseIP')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
+from marvin.utils.MarvinLog import MarvinLog
+from marvin.utils.SshClient import SshClient
 
 
 class TestReleaseIP(cloudstackTestCase):
     def setUp(self):
+        self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
+
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
@@ -39,8 +36,7 @@ class TestReleaseIP(cloudstackTestCase):
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
         template = get_template(
             self.apiclient,
-            self.zone.id,
-            self.services["ostype"]
+            self.zone.id
         )
         self.services["virtual_machine"]["zoneid"] = self.zone.id
 
@@ -70,7 +66,7 @@ class TestReleaseIP(cloudstackTestCase):
             self.account.domainid
         )
 
-        ip_addrs = list_publicIP(
+        ip_addrs = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,
@@ -108,14 +104,14 @@ class TestReleaseIP(cloudstackTestCase):
     def test_releaseIP(self):
         """Test for release public IP address"""
 
-        logger.debug("Deleting Public IP : %s" % self.ip_addr.id)
+        self.logger.debug("Deleting Public IP : %s" % self.ip_addr.id)
 
         self.ip_address.delete(self.apiclient)
 
         retriesCount = 10
         isIpAddressDisassociated = False
         while retriesCount > 0:
-            listResponse = list_publicIP(
+            listResponse = list_public_ip(
                 self.apiclient,
                 id=self.ip_addr.id
             )
@@ -137,9 +133,9 @@ class TestReleaseIP(cloudstackTestCase):
                 self.apiclient,
                 id=self.nat_rule.id
             )
-            logger.debug("List NAT Rule response" + str(list_nat_rule))
+            self.logger.debug("List NAT Rule response" + str(list_nat_rule))
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # listLoadBalancerRules should not list
         # associated rules with Public IP address
@@ -148,9 +144,9 @@ class TestReleaseIP(cloudstackTestCase):
                 self.apiclient,
                 id=self.lb_rule.id
             )
-            logger.debug("List LB Rule response" + str(list_lb_rule))
+            self.logger.debug("List LB Rule response" + str(list_lb_rule))
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # SSH Attempt though public IP should fail
         with self.assertRaises(Exception):

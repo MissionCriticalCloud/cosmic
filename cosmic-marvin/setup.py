@@ -17,11 +17,12 @@ setup(
         'marvin.cloudstackAPI',
         'marvin.lib',
         'marvin.config',
+        'marvin.utils',
     ],
     package_dir={'marvin': 'marvin'},
     package_data={
         'marvin': [
-            'marvin_logging.yaml'
+            'utils/marvin_logging.yaml'
         ]
     },
     license='LICENSE.txt',

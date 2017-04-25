@@ -5,14 +5,19 @@ disable_existing_loggers: False
 
 formatters:
   simple:
-      format: "[%(levelname)s] %(asctime)s - %(name)s - %(message)s"
+      format: "%(levelname)-10s %(asctime)s - %(name)s - %(message)s"
   full:
-      format: "[%(levelname)s] %(asctime)s - %(filename)s (line %(lineno)s) - %(message)s"
+      format: "%(levelname)-10s %(asctime)s - %(filename)s (line %(lineno)s) - %(message)s"
 
 handlers:
     console:
         class: logging.StreamHandler
         level: INFO
+        formatter: simple
+        stream: ext://sys.stdout
+    console_test:
+        class: logging.StreamHandler
+        level: DEBUG
         formatter: simple
         stream: ext://sys.stdout
     file_run_info:
@@ -40,5 +45,5 @@ loggers:
     propagate: yes
   test:
     level: DEBUG
-    handlers: [console, file_run_info]
+    handlers: [console_test, file_run_info]
     propagate: yes
