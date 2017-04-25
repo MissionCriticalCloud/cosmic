@@ -46,12 +46,12 @@ def random_gen(uuid=None, size=6, chars=string.ascii_uppercase + string.digits):
 
 
 def cleanup_resources(api_client, resources, logger=None):
-    if logger is not None:
-        logger.debug("Cleaning up all resources: %s" % resources)
     """Delete resources"""
+    if logger is not None:
+        logger.debug("Cleaning up all resources:")
     for obj in resources:
         if logger is not None:
-            logger.debug("Deleting %s" % obj.id)
+            logger.debug(" -> %s %s" % (obj.__class__.__name__, obj.id))
         obj.delete(api_client)
 
 
