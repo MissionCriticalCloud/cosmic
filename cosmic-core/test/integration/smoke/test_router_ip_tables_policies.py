@@ -1,28 +1,21 @@
 import logging
 import socket
-import time
 
 from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.lib.base import (
-    PublicIPAddress,
     VirtualMachine,
-    Network,
-    NetworkOffering,
-    NetworkACL,
-    NATRule,
-    ServiceOffering,
     Account,
-    startRouter,
-    destroyRouter
+    stopRouter
 )
 from marvin.lib.common import (
     list_routers,
     list_hosts,
     get_template,
     get_zone,
-    get_domain
+    get_domain,
+    get_default_virtual_machine_offering
 )
 from marvin.lib.utils import (
     get_process_status,
@@ -53,106 +46,6 @@ class Services:
                 # Random characters are appended for unique
                 # username
                 "password": "password",
-            },
-            "service_offering": {
-                "name": "Tiny Instance",
-                "displaytext": "Tiny Instance",
-                "cpunumber": 1,
-                "cpuspeed": 100,
-                "memory": 128,
-            },
-            "shared_network_offering_sg": {
-                "name": "MySharedOffering-sg",
-                "displaytext": "MySharedOffering-sg",
-                "guestiptype": "Shared",
-                "supportedservices": "Dhcp,Dns,UserData,SecurityGroup",
-                "specifyVlan": "False",
-                "specifyIpRanges": "False",
-                "traffictype": "GUEST",
-                "serviceProviderList": {
-                    "Dhcp": "VirtualRouter",
-                    "Dns": "VirtualRouter",
-                    "UserData": "VirtualRouter",
-                    "SecurityGroup": "SecurityGroupProvider"
-                }
-            },
-            "network_offering": {
-                "name": 'Test Network offering',
-                "displaytext": 'Test Network offering',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "serviceProviderList": {
-                    "Dhcp": 'VirtualRouter',
-                    "Dns": 'VirtualRouter',
-                    "SourceNat": 'VirtualRouter',
-                    "PortForwarding": 'VirtualRouter',
-                },
-            },
-            "vpc_network_offering": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "vpc_network_offering_no_lb": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "vpc_offering": {
-                "name": 'VPC off',
-                "displaytext": 'VPC off',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
-            },
-            "redundant_vpc_offering": {
-                "name": 'Redundant VPC off',
-                "displaytext": 'Redundant VPC off',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-                "serviceCapabilityList": {
-                    "SourceNat": {
-                        "RedundantRouter": 'true'
-                    }
-                },
             },
             "vpc": {
                 "name": "TestVPC",
@@ -213,9 +106,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             admin=True,
             domainid=cls.domain.id)
 
-        cls.service_offering = ServiceOffering.create(
-            cls.apiclient,
-            cls.services["service_offering"])
+        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
 
         cls.logger = logging.getLogger('TestRouterIpTablesPolicies')
         cls.stream_handler = logging.StreamHandler()
@@ -224,7 +115,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
 
         cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
 
-        cls._cleanup = [cls.service_offering, cls.account]
+        cls._cleanup = [cls.account]
         return
 
     @classmethod
@@ -318,110 +209,6 @@ class EntityManager(object):
     def set_cleanup(self, cleanup):
         self.cleanup = cleanup
 
-    def add_nat_rules(self, vpc_id):
-        for o in self.networks:
-            for vm in o.get_vms():
-                if vm.get_ip() is None:
-                    vm.set_ip(self.acquire_publicip(o.get_net(), vpc_id))
-                if vm.get_nat() is None:
-                    vm.set_nat(self.create_natrule(vm.get_vm(), vm.get_ip(), o.get_net(), vpc_id))
-                    time.sleep(5)
-
-    def do_vpc_test(self):
-        for o in self.networks:
-            for vm in o.get_vms():
-                self.check_ssh_into_vm(vm.get_vm(), vm.get_ip())
-
-    def create_natrule(self, vm, public_ip, network, vpc_id):
-        self.logger.debug("Creating NAT rule in network for vm with public IP")
-
-        nat_rule_services = self.services["natrule"]
-
-        nat_rule = NATRule.create(
-            self.apiclient,
-            vm,
-            nat_rule_services,
-            ipaddressid=public_ip.ipaddress.id,
-            openfirewall=False,
-            networkid=network.id,
-            vpcid=vpc_id)
-
-        self.logger.debug("Adding NetworkACL rules to make NAT rule accessible")
-        nwacl_nat = NetworkACL.create(
-            self.apiclient,
-            networkid=network.id,
-            services=nat_rule_services,
-            traffictype='Ingress'
-        )
-        self.logger.debug('nwacl_nat=%s' % nwacl_nat.__dict__)
-        return nat_rule
-
-    def check_ssh_into_vm(self, vm, public_ip):
-        self.logger.debug("Checking if we can SSH into VM=%s on public_ip=%s" %
-                          (vm.name, public_ip.ipaddress.ipaddress))
-        vm.ssh_client = None
-        try:
-            vm.get_ssh_client(ipaddress=public_ip.ipaddress.ipaddress)
-            self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
-                              (vm.name, public_ip.ipaddress.ipaddress))
-        except:
-            raise Exception("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
-
-    def create_network(self, net_offerring, vpc_id, gateway='10.1.1.1'):
-        try:
-            self.logger.debug('Create NetworkOffering')
-            net_offerring["name"] = "NET_OFF-" + str(gateway)
-            nw_off = NetworkOffering.create(
-                self.apiclient,
-                net_offerring,
-                conservemode=False)
-
-            nw_off.update(self.apiclient, state='Enabled')
-            self.logger.debug('Created and Enabled NetworkOffering')
-
-            self.services["network"]["name"] = "NETWORK-" + str(gateway)
-            self.logger.debug('Adding Network=%s to VPC ID %s' % (self.services["network"], vpc_id))
-            obj_network = Network.create(
-                self.apiclient,
-                self.services["network"],
-                accountid=self.account.name,
-                domainid=self.account.domainid,
-                networkofferingid=nw_off.id,
-                zoneid=self.zone.id,
-                gateway=gateway,
-                vpcid=vpc_id)
-
-            self.logger.debug("Created network with ID: %s" % obj_network.id)
-        except Exception, e:
-            raise Exception('Unable to create a Network with offering=%s because of %s ' % (net_offerring, e))
-
-        o = networkO(obj_network)
-
-        vm1 = self.deployvm_in_network(obj_network)
-        self.cleanup.insert(1, obj_network)
-        self.cleanup.insert(2, nw_off)
-
-        o.add_vm(vm1)
-        self.networks.append(o)
-        return o
-
-    def deployvm_in_network(self, network):
-        try:
-            self.logger.debug('Creating VM in network=%s' % network.name)
-            vm = VirtualMachine.create(
-                self.apiclient,
-                self.services["virtual_machine"],
-                accountid=self.account.name,
-                domainid=self.account.domainid,
-                serviceofferingid=self.service_offering.id,
-                networkids=[str(network.id)])
-
-            self.logger.debug('Created VM=%s in network=%s' % (vm.id, network.name))
-            self.cleanup.insert(0, vm)
-            return vm
-        except:
-            raise Exception('Unable to create VM in a Network=%s' % network.name)
-
     def deployvm(self):
         try:
             self.logger.debug('Creating VM')
@@ -438,22 +225,6 @@ class EntityManager(object):
         except:
             raise Exception('Unable to create VM')
 
-    def acquire_publicip(self, network, vpc_id):
-        self.logger.debug("Associating public IP for network: %s" % network.name)
-        public_ip = PublicIPAddress.create(
-            self.apiclient,
-            accountid=self.account.name,
-            zoneid=self.zone.id,
-            domainid=self.account.domainid,
-            networkid=network.id,
-            vpcid=vpc_id)
-        self.logger.debug("Associated %s with network %s" % (
-            public_ip.ipaddress.ipaddress,
-            network.id))
-
-        self.ips.append(public_ip)
-        return public_ip
-
     def query_routers(self):
         self.routers = list_routers(self.apiclient,
                                     account=self.account.name,
@@ -467,56 +238,3 @@ class EntityManager(object):
         cmd.id = router.id
         self.apiclient.stopRouter(cmd)
 
-    def destroy_routers(self):
-        self.logger.debug('Destroying routers')
-        for router in self.routers:
-            self.stop_router(router)
-            cmd = destroyRouter.destroyRouterCmd()
-            cmd.forced = "true"
-            cmd.id = router.id
-            self.apiclient.destroyRouter(cmd)
-        self.routers = []
-
-    def start_routers(self):
-        self.logger.debug('Starting routers')
-        for router in self.routers:
-            cmd = startRouter.startRouterCmd()
-            cmd.id = router.id
-            self.apiclient.startRouter(cmd)
-
-
-class networkO(object):
-    def __init__(self, net):
-        self.network = net
-        self.vms = []
-
-    def get_net(self):
-        return self.network
-
-    def add_vm(self, vm):
-        self.vms.append(vmsO(vm))
-
-    def get_vms(self):
-        return self.vms
-
-
-class vmsO(object):
-    def __init__(self, vm):
-        self.vm = vm
-        self.ip = None
-        self.nat = None
-
-    def get_vm(self):
-        return self.vm
-
-    def get_ip(self):
-        return self.ip
-
-    def get_nat(self):
-        return self.nat
-
-    def set_ip(self, ip):
-        self.ip = ip
-
-    def set_nat(self, nat):
-        self.nat = nat
