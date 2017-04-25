@@ -15,6 +15,11 @@ handlers:
         level: INFO
         formatter: simple
         stream: ext://sys.stdout
+    console_test:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: simple
+        stream: ext://sys.stdout
     file_run_info:
         class: logging.FileHandler
         level: DEBUG
@@ -40,5 +45,5 @@ loggers:
     propagate: yes
   test:
     level: DEBUG
-    handlers: [console, file_run_info]
+    handlers: [console_test, file_run_info]
     propagate: yes
