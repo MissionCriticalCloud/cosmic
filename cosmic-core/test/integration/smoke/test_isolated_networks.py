@@ -47,8 +47,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         cls.services['mode'] = cls.zone.networktype
         cls.template = get_template(
             cls.api_client,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
 

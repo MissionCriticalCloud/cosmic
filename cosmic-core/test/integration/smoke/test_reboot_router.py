@@ -39,8 +39,7 @@ class TestRebootRouter(cloudstackTestCase):
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
         template = get_template(
             self.apiclient,
-            self.zone.id,
-            self.services["ostype"]
+            self.zone.id
         )
         if template == FAILED:
             self.fail(

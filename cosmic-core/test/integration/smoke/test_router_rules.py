@@ -48,8 +48,7 @@ class TestRouterRules(cloudstackTestCase):
         cls.hypervisor = testClient.getHypervisorInfo()
         template = get_template(
             cls.apiclient,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
         if template == FAILED:
             assert False, "get_template() failed to return template\
