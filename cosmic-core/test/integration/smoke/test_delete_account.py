@@ -27,7 +27,8 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestDeleteAccount(cloudstackTestCase):
     def setUp(self):
-        self.logger = MarvinLog('test').get_logger()
+        self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
+
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 

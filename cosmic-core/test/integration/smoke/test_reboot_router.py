@@ -29,7 +29,7 @@ from marvin.utils.SshClient import SshClient
 
 class TestRebootRouter(cloudstackTestCase):
     def setUp(self):
-        self.logger = MarvinLog('test').get_logger()
+        self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()

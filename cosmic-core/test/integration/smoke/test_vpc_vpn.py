@@ -108,7 +108,7 @@ class TestVpcVpn(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls, redundant=False):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         test_client = super(TestVpcVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()

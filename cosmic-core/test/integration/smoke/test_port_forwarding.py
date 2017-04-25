@@ -26,7 +26,7 @@ from marvin.utils.SshClient import SshClient
 class TestPortForwarding(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog('test').get_logger()
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestPortForwarding, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
