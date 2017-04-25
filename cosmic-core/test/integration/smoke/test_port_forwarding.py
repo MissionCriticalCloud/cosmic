@@ -14,7 +14,7 @@ from marvin.lib.base import (
 )
 from marvin.lib.common import (
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     get_template,
     get_zone,
     get_domain,
@@ -98,7 +98,7 @@ class TestPortForwarding(cloudstackTestCase):
         # 1. listPortForwarding rules API should return the added PF rule
         # 2. attempt to do an ssh into the  user VM through the sourceNAT
 
-        src_nat_ip_addrs = list_publicIP(
+        src_nat_ip_addrs = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid

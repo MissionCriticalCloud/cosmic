@@ -17,7 +17,7 @@ from marvin.lib.base import (
 from marvin.lib.common import (
     list_virtual_machines,
     list_routers,
-    list_publicIP,
+    list_public_ip,
     get_template,
     get_zone,
     get_domain,
@@ -69,7 +69,7 @@ class TestRebootRouter(cloudstackTestCase):
             serviceofferingid=self.service_offering.id
         )
 
-        src_nat_ip_addrs = list_publicIP(
+        src_nat_ip_addrs = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid

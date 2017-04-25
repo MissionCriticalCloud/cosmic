@@ -13,7 +13,7 @@ from codes import (
 )
 from configGenerator import ConfigManager
 from dbConnection import DbConnection
-from lib.utils import (random_gen, validateList)
+from lib.utils import (random_gen, validate_list)
 from marvin.cloudstackAPI import *
 from marvin.cloudstackAPI.cloudstackAPIClient import CloudStackAPIClient
 from marvinLog import MarvinLog
@@ -132,7 +132,7 @@ class CSTestClient(object):
                 list_user.account = "admin"
                 list_user_res = self.__apiClient.listUsers(list_user)
                 if list_user_res is None or \
-                        (validateList(list_user_res)[0] != PASS):
+                        (validate_list(list_user_res)[0] != PASS):
                     self.__logger.error("API Client Creation Failed")
                     return FAILED
                 user_id = list_user_res[0].id

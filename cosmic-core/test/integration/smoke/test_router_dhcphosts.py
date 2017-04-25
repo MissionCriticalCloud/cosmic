@@ -19,7 +19,7 @@ from marvin.lib.common import (
     list_networks,
     list_routers,
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     list_hosts,
     list_vlan_ipranges
 )
@@ -266,7 +266,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             "Check list router response for router state"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,

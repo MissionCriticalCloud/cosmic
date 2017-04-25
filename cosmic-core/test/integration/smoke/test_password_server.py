@@ -171,7 +171,8 @@ class TestPasswordService(cloudstackTestCase):
         cls.template = get_template(
             cls.api_client,
             cls.zone.id,
-            cls.services["ostype"])
+            cls.services["ostype"]
+        )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id

@@ -15,8 +15,8 @@ from marvin.codes import (FAILED, FAIL, PASS, RUNNING, STOPPED,
                           STARTING, DESTROYED, EXPUNGING,
                           STOPPING, BACKED_UP, BACKING_UP)
 from utils import (
-    validateList,
-    validateState,
+    validate_list,
+    validate_state,
     is_server_ssh_ready,
     random_gen
 )
@@ -102,7 +102,7 @@ class Account:
         username = username[:6]
         apiclientid = apiclient.id[-85:] if len(apiclient.id) > 85 else apiclient.id
         cmd.username = "-".join([username,
-                                 random_gen(id=apiclientid, size=6)])
+                                 random_gen(uuid=apiclientid, size=6)])
 
         if "accountUUID" in services:
             cmd.accountid = "-".join([services["accountUUID"], random_gen()])
@@ -624,9 +624,9 @@ class VirtualMachine:
                 self.username,
                 self.password,
                 retries=retries,
-                retryinterv=retryinterv,
+                retry_interval=retryinterv,
                 timeout=timeout,
-                keyPairFileLocation=keyPairFileLocation
+                key_pair_file_location=keyPairFileLocation
             )
         self.ssh_client = self.ssh_client or is_server_ssh_ready(
             self.ssh_ip,
@@ -634,9 +634,9 @@ class VirtualMachine:
             self.username,
             self.password,
             retries=retries,
-            retryinterv=retryinterv,
+            retry_interval=retryinterv,
             timeout=timeout,
-            keyPairFileLocation=keyPairFileLocation
+            key_pair_file_location=keyPairFileLocation
         )
         return self.ssh_client
 
@@ -647,7 +647,7 @@ class VirtualMachine:
                        in the operation or VM state does not change
                        to expected state in given time else PASS
                        2) Reason - Reason for failure"""
-        return validateState(apiclient, self, state, timeout, interval)
+        return validate_state(apiclient, self, state, timeout, interval)
 
     def state_check_function(self, objects, state):
         return str(objects[0].state).lower().decode("string_escape") == str(state).lower()
@@ -1080,7 +1080,7 @@ class Snapshot:
                           else FAIL
                  @Reason: Reason for failure in case Result is FAIL
         """
-        return validateState(apiclient, self, state, timeout, interval)
+        return validate_state(apiclient, self, state, timeout, interval)
 
     def state_check_function(self, objects, state):
         return str(objects[0].state).lower().decode("string_escape") == str(state).lower()
@@ -2463,14 +2463,14 @@ class Host:
             till host status is up and return accordingly. Max 3 retries
             '''
             host = apiclient.addHost(cmd)
-            ret = validateList(host)
+            ret = validate_list(host)
             if ret[0] == PASS:
                 if str(host[0].state).lower() == 'up':
                     return Host(host[0].__dict__)
                 retries = 3
                 while retries:
                     lh_resp = apiclient.listHosts(host[0].id)
-                    ret = validateList(lh_resp)
+                    ret = validate_list(lh_resp)
                     if (ret[0] == PASS) and \
                             (str(ret[1].state).lower() == 'up'):
                         return Host(host[0].__dict__)
@@ -2566,7 +2566,7 @@ class Host:
                        in the operation or Host state does not change
                        to expected state in given time else PASS
                        2) Reason - Reason for failure"""
-        return validateState(apiclient, self, states, timeout, interval)
+        return validate_state(apiclient, self, states, timeout, interval)
 
     def state_check_function(self, objects, states):
         return str(objects[0].state).lower().decode('string_escape') == str(states[0]).lower() and str(
@@ -2707,7 +2707,7 @@ class StoragePool:
                        to expected state in given time else PASS
                        2) Reason - Reason for failure"""
 
-        return validateState(apiclient, self, state, timeout, interval)
+        return validate_state(apiclient, self, state, timeout, interval)
 
     def state_check_function(self, objects, state):
         return str(objects[0].state).lower().decode("string_escape") == str(state).lower()
