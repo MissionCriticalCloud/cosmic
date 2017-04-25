@@ -305,7 +305,8 @@ class TestSSVMs(cloudstackTestCase):
         self.assertEqual(
             linklocal_ip,
             res,
-            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
+            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
+            linklocal_ip, res)
         )
 
         return
@@ -404,7 +405,8 @@ class TestSSVMs(cloudstackTestCase):
         self.assertEqual(
             linklocal_ip,
             res,
-            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (linklocal_ip, res)
+            "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
+            linklocal_ip, res)
         )
 
         return
@@ -645,7 +647,8 @@ class TestSSVMs(cloudstackTestCase):
                 if list_ssvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                self.logger.debug("Warning: List SSVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
+                self.logger.debug(
+                    "Warning: List SSVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
                 return
 
             time.sleep(self.services["sleep"])
@@ -738,7 +741,8 @@ class TestSSVMs(cloudstackTestCase):
                 if list_cpvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                self.logger.debug("Warning: List CPVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
+                self.logger.debug(
+                    "Warning: List CPVM didn't return systemvms in Running state. This is a known issue, ignoring it for now!")
                 return
 
             time.sleep(self.services["sleep"])

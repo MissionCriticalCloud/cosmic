@@ -15,6 +15,7 @@ from marvin.lib.common import (
     get_default_network_offering
 )
 from marvin.lib.utils import cleanup_resources
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPublicIP(cloudstackTestCase):
@@ -23,6 +24,8 @@ class TestPublicIP(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
+
         testClient = super(TestPublicIP, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()

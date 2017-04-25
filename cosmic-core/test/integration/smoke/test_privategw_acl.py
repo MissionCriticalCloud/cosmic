@@ -1,12 +1,10 @@
-import logging
-
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     stopRouter,
     replaceNetworkACLList
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     NetworkACL,
     NetworkACLList,
@@ -37,6 +35,7 @@ from marvin.lib.utils import (
     get_host_credentials,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPrivateGateway(cloudstackTestCase):
@@ -137,15 +136,12 @@ class TestPrivateGateway(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
 
         cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
-
-        cls.logger = logging.getLogger('TestPrivateGateway')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
 
     @classmethod
     def setup_infra(cls, redundant=False):

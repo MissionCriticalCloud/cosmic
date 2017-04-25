@@ -1,5 +1,3 @@
-import logging
-
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import cloudstackTestCase
@@ -22,6 +20,7 @@ from marvin.lib.common import (
     get_default_acl
 )
 from marvin.lib.utils import cleanup_resources
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestIpExclusionList(cloudstackTestCase):
@@ -112,15 +111,12 @@ class TestIpExclusionList(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
 
         cls.test_client = super(TestIpExclusionList, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
-
-        cls.logger = logging.getLogger('TestIpExclusionList')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
 
     @classmethod
     def setup_infra(cls, redundant=False):

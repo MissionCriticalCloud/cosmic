@@ -1,14 +1,13 @@
 import socket
-import logging
 import time
 
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     stopRouter,
     destroyRouter
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     PublicIPAddress,
     VirtualMachine,
@@ -33,6 +32,7 @@ from marvin.lib.utils import (
     get_process_status,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class Services:
@@ -94,6 +94,8 @@ class Services:
 class TestVPCIpTablesPolicies(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
+
         # We want to fail quicker if it's failure
         socket.setdefaulttimeout(60)
 
@@ -120,11 +122,6 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
             domainid=cls.domain.id)
 
         cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
-
-        cls.logger = logging.getLogger('TestVPCIpTablesPolicies')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
 
         cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
 

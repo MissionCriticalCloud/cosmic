@@ -1,5 +1,3 @@
-import logging
-
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackException import CloudstackAPIException
@@ -21,17 +19,14 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering
 )
 from marvin.lib.utils import cleanup_resources
+from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
-
-logger = logging.getLogger('TestPortForwarding')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
 
 
 class TestPortForwarding(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
 
         testClient = super(TestPortForwarding, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
@@ -173,7 +168,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
         # SSH virtual machine to test port forwarding
         try:
-            logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
+            self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
                          (
                              self.virtual_machine.ipaddress,
                              src_nat_ip_addr.ipaddress
@@ -207,7 +202,7 @@ class TestPortForwarding(cloudstackTestCase):
 
         # Check if the Public SSH port is inaccessible
         with self.assertRaises(Exception):
-            logger.debug(
+            self.logger.debug(
                 "SSHing into VM with IP address %s after NAT rule deletion" %
                 self.virtual_machine.ipaddress)
 
@@ -301,7 +296,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
 
         try:
-            logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
+            self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
                          (
                              self.virtual_machine.ipaddress,
                              ip_address.ipaddress.ipaddress
@@ -321,11 +316,11 @@ class TestPortForwarding(cloudstackTestCase):
                 id=nat_rule.id
             )
         except CloudstackAPIException:
-            logger.debug("Nat Rule is deleted")
+            self.logger.debug("Nat Rule is deleted")
 
         # Check if the Public SSH port is inaccessible
         with self.assertRaises(Exception):
-            logger.debug(
+            self.logger.debug(
                 "SSHing into VM with IP address %s after NAT rule deletion" %
                 self.virtual_machine.ipaddress)
 

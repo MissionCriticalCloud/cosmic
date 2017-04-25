@@ -1,12 +1,10 @@
-import logging
-
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     stopRouter,
     replaceNetworkACLList
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     NetworkACL,
     NetworkACLList,
@@ -34,6 +32,7 @@ from marvin.lib.utils import (
     get_host_credentials,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPublicIpAcl(cloudstackTestCase):
@@ -104,15 +103,12 @@ class TestPublicIpAcl(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog('test').get_logger()
 
         cls.test_client = super(TestPublicIpAcl, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
-
-        cls.logger = logging.getLogger('TestPublicIpAcl')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
 
     @classmethod
     def setup_infra(cls, redundant=False):

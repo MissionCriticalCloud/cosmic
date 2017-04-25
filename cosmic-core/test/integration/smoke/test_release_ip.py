@@ -1,4 +1,3 @@
-import logging
 import time
 
 from nose.plugins.attrib import attr
@@ -21,16 +20,14 @@ from marvin.lib.common import (
     get_domain,
     get_default_virtual_machine_offering)
 from marvin.lib.utils import cleanup_resources
+from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
-
-logger = logging.getLogger('TestReleaseIP')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
 
 
 class TestReleaseIP(cloudstackTestCase):
     def setUp(self):
+        self.logger = MarvinLog('test').get_logger()
+
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
@@ -108,7 +105,7 @@ class TestReleaseIP(cloudstackTestCase):
     def test_releaseIP(self):
         """Test for release public IP address"""
 
-        logger.debug("Deleting Public IP : %s" % self.ip_addr.id)
+        self.logger.debug("Deleting Public IP : %s" % self.ip_addr.id)
 
         self.ip_address.delete(self.apiclient)
 
@@ -137,9 +134,9 @@ class TestReleaseIP(cloudstackTestCase):
                 self.apiclient,
                 id=self.nat_rule.id
             )
-            logger.debug("List NAT Rule response" + str(list_nat_rule))
+            self.logger.debug("List NAT Rule response" + str(list_nat_rule))
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # listLoadBalancerRules should not list
         # associated rules with Public IP address
@@ -148,9 +145,9 @@ class TestReleaseIP(cloudstackTestCase):
                 self.apiclient,
                 id=self.lb_rule.id
             )
-            logger.debug("List LB Rule response" + str(list_lb_rule))
+            self.logger.debug("List LB Rule response" + str(list_lb_rule))
         except CloudstackAPIException:
-            logger.debug("Port Forwarding Rule is deleted")
+            self.logger.debug("Port Forwarding Rule is deleted")
 
         # SSH Attempt though public IP should fail
         with self.assertRaises(Exception):
