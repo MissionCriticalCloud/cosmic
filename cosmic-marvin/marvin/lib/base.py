@@ -323,14 +323,14 @@ class VirtualMachine:
         vpcid = None
         network = None
 
-        if not networkid is None:
+        if networkid is not None:
             network = Network.list(
                 api_client=api_client,
                 accountid=virtual_machine.account,
                 domainid=virtual_machine.domainid,
                 id=networkid
             )
-            if not network is None:
+            if network is not None:
                 network = network[0]
                 vpcid = network.vpcid
 
@@ -1427,8 +1427,7 @@ class Iso:
                 # or ISO is 'Successfully Installed'
                 if response.status == 'Successfully Installed':
                     return
-                elif 'Downloaded' not in response.status and \
-                                'Installing' not in response.status:
+                elif 'Downloaded' not in response.status and 'Installing' not in response.status:
                     if retry == 1:
                         retry = retry - 1
                         continue
@@ -1440,7 +1439,6 @@ class Iso:
                 raise Exception("ISO download Timeout Exception")
             else:
                 timeout = timeout - 1
-
 
     @classmethod
     def extract(cls, api_client, id, mode, zoneid=None):
