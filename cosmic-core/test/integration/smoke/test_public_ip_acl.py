@@ -111,6 +111,69 @@ class TestPublicIpAcl(cloudstackTestCase):
         cls.class_cleanup = []
 
     @classmethod
+    def tearDownClass(cls):
+
+        try:
+            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    def setUp(self):
+
+        self.method_cleanup = []
+
+    def tearDown(self):
+
+        try:
+            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    def test_acls(self, first_time_retries=2):
+        self.define_acl(self.default_allow_acl)
+        self.test_connectivity(retries=first_time_retries)
+        self.define_acl(self.default_deny_acl)
+        self.test_no_connectivity()
+        self.define_custom_acl('acl1', 'entry1')
+        self.test_connectivity()
+        self.define_custom_acl('acl2', 'entry2')
+        self.test_no_connectivity()
+        self.define_acl(self.default_allow_acl)
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_01(self):
+
+        self.setup_infra(redundant=False)
+        self.test_acls(first_time_retries=10)
+
+    @attr(tags=['advanced'])
+    def test_02(self):
+
+        self.cleanup_vpc()
+        self.test_acls()
+
+    @attr(tags=['advanced'])
+    def test_03(self):
+
+        self.setup_infra(redundant=True)
+        self.test_acls(first_time_retries=10)
+
+    @attr(tags=['advanced'])
+    def test_04(self):
+
+        self.cleanup_vpc()
+        self.test_acls()
+
+    @attr(tags=['advanced'])
+    def test_05(self):
+
+        self.stop_master_router(self.vpc1)
+        self.test_acls()
+
+    @classmethod
     def setup_infra(cls, redundant=False):
 
         if len(cls.class_cleanup) > 0:
@@ -200,69 +263,6 @@ class TestPublicIpAcl(cloudstackTestCase):
             cls.nat_rule1.protocol,
             cls.nat_rule1.publicport,
             cls.nat_rule1.privateport)
-
-    @classmethod
-    def tearDownClass(cls):
-
-        try:
-            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    def setUp(self):
-
-        self.method_cleanup = []
-
-    def tearDown(self):
-
-        try:
-            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    def test_acls(self, first_time_retries=2):
-        self.define_acl(self.default_allow_acl)
-        self.test_connectivity(retries=first_time_retries)
-        self.define_acl(self.default_deny_acl)
-        self.test_no_connectivity()
-        self.define_custom_acl('acl1', 'entry1')
-        self.test_connectivity()
-        self.define_custom_acl('acl2', 'entry2')
-        self.test_no_connectivity()
-        self.define_acl(self.default_allow_acl)
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_01(self):
-
-        self.setup_infra(redundant=False)
-        self.test_acls(first_time_retries=10)
-
-    @attr(tags=['advanced'])
-    def test_02(self):
-
-        self.cleanup_vpc()
-        self.test_acls()
-
-    @attr(tags=['advanced'])
-    def test_03(self):
-
-        self.setup_infra(redundant=True)
-        self.test_acls(first_time_retries=10)
-
-    @attr(tags=['advanced'])
-    def test_04(self):
-
-        self.cleanup_vpc()
-        self.test_acls()
-
-    @attr(tags=['advanced'])
-    def test_05(self):
-
-        self.stop_master_router(self.vpc1)
-        self.test_acls()
 
     def test_connectivity(self, retries=2):
 
