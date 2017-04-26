@@ -42,87 +42,6 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 
 
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "host1": None,
-            "host2": None,
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.0.0.0/16'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "lbrule": {
-                "name": "SSH",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 22,
-                "publicport": 2222,
-                "openfirewall": False,
-                "startport": 22,
-                "endport": 2222,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "lbrule_http": {
-                "name": "HTTP",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 80,
-                "publicport": 8888,
-                "openfirewall": False,
-                "startport": 80,
-                "endport": 8888,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "http_rule": {
-                "privateport": 80,
-                "publicport": 80,
-                "startport": 80,
-                "endport": 80,
-                "cidrlist": '0.0.0.0/0',
-                "protocol": "TCP"
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
-
-
 class TestVPCRedundancy(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
@@ -186,6 +105,150 @@ class TestVPCRedundancy(cloudstackTestCase):
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
+
+    @attr(tags=['advanced'])
+    def test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL(self):
+        """ Create a redundant VPC with two networks with two VMs in each network """
+        self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
+        self.query_routers()
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
+        self.check_routers_state()
+        self.add_nat_rules()
+        self.do_vpc_test(False)
+
+        self.stop_router_by_type("MASTER")
+        self.check_routers_state(1)
+        self.do_vpc_test(False)
+
+        self.delete_nat_rules()
+        self.check_routers_state(count=1)
+        self.do_vpc_test(True)
+        self.delete_public_ip()
+
+        self.start_routers()
+        self.add_nat_rules()
+        self.check_routers_state()
+        self.do_vpc_test(False)
+
+    @attr(tags=['advanced'])
+    def test_02_redundant_VPC_default_routes(self):
+        """ Create a redundant VPC with two networks with two VMs in each network and check default routes"""
+        self.logger.debug("Starting test_02_redundant_VPC_default_routes")
+        self.query_routers()
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
+        self.check_routers_state()
+        self.add_nat_rules()
+        self.do_default_routes_test()
+
+    @attr(tags=['advanced'])
+    def test_03_create_redundant_VPC_1tier_2VMs_2IPs_2PF_ACL_reboot_routers(self):
+        """ Create a redundant VPC with two networks with two VMs in each network """
+        self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
+        self.query_routers()
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1"))
+        self.check_routers_state()
+        self.add_nat_rules()
+        self.do_vpc_test(False)
+
+        self.reboot_router_by_type("MASTER")
+        self.check_routers_state()
+        self.do_vpc_test(False)
+
+        self.reboot_router_by_type("MASTER")
+        self.check_routers_state()
+        self.do_vpc_test(False)
+
+    @attr(tags=['advanced'])
+    def test_04_rvpc_network_garbage_collector_nics(self):
+        """ Create a redundant VPC with 1 Tier, 1 VM, 1 ACL, 1 PF and test Network GC Nics"""
+        self.logger.debug("Starting test_04_rvpc_network_garbage_collector_nics")
+        self.query_routers()
+        net_off = get_default_network_offering(self.apiclient)
+        self.networks.append(self.create_network(net_off, "10.1.1.1", nr_vms=1))
+        self.check_routers_state()
+        self.add_nat_rules()
+        self.do_vpc_test(False)
+
+        self.stop_vm()
+
+        gc_wait = Configurations.list(self.apiclient, name="network.gc.wait")
+        gc_interval = Configurations.list(self.apiclient, name="network.gc.interval")
+
+        self.logger.debug("network.gc.wait is ==> %s" % gc_wait)
+        self.logger.debug("network.gc.interval is ==> %s" % gc_wait)
+
+        total_sleep = 120
+        if gc_wait and gc_interval:
+            total_sleep = int(gc_wait[0].value) + int(gc_interval[0].value)
+        else:
+            self.logger.debug("Could not retrieve the keys 'network.gc.interval' and 'network.gc.wait'. Sleeping for 2 minutes.")
+
+        time.sleep(total_sleep * 3)
+
+        self.check_routers_interface(interface_to_check="eth2", expected_exists=False)
+        self.start_vm()
+        self.check_routers_state(status_to_check="MASTER")
+        self.check_routers_interface(interface_to_check="eth2", expected_exists=True)
+
+    @attr(tags=['advanced'])
+    def test_05_rvpc_multi_tiers(self):
+        """ Create a redundant VPC with 3 Tiers, 3 VMs, 3 PF rules"""
+        self.logger.debug("Starting test_05_rvpc_multi_tiers")
+        self.query_routers()
+
+        net_off = get_default_network_offering(self.apiclient)
+        network_to_delete_1 = self.create_network(net_off, "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
+        self.networks.append(network_to_delete_1)
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1", nr_vms=1))
+        network_to_delete_2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
+        self.networks.append(network_to_delete_2)
+
+        self.check_routers_state()
+        self.add_nat_rules()
+        self.do_vpc_test(False)
+
+        self.destroy_vm(network_to_delete_1)
+        network_to_delete_1.get_net().delete(self.apiclient)
+        self.networks.remove(network_to_delete_1)
+
+        vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
+
+        self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
+
+        total_sleep = 10
+        if vrrp_interval:
+            total_sleep = int(vrrp_interval[0].value) * 4
+        else:
+            self.logger.debug("Could not retrieve the key 'router.redundant.vrrp.interval'. Sleeping for 10 seconds.")
+
+        '''
+        Sleep (router.redundant.vrrp.interval * 4) seconds here because since we are removing the first tier (NIC) the VRRP will have to reconfigure the interface it uses.
+        Due to the configuration changes, it will start a new election and it might take up to 4 seconds, because each router has an
+        advertisement interval of 2 seconds.
+        '''
+        time.sleep(total_sleep)
+        self.check_routers_state(status_to_check="MASTER")
+        self.do_vpc_test(False)
+
+        self.destroy_vm(network_to_delete_2)
+        network_to_delete_2.get_net().delete(self.apiclient)
+        self.networks.remove(network_to_delete_2)
+
+        '''
+        Let's be sure and sleep for 'total_sleep' seconds because removing/adding an interface will restart keepalived.
+        It restarts it because the keepalived configuration file changes in order to have the virtual_ipaddress section updated.
+        '''
+        time.sleep(total_sleep)
+        self.check_routers_state(status_to_check="MASTER")
+        self.do_vpc_test(False)
 
     def find_public_gateway(self):
         networks = list_networks(self.apiclient,
@@ -471,150 +534,6 @@ class TestVPCRedundancy(cloudstackTestCase):
             else:
                 self.fail("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 
-    @attr(tags=['advanced'])
-    def test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL(self):
-        """ Create a redundant VPC with two networks with two VMs in each network """
-        self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
-
-        self.stop_router_by_type("MASTER")
-        self.check_routers_state(1)
-        self.do_vpc_test(False)
-
-        self.delete_nat_rules()
-        self.check_routers_state(count=1)
-        self.do_vpc_test(True)
-        self.delete_public_ip()
-
-        self.start_routers()
-        self.add_nat_rules()
-        self.check_routers_state()
-        self.do_vpc_test(False)
-
-    @attr(tags=['advanced'])
-    def test_02_redundant_VPC_default_routes(self):
-        """ Create a redundant VPC with two networks with two VMs in each network and check default routes"""
-        self.logger.debug("Starting test_02_redundant_VPC_default_routes")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_default_routes_test()
-
-    @attr(tags=['advanced'])
-    def test_03_create_redundant_VPC_1tier_2VMs_2IPs_2PF_ACL_reboot_routers(self):
-        """ Create a redundant VPC with two networks with two VMs in each network """
-        self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
-
-        self.reboot_router_by_type("MASTER")
-        self.check_routers_state()
-        self.do_vpc_test(False)
-
-        self.reboot_router_by_type("MASTER")
-        self.check_routers_state()
-        self.do_vpc_test(False)
-
-    @attr(tags=['advanced'])
-    def test_04_rvpc_network_garbage_collector_nics(self):
-        """ Create a redundant VPC with 1 Tier, 1 VM, 1 ACL, 1 PF and test Network GC Nics"""
-        self.logger.debug("Starting test_04_rvpc_network_garbage_collector_nics")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1", nr_vms=1))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
-
-        self.stop_vm()
-
-        gc_wait = Configurations.list(self.apiclient, name="network.gc.wait")
-        gc_interval = Configurations.list(self.apiclient, name="network.gc.interval")
-
-        self.logger.debug("network.gc.wait is ==> %s" % gc_wait)
-        self.logger.debug("network.gc.interval is ==> %s" % gc_wait)
-
-        total_sleep = 120
-        if gc_wait and gc_interval:
-            total_sleep = int(gc_wait[0].value) + int(gc_interval[0].value)
-        else:
-            self.logger.debug("Could not retrieve the keys 'network.gc.interval' and 'network.gc.wait'. Sleeping for 2 minutes.")
-
-        time.sleep(total_sleep * 3)
-
-        self.check_routers_interface(interface_to_check="eth2", expected_exists=False)
-        self.start_vm()
-        self.check_routers_state(status_to_check="MASTER")
-        self.check_routers_interface(interface_to_check="eth2", expected_exists=True)
-
-    @attr(tags=['advanced'])
-    def test_05_rvpc_multi_tiers(self):
-        """ Create a redundant VPC with 3 Tiers, 3 VMs, 3 PF rules"""
-        self.logger.debug("Starting test_05_rvpc_multi_tiers")
-        self.query_routers()
-
-        net_off = get_default_network_offering(self.apiclient)
-        network_to_delete_1 = self.create_network(net_off, "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
-        self.networks.append(network_to_delete_1)
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1", nr_vms=1))
-        network_to_delete_2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
-        self.networks.append(network_to_delete_2)
-
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
-
-        self.destroy_vm(network_to_delete_1)
-        network_to_delete_1.get_net().delete(self.apiclient)
-        self.networks.remove(network_to_delete_1)
-
-        vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
-
-        self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
-
-        total_sleep = 10
-        if vrrp_interval:
-            total_sleep = int(vrrp_interval[0].value) * 4
-        else:
-            self.logger.debug("Could not retrieve the key 'router.redundant.vrrp.interval'. Sleeping for 10 seconds.")
-
-        '''
-        Sleep (router.redundant.vrrp.interval * 4) seconds here because since we are removing the first tier (NIC) the VRRP will have to reconfigure the interface it uses.
-        Due to the configuration changes, it will start a new election and it might take up to 4 seconds, because each router has an
-        advertisement interval of 2 seconds.
-        '''
-        time.sleep(total_sleep)
-        self.check_routers_state(status_to_check="MASTER")
-        self.do_vpc_test(False)
-
-        self.destroy_vm(network_to_delete_2)
-        network_to_delete_2.get_net().delete(self.apiclient)
-        self.networks.remove(network_to_delete_2)
-
-        '''
-        Let's be sure and sleep for 'total_sleep' seconds because removing/adding an interface will restart keepalived.
-        It restarts it because the keepalived configuration file changes in order to have the virtual_ipaddress section updated.
-        '''
-        time.sleep(total_sleep)
-        self.check_routers_state(status_to_check="MASTER")
-        self.do_vpc_test(False)
-
     def destroy_vm(self, network):
         vms_to_delete = []
         for vm in network.get_vms():
@@ -688,6 +607,87 @@ class TestVPCRedundancy(cloudstackTestCase):
                     self.fail("SSH Access failed for %s: %s" % (vmObj.get_ip(), e))
 
                 self.assertEqual(result.count("3 packets received"), 1, "Ping gateway from VM should be successful")
+
+
+class Services:
+    """Test VPC network services - Port Forwarding Rules Test Data Class.
+    """
+
+    def __init__(self):
+        self.services = {
+            "account": {
+                "email": "test@test.com",
+                "firstname": "Test",
+                "lastname": "User",
+                "username": "test",
+                # Random characters are appended for unique
+                # username
+                "password": "password",
+            },
+            "host1": None,
+            "host2": None,
+            "vpc": {
+                "name": "TestVPC",
+                "displaytext": "TestVPC",
+                "cidr": '10.0.0.0/16'
+            },
+            "network": {
+                "name": "Test Network",
+                "displaytext": "Test Network",
+                "netmask": '255.255.255.0'
+            },
+            "lbrule": {
+                "name": "SSH",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 22,
+                "publicport": 2222,
+                "openfirewall": False,
+                "startport": 22,
+                "endport": 2222,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "lbrule_http": {
+                "name": "HTTP",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 80,
+                "publicport": 8888,
+                "openfirewall": False,
+                "startport": 80,
+                "endport": 8888,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "natrule": {
+                "privateport": 22,
+                "publicport": 22,
+                "startport": 22,
+                "endport": 22,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "http_rule": {
+                "privateport": 80,
+                "publicport": 80,
+                "startport": 80,
+                "endport": 80,
+                "cidrlist": '0.0.0.0/0',
+                "protocol": "TCP"
+            },
+            "virtual_machine": {
+                "displayname": "Test VM",
+                "username": "root",
+                "password": "password",
+                "ssh_port": 22,
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": 'TCP',
+            },
+            "ostype": 'CentOS 5.3 (64-bit)',
+            "timeout": 10,
+        }
 
 
 class networkO(object):
