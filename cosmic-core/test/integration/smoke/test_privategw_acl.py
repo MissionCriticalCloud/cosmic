@@ -336,43 +336,43 @@ class TestPrivateGateway(cloudstackTestCase):
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_01(self):
 
         self.setup_infra(redundant=False)
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_02(self):
 
         self.cleanup_vpcs()
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_03(self):
 
         self.define_custom_acl()
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_04(self):
 
         self.setup_infra(redundant=True)
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_05(self):
 
         self.cleanup_vpcs()
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_06(self):
 
         self.define_custom_acl()
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_07(self):
 
         self.stop_master_router(self.vpc1)

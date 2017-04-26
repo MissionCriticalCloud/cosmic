@@ -97,7 +97,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "advancedns", "ssh"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "ssh"])
     def test_01_isolate_network_FW_PF_default_routes_egress_true(self):
         """ Test redundant router internals """
         self.logger.debug("Starting test_01_isolate_network_FW_PF_default_routes_egress_true...")
@@ -252,7 +252,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced", "advancedns", "ssh"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "ssh"])
     def test_02_isolate_network_FW_PF_default_routes_egress_false(self):
         """ Test redundant router internals """
         self.logger.debug("Starting test_02_isolate_network_FW_PF_default_routes_egress_false...")

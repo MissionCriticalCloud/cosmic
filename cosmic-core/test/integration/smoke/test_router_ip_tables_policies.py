@@ -134,7 +134,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "intervlan"], required_hardware="true")
+    @attr(tags=["advanced", "intervlan"])
     def test_02_routervm_iptables_policies(self):
         """ Test iptables default INPUT/FORWARD policy on RouterVM """
 

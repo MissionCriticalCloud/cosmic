@@ -100,7 +100,7 @@ class TestReleaseIP(cloudstackTestCase):
     def tearDown(self):
         cleanup_resources(self.apiclient, self.cleanup)
 
-    @attr(tags=["advanced", "advancedns", "smoke"], required_hardware="false")
+    @attr(tags=["advanced", "advancedns", "smoke"])
     def test_releaseIP(self):
         """Test for release public IP address"""
 

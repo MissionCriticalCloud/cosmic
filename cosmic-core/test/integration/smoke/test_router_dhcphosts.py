@@ -229,7 +229,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             1,
             "DHCP hosts file contains duplicate IPs ==> %s!" % res)
 
-    @attr(tags=["advanced", "advancedns", "ssh"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "ssh"])
     def test_router_dhcphosts(self):
         """Check that the /etc/dhcphosts.txt doesn't contain duplicate IPs"""
 
