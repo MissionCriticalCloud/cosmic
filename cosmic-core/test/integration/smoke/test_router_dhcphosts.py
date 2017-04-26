@@ -1,13 +1,11 @@
 from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
+
 from marvin.lib.base import (
     VirtualMachine,
     Account,
-    ServiceOffering,
     NATRule,
     FireWallRule,
-    NetworkOffering,
     Network
 )
 from marvin.lib.common import (
@@ -19,7 +17,9 @@ from marvin.lib.common import (
     list_nat_rules,
     list_public_ip,
     list_hosts,
-    list_vlan_ipranges
+    list_vlan_ipranges,
+    get_default_virtual_machine_offering,
+    get_default_isolated_network_offering_with_egress
 )
 from marvin.lib.utils import (
     cleanup_resources,
@@ -57,20 +57,8 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             domainid=cls.domain.id
         )
 
-        cls.logger.debug("Creating Service Offering on zone %s" % (cls.zone.id))
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"]
-        )
-
-        cls.services["isolated_network_offering"]["egress_policy"] = "true"
-
-        cls.logger.debug("Creating Network Offering on zone %s" % (cls.zone.id))
-        cls.network_offering = NetworkOffering.create(cls.api_client,
-                                                      cls.services["isolated_network_offering"],
-                                                      conservemode=True)
-
-        cls.network_offering.update(cls.api_client, state='Enabled')
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
+        cls.network_offering = get_default_isolated_network_offering_with_egress(cls.api_client)
 
         cls.logger.debug("Creating Network for Account %s using offering %s" % (cls.account.name, cls.network_offering.id))
         cls.network = Network.create(cls.api_client,
@@ -125,8 +113,6 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         cls._cleanup = [
             cls.vm_2,
             cls.network,
-            cls.network_offering,
-            cls.service_offering,
             cls.account
         ]
 
