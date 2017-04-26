@@ -19,9 +19,6 @@ from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPublicIP(cloudstackTestCase):
-    def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
-
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
@@ -95,6 +92,9 @@ class TestPublicIP(cloudstackTestCase):
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
+
+    def setUp(self):
+        self.apiclient = self.testClient.getApiClient()
 
     @attr(tags=['advanced'])
     def test_01_public_ip_admin_account(self):
