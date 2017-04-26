@@ -1,11 +1,42 @@
 import logging
 
 from nose.plugins.attrib import attr
+from marvin.cloudstackTestCase import cloudstackTestCase
 
-from marvin.cloudstackTestCase import *
-from marvin.lib.base import *
-from marvin.lib.common import *
-from marvin.lib.utils import *
+from marvin.cloudstackAPI import (
+    stopRouter,
+    replaceNetworkACLList
+)
+from marvin.lib.base import (
+    NetworkACL,
+    NetworkACLList,
+    StaticRoute,
+    PrivateGateway,
+    Network,
+    NATRule,
+    PublicIPAddress,
+    VirtualMachine,
+    VPC,
+    Account
+)
+from marvin.lib.common import (
+    list_hosts,
+    list_routers,
+    get_default_acl,
+    get_default_private_network_offering,
+    get_default_virtual_machine_offering,
+    get_default_network_offering,
+    get_default_vpc_offering,
+    get_default_redundant_vpc_offering,
+    get_template,
+    get_domain,
+    get_zone
+)
+from marvin.lib.utils import (
+    get_process_status,
+    get_host_credentials,
+    cleanup_resources
+)
 
 
 class TestPrivateGateway(cloudstackTestCase):

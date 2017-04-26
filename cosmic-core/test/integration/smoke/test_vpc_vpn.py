@@ -1,12 +1,36 @@
 import copy
 import logging
+import time
 
 from nose.plugins.attrib import attr
+from marvin.cloudstackTestCase import cloudstackTestCase
 
-from marvin.cloudstackTestCase import *
-from marvin.lib.base import *
-from marvin.lib.common import *
-from marvin.lib.utils import *
+from marvin.lib.base import (
+    VpnUser,
+    Vpn,
+    PublicIPAddress,
+    VirtualMachine,
+    Network,
+    VPC,
+    VpnCustomerGateway,
+    NetworkACLList,
+    Account
+)
+from marvin.lib.common import (
+    get_default_redundant_vpc_offering,
+    list_routers,
+    list_hosts,
+    get_template,
+    get_default_virtual_machine_offering,
+    get_default_network_offering,
+    get_default_vpc_offering,
+    get_domain,
+    get_zone
+)
+from marvin.lib.utils import (
+    get_process_status,
+    cleanup_resources
+)
 
 
 class Services:
@@ -21,15 +45,6 @@ class Services:
                 "lastname": "User",
                 "username": "test",
                 "password": "password",
-            },
-            "host1": None,
-            "host2": None,
-            "compute_offering": {
-                "name": "Tiny Instance",
-                "displaytext": "Tiny Instance",
-                "cpunumber": 1,
-                "cpuspeed": 100,
-                "memory": 128,
             },
             "vpc": {
                 "name": "TestVPC",

@@ -26,7 +26,7 @@ from marvin.lib.common import (
 from marvin.lib.utils import cleanup_resources
 from marvin.sshClient import SshClient
 
-logger = logging.getLogger('TestNetworkOps')
+logger = logging.getLogger('TestRebootRouter')
 stream_handler = logging.StreamHandler()
 logger.setLevel(logging.DEBUG)
 logger.addHandler(stream_handler)
