@@ -7,7 +7,6 @@ from marvin.lib.base import (
     FireWallRule,
     VirtualMachine,
     Network,
-    NetworkOffering,
     Account
 )
 from marvin.lib.common import (
@@ -19,7 +18,9 @@ from marvin.lib.common import (
     get_zone,
     get_domain,
     list_vlan_ipranges,
-    list_networks
+    list_networks,
+    get_default_isolated_network_offering_with_egress,
+    get_default_isolated_network_offering
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -60,12 +61,6 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
         cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
-        cls.services["network_offering_egress_true"] = cls.services["network_offering"].copy()
-        cls.services["network_offering_egress_true"]["egress_policy"] = "true"
-
-        cls.services["network_offering_egress_false"] = cls.services["network_offering"].copy()
-        cls.services["network_offering_egress_false"]["egress_policy"] = "false"
-
         cls.services["egress_8080"] = {
             "startport": 8080,
             "endport": 8080,
@@ -102,12 +97,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         """ Test redundant router internals """
         self.logger.debug("Starting test_01_isolate_network_FW_PF_default_routes_egress_true...")
 
-        self.logger.debug("Creating Network Offering with default egress TRUE")
-        network_offering_egress_true = NetworkOffering.create(self.apiclient,
-                                                              self.services["network_offering_egress_true"],
-                                                              conservemode=True)
-
-        network_offering_egress_true.update(self.apiclient, state='Enabled')
+        network_offering_egress_true = get_default_isolated_network_offering_with_egress(self.apiclient)
 
         self.logger.debug("Creating Network with Network Offering ID %s" % network_offering_egress_true.id)
         network = Network.create(self.apiclient,
@@ -128,7 +118,6 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
-        self.cleanup.insert(0, network_offering_egress_true)
         self.cleanup.insert(0, network)
         self.cleanup.insert(0, virtual_machine)
 
@@ -257,12 +246,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         """ Test redundant router internals """
         self.logger.debug("Starting test_02_isolate_network_FW_PF_default_routes_egress_false...")
 
-        self.logger.debug("Creating Network Offering with default egress FALSE")
-        network_offering_egress_false = NetworkOffering.create(self.apiclient,
-                                                               self.services["network_offering_egress_false"],
-                                                               conservemode=True)
-
-        network_offering_egress_false.update(self.apiclient, state='Enabled')
+        network_offering_egress_false = get_default_isolated_network_offering(self.apiclient)
 
         self.logger.debug("Creating Network with Network Offering ID %s" % network_offering_egress_false.id)
         network = Network.create(self.apiclient,
@@ -283,7 +267,6 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
-        self.cleanup.insert(0, network_offering_egress_false)
         self.cleanup.insert(0, network)
         self.cleanup.insert(0, virtual_machine)
 
