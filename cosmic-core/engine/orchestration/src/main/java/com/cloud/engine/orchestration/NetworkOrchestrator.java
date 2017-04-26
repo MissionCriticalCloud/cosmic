@@ -493,6 +493,15 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
 
+                //Isolated offering with egress and no source nat
+                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress) == null) {
+                    offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress, "Offering for Isolated networks with egress and no Source Nat service",
+                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
+                            true, null, true, false, null, true, null, true);
+                    offering.setState(NetworkOffering.State.Enabled);
+                    _networkOfferingDao.update(offering.getId(), offering);
+                }
+
                 //Network offering with internal lb service
                 final Map<Network.Service, Set<Network.Provider>> internalLbOffProviders = new HashMap<>();
                 final Set<Network.Provider> defaultVpcProvider = new HashSet<>();
