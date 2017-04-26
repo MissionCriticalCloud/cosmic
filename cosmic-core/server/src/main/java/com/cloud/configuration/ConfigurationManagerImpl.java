@@ -3703,11 +3703,12 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     @Override
     @DB
-    public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan, final
-    Availability availability,  final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap, final boolean isDefault, final Network
-            .GuestType type, final boolean systemOnly, final Long serviceOfferingId, final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service,
-            Map<Capability, String>> serviceCapabilityMap, final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,
-            final boolean egressDefaultPolicy, final Integer maxconn, final boolean enableKeepAlive) {
+    public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan,
+                                                   final Availability availability,  final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap,
+                                                   final boolean isDefault, final Network.GuestType type, final boolean systemOnly, final Long serviceOfferingId,
+                                                   final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service, Map<Capability, String>> serviceCapabilityMap,
+                                                   final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,
+                                                   final boolean egressDefaultPolicy, final Integer maxconn, final boolean enableKeepAlive) {
 
         final String multicastRateStr = _configDao.getValue("multicast.throttling.rate");
         final int multicastRate = multicastRateStr == null ? 10 : Integer.parseInt(multicastRateStr);
