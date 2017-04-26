@@ -375,6 +375,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         defaultIsolatedNetworkOfferingProviders.put(Service.Firewall, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.Gateway, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.Lb, defaultProviders);
+        defaultIsolatedNetworkOfferingProviders.put(Service.SourceNat, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.StaticNat, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.PortForwarding, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.Vpn, defaultProviders);
@@ -484,20 +485,20 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
 
-                //Isolated offering with source nat disabled
+                //Isolated offering with source nat
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOffering) == null) {
-                    offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOffering, "Offering for Isolated networks with no Source Nat service",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
-                            true, null, true, false, null, false, null, true);
+                    offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOffering, "Offering for Isolated networks with Source Nat service",
+                            TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
+                            true, null, false, false, null, false, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
 
                 //Isolated offering with egress and no source nat
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress) == null) {
-                    offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress, "Offering for Isolated networks with egress and no Source Nat service",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
-                            true, null, true, false, null, true, null, true);
+                    offering = _configMgr.createNetworkOffering(NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress, "Offering for Isolated networks with egress and Source Nat service",
+                            TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true, GuestType.Isolated, false, null, null,
+                            true, null, false, false, null, true, null, true);
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
