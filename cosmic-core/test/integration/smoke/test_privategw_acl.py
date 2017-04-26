@@ -144,6 +144,70 @@ class TestPrivateGateway(cloudstackTestCase):
         cls.class_cleanup = []
 
     @classmethod
+    def tearDownClass(cls):
+
+        try:
+            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    def setUp(self):
+
+        self.method_cleanup = []
+
+    def tearDown(self):
+
+        try:
+            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    @attr(tags=['advanced'])
+    def test_01(self):
+
+        self.setup_infra(redundant=False)
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_02(self):
+
+        self.cleanup_vpcs()
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_03(self):
+
+        self.define_custom_acl()
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_04(self):
+
+        self.setup_infra(redundant=True)
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_05(self):
+
+        self.cleanup_vpcs()
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_06(self):
+
+        self.define_custom_acl()
+        self.test_connectivity()
+
+    @attr(tags=['advanced'])
+    def test_07(self):
+
+        self.stop_master_router(self.vpc1)
+        self.stop_master_router(self.vpc2)
+        self.test_connectivity()
+
+    @classmethod
     def setup_infra(cls, redundant=False):
 
         if len(cls.class_cleanup) > 0:
@@ -314,70 +378,6 @@ class TestPrivateGateway(cloudstackTestCase):
             cls.attributes['static_routes']['static_route2'],
             vpcid=cls.vpc2.id)
         cls.logger.debug("Static Route '%s => %s' created, VPC: %s", cls.static_route2.cidr, cls.static_route2.nexthop, cls.vpc2.name)
-
-    @classmethod
-    def tearDownClass(cls):
-
-        try:
-            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    def setUp(self):
-
-        self.method_cleanup = []
-
-    def tearDown(self):
-
-        try:
-            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    @attr(tags=['advanced'])
-    def test_01(self):
-
-        self.setup_infra(redundant=False)
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_02(self):
-
-        self.cleanup_vpcs()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_03(self):
-
-        self.define_custom_acl()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_04(self):
-
-        self.setup_infra(redundant=True)
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_05(self):
-
-        self.cleanup_vpcs()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_06(self):
-
-        self.define_custom_acl()
-        self.test_connectivity()
-
-    @attr(tags=['advanced'])
-    def test_07(self):
-
-        self.stop_master_router(self.vpc1)
-        self.stop_master_router(self.vpc2)
-        self.test_connectivity()
 
     def test_connectivity(self):
 
