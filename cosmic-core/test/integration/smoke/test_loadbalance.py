@@ -413,7 +413,7 @@ class TestLoadBalance(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_assign_and_removal_lb(self):
+    def test_03_assign_and_removal_lb(self):
         """Test for assign & removing load balancing rule"""
 
         # Validate:

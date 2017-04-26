@@ -97,7 +97,7 @@ class TestPublicIP(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_public_ip_admin_account(self):
+    def test_01_public_ip_admin_account(self):
         """Test for Associate/Disassociate public IP address for admin account"""
 
         # Validate the following:
@@ -151,7 +151,7 @@ class TestPublicIP(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_public_ip_user_account(self):
+    def test_02_public_ip_user_account(self):
         """Test for Associate/Disassociate public IP address for user account"""
 
         # Validate the following:

@@ -412,7 +412,7 @@ class TestSSVMs(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_07_reboot_ssvm(self):
+    def test_05_reboot_ssvm(self):
         """Test reboot SSVM
         """
         # Validate the following
@@ -498,7 +498,7 @@ class TestSSVMs(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_08_reboot_cpvm(self):
+    def test_06_reboot_cpvm(self):
         """Test reboot CPVM
         """
         # Validate the following
@@ -584,7 +584,7 @@ class TestSSVMs(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_09_destroy_ssvm(self):
+    def test_07_destroy_ssvm(self):
         """Test destroy SSVM
         """
 
@@ -672,7 +672,7 @@ class TestSSVMs(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_10_destroy_cpvm(self):
+    def test_08_destroy_cpvm(self):
         """Test destroy CPVM
         """
 

@@ -114,7 +114,7 @@ class TestRebootRouter(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_reboot_router(self):
+    def test_01_reboot_router(self):
         """Test for reboot router"""
 
         # Before restart validate the VM can be accessed;

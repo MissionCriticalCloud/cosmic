@@ -88,7 +88,7 @@ class TestDeleteAccount(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_delete_account(self):
+    def test_01_delete_account(self):
         """Test for delete account"""
 
         # Validate the Following
