@@ -84,7 +84,7 @@ class TestPortForwarding(cloudstackTestCase):
         cleanup_resources(self.apiclient, self.cleanup)
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "smoke"])
     def test_01_port_fwd_on_src_nat(self):
         """Test for port forwarding on source NAT"""
 
@@ -215,7 +215,7 @@ class TestPortForwarding(cloudstackTestCase):
             )
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"], required_hardware="true")
+    @attr(tags=["advanced", "advancedns", "smoke"])
     def test_02_port_fwd_on_non_src_nat(self):
         """Test for port forwarding on non source NAT"""
 

@@ -158,7 +158,7 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "intervlan"], required_hardware="true")
+    @attr(tags=["advanced", "intervlan"])
     def test_01_single_VPC_iptables_policies(self):
         """ Test iptables default INPUT/FORWARD policies on VPC router """
         self.logger.debug("Starting test_01_single_VPC_iptables_policies")

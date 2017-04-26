@@ -229,7 +229,7 @@ class TestIpExclusionList(cloudstackTestCase):
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_01(self):
 
         self.setup_infra(redundant=False)

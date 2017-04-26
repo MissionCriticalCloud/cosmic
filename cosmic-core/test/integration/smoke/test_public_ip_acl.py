@@ -234,31 +234,31 @@ class TestPublicIpAcl(cloudstackTestCase):
         self.define_acl(self.default_allow_acl)
         self.test_connectivity()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_01(self):
 
         self.setup_infra(redundant=False)
         self.test_acls(first_time_retries=10)
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_02(self):
 
         self.cleanup_vpc()
         self.test_acls()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_03(self):
 
         self.setup_infra(redundant=True)
         self.test_acls(first_time_retries=10)
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_04(self):
 
         self.cleanup_vpc()
         self.test_acls()
 
-    @attr(tags=['advanced'], required_hardware='true')
+    @attr(tags=['advanced'])
     def test_05(self):
 
         self.stop_master_router(self.vpc1)

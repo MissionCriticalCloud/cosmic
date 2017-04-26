@@ -364,7 +364,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced"], required_hardware="true")
+    @attr(tags=["advanced"])
     def test_01_vpc_remote_access_vpn(self):
         """Test Remote Access VPN in VPC"""
         # 1) Create VPC
@@ -459,19 +459,19 @@ class TestVpcVpn(cloudstackTestCase):
 
         self.logger.debug("Deleted the Remote Access VPN: OK")
 
-    @attr(tags=["advanced"], required_hardware="true")
+    @attr(tags=["advanced"])
     def test_02_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across VPCs"""
         # Set up 1 VPNs; needs 2 VPCs
         self._test_vpc_site2site_vpn(self.vpc_offering, 2)
 
-    @attr(tags=["advanced"], required_hardware="true")
+    @attr(tags=["advanced"])
     def test_03_redundant_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across redundant VPCs"""
         # Set up 1 VPNs; needs 2 VPCs
         self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.apiclient), 2)
 
-    @attr(tags=["advanced"], required_hardware="true")
+    @attr(tags=["advanced"])
     def test_04_vpc_site2site_multiple_vpn(self):
         """Test Site 2 Site multiple VPNs Across VPCs"""
         # Set up 3 VPNs; needs 4 VPCs
