@@ -113,7 +113,7 @@ class TestRebootRouter(cloudstackTestCase):
                         ]
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke", "dvs"])
+    @attr(tags=['advanced'])
     def test_reboot_router(self):
         """Test for reboot router"""
 

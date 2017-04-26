@@ -87,7 +87,7 @@ class TestDeleteAccount(cloudstackTestCase):
         self.cleanup = []
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
+    @attr(tags=['advanced'])
     def test_delete_account(self):
         """Test for delete account"""
 

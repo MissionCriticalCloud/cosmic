@@ -135,7 +135,7 @@ class TestLoadBalance(cloudstackTestCase):
         time.sleep(10)
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
+    @attr(tags=['advanced'])
     def test_01_create_lb_rule_src_nat(self):
         """Test to create Load balancing rule with source NAT"""
 
@@ -294,7 +294,7 @@ class TestLoadBalance(cloudstackTestCase):
             self.try_ssh(src_nat_ip_addr.ipaddress, unameResults)
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
+    @attr(tags=['advanced'])
     def test_02_create_lb_rule_non_nat(self):
         """Test to create Load balancing rule with non source NAT"""
 
@@ -412,7 +412,7 @@ class TestLoadBalance(cloudstackTestCase):
             self.try_ssh(self.non_src_nat_ip.ipaddress.ipaddress, unameResults)
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
+    @attr(tags=['advanced'])
     def test_assign_and_removal_lb(self):
         """Test for assign & removing load balancing rule"""
 

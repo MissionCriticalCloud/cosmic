@@ -107,7 +107,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "advancedns", "ssh"])
+    @attr(tags=['advanced'])
     def test_01_RVR_Network_FW_PF_SSH_default_routes_egress_true(self):
         """ Test redundant router internals """
         self.logger.debug("Starting test_01_RVR_Network_FW_PF_SSH_default_routes_egress_true...")
@@ -271,7 +271,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced", "advancedns", "ssh"])
+    @attr(tags=['advanced'])
     def test_02_RVR_Network_FW_PF_SSH_default_routes_egress_false(self):
         """ Test redundant router internals """
         self.logger.debug("Starting test_02_RVR_Network_FW_PF_SSH_default_routes_egress_false...")
@@ -443,7 +443,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced", "advancedns", "ssh"])
+    @attr(tags=['advanced'])
     def test_03_RVR_Network_check_router_state(self):
         """ Test redundant router internals """
         self.logger.debug("Starting test_03_RVR_Network_check_router_state...")
