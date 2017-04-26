@@ -65,11 +65,6 @@ class TestPortForwarding(cloudstackTestCase):
             cls.account
         ]
 
-    def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
-        self.cleanup = []
-        return
-
     @classmethod
     def tearDownClass(cls):
         try:
@@ -79,6 +74,11 @@ class TestPortForwarding(cloudstackTestCase):
             cleanup_resources(cls.apiclient, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
+
+    def setUp(self):
+        self.apiclient = self.testClient.getApiClient()
+        self.cleanup = []
+        return
 
     def tearDown(self):
         cleanup_resources(self.apiclient, self.cleanup)
