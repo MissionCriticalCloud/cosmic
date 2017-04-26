@@ -21,7 +21,7 @@ from codes import (FAILED, SUCCESS)
 from config.test_data import test_data
 from lib.utils import random_gen
 from marvin.cloudstackAPI import *
-from marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class DeployDataCenters(object):
@@ -35,7 +35,7 @@ class DeployDataCenters(object):
     def __init__(self, test_client, cfg):
         self.__test_client = test_client
         self.__config = cfg
-        self.__logger = MarvinLog('marvin').getLogger()
+        self.__logger = MarvinLog('marvin').get_logger()
         self.__apiClient = None
         self.__cleanUp = {}
 
@@ -651,7 +651,7 @@ class DeleteDataCenters:
     def __init__(self, test_client, cfg):
         self.__cfg = cfg
         self.__test_client = test_client
-        self.__logger = MarvinLog('marvin').getLogger()
+        self.__logger = MarvinLog('marvin').get_logger()
         self.__apiClient = None
 
     def __deleteCmds(self, cmd_name, cmd_obj):
@@ -832,7 +832,7 @@ class Application(object):
 
 
 if __name__ == "__main__":
-    logger = MarvinLog('marvin').getLogger()
+    logger = MarvinLog('marvin').get_logger()
     try:
         Application().main(sys.argv[1:])
     except Exception as e:

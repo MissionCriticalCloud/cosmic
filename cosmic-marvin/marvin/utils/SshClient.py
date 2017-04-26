@@ -1,5 +1,3 @@
-import contextlib
-import logging
 import socket
 import time
 
@@ -13,17 +11,17 @@ from paramiko import (
     SFTPClient
 )
 
-from cloudstackException import internalError
-from codes import (
+from marvin.cloudstackException import internalError
+from marvin.codes import (
     SUCCESS,
     FAILED,
     INVALID_INPUT
 )
-from marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class SshClient(object):
-    '''
+    """
     @Desc : SSH Library for Marvin.
     Facilitates SSH,SCP services to marvin users
     @Input: host: Host to connect
@@ -32,23 +30,23 @@ class SshClient(object):
             passwd: Password for connection
             retries and delay applies for establishing connection
             timeout : Applies while executing command
-    '''
+    """
 
-    def __init__(self, host, port, user, passwd, retries=60, delay=10, log_lvl=logging.INFO, keyPairFiles=None, timeout=10.0):
+    def __init__(self, host, port, user, password, retries=60, delay=10, key_pair_files=None, timeout=10.0):
         self.host = None
         self.port = 22
         self.user = user
-        self.passwd = passwd
-        self.keyPairFiles = keyPairFiles
+        self.passwd = password
+        self.keyPairFiles = key_pair_files
         self.ssh = SSHClient()
         self.ssh.set_missing_host_key_policy(AutoAddPolicy())
         self.retryCnt = 0
         self.delay = 0
         self.timeout = 3.0
-        self.logger = MarvinLog('ssh').getLogger()
+        self.logger = MarvinLog('ssh').get_logger()
 
         # Check invalid host value and raise exception
-        # Atleast host is required for connection
+        # At least host is required for connection
         if host is not None and host != '':
             self.host = host
         if retries is not None and retries > 0:
@@ -59,7 +57,7 @@ class SshClient(object):
             self.timeout = timeout
         if port is not None and port >= 0:
             self.port = port
-        if self.createConnection() == FAILED:
+        if self.create_connection() == FAILED:
             raise internalError("Connection Failed")
 
     def execute(self, command):
@@ -78,14 +76,14 @@ class SshClient(object):
         self.logger.debug("Executing command via host %s: %s Output: %s" % (str(self.host), command, results))
         return results
 
-    def createConnection(self):
-        '''
+    def create_connection(self):
+        """
         @Name: createConnection
         @Desc: Creates an ssh connection for
                retries mentioned,along with sleep mentioned
         @Output: SUCCESS on successful connection
                  FAILED If connection through ssh failed
-        '''
+        """
         ret = FAILED
         while self.retryCnt >= 0:
             try:
@@ -126,8 +124,8 @@ class SshClient(object):
                 time.sleep(self.delay)
         return ret
 
-    def runCommand(self, command):
-        '''
+    def run_command(self, command):
+        """
         @Name: runCommand
         @Desc: Runs a command over ssh and
                returns the result along with status code
@@ -136,7 +134,7 @@ class SshClient(object):
                  SUCCESS : If command execution is successful
                  FAILED    : If command execution has failed
                  2: stdin,stdout,stderr values of command output
-        '''
+        """
         ret = {"status": FAILED, "stdin": None, "stdout": None,
                "stderr": INVALID_INPUT}
         if command is None or command == '':
@@ -156,12 +154,12 @@ class SshClient(object):
             self.logger.debug("Connection to host %s on port %s is SUCCESSFUL" % (str(self.host), command))
             return ret
 
-    def scp(self, srcFile, destPath):
+    def scp(self, src_file, dest_path):
         transport = Transport((self.host, int(self.port)))
         transport.connect(username=self.user, password=self.passwd)
         sftp = SFTPClient.from_transport(transport)
         try:
-            sftp.put(srcFile, destPath)
+            sftp.put(src_file, dest_path)
         except IOError as e:
             raise e
 
@@ -172,9 +170,3 @@ class SshClient(object):
         if self.ssh is not None:
             self.ssh.close()
             self.ssh = None
-
-
-if __name__ == "__main__":
-    with contextlib.closing(SshClient("127.0.0.1", 22, "root", "asdf!@34")) as ssh:
-        ret = ssh.runCommand("ls -l")
-        print ret

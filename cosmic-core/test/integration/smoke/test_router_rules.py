@@ -1,9 +1,7 @@
-import logging
-
 from ddt import ddt, data
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import (
     FAILED,
     STATIC_NAT_RULE,
@@ -31,18 +29,15 @@ from marvin.lib.utils import (
     cleanup_resources,
     get_process_status
 )
-from marvin.sshClient import SshClient
-
-logger = logging.getLogger('TestRouterRules')
-stream_handler = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream_handler)
+from marvin.utils.MarvinLog import MarvinLog
+from marvin.utils.SshClient import SshClient
 
 
 @ddt
 class TestRouterRules(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestRouterRules, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
@@ -53,8 +48,7 @@ class TestRouterRules(cloudstackTestCase):
         cls.hypervisor = testClient.getHypervisorInfo()
         template = get_template(
             cls.apiclient,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
         if template == FAILED:
             assert False, "get_template() failed to return template\
@@ -190,7 +184,7 @@ class TestRouterRules(cloudstackTestCase):
         else:
             self.nat_rule.delete(self.apiclient)
 
-        logger.debug("Releasing IP %s from account %s" % (self.ipaddress.ipaddress.ipaddress, self.account.name))
+        self.logger.debug("Releasing IP %s from account %s" % (self.ipaddress.ipaddress.ipaddress, self.account.name))
         self.ipaddress.delete(self.apiclient)
 
         return
@@ -221,13 +215,13 @@ class TestRouterRules(cloudstackTestCase):
                              listall=True)[0]
 
         response = self.getCommandResultFromRouter(router, "ip addr")
-        logger.debug(response)
+        self.logger.debug(response)
         stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
         self.assertTrue(stringToMatch in str(response), "IP address is\
                 not added to the VR!")
 
         try:
-            logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
+            self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
                          (
                              self.virtual_machine.ipaddress,
                              self.ipaddress.ipaddress.ipaddress
@@ -247,14 +241,14 @@ class TestRouterRules(cloudstackTestCase):
         self.removeNetworkRules(rule=value)
 
         response = self.getCommandResultFromRouter(router, "ip addr")
-        logger.debug(response)
+        self.logger.debug(response)
         stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
         self.assertFalse(stringToMatch in str(response), "IP address is\
                 not removed from VR even after disabling stat in NAT")
 
         # Check if the Public SSH port is inaccessible
         with self.assertRaises(Exception):
-            logger.debug(
+            self.logger.debug(
                 "SSHing into VM with IP address %s after NAT rule deletion" %
                 self.virtual_machine.ipaddress)
 

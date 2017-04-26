@@ -1,5 +1,3 @@
-import logging
-
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import cloudstackTestCase
@@ -19,7 +17,7 @@ from marvin.lib.common import (
     list_networks,
     list_routers,
     list_nat_rules,
-    list_publicIP,
+    list_public_ip,
     list_hosts,
     list_vlan_ipranges
 )
@@ -27,16 +25,13 @@ from marvin.lib.utils import (
     cleanup_resources,
     get_process_status
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestRouterDHCPHosts(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-
-        cls.logger = logging.getLogger('TestRouterDHCPHosts')
-        cls.stream_handler = logging.StreamHandler()
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(cls.stream_handler)
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.testClient = super(TestRouterDHCPHosts, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
@@ -48,8 +43,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         cls.services['mode'] = cls.zone.networktype
         cls.template = get_template(
             cls.api_client,
-            cls.zone.id,
-            cls.services["ostype"]
+            cls.zone.id
         )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
@@ -266,7 +260,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             "Check list router response for router state"
         )
 
-        public_ips = list_publicIP(
+        public_ips = list_public_ip(
             self.apiclient,
             account=self.account.name,
             domainid=self.account.domainid,

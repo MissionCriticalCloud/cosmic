@@ -11,7 +11,7 @@ from codes import (
     FAILED,
     EXCEPTION
 )
-from marvin.marvinLog import MarvinLog
+from marvin.utils.MarvinLog import MarvinLog
 from marvinInit import MarvinInit
 
 
@@ -45,7 +45,7 @@ class MarvinPlugin(Plugin):
         self.__testResult = SUCCESS
         self.__startTime = None
         self.__testName = None
-        self.__tcRunLogger = MarvinLog('marvin').getLogger()
+        self.__tcRunLogger = MarvinLog('marvin').get_logger()
         self.__testModName = ''
         self.__hypervisorType = None
         Plugin.__init__(self)

@@ -1,12 +1,10 @@
-import logging
-
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.cloudstackAPI import (
     stopRouter,
     replaceNetworkACLList
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     NetworkACL,
     NetworkACLList,
@@ -37,6 +35,7 @@ from marvin.lib.utils import (
     get_host_credentials,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
 
 
 class TestPrivateGateway(cloudstackTestCase):
@@ -137,15 +136,12 @@ class TestPrivateGateway(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
 
         cls.class_cleanup = []
-
-        cls.logger = logging.getLogger('TestPrivateGateway')
-        cls.logger.setLevel(logging.DEBUG)
-        cls.logger.addHandler(logging.StreamHandler())
 
     @classmethod
     def setup_infra(cls, redundant=False):
@@ -155,16 +151,16 @@ class TestPrivateGateway(cloudstackTestCase):
             cls.class_cleanup = []
 
         cls.zone = get_zone(cls.api_client, cls.test_client.getZoneForTests())
-        cls.logger.debug("[TEST] Zone '%s' selected" % cls.zone.name)
+        cls.logger.debug("Zone '%s' selected" % cls.zone.name)
 
         cls.domain = get_domain(cls.api_client)
-        cls.logger.debug("[TEST] Domain '%s' selected" % cls.domain.name)
+        cls.logger.debug("Domain '%s' selected" % cls.domain.name)
 
         cls.template = get_template(
             cls.api_client,
             cls.zone.id)
 
-        cls.logger.debug("[TEST] Template '%s' selected" % cls.template.name)
+        cls.logger.debug("Template '%s' selected" % cls.template.name)
 
         cls.account = Account.create(
             cls.api_client,
@@ -173,22 +169,22 @@ class TestPrivateGateway(cloudstackTestCase):
             domainid=cls.domain.id)
 
         cls.class_cleanup += [cls.account]
-        cls.logger.debug("[TEST] Account '%s' created", cls.account.name)
+        cls.logger.debug("Account '%s' created", cls.account.name)
 
         cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
-        cls.logger.debug("[TEST] VPC Offering '%s' selected", cls.vpc_offering.name)
+        cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
 
         cls.network_offering = get_default_network_offering(cls.api_client)
-        cls.logger.debug("[TEST] Network Offering '%s' selected", cls.network_offering.name)
+        cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
 
         cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
-        cls.logger.debug("[TEST] Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
+        cls.logger.debug("Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
         cls.private_network_offering = get_default_private_network_offering(cls.api_client)
-        cls.logger.debug("[TEST] Private Network Offering '%s' selected", cls.private_network_offering.name)
+        cls.logger.debug("Private Network Offering '%s' selected", cls.private_network_offering.name)
 
         cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
-        cls.logger.debug("[TEST] ACL '%s' selected", cls.default_allow_acl.name)
+        cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
             cls.attributes['vpcs']['vpc1'],
@@ -196,7 +192,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             account=cls.account.name)
-        cls.logger.debug("[TEST] VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
+        cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
 
         cls.network1 = Network.create(cls.api_client,
             cls.attributes['networks']['network1'],
@@ -206,7 +202,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
 
         cls.vm1 = VirtualMachine.create(cls.api_client,
             cls.attributes['vms']['vm1'],
@@ -216,7 +212,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
+        cls.logger.debug("VM '%s' created, Network: %s, IP %s", cls.vm1.name, cls.network1.name, cls.vm1.nic[0].ipaddress)
 
         cls.public_ip1 = PublicIPAddress.create(cls.api_client,
             zoneid=cls.zone.id,
@@ -224,7 +220,7 @@ class TestPrivateGateway(cloudstackTestCase):
             accountid=cls.account.name,
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id)
-        cls.logger.debug("[TEST] Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip1.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
 
         cls.nat_rule1 = NATRule.create(cls.api_client,
             cls.vm1,
@@ -232,7 +228,7 @@ class TestPrivateGateway(cloudstackTestCase):
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id,
             ipaddressid=cls.public_ip1.ipaddress.id)
-        cls.logger.debug("[TEST] Port Forwarding Rule '%s (%s) %s => %s' created",
+        cls.logger.debug("Port Forwarding Rule '%s (%s) %s => %s' created",
             cls.nat_rule1.ipaddress,
             cls.nat_rule1.protocol,
             cls.nat_rule1.publicport,
@@ -244,7 +240,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             account=cls.account.name)
-        cls.logger.debug("[TEST] VPC '%s' created, CIDR: %s", cls.vpc2.name, cls.vpc2.cidr)
+        cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc2.name, cls.vpc2.cidr)
 
         cls.network2 = Network.create(cls.api_client,
             cls.attributes['networks']['network2'],
@@ -254,7 +250,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s, Gateway: %s", cls.network2.name, cls.network2.cidr, cls.network2.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network2.name, cls.network2.cidr, cls.network2.gateway)
 
         cls.vm2 = VirtualMachine.create(cls.api_client,
             cls.attributes['vms']['vm2'],
@@ -264,7 +260,7 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] VM '%s' created, Network: %s, IP: %s", cls.vm2.name, cls.network2.name, cls.vm2.nic[0].ipaddress)
+        cls.logger.debug("VM '%s' created, Network: %s, IP: %s", cls.vm2.name, cls.network2.name, cls.vm2.nic[0].ipaddress)
 
         cls.public_ip2 = PublicIPAddress.create(cls.api_client,
             zoneid=cls.zone.id,
@@ -272,7 +268,7 @@ class TestPrivateGateway(cloudstackTestCase):
             accountid=cls.account.name,
             vpcid=cls.vpc2.id,
             networkid=cls.network2.id)
-        cls.logger.debug("[TEST] Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip2.ipaddress.ipaddress, cls.vpc2.name, cls.network2.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.public_ip2.ipaddress.ipaddress, cls.vpc2.name, cls.network2.name)
 
         cls.nat_rule2 = NATRule.create(cls.api_client,
             cls.vm2,
@@ -280,7 +276,7 @@ class TestPrivateGateway(cloudstackTestCase):
             vpcid=cls.vpc2.id,
             networkid=cls.network2.id,
             ipaddressid=cls.public_ip2.ipaddress.id)
-        cls.logger.debug("[TEST] Port Forwarding Rule '%s (%s) %s => %s' created",
+        cls.logger.debug("Port Forwarding Rule '%s (%s) %s => %s' created",
             cls.nat_rule2.ipaddress,
             cls.nat_rule2.protocol,
             cls.nat_rule2.publicport,
@@ -293,31 +289,31 @@ class TestPrivateGateway(cloudstackTestCase):
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
             accountid=cls.account.name)
-        cls.logger.debug("[TEST] Network '%s' created, CIDR: %s", cls.private_gateways_network.name, cls.private_gateways_network.cidr)
+        cls.logger.debug("Network '%s' created, CIDR: %s", cls.private_gateways_network.name, cls.private_gateways_network.cidr)
 
         cls.private_gateway1 = PrivateGateway.create(cls.api_client,
             ipaddress=cls.attributes['private_gateways']['private_gateway1'],
             networkid=cls.private_gateways_network.id,
             aclid=cls.default_allow_acl.id,
             vpcid=cls.vpc1.id)
-        cls.logger.debug("[TEST] Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway1.ipaddress, cls.private_gateways_network.name, cls.vpc1.name)
+        cls.logger.debug("Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway1.ipaddress, cls.private_gateways_network.name, cls.vpc1.name)
 
         cls.static_route1 = StaticRoute.create(cls.api_client,
             cls.attributes['static_routes']['static_route1'],
             vpcid=cls.vpc1.id)
-        cls.logger.debug("[TEST] Static Route '%s => %s' created, VPC: %s", cls.static_route1.cidr, cls.static_route1.nexthop, cls.vpc1.name)
+        cls.logger.debug("Static Route '%s => %s' created, VPC: %s", cls.static_route1.cidr, cls.static_route1.nexthop, cls.vpc1.name)
 
         cls.private_gateway2 = PrivateGateway.create(cls.api_client,
             ipaddress=cls.attributes['private_gateways']['private_gateway2'],
             networkid=cls.private_gateways_network.id,
             aclid=cls.default_allow_acl.id,
             vpcid=cls.vpc2.id)
-        cls.logger.debug("[TEST] Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway2.ipaddress, cls.private_gateways_network.name, cls.vpc2.name)
+        cls.logger.debug("Private Gateway '%s' created, Network: %s, VPC: %s", cls.private_gateway2.ipaddress, cls.private_gateways_network.name, cls.vpc2.name)
 
         cls.static_route2 = StaticRoute.create(cls.api_client,
             cls.attributes['static_routes']['static_route2'],
             vpcid=cls.vpc2.id)
-        cls.logger.debug("[TEST] Static Route '%s => %s' created, VPC: %s", cls.static_route2.cidr, cls.static_route2.nexthop, cls.vpc2.name)
+        cls.logger.debug("Static Route '%s => %s' created, VPC: %s", cls.static_route2.cidr, cls.static_route2.nexthop, cls.vpc2.name)
 
     @classmethod
     def tearDownClass(cls):
@@ -405,11 +401,11 @@ class TestPrivateGateway(cloudstackTestCase):
 
     def cleanup_vpcs(self):
 
-        self.logger.debug("[TEST] Restarting VPCs '%s' and '%s' with 'cleanup=True'", self.vpc1.name, self.vpc2.name)
+        self.logger.debug("Restarting VPCs '%s' and '%s' with 'cleanup=True'", self.vpc1.name, self.vpc2.name)
         self.vpc1.restart(self.api_client, True)
-        self.logger.debug("[TEST] VPC '%s' restarted", self.vpc1.name)
+        self.logger.debug("VPC '%s' restarted", self.vpc1.name)
         self.vpc2.restart(self.api_client, True)
-        self.logger.debug("[TEST] VPC '%s' restarted", self.vpc2.name)
+        self.logger.debug("VPC '%s' restarted", self.vpc2.name)
 
     def define_custom_acl(self):
 
@@ -432,7 +428,7 @@ class TestPrivateGateway(cloudstackTestCase):
             raise Exception("Exception: %s" % e)
 
         self.assertTrue(response.success)
-        self.logger.debug("[TEST] Private Gateway '%s' ACL replaced", self.private_gateway1.ipaddress)
+        self.logger.debug("Private Gateway '%s' ACL replaced", self.private_gateway1.ipaddress)
 
         acl2 = NetworkACLList.create(self.api_client,
             self.attributes['acls']['acl2'],
@@ -453,11 +449,11 @@ class TestPrivateGateway(cloudstackTestCase):
             raise Exception("Exception: %s" % e)
 
         self.assertTrue(response2.success)
-        self.logger.debug("[TEST] Private Gateway '%s' ACL replaced", self.private_gateway2.ipaddress)
+        self.logger.debug("Private Gateway '%s' ACL replaced", self.private_gateway2.ipaddress)
 
     def stop_master_router(self, vpc):
 
-        self.logger.debug("[TEST] Stopping Master Router of VPC '%s'...", vpc.name)
+        self.logger.debug("Stopping Master Router of VPC '%s'...", vpc.name)
         routers = list_routers(self.api_client, domainid=self.domain.id, account=self.account.name, vpcid=vpc.id)
         for router in routers:
             if router.redundantstate == 'MASTER':
@@ -480,4 +476,4 @@ class TestPrivateGateway(cloudstackTestCase):
                 except KeyError as e:
                     raise Exception("Exception: %s" % e)
 
-        self.logger.debug("[TEST] Master Router of VPC '%s' stopped", vpc.name)
+        self.logger.debug("Master Router of VPC '%s' stopped", vpc.name)
