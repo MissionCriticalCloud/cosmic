@@ -5,7 +5,6 @@ from marvin.lib.base import (
     Router,
     VirtualMachine,
     Network,
-    NetworkOffering,
     EgressFireWallRule,
     NATRule,
     FireWallRule,
@@ -19,7 +18,9 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering,
     get_template,
     get_zone,
-    get_domain
+    get_domain,
+    get_default_redundant_isolated_network_offering,
+    get_default_redundant_isolated_network_offering_with_egress
 )
 from marvin.lib.utils import (
     get_process_status,
@@ -62,12 +63,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             domainid=cls.domain.id
         )
         cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
-
-        cls.services["nw_off_persistent_RVR_egress_true"] = cls.services["nw_off_persistent_RVR"].copy()
-        cls.services["nw_off_persistent_RVR_egress_true"]["egress_policy"] = "true"
-
-        cls.services["nw_off_persistent_RVR_egress_false"] = cls.services["nw_off_persistent_RVR"].copy()
-        cls.services["nw_off_persistent_RVR_egress_false"]["egress_policy"] = "false"
 
         cls.services["egress_8080"] = {
             "startport": 8080,
@@ -112,13 +107,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         """ Test redundant router internals """
         self.logger.debug("Starting test_01_RVR_Network_FW_PF_SSH_default_routes_egress_true...")
 
-        self.logger.debug("Creating Network Offering with default egress TRUE")
-        network_offering_egress_true = NetworkOffering.create(
-            self.apiclient,
-            self.services["nw_off_persistent_RVR_egress_true"],
-            conservemode=True
-        )
-        network_offering_egress_true.update(self.api_client, state='Enabled')
+        network_offering_egress_true = get_default_redundant_isolated_network_offering_with_egress(self.apiclient)
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_true.id)
         network = Network.create(
@@ -141,7 +130,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             True,
             "List networks should return a valid response for created network"
         )
-        nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
@@ -156,7 +144,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
-        self.cleanup.insert(0, network_offering_egress_true)
         self.cleanup.insert(0, network)
         self.cleanup.insert(0, virtual_machine)
 
@@ -276,13 +263,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         """ Test redundant router internals """
         self.logger.debug("Starting test_02_RVR_Network_FW_PF_SSH_default_routes_egress_false...")
 
-        self.logger.debug("Creating Network Offering with default egress FALSE")
-        network_offering_egress_false = NetworkOffering.create(
-            self.apiclient,
-            self.services["nw_off_persistent_RVR_egress_false"],
-            conservemode=True
-        )
-        network_offering_egress_false.update(self.api_client, state='Enabled')
+        network_offering_egress_false = get_default_redundant_isolated_network_offering(self.apiclient)
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
@@ -305,7 +286,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             True,
             "List networks should return a valid response for created network"
         )
-        nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
@@ -320,7 +300,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
-        self.cleanup.insert(0, network_offering_egress_false)
         self.cleanup.insert(0, network)
         self.cleanup.insert(0, virtual_machine)
 
@@ -448,15 +427,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         """ Test redundant router internals """
         self.logger.debug("Starting test_03_RVR_Network_check_router_state...")
 
-        hypervisor = self.testClient.getHypervisorInfo()
-
-        self.logger.debug("Creating Network Offering with default egress FALSE")
-        network_offering_egress_false = NetworkOffering.create(
-            self.apiclient,
-            self.services["nw_off_persistent_RVR_egress_false"],
-            conservemode=True
-        )
-        network_offering_egress_false.update(self.apiclient, state='Enabled')
+        network_offering_egress_false = get_default_redundant_isolated_network_offering(self.apiclient)
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
@@ -479,7 +450,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             True,
             "List networks should return a valid response for created network"
         )
-        nw_response = networks[0]
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
@@ -494,7 +464,6 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deployed VM in network: %s" % network.id)
 
-        self.cleanup.insert(0, network_offering_egress_false)
         self.cleanup.insert(0, network)
         self.cleanup.insert(0, virtual_machine)
 
