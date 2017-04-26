@@ -23,62 +23,6 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 
 
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "configurableData": {
-                "host": {
-                    "password": "password",
-                    "username": "root",
-                    "port": 22
-                },
-                "input": "INPUT",
-                "forward": "FORWARD"
-            },
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.1.1.1/16'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
-
-
 class TestRouterIpTablesPolicies(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
@@ -135,7 +79,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_02_routervm_iptables_policies(self):
+    def test_01_routervm_iptables_policies(self):
         """ Test iptables default INPUT/FORWARD policy on RouterVM """
 
         self.logger.debug("Starting test_02_routervm_iptables_policies")
@@ -188,6 +132,62 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
                         "%s Default Policy should be DROP" % table)
 
 
+class Services:
+    """Test VPC network services - Port Forwarding Rules Test Data Class.
+    """
+
+    def __init__(self):
+        self.services = {
+            "configurableData": {
+                "host": {
+                    "password": "password",
+                    "username": "root",
+                    "port": 22
+                },
+                "input": "INPUT",
+                "forward": "FORWARD"
+            },
+            "account": {
+                "email": "test@test.com",
+                "firstname": "Test",
+                "lastname": "User",
+                "username": "test",
+                # Random characters are appended for unique
+                # username
+                "password": "password",
+            },
+            "vpc": {
+                "name": "TestVPC",
+                "displaytext": "TestVPC",
+                "cidr": '10.1.1.1/16'
+            },
+            "network": {
+                "name": "Test Network",
+                "displaytext": "Test Network",
+                "netmask": '255.255.255.0'
+            },
+            "natrule": {
+                "privateport": 22,
+                "publicport": 22,
+                "startport": 22,
+                "endport": 22,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "virtual_machine": {
+                "displayname": "Test VM",
+                "username": "root",
+                "password": "password",
+                "ssh_port": 22,
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": 'TCP',
+            },
+            "ostype": 'CentOS 5.3 (64-bit)',
+            "timeout": 10,
+        }
+
+
 class EntityManager(object):
     def __init__(self, apiclient, services, service_offering, account, zone, logger):
         self.apiclient = apiclient
@@ -233,4 +233,3 @@ class EntityManager(object):
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
         self.apiclient.stopRouter(cmd)
-
