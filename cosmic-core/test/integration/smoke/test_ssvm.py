@@ -48,141 +48,6 @@ class TestSSVMs(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    def wait_for_system_vm_agent(self, vmname):
-        self.logger.debug("Waiting for system VM %s agent to be UP" % vmname)
-        timeout = self.services["timeout"]
-        sleep_interval = self.services["sleep"]
-        while timeout > 0:
-            list_host_response = list_hosts(
-                self.apiclient,
-                name=vmname
-            )
-
-            if list_host_response and list_host_response[0].state == 'Up':
-                self.debug("System VM %s agent is UP" % vmname)
-                break
-
-            time.sleep(sleep_interval)
-            timeout = timeout - sleep_interval
-
-        if timeout <= 0 and list_host_response[0].state != 'Up':
-            self.fail("Timed out waiting for SVM agent to be Up")
-
-    def test_list_svm_vm(self, svm_type):
-        # Validate the following:
-        # 1. listSystemVM
-        #    should return only ONE SVM per zone
-        # 2. The returned SVM should be in Running state
-        # 3. listSystemVM for should list publicip, privateip and link-localip
-        # 4. The gateway programmed on the SVM by listSystemVm should be
-        #    the same as the gateway returned by listVlanIpRanges
-        # 5. DNS entries must match those given for the zone
-
-        list_svm_response = list_ssvms(
-            self.apiclient,
-            systemvmtype=svm_type,
-            state='Running',
-        )
-        self.assertEqual(
-            isinstance(list_svm_response, list),
-            True,
-            "Check list response returns a valid list"
-        )
-        # Verify SSVM response
-        self.assertNotEqual(
-            len(list_svm_response),
-            0,
-            "Check list System VMs response"
-        )
-
-        list_zones_response = list_zones(self.apiclient)
-
-        self.assertEqual(
-            isinstance(list_zones_response, list),
-            True,
-            "Check list response returns a valid list"
-        )
-
-        self.logger.debug("Number of zones: %s" % len(list_zones_response))
-        self.logger.debug("Number of System VMs: %s" % len(list_svm_response))
-        # Number of Sec storage VMs = No of Zones
-        self.assertEqual(
-            len(list_svm_response),
-            len(list_zones_response),
-            "Check number of System VMs with number of zones"
-        )
-        # For each secondary storage VM check private IP,
-        # public IP, link local IP and DNS
-        for svm in list_svm_response:
-
-            self.logger.debug("SVM state: %s" % svm.state)
-            self.assertEqual(
-                svm.state,
-                'Running',
-                "Check whether state of System VM is running"
-            )
-
-            self.assertEqual(
-                hasattr(svm, 'privateip'),
-                True,
-                "Check whether System VM has private IP field"
-            )
-
-            self.assertEqual(
-                hasattr(svm, 'linklocalip'),
-                True,
-                "Check whether System VM has link local IP field"
-            )
-
-            self.assertEqual(
-                hasattr(svm, 'publicip'),
-                True,
-                "Check whether System VM has public IP field"
-            )
-
-            # Fetch corresponding ip ranges information from listVlanIpRanges
-            ipranges_response = list_vlan_ipranges(
-                self.apiclient,
-                zoneid=svm.zoneid
-            )
-            self.assertEqual(
-                isinstance(ipranges_response, list),
-                True,
-                "Check list response returns a valid list"
-            )
-            iprange = ipranges_response[0]
-
-            # Execute the following assertion in all zones except basic Zones
-            if not (self.zone.networktype.lower() == 'basic'):
-                self.assertEqual(
-                    svm.gateway,
-                    iprange.gateway,
-                    "Check gateway with that of corresponding ip range"
-                )
-
-            # Fetch corresponding zone information from listZones
-            zone_response = list_zones(
-                self.apiclient,
-                id=svm.zoneid
-            )
-            self.assertEqual(
-                isinstance(zone_response, list),
-                True,
-                "Check list response returns a valid list"
-            )
-            self.assertEqual(
-                svm.dns1,
-                zone_response[0].dns1,
-                "Check DNS1 with that of corresponding zone"
-            )
-
-            self.assertEqual(
-                svm.dns2,
-                zone_response[0].dns2,
-                "Check DNS2 with that of corresponding zone"
-            )
-        return
-
     @attr(tags=['advanced'])
     def test_01_list_sec_storage_vm(self):
         self.test_list_svm_vm('secondarystoragevm')
@@ -756,4 +621,139 @@ class TestSSVMs(cloudstackTestCase):
 
         # Call to verify cloud process is running
         self.test_04_cpvm_internals()
+        return
+
+    def wait_for_system_vm_agent(self, vmname):
+        self.logger.debug("Waiting for system VM %s agent to be UP" % vmname)
+        timeout = self.services["timeout"]
+        sleep_interval = self.services["sleep"]
+        while timeout > 0:
+            list_host_response = list_hosts(
+                self.apiclient,
+                name=vmname
+            )
+
+            if list_host_response and list_host_response[0].state == 'Up':
+                self.debug("System VM %s agent is UP" % vmname)
+                break
+
+            time.sleep(sleep_interval)
+            timeout = timeout - sleep_interval
+
+        if timeout <= 0 and list_host_response[0].state != 'Up':
+            self.fail("Timed out waiting for SVM agent to be Up")
+
+    def test_list_svm_vm(self, svm_type):
+        # Validate the following:
+        # 1. listSystemVM
+        #    should return only ONE SVM per zone
+        # 2. The returned SVM should be in Running state
+        # 3. listSystemVM for should list publicip, privateip and link-localip
+        # 4. The gateway programmed on the SVM by listSystemVm should be
+        #    the same as the gateway returned by listVlanIpRanges
+        # 5. DNS entries must match those given for the zone
+
+        list_svm_response = list_ssvms(
+            self.apiclient,
+            systemvmtype=svm_type,
+            state='Running',
+        )
+        self.assertEqual(
+            isinstance(list_svm_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
+        # Verify SSVM response
+        self.assertNotEqual(
+            len(list_svm_response),
+            0,
+            "Check list System VMs response"
+        )
+
+        list_zones_response = list_zones(self.apiclient)
+
+        self.assertEqual(
+            isinstance(list_zones_response, list),
+            True,
+            "Check list response returns a valid list"
+        )
+
+        self.logger.debug("Number of zones: %s" % len(list_zones_response))
+        self.logger.debug("Number of System VMs: %s" % len(list_svm_response))
+        # Number of Sec storage VMs = No of Zones
+        self.assertEqual(
+            len(list_svm_response),
+            len(list_zones_response),
+            "Check number of System VMs with number of zones"
+        )
+        # For each secondary storage VM check private IP,
+        # public IP, link local IP and DNS
+        for svm in list_svm_response:
+
+            self.logger.debug("SVM state: %s" % svm.state)
+            self.assertEqual(
+                svm.state,
+                'Running',
+                "Check whether state of System VM is running"
+            )
+
+            self.assertEqual(
+                hasattr(svm, 'privateip'),
+                True,
+                "Check whether System VM has private IP field"
+            )
+
+            self.assertEqual(
+                hasattr(svm, 'linklocalip'),
+                True,
+                "Check whether System VM has link local IP field"
+            )
+
+            self.assertEqual(
+                hasattr(svm, 'publicip'),
+                True,
+                "Check whether System VM has public IP field"
+            )
+
+            # Fetch corresponding ip ranges information from listVlanIpRanges
+            ipranges_response = list_vlan_ipranges(
+                self.apiclient,
+                zoneid=svm.zoneid
+            )
+            self.assertEqual(
+                isinstance(ipranges_response, list),
+                True,
+                "Check list response returns a valid list"
+            )
+            iprange = ipranges_response[0]
+
+            # Execute the following assertion in all zones except basic Zones
+            if not (self.zone.networktype.lower() == 'basic'):
+                self.assertEqual(
+                    svm.gateway,
+                    iprange.gateway,
+                    "Check gateway with that of corresponding ip range"
+                )
+
+            # Fetch corresponding zone information from listZones
+            zone_response = list_zones(
+                self.apiclient,
+                id=svm.zoneid
+            )
+            self.assertEqual(
+                isinstance(zone_response, list),
+                True,
+                "Check list response returns a valid list"
+            )
+            self.assertEqual(
+                svm.dns1,
+                zone_response[0].dns1,
+                "Check DNS1 with that of corresponding zone"
+            )
+
+            self.assertEqual(
+                svm.dns2,
+                zone_response[0].dns2,
+                "Check DNS2 with that of corresponding zone"
+            )
         return
