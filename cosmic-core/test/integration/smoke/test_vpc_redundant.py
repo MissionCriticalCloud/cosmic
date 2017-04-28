@@ -154,21 +154,21 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.networks = []
         self.ips = []
 
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
 
         self.account = Account.create(
-            self.apiclient,
+            self.api_client,
             self.services["account"],
             admin=True,
             domainid=self.domain.id)
 
-        self.vpc_off = get_default_redundant_vpc_offering(self.apiclient)
+        self.vpc_off = get_default_redundant_vpc_offering(self.api_client)
 
         self.logger.debug("Creating a VPC network in the account: %s" % self.account.name)
         self.services["vpc"]["cidr"] = '10.1.1.1/16'
         self.vpc = VPC.create(
-            self.apiclient,
+            self.api_client,
             self.services["vpc"],
             vpcofferingid=self.vpc_off.id,
             zoneid=self.zone.id,
@@ -188,7 +188,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         return
 
     def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
+        networks = list_networks(self.api_client,
                                  zoneid=self.zone.id,
                                  listall=True,
                                  issystem=True,
@@ -197,7 +197,7 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
 
-        ip_ranges = list_vlan_ipranges(self.apiclient,
+        ip_ranges = list_vlan_ipranges(self.api_client,
                                        zoneid=self.zone.id,
                                        networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
@@ -208,7 +208,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         return ip_ranges[0].gateway
 
     def query_routers(self, count=2, showall=False):
-        self.routers = list_routers(self.apiclient,
+        self.routers = list_routers(self.api_client,
                                     account=self.account.name,
                                     domainid=self.account.domainid,
                                     )
@@ -231,7 +231,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         for router in self.routers:
             if router.state == "Running":
                 hosts = list_hosts(
-                    self.apiclient,
+                    self.api_client,
                     zoneid=router.zoneid,
                     type='Routing',
                     state='Up',
@@ -274,7 +274,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         for router in self.routers:
             if router.state == "Running":
                 hosts = list_hosts(
-                    self.apiclient,
+                    self.api_client,
                     zoneid=router.zoneid,
                     type='Routing',
                     state='Up',
@@ -317,13 +317,13 @@ class TestVPCRedundancy(cloudstackTestCase):
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
         cmd.forced = "true"
-        self.apiclient.stopRouter(cmd)
+        self.api_client.stopRouter(cmd)
 
     def reboot_router(self, router):
         self.logger.debug('Rebooting router %s' % router.id)
         cmd = rebootRouter.rebootRouterCmd()
         cmd.id = router.id
-        self.apiclient.rebootRouter(cmd)
+        self.api_client.rebootRouter(cmd)
 
     def stop_router_by_type(self, type):
         self.check_routers_state()
@@ -345,7 +345,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             self.stop_router(router)
             cmd = destroyRouter.destroyRouterCmd()
             cmd.id = router.id
-            self.apiclient.destroyRouter(cmd)
+            self.api_client.destroyRouter(cmd)
         self.routers = []
 
     def start_routers(self):
@@ -357,7 +357,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                 self.logger.debug('Starting stopped router %s' % router.id)
                 cmd = startRouter.startRouterCmd()
                 cmd.id = router.id
-                self.apiclient.startRouter(cmd)
+                self.api_client.startRouter(cmd)
 
     def create_network(self, network_offering, gateway='10.1.1.1', vpc=None, nr_vms=2, mark_net_cleanup=True):
         if not nr_vms or nr_vms <= 0:
@@ -366,7 +366,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             self.services["network"]["name"] = "NETWORK-" + str(gateway)
             self.logger.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(
-                self.apiclient,
+                self.api_client,
                 self.services["network"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -394,7 +394,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         try:
             self.logger.debug('Creating VM in network=%s' % network.name)
             vm = VirtualMachine.create(
-                self.apiclient,
+                self.api_client,
                 self.services["virtual_machine"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -413,7 +413,7 @@ class TestVPCRedundancy(cloudstackTestCase):
     def acquire_publicip(self, network):
         self.logger.debug("Associating public IP for network: %s" % network.name)
         public_ip = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             accountid=self.account.name,
             zoneid=self.zone.id,
             domainid=self.account.domainid,
@@ -431,7 +431,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         if not services:
             services = self.services["natrule"]
         nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             vm,
             services,
             ipaddressid=public_ip.ipaddress.id,
@@ -441,7 +441,7 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         self.logger.debug("Adding NetworkACL rules to make NAT rule accessible")
         nwacl_nat = NetworkACL.create(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             services=services,
             traffictype='Ingress'
@@ -476,9 +476,9 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
         self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
+        net_off = get_default_network_offering(self.api_client)
         self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.api_client)
         self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
         self.check_routers_state()
         self.add_nat_rules()
@@ -503,9 +503,9 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network and check default routes"""
         self.logger.debug("Starting test_02_redundant_VPC_default_routes")
         self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
+        net_off = get_default_network_offering(self.api_client)
         self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.api_client)
         self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
         self.check_routers_state()
         self.add_nat_rules()
@@ -516,7 +516,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
         self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
+        net_off = get_default_network_offering(self.api_client)
         self.networks.append(self.create_network(net_off, "10.1.1.1"))
         self.check_routers_state()
         self.add_nat_rules()
@@ -535,7 +535,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         """ Create a redundant VPC with 1 Tier, 1 VM, 1 ACL, 1 PF and test Network GC Nics"""
         self.logger.debug("Starting test_04_rvpc_network_garbage_collector_nics")
         self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
+        net_off = get_default_network_offering(self.api_client)
         self.networks.append(self.create_network(net_off, "10.1.1.1", nr_vms=1))
         self.check_routers_state()
         self.add_nat_rules()
@@ -543,8 +543,8 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         self.stop_vm()
 
-        gc_wait = Configurations.list(self.apiclient, name="network.gc.wait")
-        gc_interval = Configurations.list(self.apiclient, name="network.gc.interval")
+        gc_wait = Configurations.list(self.api_client, name="network.gc.wait")
+        gc_interval = Configurations.list(self.api_client, name="network.gc.interval")
 
         self.logger.debug("network.gc.wait is ==> %s" % gc_wait)
         self.logger.debug("network.gc.interval is ==> %s" % gc_wait)
@@ -568,10 +568,10 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.logger.debug("Starting test_05_rvpc_multi_tiers")
         self.query_routers()
 
-        net_off = get_default_network_offering(self.apiclient)
+        net_off = get_default_network_offering(self.api_client)
         network_to_delete_1 = self.create_network(net_off, "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
         self.networks.append(network_to_delete_1)
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.api_client)
         self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1", nr_vms=1))
         network_to_delete_2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
         self.networks.append(network_to_delete_2)
@@ -581,10 +581,10 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_vpc_test(False)
 
         self.destroy_vm(network_to_delete_1)
-        network_to_delete_1.get_net().delete(self.apiclient)
+        network_to_delete_1.get_net().delete(self.api_client)
         self.networks.remove(network_to_delete_1)
 
-        vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
+        vrrp_interval = Configurations.list(self.api_client, name="router.redundant.vrrp.interval")
 
         self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
 
@@ -604,7 +604,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_vpc_test(False)
 
         self.destroy_vm(network_to_delete_2)
-        network_to_delete_2.get_net().delete(self.apiclient)
+        network_to_delete_2.get_net().delete(self.api_client)
         self.networks.remove(network_to_delete_2)
 
         '''
@@ -618,7 +618,7 @@ class TestVPCRedundancy(cloudstackTestCase):
     def destroy_vm(self, network):
         vms_to_delete = []
         for vm in network.get_vms():
-            vm.get_vm().delete(self.apiclient, expunge=True)
+            vm.get_vm().delete(self.api_client, expunge=True)
             vms_to_delete.append(vm)
 
         all_vms = network.get_vms()
@@ -627,25 +627,25 @@ class TestVPCRedundancy(cloudstackTestCase):
     def stop_vm(self):
         for o in self.networks:
             for vm in o.get_vms():
-                vm.get_vm().stop(self.apiclient)
+                vm.get_vm().stop(self.api_client)
 
     def start_vm(self):
         for o in self.networks:
             for vm in o.get_vms():
-                vm.get_vm().start(self.apiclient)
+                vm.get_vm().start(self.api_client)
 
     def delete_nat_rules(self):
         for o in self.networks:
             for vm in o.get_vms():
                 if vm.get_nat() is not None:
-                    vm.get_nat().delete(self.apiclient)
+                    vm.get_nat().delete(self.api_client)
                     vm.set_nat(None)
 
     def delete_public_ip(self):
         for o in self.networks:
             for vm in o.get_vms():
                 if vm.get_ip() is not None:
-                    vm.get_ip().delete(self.apiclient)
+                    vm.get_ip().delete(self.api_client)
                     vm.set_ip(None)
                     vm.set_nat(None)
 

@@ -141,19 +141,19 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         return
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.cleanup = []
         return
 
     def tearDown(self):
         try:
-            cleanup_resources(self.apiclient, self.cleanup)
+            cleanup_resources(self.api_client, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
+        networks = list_networks(self.api_client,
                                  zoneid=self.zone.id,
                                  listall=True,
                                  issystem=True,
@@ -162,7 +162,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
 
-        ip_ranges = list_vlan_ipranges(self.apiclient,
+        ip_ranges = list_vlan_ipranges(self.api_client,
                                        zoneid=self.zone.id,
                                        networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
@@ -194,7 +194,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
     def test_dhcphosts(self, vm, router):
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=router.hostid)
 
         self.assertEqual(
@@ -235,7 +235,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         self.logger.debug("Starting test_router_dhcphosts...")
         routers = list_routers(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -261,7 +261,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         )
 
         public_ips = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid,
             zoneid=self.zone.id
@@ -277,7 +277,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % self.vm_1.id)
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=public_ip.id,
             protocol=self.services["natrule1"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -288,7 +288,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         self.logger.debug("Creating NAT rule for VM ID: %s" % self.vm_1.id)
         # Create NAT rule
         nat_rule1 = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.vm_1,
             self.services["natrule1"],
             public_ip.id
@@ -296,7 +296,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % self.vm_2.id)
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=public_ip.id,
             protocol=self.services["natrule2"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -307,14 +307,14 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         self.logger.debug("Creating NAT rule for VM ID: %s" % self.vm_2.id)
         # Create NAT rule
         nat_rule2 = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.vm_2,
             self.services["natrule2"],
             public_ip.id
         )
 
         nat_rules = list_nat_rules(
-            self.apiclient,
+            self.api_client,
             id=nat_rule1.id
         )
         self.assertEqual(
@@ -329,7 +329,7 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         )
 
         nat_rules = list_nat_rules(
-            self.apiclient,
+            self.api_client,
             id=nat_rule2.id
         )
         self.assertEqual(
@@ -352,10 +352,10 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         self.test_dhcphosts(self.vm_2, router)
 
         self.logger.debug("Deleting and Expunging VM %s with ip %s" % (self.vm_1.id, self.vm_1.nic[0].ipaddress))
-        self.vm_1.delete(self.apiclient)
+        self.vm_1.delete(self.api_client)
 
         self.logger.debug("Creating new VM using the same IP as the one which was deleted => IP 10.1.1.50")
-        self.vm_1 = VirtualMachine.create(self.apiclient,
+        self.vm_1 = VirtualMachine.create(self.api_client,
                                           self.services["virtual_machine"],
                                           templateid=self.template.id,
                                           accountid=self.account.name,

@@ -40,14 +40,14 @@ class TestRouterRules(cloudstackTestCase):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestRouterRules, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
+        cls.api_client = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()
         # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
+        cls.zone = get_zone(cls.api_client, testClient.getZoneForTests())
         cls.hypervisor = testClient.getHypervisorInfo()
         template = get_template(
-            cls.apiclient,
+            cls.api_client,
             cls.zone.id
         )
         if template == FAILED:
@@ -56,15 +56,15 @@ class TestRouterRules(cloudstackTestCase):
 
         # Create an account, network, VM and IP addresses
         cls.account = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id
         )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
-        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.virtual_machine = VirtualMachine.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["virtual_machine"],
             templateid=template.id,
             accountid=cls.account.name,
@@ -79,26 +79,26 @@ class TestRouterRules(cloudstackTestCase):
         ]
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.cleanup = []
         return
 
     @classmethod
     def tearDownClass(cls):
         try:
-            cleanup_resources(cls.apiclient, cls._cleanup)
+            cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
         return
 
     def getCommandResultFromRouter(self, router, command):
         """Run given command on router and return the result"""
 
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=router.hostid,
         )
         self.assertEqual(
@@ -127,7 +127,7 @@ class TestRouterRules(cloudstackTestCase):
         """
         # Open up firewall port for SSH
         self.fw_rule = FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=ipaddressobj.ipaddress.id,
             protocol=self.services["fwrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -137,7 +137,7 @@ class TestRouterRules(cloudstackTestCase):
 
         if rule == STATIC_NAT_RULE:
             StaticNATRule.enable(
-                self.apiclient,
+                self.api_client,
                 ipaddressobj.ipaddress.id,
                 self.virtual_machine.id,
                 networkid
@@ -145,7 +145,7 @@ class TestRouterRules(cloudstackTestCase):
 
         elif rule == LB_RULE:
             self.lb_rule = LoadBalancerRule.create(
-                self.apiclient,
+                self.api_client,
                 self.services["lbrule"],
                 ipaddressid=ipaddressobj.ipaddress.id,
                 accountid=self.account.name,
@@ -156,12 +156,12 @@ class TestRouterRules(cloudstackTestCase):
                            "vmip": str(self.virtual_machine.nic[0].ipaddress) }]
 
             self.lb_rule.assign(
-                self.apiclient,
+                self.api_client,
                 vmidipmap=vmidipmap
             )
         else:
             self.nat_rule = NATRule.create(
-                self.apiclient,
+                self.api_client,
                 self.virtual_machine,
                 self.services["natrule"],
                 ipaddressobj.ipaddress.id
@@ -172,20 +172,20 @@ class TestRouterRules(cloudstackTestCase):
         """ Remove specified rule on acquired public IP and
         default network of virtual machine
         """
-        self.fw_rule.delete(self.apiclient)
+        self.fw_rule.delete(self.api_client)
 
         if rule == STATIC_NAT_RULE:
             StaticNATRule.disable(
-                self.apiclient,
+                self.api_client,
                 self.ipaddress.ipaddress.id)
 
         elif rule == LB_RULE:
-            self.lb_rule.delete(self.apiclient)
+            self.lb_rule.delete(self.api_client)
         else:
-            self.nat_rule.delete(self.apiclient)
+            self.nat_rule.delete(self.api_client)
 
         self.logger.debug("Releasing IP %s from account %s" % (self.ipaddress.ipaddress.ipaddress, self.account.name))
-        self.ipaddress.delete(self.apiclient)
+        self.ipaddress.delete(self.api_client)
 
         return
 
@@ -199,7 +199,7 @@ class TestRouterRules(cloudstackTestCase):
         # 2. attempt to do ssh should now fail
 
         self.ipaddress = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             accountid=self.account.name,
             zoneid=self.zone.id,
             domainid=self.account.domainid,
@@ -210,7 +210,7 @@ class TestRouterRules(cloudstackTestCase):
                                 ipaddressobj=self.ipaddress,
                                 networkid=self.defaultNetworkId)
 
-        router = Router.list(self.apiclient,
+        router = Router.list(self.api_client,
                              networkid=self.virtual_machine.nic[0].networkid,
                              listall=True)[0]
 

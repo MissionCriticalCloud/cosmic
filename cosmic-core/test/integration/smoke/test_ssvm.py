@@ -26,11 +26,11 @@ from marvin.utils.MarvinLog import MarvinLog
 class TestSSVMs(cloudstackTestCase):
     def setUp(self):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
         self.cleanup = []
         self.services = self.testClient.getParsedTestDataConfig()
-        self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
+        self.zone = get_zone(self.api_client, self.testClient.getZoneForTests())
 
         self.services["sleep"] = 2
         self.services["timeout"] = 240
@@ -42,7 +42,7 @@ class TestSSVMs(cloudstackTestCase):
     def tearDown(self):
         try:
             # Clean up, terminate the created templates
-            cleanup_resources(self.apiclient, self.cleanup)
+            cleanup_resources(self.api_client, self.cleanup)
 
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -54,7 +54,7 @@ class TestSSVMs(cloudstackTestCase):
         sleep_interval = self.services["sleep"]
         while timeout > 0:
             list_host_response = list_hosts(
-                self.apiclient,
+                self.api_client,
                 name=vmname
             )
 
@@ -79,7 +79,7 @@ class TestSSVMs(cloudstackTestCase):
         # 5. DNS entries must match those given for the zone
 
         list_svm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype=svm_type,
             state='Running',
         )
@@ -95,7 +95,7 @@ class TestSSVMs(cloudstackTestCase):
             "Check list System VMs response"
         )
 
-        list_zones_response = list_zones(self.apiclient)
+        list_zones_response = list_zones(self.api_client)
 
         self.assertEqual(
             isinstance(list_zones_response, list),
@@ -142,7 +142,7 @@ class TestSSVMs(cloudstackTestCase):
 
             # Fetch corresponding ip ranges information from listVlanIpRanges
             ipranges_response = list_vlan_ipranges(
-                self.apiclient,
+                self.api_client,
                 zoneid=svm.zoneid
             )
             self.assertEqual(
@@ -162,7 +162,7 @@ class TestSSVMs(cloudstackTestCase):
 
             # Fetch corresponding zone information from listZones
             zone_response = list_zones(
-                self.apiclient,
+                self.api_client,
                 id=svm.zoneid
             )
             self.assertEqual(
@@ -205,7 +205,7 @@ class TestSSVMs(cloudstackTestCase):
         #    then the test is a failure
 
         list_ssvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='secondarystoragevm',
             state='Running',
             zoneid=self.zone.id
@@ -218,7 +218,7 @@ class TestSSVMs(cloudstackTestCase):
         ssvm = list_ssvm_response[0]
 
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=ssvm.hostid
         )
         self.assertEqual(
@@ -323,7 +323,7 @@ class TestSSVMs(cloudstackTestCase):
         #    running
 
         list_cpvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='consoleproxy',
             state='Running',
             zoneid=self.zone.id
@@ -336,7 +336,7 @@ class TestSSVMs(cloudstackTestCase):
         cpvm = list_cpvm_response[0]
 
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=cpvm.hostid
         )
         self.assertEqual(
@@ -348,15 +348,15 @@ class TestSSVMs(cloudstackTestCase):
 
         try:
             telnetlib.Telnet(
-                str(self.apiclient.connection.mgtSvr),
+                str(self.api_client.connection.mgtSvr),
                 '8250'
             )
             self.logger.debug("Telnet management server (IP: %s)" %
-                              self.apiclient.connection.mgtSvr)
+                              self.api_client.connection.mgtSvr)
         except Exception as e:
             self.fail(
                 "Telnet Access failed for %s: %s" %
-                (self.apiclient.connection.mgtSvr, e)
+                (self.api_client.connection.mgtSvr, e)
             )
 
         self.logger.debug("Checking cloud process status")
@@ -422,7 +422,7 @@ class TestSSVMs(cloudstackTestCase):
         # 3. The cloud process should still be running within the SSVM
 
         list_ssvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='secondarystoragevm',
             state='Running',
             zoneid=self.zone.id
@@ -437,7 +437,7 @@ class TestSSVMs(cloudstackTestCase):
         ssvm_response = list_ssvm_response[0]
 
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=ssvm_response.hostid
         )
         self.assertEqual(
@@ -453,12 +453,12 @@ class TestSSVMs(cloudstackTestCase):
         self.logger.debug("Rebooting SSVM: %s" % ssvm_response.id)
         cmd = rebootSystemVm.rebootSystemVmCmd()
         cmd.id = ssvm_response.id
-        self.apiclient.rebootSystemVm(cmd)
+        self.api_client.rebootSystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_ssvm_response = list_ssvms(
-                self.apiclient,
+                self.api_client,
                 id=ssvm_response.id
             )
             if isinstance(list_ssvm_response, list):
@@ -508,7 +508,7 @@ class TestSSVMs(cloudstackTestCase):
         # 3. the cloud process should still be running within the CPVM
 
         list_cpvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='consoleproxy',
             state='Running',
             zoneid=self.zone.id
@@ -521,7 +521,7 @@ class TestSSVMs(cloudstackTestCase):
         cpvm_response = list_cpvm_response[0]
 
         hosts = list_hosts(
-            self.apiclient,
+            self.api_client,
             id=cpvm_response.hostid
         )
         self.assertEqual(
@@ -538,12 +538,12 @@ class TestSSVMs(cloudstackTestCase):
 
         cmd = rebootSystemVm.rebootSystemVmCmd()
         cmd.id = cpvm_response.id
-        self.apiclient.rebootSystemVm(cmd)
+        self.api_client.rebootSystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_cpvm_response = list_ssvms(
-                self.apiclient,
+                self.api_client,
                 id=cpvm_response.id
             )
             if isinstance(list_cpvm_response, list):
@@ -596,7 +596,7 @@ class TestSSVMs(cloudstackTestCase):
         # 4. cloud process within SSVM must be up and running
 
         list_ssvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='secondarystoragevm',
             state='Running',
             zoneid=self.zone.id
@@ -613,12 +613,12 @@ class TestSSVMs(cloudstackTestCase):
         self.logger.debug("Destroying SSVM: %s" % ssvm_response.id)
         cmd = destroySystemVm.destroySystemVmCmd()
         cmd.id = ssvm_response.id
-        self.apiclient.destroySystemVm(cmd)
+        self.api_client.destroySystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_ssvm_response = list_ssvms(
-                self.apiclient,
+                self.api_client,
                 zoneid=self.zone.id,
                 systemvmtype='secondarystoragevm'
             )
@@ -684,7 +684,7 @@ class TestSSVMs(cloudstackTestCase):
         # 4. cloud process within CPVM must be up and running
 
         list_cpvm_response = list_ssvms(
-            self.apiclient,
+            self.api_client,
             systemvmtype='consoleproxy',
             zoneid=self.zone.id
         )
@@ -700,12 +700,12 @@ class TestSSVMs(cloudstackTestCase):
         self.logger.debug("Destroying CPVM: %s" % cpvm_response.id)
         cmd = destroySystemVm.destroySystemVmCmd()
         cmd.id = cpvm_response.id
-        self.apiclient.destroySystemVm(cmd)
+        self.api_client.destroySystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_cpvm_response = list_ssvms(
-                self.apiclient,
+                self.api_client,
                 systemvmtype='consoleproxy',
                 zoneid=self.zone.id
             )

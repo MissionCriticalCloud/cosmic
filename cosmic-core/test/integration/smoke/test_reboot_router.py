@@ -31,14 +31,14 @@ class TestRebootRouter(cloudstackTestCase):
     def setUp(self):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
-        self.domain = get_domain(self.apiclient)
-        self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
+        self.domain = get_domain(self.api_client)
+        self.zone = get_zone(self.api_client, self.testClient.getZoneForTests())
         template = get_template(
-            self.apiclient,
+            self.api_client,
             self.zone.id
         )
         if template == FAILED:
@@ -49,14 +49,14 @@ class TestRebootRouter(cloudstackTestCase):
 
         # Create an account, network, VM and IP addresses
         self.account = Account.create(
-            self.apiclient,
+            self.api_client,
             self.services["account"],
             admin=True,
             domainid=self.domain.id
         )
-        self.service_offering = get_default_virtual_machine_offering(self.apiclient)
+        self.service_offering = get_default_virtual_machine_offering(self.api_client)
         self.vm_1 = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=template.id,
             accountid=self.account.name,
@@ -65,7 +65,7 @@ class TestRebootRouter(cloudstackTestCase):
         )
 
         src_nat_ip_addrs = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -77,7 +77,7 @@ class TestRebootRouter(cloudstackTestCase):
                 e)
 
         self.public_ip = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             self.vm_1.account,
             self.vm_1.zoneid,
             self.vm_1.domainid,
@@ -85,7 +85,7 @@ class TestRebootRouter(cloudstackTestCase):
         )
         # Open up firewall port for SSH
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=self.public_ip.ipaddress.id,
             protocol=self.services["lbrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -94,14 +94,14 @@ class TestRebootRouter(cloudstackTestCase):
         )
 
         lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             src_nat_ip_addr.id,
             self.account.name
         )
-        lb_rule.assign(self.apiclient, [self.vm_1])
+        lb_rule.assign(self.api_client, [self.vm_1])
         self.nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.vm_1,
             self.services["natrule"],
             ipaddressid=self.public_ip.ipaddress.id
@@ -145,7 +145,7 @@ class TestRebootRouter(cloudstackTestCase):
         self.logger.debug("Public IP: %s" % self.vm_1.ssh_ip)
         self.logger.debug("Public IP: %s" % self.public_ip.ipaddress.ipaddress)
         routers = list_routers(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -161,7 +161,7 @@ class TestRebootRouter(cloudstackTestCase):
 
         cmd = rebootRouter.rebootRouterCmd()
         cmd.id = router.id
-        self.apiclient.rebootRouter(cmd)
+        self.api_client.rebootRouter(cmd)
 
         # Poll listVM to ensure VM is stopped properly
         timeout = self.services["timeout"]
@@ -169,7 +169,7 @@ class TestRebootRouter(cloudstackTestCase):
         while True:
             # Ensure that VM is in stopped state
             list_vm_response = list_virtual_machines(
-                self.apiclient,
+                self.api_client,
                 id=self.vm_1.id
             )
 
@@ -206,5 +206,5 @@ class TestRebootRouter(cloudstackTestCase):
         return
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
         return

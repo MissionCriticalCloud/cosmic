@@ -28,30 +28,30 @@ class TestReleaseIP(cloudstackTestCase):
     def setUp(self):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
-        self.domain = get_domain(self.apiclient)
-        self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
+        self.domain = get_domain(self.api_client)
+        self.zone = get_zone(self.api_client, self.testClient.getZoneForTests())
         template = get_template(
-            self.apiclient,
+            self.api_client,
             self.zone.id
         )
         self.services["virtual_machine"]["zoneid"] = self.zone.id
 
         # Create an account, network, VM, Port forwarding rule, LB rules
         self.account = Account.create(
-            self.apiclient,
+            self.api_client,
             self.services["account"],
             admin=True,
             domainid=self.domain.id
         )
 
-        self.service_offering = get_default_virtual_machine_offering(self.apiclient)
+        self.service_offering = get_default_virtual_machine_offering(self.api_client)
 
         self.virtual_machine = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=template.id,
             accountid=self.account.name,
@@ -60,14 +60,14 @@ class TestReleaseIP(cloudstackTestCase):
         )
 
         self.ip_address = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             self.account.name,
             self.zone.id,
             self.account.domainid
         )
 
         ip_addrs = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid,
             issourcenat=False
@@ -80,13 +80,13 @@ class TestReleaseIP(cloudstackTestCase):
                 (self.account.name, e))
 
         self.nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.virtual_machine,
             self.services["natrule"],
             self.ip_addr.id
         )
         self.lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             self.ip_addr.id,
             accountid=self.account.name
@@ -98,7 +98,7 @@ class TestReleaseIP(cloudstackTestCase):
         return
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
 
     @attr(tags=['advanced'])
     def test_01_release_ip(self):
@@ -106,13 +106,13 @@ class TestReleaseIP(cloudstackTestCase):
 
         self.logger.debug("Deleting Public IP : %s" % self.ip_addr.id)
 
-        self.ip_address.delete(self.apiclient)
+        self.ip_address.delete(self.api_client)
 
         retriesCount = 10
         isIpAddressDisassociated = False
         while retriesCount > 0:
             listResponse = list_public_ip(
-                self.apiclient,
+                self.api_client,
                 id=self.ip_addr.id
             )
             if listResponse is None:
@@ -130,7 +130,7 @@ class TestReleaseIP(cloudstackTestCase):
         # associated rules with Public IP address
         try:
             list_nat_rule = list_nat_rules(
-                self.apiclient,
+                self.api_client,
                 id=self.nat_rule.id
             )
             self.logger.debug("List NAT Rule response" + str(list_nat_rule))
@@ -141,7 +141,7 @@ class TestReleaseIP(cloudstackTestCase):
         # associated rules with Public IP address
         try:
             list_lb_rule = list_lb_rules(
-                self.apiclient,
+                self.api_client,
                 id=self.lb_rule.id
             )
             self.logger.debug("List LB Rule response" + str(list_lb_rule))

@@ -190,11 +190,11 @@ class TestPasswordService(cloudstackTestCase):
         return
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
 
         self.logger.debug("Creating Admin Account for Domain ID ==> %s" % self.domain.id)
         self.account = Account.create(
-            self.apiclient,
+            self.api_client,
             self.services["account"],
             admin=True,
             domainid=self.domain.id)
@@ -204,7 +204,7 @@ class TestPasswordService(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            cleanup_resources(self.apiclient, self.cleanup, self.logger)
+            cleanup_resources(self.api_client, self.cleanup, self.logger)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
@@ -213,11 +213,11 @@ class TestPasswordService(cloudstackTestCase):
     def test_01_vpc_password_service_single_vpc(self):
         self.logger.debug("Starting test for single VPC")
         vpc_off = VpcOffering.create(
-            self.apiclient,
+            self.api_client,
             self.services["vpc_offering"])
 
         self.logger.debug("Enabling the VPC offering created")
-        vpc_off.update(self.apiclient, state='Enabled')
+        vpc_off.update(self.api_client, state='Enabled')
 
         self.perform_password_service_tests(vpc_off)
 
@@ -225,11 +225,11 @@ class TestPasswordService(cloudstackTestCase):
     def test_02_vpc_password_service_redundant_vpc(self):
         self.logger.debug("Starting test for Redundant VPC")
         vpc_off = VpcOffering.create(
-            self.apiclient,
+            self.api_client,
             self.services["redundant_vpc_offering"])
 
         self.logger.debug("Enabling the VPC offering created")
-        vpc_off.update(self.apiclient, state='Enabled')
+        vpc_off.update(self.api_client, state='Enabled')
 
         self.perform_password_service_tests(vpc_off)
 
@@ -265,7 +265,7 @@ class TestPasswordService(cloudstackTestCase):
         self.assertEqual(self.routers_in_right_state(), True,
                          "Check whether the routers are in the right state.")
 
-        routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
+        routers = list_routers(self.api_client, account=self.account.name, domainid=self.account.domainid)
         for router in routers:
             self._perform_password_service_test(router, vm2)
 
@@ -276,7 +276,7 @@ class TestPasswordService(cloudstackTestCase):
             self.restart_vpc_with_cleanup(vpc_1, True)
 
         self.logger.debug("Getting the router info again after the cleanup (router names / ip addresses changed)")
-        routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
+        routers = list_routers(self.api_client, account=self.account.name, domainid=self.account.domainid)
 
         self.assertEqual(isinstance(routers, list), True,
                          "Check for list routers response return valid data")
@@ -332,7 +332,7 @@ class TestPasswordService(cloudstackTestCase):
         master_found = 0
         backup_found = 0
         while test_tries < max_tries:
-            routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
+            routers = list_routers(self.api_client, account=self.account.name, domainid=self.account.domainid)
             self.assertEqual(isinstance(routers, list), True,
                              "Check for list routers response return valid data")
             for router in routers:
@@ -436,7 +436,7 @@ class TestPasswordService(cloudstackTestCase):
             "Log line 'password sent to' not found. The password was not retrieved by the VM!")
 
     def get_host_details(self, router):
-        hosts = list_hosts(self.apiclient, id=router.hostid, type="Routing")
+        hosts = list_hosts(self.api_client, id=router.hostid, type="Routing")
 
         self.assertEqual(isinstance(hosts, list), True, "Check for list hosts response return valid data")
 
@@ -452,7 +452,7 @@ class TestPasswordService(cloudstackTestCase):
             self.services["vpc"]["cidr"] = cidr
 
             vpc = VPC.create(
-                self.apiclient,
+                self.api_client,
                 self.services["vpc"],
                 vpcofferingid=vpc_offering.id,
                 zoneid=self.zone.id,
@@ -469,7 +469,7 @@ class TestPasswordService(cloudstackTestCase):
         try:
             self.logger.debug('Creating VM in network=%s' % network.name)
             vm = VirtualMachine.create(
-                self.apiclient,
+                self.api_client,
                 self.services["virtual_machine"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -488,7 +488,7 @@ class TestPasswordService(cloudstackTestCase):
         createAclCmd.description = createAclCmd.name
         createAclCmd.vpcid = vpc.id
         try:
-            acl = self.apiclient.createNetworkACLList(createAclCmd)
+            acl = self.api_client.createNetworkACLList(createAclCmd)
             self.assertIsNotNone(acl.id, "Failed to create ACL.")
 
             self.logger.debug("Created ACL with ID: %s" % acl.id)
@@ -505,7 +505,7 @@ class TestPasswordService(cloudstackTestCase):
         createAclItemCmd.action = "Allow"
         createAclItemCmd.aclid = aclId
         try:
-            aclItem = self.apiclient.createNetworkACL(createAclItemCmd)
+            aclItem = self.api_client.createNetworkACL(createAclItemCmd)
             self.assertIsNotNone(aclItem.id, "Failed to create ACL item.")
 
             self.logger.debug("Created ACL Item ID: %s" % aclItem.id)
@@ -518,11 +518,11 @@ class TestPasswordService(cloudstackTestCase):
             net_offerring = self.services[net_offering]
             net_offerring["name"] = "NET_OFF-%s" % gateway
             nw_off = NetworkOffering.create(
-                self.apiclient,
+                self.api_client,
                 net_offerring,
                 conservemode=False)
 
-            nw_off.update(self.apiclient, state='Enabled')
+            nw_off.update(self.api_client, state='Enabled')
 
             self.logger.debug('Created and Enabled NetworkOffering')
 
@@ -530,7 +530,7 @@ class TestPasswordService(cloudstackTestCase):
 
             self.logger.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(
-                self.apiclient,
+                self.api_client,
                 self.services["network"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -583,7 +583,7 @@ class TestPasswordService(cloudstackTestCase):
 
     def _replaceAcl(self, command):
         try:
-            successResponse = self.apiclient.replaceNetworkACLList(command);
+            successResponse = self.api_client.replaceNetworkACLList(command);
         except Exception as e:
             self.fail("Failed to replace ACL list due to %s" % e)
 
