@@ -183,15 +183,15 @@ class TestSSVMs(cloudstackTestCase):
             )
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"])
+    @attr(tags=['advanced'])
     def test_01_list_sec_storage_vm(self):
         self.test_list_svm_vm('secondarystoragevm')
 
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"])
+    @attr(tags=['advanced'])
     def test_02_list_cpvm_vm(self):
         self.test_list_svm_vm('consoleproxy')
 
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"])
+    @attr(tags=['advanced'])
     def test_03_ssvm_internals(self):
         """Test SSVM Internals"""
 
@@ -311,7 +311,7 @@ class TestSSVMs(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke", "basic", "sg"])
+    @attr(tags=['advanced'])
     def test_04_cpvm_internals(self):
         """Test CPVM Internals"""
 
@@ -411,14 +411,8 @@ class TestSSVMs(cloudstackTestCase):
 
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"])
-    def test_07_reboot_ssvm(self):
+    @attr(tags=['advanced'])
+    def test_05_reboot_ssvm(self):
         """Test reboot SSVM
         """
         # Validate the following
@@ -503,14 +497,8 @@ class TestSSVMs(cloudstackTestCase):
         self.test_03_ssvm_internals()
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"])
-    def test_08_reboot_cpvm(self):
+    @attr(tags=['advanced'])
+    def test_06_reboot_cpvm(self):
         """Test reboot CPVM
         """
         # Validate the following
@@ -595,14 +583,8 @@ class TestSSVMs(cloudstackTestCase):
         self.test_04_cpvm_internals()
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"])
-    def test_09_destroy_ssvm(self):
+    @attr(tags=['advanced'])
+    def test_07_destroy_ssvm(self):
         """Test destroy SSVM
         """
 
@@ -689,14 +671,8 @@ class TestSSVMs(cloudstackTestCase):
         self.test_03_ssvm_internals()
         return
 
-    @attr(
-        tags=[
-            "advanced",
-            "advancedns",
-            "smoke",
-            "basic",
-            "sg"])
-    def test_10_destroy_cpvm(self):
+    @attr(tags=['advanced'])
+    def test_08_destroy_cpvm(self):
         """Test destroy CPVM
         """
 

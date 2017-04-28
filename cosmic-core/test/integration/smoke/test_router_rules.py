@@ -190,8 +190,8 @@ class TestRouterRules(cloudstackTestCase):
         return
 
     @data(STATIC_NAT_RULE, NAT_RULE, LB_RULE)
-    @attr(tags=["advanced", "advancedns", "smoke", "dvs"])
-    def test_network_rules_acquired_public_ip(self, value):
+    @attr(tags=['advanced'])
+    def test_01_network_rules_acquired_public_ip(self, value):
         """Test for Router rules for network rules on acquired public IP"""
 
         # Validate the following:

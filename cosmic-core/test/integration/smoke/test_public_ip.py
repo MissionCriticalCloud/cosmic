@@ -96,8 +96,8 @@ class TestPublicIP(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
-    def test_public_ip_admin_account(self):
+    @attr(tags=['advanced'])
+    def test_01_public_ip_admin_account(self):
         """Test for Associate/Disassociate public IP address for admin account"""
 
         # Validate the following:
@@ -150,8 +150,8 @@ class TestPublicIP(cloudstackTestCase):
             self.fail("list public ip response is not empty")
         return
 
-    @attr(tags=["advanced", "advancedns", "smoke"])
-    def test_public_ip_user_account(self):
+    @attr(tags=['advanced'])
+    def test_02_public_ip_user_account(self):
         """Test for Associate/Disassociate public IP address for user account"""
 
         # Validate the following:

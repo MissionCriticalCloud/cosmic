@@ -209,7 +209,7 @@ class TestPasswordService(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    @attr(tags=["advanced"])
+    @attr(tags=['advanced'])
     def test_01_vpc_password_service_single_vpc(self):
         self.logger.debug("Starting test for single VPC")
         vpc_off = VpcOffering.create(
@@ -221,7 +221,7 @@ class TestPasswordService(cloudstackTestCase):
 
         self.perform_password_service_tests(vpc_off)
 
-    @attr(tags=["advanced"])
+    @attr(tags=['advanced'])
     def test_02_vpc_password_service_redundant_vpc(self):
         self.logger.debug("Starting test for Redundant VPC")
         vpc_off = VpcOffering.create(
@@ -233,7 +233,7 @@ class TestPasswordService(cloudstackTestCase):
 
         self.perform_password_service_tests(vpc_off)
 
-    @attr(tags=["advanced"])
+    @attr(tags=['advanced'])
     def test_03_password_service_isolated(self):
         self.logger.debug("Starting test for Isolated network")
         self.perform_password_service_tests(None)
