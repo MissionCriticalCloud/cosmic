@@ -1,8 +1,8 @@
 import time
 
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
 
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     PublicIPAddress,
     Network,
@@ -12,7 +12,7 @@ from marvin.lib.common import (
     list_public_ip,
     get_zone,
     get_domain,
-    get_default_network_offering
+    get_default_guest_network_offering
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -49,7 +49,7 @@ class TestPublicIP(cloudstackTestCase):
         )
         cls.services["network"]["zoneid"] = cls.zone.id
 
-        cls.network_offering = get_default_network_offering(cls.apiclient)
+        cls.network_offering = get_default_guest_network_offering(cls.apiclient)
 
         cls.services["network"]["networkoffering"] = cls.network_offering.id
 

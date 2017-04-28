@@ -297,6 +297,12 @@ def get_default_network_offering(api_client):
     return next(iter(offerings or []), None)
 
 
+def get_default_guest_network_offering(api_client):
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithSourceNatService']
+    return next(iter(offerings or []), None)
+
+
 def get_default_network_offering_no_load_balancer(api_client):
     offerings = list_network_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
