@@ -49,7 +49,7 @@ class TestPublicIP(cloudstackTestCase):
         )
         cls.services["network"]["zoneid"] = cls.zone.id
 
-        cls.network_offering = get_default_network_offering(cls.api_client)
+        cls.network_offering = get_default_network_offering(cls.apiclient)
 
         cls.services["network"]["networkoffering"] = cls.network_offering.id
 
