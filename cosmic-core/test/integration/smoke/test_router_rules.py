@@ -32,7 +32,7 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
 
-
+@ddt
 class TestRouterRules(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
@@ -93,6 +93,7 @@ class TestRouterRules(cloudstackTestCase):
         cleanup_resources(self.apiclient, self.cleanup)
         return
 
+    @data(STATIC_NAT_RULE, NAT_RULE, LB_RULE)
     @attr(tags=['advanced'])
     def test_01_network_rules_acquired_public_ip(self, value):
         """Test for Router rules for network rules on acquired public IP"""
