@@ -96,7 +96,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         return
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.cleanup = []
         return
 
@@ -114,7 +114,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress TRUE")
         network_offering_egress_true = NetworkOffering.create(
-            self.apiclient,
+            self.api_client,
             self.services["nw_off_persistent_RVR_egress_true"],
             conservemode=True
         )
@@ -122,7 +122,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_true.id)
         network = Network.create(
-            self.apiclient,
+            self.api_client,
             self.services["network"],
             accountid=self.account.name,
             domainid=self.account.domainid,
@@ -132,7 +132,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-            self.apiclient,
+            self.api_client,
             id=network.id,
             listall=True
         )
@@ -145,7 +145,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=self.template.id,
             accountid=self.account.name,
@@ -161,7 +161,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             id=virtual_machine.id,
             listall=True
         )
@@ -179,7 +179,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             listall=True
         )
@@ -195,7 +195,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         public_ips = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid,
             zoneid=self.zone.id
@@ -211,7 +211,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % virtual_machine.id)
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=public_ip.id,
             protocol=self.services["natrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -221,7 +221,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating NAT rule for VM ID: %s" % virtual_machine.id)
         nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             virtual_machine,
             self.services["natrule"],
             public_ip.id
@@ -252,7 +252,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         EgressFireWallRule.create(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             protocol=self.services["egress_8080"]["protocol"],
             startport=self.services["egress_8080"]["startport"],
@@ -278,7 +278,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress FALSE")
         network_offering_egress_false = NetworkOffering.create(
-            self.apiclient,
+            self.api_client,
             self.services["nw_off_persistent_RVR_egress_false"],
             conservemode=True
         )
@@ -286,7 +286,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
-            self.apiclient,
+            self.api_client,
             self.services["network"],
             accountid=self.account.name,
             domainid=self.account.domainid,
@@ -296,7 +296,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-            self.apiclient,
+            self.api_client,
             id=network.id,
             listall=True
         )
@@ -309,7 +309,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=self.template.id,
             accountid=self.account.name,
@@ -325,7 +325,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             id=virtual_machine.id,
             listall=True
         )
@@ -343,7 +343,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             listall=True
         )
@@ -359,7 +359,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         public_ips = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid,
             zoneid=self.zone.id
@@ -375,7 +375,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % virtual_machine.id)
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=public_ip.id,
             protocol=self.services["natrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -385,7 +385,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating NAT rule for VM ID: %s" % virtual_machine.id)
         nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             virtual_machine,
             self.services["natrule"],
             public_ip.id
@@ -415,7 +415,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         EgressFireWallRule.create(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             protocol=self.services["egress_8080"]["protocol"],
             startport=self.services["egress_8080"]["startport"],
@@ -424,7 +424,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         )
 
         EgressFireWallRule.create(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             protocol=self.services["egress_53"]["protocol"],
             startport=self.services["egress_53"]["startport"],
@@ -452,15 +452,15 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Creating Network Offering with default egress FALSE")
         network_offering_egress_false = NetworkOffering.create(
-            self.apiclient,
+            self.api_client,
             self.services["nw_off_persistent_RVR_egress_false"],
             conservemode=True
         )
-        network_offering_egress_false.update(self.apiclient, state='Enabled')
+        network_offering_egress_false.update(self.api_client, state='Enabled')
 
         self.logger.debug("Creating network with network offering: %s" % network_offering_egress_false.id)
         network = Network.create(
-            self.apiclient,
+            self.api_client,
             self.services["network"],
             accountid=self.account.name,
             domainid=self.account.domainid,
@@ -470,7 +470,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.logger.debug("Created network with ID: %s" % network.id)
 
         networks = Network.list(
-            self.apiclient,
+            self.api_client,
             id=network.id,
             listall=True
         )
@@ -483,7 +483,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Deploying VM in account: %s" % self.account.name)
         virtual_machine = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=self.template.id,
             accountid=self.account.name,
@@ -499,7 +499,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         self.cleanup.insert(0, virtual_machine)
 
         vms = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             id=virtual_machine.id,
             listall=True
         )
@@ -517,7 +517,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Listing routers for network: %s" % network.name)
         routers = Router.list(
-            self.apiclient,
+            self.api_client,
             networkid=network.id,
             listall=True
         )
@@ -539,7 +539,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         for router in routers:
             if router.state == "Running":
                 hosts = list_hosts(
-                    self.apiclient,
+                    self.api_client,
                     zoneid=router.zoneid,
                     type='Routing',
                     state='Up',
@@ -589,7 +589,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         return result.count(check_string)
 
     def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
+        networks = list_networks(self.api_client,
                                  zoneid=self.zone.id,
                                  listall=True,
                                  issystem=True,
@@ -598,7 +598,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
 
         self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
 
-        ip_ranges = list_vlan_ipranges(self.apiclient,
+        ip_ranges = list_vlan_ipranges(self.api_client,
                                        zoneid=self.zone.id,
                                        networkid=networks[0].id)
         self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)

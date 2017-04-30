@@ -29,14 +29,14 @@ class TestPortForwarding(cloudstackTestCase):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestPortForwarding, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
+        cls.api_client = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()
         cls.hypervisor = testClient.getHypervisorInfo()
         # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
+        cls.zone = get_zone(cls.api_client, testClient.getZoneForTests())
         template = get_template(
-            cls.apiclient,
+            cls.api_client,
             cls.zone.id
         )
         if template == FAILED:
@@ -45,15 +45,15 @@ class TestPortForwarding(cloudstackTestCase):
 
         # Create an account, network, VM and IP addresses
         cls.account = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id
         )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
-        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.virtual_machine = VirtualMachine.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["virtual_machine"],
             templateid=template.id,
             accountid=cls.account.name,
@@ -66,22 +66,22 @@ class TestPortForwarding(cloudstackTestCase):
         ]
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.cleanup = []
         return
 
     @classmethod
     def tearDownClass(cls):
         try:
-            cls.apiclient = super(
+            cls.api_client = super(
                 TestPortForwarding,
                 cls).getClsTestClient().getApiClient()
-            cleanup_resources(cls.apiclient, cls._cleanup)
+            cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
         return
 
     @attr(tags=['advanced'])
@@ -93,7 +93,7 @@ class TestPortForwarding(cloudstackTestCase):
         # 2. attempt to do an ssh into the  user VM through the sourceNAT
 
         src_nat_ip_addrs = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -107,7 +107,7 @@ class TestPortForwarding(cloudstackTestCase):
 
         # Check if VM is in Running state before creating NAT rule
         vm_response = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             id=self.virtual_machine.id
         )
 
@@ -129,7 +129,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
         # Open up firewall port for SSH
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=src_nat_ip_addr.id,
             protocol=self.services["natrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -139,14 +139,14 @@ class TestPortForwarding(cloudstackTestCase):
 
         # Create NAT rule
         nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.virtual_machine,
             self.services["natrule"],
             src_nat_ip_addr.id
         )
 
         list_nat_rule_response = list_nat_rules(
-            self.apiclient,
+            self.api_client,
             id=nat_rule.id
         )
         self.assertEqual(
@@ -175,7 +175,7 @@ class TestPortForwarding(cloudstackTestCase):
 
             self.virtual_machine.get_ssh_client(src_nat_ip_addr.ipaddress)
             vm_response = VirtualMachine.list(
-                self.apiclient,
+                self.api_client,
                 id=self.virtual_machine.id
             )
             if vm_response[0].state != 'Running':
@@ -190,13 +190,13 @@ class TestPortForwarding(cloudstackTestCase):
             )
 
         try:
-            nat_rule.delete(self.apiclient)
+            nat_rule.delete(self.api_client)
         except Exception as e:
             self.fail("NAT Rule Deletion Failed: %s" % e)
 
         # NAT rule listing should fail as the nat rule does not exist
         with self.assertRaises(Exception):
-            list_nat_rules(self.apiclient,
+            list_nat_rules(self.api_client,
                            id=nat_rule.id)
 
         # Check if the Public SSH port is inaccessible
@@ -224,7 +224,7 @@ class TestPortForwarding(cloudstackTestCase):
         # 2. attempt to do ssh should now fail
 
         ip_address = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             self.account.name,
             self.zone.id,
             self.account.domainid,
@@ -234,7 +234,7 @@ class TestPortForwarding(cloudstackTestCase):
 
         # Check if VM is in Running state before creating NAT rule
         vm_response = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             id=self.virtual_machine.id
         )
 
@@ -256,7 +256,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
         # Open up firewall port for SSH
         FireWallRule.create(
-            self.apiclient,
+            self.api_client,
             ipaddressid=ip_address.ipaddress.id,
             protocol=self.services["natrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -265,7 +265,7 @@ class TestPortForwarding(cloudstackTestCase):
         )
         # Create NAT rule
         nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.virtual_machine,
             self.services["natrule"],
             ip_address.ipaddress.id
@@ -275,7 +275,7 @@ class TestPortForwarding(cloudstackTestCase):
         # 2. attempt to do ssh should now fail
 
         list_nat_rule_response = list_nat_rules(
-            self.apiclient,
+            self.api_client,
             id=nat_rule.id
         )
         self.assertEqual(
@@ -307,11 +307,11 @@ class TestPortForwarding(cloudstackTestCase):
                 (self.virtual_machine.ipaddress, e)
             )
 
-        nat_rule.delete(self.apiclient)
+        nat_rule.delete(self.api_client)
 
         try:
             list_nat_rule_response = list_nat_rules(
-                self.apiclient,
+                self.api_client,
                 id=nat_rule.id
             )
         except CloudstackAPIException:

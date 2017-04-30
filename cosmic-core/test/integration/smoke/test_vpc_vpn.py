@@ -111,22 +111,22 @@ class TestVpcVpn(cloudstackTestCase):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         test_client = super(TestVpcVpn, cls).getClsTestClient()
-        cls.apiclient = test_client.getApiClient()
+        cls.api_client = test_client.getApiClient()
         cls.services = Services().services
 
-        cls.zone = get_zone(cls.apiclient, test_client.getZoneForTests())
-        cls.domain = get_domain(cls.apiclient)
+        cls.zone = get_zone(cls.api_client, test_client.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
 
-        cls.vpc_offering = get_default_redundant_vpc_offering(cls.apiclient) if redundant else get_default_vpc_offering(cls.apiclient)
+        cls.vpc_offering = get_default_redundant_vpc_offering(cls.api_client) if redundant else get_default_vpc_offering(cls.api_client)
         cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
 
-        cls.network_offering = get_default_network_offering(cls.apiclient)
+        cls.network_offering = get_default_network_offering(cls.api_client)
         cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
 
-        cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.apiclient)
+        cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.logger.debug("Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
-        cls.account = Account.create(cls.apiclient, services=cls.services["account"])
+        cls.account = Account.create(cls.api_client, services=cls.services["account"])
         cls.logger.debug("Successfully created account: %s, id: %s" % (cls.account.name, cls.account.id))
 
         cls.hypervisor = test_client.getHypervisorInfo()
@@ -134,7 +134,7 @@ class TestVpcVpn(cloudstackTestCase):
         cls._cleanup = [cls.account]
 
         cls.template = get_template(
-            cls.apiclient,
+            cls.api_client,
             cls.zone.id
         )
 
@@ -147,20 +147,20 @@ class TestVpcVpn(cloudstackTestCase):
         try:
             self.logger.debug("Cleaning up resources")
             self.cleanup.reverse()
-            cleanup_resources(self.apiclient, self.cleanup, self.logger)
+            cleanup_resources(self.api_client, self.cleanup, self.logger)
         except Exception as e:
             raise Exception("Cleanup failed with %s" % e)
 
     @classmethod
     def tearDownClass(cls):
         try:
-            cleanup_resources(cls.apiclient, cls._cleanup, cls.logger)
+            cleanup_resources(cls.api_client, cls._cleanup, cls.logger)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
     def get_host_details(self, router, username='root', password='password', port=22):
-        hosts = list_hosts(self.apiclient, id=router.hostid, type="Routing")
+        hosts = list_hosts(self.api_client, id=router.hostid, type="Routing")
 
         self.assertEqual(isinstance(hosts, list), True, "Check for list hosts response return valid data")
 
@@ -196,7 +196,7 @@ class TestVpcVpn(cloudstackTestCase):
         master_found = 0
         backup_found = 0
         while test_tries < max_tries:
-            routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid, vpcid=vpcid)
+            routers = list_routers(self.api_client, account=self.account.name, domainid=self.account.domainid, vpcid=vpcid)
             self.assertEqual(isinstance(routers, list), True,
                              "Check for list routers response return valid data")
             for router in routers:
@@ -235,7 +235,7 @@ class TestVpcVpn(cloudstackTestCase):
                 vpcservice_n[key] = vpcservice_n[key].format(N=`i`)
 
             vpc_n = VPC.create(
-                api_client=self.apiclient,
+                api_client=self.api_client,
                 services=vpcservice_n,
                 networkDomain="vpc%d.vpn" % i,
                 vpcofferingid=vpc_offering.id,
@@ -248,7 +248,7 @@ class TestVpcVpn(cloudstackTestCase):
             self.cleanup.append(vpc_n)
             self.logger.debug("VPC%d %s created" % (i, vpc_list[i].id))
 
-        default_acl = NetworkACLList.list(self.apiclient, name="default_allow")[0]
+        default_acl = NetworkACLList.list(self.api_client, name="default_allow")[0]
 
         # Create network in VPC i
         ntwk_list = []
@@ -259,7 +259,7 @@ class TestVpcVpn(cloudstackTestCase):
                 ntwk_info_n[key] = ntwk_info_n[key].format(N=`i`)
 
             ntwk_n = Network.create(
-                api_client=self.apiclient,
+                api_client=self.api_client,
                 services=ntwk_info_n,
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -278,7 +278,7 @@ class TestVpcVpn(cloudstackTestCase):
         vm_n = None
 
         for i in range(num_VPCs):
-            vm_n = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
+            vm_n = VirtualMachine.create(self.api_client, services=self.services["virtual_machine"],
                                          templateid=self.template.id,
                                          zoneid=self.zone.id,
                                          accountid=self.account.name,
@@ -297,7 +297,7 @@ class TestVpcVpn(cloudstackTestCase):
         # 4) Enable Site-to-Site VPN for VPC
         vpn_response_list = []
         for i in range(num_VPCs):
-            vpn_response = Vpn.createVpnGateway(self.apiclient, vpc_list[i].id)
+            vpn_response = Vpn.createVpnGateway(self.api_client, vpc_list[i].id)
             self.assertIsNotNone(vpn_response, "Failed to enable VPN Gateway %d" % i)
             vpn_response_list.append(vpn_response)
             self.logger.debug("VPN gateway for VPC%d %s enabled" % (i, vpc_list[i].id))
@@ -307,7 +307,7 @@ class TestVpcVpn(cloudstackTestCase):
         services = self.services["vpncustomergateway"]
         for i in range(num_VPCs):
             src_nat_list = PublicIPAddress.list(
-                self.apiclient,
+                self.api_client,
                 account=self.account.name,
                 domainid=self.account.domainid,
                 listall=True,
@@ -316,7 +316,7 @@ class TestVpcVpn(cloudstackTestCase):
             )
             ip = src_nat_list[0]
 
-            customer_response = VpnCustomerGateway.create(self.apiclient, services, "Peer VPC" + `i`, ip.ipaddress, vpc_list[i].cidr, self.account.name, self.domain.id)
+            customer_response = VpnCustomerGateway.create(self.api_client, services, "Peer VPC" + `i`, ip.ipaddress, vpc_list[i].cidr, self.account.name, self.domain.id)
             self.cleanup.insert(0, customer_response)  # this has to be cleaned up after the VPCs have been destroyed (due to client connectionsonections)
             vpn_cust_gw_list.append(customer_response)
             self.logger.debug("VPN customer gateway added for VPC%d %s enabled" % (i, vpc_list[i].id))
@@ -327,10 +327,10 @@ class TestVpcVpn(cloudstackTestCase):
 
         # 6) Connect VPCi with VPC0
         for i in range(num_VPCs)[1:]:
-            passiveVpn = Vpn.createVpnConnection(self.apiclient, vpn_cust_gw_list[0].id, vpn_response_list[i]['id'], True)
+            passiveVpn = Vpn.createVpnConnection(self.api_client, vpn_cust_gw_list[0].id, vpn_response_list[i]['id'], True)
             self.logger.debug("VPN passive connection created for VPC%d %s" % (i, vpc_list[i].id))
 
-            vpnconn2_response = Vpn.createVpnConnection(self.apiclient, vpn_cust_gw_list[i].id, vpn_response_list[0]['id'])
+            vpnconn2_response = Vpn.createVpnConnection(self.api_client, vpn_cust_gw_list[i].id, vpn_response_list[0]['id'])
             self.logger.debug("VPN connection created for VPC%d %s" % (0, vpc_list[0].id))
 
             self.assertEqual(vpnconn2_response['state'], "Connected", "Failed to connect between VPCs 0 and %d!" % i)
@@ -338,7 +338,7 @@ class TestVpcVpn(cloudstackTestCase):
 
             time.sleep(5)
             self.logger.debug("Resetting VPN connection with id %s" % (passiveVpn['id']))
-            Vpn.resetVpnConnection(self.apiclient, passiveVpn['id'])
+            Vpn.resetVpnConnection(self.api_client, passiveVpn['id'])
             self.logger.debug("Waiting 20s for the VPN to connect")
             time.sleep(20)
 
@@ -369,7 +369,7 @@ class TestVpcVpn(cloudstackTestCase):
         """Test Remote Access VPN in VPC"""
         # 1) Create VPC
         vpc = VPC.create(
-            api_client=self.apiclient,
+            api_client=self.api_client,
             services=self.services["vpc"],
             networkDomain="vpc.vpn",
             vpcofferingid=self.vpc_offering.id,
@@ -385,7 +385,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         # 2) Create network in VPC
         ntwk = Network.create(
-            api_client=self.apiclient,
+            api_client=self.api_client,
             services=self.services["network_1"],
             accountid=self.account.name,
             domainid=self.domain.id,
@@ -400,7 +400,7 @@ class TestVpcVpn(cloudstackTestCase):
         self.cleanup.append(ntwk)
 
         # 3) Deploy a vm
-        vm = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
+        vm = VirtualMachine.create(self.api_client, services=self.services["virtual_machine"],
                                    templateid=self.template.id,
                                    zoneid=self.zone.id,
                                    accountid=self.account.name,
@@ -418,7 +418,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         # 4) Enable VPN for VPC
         src_nat_list = PublicIPAddress.list(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid,
             listall=True,
@@ -429,7 +429,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         self.logger.debug("Acquired public ip address: OK")
 
-        vpn = Vpn.create(self.apiclient,
+        vpn = Vpn.create(self.api_client,
                          publicipid=ip.id,
                          account=self.account.name,
                          domainid=self.account.domainid,
@@ -442,7 +442,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         vpn_user = None
         # 5) Add VPN user for VPC
-        vpn_user = VpnUser.create(self.apiclient,
+        vpn_user = VpnUser.create(self.api_client,
                                   account=self.account.name,
                                   domainid=self.account.domainid,
                                   username=self.services["vpn"]["vpn_user"],
@@ -455,7 +455,7 @@ class TestVpcVpn(cloudstackTestCase):
         # TODO: Add an actual remote vpn connection test from a remote vpc
 
         # 9) Disable VPN for VPC
-        vpn.delete(self.apiclient)
+        vpn.delete(self.api_client)
 
         self.logger.debug("Deleted the Remote Access VPN: OK")
 
@@ -469,7 +469,7 @@ class TestVpcVpn(cloudstackTestCase):
     def test_03_redundant_vpc_site2site_vpn(self):
         """Test Site 2 Site VPN Across redundant VPCs"""
         # Set up 1 VPNs; needs 2 VPCs
-        self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.apiclient), 2)
+        self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.api_client), 2)
 
     @attr(tags=['advanced'])
     def test_04_vpc_site2site_multiple_vpn(self):

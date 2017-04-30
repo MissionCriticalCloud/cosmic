@@ -29,14 +29,14 @@ class TestLoadBalance(cloudstackTestCase):
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
         testClient = super(TestLoadBalance, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
+        cls.api_client = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
+        cls.zone = get_zone(cls.api_client, testClient.getZoneForTests())
         cls.template = get_template(
-            cls.apiclient,
+            cls.api_client,
             cls.zone.id
         )
         if cls.template == FAILED:
@@ -46,15 +46,15 @@ class TestLoadBalance(cloudstackTestCase):
 
         # Create an account, network, VM and IP addresses
         cls.account = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id
         )
-        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
         cls.vm_1 = VirtualMachine.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["virtual_machine"],
             templateid=cls.template.id,
             accountid=cls.account.name,
@@ -62,7 +62,7 @@ class TestLoadBalance(cloudstackTestCase):
             serviceofferingid=cls.service_offering.id
         )
         cls.vm_2 = VirtualMachine.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["virtual_machine"],
             templateid=cls.template.id,
             accountid=cls.account.name,
@@ -70,7 +70,7 @@ class TestLoadBalance(cloudstackTestCase):
             serviceofferingid=cls.service_offering.id
         )
         cls.vm_3 = VirtualMachine.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["virtual_machine"],
             templateid=cls.template.id,
             accountid=cls.account.name,
@@ -78,7 +78,7 @@ class TestLoadBalance(cloudstackTestCase):
             serviceofferingid=cls.service_offering.id
         )
         cls.non_src_nat_ip = PublicIPAddress.create(
-            cls.apiclient,
+            cls.api_client,
             cls.account.name,
             cls.zone.id,
             cls.account.domainid,
@@ -86,7 +86,7 @@ class TestLoadBalance(cloudstackTestCase):
         )
         # Open up firewall port for SSH
         cls.fw_rule = FireWallRule.create(
-            cls.apiclient,
+            cls.api_client,
             ipaddressid=cls.non_src_nat_ip.ipaddress.id,
             protocol=cls.services["lbrule"]["protocol"],
             cidrlist=['0.0.0.0/0'],
@@ -98,17 +98,17 @@ class TestLoadBalance(cloudstackTestCase):
         ]
 
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.cleanup = []
         return
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
         return
 
     @classmethod
     def tearDownClass(cls):
-        cleanup_resources(cls.apiclient, cls._cleanup)
+        cleanup_resources(cls.api_client, cls._cleanup)
         return
 
     def try_ssh(self, ip_addr, unameCmd):
@@ -145,7 +145,7 @@ class TestLoadBalance(cloudstackTestCase):
         # 3. verify using the UNAME of the VM
         #   that round robin is indeed happening as expected
         src_nat_ip_addrs = PublicIPAddress.list(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -158,7 +158,7 @@ class TestLoadBalance(cloudstackTestCase):
 
         # Check if VM is in Running state before creating LB rule
         vm_response = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -183,15 +183,15 @@ class TestLoadBalance(cloudstackTestCase):
 
         # Create Load Balancer rule and assign VMs to rule
         lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             src_nat_ip_addr.id,
             accountid=self.account.name
         )
         self.cleanup.append(lb_rule)
-        lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
+        lb_rule.assign(self.api_client, [self.vm_1, self.vm_2])
         lb_rules = list_lb_rules(
-            self.apiclient,
+            self.api_client,
             id=lb_rule.id
         )
         self.assertEqual(
@@ -214,7 +214,7 @@ class TestLoadBalance(cloudstackTestCase):
         # listLoadBalancerRuleInstances should list all
         # instances associated with that LB rule
         lb_instance_rules = list_lb_instances(
-            self.apiclient,
+            self.api_client,
             id=lb_rule.id
         )
         self.assertEqual(
@@ -265,7 +265,7 @@ class TestLoadBalance(cloudstackTestCase):
         )
 
         # SSH should pass till there is a last VM associated with LB rule
-        lb_rule.remove(self.apiclient, [self.vm_2])
+        lb_rule.remove(self.api_client, [self.vm_2])
 
         # making unameResultss list empty
         unameResults[:] = []
@@ -287,7 +287,7 @@ class TestLoadBalance(cloudstackTestCase):
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, src_nat_ip_addr.ipaddress))
 
-        lb_rule.remove(self.apiclient, [self.vm_1])
+        lb_rule.remove(self.api_client, [self.vm_1])
 
         with self.assertRaises(Exception):
             self.logger.debug("Removed all VMs, trying to SSH")
@@ -306,15 +306,15 @@ class TestLoadBalance(cloudstackTestCase):
 
         # Create Load Balancer rule and assign VMs to rule
         lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             self.non_src_nat_ip.ipaddress.id,
             accountid=self.account.name
         )
         self.cleanup.append(lb_rule)
-        lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
+        lb_rule.assign(self.api_client, [self.vm_1, self.vm_2])
         lb_rules = list_lb_rules(
-            self.apiclient,
+            self.api_client,
             id=lb_rule.id
         )
         self.assertEqual(
@@ -336,7 +336,7 @@ class TestLoadBalance(cloudstackTestCase):
         # listLoadBalancerRuleInstances should list
         # all instances associated with that LB rule
         lb_instance_rules = list_lb_instances(
-            self.apiclient,
+            self.api_client,
             id=lb_rule.id
         )
         self.assertEqual(
@@ -382,7 +382,7 @@ class TestLoadBalance(cloudstackTestCase):
             )
 
             # SSH should pass till there is a last VM associated with LB rule
-            lb_rule.remove(self.apiclient, [self.vm_2])
+            lb_rule.remove(self.api_client, [self.vm_2])
             self.logger.debug("SSHing into IP address: %s after removing VM (ID: %s) from LB rule" %
                        (
                            self.non_src_nat_ip.ipaddress.ipaddress,
@@ -402,7 +402,7 @@ class TestLoadBalance(cloudstackTestCase):
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, self.non_src_nat_ip.ipaddress.ipaddress))
 
-        lb_rule.remove(self.apiclient, [self.vm_1])
+        lb_rule.remove(self.api_client, [self.vm_1])
         with self.assertRaises(Exception):
             self.logger.debug("SSHing into IP address: %s after removing VM (ID: %s) from LB rule" %
                        (
@@ -426,7 +426,7 @@ class TestLoadBalance(cloudstackTestCase):
 
         # Check if VM is in Running state before creating LB rule
         vm_response = VirtualMachine.list(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -450,12 +450,12 @@ class TestLoadBalance(cloudstackTestCase):
             )
 
         lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             self.non_src_nat_ip.ipaddress.id,
             self.account.name
         )
-        lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
+        lb_rule.assign(self.api_client, [self.vm_1, self.vm_2])
 
         unameResults = []
         self.try_ssh(self.non_src_nat_ip.ipaddress.ipaddress, unameResults)
@@ -476,7 +476,7 @@ class TestLoadBalance(cloudstackTestCase):
             "Check if ssh succeeded for server2"
         )
         # Removing VM and assigning another VM to LB rule
-        lb_rule.remove(self.apiclient, [self.vm_2])
+        lb_rule.remove(self.api_client, [self.vm_2])
 
         # making unameResults list empty
         unameResults[:] = []
@@ -498,7 +498,7 @@ class TestLoadBalance(cloudstackTestCase):
             self.fail("SSH failed for VM with IP: %s" %
                       self.non_src_nat_ip.ipaddress.ipaddress)
 
-        lb_rule.assign(self.apiclient, [self.vm_3])
+        lb_rule.assign(self.api_client, [self.vm_3])
 
         # Making unameResults list empty
         unameResults[:] = []

@@ -20,47 +20,47 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestPublicIP(cloudstackTestCase):
     def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
 
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         testClient = super(TestPublicIP, cls).getClsTestClient()
-        cls.apiclient = testClient.getApiClient()
+        cls.api_client = testClient.getApiClient()
         cls.services = testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
+        cls.zone = get_zone(cls.api_client, testClient.getZoneForTests())
         cls.services['mode'] = cls.zone.networktype
         # Create Accounts & networks
         cls.account = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id
         )
 
         cls.user = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             domainid=cls.domain.id
         )
         cls.services["network"]["zoneid"] = cls.zone.id
 
-        cls.network_offering = get_default_guest_network_offering(cls.apiclient)
+        cls.network_offering = get_default_guest_network_offering(cls.api_client)
 
         cls.services["network"]["networkoffering"] = cls.network_offering.id
 
         cls.account_network = Network.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["network"],
             cls.account.name,
             cls.account.domainid
         )
         cls.user_network = Network.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["network"],
             cls.user.name,
             cls.user.domainid
@@ -68,13 +68,13 @@ class TestPublicIP(cloudstackTestCase):
 
         # Create Source NAT IP addresses
         PublicIPAddress.create(
-            cls.apiclient,
+            cls.api_client,
             cls.account.name,
             cls.zone.id,
             cls.account.domainid
         )
         PublicIPAddress.create(
-            cls.apiclient,
+            cls.api_client,
             cls.user.name,
             cls.zone.id,
             cls.user.domainid
@@ -91,7 +91,7 @@ class TestPublicIP(cloudstackTestCase):
     def tearDownClass(cls):
         try:
             # Cleanup resources used
-            cleanup_resources(cls.apiclient, cls._cleanup)
+            cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
@@ -105,13 +105,13 @@ class TestPublicIP(cloudstackTestCase):
         # 2. the returned list should contain our acquired IP address
 
         ip_address = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             self.account.name,
             self.zone.id,
             self.account.domainid
         )
         list_pub_ip_addr_resp = list_public_ip(
-            self.apiclient,
+            self.api_client,
             id=ip_address.ipaddress.id
         )
         self.assertEqual(
@@ -131,13 +131,13 @@ class TestPublicIP(cloudstackTestCase):
             "Check Correct IP Address is returned in the List Cacls"
         )
 
-        ip_address.delete(self.apiclient)
+        ip_address.delete(self.api_client)
         time.sleep(30)
 
         # Validate the following:
         # 1.listPublicIpAddresses should no more return the released address
         list_pub_ip_addr_resp = list_public_ip(
-            self.apiclient,
+            self.api_client,
             id=ip_address.ipaddress.id
         )
         if list_pub_ip_addr_resp is None:
@@ -159,7 +159,7 @@ class TestPublicIP(cloudstackTestCase):
         # 2. the returned list should contain our acquired IP address
 
         ip_address = PublicIPAddress.create(
-            self.apiclient,
+            self.api_client,
             self.user.name,
             self.zone.id,
             self.user.domainid
@@ -167,7 +167,7 @@ class TestPublicIP(cloudstackTestCase):
 
         # listPublicIpAddresses should return newly created public IP
         list_pub_ip_addr_resp = list_public_ip(
-            self.apiclient,
+            self.api_client,
             id=ip_address.ipaddress.id
         )
         self.assertEqual(
@@ -186,10 +186,10 @@ class TestPublicIP(cloudstackTestCase):
             "Check Correct IP Address is returned in the List Call"
         )
 
-        ip_address.delete(self.apiclient)
+        ip_address.delete(self.api_client)
 
         list_pub_ip_addr_resp = list_public_ip(
-            self.apiclient,
+            self.api_client,
             id=ip_address.ipaddress.id
         )
 

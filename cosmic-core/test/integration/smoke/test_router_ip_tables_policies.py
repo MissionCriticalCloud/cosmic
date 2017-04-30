@@ -88,28 +88,28 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
         socket.setdefaulttimeout(60)
 
         cls.testClient = super(TestRouterIpTablesPolicies, cls).getClsTestClient()
-        cls.apiclient = cls.testClient.getApiClient()
+        cls.api_client = cls.testClient.getApiClient()
 
         cls.services = Services().services
         # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
+        cls.domain = get_domain(cls.api_client)
+        cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
         cls.template = get_template(
-            cls.apiclient,
+            cls.api_client,
             cls.zone.id
         )
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
         cls.account = Account.create(
-            cls.apiclient,
+            cls.api_client,
             cls.services["account"],
             admin=True,
             domainid=cls.domain.id)
 
-        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
-        cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
+        cls.entity_manager = EntityManager(cls.api_client, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
 
         cls._cleanup = [cls.account]
         return
@@ -117,7 +117,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
     @classmethod
     def tearDownClass(cls):
         try:
-            cleanup_resources(cls.apiclient, cls._cleanup)
+            cleanup_resources(cls.api_client, cls._cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
@@ -129,7 +129,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            cleanup_resources(self.apiclient, self.cleanup)
+            cleanup_resources(self.api_client, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
@@ -151,7 +151,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
         for router in routers:
             if not router.isredundantrouter and not router.vpcid:
                 hosts = list_hosts(
-                    self.apiclient,
+                    self.api_client,
                     id=router.hostid)
                 self.assertEqual(
                     isinstance(hosts, list),
@@ -189,8 +189,8 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
 
 
 class EntityManager(object):
-    def __init__(self, apiclient, services, service_offering, account, zone, logger):
-        self.apiclient = apiclient
+    def __init__(self, api_client, services, service_offering, account, zone, logger):
+        self.api_client = api_client
         self.services = services
         self.service_offering = service_offering
         self.account = account
@@ -209,7 +209,7 @@ class EntityManager(object):
         try:
             self.logger.debug('Creating VM')
             vm = VirtualMachine.create(
-                self.apiclient,
+                self.api_client,
                 self.services["virtual_machine"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
@@ -222,7 +222,7 @@ class EntityManager(object):
             raise Exception('Unable to create VM')
 
     def query_routers(self):
-        self.routers = list_routers(self.apiclient,
+        self.routers = list_routers(self.api_client,
                                     account=self.account.name,
                                     domainid=self.account.domainid)
 
@@ -232,5 +232,5 @@ class EntityManager(object):
         self.logger.debug('Stopping router')
         cmd = stopRouter.stopRouterCmd()
         cmd.id = router.id
-        self.apiclient.stopRouter(cmd)
+        self.api_client.stopRouter(cmd)
 

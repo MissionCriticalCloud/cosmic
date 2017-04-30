@@ -29,28 +29,28 @@ class TestDeleteAccount(cloudstackTestCase):
     def setUp(self):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
-        self.apiclient = self.testClient.getApiClient()
+        self.api_client = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
-        self.domain = get_domain(self.apiclient)
-        self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
+        self.domain = get_domain(self.api_client)
+        self.zone = get_zone(self.api_client, self.testClient.getZoneForTests())
         template = get_template(
-            self.apiclient,
+            self.api_client,
             self.zone.id
         )
         self.services["virtual_machine"]["zoneid"] = self.zone.id
 
         # Create an account, network, VM and IP addresses
         self.account = Account.create(
-            self.apiclient,
+            self.api_client,
             self.services["account"],
             admin=True,
             domainid=self.domain.id
         )
-        self.service_offering = get_default_virtual_machine_offering(self.apiclient)
+        self.service_offering = get_default_virtual_machine_offering(self.api_client)
         self.vm_1 = VirtualMachine.create(
-            self.apiclient,
+            self.api_client,
             self.services["virtual_machine"],
             templateid=template.id,
             accountid=self.account.name,
@@ -59,7 +59,7 @@ class TestDeleteAccount(cloudstackTestCase):
         )
 
         src_nat_ip_addrs = list_public_ip(
-            self.apiclient,
+            self.api_client,
             account=self.account.name,
             domainid=self.account.domainid
         )
@@ -71,15 +71,15 @@ class TestDeleteAccount(cloudstackTestCase):
                       (src_nat_ip_addr.ipaddress, e))
 
         self.lb_rule = LoadBalancerRule.create(
-            self.apiclient,
+            self.api_client,
             self.services["lbrule"],
             src_nat_ip_addr.id,
             self.account.name
         )
-        self.lb_rule.assign(self.apiclient, [self.vm_1])
+        self.lb_rule.assign(self.api_client, [self.vm_1])
 
         self.nat_rule = NATRule.create(
-            self.apiclient,
+            self.api_client,
             self.vm_1,
             self.services["natrule"],
             src_nat_ip_addr.id
@@ -98,9 +98,9 @@ class TestDeleteAccount(cloudstackTestCase):
         #    API does not return any rules for the account
         # 3. The domR should have been expunged for this account
 
-        self.account.delete(self.apiclient)
+        self.account.delete(self.api_client)
         interval = list_configurations(
-            self.apiclient,
+            self.api_client,
             name='account.cleanup.interval'
         )
         self.assertEqual(
@@ -116,7 +116,7 @@ class TestDeleteAccount(cloudstackTestCase):
         # Unable to find account testuser1 in domain 1 : Exception
         try:
             list_lb_rules(
-                self.apiclient,
+                self.api_client,
                 account=self.account.name,
                 domainid=self.account.domainid
             )
@@ -127,7 +127,7 @@ class TestDeleteAccount(cloudstackTestCase):
         # list associated rules with deleted account
         try:
             list_nat_rules(
-                self.apiclient,
+                self.api_client,
                 account=self.account.name,
                 domainid=self.account.domainid
             )
@@ -137,7 +137,7 @@ class TestDeleteAccount(cloudstackTestCase):
         # Retrieve router for the user account
         try:
             routers = list_routers(
-                self.apiclient,
+                self.api_client,
                 account=self.account.name,
                 domainid=self.account.domainid
             )
@@ -156,5 +156,5 @@ class TestDeleteAccount(cloudstackTestCase):
         return
 
     def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
+        cleanup_resources(self.api_client, self.cleanup)
         return
