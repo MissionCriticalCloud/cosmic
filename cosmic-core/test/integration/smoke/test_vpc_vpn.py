@@ -41,7 +41,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         test_client = super(TestVpcVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()
-        cls.services = Services().services
+        cls.services = test_client.getParsedTestDataConfig().copy()
 
         cls.zone = get_zone(cls.apiclient, test_client.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
@@ -405,74 +405,3 @@ class TestVpcVpn(cloudstackTestCase):
             self.fail("Failed to setup ssh connection to %s" % vm_list[0].public_ip)
 
         return
-
-
-class Services:
-    """Test VPC VPN Services.
-    """
-
-    def __init__(self):
-        self.services = {
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": "10.100.0.0/16"
-            },
-            "network_1": {
-                "name": "Test Network 1",
-                "displaytext": "Test Network 1",
-                "netmask": "255.255.255.0",
-                "gateway": "10.100.1.1"
-            },
-            "vpcN": {
-                "name": "TestVPC{N}",
-                "displaytext": "VPC{N}",
-                "cidr": "10.{N}.0.0/16"
-            },
-            "network_N": {
-                "name": "Test Network {N}",
-                "displaytext": "Test Network {N}",
-                "netmask": "255.255.255.0",
-                "gateway": "10.{N}.1.1"
-            },
-            "vpn": {
-                "vpn_user": "root",
-                "vpn_pass": "Md1s#dc",
-                "vpn_pass_fail": "abc!123",  # too short
-                "iprange": "10.2.2.1-10.2.2.10",
-                "fordisplay": "true"
-            },
-            "vpncustomergateway": {
-                "esppolicy": "3des-md5;modp1536",
-                "ikepolicy": "3des-md5;modp1536",
-                "ipsecpsk": "ipsecpsk"
-            },
-            "natrule": {
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "http_rule": {
-                "privateport": 80,
-                "publicport": 80,
-                "startport": 80,
-                "endport": 80,
-                "cidrlist": '0.0.0.0/0',
-                "protocol": "TCP"
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            }
-        }

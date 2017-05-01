@@ -40,7 +40,7 @@ class TestRouterRules(cloudstackTestCase):
 
         testClient = super(TestRouterRules, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
-        cls.services = testClient.getParsedTestDataConfig()
+        cls.services = testClient.getParsedTestDataConfig().copy()
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())

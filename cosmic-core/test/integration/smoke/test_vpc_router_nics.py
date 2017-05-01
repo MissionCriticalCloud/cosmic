@@ -44,7 +44,8 @@ class TestVPCNics(cloudstackTestCase):
         cls.testClient = super(TestVPCNics, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
 
-        cls.services = Services().services
+        cls.services = cls.testClient.getParsedTestDataConfig().copy()
+
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
@@ -246,7 +247,7 @@ class TestVPCNics(cloudstackTestCase):
     def create_natrule(self, vm, public_ip, network, services=None):
         self.logger.debug("Creating NAT rule in network for vm with public IP")
         if not services:
-            services = self.services["natrule"]
+            services = self.services["natrule_ssh"]
         nat_rule = NATRule.create(
             self.apiclient,
             vm,
@@ -323,85 +324,6 @@ class TestVPCNics(cloudstackTestCase):
                     self.fail("SSH Access failed for %s: %s" % (vmObj.get_ip(), e))
 
                 self.assertEqual(result.count("3 packets received"), 1, "Ping gateway from VM should be successful")
-
-
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.0.0.1/24'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "lbrule": {
-                "name": "SSH",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 22,
-                "publicport": 2222,
-                "openfirewall": False,
-                "startport": 22,
-                "endport": 2222,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "lbrule_http": {
-                "name": "HTTP",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 80,
-                "publicport": 8888,
-                "openfirewall": False,
-                "startport": 80,
-                "endport": 8888,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "http_rule": {
-                "privateport": 80,
-                "publicport": 80,
-                "startport": 80,
-                "endport": 80,
-                "cidrlist": '0.0.0.0/0',
-                "protocol": "TCP"
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
 
 
 class networkO(object):

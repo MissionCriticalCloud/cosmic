@@ -44,7 +44,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         cls.testClient = super(TestRedundantIsolatedNetworks, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
 
-        cls.services = cls.testClient.getParsedTestDataConfig()
+        cls.services = cls.testClient.getParsedTestDataConfig().copy()
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())
@@ -200,17 +200,17 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         FireWallRule.create(
             self.apiclient,
             ipaddressid=public_ip.id,
-            protocol=self.services["natrule"]["protocol"],
+            protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
-            startport=self.services["natrule"]["publicport"],
-            endport=self.services["natrule"]["publicport"]
+            startport=self.services["natrule_ssh"]["publicport"],
+            endport=self.services["natrule_ssh"]["publicport"]
         )
 
         self.logger.debug("Creating NAT rule for VM ID: %s" % virtual_machine.id)
         nat_rule = NATRule.create(
             self.apiclient,
             virtual_machine,
-            self.services["natrule"],
+            self.services["natrule_ssh"],
             public_ip.id
         )
 
@@ -356,17 +356,17 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
         FireWallRule.create(
             self.apiclient,
             ipaddressid=public_ip.id,
-            protocol=self.services["natrule"]["protocol"],
+            protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
-            startport=self.services["natrule"]["publicport"],
-            endport=self.services["natrule"]["publicport"]
+            startport=self.services["natrule_ssh"]["publicport"],
+            endport=self.services["natrule_ssh"]["publicport"]
         )
 
         self.logger.debug("Creating NAT rule for VM ID: %s" % virtual_machine.id)
         nat_rule = NATRule.create(
             self.apiclient,
             virtual_machine,
-            self.services["natrule"],
+            self.services["natrule_ssh"],
             public_ip.id
         )
 

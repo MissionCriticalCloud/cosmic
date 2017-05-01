@@ -32,7 +32,7 @@ class TestRebootRouter(cloudstackTestCase):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         self.apiclient = self.testClient.getApiClient()
-        self.services = self.testClient.getParsedTestDataConfig()
+        self.services = self.testClient.getParsedTestDataConfig().copy()
 
         # Get Zone, Domain and templates
         self.domain = get_domain(self.apiclient)
@@ -103,7 +103,7 @@ class TestRebootRouter(cloudstackTestCase):
         self.nat_rule = NATRule.create(
             self.apiclient,
             self.vm_1,
-            self.services["natrule"],
+            self.services["natrule_ssh"],
             ipaddressid=self.public_ip.ipaddress.id
         )
         self.cleanup = [self.nat_rule,
@@ -129,7 +129,7 @@ class TestRebootRouter(cloudstackTestCase):
 
             SshClient(
                 self.public_ip.ipaddress.ipaddress,
-                self.services["natrule"]["publicport"],
+                self.services["natrule_ssh"]["publicport"],
                 self.vm_1.username,
                 self.vm_1.password,
                 retries=20
@@ -198,7 +198,7 @@ class TestRebootRouter(cloudstackTestCase):
 
             SshClient(
                 self.public_ip.ipaddress.ipaddress,
-                self.services["natrule"]["publicport"],
+                self.services["natrule_ssh"]["publicport"],
                 self.vm_1.username,
                 self.vm_1.password,
                 retries=20

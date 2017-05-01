@@ -29,7 +29,7 @@ class TestSSVMs(cloudstackTestCase):
         self.apiclient = self.testClient.getApiClient()
         self.hypervisor = self.testClient.getHypervisorInfo()
         self.cleanup = []
-        self.services = self.testClient.getParsedTestDataConfig()
+        self.services = self.testClient.getParsedTestDataConfig().copy()
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
 
         self.services["sleep"] = 2

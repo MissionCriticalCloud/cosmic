@@ -25,96 +25,13 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestIpExclusionList(cloudstackTestCase):
 
-    attributes = {
-        'account': {
-            'email': 'e.cartman@southpark.com',
-            'firstname': 'Eric',
-            'lastname': 'Cartman',
-            'username': 'e.cartman',
-            'password': 'southpark'
-        },
-        'vpcs': {
-            'vpc1': {
-                'name': 'vpc1',
-                'displaytext': 'vpc1',
-                'cidr': '10.1.0.0/16'
-            }
-        },
-        'networks': {
-            'network1': {
-                'name': 'network1',
-                'displaytext': 'network1',
-                'gateway': '10.1.1.1',
-                'netmask': '255.255.255.0'
-            },
-            'network2': {
-                'name': 'network2',
-                'displaytext': 'network2',
-                'gateway': '10.1.2.1',
-                'netmask': '255.255.255.248'
-            }
-        },
-        'vms': {
-            'vm1': {
-                'name': 'vm1',
-                'displayname': 'vm1'
-            },
-            'vm2': {
-                'name': 'vm2',
-                'displayname': 'vm2',
-                'privateport': 22,
-                'publicport': 22,
-                'protocol': 'TCP'
-            },
-            'vm3': {
-                'name': 'vm3',
-                'displayname': 'vm3',
-                'privateport': 22,
-                'publicport': 22,
-                'protocol': 'TCP'
-            }
-        },
-        'nat_rule': {
-            'protocol': 'TCP',
-            'publicport': 22,
-            'privateport': 22
-        },
-        'acls': {
-            'acl1': {
-                'name': 'acl1',
-                'description': 'acl1',
-                'entries': {
-                    'entry1': {
-                        'protocol': 'TCP',
-                        'action': 'Allow',
-                        'traffictype': 'Ingress',
-                        'startport': 22,
-                        'endport': 22
-                    }
-                }
-            },
-            'acl2': {
-                'name': 'acl2',
-                'description': 'acl2',
-                'entries': {
-                    'entry2': {
-                        'protocol': 'TCP',
-                        'action': 'Deny',
-                        'traffictype': 'Ingress',
-                        'startport': 22,
-                        'endport': 22
-                    }
-                }
-            }
-        }
-    }
-
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestIpExclusionList, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
+        cls.test_data = cls.test_client.getParsedTestDataConfig().copy()
 
         cls.class_cleanup = []
 
@@ -183,7 +100,7 @@ class TestIpExclusionList(cloudstackTestCase):
 
         cls.account = Account.create(
             cls.api_client,
-            cls.attributes['account'],
+            cls.test_data['account'],
             admin=True,
             domainid=cls.domain.id)
 
@@ -206,7 +123,7 @@ class TestIpExclusionList(cloudstackTestCase):
         cls.logger.debug("ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
-            cls.attributes['vpcs']['vpc1'],
+            cls.test_data['vpcs']['vpc1'],
             vpcofferingid=cls.vpc_offering.id,
             zoneid=cls.zone.id,
             domainid=cls.domain.id,
@@ -214,7 +131,7 @@ class TestIpExclusionList(cloudstackTestCase):
         cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
 
         cls.network1 = Network.create(cls.api_client,
-            cls.attributes['networks']['network1'],
+            cls.test_data['networks']['network1'],
             networkofferingid=cls.network_offering.id,
             aclid=cls.default_allow_acl.id,
             vpcid=cls.vpc1.id,
@@ -224,7 +141,7 @@ class TestIpExclusionList(cloudstackTestCase):
         cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
 
         cls.vm1 = VirtualMachine.create(cls.api_client,
-            cls.attributes['vms']['vm1'],
+            cls.test_data['vms']['vm1'],
             templateid=cls.template.id,
             serviceofferingid=cls.virtual_machine_offering.id,
             networkids=[cls.network1.id],
@@ -243,7 +160,7 @@ class TestIpExclusionList(cloudstackTestCase):
 
         cls.nat_rule1 = NATRule.create(cls.api_client,
             cls.vm1,
-            cls.attributes['nat_rule'],
+            cls.test_data['nat_rule'],
             vpcid=cls.vpc1.id,
             networkid=cls.network1.id,
             ipaddressid=cls.public_ip1.ipaddress.id)
@@ -255,7 +172,7 @@ class TestIpExclusionList(cloudstackTestCase):
 
     def setup_new_network(self):
         self.network2 = Network.create(self.api_client,
-                                       self.attributes['networks']['network2'],
+                                       self.test_data['networks']['network2'],
                                        networkofferingid=self.network_offering.id,
                                        aclid=self.default_allow_acl.id,
                                        vpcid=self.vpc1.id,
@@ -272,7 +189,7 @@ class TestIpExclusionList(cloudstackTestCase):
 
         try:
             new_vm = VirtualMachine.create(self.api_client,
-                                           self.attributes['vms'][vm_name],
+                                           self.test_data['vms'][vm_name],
                                            templateid=self.template.id,
                                            serviceofferingid=self.virtual_machine_offering.id,
                                            networkids=[self.network2.id],

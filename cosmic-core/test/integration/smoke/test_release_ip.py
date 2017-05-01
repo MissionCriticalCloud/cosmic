@@ -29,7 +29,7 @@ class TestReleaseIP(cloudstackTestCase):
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         self.apiclient = self.testClient.getApiClient()
-        self.services = self.testClient.getParsedTestDataConfig()
+        self.services = self.testClient.getParsedTestDataConfig().copy()
 
         # Get Zone, Domain and templates
         self.domain = get_domain(self.apiclient)

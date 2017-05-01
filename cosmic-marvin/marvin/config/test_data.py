@@ -10,14 +10,13 @@ test_data = {
     "vdomain": {
         "name": "domain"
     },
-    "domain": {"name": "domain"},
+    "domain": { "name": "domain" },
     "email": "test@test.com",
     "gateway": "172.1.1.1",
     "netmask": "255.255.255.0",
     "startip": "172.1.1.10",
     "endip": "172.1.1.20",
     "regionid": "1",
-    "vlan": "10",
     "isportable": "true",
 
     "project": {
@@ -62,7 +61,7 @@ test_data = {
         "hypervisor": "XenServer",
         "privateport": 22,
         "publicport": 22,
-        "protocol": 'TCP',
+        "protocol": "TCP",
     },
     "service_offering": {
         "name": "Tiny Instance",
@@ -146,25 +145,20 @@ test_data = {
         "displaytext": "Disk offering",
         "disksize": 1
     },
-    'resized_disk_offering': {
+    "resized_disk_offering": {
         "displaytext": "Resized",
         "name": "Resized",
         "disksize": 3
     },
-    'disk_offering_shared_5GB': {
+    "disk_offering_shared_5GB": {
         "displaytext": "disk_offering_shared_5GB",
         "name": "disk_offering_shared_5GB",
         "disksize": 5
     },
-    'disk_offering_shared_15GB': {
+    "disk_offering_shared_15GB": {
         "displaytext": "disk_offering_shared_5GB",
         "name": "disk_offering_shared_5GB",
         "disksize": 15
-    },
-    "network": {
-        "name": "Test Network",
-        "displaytext": "Test Network",
-        "acltype": "Account",
     },
     "network2": {
         "name": "Test Network Shared",
@@ -177,47 +171,47 @@ test_data = {
         "acltype": "Account",
     },
     "network_offering": {
-        "name": 'Test Network offering',
-        "displaytext": 'Test Network offering',
-        "guestiptype": 'Isolated',
-        "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding',
-        "traffictype": 'GUEST',
-        "availability": 'Optional',
+        "name": "Test Network offering",
+        "displaytext": "Test Network offering",
+        "guestiptype": "Isolated",
+        "supportedservices": "Dhcp,Dns,SourceNat,PortForwarding",
+        "traffictype": "GUEST",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "SourceNat": 'VirtualRouter',
-            "PortForwarding": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "SourceNat": "VirtualRouter",
+            "PortForwarding": "VirtualRouter",
         },
     },
     "nw_off_isolated_persistent": {
-        "name": 'Test Nw off isolated persistent',
-        "displaytext": 'Test Nw off isolated persistent',
-        "guestiptype": 'Isolated',
-        "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding',
-        "traffictype": 'GUEST',
-        "ispersistent": 'True',
-        "availability": 'Optional',
+        "name": "Test Nw off isolated persistent",
+        "displaytext": "Test Nw off isolated persistent",
+        "guestiptype": "Isolated",
+        "supportedservices": "Dhcp,Dns,SourceNat,PortForwarding",
+        "traffictype": "GUEST",
+        "ispersistent": "True",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "SourceNat": 'VirtualRouter',
-            "PortForwarding": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "SourceNat": "VirtualRouter",
+            "PortForwarding": "VirtualRouter",
         },
     },
     "nw_off_isolated_persistent_lb": {
-        "name": 'Test Nw off isolated persistent',
-        "displaytext": 'Test Nw off isolated persistent',
-        "guestiptype": 'Isolated',
-        "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,Lb',
-        "traffictype": 'GUEST',
-        "ispersistent": 'True',
-        "availability": 'Optional',
+        "name": "Test Nw off isolated persistent",
+        "displaytext": "Test Nw off isolated persistent",
+        "guestiptype": "Isolated",
+        "supportedservices": "Dhcp,Dns,SourceNat,PortForwarding,Lb",
+        "traffictype": "GUEST",
+        "ispersistent": "True",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "SourceNat": 'VirtualRouter',
-            "PortForwarding": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "SourceNat": "VirtualRouter",
+            "PortForwarding": "VirtualRouter",
             "Lb": "VirtualRouter"
         },
     },
@@ -228,7 +222,7 @@ test_data = {
         "supportedservices":
             "Dhcp,Dns,SourceNat,PortForwarding,Vpn,Firewall,Lb,UserData,StaticNat",
         "traffictype": "GUEST",
-        "availability": "Optional'",
+        "availability": "Optional",
         "serviceProviderList": {
             "Dhcp": "VirtualRouter",
             "Dns": "VirtualRouter",
@@ -242,31 +236,31 @@ test_data = {
         }
     },
     "network_offering_vlan": {
-        "name": 'Test Network offering',
-        "displaytext": 'Test Network offering',
-        "guestiptype": 'Isolated',
-        "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding',
-        "traffictype": 'GUEST',
-        "specifyvlan": 'False',
-        "availability": 'Optional',
+        "name": "Test Network offering",
+        "displaytext": "Test Network offering",
+        "guestiptype": "Isolated",
+        "supportedservices": "Dhcp,Dns,SourceNat,PortForwarding",
+        "traffictype": "GUEST",
+        "specifyvlan": "False",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "SourceNat": 'VirtualRouter',
-            "PortForwarding": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "SourceNat": "VirtualRouter",
+            "PortForwarding": "VirtualRouter",
         },
     },
     "network_offering_without_sourcenat": {
-        "name": 'Test Network offering',
-        "displaytext": 'Test Network offering',
-        "guestiptype": 'Isolated',
-        "supportedservices": 'Dhcp,Dns,UserData',
-        "traffictype": 'GUEST',
-        "availability": 'Optional',
+        "name": "Test Network offering",
+        "displaytext": "Test Network offering",
+        "guestiptype": "Isolated",
+        "supportedservices": "Dhcp,Dns,UserData",
+        "traffictype": "GUEST",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "UserData": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "UserData": "VirtualRouter",
         },
     },
     "isolated_network": {
@@ -276,19 +270,6 @@ test_data = {
     "network_without_acl": {
         "name": "TestNetwork",
         "displaytext": "TestNetwork",
-    },
-    "virtual_machine": {
-        "displayname": "Test VM",
-        "username": "root",
-        "password": "password",
-        "ssh_port": 22,
-        "privateport": 22,
-        "publicport": 22,
-        "protocol": "TCP",
-        "affinity": {
-            "name": "webvms",
-            "type": "host anti-affinity",
-        }
     },
     "virtual_machine_userdata": {
         "displayname": "Test VM",
@@ -391,15 +372,10 @@ test_data = {
         "supportedservices":
             "Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat,NetworkACL"
     },
-    "vpc": {
-        "name": "TestVPC",
-        "displaytext": "TestVPC",
-        "cidr": "10.0.0.1/24"
-    },
     "vpc_network_domain": {
         "name": "TestVPC",
         "displaytext": "TestVPC",
-        "cidr": '10.0.0.1/24',
+        "cidr": "10.0.0.1/24",
         "network_domain": "TestVPC"
     },
     "clusters": {
@@ -416,32 +392,32 @@ test_data = {
     },
     "hosts": {
         "xenserver": {
-            "hypervisor": 'XenServer',
-            "clustertype": 'CloudManaged',
-            "url": 'http://192.168.100.211',
+            "hypervisor": "XenServer",
+            "clustertype": "CloudManaged",
+            "url": "http://192.168.100.211",
             "username": "root",
             "password": "fr3sca",
         },
         "kvm": {
-            "hypervisor": 'KVM',
-            "clustertype": 'CloudManaged',
-            "url": 'http://192.168.100.212',
+            "hypervisor": "KVM",
+            "clustertype": "CloudManaged",
+            "url": "http://192.168.100.212",
             "username": "root",
             "password": "fr3sca",
         }
     },
     "network_offering_shared": {
-        "name": 'Test Network offering shared',
-        "displaytext": 'Test Network offering Shared',
-        "guestiptype": 'Shared',
-        "supportedservices": 'Dhcp,Dns,UserData',
-        "traffictype": 'GUEST',
+        "name": "Test Network offering shared",
+        "displaytext": "Test Network offering Shared",
+        "guestiptype": "Shared",
+        "supportedservices": "Dhcp,Dns,UserData",
+        "traffictype": "GUEST",
         "specifyVlan": "True",
         "specifyIpRanges": "True",
         "serviceProviderList": {
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "UserData": 'VirtualRouter',
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "UserData": "VirtualRouter",
         },
     },
     "nw_off_isolated_RVR": {
@@ -474,24 +450,24 @@ test_data = {
         }
     },
     "nw_off_persistent_RVR": {
-        "name": 'Network offering-RVR services',
-        "displaytext": 'Network off-RVR services',
-        "guestiptype": 'Isolated',
+        "name": "Network offering-RVR services",
+        "displaytext": "Network off-RVR services",
+        "guestiptype": "Isolated",
         "supportedservices":
-            'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Firewall,Lb,UserData,StaticNat',
-        "traffictype": 'GUEST',
-        "ispersistent": 'True',
-        "availability": 'Optional',
+            "Vpn,Dhcp,Dns,SourceNat,PortForwarding,Firewall,Lb,UserData,StaticNat",
+        "traffictype": "GUEST",
+        "ispersistent": "True",
+        "availability": "Optional",
         "serviceProviderList": {
-            "Vpn": 'VirtualRouter',
-            "Dhcp": 'VirtualRouter',
-            "Dns": 'VirtualRouter',
-            "SourceNat": 'VirtualRouter',
-            "PortForwarding": 'VirtualRouter',
-            "Firewall": 'VirtualRouter',
-            "Lb": 'VirtualRouter',
-            "UserData": 'VirtualRouter',
-            "StaticNat": 'VirtualRouter',
+            "Vpn": "VirtualRouter",
+            "Dhcp": "VirtualRouter",
+            "Dns": "VirtualRouter",
+            "SourceNat": "VirtualRouter",
+            "PortForwarding": "VirtualRouter",
+            "Firewall": "VirtualRouter",
+            "Lb": "VirtualRouter",
+            "UserData": "VirtualRouter",
+            "StaticNat": "VirtualRouter",
         },
         "serviceCapabilityList": {
             "SourceNat": {
@@ -617,14 +593,9 @@ test_data = {
             "NetworkACL": "VpcVirtualRouter",
         },
         "serviceCapabilityList": {
-            "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
-            "Lb": {"lbSchemes": "internal", "SupportedLbIsolation": "dedicated"}
+            "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
+            "Lb": { "lbSchemes": "internal", "SupportedLbIsolation": "dedicated" }
         }
-    },
-    "natrule": {
-        "privateport": 22,
-        "publicport": 22,
-        "protocol": "TCP"
     },
     "egress_80": {
         "startport": 80,
@@ -632,19 +603,12 @@ test_data = {
         "protocol": "TCP",
         "cidrlist": ["0.0.0.0/0"]
     },
-    "lbrule": {
-        "name": "SSH",
-        "alg": "roundrobin",
-        "privateport": 22,
-        "publicport": 2222,
-        "protocol": 'TCP'
-    },
     "vpclbrule": {
         "name": "SSH",
         "alg": "roundrobin",
         "privateport": 22,
         "publicport": 22,
-        "protocol": 'TCP'
+        "protocol": "TCP"
     },
     "icmprule": {
         "icmptype": -1,
@@ -677,7 +641,7 @@ test_data = {
         "isfeatured": True,
         "ispublic": True,
         "ostype": "CentOS 5.6 (64-bit)",
-        "mode": 'HTTP_DOWNLOAD',
+        "mode": "HTTP_DOWNLOAD",
     },
     "isfeatured": True,
     "ispublic": True,
@@ -732,16 +696,16 @@ test_data = {
         "templatefilter": "self"
     },
     "volume_from_snapshot": {
-        "diskname": 'Volume from snapshot',
+        "diskname": "Volume from snapshot",
         "size": "1",
         "zoneid": ""
     },
-    "templatefilter": 'self',
+    "templatefilter": "self",
     "templates": {
-        "displaytext": 'Template',
-        "name": 'Template',
+        "displaytext": "Template",
+        "name": "Template",
         "ostype": "CentOS 5.3 (64-bit)",
-        "templatefilter": 'self',
+        "templatefilter": "self",
     },
     "win2012template": {
         "displaytext": "win2012",
@@ -766,7 +730,7 @@ test_data = {
         "url": "http://people.apache.org/~sanjeev/ttylinux_pv.vhd.bz2",
         "format": "VHD"
     },
-    "security_group": {"name": "custom_Sec_Grp"},
+    "security_group": { "name": "custom_Sec_Grp" },
     "ingress_rule": {
         "protocol": "TCP",
         "startport": "22",
@@ -774,19 +738,11 @@ test_data = {
         "cidrlist": "0.0.0.0/0"
     },
     "ingress_rule_ICMP": {
-        "name": 'ICMP',
-        "protocol": 'ICMP',
+        "name": "ICMP",
+        "protocol": "ICMP",
         "startport": -1,
         "endport": -1,
-        "cidrlist": '0.0.0.0/0',
-    },
-    "vpncustomergateway": {
-        "ipsecpsk": "secreatKey",
-        "ikepolicy": "aes128-sha1",
-        "ikelifetime": "86400",
-        "esppolicy": "aes128-sha1",
-        "epslifetime": "3600",
-        "dpd": "false"
+        "cidrlist": "0.0.0.0/0",
     },
     "vlan_ip_range": {
         "startip": "",
@@ -796,12 +752,10 @@ test_data = {
         "forvirtualnetwork": "false",
         "vlan": "untagged",
     },
-    "ostype": "CentOS 5.6 (64-bit)",
     "sleep": 90,
-    "timeout": 10,
     "page": 1,
     "pagesize": 2,
-    "listall": 'true',
+    "listall": "true",
     "advanced_sg": {
         "zone": {
             "name": "",
@@ -826,20 +780,20 @@ test_data = {
             "iscsi://192.168.100.21/iqn.2012-01.localdomain.clo-cstack-cos6:iser/1",
         "name": "Primary iSCSI"
     },
-    "volume": {"diskname": "Test Volume",
-               "size": 1
-               },
+    "volume": { "diskname": "Test Volume",
+                "size": 1
+                },
     "volume_write_path": {
         "diskname": "APP Data Volume",
         "size": 1,  # in GBs
-        "xenserver": {"rootdiskdevice": "/dev/xvda",
-                      "datadiskdevice_1": '/dev/xvdb',
-                      "datadiskdevice_2": '/dev/xvdc',  # Data Disk
-                      },
-        "kvm": {"rootdiskdevice": "/dev/vda",
-                "datadiskdevice_1": "/dev/vdb",
-                "datadiskdevice_2": "/dev/vdc"
-                }
+        "xenserver": { "rootdiskdevice": "/dev/xvda",
+                       "datadiskdevice_1": "/dev/xvdb",
+                       "datadiskdevice_2": "/dev/xvdc",  # Data Disk
+                       },
+        "kvm": { "rootdiskdevice": "/dev/vda",
+                 "datadiskdevice_1": "/dev/vdb",
+                 "datadiskdevice_2": "/dev/vdc"
+                 }
     },
     "data_write_paths": {
         "mount_dir": "/mnt/tmp",
@@ -858,20 +812,15 @@ test_data = {
         "schedule": 1
     },
     "volume_offerings": {
-        0: {"diskname": "TestDiskServ"},
+        0: { "diskname": "TestDiskServ" },
     },
-    "diskdevice": ['/dev/vdc', '/dev/vdb', '/dev/hdb', '/dev/hdc',
-                   '/dev/xvdd', '/dev/cdrom', '/dev/sr0', '/dev/cdrom1'],
+    "diskdevice": ["/dev/vdc", "/dev/vdb", "/dev/hdb", "/dev/hdc",
+                   "/dev/xvdd", "/dev/cdrom", "/dev/sr0", "/dev/cdrom1"],
 
     # test_vpc_vpn.py
     "vpn_user": {
         "username": "test",
         "password": "password",
-    },
-    "vpc": {
-        "name": "vpc_vpn",
-        "displaytext": "vpc-vpn",
-        "cidr": "10.1.1.0/24"
     },
     "ntwk": {
         "name": "tier1",
@@ -892,7 +841,7 @@ test_data = {
     },
     "privateport": 22,
     "publicport": 22,
-    "protocol": 'TCP',
+    "protocol": "TCP",
     "forvirtualnetwork": "true",
     "customdisksize": 1,
     "diskname": "Test Volume",
@@ -984,9 +933,9 @@ test_data = {
         },
         "hosts": {
             "nonvgpuxenserver": {
-                "hypervisor": 'XenServer',
-                "clustertype": 'CloudManaged',
-                "url": 'http://10.102.192.57',
+                "hypervisor": "XenServer",
+                "clustertype": "CloudManaged",
+                "url": "http://10.102.192.57",
                 "username": "root",
                 "password": "freebsd",
             },
@@ -1078,13 +1027,13 @@ test_data = {
                     }
 
             },
-        "diskdevice": ['/dev/vdc', '/dev/vdb', '/dev/hdb', '/dev/hdc', '/dev/xvdd', '/dev/cdrom', '/dev/sr0',
-                       '/dev/cdrom1'],
+        "diskdevice": ["/dev/vdc", "/dev/vdb", "/dev/hdb", "/dev/hdc", "/dev/xvdd", "/dev/cdrom", "/dev/sr0",
+                       "/dev/cdrom1"],
         # Disk device where ISO is attached to instance
         "mount_dir": "/mnt/tmp",
         "sleep": 180,
         "timeout": 60,
-        "ostype": 'Windows 8 (64-bit)',
+        "ostype": "Windows 8 (64-bit)",
         "nongpu_host_ip": "10.102.192.57"
     },
     "acl": {
@@ -1332,7 +1281,7 @@ test_data = {
         "host": {
             "publicport": 22,
             "username": "root",
-            "password": "password",
+            "password": "password"
         },
         "ldap_account": {
             "email": "",
@@ -1363,7 +1312,7 @@ test_data = {
                 "memory": 128,
             },
         },
-        "ostype": 'CentOS 5.6 (64-bit)',
+        "ostype": "CentOS 5.6 (64-bit)",
     },
     "test_34_DeployVM_in_SecondSGNetwork": {
         "zone": "advsg",
@@ -1406,7 +1355,7 @@ test_data = {
             "url": "http://people.apache.org/~sanjeev/rajani-thin-volume.qcow2",
             "checksum": "02de0576dd3a61ab59c03fd795fc86ac",
         },
-        'browser_resized_disk_offering': {
+        "browser_resized_disk_offering": {
             "displaytext": "Resizeddisk",
             "name": "Resizeddisk",
             "disksize": 3,
@@ -1447,6 +1396,7 @@ test_data = {
                 "publicport": 22,
                 "username": "root",
                 "password": "password",
+                "port": 22
             },
             "ldap_account": {
                 "email": "",
@@ -1480,10 +1430,216 @@ test_data = {
                     "bootable": True,
                     "ispublic": False,
                     "url": "http://people.apache.org/~sanjeev/CentOS-6.3-x86_64-bin-DVD1.iso",
-                    "ostype": 'CentOS 6.3 (64-bit)',
-                    "mode": 'HTTP_DOWNLOAD'
+                    "ostype": "CentOS 6.3 (64-bit)",
+                    "mode": "HTTP_DOWNLOAD"
                 },
             "setHostConfigurationForIngressRule": False,
-            "restartManagementServerThroughTestCase": False
+            "restartManagementServerThroughTestCase": False,
+            "input": "INPUT",
+            "forward": "FORWARD"
+        },
+    "networks": {
+        "network1": {
+            "name": "network1",
+            "displaytext": "network1",
+            "gateway": "10.1.1.1",
+            "netmask": "255.255.255.0"
+        },
+        "network2": {
+            "name": "network2",
+            "displaytext": "network2",
+            "gateway": "10.1.2.1",
+            "netmask": "255.255.255.248"
+        },
+        "network3": {
+            "name": "network3",
+            "displaytext": "network3",
+            "gateway": "10.2.1.1",
+            "netmask": "255.255.255.0"
+        },
+        "private_gateways_network": {
+            "name": "private_gateways_network",
+            "displaytext": "private_gateways_network",
+            "cidr": "172.16.1.0/24"
         }
+    },
+    "vms": {
+        "vm1": {
+            "name": "vm1",
+            "displayname": "vm1"
+        },
+        "vm2": {
+            "name": "vm2",
+            "displayname": "vm2",
+            "privateport": 22,
+            "publicport": 22,
+            "protocol": "TCP"
+        },
+        "vm3": {
+            "name": "vm3",
+            "displayname": "vm3",
+            "privateport": 22,
+            "publicport": 22,
+            "protocol": "TCP"
+        }
+    },
+    "nat_rule": {
+        "protocol": "TCP",
+        "publicport": 22,
+        "privateport": 22
+    },
+    "network_1": {
+        "name": "Test Network 1",
+        "displaytext": "Test Network 1",
+        "netmask": "255.255.255.0",
+        "gateway": "10.0.0.2"
+    },
+    "vpcN": {
+        "name": "TestVPC{N}",
+        "displaytext": "VPC{N}",
+        "cidr": "10.{N}.0.0/16"
+    },
+    "network_N": {
+        "name": "Test Network {N}",
+        "displaytext": "Test Network {N}",
+        "netmask": "255.255.255.0",
+        "gateway": "10.{N}.1.1"
+    },
+    "vpn": {
+        "vpn_user": "root",
+        "vpn_pass": "Md1s#dc",
+        "vpn_pass_fail": "abc!123",  # too short
+        "iprange": "10.2.2.1-10.2.2.10",
+        "fordisplay": "true"
+    },
+    "vpncustomergateway": {
+        "esppolicy": "3des-md5;modp1536",
+        "ikepolicy": "3des-md5;modp1536",
+        "ipsecpsk": "ipsecpsk"
+    },
+    "natrule": {
+        "privateport": 80,
+        "publicport": 80,
+        "startport": 80,
+        "endport": 80,
+        "protocol": "TCP",
+        "cidrlist": "0.0.0.0/0",
+    },
+    "http_rule": {
+        "privateport": 80,
+        "publicport": 80,
+        "startport": 80,
+        "endport": 80,
+        "cidrlist": "0.0.0.0/0",
+        "protocol": "TCP"
+    },
+    "natrule_ssh": {
+        "privateport": 22,
+        "publicport": 22,
+        "startport": 22,
+        "endport": 22,
+        "protocol": "TCP",
+        "cidrlist": "0.0.0.0/0",
+    },
+    "vpc": {
+        "name": "TestVPC",
+        "displaytext": "TestVPC",
+        "cidr": "10.0.0.1/24"
+    },
+    "network": {
+        "name": "Test Network",
+        "displaytext": "Test Network",
+        "netmask": "255.255.255.0"
+    },
+    "lbrule": {
+        "name": "SSH",
+        "alg": "leastconn",
+        # Algorithm used for load balancing
+        "privateport": 22,
+        "publicport": 2222,
+        "openfirewall": False,
+        "startport": 22,
+        "endport": 2222,
+        "protocol": "TCP",
+        "cidrlist": "0.0.0.0/0",
+    },
+    "lbrule_http": {
+        "name": "HTTP",
+        "alg": "leastconn",
+        # Algorithm used for load balancing
+        "privateport": 80,
+        "publicport": 8888,
+        "openfirewall": False,
+        "startport": 80,
+        "endport": 8888,
+        "protocol": "TCP",
+        "cidrlist": "0.0.0.0/0",
+    },
+
+    "virtual_machine": {
+        "displayname": "Test VM",
+        "username": "root",
+        "password": "password",
+        "ssh_port": 22,
+        "privateport": 22,
+        "publicport": 22,
+        "protocol": "TCP",
+    },
+    "ostype": "CentOS 5.3 (64-bit)",
+    "timeout": 10,
+    "acls": {
+        "acl1": {
+            "name": "acl1",
+            "description": "acl1",
+            "entries": {
+                "entry1": {
+                    "protocol": "TCP",
+                    "action": "Allow",
+                    "traffictype": "Ingress",
+                    "startport": 22,
+                    "endport": 22
+                }
+            }
+        },
+        "acl2": {
+            "name": "acl2",
+            "description": "acl2",
+            "entries": {
+                "entry2": {
+                    "protocol": "TCP",
+                    "action": "Deny",
+                    "traffictype": "Ingress",
+                    "startport": 22,
+                    "endport": 22
+                }
+            }
+        }
+    },
+    "vpcs": {
+        "vpc1": {
+            "name": "vpc1",
+            "displaytext": "vpc1",
+            "cidr": "10.1.0.0/16"
+        },
+        "vpc2": {
+            "name": "vpc2",
+            "displaytext": "vpc2",
+            "cidr": "10.2.0.0/16"
+        }
+    },
+    "private_gateways": {
+        "private_gateway1": "172.16.1.1",
+        "private_gateway2": "172.16.1.2"
+    },
+    "static_routes": {
+        "static_route1": {
+            "cidr": "10.2.0.0/16",
+            "nexthop": "172.16.1.2"
+        },
+        "static_route2": {
+            "cidr": "10.1.0.0/16",
+            "nexthop": "172.16.1.1"
+        }
+    }
+
 }

@@ -131,17 +131,17 @@ class TestPortForwarding(cloudstackTestCase):
         FireWallRule.create(
             self.apiclient,
             ipaddressid=src_nat_ip_addr.id,
-            protocol=self.services["natrule"]["protocol"],
+            protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
-            startport=self.services["natrule"]["publicport"],
-            endport=self.services["natrule"]["publicport"]
+            startport=self.services["natrule_ssh"]["publicport"],
+            endport=self.services["natrule_ssh"]["publicport"]
         )
 
         # Create NAT rule
         nat_rule = NATRule.create(
             self.apiclient,
             self.virtual_machine,
-            self.services["natrule"],
+            self.services["natrule_ssh"],
             src_nat_ip_addr.id
         )
 
@@ -258,16 +258,16 @@ class TestPortForwarding(cloudstackTestCase):
         FireWallRule.create(
             self.apiclient,
             ipaddressid=ip_address.ipaddress.id,
-            protocol=self.services["natrule"]["protocol"],
+            protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
-            startport=self.services["natrule"]["publicport"],
-            endport=self.services["natrule"]["publicport"]
+            startport=self.services["natrule_ssh"]["publicport"],
+            endport=self.services["natrule_ssh"]["publicport"]
         )
         # Create NAT rule
         nat_rule = NATRule.create(
             self.apiclient,
             self.virtual_machine,
-            self.services["natrule"],
+            self.services["natrule_ssh"],
             ip_address.ipaddress.id
         )
         # Validate the following:

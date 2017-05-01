@@ -40,107 +40,13 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestPrivateGateway(cloudstackTestCase):
 
-    attributes = {
-        'account': {
-            'email': 'e.cartman@southpark.com',
-            'firstname': 'Eric',
-            'lastname': 'Cartman',
-            'username': 'e.cartman',
-            'password': 'southpark'
-        },
-        'vpcs': {
-            'vpc1': {
-                'name': 'vpc1',
-                'displaytext': 'vpc1',
-                'cidr': '10.1.0.0/16'
-            },
-            'vpc2': {
-                'name': 'vpc2',
-                'displaytext': 'vpc2',
-                'cidr': '10.2.0.0/16'
-            }
-        },
-        'networks': {
-            'network1': {
-                'name': 'network1',
-                'displaytext': 'network1',
-                'gateway': '10.1.1.1',
-                'netmask': '255.255.255.0'
-            },
-            'network2': {
-                'name': 'network2',
-                'displaytext': 'network2',
-                'gateway': '10.2.1.1',
-                'netmask': '255.255.255.0'
-            },
-            'private_gateways_network': {
-                'name': 'private_gateways_network',
-                'displaytext': 'private_gateways_network',
-                'cidr': '172.16.1.0/24'
-            }
-        },
-        'vms': {
-            'vm1': {
-                'name': 'vm1',
-                'displayname': 'vm1'
-            },
-            'vm2': {
-                'name': 'vm2',
-                'displayname': 'vm2'
-            }
-        },
-        'private_gateways': {
-            'private_gateway1': '172.16.1.1',
-            'private_gateway2': '172.16.1.2'
-        },
-        'nat_rule': {
-            'protocol': 'TCP',
-            'publicport': 22,
-            'privateport': 22
-        },
-        'static_routes': {
-            'static_route1': {
-                'cidr': '10.2.0.0/16',
-                'nexthop': '172.16.1.2'
-            },
-            'static_route2': {
-                'cidr': '10.1.0.0/16',
-                'nexthop': '172.16.1.1'
-            }
-        },
-        'acls': {
-            'acl1': {
-                'name': 'acl1',
-                'description': 'acl1',
-                'entries': {
-                    'entry1': {
-                        'protocol': 'All',
-                        'action': 'Allow',
-                        'traffictype': 'Ingress'
-                    }
-                }
-            },
-            'acl2': {
-                'name': 'acl2',
-                'description': 'acl2',
-                'entries': {
-                    'entry2': {
-                        'protocol': 'All',
-                        'action': 'Allow',
-                        'traffictype': 'Ingress'
-                    }
-                }
-            }
-        }
-    }
-
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
-
+        cls.attributes = cls.test_client.getParsedTestDataConfig().copy()
         cls.class_cleanup = []
 
     @classmethod
@@ -307,7 +213,7 @@ class TestPrivateGateway(cloudstackTestCase):
         cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc2.name, cls.vpc2.cidr)
 
         cls.network2 = Network.create(cls.api_client,
-            cls.attributes['networks']['network2'],
+            cls.attributes['networks']['network3'],
             networkofferingid=cls.network_offering.id,
             aclid=cls.default_allow_acl.id,
             vpcid=cls.vpc2.id,
