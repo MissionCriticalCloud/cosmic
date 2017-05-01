@@ -119,6 +119,51 @@ class TestIpExclusionList(cloudstackTestCase):
         cls.class_cleanup = []
 
     @classmethod
+    def tearDownClass(cls):
+
+        try:
+            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    def setUp(self):
+
+        self.method_cleanup = []
+
+    def tearDown(self):
+
+        try:
+            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
+
+        except Exception as e:
+            raise Exception("Exception: %s" % e)
+
+    @attr(tags=['advanced'])
+    def test_01(self):
+
+        self.setup_infra(redundant=False)
+        self.setup_new_network()
+        #
+        # Deploy and test new VM
+        #
+        self.vm2 = self.deploy_new_vm('vm2')
+        self.test_vm(self.vm2, '10.1.2.6')
+        #
+        # Try to deploy new VM without free IPs
+        # Test failure
+        #
+        self.vm3 = self.deploy_new_vm('vm3')
+        self.test_deploy_new_vm_failed(self.vm3)
+        #
+        # Update exlcluded IPs range
+        # Deploy and test new VM
+        #
+        self.expand_free_ips()
+        self.vm3 = self.deploy_new_vm('vm3')
+        self.test_vm(self.vm3, '10.1.2.5')
+
+    @classmethod
     def setup_infra(cls, redundant=False):
 
         if len(cls.class_cleanup) > 0:
@@ -207,51 +252,6 @@ class TestIpExclusionList(cloudstackTestCase):
             cls.nat_rule1.protocol,
             cls.nat_rule1.publicport,
             cls.nat_rule1.privateport)
-
-    @classmethod
-    def tearDownClass(cls):
-
-        try:
-            cleanup_resources(cls.api_client, cls.class_cleanup, cls.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    def setUp(self):
-
-        self.method_cleanup = []
-
-    def tearDown(self):
-
-        try:
-            cleanup_resources(self.api_client, self.method_cleanup, self.logger)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-    @attr(tags=['advanced'])
-    def test_01(self):
-
-        self.setup_infra(redundant=False)
-        self.setup_new_network()
-        #
-        # Deploy and test new VM
-        #
-        self.vm2 = self.deploy_new_vm('vm2')
-        self.test_vm(self.vm2, '10.1.2.6')
-        #
-        # Try to deploy new VM without free IPs
-        # Test failure
-        #
-        self.vm3 = self.deploy_new_vm('vm3')
-        self.test_deploy_new_vm_failed(self.vm3)
-        #
-        # Update exlcluded IPs range
-        # Deploy and test new VM
-        #
-        self.expand_free_ips()
-        self.vm3 = self.deploy_new_vm('vm3')
-        self.test_vm(self.vm3, '10.1.2.5')
 
     def setup_new_network(self):
         self.network2 = Network.create(self.api_client,

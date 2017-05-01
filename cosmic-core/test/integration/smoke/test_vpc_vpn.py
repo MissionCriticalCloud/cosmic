@@ -33,77 +33,6 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 
 
-class Services:
-    """Test VPC VPN Services.
-    """
-
-    def __init__(self):
-        self.services = {
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": "10.100.0.0/16"
-            },
-            "network_1": {
-                "name": "Test Network 1",
-                "displaytext": "Test Network 1",
-                "netmask": "255.255.255.0",
-                "gateway": "10.100.1.1"
-            },
-            "vpcN": {
-                "name": "TestVPC{N}",
-                "displaytext": "VPC{N}",
-                "cidr": "10.{N}.0.0/16"
-            },
-            "network_N": {
-                "name": "Test Network {N}",
-                "displaytext": "Test Network {N}",
-                "netmask": "255.255.255.0",
-                "gateway": "10.{N}.1.1"
-            },
-            "vpn": {
-                "vpn_user": "root",
-                "vpn_pass": "Md1s#dc",
-                "vpn_pass_fail": "abc!123",  # too short
-                "iprange": "10.2.2.1-10.2.2.10",
-                "fordisplay": "true"
-            },
-            "vpncustomergateway": {
-                "esppolicy": "3des-md5;modp1536",
-                "ikepolicy": "3des-md5;modp1536",
-                "ipsecpsk": "ipsecpsk"
-            },
-            "natrule": {
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "http_rule": {
-                "privateport": 80,
-                "publicport": 80,
-                "startport": 80,
-                "endport": 80,
-                "cidrlist": '0.0.0.0/0',
-                "protocol": "TCP"
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            }
-        }
-
-
 class TestVpcVpn(cloudstackTestCase):
 
     @classmethod
@@ -140,6 +69,14 @@ class TestVpcVpn(cloudstackTestCase):
 
         return
 
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            cleanup_resources(cls.apiclient, cls._cleanup, cls.logger)
+        except Exception as e:
+            raise Exception("Warning: Exception during cleanup : %s" % e)
+        return
+
     def setUp(self):
         self.cleanup = []
 
@@ -151,13 +88,118 @@ class TestVpcVpn(cloudstackTestCase):
         except Exception as e:
             raise Exception("Cleanup failed with %s" % e)
 
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            cleanup_resources(cls.apiclient, cls._cleanup, cls.logger)
-        except Exception as e:
-            raise Exception("Warning: Exception during cleanup : %s" % e)
-        return
+    @attr(tags=['advanced'])
+    def test_01_vpc_remote_access_vpn(self):
+        """Test Remote Access VPN in VPC"""
+        # 1) Create VPC
+        vpc = VPC.create(
+            api_client=self.apiclient,
+            services=self.services["vpc"],
+            networkDomain="vpc.vpn",
+            vpcofferingid=self.vpc_offering.id,
+            zoneid=self.zone.id,
+            account=self.account.name,
+            domainid=self.domain.id
+        )
+
+        self.assertIsNotNone(vpc, "VPC creation failed")
+        self.logger.debug("VPC %s created" % (vpc.id))
+
+        self.cleanup.append(vpc)
+
+        # 2) Create network in VPC
+        ntwk = Network.create(
+            api_client=self.apiclient,
+            services=self.services["network_1"],
+            accountid=self.account.name,
+            domainid=self.domain.id,
+            networkofferingid=self.network_offering.id,
+            zoneid=self.zone.id,
+            vpcid=vpc.id
+        )
+
+        self.assertIsNotNone(ntwk, "Network failed to create")
+        self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
+
+        self.cleanup.append(ntwk)
+
+        # 3) Deploy a vm
+        vm = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
+                                   templateid=self.template.id,
+                                   zoneid=self.zone.id,
+                                   accountid=self.account.name,
+                                   domainid=self.domain.id,
+                                   serviceofferingid=self.virtual_machine_offering.id,
+                                   networkids=ntwk.id,
+                                   hypervisor=self.hypervisor
+                                   )
+        self.assertIsNotNone(vm, "VM failed to deploy")
+        self.assertEquals(vm.state, 'Running', "VM is not running")
+        self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
+
+        self.logger.debug("Deployed virtual machine: OK")
+        self.cleanup.append(vm)
+
+        # 4) Enable VPN for VPC
+        src_nat_list = PublicIPAddress.list(
+            self.apiclient,
+            account=self.account.name,
+            domainid=self.account.domainid,
+            listall=True,
+            issourcenat=True,
+            vpcid=vpc.id
+        )
+        ip = src_nat_list[0]
+
+        self.logger.debug("Acquired public ip address: OK")
+
+        vpn = Vpn.create(self.apiclient,
+                         publicipid=ip.id,
+                         account=self.account.name,
+                         domainid=self.account.domainid,
+                         iprange=self.services["vpn"]["iprange"],
+                         fordisplay=self.services["vpn"]["fordisplay"]
+                         )
+
+        self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
+        self.logger.debug("Created Remote Access VPN: OK")
+
+        vpn_user = None
+        # 5) Add VPN user for VPC
+        vpn_user = VpnUser.create(self.apiclient,
+                                  account=self.account.name,
+                                  domainid=self.account.domainid,
+                                  username=self.services["vpn"]["vpn_user"],
+                                  password=self.services["vpn"]["vpn_pass"]
+                                  )
+
+        self.assertIsNotNone(vpn_user, "Failed to create Remote Access VPN User")
+        self.logger.debug("Created VPN User: OK")
+
+        # TODO: Add an actual remote vpn connection test from a remote vpc
+
+        # 9) Disable VPN for VPC
+        vpn.delete(self.apiclient)
+
+        self.logger.debug("Deleted the Remote Access VPN: OK")
+
+    @attr(tags=['advanced'])
+    def test_02_vpc_site2site_vpn(self):
+        """Test Site 2 Site VPN Across VPCs"""
+        # Set up 1 VPNs; needs 2 VPCs
+        self._test_vpc_site2site_vpn(self.vpc_offering, 2)
+
+    @attr(tags=['advanced'])
+    def test_03_redundant_vpc_site2site_vpn(self):
+        """Test Site 2 Site VPN Across redundant VPCs"""
+        # Set up 1 VPNs; needs 2 VPCs
+        self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.apiclient), 2)
+
+    @attr(tags=['advanced'])
+    def test_04_vpc_site2site_multiple_vpn(self):
+        """Test Site 2 Site multiple VPNs Across VPCs"""
+        # Set up 3 VPNs; needs 4 VPCs
+        self._test_vpc_site2site_vpn(self.vpc_offering, 4)
 
     def get_host_details(self, router, username='root', password='password', port=22):
         hosts = list_hosts(self.apiclient, id=router.hostid, type="Routing")
@@ -364,115 +406,73 @@ class TestVpcVpn(cloudstackTestCase):
 
         return
 
-    @attr(tags=['advanced'])
-    def test_01_vpc_remote_access_vpn(self):
-        """Test Remote Access VPN in VPC"""
-        # 1) Create VPC
-        vpc = VPC.create(
-            api_client=self.apiclient,
-            services=self.services["vpc"],
-            networkDomain="vpc.vpn",
-            vpcofferingid=self.vpc_offering.id,
-            zoneid=self.zone.id,
-            account=self.account.name,
-            domainid=self.domain.id
-        )
 
-        self.assertIsNotNone(vpc, "VPC creation failed")
-        self.logger.debug("VPC %s created" % (vpc.id))
+class Services:
+    """Test VPC VPN Services.
+    """
 
-        self.cleanup.append(vpc)
-
-        # 2) Create network in VPC
-        ntwk = Network.create(
-            api_client=self.apiclient,
-            services=self.services["network_1"],
-            accountid=self.account.name,
-            domainid=self.domain.id,
-            networkofferingid=self.network_offering.id,
-            zoneid=self.zone.id,
-            vpcid=vpc.id
-        )
-
-        self.assertIsNotNone(ntwk, "Network failed to create")
-        self.logger.debug("Network %s created in VPC %s" % (ntwk.id, vpc.id))
-
-        self.cleanup.append(ntwk)
-
-        # 3) Deploy a vm
-        vm = VirtualMachine.create(self.apiclient, services=self.services["virtual_machine"],
-                                   templateid=self.template.id,
-                                   zoneid=self.zone.id,
-                                   accountid=self.account.name,
-                                   domainid=self.domain.id,
-                                   serviceofferingid=self.virtual_machine_offering.id,
-                                   networkids=ntwk.id,
-                                   hypervisor=self.hypervisor
-                                   )
-        self.assertIsNotNone(vm, "VM failed to deploy")
-        self.assertEquals(vm.state, 'Running', "VM is not running")
-        self.debug("VM %s deployed in VPC %s" % (vm.id, vpc.id))
-
-        self.logger.debug("Deployed virtual machine: OK")
-        self.cleanup.append(vm)
-
-        # 4) Enable VPN for VPC
-        src_nat_list = PublicIPAddress.list(
-            self.apiclient,
-            account=self.account.name,
-            domainid=self.account.domainid,
-            listall=True,
-            issourcenat=True,
-            vpcid=vpc.id
-        )
-        ip = src_nat_list[0]
-
-        self.logger.debug("Acquired public ip address: OK")
-
-        vpn = Vpn.create(self.apiclient,
-                         publicipid=ip.id,
-                         account=self.account.name,
-                         domainid=self.account.domainid,
-                         iprange=self.services["vpn"]["iprange"],
-                         fordisplay=self.services["vpn"]["fordisplay"]
-                         )
-
-        self.assertIsNotNone(vpn, "Failed to create Remote Access VPN")
-        self.logger.debug("Created Remote Access VPN: OK")
-
-        vpn_user = None
-        # 5) Add VPN user for VPC
-        vpn_user = VpnUser.create(self.apiclient,
-                                  account=self.account.name,
-                                  domainid=self.account.domainid,
-                                  username=self.services["vpn"]["vpn_user"],
-                                  password=self.services["vpn"]["vpn_pass"]
-                                  )
-
-        self.assertIsNotNone(vpn_user, "Failed to create Remote Access VPN User")
-        self.logger.debug("Created VPN User: OK")
-
-        # TODO: Add an actual remote vpn connection test from a remote vpc
-
-        # 9) Disable VPN for VPC
-        vpn.delete(self.apiclient)
-
-        self.logger.debug("Deleted the Remote Access VPN: OK")
-
-    @attr(tags=['advanced'])
-    def test_02_vpc_site2site_vpn(self):
-        """Test Site 2 Site VPN Across VPCs"""
-        # Set up 1 VPNs; needs 2 VPCs
-        self._test_vpc_site2site_vpn(self.vpc_offering, 2)
-
-    @attr(tags=['advanced'])
-    def test_03_redundant_vpc_site2site_vpn(self):
-        """Test Site 2 Site VPN Across redundant VPCs"""
-        # Set up 1 VPNs; needs 2 VPCs
-        self._test_vpc_site2site_vpn(get_default_redundant_vpc_offering(self.apiclient), 2)
-
-    @attr(tags=['advanced'])
-    def test_04_vpc_site2site_multiple_vpn(self):
-        """Test Site 2 Site multiple VPNs Across VPCs"""
-        # Set up 3 VPNs; needs 4 VPCs
-        self._test_vpc_site2site_vpn(self.vpc_offering, 4)
+    def __init__(self):
+        self.services = {
+            "account": {
+                "email": "test@test.com",
+                "firstname": "Test",
+                "lastname": "User",
+                "username": "test",
+                "password": "password",
+            },
+            "vpc": {
+                "name": "TestVPC",
+                "displaytext": "TestVPC",
+                "cidr": "10.100.0.0/16"
+            },
+            "network_1": {
+                "name": "Test Network 1",
+                "displaytext": "Test Network 1",
+                "netmask": "255.255.255.0",
+                "gateway": "10.100.1.1"
+            },
+            "vpcN": {
+                "name": "TestVPC{N}",
+                "displaytext": "VPC{N}",
+                "cidr": "10.{N}.0.0/16"
+            },
+            "network_N": {
+                "name": "Test Network {N}",
+                "displaytext": "Test Network {N}",
+                "netmask": "255.255.255.0",
+                "gateway": "10.{N}.1.1"
+            },
+            "vpn": {
+                "vpn_user": "root",
+                "vpn_pass": "Md1s#dc",
+                "vpn_pass_fail": "abc!123",  # too short
+                "iprange": "10.2.2.1-10.2.2.10",
+                "fordisplay": "true"
+            },
+            "vpncustomergateway": {
+                "esppolicy": "3des-md5;modp1536",
+                "ikepolicy": "3des-md5;modp1536",
+                "ipsecpsk": "ipsecpsk"
+            },
+            "natrule": {
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "http_rule": {
+                "privateport": 80,
+                "publicport": 80,
+                "startport": 80,
+                "endport": 80,
+                "cidrlist": '0.0.0.0/0',
+                "protocol": "TCP"
+            },
+            "virtual_machine": {
+                "displayname": "Test VM",
+                "username": "root",
+                "password": "password",
+                "ssh_port": 22,
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": 'TCP',
+            }
+        }

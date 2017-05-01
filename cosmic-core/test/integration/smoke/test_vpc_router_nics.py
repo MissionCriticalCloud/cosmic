@@ -33,85 +33,6 @@ from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
 
 
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.0.0.1/24'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "lbrule": {
-                "name": "SSH",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 22,
-                "publicport": 2222,
-                "openfirewall": False,
-                "startport": 22,
-                "endport": 2222,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "lbrule_http": {
-                "name": "HTTP",
-                "alg": "leastconn",
-                # Algorithm used for load balancing
-                "privateport": 80,
-                "publicport": 8888,
-                "openfirewall": False,
-                "startport": 80,
-                "endport": 8888,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "http_rule": {
-                "privateport": 80,
-                "publicport": 80,
-                "startport": 80,
-                "endport": 80,
-                "cidrlist": '0.0.0.0/0',
-                "protocol": "TCP"
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
-
-
 class TestVPCNics(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
@@ -171,6 +92,49 @@ class TestVPCNics(cloudstackTestCase):
         except Exception as e:
             self.logger.debug("Warning: Exception during cleanup : %s" % e)
         return
+
+    @attr(tags=['advanced'])
+    def test_01_VPC_nics_after_destroy(self):
+        """ Create a VPC with two networks with one VM in each network and test nics after destroy"""
+        self.logger.debug("Starting test_01_VPC_nics_after_destroy")
+        self.query_routers()
+
+        net_off = get_default_network_offering(self.apiclient)
+        net1 = self.create_network(net_off, "10.1.1.1")
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
+
+        self.networks.append(net1)
+        self.networks.append(net2)
+
+        self.add_nat_rules()
+        self.check_ssh_into_vm()
+
+        self.destroy_routers()
+        time.sleep(30)
+
+        net1.add_vm(self.deployvm_in_network(net1.get_net()))
+        self.query_routers()
+
+        self.add_nat_rules()
+        self.check_ssh_into_vm()
+
+    @attr(tags=['advanced'])
+    def test_02_VPC_default_routes(self):
+        """ Create a VPC with two networks with one VM in each network and test default routes"""
+        self.logger.debug("Starting test_02_VPC_default_routes")
+        self.query_routers()
+
+        net_off = get_default_network_offering(self.apiclient)
+        net1 = self.create_network(net_off, "10.1.1.1")
+        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
+
+        self.networks.append(net1)
+        self.networks.append(net2)
+
+        self.add_nat_rules()
+        self.do_default_routes_test()
 
     def find_public_gateway(self):
         networks = list_networks(self.apiclient,
@@ -302,49 +266,6 @@ class TestVPCNics(cloudstackTestCase):
         self.logger.debug('nwacl_nat=%s' % nwacl_nat.__dict__)
         return nat_rule
 
-    @attr(tags=['advanced'])
-    def test_01_VPC_nics_after_destroy(self):
-        """ Create a VPC with two networks with one VM in each network and test nics after destroy"""
-        self.logger.debug("Starting test_01_VPC_nics_after_destroy")
-        self.query_routers()
-
-        net_off = get_default_network_offering(self.apiclient)
-        net1 = self.create_network(net_off, "10.1.1.1")
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
-
-        self.networks.append(net1)
-        self.networks.append(net2)
-
-        self.add_nat_rules()
-        self.check_ssh_into_vm()
-
-        self.destroy_routers()
-        time.sleep(30)
-
-        net1.add_vm(self.deployvm_in_network(net1.get_net()))
-        self.query_routers()
-
-        self.add_nat_rules()
-        self.check_ssh_into_vm()
-
-    @attr(tags=['advanced'])
-    def test_02_VPC_default_routes(self):
-        """ Create a VPC with two networks with one VM in each network and test default routes"""
-        self.logger.debug("Starting test_02_VPC_default_routes")
-        self.query_routers()
-
-        net_off = get_default_network_offering(self.apiclient)
-        net1 = self.create_network(net_off, "10.1.1.1")
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        net2 = self.create_network(net_off_no_lb, "10.1.2.1")
-
-        self.networks.append(net1)
-        self.networks.append(net2)
-
-        self.add_nat_rules()
-        self.do_default_routes_test()
-
     def delete_nat_rules(self):
         for o in self.networks:
             for vm in o.get_vms():
@@ -402,6 +323,85 @@ class TestVPCNics(cloudstackTestCase):
                     self.fail("SSH Access failed for %s: %s" % (vmObj.get_ip(), e))
 
                 self.assertEqual(result.count("3 packets received"), 1, "Ping gateway from VM should be successful")
+
+
+class Services:
+    """Test VPC network services - Port Forwarding Rules Test Data Class.
+    """
+
+    def __init__(self):
+        self.services = {
+            "account": {
+                "email": "test@test.com",
+                "firstname": "Test",
+                "lastname": "User",
+                "username": "test",
+                # Random characters are appended for unique
+                # username
+                "password": "password",
+            },
+            "vpc": {
+                "name": "TestVPC",
+                "displaytext": "TestVPC",
+                "cidr": '10.0.0.1/24'
+            },
+            "network": {
+                "name": "Test Network",
+                "displaytext": "Test Network",
+                "netmask": '255.255.255.0'
+            },
+            "lbrule": {
+                "name": "SSH",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 22,
+                "publicport": 2222,
+                "openfirewall": False,
+                "startport": 22,
+                "endport": 2222,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "lbrule_http": {
+                "name": "HTTP",
+                "alg": "leastconn",
+                # Algorithm used for load balancing
+                "privateport": 80,
+                "publicport": 8888,
+                "openfirewall": False,
+                "startport": 80,
+                "endport": 8888,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "natrule": {
+                "privateport": 22,
+                "publicport": 22,
+                "startport": 22,
+                "endport": 22,
+                "protocol": "TCP",
+                "cidrlist": '0.0.0.0/0',
+            },
+            "http_rule": {
+                "privateport": 80,
+                "publicport": 80,
+                "startport": 80,
+                "endport": 80,
+                "cidrlist": '0.0.0.0/0',
+                "protocol": "TCP"
+            },
+            "virtual_machine": {
+                "displayname": "Test VM",
+                "username": "root",
+                "password": "password",
+                "ssh_port": 22,
+                "privateport": 22,
+                "publicport": 22,
+                "protocol": 'TCP',
+            },
+            "ostype": 'CentOS 5.3 (64-bit)',
+            "timeout": 10,
+        }
 
 
 class networkO(object):

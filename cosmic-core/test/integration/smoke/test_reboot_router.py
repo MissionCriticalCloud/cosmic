@@ -113,6 +113,10 @@ class TestRebootRouter(cloudstackTestCase):
                         ]
         return
 
+    def tearDown(self):
+        cleanup_resources(self.apiclient, self.cleanup)
+        return
+
     @attr(tags=['advanced'])
     def test_01_reboot_router(self):
         """Test for reboot router"""
@@ -203,8 +207,4 @@ class TestRebootRouter(cloudstackTestCase):
             self.fail(
                 "SSH Access failed for %s: %s" %
                 (self.public_ip.ipaddress.ipaddress, e))
-        return
-
-    def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
         return

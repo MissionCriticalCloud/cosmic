@@ -87,6 +87,10 @@ class TestDeleteAccount(cloudstackTestCase):
         self.cleanup = []
         return
 
+    def tearDown(self):
+        cleanup_resources(self.apiclient, self.cleanup)
+        return
+
     @attr(tags=['advanced'])
     def test_01_delete_account(self):
         """Test for delete account"""
@@ -153,8 +157,4 @@ class TestDeleteAccount(cloudstackTestCase):
             raise Exception(
                 "Encountered %s raised while fetching routers for account: %s" %
                 (e, self.account.name))
-        return
-
-    def tearDown(self):
-        cleanup_resources(self.apiclient, self.cleanup)
         return

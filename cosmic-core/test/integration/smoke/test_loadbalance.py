@@ -97,6 +97,11 @@ class TestLoadBalance(cloudstackTestCase):
             cls.account
         ]
 
+    @classmethod
+    def tearDownClass(cls):
+        cleanup_resources(cls.apiclient, cls._cleanup)
+        return
+
     def setUp(self):
         self.apiclient = self.testClient.getApiClient()
         self.cleanup = []
@@ -104,35 +109,6 @@ class TestLoadBalance(cloudstackTestCase):
 
     def tearDown(self):
         cleanup_resources(self.apiclient, self.cleanup)
-        return
-
-    @classmethod
-    def tearDownClass(cls):
-        cleanup_resources(cls.apiclient, cls._cleanup)
-        return
-
-    def try_ssh(self, ip_addr, unameCmd):
-        try:
-            self.logger.debug(
-                "SSH into VM (IPaddress: %s) & NAT Rule (Public IP: %s)" %
-                (self.vm_1.ipaddress, ip_addr)
-            )
-            # If Round Robin Algorithm is chosen,
-            # each ssh command should alternate between VMs
-
-            ssh_1 = SshClient(
-                ip_addr,
-                self.services['lbrule']["publicport"],
-                self.vm_1.username,
-                self.vm_1.password,
-                retries=10
-            )
-            unameCmd.append(ssh_1.execute("uname")[0])
-            self.logger.debug(unameCmd)
-        except Exception as e:
-            self.fail("%s: SSH failed for VM with IP Address: %s" %
-                      (e, ip_addr))
-        time.sleep(10)
         return
 
     @attr(tags=['advanced'])
@@ -518,4 +494,28 @@ class TestLoadBalance(cloudstackTestCase):
             unameResults,
             "Check if ssh succeeded for server3"
         )
+        return
+
+    def try_ssh(self, ip_addr, unameCmd):
+        try:
+            self.logger.debug(
+                "SSH into VM (IPaddress: %s) & NAT Rule (Public IP: %s)" %
+                (self.vm_1.ipaddress, ip_addr)
+            )
+            # If Round Robin Algorithm is chosen,
+            # each ssh command should alternate between VMs
+
+            ssh_1 = SshClient(
+                ip_addr,
+                self.services['lbrule']["publicport"],
+                self.vm_1.username,
+                self.vm_1.password,
+                retries=10
+            )
+            unameCmd.append(ssh_1.execute("uname")[0])
+            self.logger.debug(unameCmd)
+        except Exception as e:
+            self.fail("%s: SSH failed for VM with IP Address: %s" %
+                      (e, ip_addr))
+        time.sleep(10)
         return

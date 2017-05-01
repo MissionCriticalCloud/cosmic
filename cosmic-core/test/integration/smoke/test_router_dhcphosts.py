@@ -152,83 +152,6 @@ class TestRouterDHCPHosts(cloudstackTestCase):
             raise Exception("Warning: Exception during cleanup : %s" % e)
         return
 
-    def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
-                                 zoneid=self.zone.id,
-                                 listall=True,
-                                 issystem=True,
-                                 traffictype="Public")
-        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
-
-        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-
-        ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid=self.zone.id,
-                                       networkid=networks[0].id)
-        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
-
-        return ip_ranges[0].gateway
-
-    def test_ssh_command(self, vm, nat_rule, rule_label):
-        result = 'failed'
-        try:
-            gateway = self.find_public_gateway()
-            ssh_command = "ping -c 3 %s" % gateway
-            self.logger.debug("SSH into VM with IP: %s" % nat_rule.ipaddress)
-
-            ssh = vm.get_ssh_client(ipaddress=nat_rule.ipaddress, port=self.services[rule_label]["publicport"], retries=5)
-            result = str(ssh.execute(ssh_command))
-
-            self.logger.debug("SSH result: %s; COUNT is ==> %s" % (result, result.count("3 packets received")))
-        except:
-            self.fail("Failed to SSH into VM - %s" % (nat_rule.ipaddress))
-
-        self.assertEqual(
-            result.count("3 packets received"),
-            1,
-            "Ping to outside world from VM should be successful"
-        )
-
-    def test_dhcphosts(self, vm, router):
-        hosts = list_hosts(
-            self.apiclient,
-            id=router.hostid)
-
-        self.assertEqual(
-            isinstance(hosts, list),
-            True,
-            "Check for list hosts response return valid data")
-
-        host = hosts[0]
-        host.user = self.services["configurableData"]["host"]["username"]
-        host.passwd = self.services["configurableData"]["host"]["password"]
-        host.port = self.services["configurableData"]["host"]["port"]
-        # mac1,10.7.32.101,infinite
-        try:
-            result = get_process_status(
-                host.ipaddress,
-                host.port,
-                host.user,
-                host.passwd,
-                router.linklocalip,
-                "cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}'" % (vm.nic[0].ipaddress))
-        except KeyError:
-            self.skipTest(
-                "Provide a marvin config file with host\
-                        credentials to run %s" %
-                self._testMethodName)
-
-        self.logger.debug("cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}' RESULT IS ==> %s" % (vm.nic[0].ipaddress, result))
-        res = str(result)
-
-        self.assertEqual(
-            res.count(vm.nic[0].ipaddress),
-            1,
-            "DHCP hosts file contains duplicate IPs ==> %s!" % res)
-
     @attr(tags=['advanced'])
     def test_01_router_dhcphosts(self):
         """Check that the /etc/dhcphosts.txt doesn't contain duplicate IPs"""
@@ -371,3 +294,80 @@ class TestRouterDHCPHosts(cloudstackTestCase):
         self.test_dhcphosts(self.vm_2, router)
 
         return
+
+    def find_public_gateway(self):
+        networks = list_networks(self.apiclient,
+                                 zoneid=self.zone.id,
+                                 listall=True,
+                                 issystem=True,
+                                 traffictype="Public")
+        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
+
+        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
+
+        ip_ranges = list_vlan_ipranges(self.apiclient,
+                                       zoneid=self.zone.id,
+                                       networkid=networks[0].id)
+        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
+
+        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
+        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
+
+        return ip_ranges[0].gateway
+
+    def test_ssh_command(self, vm, nat_rule, rule_label):
+        result = 'failed'
+        try:
+            gateway = self.find_public_gateway()
+            ssh_command = "ping -c 3 %s" % gateway
+            self.logger.debug("SSH into VM with IP: %s" % nat_rule.ipaddress)
+
+            ssh = vm.get_ssh_client(ipaddress=nat_rule.ipaddress, port=self.services[rule_label]["publicport"], retries=5)
+            result = str(ssh.execute(ssh_command))
+
+            self.logger.debug("SSH result: %s; COUNT is ==> %s" % (result, result.count("3 packets received")))
+        except:
+            self.fail("Failed to SSH into VM - %s" % (nat_rule.ipaddress))
+
+        self.assertEqual(
+            result.count("3 packets received"),
+            1,
+            "Ping to outside world from VM should be successful"
+        )
+
+    def test_dhcphosts(self, vm, router):
+        hosts = list_hosts(
+            self.apiclient,
+            id=router.hostid)
+
+        self.assertEqual(
+            isinstance(hosts, list),
+            True,
+            "Check for list hosts response return valid data")
+
+        host = hosts[0]
+        host.user = self.services["configurableData"]["host"]["username"]
+        host.passwd = self.services["configurableData"]["host"]["password"]
+        host.port = self.services["configurableData"]["host"]["port"]
+        # mac1,10.7.32.101,infinite
+        try:
+            result = get_process_status(
+                host.ipaddress,
+                host.port,
+                host.user,
+                host.passwd,
+                router.linklocalip,
+                "cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}'" % (vm.nic[0].ipaddress))
+        except KeyError:
+            self.skipTest(
+                "Provide a marvin config file with host\
+                        credentials to run %s" %
+                self._testMethodName)
+
+        self.logger.debug("cat /etc/dhcphosts.txt | grep %s | sed 's/\,/ /g' | awk '{print $3}' RESULT IS ==> %s" % (vm.nic[0].ipaddress, result))
+        res = str(result)
+
+        self.assertEqual(
+            res.count(vm.nic[0].ipaddress),
+            1,
+            "DHCP hosts file contains duplicate IPs ==> %s!" % res)

@@ -32,7 +32,6 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
 
-
 @ddt
 class TestRouterRules(cloudstackTestCase):
     @classmethod
@@ -78,11 +77,6 @@ class TestRouterRules(cloudstackTestCase):
             cls.account
         ]
 
-    def setUp(self):
-        self.apiclient = self.testClient.getApiClient()
-        self.cleanup = []
-        return
-
     @classmethod
     def tearDownClass(cls):
         try:
@@ -90,8 +84,86 @@ class TestRouterRules(cloudstackTestCase):
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
 
+    def setUp(self):
+        self.apiclient = self.testClient.getApiClient()
+        self.cleanup = []
+        return
+
     def tearDown(self):
         cleanup_resources(self.apiclient, self.cleanup)
+        return
+
+    @data(STATIC_NAT_RULE, NAT_RULE, LB_RULE)
+    @attr(tags=['advanced'])
+    def test_01_network_rules_acquired_public_ip(self, value):
+        """Test for Router rules for network rules on acquired public IP"""
+
+        # Validate the following:
+        # 1. listPortForwardingRules should not return the deleted rule anymore
+        # 2. attempt to do ssh should now fail
+
+        self.ipaddress = PublicIPAddress.create(
+            self.apiclient,
+            accountid=self.account.name,
+            zoneid=self.zone.id,
+            domainid=self.account.domainid,
+            networkid=self.defaultNetworkId
+        )
+
+        self.createNetworkRules(rule=value,
+                                ipaddressobj=self.ipaddress,
+                                networkid=self.defaultNetworkId)
+
+        router = Router.list(self.apiclient,
+                             networkid=self.virtual_machine.nic[0].networkid,
+                             listall=True)[0]
+
+        response = self.getCommandResultFromRouter(router, "ip addr")
+        self.logger.debug(response)
+        stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
+        self.assertTrue(stringToMatch in str(response), "IP address is\
+                not added to the VR!")
+
+        try:
+            self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
+                         (
+                             self.virtual_machine.ipaddress,
+                             self.ipaddress.ipaddress.ipaddress
+                         ))
+            self.virtual_machine.get_ssh_client(
+                self.ipaddress.ipaddress.ipaddress)
+        except Exception as e:
+            self.fail(
+                "SSH Access failed for %s: %s" %
+                (self.virtual_machine.ipaddress, e)
+            )
+
+        # Validate the following:
+        # 1. listIpForwardingRules should not return the deleted rule anymore
+        # 2. attempt to do ssh should now fail
+
+        self.removeNetworkRules(rule=value)
+
+        response = self.getCommandResultFromRouter(router, "ip addr")
+        self.logger.debug(response)
+        stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
+        self.assertFalse(stringToMatch in str(response), "IP address is\
+                not removed from VR even after disabling stat in NAT")
+
+        # Check if the Public SSH port is inaccessible
+        with self.assertRaises(Exception):
+            self.logger.debug(
+                "SSHing into VM with IP address %s after NAT rule deletion" %
+                self.virtual_machine.ipaddress)
+
+            SshClient(
+                self.ipaddress.ipaddress.ipaddress,
+                self.virtual_machine.ssh_port,
+                self.virtual_machine.username,
+                self.virtual_machine.password,
+                retries=2,
+                delay=0
+            )
         return
 
     def getCommandResultFromRouter(self, router, command):
@@ -187,77 +259,4 @@ class TestRouterRules(cloudstackTestCase):
         self.logger.debug("Releasing IP %s from account %s" % (self.ipaddress.ipaddress.ipaddress, self.account.name))
         self.ipaddress.delete(self.apiclient)
 
-        return
-
-    @data(STATIC_NAT_RULE, NAT_RULE, LB_RULE)
-    @attr(tags=['advanced'])
-    def test_01_network_rules_acquired_public_ip(self, value):
-        """Test for Router rules for network rules on acquired public IP"""
-
-        # Validate the following:
-        # 1. listPortForwardingRules should not return the deleted rule anymore
-        # 2. attempt to do ssh should now fail
-
-        self.ipaddress = PublicIPAddress.create(
-            self.apiclient,
-            accountid=self.account.name,
-            zoneid=self.zone.id,
-            domainid=self.account.domainid,
-            networkid=self.defaultNetworkId
-        )
-
-        self.createNetworkRules(rule=value,
-                                ipaddressobj=self.ipaddress,
-                                networkid=self.defaultNetworkId)
-
-        router = Router.list(self.apiclient,
-                             networkid=self.virtual_machine.nic[0].networkid,
-                             listall=True)[0]
-
-        response = self.getCommandResultFromRouter(router, "ip addr")
-        self.logger.debug(response)
-        stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
-        self.assertTrue(stringToMatch in str(response), "IP address is\
-                not added to the VR!")
-
-        try:
-            self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
-                         (
-                             self.virtual_machine.ipaddress,
-                             self.ipaddress.ipaddress.ipaddress
-                         ))
-            self.virtual_machine.get_ssh_client(
-                self.ipaddress.ipaddress.ipaddress)
-        except Exception as e:
-            self.fail(
-                "SSH Access failed for %s: %s" %
-                (self.virtual_machine.ipaddress, e)
-            )
-
-        # Validate the following:
-        # 1. listIpForwardingRules should not return the deleted rule anymore
-        # 2. attempt to do ssh should now fail
-
-        self.removeNetworkRules(rule=value)
-
-        response = self.getCommandResultFromRouter(router, "ip addr")
-        self.logger.debug(response)
-        stringToMatch = "inet %s" % self.ipaddress.ipaddress.ipaddress
-        self.assertFalse(stringToMatch in str(response), "IP address is\
-                not removed from VR even after disabling stat in NAT")
-
-        # Check if the Public SSH port is inaccessible
-        with self.assertRaises(Exception):
-            self.logger.debug(
-                "SSHing into VM with IP address %s after NAT rule deletion" %
-                self.virtual_machine.ipaddress)
-
-            SshClient(
-                self.ipaddress.ipaddress.ipaddress,
-                self.virtual_machine.ssh_port,
-                self.virtual_machine.username,
-                self.virtual_machine.password,
-                retries=2,
-                delay=0
-            )
         return
