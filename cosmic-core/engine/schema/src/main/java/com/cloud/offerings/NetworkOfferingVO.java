@@ -23,93 +23,91 @@ public class NetworkOfferingVO implements NetworkOffering {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    long id;
+    private long id;
 
     @Column(name = "name")
-    String name;
+    private String name;
     @Column(name = "display_text")
-    String displayText;
+    private String displayText;
     @Column(name = "nw_rate")
-    Integer rateMbps;
+    private Integer rateMbps;
     @Column(name = "mc_rate")
-    Integer multicastRateMbps;
+    private Integer multicastRateMbps;
     @Column(name = "traffic_type")
     @Enumerated(value = EnumType.STRING)
-    TrafficType trafficType;
+    private TrafficType trafficType;
     @Column(name = "specify_vlan")
-    boolean specifyVlan;
+    private boolean specifyVlan;
     @Column(name = "system_only")
-    boolean systemOnly;
+    private boolean systemOnly;
     @Column(name = "service_offering_id")
-    Long serviceOfferingId;
+    private Long serviceOfferingId;
     @Column(name = "secondary_service_offering_id")
-    Long secondaryServiceOfferingId;
+    private Long secondaryServiceOfferingId;
     @Column(name = "tags", length = 4096)
-    String tags;
+    private String tags;
     @Column(name = "default")
-    boolean isDefault;
+    private boolean isDefault;
     @Column(name = "availability")
     @Enumerated(value = EnumType.STRING)
-    Availability availability;
+    private Availability availability;
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
-    State state = State.Disabled;
+    private State state = State.Disabled;
     @Column(name = GenericDao.REMOVED_COLUMN)
-    Date removed;
+    private Date removed;
     @Column(name = GenericDao.CREATED_COLUMN)
-    Date created;
+    private Date created;
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
-    Network.GuestType guestType;
+    private Network.GuestType guestType;
     @Column(name = "dedicated_lb_service")
-    boolean dedicatedLB;
+    private boolean dedicatedLB;
     @Column(name = "shared_source_nat_service")
-    boolean sharedSourceNat;
+    private boolean sharedSourceNat;
     @Column(name = "specify_ip_ranges")
-    boolean specifyIpRanges = false;
+    private boolean specifyIpRanges = false;
     @Column(name = "sort_key")
-    int sortKey;
+    private int sortKey;
     @Column(name = "uuid")
-    String uuid;
+    private String uuid;
     @Column(name = "redundant_router_service")
-    boolean redundantRouter;
+    private boolean redundantRouter;
     @Column(name = "conserve_mode")
-    boolean conserveMode;
+    private boolean conserveMode;
     @Column(name = "elastic_ip_service")
-    boolean elasticIp;
+    private boolean elasticIp;
     @Column(name = "eip_associate_public_ip")
-    boolean eipAssociatePublicIp;
+    private boolean eipAssociatePublicIp;
     @Column(name = "elastic_lb_service")
-    boolean elasticLb;
+    private boolean elasticLb;
     @Column(name = "inline")
-    boolean inline;
+    private boolean inline;
     @Column(name = "is_persistent")
-    boolean isPersistent;
+    private boolean isPersistent;
     @Column(name = "egress_default_policy")
-    boolean egressdefaultpolicy;
+    private boolean egressdefaultpolicy;
     @Column(name = "concurrent_connections")
-    Integer concurrentConnections;
+    private Integer concurrentConnections;
     @Column(name = "keep_alive_enabled")
-    boolean keepAliveEnabled = false;
+    private boolean keepAliveEnabled = false;
     @Column(name = "supports_streched_l2")
-    boolean supportsStrechedL2 = false;
+    private boolean supportsStrechedL2 = false;
     @Column(name = "internal_lb")
-    boolean internalLb;
+    private boolean internalLb;
     @Column(name = "public_lb")
-    boolean publicLb;
+    private boolean publicLb;
     @Column(name = "unique_name")
     private String uniqueName;
 
-    public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan, final Integer
-            rateMbps,
-                             final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags, final Network.GuestType guestType,
-                             final boolean conserveMode, final boolean
-                                     dedicatedLb,
-                             final boolean sharedSourceNat, final boolean redundantRouter, final boolean elasticIp, final boolean elasticLb, final boolean specifyIpRanges, final
-                             boolean inline, final boolean isPersistent,
-                             final boolean associatePublicIP, final boolean publicLb, final boolean internalLb, final boolean egressdefaultpolicy, final boolean
-                                     supportsStrechedL2) {
-        this(name,
+    public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan,
+                             final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
+                             final Network.GuestType guestType, final boolean conserveMode, final boolean dedicatedLb, final boolean sharedSourceNat, final boolean redundantRouter,
+                             final boolean elasticIp, final boolean elasticLb, final boolean specifyIpRanges, final boolean inline, final boolean isPersistent,
+                             final boolean associatePublicIP, final boolean publicLb, final boolean internalLb, final boolean egressdefaultpolicy,
+                             final boolean supportsStrechedL2) {
+        this(
+                name,
                 displayText,
                 trafficType,
                 systemOnly,
@@ -124,7 +122,8 @@ public class NetworkOfferingVO implements NetworkOffering {
                 specifyIpRanges,
                 isPersistent,
                 internalLb,
-                publicLb);
+                publicLb
+        );
         this.dedicatedLB = dedicatedLb;
         this.sharedSourceNat = sharedSourceNat;
         this.redundantRouter = redundantRouter;
@@ -183,7 +182,8 @@ public class NetworkOfferingVO implements NetworkOffering {
     }
 
     public NetworkOfferingVO(final String name, final Network.GuestType guestType, final boolean specifyVlan) {
-        this(name,
+        this(
+                name,
                 "System Offering for " + name,
                 TrafficType.Guest,
                 false,
@@ -198,7 +198,8 @@ public class NetworkOfferingVO implements NetworkOffering {
                 false,
                 true,
                 false,
-                false);
+                false
+        );
         this.state = State.Enabled;
     }
 
@@ -369,6 +370,10 @@ public class NetworkOfferingVO implements NetworkOffering {
     @Override
     public boolean getEgressDefaultPolicy() {
         return egressdefaultpolicy;
+    }
+
+    public void setEgressdefaultpolicy(final boolean egressdefaultpolicy) {
+        this.egressdefaultpolicy = egressdefaultpolicy;
     }
 
     @Override

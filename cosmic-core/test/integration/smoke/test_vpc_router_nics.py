@@ -199,7 +199,7 @@ class TestVPCNics(cloudstackTestCase):
 
             self.logger.debug("Created network with ID: %s" % obj_network.id)
         except Exception, e:
-            self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering, e))
+            self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
         o = networkO(obj_network)
 
         vm1 = self.deployvm_in_network(obj_network)

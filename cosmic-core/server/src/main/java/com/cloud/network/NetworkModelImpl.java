@@ -242,8 +242,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     @Override
     public NetworkElement getElementImplementingProvider(final String providerName) {
         final String elementName = s_providerToNetworkElementMap.get(providerName);
-        final NetworkElement element = AdapterBase.getAdapterByName(networkElements, elementName);
-        return element;
+        return AdapterBase.getAdapterByName(networkElements, elementName);
     }
 
     Map<Service, Set<Provider>> getServiceProvidersMap(final long networkId) {
@@ -1596,7 +1595,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                 }
                 final Map<Capability, String> serviceCapabilities = elementCapabilities.get(service);
                 if (serviceCapabilities == null || serviceCapabilities.isEmpty()) {
-                    throw new UnsupportedServiceException("Service " + service.getName() + " doesn't have capabilites for element=" + element.getName() +
+                    throw new UnsupportedServiceException("Service " + service.getName() + " doesn't have capabilities for element=" + element.getName() +
                             " implementing Provider=" + provider.getName());
                 }
 

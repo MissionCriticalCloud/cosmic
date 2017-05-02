@@ -1,10 +1,38 @@
-from nose.plugins.attrib import attr
+import time
 
-from marvin.cloudstackTestCase import *
-from marvin.lib.base import *
-from marvin.lib.common import *
-from marvin.lib.utils import *
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
+from marvin.cloudstackTestCase import cloudstackTestCase
+
+from marvin.cloudstackAPI import (
+    createNetworkACLList,
+    createNetworkACL,
+    replaceNetworkACLList,
+    restartVPC,
+    restartNetwork
+)
+from marvin.lib.base import (
+    Network,
+    VirtualMachine,
+    VPC,
+    Account
+)
+from marvin.lib.common import (
+    list_hosts,
+    list_routers,
+    get_default_network_offering,
+    get_default_redundant_vpc_offering,
+    get_default_vpc_offering,
+    get_default_virtual_machine_offering,
+    get_template,
+    get_zone,
+    get_domain,
+    get_default_isolated_network_offering_with_egress
+)
+from marvin.lib.utils import (
+    get_process_status,
+    cleanup_resources
+)
 
 
 class TestPasswordService(cloudstackTestCase):
@@ -28,10 +56,8 @@ class TestPasswordService(cloudstackTestCase):
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
-        cls.service_offering = ServiceOffering.create(
-            cls.api_client,
-            cls.services["service_offering"])
-        cls._cleanup = [cls.service_offering]
+        cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
+        cls._cleanup = []
 
     @classmethod
     def tearDownClass(cls):
@@ -64,25 +90,13 @@ class TestPasswordService(cloudstackTestCase):
     @attr(tags=['advanced'])
     def test_01_vpc_password_service_single_vpc(self):
         self.logger.debug("Starting test for single VPC")
-        vpc_off = VpcOffering.create(
-            self.apiclient,
-            self.services["vpc_offering"])
-
-        self.logger.debug("Enabling the VPC offering created")
-        vpc_off.update(self.apiclient, state='Enabled')
-
+        vpc_off = get_default_vpc_offering(self.apiclient)
         self.perform_password_service_tests(vpc_off)
 
     @attr(tags=['advanced'])
     def test_02_vpc_password_service_redundant_vpc(self):
         self.logger.debug("Starting test for Redundant VPC")
-        vpc_off = VpcOffering.create(
-            self.apiclient,
-            self.services["redundant_vpc_offering"])
-
-        self.logger.debug("Enabling the VPC offering created")
-        vpc_off.update(self.apiclient, state='Enabled')
-
+        vpc_off = get_default_redundant_vpc_offering(self.apiclient)
         self.perform_password_service_tests(vpc_off)
 
     @attr(tags=['advanced'])
@@ -100,9 +114,10 @@ class TestPasswordService(cloudstackTestCase):
         else:
             self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
             vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
-            self.cleanup += [vpc_1, vpc_off, self.account]
+            self.cleanup += [vpc_1, self.account]
             self.logger.debug("Creating network inside VPC")
-            network_1 = self.createNetwork(vpc_1, gateway='10.0.0.1')
+            net_off = get_default_network_offering(self.apiclient)
+            network_1 = self.createNetwork(vpc_1, net_off, gateway='10.0.0.1')
             acl1 = self.createACL(vpc_1)
             self.createACLItem(acl1.id, cidr="0.0.0.0/0")
             self.replaceNetworkAcl(acl1.id, network_1)
@@ -364,29 +379,16 @@ class TestPasswordService(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to create ACL Item due to %s ' % e)
 
-    def createNetwork(self, vpc, net_offering="network_offering", gateway='10.1.1.1'):
+    def createNetwork(self, vpc, network_offering, gateway='10.1.1.1'):
         try:
-            self.logger.debug('Create NetworkOffering')
-            net_offerring = self.services[net_offering]
-            net_offerring["name"] = "NET_OFF-%s" % gateway
-            nw_off = NetworkOffering.create(
-                self.apiclient,
-                net_offerring,
-                conservemode=False)
-
-            nw_off.update(self.apiclient, state='Enabled')
-
-            self.logger.debug('Created and Enabled NetworkOffering')
-
             self.services["network"]["name"] = "NETWORK-%s" % gateway
-
             self.logger.debug('Adding Network=%s' % self.services["network"])
             obj_network = Network.create(
                 self.apiclient,
                 self.services["network"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
-                networkofferingid=nw_off.id,
+                networkofferingid=network_offering.id,
                 zoneid=self.zone.id,
                 gateway=gateway,
                 vpcid=vpc.id
@@ -394,23 +396,15 @@ class TestPasswordService(cloudstackTestCase):
 
             self.logger.debug("Created network with ID: %s" % obj_network.id)
         except Exception, e:
-            self.fail('Unable to create a Network with offering=%s because of %s ' % (net_offerring, e))
+            self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
 
-        self.cleanup.insert(0, nw_off)
         self.cleanup.insert(0, obj_network)
 
         return obj_network
 
     def createIsolatedNetwork(self):
 
-        self.services["isolated_network_offering"]["egress_policy"] = "true"
-
-        self.logger.debug("Creating Network Offering on zone %s" % self.zone.id)
-        network_offering = NetworkOffering.create(self.api_client,
-                                                  self.services["isolated_network_offering"],
-                                                  conservemode=True)
-
-        network_offering.update(self.api_client, state='Enabled')
+        network_offering = get_default_isolated_network_offering_with_egress(self.apiclient)
 
         self.logger.debug("Creating Network for Account %s using offering %s" % (self.account.name, network_offering.id))
         network_obj = Network.create(self.api_client,
@@ -421,7 +415,6 @@ class TestPasswordService(cloudstackTestCase):
                                      zoneid=self.zone.id
                                      )
 
-        self.cleanup.insert(0, network_offering)
         self.cleanup.insert(0, network_obj)
 
         return network_obj
@@ -435,7 +428,7 @@ class TestPasswordService(cloudstackTestCase):
 
     def _replaceAcl(self, command):
         try:
-            successResponse = self.apiclient.replaceNetworkACLList(command);
+            successResponse = self.apiclient.replaceNetworkACLList(command)
         except Exception as e:
             self.fail("Failed to replace ACL list due to %s" % e)
 
@@ -506,99 +499,6 @@ class Services:
                 "password": "password",
             },
             "host1": None,
-            "service_offering": {
-                "name": "Tiny Instance",
-                "displaytext": "Tiny Instance",
-                "cpunumber": 1,
-                "cpuspeed": 100,
-                "memory": 128,
-            },
-            "network_offering": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Vpn,Dhcp,Dns,SourceNat,PortForwarding,Lb,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "network_offering_no_lb": {
-                "name": 'VPC Network offering',
-                "displaytext": 'VPC Network off',
-                "guestiptype": 'Isolated',
-                "supportedservices": 'Dhcp,Dns,SourceNat,PortForwarding,UserData,StaticNat,NetworkACL',
-                "traffictype": 'GUEST',
-                "availability": 'Optional',
-                "useVpc": 'on',
-                "serviceProviderList": {
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-            },
-            "redundant_vpc_offering": {
-                "name": 'Redundant VPC off',
-                "displaytext": 'Redundant VPC off',
-                "supportedservices": 'Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat',
-                "serviceProviderList": {
-                    "Gateway": 'VpcVirtualRouter',
-                    "Vpn": 'VpcVirtualRouter',
-                    "Dhcp": 'VpcVirtualRouter',
-                    "Dns": 'VpcVirtualRouter',
-                    "SourceNat": 'VpcVirtualRouter',
-                    "PortForwarding": 'VpcVirtualRouter',
-                    "Lb": 'VpcVirtualRouter',
-                    "UserData": 'VpcVirtualRouter',
-                    "StaticNat": 'VpcVirtualRouter',
-                    "NetworkACL": 'VpcVirtualRouter'
-                },
-                "serviceCapabilityList": {
-                    "SourceNat": {
-                        "RedundantRouter": 'true'
-                    }
-                },
-            },
-            "isolated_network_offering": {
-                "name": "Network offering-DA services",
-                "displaytext": "Network offering-DA services",
-                "guestiptype": "Isolated",
-                "supportedservices":
-                    "Dhcp,Dns,SourceNat,PortForwarding,Vpn,Firewall,Lb,UserData,StaticNat",
-                "traffictype": "GUEST",
-                "availability": "Optional'",
-                "serviceProviderList": {
-                    "Dhcp": "VirtualRouter",
-                    "Dns": "VirtualRouter",
-                    "SourceNat": "VirtualRouter",
-                    "PortForwarding": "VirtualRouter",
-                    "Vpn": "VirtualRouter",
-                    "Firewall": "VirtualRouter",
-                    "Lb": "VirtualRouter",
-                    "UserData": "VirtualRouter",
-                    "StaticNat": "VirtualRouter"
-                }
-            },
-            "vpc_offering": {
-                "name": "VPC off",
-                "displaytext": "VPC off",
-                "supportedservices":
-                    "Gateway,Dhcp,Dns,SourceNat,PortForwarding,Vpn,Lb,UserData,StaticNat,NetworkACL"
-            },
             "vpc": {
                 "name": "TestVPC",
                 "displaytext": "TestVPC",
