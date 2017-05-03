@@ -21,11 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
-import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import junit.framework.Assert;
-import org.apache.bcel.generic.NEW;
 import org.junit.Before;
 import org.junit.Test;
 
