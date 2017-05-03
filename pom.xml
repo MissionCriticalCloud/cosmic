@@ -80,7 +80,6 @@
         <cs.dependency-check-maven.version>1.4.5</cs.dependency-check-maven.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
-        <cs.esapi.version>2.1.0.1</cs.esapi.version>
         <cs.gmaven-runtime-1.7.version>1.3</cs.gmaven-runtime-1.7.version>
         <cs.groovy-all.version>2.0.5</cs.groovy-all.version>
         <cs.guava-testlib.version>18.0</cs.guava-testlib.version>
@@ -351,11 +350,6 @@
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${cs.reflections.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
-                <version>${cs.esapi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
