@@ -728,9 +728,7 @@ class CsRemoteAccessVpn(CsDataBag):
                 logging.debug("Remote accessvpn  data bag %s",  self.dbag)
                 self.remoteaccessvpn_iptables(public_ip, self.dbag[public_ip])
 
-                CsHelper.execute("ipsec down L2TP-PSK")
                 CsHelper.execute("ipsec update")
-                CsHelper.execute("service xl2tpd stop")
                 CsHelper.execute("service xl2tpd start")
                 CsHelper.execute("ipsec rereadsecrets")
             else:
