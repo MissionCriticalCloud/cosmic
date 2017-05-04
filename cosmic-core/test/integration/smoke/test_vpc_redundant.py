@@ -94,7 +94,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             account=self.account.name,
             domainid=self.account.domainid)
 
-        self.cleanup = [self.vpc, self.account]
+        self.cleanup = [self.account]
         return
 
     def tearDown(self):
@@ -204,20 +204,20 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.query_routers()
 
         net_off = get_default_network_offering(self.apiclient)
-        network_to_delete_1 = self.create_network(net_off, "10.1.1.1", nr_vms=1, mark_net_cleanup=False)
-        self.networks.append(network_to_delete_1)
+        network1 = self.create_network(net_off, "10.1.1.1", nr_vms=1)
+        self.networks.append(network1)
         net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
         self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1", nr_vms=1))
-        network_to_delete_2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1, mark_net_cleanup=False)
-        self.networks.append(network_to_delete_2)
+        network2 = self.create_network(net_off_no_lb, "10.1.3.1", nr_vms=1)
+        self.networks.append(network2)
 
         self.check_routers_state()
         self.add_nat_rules()
         self.do_vpc_test(False)
 
-        self.destroy_vm(network_to_delete_1)
-        network_to_delete_1.get_net().delete(self.apiclient)
-        self.networks.remove(network_to_delete_1)
+        self.destroy_vm(network1)
+        network1.get_net().delete(self.apiclient)
+        self.networks.remove(network1)
 
         vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
 
@@ -238,9 +238,9 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state(status_to_check="MASTER")
         self.do_vpc_test(False)
 
-        self.destroy_vm(network_to_delete_2)
-        network_to_delete_2.get_net().delete(self.apiclient)
-        self.networks.remove(network_to_delete_2)
+        self.destroy_vm(network2)
+        network2.get_net().delete(self.apiclient)
+        self.networks.remove(network2)
 
         '''
         Let's be sure and sleep for 'total_sleep' seconds because removing/adding an interface will restart keepalived.
@@ -422,13 +422,13 @@ class TestVPCRedundancy(cloudstackTestCase):
                 cmd.id = router.id
                 self.apiclient.startRouter(cmd)
 
-    def create_network(self, network_offering, gateway='10.1.1.1', vpc=None, nr_vms=2, mark_net_cleanup=True):
+    def create_network(self, network_offering, gateway='10.1.1.1', vpc=None, nr_vms=2):
         if not nr_vms or nr_vms <= 0:
             self.fail("At least 1 VM has to be created. You informed nr_vms < 1")
         try:
             self.services["network"]["name"] = "NETWORK-" + str(gateway)
             self.logger.debug('Adding Network=%s' % self.services["network"])
-            obj_network = Network.create(
+            network = Network.create(
                 self.apiclient,
                 self.services["network"],
                 accountid=self.account.name,
@@ -439,21 +439,18 @@ class TestVPCRedundancy(cloudstackTestCase):
                 vpcid=vpc.id if vpc else self.vpc.id
             )
 
-            self.logger.debug("Created network with ID: %s" % obj_network.id)
+            self.logger.debug("Created network with ID: %s" % network.id)
         except Exception, e:
             self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
-        o = networkO(obj_network)
-
-        if mark_net_cleanup:
-            self.cleanup.insert(0, obj_network)
+        o = networkO(network)
 
         for i in range(0, nr_vms):
-            vm1 = self.deployvm_in_network(obj_network, mark_vm_cleanup=mark_net_cleanup)
+            vm1 = self.deployvm_in_network(network)
             o.add_vm(vm1)
 
         return o
 
-    def deployvm_in_network(self, network, host_id=None, mark_vm_cleanup=True):
+    def deployvm_in_network(self, network, host_id=None):
         try:
             self.logger.debug('Creating VM in network=%s' % network.name)
             vm = VirtualMachine.create(
@@ -467,8 +464,6 @@ class TestVPCRedundancy(cloudstackTestCase):
             )
 
             self.logger.debug('Created VM=%s in network=%s' % (vm.id, network.name))
-            if mark_vm_cleanup:
-                self.cleanup.insert(0, vm)
             return vm
         except:
             self.fail('Unable to create VM in a Network=%s' % network.name)
