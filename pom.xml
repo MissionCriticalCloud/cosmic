@@ -46,6 +46,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <cs.target.dir>target</cs.target.dir>
+        <cosmic.dir>${project.basedir}</cosmic.dir>
         <cs.dependency.check.report.dir>${cosmic.dir}/target/dependency-check</cs.dependency.check.report.dir>
         <cs.dependency.check.format>XML</cs.dependency.check.format>
 
