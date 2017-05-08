@@ -74,7 +74,6 @@
         <cs.commons-lang3.version>3.4</cs.commons-lang3.version>
         <cs.commons-net.version>3.3</cs.commons-net.version>
         <cs.commons-validator.version>1.5.0</cs.commons-validator.version>
-        <cs.cxf-bundle-jaxrs.version>2.7.18</cs.cxf-bundle-jaxrs.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
         <cs.dependency-check-maven.version>1.4.5</cs.dependency-check-maven.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
@@ -89,6 +88,7 @@
         <cs.java-ipv6.version>0.15</cs.java-ipv6.version>
         <cs.javax.inject.version>1</cs.javax.inject.version>
         <cs.javax.persistence.version>2.1.0</cs.javax.persistence.version>
+        <cs.javax.ws.rs>2.0-m10</cs.javax.ws.rs>
         <cs.jna.version>4.2.2</cs.jna.version>
         <cs.jsch.version>0.1.54</cs.jsch.version>
         <cs.jstl.version>1.2</cs.jstl.version>
@@ -195,11 +195,6 @@
                 <groupId>org.dbunit</groupId>
                 <artifactId>dbunit</artifactId>
                 <version>${cs.dbunit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-bundle-jaxrs</artifactId>
-                <version>${cs.cxf-bundle-jaxrs.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -354,6 +349,11 @@
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>javax.persistence</artifactId>
                 <version>${cs.javax.persistence.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${cs.javax.ws.rs}</version>
             </dependency>
             <dependency>
                 <groupId>com.thoughtworks.xstream</groupId>
