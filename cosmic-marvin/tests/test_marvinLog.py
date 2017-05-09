@@ -15,7 +15,7 @@ class TestMarvinLog(unittest.TestCase):
         marvin_log = MarvinLog()
 
         self.assertIsNotNone(marvin_log)
-        self.assertEquals('marvin.marvinLog', marvin_log.get_logger().name)
+        self.assertEquals('marvin.utils.MarvinLog', marvin_log.get_logger().name)
 
 
 if __name__ == '__main__':

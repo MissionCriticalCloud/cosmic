@@ -43,7 +43,7 @@ class TestUtils(unittest.TestCase):
         api_client = MockApiClient(retries, 'initial state', 'final state')
         state = validate_state(api_client, self, 'final state', timeout=timeout, interval=1)
 
-        self.assertEqual(state, [FAIL, 'TestUtils state not trasited to final state, operation timed out'])
+        self.assertEqual(state, [FAIL, 'TestUtils state not transited to final state, operation timed out'])
         self.assertEqual(retries, api_client.retry_counter)
 
     def test_key_maps_to_value_when_empty_dict(self):
