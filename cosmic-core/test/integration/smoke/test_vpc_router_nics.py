@@ -44,7 +44,7 @@ class TestVPCNics(cloudstackTestCase):
         cls.testClient = super(TestVPCNics, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
 
-        cls.services = cls.testClient.getParsedTestDataConfig().copy()
+        cls.services = cls.testClient.getParsedTestDataConfig()
 
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)

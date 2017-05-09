@@ -46,7 +46,7 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
         cls.testClient = super(TestVPCIpTablesPolicies, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
 
-        cls.services = cls.testClient.getParsedTestDataConfig().copy()
+        cls.services = cls.testClient.getParsedTestDataConfig()
         cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)

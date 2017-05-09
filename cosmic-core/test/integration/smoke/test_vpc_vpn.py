@@ -41,7 +41,7 @@ class TestVpcVpn(cloudstackTestCase):
 
         test_client = super(TestVpcVpn, cls).getClsTestClient()
         cls.apiclient = test_client.getApiClient()
-        cls.services = test_client.getParsedTestDataConfig().copy()
+        cls.services = test_client.getParsedTestDataConfig()
 
         cls.zone = get_zone(cls.apiclient, test_client.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)

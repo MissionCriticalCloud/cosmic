@@ -53,7 +53,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         cls.testClient = super(TestVPCRedundancy, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
 
-        cls.services = cls.testClient.getParsedTestDataConfig().copy()
+        cls.services = cls.testClient.getParsedTestDataConfig()
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
         cls.zone = get_zone(cls.api_client, cls.testClient.getZoneForTests())

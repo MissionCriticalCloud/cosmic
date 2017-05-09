@@ -31,7 +31,7 @@ class TestIpExclusionList(cloudstackTestCase):
 
         cls.test_client = super(TestIpExclusionList, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
-        cls.test_data = cls.test_client.getParsedTestDataConfig().copy()
+        cls.test_data = cls.test_client.getParsedTestDataConfig()
 
         cls.class_cleanup = []
 

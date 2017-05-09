@@ -46,7 +46,7 @@ class TestPrivateGateway(cloudstackTestCase):
 
         cls.test_client = super(TestPrivateGateway, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
-        cls.attributes = cls.test_client.getParsedTestDataConfig().copy()
+        cls.attributes = cls.test_client.getParsedTestDataConfig()
         cls.class_cleanup = []
 
     @classmethod
