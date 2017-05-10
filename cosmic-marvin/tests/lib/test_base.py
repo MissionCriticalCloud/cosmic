@@ -42,7 +42,7 @@ class TestVirtualMachine(unittest.TestCase):
         vm = VirtualMachine({'id': 'vm_id', 'nic': [NIC({'ipaddress': '192.168.0.100'})]}, {})
         state = vm.validateState(api_client, 'final state', timeout=timeout, interval=1)
 
-        self.assertEqual(state, [FAIL, 'VirtualMachine state not trasited to final state, operation timed out'])
+        self.assertEqual(state, [FAIL, 'VirtualMachine state not transited to final state, operation timed out'])
         self.assertEqual(retries, api_client.retry_counter)
 
 
@@ -74,7 +74,7 @@ class TestSnapshot(unittest.TestCase):
         snapshot = Snapshot({'id': 'snapshot_id'})
         state = snapshot.validateState(api_client, 'final state', timeout=timeout, interval=1)
 
-        self.assertEqual(state, [FAIL, 'Snapshot state not trasited to final state, operation timed out'])
+        self.assertEqual(state, [FAIL, 'Snapshot state not transited to final state, operation timed out'])
         self.assertEqual(retries, api_client.retry_counter)
 
 
@@ -107,7 +107,7 @@ class TestHost(unittest.TestCase):
         state = host.validateState(api_client, ['final state', 'final state'], timeout=timeout, interval=1)
 
         self.assertEqual(state,
-                         [FAIL, "Host state not trasited to %s, operation timed out" % ['final state', 'final state']])
+                         [FAIL, "Host state not transited to %s, operation timed out" % ['final state', 'final state']])
         self.assertEqual(retries, api_client.retry_counter)
 
 
@@ -139,7 +139,7 @@ class TestStoragePool(unittest.TestCase):
         storage_pool = StoragePool({'id': 'snapshot_id'})
         state = storage_pool.validateState(api_client, 'final state', timeout=timeout, interval=1)
 
-        self.assertEqual(state, [FAIL, 'StoragePool state not trasited to final state, operation timed out'])
+        self.assertEqual(state, [FAIL, 'StoragePool state not transited to final state, operation timed out'])
         self.assertEqual(retries, api_client.retry_counter)
 
 
