@@ -972,11 +972,35 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 throw new InvalidParameterValueException("The vpc already has the specified offering, so not upgrading. Use restart+cleanup to rebuild.");
             }
 
+            // check if the new VPC offering matches the network offerings in use
             checkVpcOfferingServicesWithCurrentNetworkOfferings(vpcOfferingId, vpcToUpdate);
 
             vpc.setVpcOfferingId(vpcOfferingId);
             vpc.setRedundant(newVpcOffering.getRedundantRouter());
             restartWithCleanupRequired = true;
+
+            // disassociate the public IPs if not required anymore
+            if (!hasSourceNatService(vpc)) {
+                boolean success = true;
+                final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
+                s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
+                for (final IPAddressVO ipToRelease : ipsToRelease) {
+                    if (ipToRelease.isPortable()) {
+                        // portable IP address are associated with owner, until
+                        // explicitly requested to be disassociated.
+                        // so as part of VPC clean up just break IP association with VPC
+                        ipToRelease.setVpcId(null);
+                        ipToRelease.setAssociatedWithNetworkId(null);
+                        _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
+                        s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any VPC");
+                    } else {
+                        success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), CallContext.current().getCallingUserId(), caller);
+                        if (!success) {
+                            s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
+                        }
+                    }
+                }
+            }
         }
         vpc.setRestartRequired(restartWithCleanupRequired);
 
