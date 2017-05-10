@@ -34,7 +34,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
         cls.testClient = super(TestRouterIpTablesPolicies, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
 
-        cls.services = Services().services
+        cls.services = cls.testClient.getParsedTestDataConfig()
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
@@ -42,6 +42,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
             cls.apiclient,
             cls.zone.id
         )
+        cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
         cls.services["virtual_machine"]["template"] = cls.template.id
 
@@ -82,7 +83,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
     def test_01_routervm_iptables_policies(self):
         """ Test iptables default INPUT/FORWARD policy on RouterVM """
 
-        self.logger.debug("Starting test_02_routervm_iptables_policies")
+        self.logger.debug("Starting test_01_routervm_iptables_policies")
 
         vm1 = self.entity_manager.deployvm()
 
@@ -130,62 +131,6 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
                         res.count("DROP"),
                         1,
                         "%s Default Policy should be DROP" % table)
-
-
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "configurableData": {
-                "host": {
-                    "password": "password",
-                    "username": "root",
-                    "port": 22
-                },
-                "input": "INPUT",
-                "forward": "FORWARD"
-            },
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.1.1.1/16'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
 
 
 class EntityManager(object):

@@ -46,7 +46,8 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
         cls.testClient = super(TestVPCIpTablesPolicies, cls).getClsTestClient()
         cls.apiclient = cls.testClient.getApiClient()
 
-        cls.services = Services().services
+        cls.services = cls.testClient.getParsedTestDataConfig()
+        cls.services["vpc"]["cidr"] = '10.1.1.1/16'
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
@@ -161,62 +162,6 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
                         "%s Default Policy should be DROP" % table)
 
 
-class Services:
-    """Test VPC network services - Port Forwarding Rules Test Data Class.
-    """
-
-    def __init__(self):
-        self.services = {
-            "configurableData": {
-                "host": {
-                    "password": "password",
-                    "username": "root",
-                    "port": 22
-                },
-                "input": "INPUT",
-                "forward": "FORWARD"
-            },
-            "account": {
-                "email": "test@test.com",
-                "firstname": "Test",
-                "lastname": "User",
-                "username": "test",
-                # Random characters are appended for unique
-                # username
-                "password": "password",
-            },
-            "vpc": {
-                "name": "TestVPC",
-                "displaytext": "TestVPC",
-                "cidr": '10.1.1.1/16'
-            },
-            "network": {
-                "name": "Test Network",
-                "displaytext": "Test Network",
-                "netmask": '255.255.255.0'
-            },
-            "natrule": {
-                "privateport": 22,
-                "publicport": 22,
-                "startport": 22,
-                "endport": 22,
-                "protocol": "TCP",
-                "cidrlist": '0.0.0.0/0',
-            },
-            "virtual_machine": {
-                "displayname": "Test VM",
-                "username": "root",
-                "password": "password",
-                "ssh_port": 22,
-                "privateport": 22,
-                "publicport": 22,
-                "protocol": 'TCP',
-            },
-            "ostype": 'CentOS 5.3 (64-bit)',
-            "timeout": 10,
-        }
-
-
 class EntityManager(object):
     def __init__(self, apiclient, services, service_offering, account, zone, logger):
         self.apiclient = apiclient
@@ -251,7 +196,7 @@ class EntityManager(object):
     def create_natrule(self, vm, public_ip, network, vpc_id):
         self.logger.debug("Creating NAT rule in network for vm with public IP")
 
-        nat_rule_services = self.services["natrule"]
+        nat_rule_services = self.services["natrule_ssh"]
 
         nat_rule = NATRule.create(
             self.apiclient,

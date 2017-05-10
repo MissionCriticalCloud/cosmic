@@ -37,77 +37,13 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestPublicIpAcl(cloudstackTestCase):
 
-    attributes = {
-        'account': {
-            'email': 'e.cartman@southpark.com',
-            'firstname': 'Eric',
-            'lastname': 'Cartman',
-            'username': 'e.cartman',
-            'password': 'southpark'
-        },
-        'vpcs': {
-            'vpc1': {
-                'name': 'vpc1',
-                'displaytext': 'vpc1',
-                'cidr': '10.1.0.0/16'
-            }
-        },
-        'networks': {
-            'network1': {
-                'name': 'network1',
-                'displaytext': 'network1',
-                'gateway': '10.1.1.1',
-                'netmask': '255.255.255.0'
-            }
-        },
-        'vms': {
-            'vm1': {
-                'name': 'vm1',
-                'displayname': 'vm1'
-            }
-        },
-        'nat_rule': {
-            'protocol': 'TCP',
-            'publicport': 22,
-            'privateport': 22
-        },
-        'acls': {
-            'acl1': {
-                'name': 'acl1',
-                'description': 'acl1',
-                'entries': {
-                    'entry1': {
-                        'protocol': 'TCP',
-                        'action': 'Allow',
-                        'traffictype': 'Ingress',
-                        'startport': 22,
-                        'endport': 22
-                    }
-                }
-            },
-            'acl2': {
-                'name': 'acl2',
-                'description': 'acl2',
-                'entries': {
-                    'entry2': {
-                        'protocol': 'TCP',
-                        'action': 'Deny',
-                        'traffictype': 'Ingress',
-                        'startport': 22,
-                        'endport': 22
-                    }
-                }
-            }
-        }
-    }
-
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
         cls.test_client = super(TestPublicIpAcl, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
-
+        cls.attributes = cls.test_client.getParsedTestDataConfig()
         cls.class_cleanup = []
 
     @classmethod
