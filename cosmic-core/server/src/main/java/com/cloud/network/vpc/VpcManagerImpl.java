@@ -972,7 +972,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 throw new InvalidParameterValueException("The vpc already has the specified offering, so not upgrading. Use restart+cleanup to rebuild.");
             }
 
-            checkVpcOfferingServicesWithCurrentOffering(vpcOfferingId, vpcToUpdate);
+            checkVpcOfferingServicesWithCurrentNetworkOfferings(vpcOfferingId, vpcToUpdate);
 
             vpc.setVpcOfferingId(vpcOfferingId);
             vpc.setRedundant(newVpcOffering.getRedundantRouter());
@@ -1009,24 +1009,28 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return _vpcDao.findById(vpcId);
     }
 
-    private void checkVpcOfferingServicesWithCurrentOffering(final Long vpcOfferingId, final VpcVO currentVpc) {
-        // Services that the current offering supports
-        final List<String> currentOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(currentVpc.getVpcOfferingId());
+    private void checkVpcOfferingServicesWithCurrentNetworkOfferings(final Long vpcOfferingId, final VpcVO currentVpc) {
+        // List of VPC networks
+        final List<NetworkVO> networks = _ntwkDao.listVpcNetworks();
 
         // Services that the new offering supports
         final List<String> newOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
 
         final List<String> notSupportedServices = new LinkedList<>();
 
-        for (final String serviceName : currentOfferingSupportedServicesStr) {
-            if (! newOfferingSupportedServicesStr.contains(serviceName)) {
-                notSupportedServices.add(serviceName);
+        for (NetworkVO network: networks) {
+            final List<String> networkOfferingSupportedServicesStr = _ntwkOffServiceDao.listServicesForNetworkOffering(network.getNetworkOfferingId());
+
+            for (final String serviceName : networkOfferingSupportedServicesStr) {
+                if (! newOfferingSupportedServicesStr.contains(serviceName)) {
+                    notSupportedServices.add(serviceName);
+                }
             }
         }
 
         if (!notSupportedServices.isEmpty()) {
             throw new InvalidParameterValueException("The new vpc offering does not support these service(s) that this vpc requires for proper operation: " +
-                    notSupportedServices + ". " + "Please select an offering with compatible services.");
+                    notSupportedServices + " based on the network offerings used. Please select an offering with compatible services.");
         }
     }
 
