@@ -266,6 +266,7 @@ class TestPublicIpAcl(cloudstackTestCase):
                 self.api_client.stopRouter(cmd)
                 break
 
+        routers = list_routers(self.api_client, domainid=self.domain.id, account=self.account.name, vpcid=vpc.id)
         for router in routers:
             if router.state == 'Running':
                 hosts = list_hosts(self.api_client, zoneid=router.zoneid, type='Routing', state='Up', id=router.hostid)
