@@ -972,11 +972,35 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 throw new InvalidParameterValueException("The vpc already has the specified offering, so not upgrading. Use restart+cleanup to rebuild.");
             }
 
-            checkVpcOfferingServicesWithCurrentOffering(vpcOfferingId, vpcToUpdate);
+            // check if the new VPC offering matches the network offerings in use
+            checkVpcOfferingServicesWithCurrentNetworkOfferings(vpcOfferingId, vpcToUpdate);
 
             vpc.setVpcOfferingId(vpcOfferingId);
             vpc.setRedundant(newVpcOffering.getRedundantRouter());
             restartWithCleanupRequired = true;
+
+            // disassociate the public IPs if not required anymore
+            if (!hasSourceNatService(vpc)) {
+                boolean success = true;
+                final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
+                s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
+                for (final IPAddressVO ipToRelease : ipsToRelease) {
+                    if (ipToRelease.isPortable()) {
+                        // portable IP address are associated with owner, until
+                        // explicitly requested to be disassociated.
+                        // so as part of VPC clean up just break IP association with VPC
+                        ipToRelease.setVpcId(null);
+                        ipToRelease.setAssociatedWithNetworkId(null);
+                        _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
+                        s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any VPC");
+                    } else {
+                        success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), CallContext.current().getCallingUserId(), caller);
+                        if (!success) {
+                            s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
+                        }
+                    }
+                }
+            }
         }
         vpc.setRestartRequired(restartWithCleanupRequired);
 
@@ -1009,24 +1033,28 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return _vpcDao.findById(vpcId);
     }
 
-    private void checkVpcOfferingServicesWithCurrentOffering(final Long vpcOfferingId, final VpcVO currentVpc) {
-        // Services that the current offering supports
-        final List<String> currentOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(currentVpc.getVpcOfferingId());
+    private void checkVpcOfferingServicesWithCurrentNetworkOfferings(final Long vpcOfferingId, final VpcVO currentVpc) {
+        // List of VPC networks
+        final List<NetworkVO> networks = _ntwkDao.listVpcNetworks();
 
         // Services that the new offering supports
         final List<String> newOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
 
         final List<String> notSupportedServices = new LinkedList<>();
 
-        for (final String serviceName : currentOfferingSupportedServicesStr) {
-            if (! newOfferingSupportedServicesStr.contains(serviceName)) {
-                notSupportedServices.add(serviceName);
+        for (NetworkVO network: networks) {
+            final List<String> networkOfferingSupportedServicesStr = _ntwkOffServiceDao.listServicesForNetworkOffering(network.getNetworkOfferingId());
+
+            for (final String serviceName : networkOfferingSupportedServicesStr) {
+                if (! newOfferingSupportedServicesStr.contains(serviceName)) {
+                    notSupportedServices.add(serviceName);
+                }
             }
         }
 
         if (!notSupportedServices.isEmpty()) {
             throw new InvalidParameterValueException("The new vpc offering does not support these service(s) that this vpc requires for proper operation: " +
-                    notSupportedServices + ". " + "Please select an offering with compatible services.");
+                    notSupportedServices + " based on the network offerings used. Please select an offering with compatible services.");
         }
     }
 
