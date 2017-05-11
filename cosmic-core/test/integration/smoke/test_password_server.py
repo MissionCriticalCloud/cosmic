@@ -77,7 +77,7 @@ class TestPasswordService(cloudstackTestCase):
             admin=True,
             domainid=self.domain.id)
 
-        self.cleanup = []
+        self.cleanup = [self.account]
         return
 
     def tearDown(self):
@@ -114,7 +114,6 @@ class TestPasswordService(cloudstackTestCase):
         else:
             self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
             vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
-            self.cleanup += [vpc_1, self.account]
             self.logger.debug("Creating network inside VPC")
             net_off = get_default_network_offering(self.apiclient)
             network_1 = self.createNetwork(vpc_1, net_off, gateway='10.0.0.1')
@@ -124,9 +123,7 @@ class TestPasswordService(cloudstackTestCase):
 
         # VM
         vm1 = self.createVM(network_1)
-        self.cleanup.insert(0, vm1)
         vm2 = self.createVM(network_1)
-        self.cleanup.insert(0, vm2)
 
         # Routers in the right state?
         self.assertEqual(self.routers_in_right_state(), True,
@@ -150,7 +147,6 @@ class TestPasswordService(cloudstackTestCase):
         self.logger.debug("Check whether routers are happy")
 
         vm3 = self.createVM(network_1)
-        self.cleanup.insert(0, vm3)
 
         # Routers in the right state?
         self.assertEqual(self.routers_in_right_state(), True,
@@ -398,8 +394,6 @@ class TestPasswordService(cloudstackTestCase):
         except Exception, e:
             self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
 
-        self.cleanup.insert(0, obj_network)
-
         return obj_network
 
     def createIsolatedNetwork(self):
@@ -414,8 +408,6 @@ class TestPasswordService(cloudstackTestCase):
                                      networkofferingid=network_offering.id,
                                      zoneid=self.zone.id
                                      )
-
-        self.cleanup.insert(0, network_obj)
 
         return network_obj
 
