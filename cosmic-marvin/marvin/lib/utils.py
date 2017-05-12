@@ -26,7 +26,7 @@ def _execute_ssh_command(hostip, port, username, password, ssh_command):
     while True:
         res = ssh.execute(ssh_command)
         if "Connection refused".lower() in res[0].lower():
-            pass
+            time.sleep(10)
         elif res[0] != "Host key verification failed.":
             break
         elif timeout == 0:
