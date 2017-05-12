@@ -46,8 +46,9 @@ def process(do_merge=True):
 def process_file():
     print("[INFO] process_file")
     process()
-    # Converge
-    finish_config()
+    if not os.environ.get('DEFER_CONFIG', False):
+        # Converge
+        finish_config()
 
 
 def process_vmpasswd():
