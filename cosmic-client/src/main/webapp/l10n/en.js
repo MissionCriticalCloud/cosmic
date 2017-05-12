@@ -1654,6 +1654,7 @@ var dictionary = {
     "label.vpc": "VPC",
     "label.vpc.distributedvpcrouter": "Distributed VPC Router",
     "label.vpc.id": "VPC ID",
+    "label.vpc.sourcenatlist": "Source NAT list",
     "label.vpc.offering": "VPC Offering",
     "label.vpc.offering.details": "VPC offering details",
     "label.vpc.router.details": "VPC Router Details",

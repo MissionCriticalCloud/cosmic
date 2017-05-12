@@ -114,6 +114,10 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "if this VPC has redundant router", since = "4.6")
     private boolean redundantRouter;
 
+    @SerializedName(ApiConstants.SOURCE_NAT_LIST)
+    @Param(description = "Source Nat CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface", since = "5.3")
+    private String sourceNatList;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -221,5 +225,9 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
 
     public void setVpcOfferingDisplayText(final String vpcOfferingDisplayText) {
         this.vpcOfferingDisplayText = vpcOfferingDisplayText;
+    }
+
+    public void setSourceNatList(final String sourceNatList) {
+        this.sourceNatList = sourceNatList;
     }
 }

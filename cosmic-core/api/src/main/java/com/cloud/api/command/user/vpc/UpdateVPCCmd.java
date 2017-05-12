@@ -17,6 +17,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +48,17 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             "in a restart+cleanup of the VPC")
     private Long vpcOfferingId;
 
+    @Parameter(name = ApiConstants.SOURCE_NAT_LIST, type = CommandType.STRING,
+            description = "Source NAT CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface")
+    private String sourceNatList;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
-        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId());
+        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList());
         if (result != null) {
             final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -119,6 +124,13 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
     @Override
     public Long getSyncObjId() {
         return getId();
+    }
+
+    public String getSourceNatList() {
+        if (StringUtils.isEmpty(sourceNatList)) {
+            return sourceNatList;
+        }
+        return sourceNatList.replaceAll("\\s", "");
     }
 
     @Override

@@ -401,6 +401,7 @@ public class ApiConstants {
     public static final String ASSOCIATED_NETWORK_ID = "associatednetworkid";
     public static final String ASSOCIATED_NETWORK_NAME = "associatednetworkname";
     public static final String SOURCE_NAT_SUPPORTED = "sourcenatsupported";
+    public static final String SOURCE_NAT_LIST = "sourcenatlist";
     public static final String RESOURCE_STATE = "resourcestate";
     public static final String PROJECT_INVITE_REQUIRED = "projectinviterequired";
     public static final String REQUIRED = "required";
