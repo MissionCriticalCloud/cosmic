@@ -945,6 +945,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final VpcVO vpc = _vpcDao.createForUpdate(vpcId);
         boolean restartWithCleanupRequired = false;
+        //boolean updateVRConfigRequired = false;
 
         if (vpcName != null) {
             vpc.setName(vpcName);
@@ -962,9 +963,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             vpc.setDisplay(displayVpc);
         }
 
-        if (sourceNatList != null) {
-            vpc.setSourceNatList(sourceNatList);
-        }
+        vpc.setSourceNatList(sourceNatList);
 
         if (vpcOfferingId != null) {
             final VpcOfferingVO newVpcOffering = _vpcOffDao.findById(vpcOfferingId);
@@ -1032,6 +1031,20 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             } catch (final InsufficientCapacityException ex) {
                 s_logger.info(ex.toString());
                 throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
+            }
+        } else {
+            //LOOP over all routers
+            final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
+            if (routers != null && !routers.isEmpty()) {
+                s_logger.debug("Updating routers of VPC " + vpc + " as a part of VPC update process");
+                for (final DomainRouterVO router : routers) {
+                    // Validate that the router is running
+                    if (router.getState() == VirtualMachine.State.Running) {
+                        if( !_routerMgr.updateVR(vpc, router)) {
+                            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC config");
+                        }
+                    }
+                }
             }
         }
         return _vpcDao.findById(vpcId);

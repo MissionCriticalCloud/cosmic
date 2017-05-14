@@ -13,6 +13,7 @@ import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.vpc.PrivateGateway;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.component.ManagerBase;
@@ -247,6 +248,12 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     @Override
     public boolean stopRemoteAccessVpn(final RemoteAccessVpn vpn, final VirtualRouter router) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean updateVR(final Vpc vpc, final DomainRouterVO router) {
+    // TODO Auto-generated method stub
         return false;
     }
 }

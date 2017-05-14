@@ -104,6 +104,25 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
     }
 
     @Override
+    public boolean updateVR(final Vpc vpc, final DomainRouterVO router) {
+        Commands commands = new Commands(Command.OnError.Stop);
+
+        _commandSetupHelper.createVRConfigCommands(vpc, router, commands);
+        try {
+            if (_nwHelper.sendCommandsToRouter(router, commands)) {
+                s_logger.debug("Successfully applied source NAT list on the vpc " + router.getHostName());
+                return true;
+            } else {
+                s_logger.warn("Failed to apply source NAT list on vpc " + router.getHostName());
+                return false;
+            }
+        } catch (final Exception ex) {
+            s_logger.warn("Failed to send config update to router " + router.getHostName());
+            return false;
+        }
+    }
+
+    @Override
     public boolean finalizeVirtualMachineProfile(final VirtualMachineProfile profile, final DeployDestination dest, final ReservationContext context) {
         final DomainRouterVO domainRouterVO = _routerDao.findById(profile.getId());
 
@@ -367,6 +386,10 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                                 guestNic.getNetworkId(), domainRouterVO.getId()));
                 cmds.addCommand(finishCmd);
             }
+
+            // 7) RE-APPLY VR Configuration
+            final Vpc vpc = _vpcDao.findById(domainRouterVO.getVpcId());
+            _commandSetupHelper.createVRConfigCommands(vpc, domainRouterVO, cmds);
 
             // Add network usage commands
             cmds.addCommands(usageCmds);

@@ -900,6 +900,8 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         return startRouter(id, true);
     }
 
+    public boolean updateVR(final Vpc vpc, final DomainRouterVO router) { return false; }
+
     @Override
     public VirtualRouter destroyRouter(final long routerId, final Account caller, final Long callerUserId) throws ResourceUnavailableException, ConcurrentOperationException {
         return _nwHelper.destroyRouter(routerId, caller, callerUserId);

@@ -6,6 +6,7 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.network.Network;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VirtualNetworkApplianceService;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.utils.component.Manager;
@@ -59,4 +60,6 @@ public interface VirtualNetworkApplianceManager extends Manager, VirtualNetworkA
     boolean prepareAggregatedExecution(Network network, List<DomainRouterVO> routers) throws ResourceUnavailableException;
 
     boolean completeAggregatedExecution(Network network, List<DomainRouterVO> routers) throws ResourceUnavailableException;
+
+    boolean updateVR(final Vpc vpc, final DomainRouterVO router);
 }
