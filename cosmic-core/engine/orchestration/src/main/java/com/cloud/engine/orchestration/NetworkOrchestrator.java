@@ -359,62 +359,53 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     @Override
     @DB
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        // populate providers
-        final Map<Network.Service, Set<Network.Provider>> defaultSharedNetworkOfferingProviders = new HashMap<>();
-        final Set<Network.Provider> defaultProviders = new HashSet<>();
+        final Set<Network.Provider> virtualRouterProvider = new HashSet<>();
+        virtualRouterProvider.add(Network.Provider.VirtualRouter);
 
-        defaultProviders.add(Network.Provider.VirtualRouter);
-        defaultSharedNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-        defaultSharedNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-        defaultSharedNetworkOfferingProviders.put(Service.UserData, defaultProviders);
+        final Set<Network.Provider> vpcVirtualRouterProvider = new HashSet<>();
+        vpcVirtualRouterProvider.add(Network.Provider.VPCVirtualRouter);
 
-        final Map<Network.Service, Set<Network.Provider>> defaultIsolatedNetworkOfferingProviders = defaultSharedNetworkOfferingProviders;
-        defaultIsolatedNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.Firewall, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.Gateway, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.Lb, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.SourceNat, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.StaticNat, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.PortForwarding, defaultProviders);
-        defaultIsolatedNetworkOfferingProviders.put(Service.Vpn, defaultProviders);
+        final Set<Network.Provider> securityGroupProvider = new HashSet<>();
+        securityGroupProvider.add(Provider.SecurityGroupProvider);
 
-        final Map<Network.Service, Set<Network.Provider>> defaultSharedSGEnabledNetworkOfferingProviders = new HashMap<>();
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-        final Set<Provider> sgProviders = new HashSet<>();
-        sgProviders.add(Provider.SecurityGroupProvider);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.SecurityGroup, sgProviders);
+        final Set<Network.Provider> internalLbVmProvider = new HashSet<>();
+        internalLbVmProvider.add(Network.Provider.InternalLbVm);
 
-        final Map<Network.Service, Set<Network.Provider>> defaultIsolatedSourceNatEnabledNetworkOfferingProviders = new HashMap<>();
-        defaultProviders.clear();
-        defaultProviders.add(Network.Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Firewall, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Gateway, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Lb, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.SourceNat, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.StaticNat, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.PortForwarding, defaultProviders);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Vpn, defaultProviders);
+        final Map<Network.Service, Set<Network.Provider>> defaultIsolatedNetworkOfferingProviders = new HashMap<>();
+        defaultIsolatedNetworkOfferingProviders.put(Service.Dhcp, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.Dns, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.UserData, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.Firewall, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.Gateway, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.Lb, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.SourceNat, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.StaticNat, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.PortForwarding, virtualRouterProvider);
+        defaultIsolatedNetworkOfferingProviders.put(Service.Vpn, virtualRouterProvider);
+
+        final Map<Network.Service, Set<Network.Provider>> defaultSharedSGEnabledNetworkOfferingProviders = new HashMap<>(defaultIsolatedNetworkOfferingProviders);
+        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.SecurityGroup, securityGroupProvider);
 
         final Map<Network.Service, Set<Network.Provider>> defaultVPCOffProviders = new HashMap<>();
-        defaultProviders.clear();
-        defaultProviders.add(Network.Provider.VPCVirtualRouter);
-        defaultVPCOffProviders.put(Service.Dhcp, defaultProviders);
-        defaultVPCOffProviders.put(Service.Dns, defaultProviders);
-        defaultVPCOffProviders.put(Service.UserData, defaultProviders);
-        defaultVPCOffProviders.put(Service.NetworkACL, defaultProviders);
-        defaultVPCOffProviders.put(Service.Gateway, defaultProviders);
-        defaultVPCOffProviders.put(Service.Lb, defaultProviders);
-        defaultVPCOffProviders.put(Service.SourceNat, defaultProviders);
-        defaultVPCOffProviders.put(Service.StaticNat, defaultProviders);
-        defaultVPCOffProviders.put(Service.PortForwarding, defaultProviders);
-        defaultVPCOffProviders.put(Service.Vpn, defaultProviders);
+        defaultVPCOffProviders.put(Service.Dhcp, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.Dns, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.UserData, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.NetworkACL, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.Gateway, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.Lb, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.SourceNat, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.StaticNat, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.PortForwarding, vpcVirtualRouterProvider);
+        defaultVPCOffProviders.put(Service.Vpn, vpcVirtualRouterProvider);
+
+        final Map<Network.Service, Set<Network.Provider>> internalLbOffProviders = new HashMap<>();
+        internalLbOffProviders.put(Service.Dhcp, vpcVirtualRouterProvider);
+        internalLbOffProviders.put(Service.Dns, vpcVirtualRouterProvider);
+        internalLbOffProviders.put(Service.UserData, vpcVirtualRouterProvider);
+        internalLbOffProviders.put(Service.NetworkACL, vpcVirtualRouterProvider);
+        internalLbOffProviders.put(Service.Gateway, vpcVirtualRouterProvider);
+        internalLbOffProviders.put(Service.Lb, internalLbVmProvider);
+        internalLbOffProviders.put(Service.SourceNat, vpcVirtualRouterProvider);
 
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
@@ -425,7 +416,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     offering = _configMgr.createNetworkOffering(
                             NetworkOffering.DefaultSharedNetworkOfferingWithSGService,
                             "Offering for Shared Security group enabled networks",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedNetworkOfferingProviders, true,
+                            TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedSGEnabledNetworkOfferingProviders, true,
                             GuestType.Shared, false, null, null, true, null, true,
                             false, null, false, null, true
                     );
@@ -438,7 +429,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     offering = _configMgr.createNetworkOffering(
                             NetworkOffering.DefaultSharedNetworkOffering,
                             "Offering for Shared networks",
-                            TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedNetworkOfferingProviders, true,
+                            TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Shared, false, null, null, true, null, true,
                             false, null, false, null, true
                     );
@@ -451,7 +442,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     offering = _configMgr.createNetworkOffering(
                             NetworkOffering.DefaultIsolatedNetworkOfferingWithSourceNatService,
                             "Offering for Isolated networks with Source Nat service enabled",
-                            TrafficType.Guest, null, false, Availability.Required, null, defaultIsolatedSourceNatEnabledNetworkOfferingProviders,
+                            TrafficType.Guest, null, false, Availability.Required, null, defaultIsolatedNetworkOfferingProviders,
                             true, GuestType.Isolated, false, null, null, true, null,
                             false, false, null, false, null, true
                     );
@@ -563,21 +554,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 }
 
                 //Network offering with internal lb service
-                final Map<Network.Service, Set<Network.Provider>> internalLbOffProviders = new HashMap<>();
-                final Set<Network.Provider> defaultVpcProvider = new HashSet<>();
-                defaultVpcProvider.add(Network.Provider.VPCVirtualRouter);
-
-                final Set<Network.Provider> defaultInternalLbProvider = new HashSet<>();
-                defaultInternalLbProvider.add(Network.Provider.InternalLbVm);
-
-                internalLbOffProviders.put(Service.Dhcp, defaultVpcProvider);
-                internalLbOffProviders.put(Service.Dns, defaultVpcProvider);
-                internalLbOffProviders.put(Service.UserData, defaultVpcProvider);
-                internalLbOffProviders.put(Service.NetworkACL, defaultVpcProvider);
-                internalLbOffProviders.put(Service.Gateway, defaultVpcProvider);
-                internalLbOffProviders.put(Service.Lb, defaultInternalLbProvider);
-                internalLbOffProviders.put(Service.SourceNat, defaultVpcProvider);
-
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB) == null) {
                     offering = _configMgr.createNetworkOffering(
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
