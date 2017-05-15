@@ -562,9 +562,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 defaultNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
                 defaultNetworkOfferingProviders.put(Service.Dns, defaultProviders);
                 defaultNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.UserData, defaultProviders);
                 defaultNetworkOfferingProviders.put(Service.Firewall, defaultProviders);
                 defaultNetworkOfferingProviders.put(Service.Gateway, defaultProviders);
                 defaultNetworkOfferingProviders.put(Service.Lb, defaultProviders);
