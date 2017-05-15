@@ -86,7 +86,7 @@ class CsAcl(CsDataBag):
                                     " -s %s " % cidr +
                                     " -p %s " % rule['protocol'] +
                                     " -m %s " % rule['protocol'] +
-                                    " %s -j RETURN" % rnge])
+                                    " %s -j %s" % (rnge, self.rule['action'])])
 
             logging.debug("Current ACL IP direction is ==> %s", self.direction)
             if self.direction == 'egress':
