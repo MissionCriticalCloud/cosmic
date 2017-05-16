@@ -215,22 +215,6 @@ class TestVPCRedundancy(cloudstackTestCase):
         network1.get_net().delete(self.apiclient)
         self.networks.remove(network1)
 
-        vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
-
-        self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
-
-        total_sleep = 10
-        if vrrp_interval:
-            total_sleep = int(vrrp_interval[0].value) * 4
-        else:
-            self.logger.debug("Could not retrieve the key 'router.redundant.vrrp.interval'. Sleeping for 10 seconds.")
-
-        '''
-        Sleep (router.redundant.vrrp.interval * 4) seconds here because since we are removing the first tier (NIC) the VRRP will have to reconfigure the interface it uses.
-        Due to the configuration changes, it will start a new election and it might take up to 4 seconds, because each router has an
-        advertisement interval of 2 seconds.
-        '''
-        time.sleep(total_sleep)
         self.check_routers_state(status_to_check="MASTER")
         self.do_vpc_test(False)
 
@@ -238,11 +222,6 @@ class TestVPCRedundancy(cloudstackTestCase):
         network2.get_net().delete(self.apiclient)
         self.networks.remove(network2)
 
-        '''
-        Let's be sure and sleep for 'total_sleep' seconds because removing/adding an interface will restart keepalived.
-        It restarts it because the keepalived configuration file changes in order to have the virtual_ipaddress section updated.
-        '''
-        time.sleep(total_sleep)
         self.check_routers_state(status_to_check="MASTER")
         self.do_vpc_test(False)
 
@@ -290,6 +269,22 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         result = "TESTFAILED"
         self.logger.debug('check_routers_state count: %s, status_to_check: %s, expected_count: %s, showall: %s' % (count, status_to_check, expected_count, showall))
+
+        vrrp_interval = Configurations.list(self.apiclient, name="router.redundant.vrrp.interval")
+        self.logger.debug("router.redundant.vrrp.interval is ==> %s" % vrrp_interval)
+
+        total_sleep = 20
+        if vrrp_interval:
+            total_sleep = (int(vrrp_interval[0].value) * 4) + 10
+        else:
+            self.logger.debug("Could not retrieve the key 'router.redundant.vrrp.interval'. Sleeping for 10 seconds.")
+
+        '''
+        Sleep (router.redundant.vrrp.interval * 4) seconds here because VRRP will have to be reconfigured. Due to the configuration changes,
+        it will start a new election and that will take ~4 multiplied by the advertisement interval seconds. Next to that, we need some time
+        for the router to be reconfigured, so adding 10 seconds to be on the safe side.
+        '''
+        time.sleep(total_sleep)
 
         self.query_routers(count, showall)
         for router in self.routers:
