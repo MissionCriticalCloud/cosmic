@@ -54,6 +54,8 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
+import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
@@ -67,8 +69,6 @@ import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SSHCmdHelper;
 import com.cloud.utils.ssh.SshHelper;
 import com.cloud.vm.VirtualMachine.PowerState;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -4353,7 +4353,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
                 final VM router = getVM(conn, routerName);
 
-                final VIF correctVif = getVifByMac(conn, router, ip.getVifMacAddress());
+                final VIF correctVif = getVifByMac(conn, router, ip.getDeviceMacAddress());
                 setNicDevIdIfCorrectVifIsNotNull(conn, ip, correctVif);
             }
         } catch (final Exception e) {

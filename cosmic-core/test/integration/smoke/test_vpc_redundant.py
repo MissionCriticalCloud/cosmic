@@ -1,9 +1,6 @@
 import inspect
 import socket
 import time
-
-from nose.plugins.attrib import attr
-
 from marvin.cloudstackAPI import (
     startRouter,
     stopRouter,
@@ -40,6 +37,7 @@ from marvin.lib.utils import (
     cleanup_resources
 )
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestVPCRedundancy(cloudstackTestCase):
@@ -99,8 +97,6 @@ class TestVPCRedundancy(cloudstackTestCase):
 
     def tearDown(self):
         try:
-            # Stop/Destroy the routers so we are able to remove the networks. Issue CLOUDSTACK-8935
-            self.destroy_routers()
             cleanup_resources(self.api_client, self.cleanup)
         except Exception as e:
             raise Exception("Warning: Exception during cleanup : %s" % e)
@@ -271,12 +267,15 @@ class TestVPCRedundancy(cloudstackTestCase):
         return ip_ranges[0].gateway
 
     def query_routers(self, count=2, showall=False):
+        self.logger.debug('query_routers count: %s, showall: %s' % (count, showall))
         self.routers = list_routers(self.apiclient,
                                     account=self.account.name,
                                     domainid=self.account.domainid,
                                     )
         if not showall:
             self.routers = [r for r in self.routers if r.state != "Stopped"]
+
+        self.logger.debug('query_routers routers: %s' % self.routers)
         self.assertEqual(
             isinstance(self.routers, list), True,
             "Check for list routers response return valid data")
@@ -286,10 +285,12 @@ class TestVPCRedundancy(cloudstackTestCase):
             "Check that %s routers were indeed created" % count)
 
     def check_routers_state(self, count=2, status_to_check="MASTER", expected_count=1, showall=False):
-        vals = ["MASTER", "BACKUP", "UNKNOWN"]
+        vals = ["MASTER", "BACKUP", "UNKNOWN", "TESTFAILED"]
         cnts = [0, 0, 0]
 
-        result = "UNKNOWN"
+        result = "TESTFAILED"
+        self.logger.debug('check_routers_state count: %s, status_to_check: %s, expected_count: %s, showall: %s' % (count, status_to_check, expected_count, showall))
+
         self.query_routers(count, showall)
         for router in self.routers:
             if router.state == "Running":
@@ -308,27 +309,35 @@ class TestVPCRedundancy(cloudstackTestCase):
                 host = hosts[0]
 
                 try:
-                    host.user, host.passwd = get_host_credentials(
-                        self.config, host.ipaddress)
-                    result = str(get_process_status(
-                        host.ipaddress,
-                        22,
-                        host.user,
-                        host.passwd,
-                        router.linklocalip,
-                        "sh /opt/cloud/bin/checkrouter.sh "
-                    ))
+                    for _ in range(5):
+                        host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
+                        result = str(get_process_status(
+                            host.ipaddress,
+                            22,
+                            host.user,
+                            host.passwd,
+                            router.linklocalip,
+                            "sh /opt/cloud/bin/checkrouter.sh "
+                        ))
+
+                        self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))
+
+                        if result.count(status_to_check) == 1:
+                            cnts[vals.index(status_to_check)] += 1
+                            break
+                        elif result.count("UNKNOWN") == 1:
+                            time.sleep(5)
+                        else:
+                            break
+
 
                 except KeyError:
                     self.skipTest(
                         "Marvin configuration has no host credentials to\
                                 check router services")
 
-                if result.count(status_to_check) == 1:
-                    cnts[vals.index(status_to_check)] += 1
-
         if cnts[vals.index(status_to_check)] != expected_count:
-            self.fail("Expected '%s' router[s] at state '%s', but found '%s'!" % (expected_count, status_to_check, cnts[vals.index(status_to_check)]))
+            self.fail("Expected '%s' router[s] at state '%s', but found '%s'! Result: %s" % (expected_count, status_to_check, cnts[vals.index(status_to_check)], result))
 
     def check_routers_interface(self, count=2, interface_to_check="eth1", expected_exists=True, showall=False):
         result = ""
