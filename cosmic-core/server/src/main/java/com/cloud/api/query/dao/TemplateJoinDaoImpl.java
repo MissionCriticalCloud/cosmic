@@ -15,6 +15,7 @@ import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
+import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
@@ -44,6 +45,8 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
     private ConfigurationDao _configDao;
     @Inject
     private AccountService _accountService;
+    @Inject
+    public AccountManager _accountMgr;
 
     protected TemplateJoinDaoImpl() {
 
@@ -105,7 +108,9 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         templateResponse.setDomainName(template.getDomainName());
 
         // If the user is an 'Admin' or 'the owner of template', add the template download status
-        if (view == ResponseView.Full || template.getAccountId() == CallContext.current().getCallingAccount().getId()) {
+        final Account caller = CallContext.current().getCallingAccount();
+
+        if (view == ResponseView.Full || _accountMgr.isDomainAdmin(caller.getId()) || template.getAccountId() == CallContext.current().getCallingAccount().getId()) {
             final String templateStatus = getTemplateStatus(template);
             if (templateStatus != null) {
                 templateResponse.setStatus(templateStatus);

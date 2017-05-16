@@ -1015,7 +1015,7 @@
 
                                 preFilter: function (args) {
                                     var hiddenFields;
-                                    if (isAdmin()) {
+                                    if (isAdmin() || isDomainAdmin()) {
                                         hiddenFields = [];
                                     } else {
                                         hiddenFields = ["hypervisor", 'xenserverToolsVersion61plus'];
@@ -1412,7 +1412,7 @@
                                                 title: 'label.details',
                                                 preFilter: function (args) {
                                                     var hiddenFields;
-                                                    if (isAdmin()) {
+                                                    if (isAdmin() || isDomainAdmin()) {
                                                         hiddenFields = [];
                                                     } else {
                                                         hiddenFields = ["hypervisor", 'xenserverToolsVersion61plus'];
