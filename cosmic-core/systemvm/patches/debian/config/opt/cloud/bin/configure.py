@@ -17,6 +17,7 @@ from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsPrivateGateway import CsPrivateGateway
 from cs.CsHelper import get_systemvm_version
+from cs.CsVrConfig import CsVrConfig
 
 OCCURRENCES = 1
 
@@ -1203,7 +1204,8 @@ def main(argv):
                                ("load_balancer.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("monitor_service.json", { "process_iptables": False, "executor": CsMonitor("monitorservice", config) }),
                                ("static_routes.json", { "process_iptables": False, "executor": CsStaticRoutes("staticroutes", config) }),
-                               ("private_gateway.json", { "process_iptables": True, "executor": CsPrivateGateway("privategateway", config) })
+                               ("private_gateway.json", { "process_iptables": True, "executor": CsPrivateGateway("privategateway", config) }),
+                               ("vr.json", { "process_iptables": True, "executor": CsVrConfig("virtualrouter", config) })
                                ])
 
     if process_file.count("cmd_line.json") == OCCURRENCES:

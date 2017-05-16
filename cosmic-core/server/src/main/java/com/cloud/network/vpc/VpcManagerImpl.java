@@ -945,7 +945,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final VpcVO vpc = _vpcDao.createForUpdate(vpcId);
         boolean restartWithCleanupRequired = false;
-        //boolean updateVRConfigRequired = false;
 
         if (vpcName != null) {
             vpc.setName(vpcName);
@@ -962,8 +961,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         if (displayVpc != null) {
             vpc.setDisplay(displayVpc);
         }
-
-        vpc.setSourceNatList(sourceNatList);
 
         if (vpcOfferingId != null) {
             final VpcOfferingVO newVpcOffering = _vpcOffDao.findById(vpcOfferingId);
@@ -1006,6 +1003,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         }
         vpc.setRestartRequired(restartWithCleanupRequired);
+
+        // always clear the sourceNatList if it is null and only set if sourceNatList is not null and current of new vpcOffering supports sourceNatService
+        if ( sourceNatList == null || (sourceNatList != null && ((vpcOfferingId != null && hasSourceNatService(vpc)) || hasSourceNatService(vpcToUpdate)))) {
+            vpc.setSourceNatList(sourceNatList);
+        } else {
+            // otherwise throw an exception
+            throw new InvalidParameterValueException("Source NAT is not enabled on the VPC, so source NAT list is not allowed!");
+        }
 
         // Save the new config
         if (_vpcDao.update(vpcId, vpc)) {
