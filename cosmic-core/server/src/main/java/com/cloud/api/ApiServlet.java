@@ -239,7 +239,7 @@ public class ApiServlet extends HttpServlet {
                     }
                 }
 
-                final String errorMessage = "The given command either does not exist, is not available for user, or not available from ip address '" + remoteAddress + "'.";
+                final String errorMessage = "Permission denied due to: Expired session, unavailable API command or non-authorised from ip-address '" + remoteAddress + "'";
                 auditTrailSb.append(" " + HttpServletResponse.SC_UNAUTHORIZED + " " + errorMessage);
                 final String serializedResponse =
                         _apiServer.getSerializedApiError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage, params, responseType);
