@@ -4885,10 +4885,15 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     protected abstract String getPatchFilePath();
 
-    public void shutdownVM(final Connection conn, final VM vm, final String vmName) throws XmlRpcException {
+    public void shutdownVM(final Connection conn, final VM vm, final String vmName, final boolean forcedStop) throws XmlRpcException {
         Task task = null;
         try {
-            task = vm.cleanShutdownAsync(conn);
+            if (forcedStop) {
+                task = vm.hardShutdownAsync(conn);
+            } else {
+                task = vm.cleanShutdownAsync(conn);
+            }
+
             try {
                 // poll every 1 seconds , timeout after 10 minutes
                 waitForTask(conn, task, 1000, 10 * 60 * 1000);

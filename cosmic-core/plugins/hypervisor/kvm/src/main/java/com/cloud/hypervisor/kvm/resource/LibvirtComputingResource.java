@@ -2389,7 +2389,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
             logger.debug(vmDef);
-            msg = stopVm(conn, vmName);
+            msg = stopVm(conn, vmName, false);
             msg = startVm(conn, vmName, vmDef);
             return null;
         } catch (final LibvirtException e) {
@@ -2411,12 +2411,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return msg;
     }
 
-    public String stopVm(final Connect conn, final String vmName) {
+    public String stopVm(final Connect conn, final String vmName, final boolean forceStop) {
         DomainState state = null;
         Domain dm = null;
 
         logger.debug("Try to stop the vm at first");
-        String ret = stopVm(conn, vmName, false);
+        String ret = stopVmInternal(conn, vmName, forceStop);
         if (ret == Script.ERR_TIMEOUT) {
             ret = stopVm(conn, vmName, true);
         } else if (ret != null) {
@@ -2450,7 +2450,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
             if (state != DomainState.VIR_DOMAIN_SHUTOFF) {
                 logger.debug("Try to destroy the vm");
-                ret = stopVm(conn, vmName, true);
+                ret = stopVmInternal(conn, vmName, forceStop);
                 if (ret != null) {
                     return ret;
                 }
@@ -2494,7 +2494,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return null;
     }
 
-    protected String stopVm(final Connect conn, final String vmName, final boolean force) {
+    protected String stopVmInternal(final Connect conn, final String vmName, final boolean force) {
         Domain dm = null;
         try {
             dm = conn.domainLookupByName(vmName);

@@ -9,6 +9,7 @@ public class StopCommand extends RebootCommand {
     private String urlPort = null;
     private String publicConsoleProxyIpAddress = null;
     private GPUDeviceTO gpuDevice;
+    boolean forceStop = false;
 
     protected StopCommand() {
     }
@@ -30,6 +31,11 @@ public class StopCommand extends RebootCommand {
     public StopCommand(final String vmName, final boolean executeInSequence, final boolean checkBeforeCleanup) {
         super(vmName, executeInSequence);
         this.checkBeforeCleanup = checkBeforeCleanup;
+    }
+
+    public StopCommand(VirtualMachine vm, boolean executeInSequence, boolean checkBeforeCleanup, boolean forceStop) {
+        super(vm.getInstanceName(), executeInSequence);
+        this.forceStop = forceStop;
     }
 
     @Override
@@ -63,5 +69,9 @@ public class StopCommand extends RebootCommand {
 
     public boolean checkBeforeCleanup() {
         return this.checkBeforeCleanup;
+    }
+
+    public boolean isForceStop() {
+        return forceStop;
     }
 }
