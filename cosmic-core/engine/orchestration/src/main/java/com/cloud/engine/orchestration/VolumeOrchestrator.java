@@ -1117,7 +1117,9 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                                     final VolumeTask task = new VolumeTask(VolumeTaskType.MIGRATE, vol, assignedPool);
                                     tasks.add(task);
                                 } else {
-                                    throw new CloudRuntimeException("Cannot migrate volumes. Volume Migration is disabled");
+                                    throw new CloudRuntimeException("Cannot start VM on the hypervisor it was last running on, due to not enough capacity. Please try to start on " +
+                                            "another hypervisor in the same cluster, or migrate the volumes to another storage pool. Automatic Volume Migration is disabled, " +
+                                            "so this is not handled automatically.");
                                 }
                             }
                         } else {
