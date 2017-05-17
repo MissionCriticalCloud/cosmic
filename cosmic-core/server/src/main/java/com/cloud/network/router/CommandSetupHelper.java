@@ -483,7 +483,12 @@ public class CommandSetupHelper {
                 associatedWithNetworkId = ipAddrList.get(0).getNetworkId();
             }
 
-            final IpAssocCommand cmd = new IpAssocCommand(ipsToSend);
+            final IpAssocCommand cmd;
+            if (ipAssocCommand.equals("IPAssocVpcCommand")) {
+                cmd = new IpAssocVpcCommand(ipsToSend);
+            } else {
+                cmd = new IpAssocCommand(ipsToSend);
+            }
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(associatedWithNetworkId, router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
