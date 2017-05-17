@@ -35,6 +35,9 @@ public class GuestOSVO implements GuestOS {
     @Column(name = "is_user_defined")
     private boolean isUserDefined;
 
+    @Column(name = "manufacturer_string")
+    String manufacturer;
+
     @Override
     public long getId() {
         return id;
@@ -97,5 +100,13 @@ public class GuestOSVO implements GuestOS {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(final String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 }
