@@ -1721,7 +1721,7 @@
 
                                 preFilter: function (args) {
                                     var hiddenFields;
-                                    if (isAdmin()) {
+                                    if (isAdmin() || isDomainAdmin()) {
                                         hiddenFields = [];
                                     } else {
                                         hiddenFields = ['storage', 'hypervisor'];

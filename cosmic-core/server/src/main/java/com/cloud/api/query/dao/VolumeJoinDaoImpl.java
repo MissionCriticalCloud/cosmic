@@ -6,12 +6,14 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.api.response.VolumeResponse;
+import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.Volume;
+import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -123,7 +125,10 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             }
         }
 
-        if (view == ResponseView.Full) {
+        final Account caller = CallContext.current().getCallingAccount();
+
+        // return the path on disk to root admins and admins
+        if (!_accountMgr.isNormalUser(caller.getId())) {
             volResponse.setPath(volume.getPath());
         }
 
@@ -162,8 +167,8 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             volResponse.setIopsWriteRate(volume.getIopsWriteRate());
         }
 
-        // return hypervisor and storage pool info for ROOT and Resource domain only
-        if (view == ResponseView.Full) {
+        if (!_accountMgr.isNormalUser(caller.getId())) {
+            // return hypervisor and storage pool info to root admins and admins
             if (volume.getState() != Volume.State.UploadOp) {
                 if (volume.getHypervisorType() != null) {
                     volResponse.setHypervisor(volume.getHypervisorType().toString());
