@@ -17,7 +17,7 @@ from marvin.lib.common import (
     get_default_redundant_vpc_offering,
     get_default_network_offering,
     get_default_virtual_machine_offering,
-    get_default_acl
+    get_network_acl
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -116,10 +116,10 @@ class TestIpExclusionList(cloudstackTestCase):
         cls.virtual_machine_offering = get_default_virtual_machine_offering(cls.api_client)
         cls.logger.debug("Virtual Machine Offering '%s' selected", cls.virtual_machine_offering.name)
 
-        cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
+        cls.default_allow_acl = get_network_acl(cls.api_client, 'default_allow')
         cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
-        cls.default_deny_acl = get_default_acl(cls.api_client, 'default_deny')
+        cls.default_deny_acl = get_network_acl(cls.api_client, 'default_deny')
         cls.logger.debug("ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,

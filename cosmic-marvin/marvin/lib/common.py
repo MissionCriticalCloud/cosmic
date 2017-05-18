@@ -1,6 +1,6 @@
-from base import NetworkACLList
 from marvin.cloudstackAPI import (
     listConfigurations,
+    listNetworkACLLists,
     listDomains,
     listZones,
     listTemplates,
@@ -16,7 +16,8 @@ from marvin.cloudstackAPI import (
     listLoadBalancerRules,
     listServiceOfferings,
     listNetworkOfferings,
-    listVPCOfferings
+    listVPCOfferings,
+    listVPCs
 )
 from marvin.codes import (
     PASS,
@@ -147,6 +148,16 @@ def list_networks(api_client, **kwargs):
     return api_client.listNetworks(cmd)
 
 
+def list_vpcs(api_client, **kwargs):
+    """List all VPCs matching criteria"""
+
+    cmd = listVPCs.listVPCsCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listVPCs(cmd)
+
+
 def list_ssvms(api_client, **kwargs):
     """List all SSVMs matching criteria"""
 
@@ -267,6 +278,16 @@ def list_vpc_offerings(api_client, **kwargs):
     return api_client.listVPCOfferings(cmd)
 
 
+def list_network_acl_lists(api_client, **kwargs):
+    """List Network ACL lists"""
+
+    cmd = listNetworkACLLists.listNetworkACLListsCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listNetworkACLLists(cmd)
+
+
 def get_hypervisor_type(api_client):
     """Return the hypervisor type of the hosts in setup"""
 
@@ -285,6 +306,12 @@ def get_default_vpc_offering(api_client):
     return next(iter(offerings or []), None)
 
 
+def get_vpc_offering(api_client, name):
+    offerings = list_vpc_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == name]
+    return next(iter(offerings or []), None)
+
+
 def get_default_redundant_vpc_offering(api_client):
     offerings = list_vpc_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'Redundant VPC offering']
@@ -297,43 +324,48 @@ def get_default_network_offering(api_client):
     return next(iter(offerings or []), None)
 
 
+def get_network_offering(api_client, name):
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == name]
+    return next(iter(offerings or []), None)
+
+
 def get_default_guest_network_offering(api_client):
     offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithSourceNatService']
+    offerings = [offering for offering in offerings if
+                 offering.name == 'DefaultIsolatedNetworkOfferingWithSourceNatService']
     return next(iter(offerings or []), None)
 
 
 def get_default_network_offering_no_load_balancer(api_client):
     offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
+    offerings = [offering for offering in offerings if
+                 offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
     return next(iter(offerings or []), None)
 
 
 def get_default_isolated_network_offering(api_client):
-
     offerings = list_network_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOffering']
     return next(iter(offerings or []), None)
 
 
 def get_default_isolated_network_offering_with_egress(api_client):
-
     offerings = list_network_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithEgress']
     return next(iter(offerings or []), None)
 
 
 def get_default_redundant_isolated_network_offering(api_client):
-
     offerings = list_network_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'DefaultRedundantIsolatedNetworkOffering']
     return next(iter(offerings or []), None)
 
 
 def get_default_redundant_isolated_network_offering_with_egress(api_client):
-
     offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultRedundantIsolatedNetworkOfferingWithEgress']
+    offerings = [offering for offering in offerings if
+                 offering.name == 'DefaultRedundantIsolatedNetworkOfferingWithEgress']
     return next(iter(offerings or []), None)
 
 
@@ -343,20 +375,20 @@ def get_default_virtual_machine_offering(api_client):
     return next(iter(offerings or []), None)
 
 
-def get_default_acl(api_client, name):
-    acls = NetworkACLList.list(api_client)
-    acls = [acl for acl in acls if acl.name == name]
-    return next(iter(acls or []), None)
+def get_virtual_machine_offering(api_client, name):
+    offerings = list_service_offering(api_client)
+    offerings = [offering for offering in offerings if offering.name == name]
+    return next(iter(offerings or []), None)
 
 
 def get_default_allow_vpc_acl(api_client, vpc):
-    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = list_network_acl_lists(api_client, vpcid=vpc.id)
     acls = [acl for acl in acls if acl.name == 'default_allow']
     return next(iter(acls or []), None)
 
 
 def get_default_deny_vpc_acl(api_client, vpc):
-    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
+    acls = list_network_acl_lists(api_client, vpcid=vpc.id)
     acls = [acl for acl in acls if acl.name == 'default_deny']
     return next(iter(acls or []), None)
 
@@ -365,3 +397,34 @@ def get_default_private_network_offering(api_client):
     offerings = list_network_offerings(api_client)
     offerings = [offering for offering in offerings if offering.name == 'DefaultPrivateGatewayNetworkOffering']
     return next(iter(offerings or []), None)
+
+
+def get_private_network_offering(api_client, name):
+    offerings = list_network_offerings(api_client)
+    offerings = [offering for offering in offerings if offering.name == name]
+    return next(iter(offerings or []), None)
+
+
+def get_network(api_client, name, vpc=None):
+    if vpc:
+        networks = list_networks(api_client, vpcid=vpc.id)
+    else:
+        networks = list_networks(api_client)
+    networks = [network for network in networks if network.name == name]
+    return next(iter(networks or []), None)
+
+
+def get_virtual_machine(api_client, name, vpc=None):
+    virtual_machines = list_virtual_machines(api_client, listall=True)
+    virtual_machines = [virtual_machine for virtual_machine in virtual_machines if virtual_machine.name == name]
+    return next(iter(virtual_machines or []), None)
+
+
+def get_vpc(api_client, name):
+    vpcs = list_vpcs(api_client, name=name, listall=True)
+    return next(iter(vpcs or []), None)
+
+
+def get_network_acl(api_client, name):
+    acls = list_network_acl_lists(api_client, name=name, listall=True)
+    return next(iter(acls or []), None)
