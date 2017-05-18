@@ -101,6 +101,7 @@ public class LibvirtVmDef {
         private String cmdline;
         private String uuid;
         private String machine;
+        private String manufacturer;
 
         public GuestType getGuestType() {
             return type;
@@ -137,6 +138,10 @@ public class LibvirtVmDef {
             this.uuid = uuid;
         }
 
+        public void setManufacturer(final String manufacturer) {
+            this.manufacturer = manufacturer;
+        }
+
         @Override
         public String toString() {
             if (type == GuestType.KVM) {
@@ -144,7 +149,9 @@ public class LibvirtVmDef {
 
                 guestDef.append("<sysinfo type='smbios'>\n");
                 guestDef.append("<system>\n");
-                guestDef.append("<entry name='manufacturer'>Mission Critical Cloud</entry>\n");
+                if (manufacturer != null && ! manufacturer.isEmpty()) {
+                    guestDef.append("<entry name='manufacturer'>" + manufacturer + "</entry>\n");
+                }
                 guestDef.append("<entry name='product'>Cosmic " + type.toString() + " Hypervisor</entry>\n");
                 guestDef.append("<entry name='uuid'>" + uuid + "</entry>\n");
                 guestDef.append("</system>\n");

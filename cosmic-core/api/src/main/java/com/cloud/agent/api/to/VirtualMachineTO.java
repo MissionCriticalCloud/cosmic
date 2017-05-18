@@ -27,6 +27,7 @@ public class VirtualMachineTO {
     String hostName;
     String arch;
     String os;
+    String manufacturer;
     String platformEmulator;
     String bootArgs;
     String[] bootupScripts;
@@ -301,5 +302,13 @@ public class VirtualMachineTO {
 
     public void setConfigDriveIsoFile(final String configDriveIsoFile) {
         this.configDriveIsoFile = configDriveIsoFile;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(final String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 }

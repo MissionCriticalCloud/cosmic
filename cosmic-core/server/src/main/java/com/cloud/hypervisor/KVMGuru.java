@@ -77,6 +77,7 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
         // Determine the VM's OS description
         final GuestOSVO guestOS = _guestOsDao.findByIdIncludingRemoved(vm.getVirtualMachine().getGuestOSId());
         to.setOs(guestOS.getDisplayName());
+        to.setManufacturer(guestOS.getManufacturer());
         final HostVO host = _hostDao.findById(vm.getVirtualMachine().getHostId());
         GuestOSHypervisorVO guestOsMapping = null;
         if (host != null) {
