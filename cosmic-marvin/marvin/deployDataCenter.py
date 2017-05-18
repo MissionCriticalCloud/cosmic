@@ -246,7 +246,7 @@ class DeployDataCenters(object):
                 secondarycmd.provider = secondary.provider
                 secondarycmd.details = []
 
-                if secondarycmd.provider.lower() in ("swift", "smb"):
+                if secondarycmd.provider.lower() in ("smb"):
                     for key, value in vars(secondary.details).iteritems():
                         secondarycmd.details.append({
                             'key': key,

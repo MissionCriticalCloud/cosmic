@@ -1404,7 +1404,6 @@
                                 success: function (json) {
                                     storageproviders.push({id: 'NFS', description: 'NFS'});
                                     storageproviders.push({id: 'SMB', description: 'SMB/CIFS'});
-                                    storageproviders.push({id: 'Swift', description: 'Swift'});
                                     args.response.success({
                                         data: storageproviders
                                     });
@@ -1425,12 +1424,6 @@
                                             $fields.filter('[rel=smbUsername]').hide();
                                             $fields.filter('[rel=smbPassword]').hide();
                                             $fields.filter('[rel=smbDomain]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
                                         } else if ($(this).val() == "NFS") {
                                             $fields.filter('[rel=name]').css('display', 'inline-block');
 
@@ -1443,12 +1436,6 @@
                                             $fields.filter('[rel=smbUsername]').hide();
                                             $fields.filter('[rel=smbPassword]').hide();
                                             $fields.filter('[rel=smbDomain]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
                                         } else if ($(this).val() == "SMB") {
                                             $fields.filter('[rel=name]').css('display', 'inline-block');
 
@@ -1461,30 +1448,6 @@
                                             $fields.filter('[rel=smbUsername]').css('display', 'inline-block');
                                             $fields.filter('[rel=smbPassword]').css('display', 'inline-block');
                                             $fields.filter('[rel=smbDomain]').css('display', 'inline-block');
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
-                                        } else if ($(this).val() == "Swift") {
-                                            $fields.filter('[rel=name]').css('display', 'inline-block');
-
-                                            //NFS
-                                            $fields.filter('[rel=zoneid]').hide();
-                                            $fields.filter('[rel=nfsServer]').hide();
-                                            $fields.filter('[rel=path]').hide();
-
-                                            //SMB
-                                            $fields.filter('[rel=smbUsername]').hide();
-                                            $fields.filter('[rel=smbPassword]').hide();
-                                            $fields.filter('[rel=smbDomain]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').css('display', 'inline-block');
-                                            $fields.filter('[rel=account]').css('display', 'inline-block');
-                                            $fields.filter('[rel=username]').css('display', 'inline-block');
-                                            $fields.filter('[rel=key]').css('display', 'inline-block');
                                         }
                                     });
                                     args.$select.change();
@@ -1536,28 +1499,6 @@
                         }
                     },
                     //SMB (end)
-
-                    //Swift (begin)
-                    url: {
-                        label: 'label.url',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    account: {
-                        label: 'label.account',
-                        isHidden: true
-                    },
-                    username: {
-                        label: 'label.username',
-                        isHidden: true
-                    },
-                    key: {
-                        label: 'label.key',
-                        isHidden: true
-                    }
-                    //Swift (end)
                 }
             }
         },
@@ -3388,48 +3329,6 @@
                             url: createURL('addImageStore'),
                             data: data,
                             success: function (json) {
-                                complete({
-                                    data: $.extend(args.data, {
-                                        returnedSecondaryStorage: json.addimagestoreresponse.secondarystorage
-                                    })
-                                });
-                            },
-                            error: function (XMLHttpResponse) {
-                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                error('addSecondaryStorage', errorMsg, {
-                                    fn: 'addSecondaryStorage',
-                                    args: args
-                                });
-                            }
-                        });
-                    } else if (args.data.secondaryStorage.provider == 'Swift') {
-                        $.extend(data, {
-                            provider: args.data.secondaryStorage.provider,
-                            url: args.data.secondaryStorage.url
-                        });
-
-                        var index = 0;
-                        if (args.data.secondaryStorage.account != null && args.data.secondaryStorage.account.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'account';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.account;
-                            index++;
-                        }
-                        if (args.data.secondaryStorage.username != null && args.data.secondaryStorage.username.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'username';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.username;
-                            index++;
-                        }
-                        if (args.data.secondaryStorage.key != null && args.data.secondaryStorage.key.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'key';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.key;
-                            index++;
-                        }
-                        $.ajax({
-                            url: createURL('addImageStore'),
-                            data: data,
-                            success: function (json) {
-                                g_regionsecondaryenabled = true;
-
                                 complete({
                                     data: $.extend(args.data, {
                                         returnedSecondaryStorage: json.addimagestoreresponse.secondarystorage

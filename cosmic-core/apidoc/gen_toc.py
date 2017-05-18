@@ -106,7 +106,6 @@ known_categories = {
     'Product': 'Product',
     'LB': 'Load Balancer',
     'ldap': 'LDAP',
-    'Swift': 'Swift',
     'SecondaryStorage': 'Host',
     'Project': 'Project',
     'Lun': 'Storage',

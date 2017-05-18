@@ -11913,18 +11913,16 @@
                                             provider: {
                                                 label: 'label.provider',
                                                 select: function (args) {
-                                                    var items = [{
-                                                        id: 'NFS',
-                                                        description: 'NFS'
-                                                    },
+                                                    var items = [
+                                                        {
+                                                            id: 'NFS',
+                                                            description: 'NFS'
+                                                        },
                                                         {
                                                             id: 'SMB',
                                                             description: 'SMB/CIFS'
-                                                        },
-                                                        {
-                                                            id: 'Swift',
-                                                            description: 'Swift'
-                                                        }];
+                                                        }
+                                                    ];
 
                                                     args.response.success({
                                                         data: items
@@ -11942,12 +11940,6 @@
                                                             $form.find('.form-item[rel=smbUsername]').hide();
                                                             $form.find('.form-item[rel=smbPassword]').hide();
                                                             $form.find('.form-item[rel=smbDomain]').hide();
-
-                                                            //Swift
-                                                            $form.find('.form-item[rel=url]').hide();
-                                                            $form.find('.form-item[rel=account]').hide();
-                                                            $form.find('.form-item[rel=username]').hide();
-                                                            $form.find('.form-item[rel=key]').hide();
                                                         } else if ($(this).val() == "SMB") {
                                                             //NFS, SMB
                                                             $form.find('.form-item[rel=zoneid]').css('display', 'inline-block');
@@ -11958,29 +11950,6 @@
                                                             $form.find('.form-item[rel=smbUsername]').css('display', 'inline-block');
                                                             $form.find('.form-item[rel=smbPassword]').css('display', 'inline-block');
                                                             $form.find('.form-item[rel=smbDomain]').css('display', 'inline-block');
-
-                                                            //Swift
-                                                            $form.find('.form-item[rel=url]').hide();
-                                                            $form.find('.form-item[rel=account]').hide();
-                                                            $form.find('.form-item[rel=username]').hide();
-                                                            $form.find('.form-item[rel=key]').hide();
-                                                        } else if ($(this).val() == "Swift") {
-                                                            //NFS, SMB
-                                                            $form.find('.form-item[rel=zoneid]').hide();
-                                                            $form.find('.form-item[rel=nfsServer]').hide();
-                                                            $form.find('.form-item[rel=path]').hide();
-
-                                                            //SMB
-                                                            $form.find('.form-item[rel=smbUsername]').hide();
-                                                            $form.find('.form-item[rel=smbPassword]').hide();
-                                                            $form.find('.form-item[rel=smbDomain]').hide();
-
-                                                            //Swift
-                                                            $form.find('.form-item[rel=url]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=account]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=username]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=key]').css('display', 'inline-block');
-                                                        }
                                                     });
 
                                                     args.$select.change();
@@ -12059,24 +12028,6 @@
                                                 }
                                             },
                                             //SMB (end)
-
-                                            //Swift (begin)
-                                            url: {
-                                                label: 'label.url',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            account: {
-                                                label: 'label.account'
-                                            },
-                                            username: {
-                                                label: 'label.username'
-                                            },
-                                            key: {
-                                                label: 'label.key'
-                                            }
-                                            //Swift (end)
                                         }
                                     },
 
@@ -12143,43 +12094,6 @@
                                                 error: function (XMLHttpResponse) {
                                                     var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
                                                     args.response.error(errorMsg);
-                                                }
-                                            });
-                                        } else if (args.data.provider == 'Swift') {
-                                            $.extend(data, {
-                                                provider: args.data.provider,
-                                                url: args.data.url
-                                            });
-
-                                            var index = 0;
-                                            if (args.data.account != null && args.data.account.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'account';
-                                                data['details[' + index.toString() + '].value'] = args.data.account;
-                                                index++;
-                                            }
-                                            if (args.data.username != null && args.data.username.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'username';
-                                                data['details[' + index.toString() + '].value'] = args.data.username;
-                                                index++;
-                                            }
-                                            if (args.data.key != null && args.data.key.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'key';
-                                                data['details[' + index.toString() + '].value'] = args.data.key;
-                                                index++;
-                                            }
-                                            $.ajax({
-                                                url: createURL('addImageStore'),
-                                                data: data,
-                                                success: function (json) {
-                                                    g_regionsecondaryenabled = true;
-
-                                                    var item = json.addimagestoreresponse.imagestore;
-                                                    args.response.success({
-                                                        data: item
-                                                    });
-                                                },
-                                                error: function (json) {
-                                                    args.response.error(parseXMLHttpResponse(json));
                                                 }
                                             });
                                         }
@@ -13204,7 +13118,6 @@
     //action filters (begin)
     var zoneActionfilter = cloudStack.actionFilter.zoneActionfilter = function (args) {
         var jsonObj = args.context.item;
-        var allowedActions = ['enableSwift'];
 
         if (jsonObj.domainid != null)
             allowedActions.push("releaseDedicatedZone"); else

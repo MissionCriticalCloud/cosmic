@@ -12663,7 +12663,6 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 
 .create .icon,
 .createTemplate .icon,
-.enableSwift .icon,
 .addVM .icon,
 .dedicateZone .icon,
 .dedicate .icon {
@@ -12672,7 +12671,6 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 
 .create:hover .icon,
 .createTemplate:hover .icon,
-.enableSwift:hover .icon,
 .addVM:hover .icon,
 .dedicateZone:hover .icon {
     background-position: -69px -645px;

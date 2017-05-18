@@ -6,7 +6,6 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.Storage;
@@ -719,22 +718,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                     snapshotBackupUuid = backedVdi.getUuid(conn);
                     physicalSize = backedVdi.getPhysicalUtilisation(conn);
 
-                    if (destStore instanceof SwiftTO) {
-                        try {
-                            final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
-                            final String destSnapshotName = swiftBackupSnapshot(conn, (SwiftTO) destStore, snapshotSr.getUuid(conn), snapshotBackupUuid, container, false, wait);
-                            final String swiftPath = container + File.separator + destSnapshotName;
-                            finalPath = swiftPath;
-                        } finally {
-                            try {
-                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
-                            } catch (final Exception e) {
-                                s_logger.debug("Failed to delete snapshot on cache storages", e);
-                            }
-                        }
-                    } else {
-                        finalPath = folder + File.separator + snapshotBackupUuid;
-                    }
+                    finalPath = folder + File.separator + snapshotBackupUuid;
                 } finally {
                     if (task != null) {
                         try {
@@ -749,19 +733,12 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                 }
             } else {
                 final String primaryStorageSRUuid = primaryStorageSR.getUuid(conn);
-                if (destStore instanceof SwiftTO) {
-                    final String container = "S-" + snapshotTO.getVolume().getVolumeId().toString();
-                    snapshotBackupUuid = swiftBackupSnapshot(conn, (SwiftTO) destStore, primaryStorageSRUuid, snapshotPaUuid, "S-"
-                            + snapshotTO.getVolume().getVolumeId().toString(), isISCSI, wait);
-                    finalPath = container + File.separator + snapshotBackupUuid;
-                } else {
-                    final String result = backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid,
-                            prevSnapshotUuid, isISCSI, wait);
-                    final String[] tmp = result.split("#");
-                    snapshotBackupUuid = tmp[0];
-                    physicalSize = Long.parseLong(tmp[1]);
-                    finalPath = folder + File.separator + snapshotBackupUuid;
-                }
+                final String result = backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid,
+                        prevSnapshotUuid, isISCSI, wait);
+                final String[] tmp = result.split("#");
+                snapshotBackupUuid = tmp[0];
+                physicalSize = Long.parseLong(tmp[1]);
+                finalPath = folder + File.separator + snapshotBackupUuid;
             }
             final String volumeUuid = snapshotTO.getVolume().getPath();
             destroySnapshotOnPrimaryStorageExceptThis(conn, volumeUuid, snapshotUuid);

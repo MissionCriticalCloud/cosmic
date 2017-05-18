@@ -2,7 +2,6 @@ package com.cloud.agent.api;
 
 import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.storage.StoragePool;
 
 /**
@@ -16,7 +15,6 @@ public class BackupSnapshotCommand extends SnapshotCommand {
     private String vmName;
     private Long snapshotId;
     @LogLevel(Level.Off)
-    private SwiftTO swift;
     private Long secHostId;
 
     protected BackupSnapshotCommand() {
@@ -64,14 +62,6 @@ public class BackupSnapshotCommand extends SnapshotCommand {
 
     public String getVmName() {
         return vmName;
-    }
-
-    public SwiftTO getSwift() {
-        return swift;
-    }
-
-    public void setSwift(final SwiftTO swift) {
-        this.swift = swift;
     }
 
     public Long getSnapshotId() {
