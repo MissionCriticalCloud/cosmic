@@ -3287,13 +3287,20 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 s_logger.error("Allocating ip to guest nic " + nicId + " failed");
                 return null;
             }
+        } else if (network.getTrafficType() == TrafficType.Public) {
+            try {
+                final PublicIp ip = _ipAddrMgr.assignPublicIpAddress(vm.getDataCenterId(), null, ipOwner, VlanType.VirtualNetwork, null, requestedIp, false);
+                ipaddr = ip.getAddress().toString();
+            } catch (final InsufficientAddressCapacityException e) {
+                throw new InvalidParameterValueException("Allocating public ip for nic failed");
+            }
         } else {
             s_logger.error("AddIpToVMNic is not supported in this network...");
             return null;
         }
 
         if (ipaddr != null) {
-            // we got the ip addr so up the nics table and secodary ip
+            // we got the ip addr so up the nics table and secondary ip
             final String addrFinal = ipaddr;
             final long id = Transaction.execute(new TransactionCallback<Long>() {
                 @Override
@@ -3401,6 +3408,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     }
                 });
             }
+        } else if(network.getTrafficType() == TrafficType.Public) {
+            final IPAddressVO publicIpVO = _ipAddressDao.findByIpAndSourceNetworkId(secIpVO.getNetworkId(), secIpVO.getIp4Address());
+            final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
+            final Account callerAccount = _accountMgr.getActiveAccountById(callerUser.getAccountId());
+            _ipAddrMgr.disassociatePublicIpAddress(publicIpVO.getId(), callerUser.getId(), callerAccount);
         } else {
             throw new InvalidParameterValueException("Not supported for this network now");
         }
