@@ -1851,9 +1851,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new InvalidParameterValueException("unable to find a network with id " + networkId);
         }
 
+        // Root admin may plug anything, Domain admin is allowed to plug into the public network
         if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
             if (!(network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Domain)
-                    && !(network.getAclType() == ACLType.Account && network.getAccountId() == vmInstance.getAccountId())) {
+                    && !(network.getAclType() == ACLType.Account && network.getAccountId() == vmInstance.getAccountId())
+                    && !(caller.getType() == Account.ACCOUNT_TYPE_DOMAIN_ADMIN && TrafficType.Public.equals(network.getTrafficType()))) {
                 throw new InvalidParameterValueException("only shared network or isolated network with the same account_id can be added to vmId: " + vmId);
             }
         }
