@@ -52,7 +52,7 @@ public class ImageStoreDetailsDaoImpl extends GenericDaoBase<ImageStoreDetailVO,
         for (final ImageStoreDetailVO detail : details) {
             final String name = detail.getName();
             String value = detail.getValue();
-            if (name.equals(ApiConstants.KEY) || name.equals(ApiConstants.S3_SECRET_KEY)) {
+            if (name.equals(ApiConstants.KEY)) {
                 value = DBEncryptionUtil.decrypt(value);
             }
             detailsMap.put(name, value);

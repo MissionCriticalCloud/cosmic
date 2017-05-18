@@ -190,18 +190,6 @@ class cacheStorage(object):
         self.details = None
 
 
-class s3(object):
-    def __init__(self):
-        self.accesskey = None
-        self.secretkey = None
-        self.bucket = None
-        self.endpoint = None
-        self.sockettimeout = None
-        self.connectiontimeout = None
-        self.maxerrorrety = None
-        self.usehttps = None
-
-
 class srx(object):
     def __init__(self, hostname=None, username='root', password='admin'):
         self.hostname = hostname

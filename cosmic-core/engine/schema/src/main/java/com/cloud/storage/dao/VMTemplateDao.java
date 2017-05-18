@@ -60,8 +60,6 @@ public interface VMTemplateDao extends GenericDao<VMTemplateVO, Long>, StateDao<
 
     public Long countTemplatesForAccount(long accountId);
 
-    List<VMTemplateVO> findTemplatesToSyncToS3();
-
     void loadDetails(VMTemplateVO tmpl);
 
     void saveDetails(VMTemplateVO tmpl);

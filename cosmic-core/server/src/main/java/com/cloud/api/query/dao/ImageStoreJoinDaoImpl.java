@@ -60,7 +60,7 @@ public class ImageStoreJoinDaoImpl extends GenericDaoBase<ImageStoreJoinVO, Long
         final String detailName = ids.getDetailName();
         if (detailName != null && detailName.length() > 0 && !detailName.equals(ApiConstants.PASSWORD)) {
             String detailValue = ids.getDetailValue();
-            if (detailName.equals(ApiConstants.KEY) || detailName.equals(ApiConstants.S3_SECRET_KEY)) {
+            if (detailName.equals(ApiConstants.KEY)) {
                 // ALWAYS return an empty value for the S3 secret key since that key is managed by Amazon and not CloudStack
                 detailValue = "";
             }
@@ -76,7 +76,7 @@ public class ImageStoreJoinDaoImpl extends GenericDaoBase<ImageStoreJoinVO, Long
         final String detailName = ids.getDetailName();
         if (detailName != null && detailName.length() > 0 && !detailName.equals(ApiConstants.PASSWORD)) {
             String detailValue = ids.getDetailValue();
-            if (detailName.equals(ApiConstants.KEY) || detailName.equals(ApiConstants.S3_SECRET_KEY)) {
+            if (detailName.equals(ApiConstants.KEY)) {
                 // ALWAYS return an empty value for the S3 secret key since that key is managed by Amazon and not CloudStack
                 detailValue = "";
             }

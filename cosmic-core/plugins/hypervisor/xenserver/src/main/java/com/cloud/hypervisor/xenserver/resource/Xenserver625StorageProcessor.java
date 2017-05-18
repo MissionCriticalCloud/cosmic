@@ -6,7 +6,6 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -733,21 +732,6 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                                 s_logger.debug("Failed to delete snapshot on cache storages", e);
                             }
                         }
-                    } else if (destStore instanceof S3TO) {
-                        try {
-                            finalPath = backupSnapshotToS3(conn, (S3TO) destStore, snapshotSr.getUuid(conn), folder, snapshotBackupUuid, isISCSI, wait);
-                            if (finalPath == null) {
-                                throw new CloudRuntimeException("S3 upload of snapshots " + snapshotBackupUuid + " failed");
-                            }
-                        } finally {
-                            try {
-                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
-                            } catch (final Exception e) {
-                                s_logger.debug("Failed to delete snapshot on cache storages", e);
-                            }
-                        }
-                        // finalPath = folder + File.separator +
-                        // snapshotBackupUuid;
                     } else {
                         finalPath = folder + File.separator + snapshotBackupUuid;
                     }
@@ -770,11 +754,6 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                     snapshotBackupUuid = swiftBackupSnapshot(conn, (SwiftTO) destStore, primaryStorageSRUuid, snapshotPaUuid, "S-"
                             + snapshotTO.getVolume().getVolumeId().toString(), isISCSI, wait);
                     finalPath = container + File.separator + snapshotBackupUuid;
-                } else if (destStore instanceof S3TO) {
-                    finalPath = backupSnapshotToS3(conn, (S3TO) destStore, primaryStorageSRUuid, folder, snapshotPaUuid, isISCSI, wait);
-                    if (finalPath == null) {
-                        throw new CloudRuntimeException("S3 upload of snapshots " + snapshotPaUuid + " failed");
-                    }
                 } else {
                     final String result = backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid,
                             prevSnapshotUuid, isISCSI, wait);

@@ -59,7 +59,6 @@
 
         <!-- Dependency management properties -->
         <cs.amqp-client.version>3.5.4</cs.amqp-client.version>
-        <cs.aws-java-sdk.version>1.10.34</cs.aws-java-sdk.version>
         <cs.axis-jaxrpc.version>1.4</cs.axis-jaxrpc.version>
         <cs.axis.version>1.4</cs.axis.version>
         <cs.batik-css.version>1.8</cs.batik-css.version>
@@ -307,11 +306,6 @@
                 <groupId>com.trilead</groupId>
                 <artifactId>trilead-ssh2</artifactId>
                 <version>${cs.trilead-ssh2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
-                <version>${cs.aws-java-sdk.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.ejb</groupId>
