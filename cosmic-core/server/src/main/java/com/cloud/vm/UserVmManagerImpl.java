@@ -4370,14 +4370,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 securityGroupEnabled = true;
             }
 
-            // vm can't be a part of more than 1 VPC network
-            if (network.getVpcId() != null) {
-                if (vpcNetwork) {
-                    throw new InvalidParameterValueException("Vm can't be a part of more than 1 VPC network");
-                }
-                vpcNetwork = true;
-            }
-
             networkNicMap.put(network.getUuid(), profile);
         }
 
