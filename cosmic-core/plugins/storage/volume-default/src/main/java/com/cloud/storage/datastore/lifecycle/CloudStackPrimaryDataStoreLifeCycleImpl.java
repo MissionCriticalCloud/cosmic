@@ -494,14 +494,6 @@ public class CloudStackPrimaryDataStoreLifeCycleImpl implements PrimaryDataStore
         return HypervisorType.None;
     }
 
-    /* (non-Javadoc)
-     * @see DataStoreLifeCycle#migrateToObjectStore(DataStore)
-     */
-    @Override
-    public boolean migrateToObjectStore(final DataStore store) {
-        return false;
-    }
-
     @Override
     public void updateStoragePool(final StoragePool storagePool, final Map<String, String> details) {
     }

@@ -5,7 +5,6 @@ import java.util.Set;
 
 public interface DataStoreProvider {
     String NFS_IMAGE = "NFS";
-    String S3_IMAGE = "S3";
     String DEFAULT_PRIMARY = "DefaultPrimary";
 
     DataStoreLifeCycle getDataStoreLifeCycle();

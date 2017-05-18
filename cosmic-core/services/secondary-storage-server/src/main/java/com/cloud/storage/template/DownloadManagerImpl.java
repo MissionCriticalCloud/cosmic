@@ -3,7 +3,6 @@ package com.cloud.storage.template;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StorageLayer;
@@ -137,73 +136,24 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 threadPool.execute(td);
                 break;
             case DOWNLOAD_FINISHED:
-                if (td instanceof S3TemplateDownloader) {
-                    // For S3 and Swift, which are considered "remote",
-                    // as in the file cannot be accessed locally,
-                    // we run the postRemoteDownload() method.
-                    td.setDownloadError("Download success, starting install ");
-                    final String result = postRemoteDownload(jobId);
-                    if (result != null) {
-                        s_logger.error("Failed post download install: " + result);
-                        td.setStatus(Status.UNRECOVERABLE_ERROR);
-                        td.setDownloadError("Failed post download install: " + result);
-                        ((S3TemplateDownloader) td).cleanupAfterError();
-                    } else {
-                        td.setStatus(Status.POST_DOWNLOAD_FINISHED);
-                        td.setDownloadError("Install completed successfully at " + new SimpleDateFormat().format(new Date()));
-                    }
+                // For other TemplateDownloaders where files are locally available,
+                // we run the postLocalDownload() method.
+                td.setDownloadError("Download success, starting install ");
+                final String result = postLocalDownload(jobId);
+                if (result != null) {
+                    s_logger.error("Failed post download script: " + result);
+                    td.setStatus(Status.UNRECOVERABLE_ERROR);
+                    td.setDownloadError("Failed post download script: " + result);
                 } else {
-                    // For other TemplateDownloaders where files are locally available,
-                    // we run the postLocalDownload() method.
-                    td.setDownloadError("Download success, starting install ");
-                    final String result = postLocalDownload(jobId);
-                    if (result != null) {
-                        s_logger.error("Failed post download script: " + result);
-                        td.setStatus(Status.UNRECOVERABLE_ERROR);
-                        td.setDownloadError("Failed post download script: " + result);
-                    } else {
-                        td.setStatus(Status.POST_DOWNLOAD_FINISHED);
-                        td.setDownloadError("Install completed successfully at " + new SimpleDateFormat().format(new Date()));
-                    }
+                    td.setStatus(Status.POST_DOWNLOAD_FINISHED);
+                    td.setDownloadError("Install completed successfully at " + new SimpleDateFormat().format(new Date()));
                 }
+
                 dj.cleanup();
                 break;
             default:
                 break;
         }
-    }
-
-    /**
-     * Post remote download activity (install and cleanup). Executed in context of the downloader thread.
-     */
-    private String postRemoteDownload(final String jobId) {
-        String result = null;
-        final DownloadJob dnld = jobs.get(jobId);
-        final S3TemplateDownloader td = (S3TemplateDownloader) dnld.getTemplateDownloader();
-
-        if (td.getFileExtension().equalsIgnoreCase("QCOW2")) {
-            // The QCOW2 is the only format with a header,
-            // and as such can be easily read.
-
-            try {
-                final InputStream inputStream = td.getS3ObjectInputStream();
-
-                dnld.setTemplatesize(QCOW2Utils.getVirtualSize(inputStream));
-
-                inputStream.close();
-            } catch (final IOException e) {
-                result = "Couldn't read QCOW2 virtual size. Error: " + e.getMessage();
-            }
-        } else {
-            // For the other formats, both the virtual
-            // and actual file size are set the same.
-            dnld.setTemplatesize(td.getTotalBytes());
-        }
-
-        dnld.setTemplatePhysicalSize(td.getTotalBytes());
-        dnld.setTmpltPath(td.getDownloadLocalPath());
-
-        return result;
     }
 
     /**
@@ -430,38 +380,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     @Override
-    public String downloadS3Template(final S3TO s3, final long id, final String url, final String name, final ImageFormat format, final boolean hvm, final Long accountId, final
-    String descr, final String cksum,
-                                     final String installPathPrefix, final String user, final String password, final long maxTemplateSizeInBytes, final Proxy proxy, final
-                                     ResourceType resourceType) {
-        final UUID uuid = UUID.randomUUID();
-        final String jobId = uuid.toString();
-
-        final URI uri;
-        try {
-            uri = new URI(url);
-        } catch (final URISyntaxException e) {
-            throw new CloudRuntimeException("URI is incorrect: " + url);
-        }
-        final TemplateDownloader td;
-        if (uri != null && uri.getScheme() != null) {
-            if (uri.getScheme().equalsIgnoreCase("http") || uri.getScheme().equalsIgnoreCase("https")) {
-                td = new S3TemplateDownloader(s3, url, installPathPrefix, new Completion(jobId), maxTemplateSizeInBytes, user, password, proxy, resourceType);
-            } else {
-                throw new CloudRuntimeException("Scheme is not supported " + url);
-            }
-        } else {
-            throw new CloudRuntimeException("Unable to download from URL: " + url);
-        }
-        final DownloadJob dj = new DownloadJob(td, jobId, id, name, format, hvm, accountId, descr, cksum, installPathPrefix, resourceType);
-        dj.setTmpltPath(installPathPrefix);
-        jobs.put(jobId, dj);
-        threadPool.execute(td);
-
-        return jobId;
-    }
-
-    @Override
     public Map<String, Processor> getProcessors() {
         return _processors;
     }
@@ -533,15 +451,9 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         final long maxDownloadSizeInBytes =
                 cmd.getMaxDownloadSizeInBytes() == null ? TemplateDownloader.DEFAULT_MAX_TEMPLATE_SIZE_IN_BYTES : cmd.getMaxDownloadSizeInBytes();
         String jobId = null;
-        if (dstore instanceof S3TO) {
-            jobId =
-                    downloadS3Template((S3TO) dstore, cmd.getId(), cmd.getUrl(), cmd.getName(), cmd.getFormat(), cmd.isHvm(), cmd.getAccountId(), cmd.getDescription(),
-                            cmd.getChecksum(), installPathPrefix, user, password, maxDownloadSizeInBytes, cmd.getProxy(), resourceType);
-        } else {
-            jobId =
-                    downloadPublicTemplate(cmd.getId(), cmd.getUrl(), cmd.getName(), cmd.getFormat(), cmd.isHvm(), cmd.getAccountId(), cmd.getDescription(),
-                            cmd.getChecksum(), installPathPrefix, cmd.getInstallPath(), user, password, maxDownloadSizeInBytes, cmd.getProxy(), resourceType);
-        }
+        jobId =
+                downloadPublicTemplate(cmd.getId(), cmd.getUrl(), cmd.getName(), cmd.getFormat(), cmd.isHvm(), cmd.getAccountId(), cmd.getDescription(),
+                        cmd.getChecksum(), installPathPrefix, cmd.getInstallPath(), user, password, maxDownloadSizeInBytes, cmd.getProxy(), resourceType);
         sleep();
         if (jobId == null) {
             return new DownloadAnswer("Internal Error", VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
