@@ -10,7 +10,9 @@ from marvin.lib.base import (Vpn,
                              NetworkACLList,
                              VPC,
                              Account,
-                             Domain)
+                             Domain,
+                             EgressFireWallRule,
+                             FireWallRule)
 
 from marvin.lib.common import (get_vpngateway,
                                get_vpc,
@@ -83,8 +85,10 @@ class TestScenarioManager:
                           account.name, account.state, account.domainid)
 
         self.deploy_vpcs(account_data['vpcs'], account)
+        self.deploy_isolatednetworks(account_data['isolatednetworks'], account)
         self.deploy_vms(account_data['virtualmachines'], account)
         self.deploy_vpcs_publicipaddresses(account_data['vpcs'], account_data['virtualmachines'])
+        self.deploy_isolatednetworks_publicipaddresses(account_data['isolatednetworks'], account_data['virtualmachines'])
         self.deploy_privatenetworks(account_data['privatenetworks'], account, domain)
         self.deploy_vpcs_privategateways(account_data['vpcs'])
         self.enable_vpcs_localvpngateway(account_data['vpcs'])
@@ -367,6 +371,56 @@ class TestScenarioManager:
                                   '=>  VPN Customer Gateway: %s  =>  State: %s', vpnconnection['id'],
                                   vpnconnection['s2svpngatewayid'], vpnconnection['s2scustomergatewayid'],
                                   vpnconnection['state'])
+
+    def deploy_isolatednetworks(self, isolatednetworks_data, account):
+        for isolatednetwork in isolatednetworks_data:
+            self.deploy_isolatednetwork(isolatednetwork['data'], account)
+
+    def deploy_isolatednetwork(self, isolatednetwork_data, account):
+        Network.create(
+            self.api_client,
+            data=isolatednetwork_data,
+            account=account,
+            zone=self.zone
+        )
+
+    def deploy_isolatednetworks_publicipaddresses(self, isolatednetworks_data, virtualmachines_data):
+        for isolatednetwork in isolatednetworks_data:
+            network = get_network(self.api_client, isolatednetwork['data']['name'])
+            self.deploy_isolatednetwork_egresses(isolatednetwork['data'], network)
+            self.deploy_isolatednetwork_publicipaddresses(isolatednetwork['data'], virtualmachines_data, network)
+
+    def deploy_isolatednetwork_egresses(self, isolatednetwork_data, network):
+        for egress in isolatednetwork_data['egressrules']:
+            EgressFireWallRule.create(
+                self.api_client,
+                network=network,
+                data=egress['data']
+            )
+
+    def deploy_isolatednetwork_publicipaddresses(self, isolatednetwork_data, virtual_machines, network):
+        for ipaddress in isolatednetwork_data['publicipaddresses']:
+            self.deploy_isolatednetwork_publicipaddress(ipaddress['data'], virtual_machines, network)
+
+    def deploy_isolatednetwork_publicipaddress(self, ipaddress_data, virtualmachines_data, network):
+        publicipaddress = PublicIPAddress.create(
+            api_client=self.api_client,
+            data=ipaddress_data,
+            network=network
+        )
+        self.deploy_firewallrules(ipaddress_data, publicipaddress)
+        self.deploy_portforwards(ipaddress_data['portforwards'], virtualmachines_data, None, publicipaddress)
+
+    def deploy_firewallrules(self, ipaddress_data, publicipaddress):
+        for firewallrule in ipaddress_data['firewallrules']:
+            self.deploy_firewallrule(firewallrule, publicipaddress)
+
+    def deploy_firewallrule(self, firewallrule, publicipaddress):
+        FireWallRule.create(
+            self.api_client,
+            data=firewallrule['data'],
+            ipaddress=publicipaddress
+        )
 
     def finalize(self):
         try:

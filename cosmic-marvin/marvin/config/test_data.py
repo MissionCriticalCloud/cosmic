@@ -148,6 +148,13 @@ test_data = {
                                                             "guestip": "10.0.0.2",
                                                             "networkname": "tier001"
                                                         }
+                                                    },
+                                                    {
+                                                        "metadata": {},
+                                                        "data": {
+                                                            "guestip": "10.1.1.2",
+                                                            "networkname": "guest_network1"
+                                                        }
                                                     }
                                                 ]
                                             }
@@ -165,11 +172,56 @@ test_data = {
                                             }
                                         }
                                     ],
-                                    "guestnetworks": [
+                                    "isolatednetworks": [
                                         {
                                             "metadata": {},
                                             "data": {
-
+                                                "name": "guest_network1",
+                                                "displaytext": "guest_network1",
+                                                "networkofferingname": "DefaultIsolatedNetworkOfferingWithSourceNatService",
+                                                "guestgateway": "10.1.1.1",
+                                                "guestnetmask": "255.255.255.0",
+                                                "egressrules": [
+                                                    {
+                                                        "metadata": {},
+                                                        "data": {
+                                                            "protocol": "TCP",
+                                                            "cidrlist": "0.0.0.0/0",
+                                                            "startport": 22,
+                                                            "endport": 22
+                                                        }
+                                                    }
+                                                ],
+                                                "publicipaddresses": [
+                                                    {
+                                                        "metadata": {},
+                                                        "data": {
+                                                            "firewallrules": [
+                                                                {
+                                                                    "metadata": {},
+                                                                    "data": {
+                                                                        "cidrlist": "0.0.0.0/0",
+                                                                        "protocol": "TCP",
+                                                                        "startport": 22,
+                                                                        "endport": 22
+                                                                    }
+                                                                }
+                                                            ],
+                                                            "portforwards": [
+                                                                {
+                                                                    "metadata": {},
+                                                                    "data": {
+                                                                        "privateport": 22,
+                                                                        "publicport": 22,
+                                                                        "protocol": "TCP",
+                                                                        "virtualmachinename": "vm",
+                                                                        "nic": "10.1.1.2"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
                                             }
                                         }
                                     ]
@@ -194,7 +246,7 @@ test_data = {
     "vdomain": {
         "name": "domain"
     },
-    "domain": { "name": "domain" },
+    "domain": {"name": "domain"},
     "email": "test@test.com",
     "gateway": "172.1.1.1",
     "netmask": "255.255.255.0",
@@ -777,8 +829,8 @@ test_data = {
             "NetworkACL": "VpcVirtualRouter",
         },
         "serviceCapabilityList": {
-            "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
-            "Lb": { "lbSchemes": "internal", "SupportedLbIsolation": "dedicated" }
+            "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
+            "Lb": {"lbSchemes": "internal", "SupportedLbIsolation": "dedicated"}
         }
     },
     "egress_80": {
@@ -914,7 +966,7 @@ test_data = {
         "url": "http://people.apache.org/~sanjeev/ttylinux_pv.vhd.bz2",
         "format": "VHD"
     },
-    "security_group": { "name": "custom_Sec_Grp" },
+    "security_group": {"name": "custom_Sec_Grp"},
     "ingress_rule": {
         "protocol": "TCP",
         "startport": "22",
@@ -964,20 +1016,20 @@ test_data = {
             "iscsi://192.168.100.21/iqn.2012-01.localdomain.clo-cstack-cos6:iser/1",
         "name": "Primary iSCSI"
     },
-    "volume": { "diskname": "Test Volume",
-                "size": 1
-                },
+    "volume": {"diskname": "Test Volume",
+               "size": 1
+               },
     "volume_write_path": {
         "diskname": "APP Data Volume",
         "size": 1,  # in GBs
-        "xenserver": { "rootdiskdevice": "/dev/xvda",
-                       "datadiskdevice_1": "/dev/xvdb",
-                       "datadiskdevice_2": "/dev/xvdc",  # Data Disk
-                       },
-        "kvm": { "rootdiskdevice": "/dev/vda",
-                 "datadiskdevice_1": "/dev/vdb",
-                 "datadiskdevice_2": "/dev/vdc"
-                 }
+        "xenserver": {"rootdiskdevice": "/dev/xvda",
+                      "datadiskdevice_1": "/dev/xvdb",
+                      "datadiskdevice_2": "/dev/xvdc",  # Data Disk
+                      },
+        "kvm": {"rootdiskdevice": "/dev/vda",
+                "datadiskdevice_1": "/dev/vdb",
+                "datadiskdevice_2": "/dev/vdc"
+                }
     },
     "data_write_paths": {
         "mount_dir": "/mnt/tmp",
@@ -996,7 +1048,7 @@ test_data = {
         "schedule": 1
     },
     "volume_offerings": {
-        0: { "diskname": "TestDiskServ" },
+        0: {"diskname": "TestDiskServ"},
     },
     "diskdevice": ["/dev/vdc", "/dev/vdb", "/dev/hdb", "/dev/hdc",
                    "/dev/xvdd", "/dev/cdrom", "/dev/sr0", "/dev/cdrom1"],

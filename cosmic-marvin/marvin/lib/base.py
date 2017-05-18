@@ -1511,7 +1511,7 @@ class PublicIPAddress:
     @classmethod
     def create(cls, api_client, accountid=None, zoneid=None, domainid=None,
                services=None, networkid=None, projectid=None, vpcid=None,
-               isportable=False, vpc=None, data=None):
+               isportable=False, vpc=None, data=None, network=None):
         """Associate Public IP address"""
         if data:
             services = data
@@ -1537,6 +1537,8 @@ class PublicIPAddress:
 
         if networkid:
             cmd.networkid = networkid
+        elif network:
+            cmd.networkid = network.id
 
         if projectid:
             cmd.projectid = projectid
@@ -1731,18 +1733,30 @@ class EgressFireWallRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, networkid, protocol, cidrlist=None,
-               startport=None, endport=None, type=None, code=None):
+    def create(cls, api_client, networkid=None, protocol=None, cidrlist=None,
+               startport=None, endport=None, type=None, code=None, network=None, data=None):
         """Create Egress Firewall Rule"""
         cmd = createEgressFirewallRule.createEgressFirewallRuleCmd()
-        cmd.networkid = networkid
-        cmd.protocol = protocol
+        if networkid:
+            cmd.networkid = networkid
+        elif network:
+            cmd.networkid = network.id
+        if protocol:
+            cmd.protocol = protocol
+        elif 'protocol' in data:
+            cmd.protocol = data['protocol']
         if cidrlist:
             cmd.cidrlist = cidrlist
+        elif 'cidrlist' in data:
+            cmd.cidrlist = data['cidrlist']
         if startport:
             cmd.startport = startport
+        elif 'startport' in data:
+            cmd.startport = data['startport']
         if endport:
             cmd.endport = endport
+        elif 'endport' in data:
+            cmd.endport = data['endport']
         if type:
             cmd.type = type
         if code:
@@ -1776,18 +1790,30 @@ class FireWallRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, ipaddressid, protocol, cidrlist=None,
-               startport=None, endport=None, projectid=None, vpcid=None):
+    def create(cls, api_client, ipaddressid=None, protocol=None, cidrlist=None,
+               startport=None, endport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
         """Create Firewall Rule"""
         cmd = createFirewallRule.createFirewallRuleCmd()
-        cmd.ipaddressid = ipaddressid
-        cmd.protocol = protocol
+        if ipaddressid:
+            cmd.ipaddressid = ipaddressid
+        elif ipaddress:
+            cmd.ipaddressid = ipaddress.ipaddress.id
+        if protocol:
+            cmd.protocol = protocol
+        elif 'protocol' in data:
+            cmd.protocol = data['protocol']
         if cidrlist:
             cmd.cidrlist = cidrlist
+        elif 'cidrlist' in data:
+            cmd.cidrlist = data['cidrlist']
         if startport:
             cmd.startport = startport
+        elif 'startport' in data:
+            cmd.startport = data['startport']
         if endport:
             cmd.endport = endport
+        elif 'endport' in data:
+            cmd.endport = data['endport']
 
         if projectid:
             cmd.projectid = projectid
@@ -2819,12 +2845,16 @@ class Network:
             cmd.account = account.name
         elif vpc:
             cmd.account = vpc.account
+        elif account:
+            cmd.account = account.name
         if domainid:
             cmd.domainid = domainid
         elif domain:
             cmd.domainid = domain.id
         elif vpc:
             cmd.domainid = vpc.domainid
+        elif account:
+            cmd.domainid = account.domainid
         if projectid:
             cmd.projectid = projectid
         if vpcid:
