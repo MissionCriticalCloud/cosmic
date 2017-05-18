@@ -276,7 +276,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     static final ConfigKey<Integer> VmIpFetchThreadPoolMax = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmipFetch.threadPool.max", "10",
             "number of threads for fetching vms ip address", true);
     private static final Logger s_logger = LoggerFactory.getLogger(UserVmManagerImpl.class);
-    private static final int ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION = 3; // 3
+    private static final int ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION = 3; // 3 seconds
+    private static final long GB_TO_BYTES = 1024 * 1024 * 1024;
     private static final int MAX_VM_NAME_LEN = 80;
     private static final int MAX_HTTP_GET_LENGTH = 2 * MAX_USER_DATA_LENGTH_BYTES;
     private static final int MAX_HTTP_POST_LENGTH = 16 * MAX_USER_DATA_LENGTH_BYTES;
@@ -4373,11 +4374,17 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
         // check if account/domain is with in resource limits to create a new vm
         final boolean isIso = Storage.ImageFormat.ISO == template.getFormat();
-        final Long tmp = _templateDao.findById(template.getId()).getSize();
         long size = 0;
-        if (tmp != null) {
-            size = tmp;
+
+        // custom root disk size, resizes base template to larger size
+        if (customParameters.containsKey("rootdisksize")) {
+            Long rootDiskSize = NumbersUtil.parseLong(customParameters.get("rootdisksize"), -1);
+            if (rootDiskSize <= 0) {
+                throw new InvalidParameterValueException("Root disk size should be a positive number.");
+            }
+            size = rootDiskSize * GB_TO_BYTES;
         }
+
         if (diskOfferingId != null) {
             final DiskOfferingVO diskOffering = _diskOfferingDao.findById(diskOfferingId);
             if (diskOffering != null && diskOffering.isCustomized()) {
@@ -4390,7 +4397,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     throw new InvalidParameterValueException("VM Creation failed. Volume size: " + diskSize + "GB is out of allowed range. Max: " + customDiskOfferingMaxSize
                             + " Min:" + customDiskOfferingMinSize);
                 }
-                size = size + diskSize * (1024 * 1024 * 1024);
+                size += diskSize * GB_TO_BYTES;
             }
             size += _diskOfferingDao.findById(diskOfferingId).getDiskSize();
         }
@@ -4681,8 +4688,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
-                final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(), offering.getOfferHA(), offering
-                        .getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(), userData, hostName, diskOfferingId);
+                final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(),
+                        offering.getOfferHA(), offering.getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(),
+                        userData, hostName, diskOfferingId);
                 vm.setUuid(uuidName);
                 vm.setDynamicallyScalable(template.isDynamicallyScalable());
 
@@ -4705,24 +4713,17 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 Long rootDiskSize = null;
                 // custom root disk size, resizes base template to larger size
                 if (customParameters.containsKey("rootdisksize")) {
-                    if (NumbersUtil.parseLong(customParameters.get("rootdisksize"), -1) <= 0) {
-                        throw new InvalidParameterValueException("rootdisk size should be a non zero number.");
-                    }
+
                     rootDiskSize = Long.parseLong(customParameters.get("rootdisksize"));
 
-                    // only KVM supports rootdisksize override
-                    if (hypervisorType != HypervisorType.KVM) {
-                        throw new InvalidParameterValueException("Hypervisor " + hypervisorType + " does not support rootdisksize override");
-                    }
-
-                    // rotdisksize must be larger than template
+                    // rootdisksize must be larger than template
                     final VMTemplateVO templateVO = _templateDao.findById(template.getId());
                     if (templateVO == null) {
                         throw new InvalidParameterValueException("Unable to look up template by id " + template.getId());
                     }
 
                     if (rootDiskSize << 30 < templateVO.getSize()) {
-                        final Long templateVOSizeGB = templateVO.getSize() / 1024 / 1024 / 1024;
+                        final Long templateVOSizeGB = templateVO.getSize() / GB_TO_BYTES;
                         throw new InvalidParameterValueException("unsupported: rootdisksize override is smaller than template size " + templateVO.getSize()
                                 + "B (" + templateVOSizeGB + "GB)");
                     } else {
