@@ -414,9 +414,13 @@ def get_network(api_client, name, vpc=None):
     return next(iter(networks or []), None)
 
 
-def get_virtual_machine(api_client, name, vpc=None):
-    virtual_machines = list_virtual_machines(api_client, listall=True)
-    virtual_machines = [virtual_machine for virtual_machine in virtual_machines if virtual_machine.name == name]
+def get_vpngateway(api_client, vpc=None):
+    vpngateways = list_vpngateways(api_client, vpcid=vpc.id)
+    return next(iter(vpngateways or []), None)
+
+
+def get_virtual_machine(api_client, name):
+    virtual_machines = list_virtual_machines(api_client, name=name, listall=True)
     return next(iter(virtual_machines or []), None)
 
 
@@ -425,6 +429,9 @@ def get_vpc(api_client, name):
     return next(iter(vpcs or []), None)
 
 
-def get_network_acl(api_client, name):
-    acls = list_network_acl_lists(api_client, name=name, listall=True)
+def get_network_acl(api_client, name, vpc=None):
+    if vpc:
+        acls = list_network_acl_lists(api_client, name=name, vpcid=vpc.id, listall=True)
+    else:
+        acls = list_network_acl_lists(api_client, name=name, listall=True)
     return next(iter(acls or []), None)
