@@ -1501,7 +1501,7 @@ class PublicIPAddress:
 
         if zoneid:
             cmd.zoneid = zoneid
-        elif "zoneid" in services:
+        elif services and "zoneid" in services:
             cmd.zoneid = services["zoneid"]
 
         if domainid:
@@ -1520,6 +1520,8 @@ class PublicIPAddress:
 
         if vpcid:
             cmd.vpcid = vpcid
+
+
         return PublicIPAddress(api_client.associateIpAddress(cmd).__dict__)
 
     def delete(self, api_client):

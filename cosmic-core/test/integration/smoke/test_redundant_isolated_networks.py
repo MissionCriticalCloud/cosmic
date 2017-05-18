@@ -8,7 +8,8 @@ from marvin.lib.base import (
     EgressFireWallRule,
     NATRule,
     FireWallRule,
-    Account
+    Account,
+    PublicIPAddress
 )
 from marvin.lib.common import (
     list_vlan_ipranges,
@@ -181,25 +182,16 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             "Length of the list router should be 2 (Backup & master)"
         )
 
-        public_ips = list_public_ip(
-            self.apiclient,
-            account=self.account.name,
-            domainid=self.account.domainid,
-            zoneid=self.zone.id
-        )
-
-        public_ip = public_ips[0]
-
-        self.assertEqual(
-            isinstance(public_ips, list),
-            True,
-            "Check for list public IPs response return valid data"
+        self.logger.debug("Acquiring Public IP for Network ID: %s" % network.id)
+        public_ip = PublicIPAddress.create(
+            api_client=self.apiclient,
+            networkid=network.id
         )
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % virtual_machine.id)
         FireWallRule.create(
             self.apiclient,
-            ipaddressid=public_ip.id,
+            ipaddressid=public_ip.ipaddress.id,
             protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
             startport=self.services["natrule_ssh"]["publicport"],
@@ -211,7 +203,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
             self.apiclient,
             virtual_machine,
             self.services["natrule_ssh"],
-            public_ip.id
+            public_ip.ipaddress.id
         )
 
         # Test SSH after closing port 22
