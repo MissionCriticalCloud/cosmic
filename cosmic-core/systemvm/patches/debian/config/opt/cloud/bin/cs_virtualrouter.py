@@ -2,12 +2,9 @@ from netaddr import *
 
 
 def merge(dbag, data):
-    print(dbag)
-
+    # always empty the databag as we will receive all new data
     for key in dbag.keys():
         del dbag[key]
-
-    print(dbag)
 
     for key in data:
         if key == "type":
@@ -17,6 +14,7 @@ def merge(dbag, data):
             dbag[key] = data[key]
 
         if key == "source_nat_list":
+            # let's verify that the list contains valid CIDRs
             cidrs = data[key].split(',')
             for cidr in cidrs:
                 try:

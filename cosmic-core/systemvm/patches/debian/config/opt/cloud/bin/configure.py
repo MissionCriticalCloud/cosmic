@@ -1139,6 +1139,9 @@ class IpTablesExecutor:
         fwd = CsForwardingRules("forwardingrules", self.config)
         fwd.process()
 
+        acls = CsVrConfig('virtualrouter', self.config)
+        acls.process()
+
         # Strongswan is included in the systemvm template 17.3.13 and newer
         if get_systemvm_version() > 170312:
             logging.debug("Found StrongSwan compatible systemvm template so let's configure VPN with it")
@@ -1205,7 +1208,7 @@ def main(argv):
                                ("monitor_service.json", { "process_iptables": False, "executor": CsMonitor("monitorservice", config) }),
                                ("static_routes.json", { "process_iptables": False, "executor": CsStaticRoutes("staticroutes", config) }),
                                ("private_gateway.json", { "process_iptables": True, "executor": CsPrivateGateway("privategateway", config) }),
-                               ("vr.json", { "process_iptables": True, "executor": CsVrConfig("virtualrouter", config) })
+                               ("vr.json", { "process_iptables": True, "executor": IpTablesExecutor(config) })
                                ])
 
     if process_file.count("cmd_line.json") == OCCURRENCES:
