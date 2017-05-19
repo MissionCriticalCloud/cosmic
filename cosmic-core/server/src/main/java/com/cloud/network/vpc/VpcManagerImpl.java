@@ -1046,7 +1046,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             final List<String> networkOfferingSupportedServicesStr = _ntwkOffServiceDao.listServicesForNetworkOffering(network.getNetworkOfferingId());
 
             for (final String serviceName : networkOfferingSupportedServicesStr) {
-                if (! newOfferingSupportedServicesStr.contains(serviceName)) {
+                if (! newOfferingSupportedServicesStr.contains(serviceName) && ! notSupportedServices.contains(serviceName)) {
                     notSupportedServices.add(serviceName);
                 }
             }
