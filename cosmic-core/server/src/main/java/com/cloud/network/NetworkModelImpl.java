@@ -1635,7 +1635,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                     throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
                             ", permission denied");
                 }
-            } else {
+            } else if (! TrafficType.Public.equals(network.getTrafficType())) {
                 final List<NetworkVO> networkMap = _networksDao.listBy(owner.getId(), network.getId());
                 if (networkMap == null || networkMap.isEmpty()) {
                     throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
