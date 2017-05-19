@@ -300,133 +300,63 @@ def get_hypervisor_type(api_client):
     return hosts_list_validation_result[1].hypervisor
 
 
-def get_default_vpc_offering(api_client):
-    offerings = list_vpc_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Default VPC offering']
-    return next(iter(offerings or []), None)
-
-
 def get_vpc_offering(api_client, name):
-    offerings = list_vpc_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == name]
-    return next(iter(offerings or []), None)
+    offerings = list_vpc_offerings(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
+
+
+def get_default_vpc_offering(api_client):
+    return get_vpc_offering(api_client, 'Default VPC offering')
 
 
 def get_default_redundant_vpc_offering(api_client):
-    offerings = list_vpc_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Redundant VPC offering']
-    return next(iter(offerings or []), None)
-
-
-def get_default_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworks']
-    return next(iter(offerings or []), None)
+    return get_vpc_offering(api_client, 'Redundant VPC offering')
 
 
 def get_network_offering(api_client, name):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == name]
-    return next(iter(offerings or []), None)
+    offerings = list_network_offerings(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
+
+
+def get_default_network_offering(api_client):
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingForVpcNetworks')
 
 
 def get_default_guest_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if
-                 offering.name == 'DefaultIsolatedNetworkOfferingWithSourceNatService']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingWithSourceNatService')
 
 
 def get_default_network_offering_no_load_balancer(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if
-                 offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB')
 
 
 def get_default_isolated_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOffering')
 
 
 def get_default_isolated_network_offering_with_egress(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithEgress']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingWithEgress')
 
 
 def get_default_redundant_isolated_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultRedundantIsolatedNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultRedundantIsolatedNetworkOffering')
 
 
 def get_default_redundant_isolated_network_offering_with_egress(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if
-                 offering.name == 'DefaultRedundantIsolatedNetworkOfferingWithEgress']
-    return next(iter(offerings or []), None)
-
-
-def get_default_virtual_machine_offering(api_client):
-    offerings = list_service_offering(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Small Instance']
-    return next(iter(offerings or []), None)
-
-
-def get_virtual_machine_offering(api_client, name):
-    offerings = list_service_offering(api_client)
-    offerings = [offering for offering in offerings if offering.name == name]
-    return next(iter(offerings or []), None)
-
-
-def get_default_allow_vpc_acl(api_client, vpc):
-    acls = list_network_acl_lists(api_client, vpcid=vpc.id)
-    acls = [acl for acl in acls if acl.name == 'default_allow']
-    return next(iter(acls or []), None)
-
-
-def get_default_deny_vpc_acl(api_client, vpc):
-    acls = list_network_acl_lists(api_client, vpcid=vpc.id)
-    acls = [acl for acl in acls if acl.name == 'default_deny']
-    return next(iter(acls or []), None)
+    return get_network_offering(api_client, 'DefaultRedundantIsolatedNetworkOfferingWithEgress')
 
 
 def get_default_private_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultPrivateGatewayNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultPrivateGatewayNetworkOffering')
 
 
-def get_private_network_offering(api_client, name):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == name]
-    return next(iter(offerings or []), None)
+def get_default_virtual_machine_offering(api_client):
+    return get_virtual_machine_offering(api_client, 'Small Instance')
 
 
-def get_network(api_client, name, vpc=None):
-    if vpc:
-        networks = list_networks(api_client, vpcid=vpc.id)
-    else:
-        networks = list_networks(api_client)
-    networks = [network for network in networks if network.name == name]
-    return next(iter(networks or []), None)
-
-
-def get_vpngateway(api_client, vpc=None):
-    vpngateways = list_vpngateways(api_client, vpcid=vpc.id)
-    return next(iter(vpngateways or []), None)
-
-
-def get_virtual_machine(api_client, name):
-    virtual_machines = list_virtual_machines(api_client, name=name, listall=True)
-    return next(iter(virtual_machines or []), None)
-
-
-def get_vpc(api_client, name):
-    vpcs = list_vpcs(api_client, name=name, listall=True)
-    return next(iter(vpcs or []), None)
+def get_virtual_machine_offering(api_client, name):
+    offerings = list_service_offering(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
 
 
 def get_network_acl(api_client, name, vpc=None):
@@ -434,4 +364,40 @@ def get_network_acl(api_client, name, vpc=None):
         acls = list_network_acl_lists(api_client, name=name, vpcid=vpc.id, listall=True)
     else:
         acls = list_network_acl_lists(api_client, name=name, listall=True)
-    return next(iter(acls or []), None)
+    return find_exact_match_by_name(acls, name)
+
+
+def get_default_allow_vpc_acl(api_client, vpc):
+    return get_network_acl(api_client, 'default_allow', vpc)
+
+
+def get_default_deny_vpc_acl(api_client, vpc):
+    return get_network_acl(api_client, 'default_deny', vpc)
+
+
+def get_vpc(api_client, name):
+    vpcs = list_vpcs(api_client, name=name, listall=True)
+    return find_exact_match_by_name(vpcs, name)
+
+
+def get_network(api_client, name, vpc=None):
+    if vpc:
+        networks = list_networks(api_client, name=name, vpcid=vpc.id)
+    else:
+        networks = list_networks(api_client, name=name)
+    return find_exact_match_by_name(networks, name)
+
+
+def get_virtual_machine(api_client, name, network):
+    virtual_machines = list_virtual_machines(api_client, name=name, networkid=network.id, listall=True)
+    return find_exact_match_by_name(virtual_machines, name)
+
+
+def get_vpngateway(api_client, vpc=None):
+    vpngateways = list_vpngateways(api_client, vpcid=vpc.id)
+    return next(iter(vpngateways or []), None)
+
+
+def find_exact_match_by_name(items, name):
+    items = [item for item in items if item.name == name]
+    return next(iter(items or []), None)

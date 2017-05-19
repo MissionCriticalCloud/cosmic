@@ -227,7 +227,8 @@ class TestScenario1(cloudstackTestCase):
                             )
                             virtualmachine = get_virtual_machine(
                                 api_client=self.api_client,
-                                name=virtualmachine_data['data']['name']
+                                name=virtualmachine_data['data']['name'],
+                                network=network
                             )
                             self.logger.debug('>>>>> VM >>> %s', vars(virtualmachine))
                             NATRule.create(
