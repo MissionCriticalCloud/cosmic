@@ -497,6 +497,25 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
 
+                //Default vpc offering for internal VPC networks
+                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC) == null) {
+                    //remove services this VPC does not need
+                    defaultVPCOffProviders.remove(Service.Lb);
+                    defaultVPCOffProviders.remove(Service.SourceNat);
+                    defaultVPCOffProviders.remove(Service.StaticNat);
+                    defaultVPCOffProviders.remove(Service.PortForwarding);
+                    defaultVPCOffProviders.remove(Service.Vpn);
+                    offering = _configMgr.createNetworkOffering(
+                            NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC,
+                            "Offering for Isolated VPC networks for Internal VPC networks",
+                            TrafficType.Guest, null, false, Availability.Optional, null, defaultVPCOffProviders, true, GuestType.Isolated,
+                            false, null, null, false, null, false, false,
+                            null, false, null, true
+                    );
+                    offering.setState(NetworkOffering.State.Enabled);
+                    _networkOfferingDao.update(offering.getId(), offering);
+                }
+
                 //Isolated offering with source nat
                 if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultIsolatedNetworkOffering) == null) {
                     offering = _configMgr.createNetworkOffering(
