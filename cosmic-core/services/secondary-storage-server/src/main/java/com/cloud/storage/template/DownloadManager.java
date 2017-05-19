@@ -1,7 +1,6 @@
 package com.cloud.storage.template;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.command.DownloadCommand;
@@ -31,9 +30,6 @@ public interface DownloadManager extends Manager {
                                          String installPathPrefix, String templatePath, String userName, String passwd, long maxDownloadSizeInBytes, Proxy proxy, DownloadCommand
                                                  .ResourceType
                                                  resourceType);
-
-    public String downloadS3Template(S3TO s3, long id, String url, String name, ImageFormat format, boolean hvm, Long accountId, String descr, String cksum,
-                                     String installPathPrefix, String user, String password, long maxTemplateSizeInBytes, Proxy proxy, DownloadCommand.ResourceType resourceType);
 
     Map<String, Processor> getProcessors();
 

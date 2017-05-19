@@ -11922,10 +11922,6 @@
                                                             description: 'SMB/CIFS'
                                                         },
                                                         {
-                                                            id: 'S3',
-                                                            description: 'S3'
-                                                        },
-                                                        {
                                                             id: 'Swift',
                                                             description: 'Swift'
                                                         }];
@@ -11947,22 +11943,6 @@
                                                             $form.find('.form-item[rel=smbPassword]').hide();
                                                             $form.find('.form-item[rel=smbDomain]').hide();
 
-                                                            //S3
-                                                            $form.find('.form-item[rel=accesskey]').hide();
-                                                            $form.find('.form-item[rel=secretkey]').hide();
-                                                            $form.find('.form-item[rel=bucket]').hide();
-                                                            $form.find('.form-item[rel=endpoint]').hide();
-                                                            $form.find('.form-item[rel=usehttps]').hide();
-                                                            $form.find('.form-item[rel=connectiontimeout]').hide();
-                                                            $form.find('.form-item[rel=maxerrorretry]').hide();
-                                                            $form.find('.form-item[rel=sockettimeout]').hide();
-
-                                                            $form.find('.form-item[rel=createNfsCache]').find('input').removeAttr('checked');
-                                                            $form.find('.form-item[rel=createNfsCache]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheZoneid]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheNfsServer]').hide();
-                                                            $form.find('.form-item[rel=nfsCachePath]').hide();
-
                                                             //Swift
                                                             $form.find('.form-item[rel=url]').hide();
                                                             $form.find('.form-item[rel=account]').hide();
@@ -11979,56 +11959,6 @@
                                                             $form.find('.form-item[rel=smbPassword]').css('display', 'inline-block');
                                                             $form.find('.form-item[rel=smbDomain]').css('display', 'inline-block');
 
-                                                            //S3
-                                                            $form.find('.form-item[rel=accesskey]').hide();
-                                                            $form.find('.form-item[rel=secretkey]').hide();
-                                                            $form.find('.form-item[rel=bucket]').hide();
-                                                            $form.find('.form-item[rel=endpoint]').hide();
-                                                            $form.find('.form-item[rel=usehttps]').hide();
-                                                            $form.find('.form-item[rel=connectiontimeout]').hide();
-                                                            $form.find('.form-item[rel=maxerrorretry]').hide();
-                                                            $form.find('.form-item[rel=sockettimeout]').hide();
-
-                                                            $form.find('.form-item[rel=createNfsCache]').find('input').removeAttr('checked');
-                                                            $form.find('.form-item[rel=createNfsCache]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheZoneid]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheNfsServer]').hide();
-                                                            $form.find('.form-item[rel=nfsCachePath]').hide();
-
-                                                            //Swift
-                                                            $form.find('.form-item[rel=url]').hide();
-                                                            $form.find('.form-item[rel=account]').hide();
-                                                            $form.find('.form-item[rel=username]').hide();
-                                                            $form.find('.form-item[rel=key]').hide();
-                                                        } else if ($(this).val() == "S3") {
-                                                            //NFS, SMB
-                                                            $form.find('.form-item[rel=zoneid]').hide();
-                                                            $form.find('.form-item[rel=nfsServer]').hide();
-                                                            $form.find('.form-item[rel=path]').hide();
-
-                                                            //SMB
-                                                            $form.find('.form-item[rel=smbUsername]').hide();
-                                                            $form.find('.form-item[rel=smbPassword]').hide();
-                                                            $form.find('.form-item[rel=smbDomain]').hide();
-
-                                                            //S3
-                                                            $form.find('.form-item[rel=accesskey]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=secretkey]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=bucket]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=endpoint]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=usehttps]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=connectiontimeout]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=maxerrorretry]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=sockettimeout]').css('display', 'inline-block');
-
-                                                            $form.find('.form-item[rel=createNfsCache]').find('input').attr('checked', 'checked');
-                                                            //$form.find('.form-item[rel=createNfsCache]').find('input').attr('disabled', 'disabled');  //This checkbox should not be disabled any more because NFS staging (of a zone) might already exist (from "NFS secondary storage => Prepare Object Store Migration => NFS staging")
-                                                            $form.find('.form-item[rel=createNfsCache]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=nfsCacheZoneid]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=nfsCacheNfsServer]').css('display', 'inline-block');
-                                                            $form.find('.form-item[rel=nfsCachePath]').css('display', 'inline-block');
-
-
                                                             //Swift
                                                             $form.find('.form-item[rel=url]').hide();
                                                             $form.find('.form-item[rel=account]').hide();
@@ -12044,22 +11974,6 @@
                                                             $form.find('.form-item[rel=smbUsername]').hide();
                                                             $form.find('.form-item[rel=smbPassword]').hide();
                                                             $form.find('.form-item[rel=smbDomain]').hide();
-
-                                                            //S3
-                                                            $form.find('.form-item[rel=accesskey]').hide();
-                                                            $form.find('.form-item[rel=secretkey]').hide();
-                                                            $form.find('.form-item[rel=bucket]').hide();
-                                                            $form.find('.form-item[rel=endpoint]').hide();
-                                                            $form.find('.form-item[rel=usehttps]').hide();
-                                                            $form.find('.form-item[rel=connectiontimeout]').hide();
-                                                            $form.find('.form-item[rel=maxerrorretry]').hide();
-                                                            $form.find('.form-item[rel=sockettimeout]').hide();
-
-                                                            $form.find('.form-item[rel=createNfsCache]').find('input').removeAttr('checked');
-                                                            $form.find('.form-item[rel=createNfsCache]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheZoneid]').hide();
-                                                            $form.find('.form-item[rel=nfsCacheNfsServer]').hide();
-                                                            $form.find('.form-item[rel=nfsCachePath]').hide();
 
                                                             //Swift
                                                             $form.find('.form-item[rel=url]').css('display', 'inline-block');
@@ -12146,108 +12060,6 @@
                                             },
                                             //SMB (end)
 
-                                            //S3 (begin)
-                                            accesskey: {
-                                                label: 'label.s3.access_key',
-                                                docID: 'helpS3AccessKey',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            secretkey: {
-                                                label: 'label.s3.secret_key',
-                                                docID: 'helpS3SecretKey',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            bucket: {
-                                                label: 'label.s3.bucket',
-                                                docID: 'helpS3Bucket',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            endpoint: {
-                                                label: 'label.s3.endpoint',
-                                                docID: 'helpS3Endpoint'
-                                            },
-                                            usehttps: {
-                                                label: 'label.s3.use_https',
-                                                isEditable: true,
-                                                isBoolean: true,
-                                                isChecked: true,
-                                                converter: cloudStack.converters.toBooleanText
-                                            },
-                                            connectiontimeout: {
-                                                label: 'label.s3.connection_timeout',
-                                                docID: 'helpS3ConnectionTimeout'
-                                            },
-                                            maxerrorretry: {
-                                                label: 'label.s3.max_error_retry',
-                                                docID: 'helpS3MaxErrorRetry'
-                                            },
-                                            sockettimeout: {
-                                                label: 'label.s3.socket_timeout',
-                                                docID: 'helpS3SocketTimeout'
-                                            },
-
-                                            createNfsCache: {
-                                                label: 'label.create.nfs.secondary.staging.store',
-                                                isBoolean: true,
-                                                isChecked: true
-                                            },
-                                            nfsCacheZoneid: {
-                                                dependsOn: 'createNfsCache',
-                                                label: 'label.zone',
-                                                validation: {
-                                                    required: true
-                                                },
-                                                select: function (args) {
-                                                    $.ajax({
-                                                        url: createURL('listZones'),
-                                                        data: {},
-                                                        success: function (json) {
-                                                            var zones = json.listzonesresponse.zone;
-
-                                                            if (zones != null) {
-                                                                //$.map(items, fn) - items can not be null
-                                                                args.response.success({
-                                                                    data: $.map(zones, function (zone) {
-                                                                        return {
-                                                                            id: zone.id,
-                                                                            description: zone.name
-                                                                        };
-                                                                    })
-                                                                });
-                                                            } else {
-                                                                args.response.success({
-                                                                    data: null
-                                                                });
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                            },
-                                            nfsCacheNfsServer: {
-                                                dependsOn: 'createNfsCache',
-                                                label: 'label.nfs.server',
-                                                docID: 'helpNFSStagingServer',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            nfsCachePath: {
-                                                dependsOn: 'createNfsCache',
-                                                label: 'label.path',
-                                                docID: 'helpNFSStagingPath',
-                                                validation: {
-                                                    required: true
-                                                }
-                                            },
-                                            //S3 (end)
-
-
                                             //Swift (begin)
                                             url: {
                                                 label: 'label.url',
@@ -12333,80 +12145,6 @@
                                                     args.response.error(errorMsg);
                                                 }
                                             });
-                                        } else if (args.data.provider == 'S3') {
-                                            $.extend(data, {
-                                                provider: args.data.provider,
-                                                'details[0].key': 'accesskey',
-                                                'details[0].value': args.data.accesskey,
-                                                'details[1].key': 'secretkey',
-                                                'details[1].value': args.data.secretkey,
-                                                'details[2].key': 'bucket',
-                                                'details[2].value': args.data.bucket,
-                                                'details[3].key': 'usehttps',
-                                                'details[3].value': (args.data.usehttps != null && args.data.usehttps == 'on' ? 'true' : 'false')
-                                            });
-
-                                            var index = 4;
-                                            if (args.data.endpoint != null && args.data.endpoint.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'endpoint';
-                                                data['details[' + index.toString() + '].value'] = args.data.endpoint;
-                                                index++;
-                                            }
-                                            if (args.data.connectiontimeout != null && args.data.connectiontimeout.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'connectiontimeout';
-                                                data['details[' + index.toString() + '].value'] = args.data.connectiontimeout;
-                                                index++;
-                                            }
-                                            if (args.data.maxerrorretry != null && args.data.maxerrorretry.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'maxerrorretry';
-                                                data['details[' + index.toString() + '].value'] = args.data.maxerrorretry;
-                                                index++;
-                                            }
-                                            if (args.data.sockettimeout != null && args.data.sockettimeout.length > 0) {
-                                                data['details[' + index.toString() + '].key'] = 'sockettimeout';
-                                                data['details[' + index.toString() + '].value'] = args.data.sockettimeout;
-                                                index++;
-                                            }
-
-                                            $.ajax({
-                                                url: createURL('addImageStore'),
-                                                data: data,
-                                                success: function (json) {
-                                                    g_regionsecondaryenabled = true;
-
-                                                    var item = json.addimagestoreresponse.imagestore;
-                                                    args.response.success({
-                                                        data: item
-                                                    });
-                                                },
-                                                error: function (json) {
-                                                    args.response.error(parseXMLHttpResponse(json));
-                                                }
-                                            });
-
-                                            if (args.data.createNfsCache == 'on') {
-                                                var zoneid = args.data.nfsCacheZoneid;
-                                                var nfs_server = args.data.nfsCacheNfsServer;
-                                                var path = args.data.nfsCachePath;
-                                                var url = nfsURL(nfs_server, path);
-
-                                                var nfsCacheData = {
-                                                    provider: 'NFS',
-                                                    zoneid: zoneid,
-                                                    url: url
-                                                };
-
-                                                $.ajax({
-                                                    url: createURL('createSecondaryStagingStore'),
-                                                    data: nfsCacheData,
-                                                    success: function (json) {
-                                                        //do nothing
-                                                    },
-                                                    error: function (json) {
-                                                        args.response.error(parseXMLHttpResponse(json));
-                                                    }
-                                                });
-                                            }
                                         } else if (args.data.provider == 'Swift') {
                                             $.extend(data, {
                                                 provider: args.data.provider,

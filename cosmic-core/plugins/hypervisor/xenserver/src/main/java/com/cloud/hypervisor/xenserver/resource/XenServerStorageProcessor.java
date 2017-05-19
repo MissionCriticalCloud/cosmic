@@ -10,7 +10,6 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.exception.InternalErrorException;
@@ -21,7 +20,6 @@ import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.resource.StorageProcessor;
 import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.storage.S3.ClientOptions;
 import com.cloud.utils.storage.encoding.DecodedDataObject;
 import com.cloud.utils.storage.encoding.DecodedDataStore;
 import com.cloud.utils.storage.encoding.Decoder;
@@ -836,20 +834,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
                                 s_logger.debug("Failed to delete snapshot on cache storages", e);
                             }
                         }
-                    } else if (destStore instanceof S3TO) {
-                        try {
-                            finalPath = backupSnapshotToS3(conn, (S3TO) destStore, snapshotSr.getUuid(conn), folder, snapshotBackupUuid, isISCSI, wait);
-                            if (finalPath == null) {
-                                throw new CloudRuntimeException("S3 upload of snapshots " + snapshotBackupUuid + " failed");
-                            }
-                        } finally {
-                            try {
-                                deleteSnapshotBackup(conn, localMountPoint, folder, secondaryStorageMountPath, snapshotBackupUuid);
-                            } catch (final Exception e) {
-                                s_logger.debug("Failed to delete snapshot on cache storages", e);
-                            }
-                        }
-                        // finalPath = folder + File.separator + snapshotBackupUuid;
                     } else {
                         finalPath = folder + cacheStore.getPathSeparator() + snapshotBackupUuid;
                     }
@@ -866,11 +850,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
                             swiftBackupSnapshot(conn, (SwiftTO) destStore, primaryStorageSRUuid, snapshotPaUuid, "S-" + snapshotTO.getVolume().getVolumeId().toString(),
                                     isISCSI, wait);
                     finalPath = container + File.separator + snapshotBackupUuid;
-                } else if (destStore instanceof S3TO) {
-                    finalPath = backupSnapshotToS3(conn, (S3TO) destStore, primaryStorageSRUuid, folder, snapshotPaUuid, isISCSI, wait);
-                    if (finalPath == null) {
-                        throw new CloudRuntimeException("S3 upload of snapshots " + snapshotPaUuid + " failed");
-                    }
                 } else {
                     final String results =
                             backupSnapshot(conn, primaryStorageSRUuid, localMountPoint, folder, secondaryStorageMountPath, snapshotUuid, prevBackupUuid, isISCSI, wait);
@@ -1579,34 +1558,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
                         secondaryStorageMountPath, "localMountPoint", localMountPoint);
 
         return result;
-    }
-
-    protected String backupSnapshotToS3(final Connection connection, final S3TO s3, final String srUuid, final String folder, final String snapshotUuid,
-                                        final Boolean iSCSIFlag, final int wait) {
-
-        final String filename = iSCSIFlag ? "VHD-" + snapshotUuid : snapshotUuid + ".vhd";
-        final String dir = (iSCSIFlag ? "/dev/VG_XenStorage-" : "/var/run/sr-mount/") + srUuid;
-        final String key = folder + "/" + filename; // String.format("/snapshots/%1$s", snapshotUuid);
-
-        try {
-
-            final List<String> parameters = newArrayList(flattenProperties(s3, ClientOptions.class));
-            // https workaround for Introspector bug that does not
-            // recognize Boolean accessor methods ...
-
-            parameters.addAll(Arrays.asList("operation", "put", "filename", dir + "/" + filename, "iSCSIFlag", iSCSIFlag.toString(), "bucket", s3.getBucketName(), "key",
-                    key, "https", s3.isHttps() != null ? s3.isHttps().toString() : "null", "maxSingleUploadSizeInBytes", String.valueOf(s3.getMaxSingleUploadSizeInBytes())));
-            final String result = hypervisorResource.callHostPluginAsync(connection, "s3xenserver", "s3", wait, parameters.toArray(new String[parameters.size()]));
-
-            if (result != null && result.equals("true")) {
-                return key;
-            }
-            return null;
-        } catch (final Exception e) {
-            s_logger.error(String.format("S3 upload failed of snapshot %1$s due to %2$s.", snapshotUuid, e.toString()), e);
-        }
-
-        return null;
     }
 
     protected String backupSnapshot(final Connection conn, final String primaryStorageSRUuid, final String localMountPoint, final String path, final String

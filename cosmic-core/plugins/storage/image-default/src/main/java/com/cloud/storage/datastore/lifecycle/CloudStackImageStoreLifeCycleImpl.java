@@ -144,14 +144,6 @@ public class CloudStackImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see DataStoreLifeCycle#migrateToObjectStore(DataStore)
-     */
-    @Override
-    public boolean migrateToObjectStore(final DataStore store) {
-        return imageStoreHelper.convertToStagingStore(store);
-    }
-
     public static String cleanPassword(final String logString) {
         String cleanLogString = null;
         if (logString != null) {

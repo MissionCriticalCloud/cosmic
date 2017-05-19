@@ -1,7 +1,6 @@
 package com.cloud.storage.datastore;
 
 import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -128,18 +127,6 @@ public class ObjectInDataStoreManagerImpl implements ObjectInDataStoreManager {
                     String installPath =
                             TemplateConstants.DEFAULT_TMPLT_ROOT_DIR + "/" + TemplateConstants.DEFAULT_TMPLT_FIRST_LEVEL_DIR +
                                     templateDao.findById(obj.getId()).getAccountId() + "/" + obj.getId();
-                    if (dataStore.getTO() instanceof S3TO) {
-                        final TemplateInfo tmpl = (TemplateInfo) obj;
-                        installPath += "/" + tmpl.getUniqueName(); // for S3, we
-                        // append
-                        // template name
-                        // in the path
-                        // for template
-                        // sync since we
-                        // don't have
-                        // template.properties
-                        // there
-                    }
                     ts.setInstallPath(installPath);
                     ts.setState(ObjectInDataStoreStateMachine.State.Allocated);
                     ts = templateDataStoreDao.persist(ts);

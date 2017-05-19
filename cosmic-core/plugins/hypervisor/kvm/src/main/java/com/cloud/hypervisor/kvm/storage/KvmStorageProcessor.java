@@ -1,7 +1,5 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import static com.cloud.utils.storage.S3.S3Utils.putFile;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.PrimaryStorageDownloadAnswer;
 import com.cloud.agent.api.to.DataObjectType;
@@ -9,7 +7,6 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.S3TO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
@@ -50,7 +47,6 @@ import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.qemu.QemuImgException;
 import com.cloud.utils.qemu.QemuImgFile;
 import com.cloud.utils.script.Script;
-import com.cloud.utils.storage.S3.S3Utils;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -584,9 +580,6 @@ public class KvmStorageProcessor implements StorageProcessor {
         final SnapshotObjectTO destSnapshot = (SnapshotObjectTO) destData;
         final DataStoreTO imageStore = destData.getDataStore();
 
-        if (!(imageStore instanceof NfsTO)) {
-            return backupSnapshotForObjectStore(cmd);
-        }
         final NfsTO nfsImageStore = (NfsTO) imageStore;
 
         final String secondaryStoragePoolUrl = nfsImageStore.getUrl();
@@ -1185,81 +1178,5 @@ public class KvmStorageProcessor implements StorageProcessor {
                 dm.free();
             }
         }
-    }
-
-    protected String copyToS3(final File srcFile, final S3TO destStore, final String destPath)
-            throws InterruptedException {
-        final String key = destPath + S3Utils.SEPARATOR + srcFile.getName();
-
-        putFile(destStore, srcFile, destStore.getBucketName(), key).waitForCompletion();
-
-        return key;
-    }
-
-    protected Answer copyToObjectStore(final CopyCommand cmd) {
-        final DataTO srcData = cmd.getSrcTO();
-        final DataTO destData = cmd.getDestTO();
-        final DataStoreTO imageStore = destData.getDataStore();
-        final NfsTO srcStore = (NfsTO) srcData.getDataStore();
-        final String srcPath = srcData.getPath();
-        final int index = srcPath.lastIndexOf(File.separator);
-        final String srcSnapshotDir = srcPath.substring(0, index);
-        final String srcFileName = srcPath.substring(index + 1);
-        KvmStoragePool srcStorePool = null;
-        File srcFile = null;
-        try {
-            srcStorePool = storagePoolMgr.getStoragePoolByUri(srcStore.getUrl() + File.separator + srcSnapshotDir);
-            if (srcStorePool == null) {
-                return new CopyCmdAnswer("Can't get store:" + srcStore.getUrl());
-            }
-            srcFile = new File(srcStorePool.getLocalPath() + File.separator + srcFileName);
-            if (!srcFile.exists()) {
-                return new CopyCmdAnswer("Can't find src file: " + srcPath);
-            }
-            String destPath = null;
-            if (imageStore instanceof S3TO) {
-                destPath = copyToS3(srcFile, (S3TO) imageStore, destData.getPath());
-            } else {
-                return new CopyCmdAnswer("Unsupported protocol");
-            }
-            final SnapshotObjectTO newSnapshot = new SnapshotObjectTO();
-            newSnapshot.setPath(destPath);
-            return new CopyCmdAnswer(newSnapshot);
-        } catch (final Exception e) {
-            logger.error("failed to upload" + srcPath, e);
-            return new CopyCmdAnswer("failed to upload" + srcPath + e.toString());
-        } finally {
-            try {
-                if (srcFile != null) {
-                    srcFile.delete();
-                }
-                if (srcStorePool != null) {
-                    srcStorePool.delete();
-                }
-            } catch (final Exception e) {
-                logger.debug("Failed to clean up:", e);
-            }
-        }
-    }
-
-    protected Answer backupSnapshotForObjectStore(final CopyCommand cmd) {
-        final DataTO destData = cmd.getDestTO();
-        final DataStoreTO imageStore = destData.getDataStore();
-        final DataTO cacheData = cmd.getCacheTO();
-        if (cacheData == null) {
-            return new CopyCmdAnswer("Failed to copy to object store without cache store");
-        }
-        final DataStoreTO cacheStore = cacheData.getDataStore();
-        ((SnapshotObjectTO) destData).setDataStore(cacheStore);
-        final CopyCmdAnswer answer = (CopyCmdAnswer) backupSnapshot(cmd);
-        if (!answer.getResult()) {
-            return answer;
-        }
-        final SnapshotObjectTO snapshotOnCacheStore = (SnapshotObjectTO) answer.getNewData();
-        snapshotOnCacheStore.setDataStore(cacheStore);
-        ((SnapshotObjectTO) destData).setDataStore(imageStore);
-        final CopyCommand newCpyCmd = new CopyCommand(snapshotOnCacheStore, destData, cmd.getWaitInMillSeconds(),
-                cmd.executeInSequence());
-        return copyToObjectStore(newCpyCmd);
     }
 }
