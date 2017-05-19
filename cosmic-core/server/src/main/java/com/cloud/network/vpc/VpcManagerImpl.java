@@ -1035,7 +1035,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     private void checkVpcOfferingServicesWithCurrentNetworkOfferings(final Long vpcOfferingId, final VpcVO currentVpc) {
         // List of VPC networks
-        final List<NetworkVO> networks = _ntwkDao.listVpcNetworks();
+        final List<NetworkVO> networks = _ntwkDao.listByVpc(currentVpc.getId());
 
         // Services that the new offering supports
         final List<String> newOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
