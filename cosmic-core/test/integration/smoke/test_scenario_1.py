@@ -15,7 +15,9 @@ from marvin.lib.base import (
     PublicIPAddress,
     StaticRoute,
     VirtualMachine,
-    VPC
+    VPC,
+    Vpn,
+    VpnCustomerGateway
 )
 
 from marvin.lib.utils import (
@@ -28,7 +30,8 @@ from marvin.lib.common import (
     get_network,
     get_virtual_machine,
     get_vpc,
-    get_network_acl
+    get_network_acl,
+    get_vpngateway
 )
 
 
@@ -42,6 +45,11 @@ class TestScenario1(cloudstackTestCase):
         cls.api_client = cls.test_client.getApiClient()
         cls.test_data = cls.test_client.getParsedTestDataConfig()
         cls.zone = get_zone(cls.api_client, cls.test_client.getZoneForTests())
+        cls.dynamic_names = {
+            'accounts': {},
+            'vpcs': {},
+            'vms': {},
+        }
 
         cls.class_cleanup = []
 
@@ -88,7 +96,6 @@ class TestScenario1(cloudstackTestCase):
                 api_client=self.api_client,
                 name=domain_data['name'] + '-' + random_gen()
             )
-            domain_data['name'] = domain.name
 
         self.logger.debug('>>>>> DOMAIN >>> %s', domain.name)
 
@@ -105,7 +112,7 @@ class TestScenario1(cloudstackTestCase):
             domainid=domain.uuid
         )
         self.class_cleanup.append(account)
-        account_data['username'] = account.name
+        self.dynamic_names['accounts'][account_data['username']] = account.name
 
         self.logger.debug('>>>>> ACCOUNT >>> %s', account.name)
 
@@ -114,6 +121,8 @@ class TestScenario1(cloudstackTestCase):
         self.deploy_vpcs_publicipaddresses(account_data['vpcs'], account_data['virtualmachines'])
         self.deploy_privatenetworks(account_data['privatenetworks'], account, domain)
         self.deploy_vpcs_privategateways(account_data['vpcs'])
+        self.enable_vpcs_localvpngateway(account_data['vpcs'])
+        self.deploy_vpcs_remotevpngateways(account_data['vpcs'], account)
 
     def deploy_vpcs(self, vpcs_data, account):
         for vpc in vpcs_data:
@@ -126,7 +135,7 @@ class TestScenario1(cloudstackTestCase):
             zone=self.zone,
             account=account
         )
-        vpc_data['name'] = vpc.name
+        self.dynamic_names['vpcs'][vpc_data['name']] = vpc.name
 
         self.logger.debug('>>>>> VPC >>> %s', vpc.name)
 
@@ -159,19 +168,18 @@ class TestScenario1(cloudstackTestCase):
 
     def deploy_networks(self, networks_data, vpc):
         for network in networks_data:
-            self.deploy_network(network, vpc)
+            self.deploy_network(network['data'], vpc)
 
     def deploy_network(self, network_data, vpc):
-        acl = get_network_acl(api_client=self.api_client, name=network_data['data']['aclname'], vpc=vpc)
+        acl = get_network_acl(api_client=self.api_client, name=network_data['aclname'], vpc=vpc)
 
-        network = Network.create(
+        Network.create(
             self.api_client,
-            data=network_data['data'],
+            data=network_data,
             vpc=vpc,
             zone=self.zone,
             acl=acl
         )
-        network_data['data']['name'] = network.name
 
     def deploy_vms(self, vms_data, account):
         for vm in vms_data:
@@ -188,20 +196,21 @@ class TestScenario1(cloudstackTestCase):
                 network_and_ip['ip'] = nic['data']['guestip']
             network_and_ip_list.append(network_and_ip)
 
-        VirtualMachine.create(
+        vm = VirtualMachine.create(
             self.api_client,
             data=vm_data,
             zone=self.zone,
             account=account,
             network_and_ip_list=network_and_ip_list
         )
+        self.dynamic_names['vms'][vm_data['name']] = vm.name
 
     def deploy_vpcs_publicipaddresses(self, vpcs_data, virtualmachines_data):
         for vpc in vpcs_data:
             self.deploy_vpc_publicipaddresses(vpc['data'], virtualmachines_data)
 
     def deploy_vpc_publicipaddresses(self, vpc_data, virtualmachines_data):
-        vpc = get_vpc(api_client=self.api_client, name=vpc_data['name'])
+        vpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpc_data['name']])
         for publicipaddress in vpc_data['publicipaddresses']:
             self.deploy_publicipaddress(publicipaddress['data'], virtualmachines_data, vpc)
 
@@ -227,10 +236,9 @@ class TestScenario1(cloudstackTestCase):
                             )
                             virtualmachine = get_virtual_machine(
                                 api_client=self.api_client,
-                                name=virtualmachine_data['data']['name'],
+                                name=self.dynamic_names['vms'][virtualmachine_data['data']['name']],
                                 network=network
                             )
-                            self.logger.debug('>>>>> VM >>> %s', vars(virtualmachine))
                             NATRule.create(
                                 api_client=self.api_client,
                                 data=portforward_data['data'],
@@ -257,7 +265,7 @@ class TestScenario1(cloudstackTestCase):
             self.deploy_vpc_privategateways(vpc['data'])
 
     def deploy_vpc_privategateways(self, vpc_data):
-        vpc = get_vpc(api_client=self.api_client, name=vpc_data['name'])
+        vpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpc_data['name']])
         for privategateway in vpc_data['privategateways']:
             self.deploy_privategateway(privategateway['data'], vpc)
 
@@ -277,3 +285,36 @@ class TestScenario1(cloudstackTestCase):
                 data=staticroute['data'],
                 vpc=vpc
             )
+
+    def enable_vpcs_localvpngateway(self, vpcs_data):
+        for vpc_data in vpcs_data:
+            vpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpc_data['data']['name']])
+            if vpc_data['data']['vpnconnections']:
+                Vpn.createVpnGateway(api_client=self.api_client, vpc=vpc)
+
+    def deploy_vpcs_remotevpngateways(self, vpcs_data, account):
+        for vpc_data in vpcs_data:
+            for vpnconnection in vpc_data['data']['vpnconnections']:
+                vpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpc_data['data']['name']])
+                vpc_vpngateway = get_vpngateway(api_client=self.api_client, vpc=vpc)
+
+                remotevpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpnconnection])
+                remotevpc_vpngateway = get_vpngateway(api_client=self.api_client, vpc=remotevpc)
+
+                vpncustomergateway = VpnCustomerGateway.create(
+                    api_client=self.api_client,
+                    name="remotegateway_to_" + remotevpc.name,
+                    gateway=remotevpc_vpngateway.publicip,
+                    cidrlist=remotevpc.cidr,
+                    presharedkey='notasecret',
+                    ikepolicy='aes128-sha256;modp2048',
+                    esppolicy='aes128-sha256;modp2048',
+                    account=account.name,
+                    domainid=account.domainid
+                )
+
+                Vpn.createVpnConnection(
+                    api_client=self.api_client,
+                    s2svpngatewayid=vpc_vpngateway.id,
+                    s2scustomergatewayid=vpncustomergateway.id
+                )

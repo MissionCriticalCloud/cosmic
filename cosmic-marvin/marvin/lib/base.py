@@ -3041,10 +3041,13 @@ class Vpn:
         return Vpn(api_client.createRemoteAccessVpn(cmd).__dict__)
 
     @classmethod
-    def createVpnGateway(cls, api_client, vpcid):
+    def createVpnGateway(cls, api_client, vpcid=None, vpc=None):
         """Create VPN Gateway """
         cmd = createVpnGateway.createVpnGatewayCmd()
-        cmd.vpcid = vpcid
+        if vpcid:
+            cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
         return api_client.createVpnGateway(cmd).__dict__
 
     @classmethod
@@ -3634,31 +3637,48 @@ class VpnCustomerGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, name, gateway, cidrlist,
-               account=None, domainid=None):
+    def create(cls, api_client, services=None, name=None, gateway=None, cidrlist=None, account=None, domainid=None,
+               presharedkey=None, ikepolicy=None, esppolicy=None):
         """Create VPN Customer Gateway"""
         cmd = createVpnCustomerGateway.createVpnCustomerGatewayCmd()
         cmd.name = name
         cmd.gateway = gateway
         cmd.cidrlist = cidrlist
+
+        if not services:
+            services = {}
         if "ipsecpsk" in services:
             cmd.ipsecpsk = services["ipsecpsk"]
+        elif presharedkey:
+            cmd.ipsecpsk = presharedkey
+
         if "ikepolicy" in services:
             cmd.ikepolicy = services["ikepolicy"]
+        elif ikepolicy:
+            cmd.ikepolicy = ikepolicy
+
         if "ikelifetime" in services:
             cmd.ikelifetime = services["ikelifetime"]
+
         if "esppolicy" in services:
             cmd.esppolicy = services["esppolicy"]
+        elif esppolicy:
+            cmd.esppolicy = esppolicy
+
         if "esplifetime" in services:
             cmd.esplifetime = services["esplifetime"]
+
         if "dpd" in services:
             cmd.dpd = services["dpd"]
+
         if "forceencap" in services:
             cmd.forceencap = services["forceencap"]
+
         if account:
             cmd.account = account
         if domainid:
             cmd.domainid = domainid
+
         return VpnCustomerGateway(
             api_client.createVpnCustomerGateway(cmd).__dict__)
 

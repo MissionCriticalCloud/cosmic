@@ -82,6 +82,7 @@ test_data = {
                                                         }
                                                     }
                                                 ],
+                                                # TODO: remote networks/connections
                                                 "privategateways": [
                                                     {
                                                         "metadata": {},
@@ -164,14 +165,6 @@ test_data = {
                                         }
                                     ],
                                     "guestnetworks": [
-                                        {
-                                            "metadata": {},
-                                            "data": {
-
-                                            }
-                                        }
-                                    ],
-                                    "vpns": [
                                         {
                                             "metadata": {},
                                             "data": {

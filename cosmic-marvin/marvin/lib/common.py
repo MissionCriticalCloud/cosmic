@@ -17,7 +17,8 @@ from marvin.cloudstackAPI import (
     listServiceOfferings,
     listNetworkOfferings,
     listVPCOfferings,
-    listVPCs
+    listVPCs,
+    listVpnGateways
 )
 from marvin.codes import (
     PASS,
@@ -268,6 +269,16 @@ def list_network_offerings(api_client, **kwargs):
     return api_client.listNetworkOfferings(cmd)
 
 
+def list_vpngateways(api_client, **kwargs):
+    """ Lists VPN gateways """
+
+    cmd = listVpnGateways.listVpnGatewaysCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listVpnGateways(cmd)
+
+
 def list_vpc_offerings(api_client, **kwargs):
     """ Lists VPC offerings """
 
@@ -394,7 +405,7 @@ def get_virtual_machine(api_client, name, network):
 
 
 def get_vpngateway(api_client, vpc=None):
-    vpngateways = list_vpngateways(api_client, vpcid=vpc.id)
+    vpngateways = list_vpngateways(api_client, vpcid=vpc.id, listall=True)
     return next(iter(vpngateways or []), None)
 
 
