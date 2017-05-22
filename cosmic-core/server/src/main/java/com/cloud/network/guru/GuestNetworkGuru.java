@@ -286,9 +286,9 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                     case DomainRouter:
                         if (network.getVpcId() != null) {
                             final Vpc vpc = _vpcDao.findById(network.getVpcId());
-                            if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat,
+                            if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway,
                                     Provider.VPCVirtualRouter) && !vpc.isRedundant()) {
-                                // Non-redundant VPCs that support SourceNat acquire the gateway ip on their nic
+                                // Non-redundant VPCs that support Gateway acquire the gateway ip on their nic
                                 guestIp = network.getGateway();
                             } else {
                                 // In other cases, acquire an ip address from the DHCP range (take lowest possible)
