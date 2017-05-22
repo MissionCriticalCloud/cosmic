@@ -84,6 +84,10 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
             description = "Source NAT CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface")
     private String sourceNatList;
 
+    @Parameter(name = ApiConstants.SYSLOG_SERVER_LIST, type = CommandType.STRING,
+            description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging")
+    private String syslogServerList;
+
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
@@ -98,7 +102,7 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void create() throws ResourceAllocationException {
-        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc(), getSourceNatList());
+        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc(), getSourceNatList(), getSyslogServerList());
         if (vpc != null) {
             setEntityId(vpc.getId());
             setEntityUuid(vpc.getUuid());
@@ -140,6 +144,13 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
             return sourceNatList;
         }
         return sourceNatList.replaceAll("\\s", "");
+    }
+
+    public String getSyslogServerList() {
+        if (StringUtils.isEmpty(syslogServerList)) {
+            return syslogServerList;
+        }
+        return syslogServerList.replaceAll("\\s", "");
     }
 
     @Override

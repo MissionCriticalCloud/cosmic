@@ -970,6 +970,10 @@ cloudStack.docs = {
         desc: 'Comma separated list of CIDRs that will be source NATted into this VPC\'s Source NAT IP address.',
         externalLink: ''
     },
+    helpVPCSyslogServerList: {
+        desc: 'Comma separated list of IP addresses that will be configured as remote syslog servers to forward IP tables logging.',
+        externalLink: ''
+    },
     helpVPCDomain: {
         desc: 'If you want to assign a special domain name to this VPC\'s guest VM network, specify the DNS suffix',
         externalLink: ''

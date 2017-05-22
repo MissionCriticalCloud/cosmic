@@ -627,6 +627,10 @@
                                         docID: 'helpVPCSourceNATList',
                                         label: 'label.vpc.sourcenatlist'
                                     },
+                                    syslogserverlist: {
+                                        docID: 'helpVPCSyslogServerList',
+                                        label: 'label.vpc.syslogserverlist'
+                                    },
                                     networkdomain: {
                                         docID: 'helpVPCDomain',
                                         label: 'label.DNS.domain.for.guest.networks'
@@ -675,6 +679,11 @@
                                 if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
                                     $.extend(dataObj, {
                                         sourcenatlist: args.data.sourcenatlist
+                                    });
+
+                                if (args.data.syslogserverlist != null && args.data.syslogserverlist.length > 0)
+                                    $.extend(dataObj, {
+                                        syslogserverlist: args.data.syslogserverlist
                                     });
 
                                 if (args.data.networkdomain != null && args.data.networkdomain.length > 0)
@@ -755,6 +764,11 @@
                                                 sourcenatlist: args.data.sourcenatlist
                                             });
 
+                                        if (args.data.syslogserverlist != null && args.data.syslogserverlist.length > 0)
+                                            $.extend(dataObj, {
+                                                syslogserverlist: args.data.syslogserverlist
+                                            });
+
                                         cloudStack.dialog.confirm({
                                             message: 'message.confirm.change.vpcoffering',
                                             action: function () { //"Yes"    button is clicked
@@ -790,6 +804,11 @@
                                         if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
                                             $.extend(dataObj, {
                                                 sourcenatlist: args.data.sourcenatlist
+                                            });
+
+                                        if (args.data.syslogserverlist != null && args.data.syslogserverlist.length > 0)
+                                            $.extend(dataObj, {
+                                                syslogserverlist: args.data.syslogserverlist
                                             });
 
                                         $.ajax({
@@ -987,6 +1006,10 @@
                                     },
                                     sourcenatlist: {
                                         label: 'label.vpc.sourcenatlist',
+                                        isEditable: true
+                                    },
+                                    syslogserverlist: {
+                                        label: 'label.vpc.syslogserverlist',
                                         isEditable: true
                                     },
                                     networkdomain: {

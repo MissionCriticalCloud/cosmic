@@ -52,13 +52,17 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             description = "Source NAT CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface")
     private String sourceNatList;
 
+    @Parameter(name = ApiConstants.SYSLOG_SERVER_LIST, type = CommandType.STRING,
+            description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging")
+    private String syslogServerList;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
-        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList());
+        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList(), getSyslogServerList());
         if (result != null) {
             final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -131,6 +135,13 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             return sourceNatList;
         }
         return sourceNatList.replaceAll("\\s", "");
+    }
+
+    public String getSyslogServerList() {
+        if (StringUtils.isEmpty(syslogServerList)) {
+            return syslogServerList;
+        }
+        return syslogServerList.replaceAll("\\s", "");
     }
 
     @Override

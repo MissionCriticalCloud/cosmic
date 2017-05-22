@@ -47,6 +47,11 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
     String getSourceNatList();
 
     /**
+     * @return VPC syslog server list
+     */
+    String getSyslogServerList();
+
+    /**
      * @return true if restart is required for the VPC; false otherwise
      */
     boolean isRestartRequired();
