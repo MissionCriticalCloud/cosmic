@@ -966,6 +966,10 @@ cloudStack.docs = {
         desc: 'CIDR range for all the tiers within a VPC. Each tier\'s CIDR must be within the Super CIDR.',
         externalLink: ''
     },
+    helpVPCSourceNATList: {
+        desc: 'Comma separated list of CIDRs that will be source NATted into this VPC\'s Source NAT IP address.',
+        externalLink: ''
+    },
     helpVPCDomain: {
         desc: 'If you want to assign a special domain name to this VPC\'s guest VM network, specify the DNS suffix',
         externalLink: ''

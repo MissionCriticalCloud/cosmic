@@ -2,6 +2,7 @@ package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.BumpUpPriorityCommand;
 import com.cloud.agent.api.SetupGuestNetworkCommand;
+import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.DhcpEntryCommand;
@@ -81,6 +82,7 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());
         flyweight.put(IpAssocCommand.class, new IpAssociationConfigItem());
         flyweight.put(IpAssocVpcCommand.class, new IpAssociationConfigItem());
+        flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
     }
 
     protected String destinationFile;

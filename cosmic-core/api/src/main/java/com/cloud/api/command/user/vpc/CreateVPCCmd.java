@@ -21,6 +21,7 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.Vpc;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,10 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
 
+    @Parameter(name = ApiConstants.SOURCE_NAT_LIST, type = CommandType.STRING,
+            description = "Source NAT CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface")
+    private String sourceNatList;
+
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
@@ -93,7 +98,7 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void create() throws ResourceAllocationException {
-        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc());
+        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc(), getSourceNatList());
         if (vpc != null) {
             setEntityId(vpc.getId());
             setEntityUuid(vpc.getUuid());
@@ -128,6 +133,13 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
 
     public Boolean getDisplayVpc() {
         return display;
+    }
+
+    public String getSourceNatList() {
+        if (StringUtils.isEmpty(sourceNatList)) {
+            return sourceNatList;
+        }
+        return sourceNatList.replaceAll("\\s", "");
     }
 
     @Override

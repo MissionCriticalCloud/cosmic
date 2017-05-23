@@ -42,6 +42,11 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
     String getNetworkDomain();
 
     /**
+     * @return VPC source NAT list
+     */
+    String getSourceNatList();
+
+    /**
      * @return true if restart is required for the VPC; false otherwise
      */
     boolean isRestartRequired();

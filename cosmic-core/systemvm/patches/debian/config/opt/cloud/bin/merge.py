@@ -25,6 +25,7 @@ import cs_staticroutes
 import cs_vmdata
 import cs_vpnusers
 import cs_privategateway
+import cs_virtualrouter
 import cs.CsHelper as csHelper
 
 
@@ -125,6 +126,8 @@ class updateDataBag:
             return
         elif self.qFile.type == 'privategateway':
             dbag = self.process_privategateway(self.db.getDataBag())
+        elif self.qFile.type == 'virtualrouter':
+            dbag = self.process_virtualrouter(self.db.getDataBag())
         else:
             logging.error("Error I do not know what to do with file of type %s", self.qFile.type)
             return
@@ -293,6 +296,9 @@ class updateDataBag:
         # to be used by both staticnat and portforwarding
         return cs_forwardingrules.merge(dbag, self.qFile.data)
 
+    def process_virtualrouter(self, dbag):
+        return cs_virtualrouter.merge(dbag, self.qFile.data)
+
     def process_ip(self, dbag):
         for ip in self.qFile.data["ip_address"]:
             # Find the right device we should use to configure the ip address
@@ -313,7 +319,7 @@ class updateDataBag:
                                       % (device_name, ip['device_mac_address'], ip['vif_mac_address'])
                         ip['vif_mac_address_as_sent_by_mgt_server'] = ip['vif_mac_address']
                     else:
-                        log_message = "The mac address as sent by the management server %s matches the one we found (%s) on device %s so that's good"\
+                        log_message = "The mac address as sent by the management server %s matches the one we found (%s) on device %s so that's good" \
                                       % (ip['vif_mac_address'], ip['device_mac_address'], device_name)
                         logging.info(log_message)
 

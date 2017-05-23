@@ -760,7 +760,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @ActionEvent(eventType = EventTypes.EVENT_VPC_CREATE, eventDescription = "creating vpc", create = true)
     public Vpc createVpc(final long zoneId, final long vpcOffId, final long vpcOwnerId, final String vpcName,
                          final String displayText, final String cidr, String networkDomain,
-                         final Boolean displayVpc) throws ResourceAllocationException {
+                         final Boolean displayVpc, final String sourceNatList) throws ResourceAllocationException {
         final Account caller = CallContext.current().getCallingAccount();
         final Account owner = _accountMgr.getAccount(vpcOwnerId);
 
@@ -817,7 +817,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final boolean useDistributedRouter = vpcOff.supportsDistributedRouter();
         final VpcVO vpc = new VpcVO(zoneId, vpcName, displayText, owner.getId(), owner.getDomainId(), vpcOffId, cidr,
                 networkDomain, useDistributedRouter, isRegionLevelVpcOff,
-                vpcOff.getRedundantRouter());
+                vpcOff.getRedundantRouter(), sourceNatList);
 
         return createVpc(displayVpc, vpc);
     }
@@ -931,7 +931,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
-    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId) {
+    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final String sourceNatList) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -1004,6 +1004,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
         vpc.setRestartRequired(restartWithCleanupRequired);
 
+        // always clear the sourceNatList if it is null and only set if sourceNatList is not null and current of new vpcOffering supports sourceNatService
+        if ( sourceNatList == null || (sourceNatList != null && ((vpcOfferingId != null && hasSourceNatService(vpc)) || hasSourceNatService(vpcToUpdate)))) {
+            vpc.setSourceNatList(sourceNatList);
+        } else {
+            // otherwise throw an exception
+            throw new InvalidParameterValueException("Source NAT is not enabled on the VPC, so source NAT list is not allowed!");
+        }
+
         // Save the new config
         if (_vpcDao.update(vpcId, vpc)) {
             s_logger.debug("Updated VPC id=" + vpcId);
@@ -1028,6 +1036,20 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             } catch (final InsufficientCapacityException ex) {
                 s_logger.info(ex.toString());
                 throw new ServerApiException(ApiErrorCode.INSUFFICIENT_CAPACITY_ERROR, ex.getMessage());
+            }
+        } else {
+            //LOOP over all routers
+            final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
+            if (routers != null && !routers.isEmpty()) {
+                s_logger.debug("Updating routers of VPC " + vpc + " as a part of VPC update process");
+                for (final DomainRouterVO router : routers) {
+                    // Validate that the router is running
+                    if (router.getState() == VirtualMachine.State.Running) {
+                        if( !_routerMgr.updateVR(vpc, router)) {
+                            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC config");
+                        }
+                    }
+                }
             }
         }
         return _vpcDao.findById(vpcId);

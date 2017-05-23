@@ -53,6 +53,8 @@ public class VpcVO implements Vpc {
     private String name;
     @Column(name = "cidr")
     private String cidr = null;
+    @Column(name = "source_nat_list")
+    String sourceNatList;
 
     public VpcVO() {
         uuid = UUID.randomUUID().toString();
@@ -60,7 +62,7 @@ public class VpcVO implements Vpc {
 
     public VpcVO(final long zoneId, final String name, final String displayText, final long accountId, final long domainId,
                  final long vpcOffId, final String cidr, final String networkDomain, final boolean useDistributedRouter,
-                 final boolean regionLevelVpc, final boolean isRedundant) {
+                 final boolean regionLevelVpc, final boolean isRedundant, final String sourceNatList) {
         this.zoneId = zoneId;
         this.name = name;
         this.displayText = displayText;
@@ -74,6 +76,7 @@ public class VpcVO implements Vpc {
         usesDistributedRouter = useDistributedRouter;
         this.regionLevelVpc = regionLevelVpc;
         redundant = isRedundant;
+        this.sourceNatList = sourceNatList;
     }
 
     @Override
@@ -201,5 +204,13 @@ public class VpcVO implements Vpc {
     @Override
     public Class<?> getEntityType() {
         return Vpc.class;
+    }
+
+    public void setSourceNatList(final String sourceNatList) {
+        this.sourceNatList = sourceNatList;
+    }
+
+    public String getSourceNatList() {
+        return sourceNatList;
     }
 }

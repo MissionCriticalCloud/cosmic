@@ -623,6 +623,10 @@
                                             ipv4cidr: true
                                         }
                                     },
+                                    sourcenatlist: {
+                                        docID: 'helpVPCSourceNATList',
+                                        label: 'label.vpc.sourcenatlist'
+                                    },
                                     networkdomain: {
                                         docID: 'helpVPCDomain',
                                         label: 'label.DNS.domain.for.guest.networks'
@@ -667,6 +671,11 @@
                                     cidr: args.data.cidr,
                                     vpcofferingid: args.data.vpcoffering
                                 };
+
+                                if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
+                                    $.extend(dataObj, {
+                                        sourcenatlist: args.data.sourcenatlist
+                                    });
 
                                 if (args.data.networkdomain != null && args.data.networkdomain.length > 0)
                                     $.extend(dataObj, {
@@ -732,18 +741,26 @@
                                 label: 'label.edit',
                                 action: function (args) {
                                     // should we update the vpc offering
+
                                     if (args.data.vpcofferingid != null && args.data.vpcofferingid != args.context.vpc[0].vpcofferingid) {
+                                        var dataObj = {
+                                            id: args.context.vpc[0].id,
+                                            name: args.data.name,
+                                            displaytext: args.data.displaytext,
+                                            vpcofferingid: args.data.vpcofferingid
+                                        };
+
+                                        if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
+                                            $.extend(dataObj, {
+                                                sourcenatlist: args.data.sourcenatlist
+                                            });
+
                                         cloudStack.dialog.confirm({
                                             message: 'message.confirm.change.vpcoffering',
                                             action: function () { //"Yes"    button is clicked
                                                 $.ajax({
                                                     url: createURL('updateVPC'),
-                                                    data: {
-                                                        id: args.context.vpc[0].id,
-                                                        name: args.data.name,
-                                                        displaytext: args.data.displaytext,
-                                                        vpcofferingid: args.data.vpcofferingid
-                                                    },
+                                                    data: dataObj,
                                                     success: function (json) {
                                                         var jid = json.updatevpcresponse.jobid;
                                                         args.response.success({
@@ -764,13 +781,20 @@
                                             }
                                         });
                                     } else {
+                                        var dataObj = {
+                                            id: args.context.vpc[0].id,
+                                            name: args.data.name,
+                                            displaytext: args.data.displaytext
+                                        };
+
+                                        if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
+                                            $.extend(dataObj, {
+                                                sourcenatlist: args.data.sourcenatlist
+                                            });
+
                                         $.ajax({
                                             url: createURL('updateVPC'),
-                                            data: {
-                                                id: args.context.vpc[0].id,
-                                                name: args.data.name,
-                                                displaytext: args.data.displaytext
-                                            },
+                                            data: dataObj,
                                             success: function (json) {
                                                 var jid = json.updatevpcresponse.jobid;
                                                 args.response.success({
@@ -960,6 +984,10 @@
                                     },
                                     cidr: {
                                         label: 'label.cidr'
+                                    },
+                                    sourcenatlist: {
+                                        label: 'label.vpc.sourcenatlist',
+                                        isEditable: true
                                     },
                                     networkdomain: {
                                         label: 'label.network.domain'

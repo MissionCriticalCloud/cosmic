@@ -140,6 +140,7 @@ class CsAddress(CsDataBag):
         if self.config.is_vpc():
             vpccidr = cmdline.get_vpccidr()
             self.fw.append(["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
+            self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
             # adding logging here for all ingress traffic at once
             self.fw.append(["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
 
@@ -532,6 +533,9 @@ class CsIP:
             # jump to egress chain
             self.fw.append(["mangle", "front", "-A PREROUTING -m state --state NEW -i %s -j ACL_OUTBOUND_%s" %
                             (self.dev, self.dev)])
+
+            # create source nat list chain
+            self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
 
         if self.get_type() in ["privategateway"]:
             # create egress chain
