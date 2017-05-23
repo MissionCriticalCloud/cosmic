@@ -11,13 +11,13 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 
 
-class TestScenario1(cloudstackTestCase):
+class TestScenario2(cloudstackTestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
-        cls.test_client = super(TestScenario1, cls).getClsTestClient()
+        cls.test_client = super(TestScenario2, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
         cls.scenario_manager = cls.test_client.getScenarioManager('scenario_1')
         cls.class_cleanup = []
@@ -39,7 +39,7 @@ class TestScenario1(cloudstackTestCase):
             sys.exit(1)
 
     @attr(tags=['advanced'])
-    def test_01(self):
+    def test_02(self):
         try:
             pass
         except:

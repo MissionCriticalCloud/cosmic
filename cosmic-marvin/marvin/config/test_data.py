@@ -1,6 +1,7 @@
 test_data = {
     "scenario_1": {
         "metadata": {
+            "name": "Scenario #1",
             "description": "This scenario contains an account with 1 VPC 1 tier and 1 VM, there will be a port forward "
                            "from the public ip address to the VM.",
             "hierarchy": "domain -> account (user) -> vpc (static routes, publicips (acl) -> portforward, "

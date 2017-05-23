@@ -254,4 +254,5 @@ class MarvinPlugin(Plugin):
                                                test.AcctType)
 
     def finalize(self, result):
-        self.__tcRunLogger.info('=== finalize does nothing!  ===')
+        self.__tcRunLogger.info('=== Finalizing... ===')
+        self.__testClient.finalize()
