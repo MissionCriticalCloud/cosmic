@@ -4163,15 +4163,22 @@ class VPC:
 
     @classmethod
     def create(cls, api_client, data=None, services=None, vpcofferingid=None,
-               zoneid=None, networkDomain=None, account=None, zone = None,
+               zoneid=None, networkDomain=None, account=None, zone=None,
                domainid=None, **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
 
         cmd = createVPC.createVPCCmd()
-        cmd.name = "-".join([services["name"], random_gen()])
-        cmd.displaytext = "-".join([services["displaytext"], random_gen()])
+
+        random_name = "-".join([services["name"], random_gen()])
+        cmd.name = random_name
+
+        if "displaytext" in services:
+            random_displaytext = "-".join([services["displaytext"], random_gen()])
+        else:
+            random_displaytext = random_name
+        cmd.displaytext = random_displaytext
 
         if vpcofferingid:
             cmd.vpcofferingid = vpcofferingid
