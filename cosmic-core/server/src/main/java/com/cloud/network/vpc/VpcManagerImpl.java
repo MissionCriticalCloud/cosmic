@@ -760,7 +760,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @ActionEvent(eventType = EventTypes.EVENT_VPC_CREATE, eventDescription = "creating vpc", create = true)
     public Vpc createVpc(final long zoneId, final long vpcOffId, final long vpcOwnerId, final String vpcName,
                          final String displayText, final String cidr, String networkDomain,
-                         final Boolean displayVpc, final String sourceNatList) throws ResourceAllocationException {
+                         final Boolean displayVpc, final String sourceNatList, final String syslogServerList) throws ResourceAllocationException {
         final Account caller = CallContext.current().getCallingAccount();
         final Account owner = _accountMgr.getAccount(vpcOwnerId);
 
@@ -817,7 +817,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final boolean useDistributedRouter = vpcOff.supportsDistributedRouter();
         final VpcVO vpc = new VpcVO(zoneId, vpcName, displayText, owner.getId(), owner.getDomainId(), vpcOffId, cidr,
                 networkDomain, useDistributedRouter, isRegionLevelVpcOff,
-                vpcOff.getRedundantRouter(), sourceNatList);
+                vpcOff.getRedundantRouter(), sourceNatList, syslogServerList);
 
         return createVpc(displayVpc, vpc);
     }
@@ -931,7 +931,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
-    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final String sourceNatList) {
+    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final String sourceNatList, final String syslogServerList) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -961,6 +961,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         if (displayVpc != null) {
             vpc.setDisplay(displayVpc);
         }
+
+        vpc.setSyslogServerList(syslogServerList);
 
         if (vpcOfferingId != null) {
             final VpcOfferingVO newVpcOffering = _vpcOffDao.findById(vpcOfferingId);

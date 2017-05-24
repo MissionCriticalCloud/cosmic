@@ -20,7 +20,19 @@ def merge(dbag, data):
                 try:
                     net = IPNetwork(cidr)
                 except:
-                    print('[ERROR] So it seems we have an faulty CIDR in the source NAT list: ' + cidr)
+                    print('[ERROR] So it seems we have a faulty CIDR in the source NAT list: ' + cidr)
+                    exit(1)
+
+            dbag[key] = data[key]
+
+        if key == "syslog_server_list":
+            # let's verify that the list contains valid CIDRs
+            ips = data[key].split(',')
+            for ip in ips:
+                try:
+                    address = IPAddress(ip)
+                except:
+                    print('[ERROR] So it seems we have a faulty IP address in the syslog server list: ' + ip)
                     exit(1)
 
             dbag[key] = data[key]

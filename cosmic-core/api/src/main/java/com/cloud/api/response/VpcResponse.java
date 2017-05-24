@@ -118,6 +118,10 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "Source Nat CIDR list for used to allow other CIDRs to be source NATted by the VPC over the public interface", since = "5.3")
     private String sourceNatList;
 
+    @SerializedName(ApiConstants.SYSLOG_SERVER_LIST)
+    @Param(description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging", since = "5.3")
+    private String syslogServerList;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -229,5 +233,9 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
 
     public void setSourceNatList(final String sourceNatList) {
         this.sourceNatList = sourceNatList;
+    }
+
+    public void setSyslogServerList(final String syslogServerList) {
+        this.syslogServerList = syslogServerList;
     }
 }
