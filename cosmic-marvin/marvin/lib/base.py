@@ -418,12 +418,12 @@ class VirtualMachine:
         virtual_machine.public_ip = nat_rule.ipaddress
 
     @classmethod
-    def create(cls, api_client, data=None, services=None, templateid=None, accountid=None, domainid=None, zoneid=None,
+    def create(cls, api_client, services=None, templateid=None, accountid=None, domainid=None, zoneid=None,
                networkids=None, serviceofferingid=None, securitygroupids=None, projectid=None, startvm=None,
                diskofferingid=None, affinitygroupnames=None, affinitygroupids=None, group=None, hostid=None,
                keypair=None, ipaddress=None, mode='default', method='GET', hypervisor=None, customcpunumber=None,
                customcpuspeed=None, custommemory=None, rootdisksize=None, zone=None, networks=None, account=None,
-               network_and_ip_list=None):
+               network_and_ip_list=None, data=None):
         """Create the instance"""
         if data:
             services = data
@@ -1573,9 +1573,8 @@ class NATRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, virtual_machine, data=None, services=None, ipaddressid=None, ipaddress=None,
-               projectid=None, openfirewall=False, networkid=None, network=None, vpcid=None, vpc=None,
-               vmguestip=None):
+    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None, openfirewall=False,
+               networkid=None, network=None, vpcid=None, vpc=None, vmguestip=None, ipaddress=None, data=None):
         """Create Port forwarding rule"""
         if data:
             services = data
@@ -2759,9 +2758,9 @@ class Network:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, data=None, services=None, accountid=None, account=None, domainid=None, domain=None,
-               networkofferingid=None, projectid=None, subdomainaccess=None, zoneid=None, gateway=None, netmask=None,
-               cidr=None, vpcid=None, aclid=None, vlan=None, ipexclusionlist=None, vpc=None, zone=None, acl=None):
+    def create(cls, api_client, services=None, accountid=None, domainid=None, networkofferingid=None, projectid=None,
+               subdomainaccess=None, zoneid=None, gateway=None, netmask=None,  cidr=None, vpcid=None, aclid=None,
+               vlan=None, ipexclusionlist=None, domain=None, account=None, vpc=None, zone=None, acl=None, data=None):
         """Create Network for account"""
         if data:
             services = data
@@ -2883,9 +2882,8 @@ class NetworkACL:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, data=None, services=None, networkid=None, protocol=None,
-               number=None, aclid=None, action='Allow',
-               traffictype=None, cidrlist=None, acl=None):
+    def create(cls, api_client, services=None, networkid=None, protocol=None, number=None, aclid=None, action='Allow',
+               traffictype=None, cidrlist=None, acl=None, data=None):
         """Create network ACL rules(Ingress/Egress)"""
         if data:
             services = data
@@ -2967,7 +2965,7 @@ class NetworkACLList:
 
     @classmethod
     def create(
-            cls, api_client, data=None, services=None, name=None, description=None, vpcid=None, vpc=None):
+            cls, api_client, services=None, name=None, description=None, vpcid=None, vpc=None, data=None):
         """Create network ACL container list"""
         if data:
             services = data
@@ -4162,9 +4160,8 @@ class VPC:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, data=None, services=None, vpcofferingid=None,
-               zoneid=None, networkDomain=None, account=None, zone=None,
-               domainid=None, **kwargs):
+    def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
+               domainid=None, zone=None, data=None, **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
@@ -4249,8 +4246,8 @@ class PrivateGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, ipaddress=None, networkid=None, vpcid=None, vpc=None, data=None,
-               sourcenatsupported=None, aclid=None):
+    def create(cls, api_client, ipaddress=None, networkid=None, vpcid=None, sourcenatsupported=None, aclid=None,
+               vpc=None, data=None):
         """Create private gateway"""
 
         cmd = createPrivateGateway.createPrivateGatewayCmd()
@@ -4341,7 +4338,7 @@ class StaticRoute:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services=None, vpcid=None, cidr=None, nexthop=None, data=None, vpc=None):
+    def create(cls, api_client, services=None, vpcid=None, cidr=None, nexthop=None, vpc=None, data=None):
         """Create static route"""
 
         cmd = createStaticRoute.createStaticRouteCmd()
