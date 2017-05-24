@@ -1,4 +1,5 @@
 import copy
+import traceback
 
 from asyncJobMgr import asyncJobMgr
 from cloudstackConnection import CSConnection
@@ -436,8 +437,12 @@ class CSTestClient(object):
                 self.getParsedTestDataConfig()[scenarioName],
                 get_zone(self.getApiClient(), self.getZoneForTests())
             )
-            self.__scenarioManager.setup_infra()
 
+            try:
+                self.__scenarioManager.setup_infra()
+            except:
+                self.__logger.exception(">>>>>>>>>>>>>>>>>>>>>>> %s ", traceback.format_exc())
+                raise
             self.__logger.info("=== Scenario Manager, Scenario \"%s\" Created ===", scenarioHumanReadableName)
         return self.__scenarioManager
 
