@@ -836,7 +836,7 @@
                                 }
                             },
 
-                            restart: {
+                            /*restart: {
                                 label: 'label.restart.vpc',
                                 createForm: {
                                     title: 'label.restart.vpc',
@@ -898,7 +898,7 @@
                                 notification: {
                                     poll: pollAsyncJobResult
                                 }
-                            },
+                            },*/
 
                             remove: {
                                 label: 'label.remove.vpc',
