@@ -2316,7 +2316,6 @@
                                                         success: function (json) {
                                                             var networkObjs = json.listnetworksresponse.network;
                                                             var nicObjs = args.context.instances[0].nic;
-                                                            var itemsUser = [];
 
                                                             for (var i = 0; i < networkObjs.length; i++) {
                                                                 var networkObj = networkObjs[i];
@@ -2330,15 +2329,24 @@
                                                                 }
 
                                                                 if (!isNetworkExists) {
+                                                                    var vpcName = "";
+                                                                    if (networkObj.vpcname != null) {
+                                                                        vpcName = " (VPC " + networkObj.vpcname + ")";
+                                                                    }
+                                                                    if (typeof(itemsUser) == "undefined") {
+                                                                        var itemsUser = [];
+                                                                    }
                                                                     itemsUser.push({
                                                                         id: networkObj.id,
-                                                                        description: networkObj.name
+                                                                        description: networkObj.name + vpcName
                                                                     });
                                                                 }
                                                             }
-                                                            args.response.success({
-                                                                data: itemsUser
-                                                            });
+                                                            if (typeof(itemsUser) != "undefined") {
+                                                                args.response.success({
+                                                                    data: itemsUser
+                                                                });
+                                                            }
                                                         }
                                                     }),
 
@@ -2349,8 +2357,6 @@
                                                                 trafficType: "Public"
                                                         },
                                                         success: function (json) {
-                                                            var itemsPub = [];
-
                                                             var networkObjs = json.listnetworksresponse.network;
                                                             var nicObjs = args.context.instances[0].nic;
 
@@ -2366,17 +2372,39 @@
                                                                 }
 
                                                                 if (!isNetworkExists) {
+                                                                    if (typeof(itemsPub) == "undefined") {
+                                                                        var itemsPub = [];
+                                                                    }
                                                                     itemsPub.push({
                                                                         id: networkObj.id,
-                                                                        description: "*** Public Network ***"
+                                                                        description: "Public Network"
                                                                     });
                                                                 }
                                                             }
-                                                            args.response.success({
-                                                                data: itemsPub
-                                                            });
+
+                                                            if (typeof(itemsPub) != "undefined") {
+                                                                args.response.success({
+                                                                    data: itemsPub
+                                                                });
+                                                            }
                                                         }
                                                     })).done(function(data1, data2) {
+                                                        var selectList = $('#label_network option');
+                                                        selectList.sort(function(a,b){
+                                                            if (a.text.toLowerCase() < b.text.toLowerCase())
+                                                                return -1;
+                                                            if (a.text.toLowerCase() > b.text.toLowerCase())
+                                                                return 1;
+                                                            return 0;
+                                                        });
+
+                                                        $('#label_network option').filter(function() {
+                                                                return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
+                                                            })
+                                                            .remove();
+
+                                                    $('#label_network').html(selectList);
+
                                                         return data1.concat(data2);
                                                     });
                                             }
