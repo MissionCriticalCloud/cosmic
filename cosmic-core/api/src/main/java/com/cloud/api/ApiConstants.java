@@ -459,6 +459,7 @@ public class ApiConstants {
     public static final String VPC_OFF_DISPLAYTEXT = "vpcofferingdisplaytext";
     public static final String NETWORK = "network";
     public static final String VPC_ID = "vpcid";
+    public static final String VPC_NAME = "vpcname";
     public static final String GATEWAY_ID = "gatewayid";
     public static final String CAN_USE_FOR_DEPLOY = "canusefordeploy";
     public static final String RESOURCE_IDS = "resourceids";
