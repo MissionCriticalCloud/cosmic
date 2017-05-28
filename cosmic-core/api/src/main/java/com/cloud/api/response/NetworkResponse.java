@@ -172,6 +172,10 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
     @Param(description = "VPC the network belongs to")
     private String vpcId;
 
+    @SerializedName(ApiConstants.VPC_NAME)
+    @Param(description = "VPC the network belongs to")
+    private String vpcName;
+
     @SerializedName(ApiConstants.CAN_USE_FOR_DEPLOY)
     @Param(description = "list networks available for vm deployment")
     private Boolean canUseForDeploy;
@@ -383,6 +387,10 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
 
     public void setVpcId(final String vpcId) {
         this.vpcId = vpcId;
+    }
+
+    public void setVpcName(final String vpcName) {
+        this.vpcName = vpcName;
     }
 
     public void setCanUseForDeploy(final Boolean canUseForDeploy) {

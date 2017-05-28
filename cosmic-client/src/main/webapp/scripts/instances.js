@@ -152,13 +152,13 @@
                     label: 'label.ip.address'
                 },
                 hostname: {
-                        label: 'label.hypervisor',
-                        converter: function(args) {
-                            if (args)
-                                return args.split('.')[0];
-                            else
-                                return '';
-                        }
+                    label: 'label.hypervisor',
+                    converter: function(args) {
+                        if (args)
+                            return args.split('.')[0];
+                        else
+                            return '';
+                    }
                 },
                 state: {
                     label: 'label.state',
@@ -1498,13 +1498,13 @@
                                                 label: 'label.name'
                                             },
                                             availableHostSuitability: {
-                                                 label: 'label.suitability',
-                                                 indicator: {
+                                                label: 'label.suitability',
+                                                indicator: {
                                                     'Suitable': 'suitable',
                                                     'Suitable-Storage migration required': 'suitable suitable-storage-migration-required',
                                                     'Not Suitable': 'notsuitable',
                                                     'Not Suitable-Storage migration required': 'notsuitable notsuitable-storage-migration-required'
-                                                 }
+                                                }
                                             },
                                             cpuused: {
                                                 label: 'label.cpu.utilized'
@@ -1514,7 +1514,7 @@
                                             }
                                         },
                                         dataProvider: function(args) {
-                                             var data = {
+                                            var data = {
                                                 page: args.page,
                                                 pagesize: pageSize
                                             };
@@ -1551,9 +1551,9 @@
                                                             message: _l('message.no.host.available')
                                                         }); //Only a single host in the set up
                                                     } else {
-                                                         cloudStack.dialog.notice({
-                                                             message: _l('message.no.more.hosts.available')
-                                                         });
+                                                        cloudStack.dialog.notice({
+                                                            message: _l('message.no.more.hosts.available')
+                                                        });
                                                     }
                                                 }
                                             });
@@ -2296,50 +2296,117 @@
                                         networkid: {
                                             label: 'label.network',
                                             select: function (args) {
-                                                var data1 = {
+                                                var dataUser = {
                                                     zoneid: args.context.instances[0].zoneid
                                                 };
                                                 if (isAdmin()) {
-                                                    $.extend(data1, {
+                                                    $.extend(dataUser, {
                                                         listAll: true
                                                     });
                                                 } else {
-                                                    $.extend(data1, {
+                                                    $.extend(dataUser, {
                                                         account: args.context.instances[0].account,
                                                         domainid: args.context.instances[0].domainid
                                                     });
                                                 }
-                                                $.ajax({
-                                                    url: createURL('listNetworks'),
-                                                    data: data1,
-                                                    success: function (json) {
-                                                        var networkObjs = json.listnetworksresponse.network;
-                                                        var nicObjs = args.context.instances[0].nic;
-                                                        var items = [];
+                                                $.when(
+                                                    $.ajax({
+                                                        url: createURL('listNetworks'),
+                                                        data: dataUser,
+                                                        success: function (json) {
+                                                            var networkObjs = json.listnetworksresponse.network;
+                                                            var nicObjs = args.context.instances[0].nic;
 
-                                                        for (var i = 0; i < networkObjs.length; i++) {
-                                                            var networkObj = networkObjs[i];
-                                                            var isNetworkExists = false;
+                                                            for (var i = 0; i < networkObjs.length; i++) {
+                                                                var networkObj = networkObjs[i];
+                                                                var isNetworkExists = false;
+    
+                                                                for (var j = 0; j < nicObjs.length; j++) {
+                                                                    if (nicObjs[j].networkid == networkObj.id) {
+                                                                        isNetworkExists = true;
+                                                                        break;
+                                                                    }
+                                                                }
 
-                                                            for (var j = 0; j < nicObjs.length; j++) {
-                                                                if (nicObjs[j].networkid == networkObj.id) {
-                                                                    isNetworkExists = true;
-                                                                    break;
+                                                                if (!isNetworkExists) {
+                                                                    var vpcName = "";
+                                                                    if (networkObj.vpcname != null) {
+                                                                        vpcName = " (VPC " + networkObj.vpcname + ")";
+                                                                    }
+                                                                    if (typeof(itemsUser) == "undefined") {
+                                                                        var itemsUser = [];
+                                                                    }
+                                                                    itemsUser.push({
+                                                                        id: networkObj.id,
+                                                                        description: networkObj.name + vpcName
+                                                                    });
                                                                 }
                                                             }
-
-                                                            if (!isNetworkExists) {
-                                                                items.push({
-                                                                    id: networkObj.id,
-                                                                    description: networkObj.name
+                                                            if (typeof(itemsUser) != "undefined") {
+                                                                args.response.success({
+                                                                    data: itemsUser
                                                                 });
                                                             }
                                                         }
-                                                        args.response.success({
-                                                            data: items
+                                                    }),
+
+                                                    $.ajax({
+                                                        url: createURL('listNetworks'),
+                                                        data: {
+                                                                issystem: true,
+                                                                trafficType: "Public"
+                                                        },
+                                                        success: function (json) {
+                                                            var networkObjs = json.listnetworksresponse.network;
+                                                            var nicObjs = args.context.instances[0].nic;
+
+                                                            for (var i = 0; i < networkObjs.length; i++) {
+                                                                var networkObj = networkObjs[i];
+                                                                var isNetworkExists = false;
+
+                                                                for (var j = 0; j < nicObjs.length; j++) {
+                                                                    if (nicObjs[j].networkid == networkObj.id) {
+                                                                        isNetworkExists = true;
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                if (!isNetworkExists) {
+                                                                    if (typeof(itemsPub) == "undefined") {
+                                                                        var itemsPub = [];
+                                                                    }
+                                                                    itemsPub.push({
+                                                                        id: networkObj.id,
+                                                                        description: "Public Network"
+                                                                    });
+                                                                }
+                                                            }
+
+                                                            if (typeof(itemsPub) != "undefined") {
+                                                                args.response.success({
+                                                                    data: itemsPub
+                                                                });
+                                                            }
+                                                        }
+                                                    })).done(function(data1, data2) {
+                                                        var selectList = $('#label_network option');
+                                                        selectList.sort(function(a,b){
+                                                            if (a.text.toLowerCase() < b.text.toLowerCase())
+                                                                return -1;
+                                                            if (a.text.toLowerCase() > b.text.toLowerCase())
+                                                                return 1;
+                                                            return 0;
                                                         });
-                                                    }
-                                                });
+
+                                                        $('#label_network option').filter(function() {
+                                                                return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
+                                                            })
+                                                            .remove();
+
+                                                    $('#label_network').html(selectList);
+
+                                                        return data1.concat(data2);
+                                                    });
                                             }
                                         }
                                     }
