@@ -1,7 +1,6 @@
 package com.cloud.storage.resource;
 
 import static com.cloud.utils.StringUtils.join;
-import static com.cloud.utils.storage.S3.S3Utils.putFile;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -38,8 +37,6 @@ import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.S3TO;
-import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.Host;
@@ -79,14 +76,12 @@ import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.SwiftUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
-import com.cloud.utils.storage.S3.S3Utils;
 import com.cloud.vm.SecondaryStorageVm;
 
 import javax.naming.ConfigurationException;
@@ -112,7 +107,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -277,67 +271,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         }
 
         return new CopyCmdAnswer(newDestTO);
-    }
-
-    protected Answer copyFromSwiftToNfs(final CopyCommand cmd, final DataTO srcData, final SwiftTO swiftTO, final DataTO destData, final NfsTO destImageStore) {
-        final String storagePath = destImageStore.getUrl();
-        final String destPath = destData.getPath();
-        try {
-            final String downloadPath = determineStorageTemplatePath(storagePath, destPath);
-            final File downloadDirectory = _storage.getFile(downloadPath);
-
-            if (downloadDirectory.exists()) {
-                s_logger.debug("Directory " + downloadPath + " already exists");
-            } else {
-                if (!downloadDirectory.mkdirs()) {
-                    final String errMsg = "Unable to create directory " + downloadPath + " to copy from Swift to cache.";
-                    s_logger.error(errMsg);
-                    return new CopyCmdAnswer(errMsg);
-                }
-            }
-
-            final File destFile = SwiftUtil.getObject(swiftTO, downloadDirectory, srcData.getPath());
-            return postProcessing(destFile, downloadPath, destPath, srcData, destData);
-        } catch (final Exception e) {
-            s_logger.debug("Failed to copy swift to nfs", e);
-            return new CopyCmdAnswer(e.toString());
-        }
-    }
-
-    protected Answer copyFromS3ToNfs(final CopyCommand cmd, final DataTO srcData, final S3TO s3, final DataTO destData, final NfsTO destImageStore) {
-        final String storagePath = destImageStore.getUrl();
-        final String destPath = destData.getPath();
-
-        try {
-
-            final String downloadPath = determineStorageTemplatePath(storagePath, destPath);
-            final File downloadDirectory = _storage.getFile(downloadPath);
-
-            if (downloadDirectory.exists()) {
-                s_logger.debug("Directory " + downloadPath + " already exists");
-            } else {
-                if (!downloadDirectory.mkdirs()) {
-                    final String errMsg = "Unable to create directory " + downloadPath + " to copy from S3 to cache.";
-                    s_logger.error(errMsg);
-                    return new CopyCmdAnswer(errMsg);
-                }
-            }
-
-            final File destFile = new File(downloadDirectory, substringAfterLast(srcData.getPath(), S3Utils.SEPARATOR));
-
-            S3Utils.getFile(s3, s3.getBucketName(), srcData.getPath(), destFile).waitForCompletion();
-
-            if (destFile == null) {
-                return new CopyCmdAnswer("Can't find template");
-            }
-
-            return postProcessing(destFile, downloadPath, destPath, srcData, destData);
-        } catch (final Exception e) {
-
-            final String errMsg = format("Failed to download" + "due to $1%s", e.getMessage());
-            s_logger.error(errMsg, e);
-            return new CopyCmdAnswer(errMsg);
-        }
     }
 
     protected Answer copySnapshotToTemplateFromNfsToNfsXenserver(final CopyCommand cmd, final SnapshotObjectTO srcData, final NfsTO srcDataStore, final TemplateObjectTO destData,
@@ -519,76 +452,10 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
             if (destDataStore instanceof NfsTO) {
                 return copySnapshotToTemplateFromNfsToNfs(cmd, (SnapshotObjectTO) srcData, (NfsTO) srcDataStore, (TemplateObjectTO) destData, (NfsTO) destDataStore);
-            } else if (destDataStore instanceof SwiftTO) {
-                //create template on the same data store
-                final CopyCmdAnswer answer =
-                        (CopyCmdAnswer) copySnapshotToTemplateFromNfsToNfs(cmd, (SnapshotObjectTO) srcData, (NfsTO) srcDataStore, (TemplateObjectTO) destData,
-                                (NfsTO) srcDataStore);
-                if (!answer.getResult()) {
-                    return answer;
-                }
-                s_logger.debug("starting copy template to swift");
-                final DataTO newTemplate = answer.getNewData();
-                final File templateFile = getFile(newTemplate.getPath(), ((NfsTO) srcDataStore).getUrl());
-                final SwiftTO swift = (SwiftTO) destDataStore;
-                final String containterName = SwiftUtil.getContainerName(destData.getObjectType().toString(), destData.getId());
-                final String swiftPath = SwiftUtil.putObject(swift, templateFile, containterName, templateFile.getName());
-                //upload template.properties
-                final File properties = new File(templateFile.getParent() + File.separator + _tmpltpp);
-                if (properties.exists()) {
-                    SwiftUtil.putObject(swift, properties, containterName, _tmpltpp);
-                }
-
-                //clean up template data on staging area
-                try {
-                    final DeleteCommand deleteCommand = new DeleteCommand(newTemplate);
-                    execute(deleteCommand);
-                } catch (final Exception e) {
-                    s_logger.debug("Failed to clean up staging area:", e);
-                }
-
-                final TemplateObjectTO template = new TemplateObjectTO();
-                template.setPath(swiftPath);
-                template.setSize(templateFile.length());
-                template.setPhysicalSize(template.getSize());
-                final SnapshotObjectTO snapshot = (SnapshotObjectTO) srcData;
-                template.setFormat(snapshot.getVolume().getFormat());
-                return new CopyCmdAnswer(template);
-            } else if (destDataStore instanceof S3TO) {
-                //create template on the same data store
-                final CopyCmdAnswer answer =
-                        (CopyCmdAnswer) copySnapshotToTemplateFromNfsToNfs(cmd, (SnapshotObjectTO) srcData, (NfsTO) srcDataStore, (TemplateObjectTO) destData,
-                                (NfsTO) srcDataStore);
-                if (!answer.getResult()) {
-                    return answer;
-                }
-                final TemplateObjectTO newTemplate = (TemplateObjectTO) answer.getNewData();
-                newTemplate.setDataStore(srcDataStore);
-                final CopyCommand newCpyCmd = new CopyCommand(newTemplate, destData, cmd.getWait(), cmd.executeInSequence());
-                final Answer result = copyFromNfsToS3(newCpyCmd);
-                //clean up template data on staging area
-                try {
-                    final DeleteCommand deleteCommand = new DeleteCommand(newTemplate);
-                    execute(deleteCommand);
-                } catch (final Exception e) {
-                    s_logger.debug("Failed to clean up staging area:", e);
-                }
-                return result;
             }
         }
         s_logger.debug("Failed to create templat from snapshot");
         return new CopyCmdAnswer("Unsupported prototcol");
-    }
-
-    protected Answer copyFromNfsToImage(final CopyCommand cmd) {
-        final DataTO destData = cmd.getDestTO();
-        final DataStoreTO destDataStore = destData.getDataStore();
-
-        if (destDataStore instanceof S3TO) {
-            return copyFromNfsToS3(cmd);
-        } else {
-            return new CopyCmdAnswer("unsupported ");
-        }
     }
 
     protected Answer execute(final CopyCommand cmd) {
@@ -601,37 +468,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             return createTemplateFromSnapshot(cmd);
         }
 
-        if (destDataStore instanceof NfsTO && destDataStore.getRole() == DataStoreRole.ImageCache) {
-            final NfsTO destImageStore = (NfsTO) destDataStore;
-            if (srcDataStore instanceof S3TO) {
-                final S3TO s3 = (S3TO) srcDataStore;
-                return copyFromS3ToNfs(cmd, srcData, s3, destData, destImageStore);
-            } else if (srcDataStore instanceof SwiftTO) {
-                return copyFromSwiftToNfs(cmd, srcData, (SwiftTO) srcDataStore, destData, destImageStore);
-            }
-        }
-
-        if (srcDataStore.getRole() == DataStoreRole.ImageCache && destDataStore.getRole() == DataStoreRole.Image) {
-            return copyFromNfsToImage(cmd);
-        }
-
         return Answer.createUnsupportedCommandAnswer(cmd);
-    }
-
-    protected String determineS3TemplateDirectory(final Long accountId, final Long templateId, final String templateUniqueName) {
-        return join(asList(TEMPLATE_ROOT_DIR, accountId, templateId, templateUniqueName), S3Utils.SEPARATOR);
-    }
-
-    private String determineS3TemplateNameFromKey(final String key) {
-        return StringUtils.substringAfterLast(StringUtils.substringBeforeLast(key, S3Utils.SEPARATOR), S3Utils.SEPARATOR);
-    }
-
-    protected String determineS3VolumeDirectory(final Long accountId, final Long volId) {
-        return join(asList(VOLUME_ROOT_DIR, accountId, volId), S3Utils.SEPARATOR);
-    }
-
-    protected Long determineS3VolumeIdFromKey(final String key) {
-        return Long.parseLong(StringUtils.substringAfterLast(StringUtils.substringBeforeLast(key, S3Utils.SEPARATOR), S3Utils.SEPARATOR));
     }
 
     private String determineStorageTemplatePath(final String storagePath, final String dataPath) {
@@ -672,66 +509,10 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         }
     }
 
-    protected Answer registerTemplateOnSwift(final DownloadCommand cmd) {
-        final SwiftTO swiftTO = (SwiftTO) cmd.getDataStore();
-        final String path = cmd.getInstallPath();
-        final DataStoreTO cacheStore = cmd.getCacheStore();
-        if (cacheStore == null || !(cacheStore instanceof NfsTO)) {
-            return new DownloadAnswer("cache store can't be null", VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
-        }
-
-        File file = null;
-        try {
-            final NfsTO nfsCacheStore = (NfsTO) cacheStore;
-            final String fileName = cmd.getName() + "." + cmd.getFormat().getFileExtension();
-            file = downloadFromUrlToNfs(cmd.getUrl(), nfsCacheStore, path, fileName);
-            final String container = "T-" + cmd.getId();
-            final String swiftPath = SwiftUtil.putObject(swiftTO, file, container, null);
-
-            //put metda file
-            final File uniqDir = _storage.createUniqDir();
-            final String metaFileName = uniqDir.getAbsolutePath() + File.separator + "template.properties";
-            _storage.create(uniqDir.getAbsolutePath(), "template.properties");
-            final File metaFile = new File(metaFileName);
-            final FileWriter writer = new FileWriter(metaFile);
-            final BufferedWriter bufferWriter = new BufferedWriter(writer);
-            bufferWriter.write("uniquename=" + cmd.getName());
-            bufferWriter.write("\n");
-            bufferWriter.write("filename=" + fileName);
-            bufferWriter.write("\n");
-            bufferWriter.write("size=" + file.length());
-            bufferWriter.close();
-            writer.close();
-
-            SwiftUtil.putObject(swiftTO, metaFile, container, "template.properties");
-            metaFile.delete();
-            uniqDir.delete();
-            String md5sum = null;
-            try (FileInputStream fs = new FileInputStream(file)) {
-                md5sum = DigestUtils.md5Hex(fs);
-            } catch (final IOException e) {
-                s_logger.debug("Failed to get md5sum: " + file.getAbsoluteFile());
-            }
-
-            final DownloadAnswer answer =
-                    new DownloadAnswer(null, 100, null, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, swiftPath, swiftPath, file.length(), file.length(), md5sum);
-            return answer;
-        } catch (final IOException e) {
-            s_logger.debug("Failed to register template into swift", e);
-            return new DownloadAnswer(e.toString(), VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
-        } finally {
-            if (file != null) {
-                file.delete();
-            }
-        }
-    }
-
     private Answer execute(final DownloadCommand cmd) {
         final DataStoreTO dstore = cmd.getDataStore();
-        if (dstore instanceof NfsTO || dstore instanceof S3TO) {
+        if (dstore instanceof NfsTO) {
             return _dlMgr.handleDownloadCommand(this, cmd);
-        } else if (dstore instanceof SwiftTO) {
-            return registerTemplateOnSwift(cmd);
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + dstore);
         }
@@ -792,222 +573,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         }
     }
 
-    protected Answer copyFromNfsToS3(final CopyCommand cmd) {
-        final DataTO srcData = cmd.getSrcTO();
-        final DataTO destData = cmd.getDestTO();
-        final DataStoreTO srcDataStore = srcData.getDataStore();
-        final NfsTO srcStore = (NfsTO) srcDataStore;
-        final DataStoreTO destDataStore = destData.getDataStore();
-
-        final S3TO s3 = (S3TO) destDataStore;
-
-        try {
-            final String templatePath = determineStorageTemplatePath(srcStore.getUrl(), srcData.getPath());
-
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Found " + srcData.getObjectType() + " from directory " + templatePath + " to upload to S3.");
-            }
-
-            final String bucket = s3.getBucketName();
-            File srcFile = _storage.getFile(templatePath);
-            // guard the case where templatePath does not have file extension, since we are not completely sure
-            // about hypervisor, so we check each extension
-            if (!srcFile.exists()) {
-                srcFile = _storage.getFile(templatePath + ".qcow2");
-                if (!srcFile.exists()) {
-                    srcFile = _storage.getFile(templatePath + ".vhd");
-                    if (!srcFile.exists()) {
-                        srcFile = _storage.getFile(templatePath + ".ova");
-                        if (!srcFile.exists()) {
-                            srcFile = _storage.getFile(templatePath + ".vmdk");
-                            if (!srcFile.exists()) {
-                                return new CopyCmdAnswer("Can't find src file:" + templatePath);
-                            }
-                        }
-                    }
-                }
-            }
-
-            final ImageFormat format = getTemplateFormat(srcFile.getName());
-            final String key = destData.getPath() + S3Utils.SEPARATOR + srcFile.getName();
-
-            putFile(s3, srcFile, bucket, key).waitForCompletion();
-
-            DataTO retObj = null;
-            if (destData.getObjectType() == DataObjectType.TEMPLATE) {
-                final TemplateObjectTO newTemplate = new TemplateObjectTO();
-                newTemplate.setPath(key);
-                newTemplate.setSize(getVirtualSize(srcFile, format));
-                newTemplate.setPhysicalSize(srcFile.length());
-                newTemplate.setFormat(format);
-                retObj = newTemplate;
-            } else if (destData.getObjectType() == DataObjectType.VOLUME) {
-                final VolumeObjectTO newVol = new VolumeObjectTO();
-                newVol.setPath(key);
-                newVol.setSize(srcFile.length());
-                retObj = newVol;
-            } else if (destData.getObjectType() == DataObjectType.SNAPSHOT) {
-                final SnapshotObjectTO newSnapshot = new SnapshotObjectTO();
-                newSnapshot.setPath(key);
-                retObj = newSnapshot;
-            }
-
-            return new CopyCmdAnswer(retObj);
-        } catch (final Exception e) {
-            s_logger.error("failed to upload" + srcData.getPath(), e);
-            return new CopyCmdAnswer("failed to upload" + srcData.getPath() + e.toString());
-        }
-    }
-
-    String swiftDownload(final SwiftTO swift, final String container, final String rfilename, final String lFullPath) {
-        final Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
-                swift.getUserName() + " -K " + swift.getKey() + " download " + container + " " + rfilename + " -o " + lFullPath);
-        final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
-        final String result = command.execute(parser);
-        if (result != null) {
-            final String errMsg = "swiftDownload failed  err=" + result;
-            s_logger.warn(errMsg);
-            return errMsg;
-        }
-        if (parser.getLines() != null) {
-            final String[] lines = parser.getLines().split("\\n");
-            for (final String line : lines) {
-                if (line.contains("Errno") || line.contains("failed")) {
-                    final String errMsg = "swiftDownload failed , err=" + parser.getLines();
-                    s_logger.warn(errMsg);
-                    return errMsg;
-                }
-            }
-        }
-        return null;
-    }
-
-    String swiftDownloadContainer(final SwiftTO swift, final String container, final String ldir) {
-        final Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("cd " + ldir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
-                swift.getUserName() + " -K " + swift.getKey() + " download " + container);
-        final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
-        final String result = command.execute(parser);
-        if (result != null) {
-            final String errMsg = "swiftDownloadContainer failed  err=" + result;
-            s_logger.warn(errMsg);
-            return errMsg;
-        }
-        if (parser.getLines() != null) {
-            final String[] lines = parser.getLines().split("\\n");
-            for (final String line : lines) {
-                if (line.contains("Errno") || line.contains("failed")) {
-                    final String errMsg = "swiftDownloadContainer failed , err=" + parser.getLines();
-                    s_logger.warn(errMsg);
-                    return errMsg;
-                }
-            }
-        }
-        return null;
-    }
-
-    String swiftUpload(final SwiftTO swift, final String container, final String lDir, final String lFilename) {
-        final long SWIFT_MAX_SIZE = 5L * 1024L * 1024L * 1024L;
-        final List<String> files = new ArrayList<>();
-        if (lFilename.equals("*")) {
-            final File dir = new File(lDir);
-            final String[] dir_lst = dir.list();
-            if (dir_lst != null) {
-                for (final String file : dir_lst) {
-                    if (file.startsWith(".")) {
-                        continue;
-                    }
-                    files.add(file);
-                }
-            }
-        } else {
-            files.add(lFilename);
-        }
-
-        for (final String file : files) {
-            final File f = new File(lDir + "/" + file);
-            final long size = f.length();
-            final Script command = new Script("/bin/bash", s_logger);
-            command.add("-c");
-            if (size <= SWIFT_MAX_SIZE) {
-                command.add("cd " + lDir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
-                        swift.getAccount() + ":" + swift.getUserName() + " -K " + swift.getKey() + " upload " + container + " " + file);
-            } else {
-                command.add("cd " + lDir + ";/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " +
-                        swift.getAccount() + ":" + swift.getUserName() + " -K " + swift.getKey() + " upload -S " + SWIFT_MAX_SIZE + " " + container + " " + file);
-            }
-            final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
-            final String result = command.execute(parser);
-            if (result != null) {
-                final String errMsg = "swiftUpload failed , err=" + result;
-                s_logger.warn(errMsg);
-                return errMsg;
-            }
-            if (parser.getLines() != null) {
-                final String[] lines = parser.getLines().split("\\n");
-                for (final String line : lines) {
-                    if (line.contains("Errno") || line.contains("failed")) {
-                        final String errMsg = "swiftUpload failed , err=" + parser.getLines();
-                        s_logger.warn(errMsg);
-                        return errMsg;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    String[] swiftList(final SwiftTO swift, final String container, final String rFilename) {
-        final Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
-                swift.getUserName() + " -K " + swift.getKey() + " list " + container + " " + rFilename);
-        final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
-        final String result = command.execute(parser);
-        if (result == null && parser.getLines() != null) {
-            final String[] lines = parser.getLines().split("\\n");
-            return lines;
-        } else {
-            if (result != null) {
-                final String errMsg = "swiftList failed , err=" + result;
-                s_logger.warn(errMsg);
-            } else {
-                final String errMsg = "swiftList failed, no lines returns";
-                s_logger.warn(errMsg);
-            }
-        }
-        return null;
-    }
-
-    String swiftDelete(final SwiftTO swift, final String container, final String object) {
-        final Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("/usr/bin/python /opt/cosmic/agent/scripts/storage/secondary/swift -A " + swift.getUrl() + " -U " + swift.getAccount() + ":" +
-                swift.getUserName() + " -K " + swift.getKey() + " delete " + container + " " + object);
-        final OutputInterpreter.AllLinesParser parser = new OutputInterpreter.AllLinesParser();
-        final String result = command.execute(parser);
-        if (result != null) {
-            final String errMsg = "swiftDelete failed , err=" + result;
-            s_logger.warn(errMsg);
-            return errMsg;
-        }
-        if (parser.getLines() != null) {
-            final String[] lines = parser.getLines().split("\\n");
-            for (final String line : lines) {
-                if (line.contains("Errno") || line.contains("failed")) {
-                    final String errMsg = "swiftDelete failed , err=" + parser.getLines();
-                    s_logger.warn(errMsg);
-                    return errMsg;
-                }
-            }
-        }
-        return null;
-    }
-
     public Answer execute(final DeleteSnapshotsDirCommand cmd) {
         final DataStoreTO dstore = cmd.getDataStore();
         if (dstore instanceof NfsTO) {
@@ -1045,39 +610,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 return new Answer(cmd, false, details);
             }
             return new Answer(cmd, true, null);
-        } else if (dstore instanceof S3TO) {
-            final S3TO s3 = (S3TO) dstore;
-            final String path = cmd.getDirectory();
-            final String bucket = s3.getBucketName();
-            try {
-                S3Utils.deleteDirectory(s3, bucket, path);
-                return new Answer(cmd, true, String.format("Deleted snapshot %1%s from bucket %2$s.", path, bucket));
-            } catch (final Exception e) {
-                final String errorMessage =
-                        String.format("Failed to delete snapshot %1$s from bucket %2$s due to the following error: %3$s", path, bucket, e.getMessage());
-                s_logger.error(errorMessage, e);
-                return new Answer(cmd, false, errorMessage);
-            }
-        } else if (dstore instanceof SwiftTO) {
-            final String path = cmd.getDirectory();
-            final String volumeId = StringUtils.substringAfterLast(path, "/"); // assuming
-            // that
-            // the
-            // filename
-            // is
-            // the
-            // last
-            // section
-            // in
-            // the
-            // path
-            final String result = swiftDelete((SwiftTO) dstore, "V-" + volumeId.toString(), "");
-            if (result != null) {
-                final String errMsg = "failed to delete snapshot for volume " + volumeId + " , err=" + result;
-                s_logger.warn(errMsg);
-                return new Answer(cmd, false, errMsg);
-            }
-            return new Answer(cmd, true, "Deleted snapshot " + path + " from swift");
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + dstore);
         }
@@ -1235,8 +767,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 answer = new Answer(cmd, false, msg);
             }
         } else {
-            // TODO: what do we need to setup for S3/Swift, maybe need to mount
-            // to some cache storage
             answer = new Answer(cmd, true, null);
         }
 
@@ -1337,122 +867,9 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 return new Answer(cmd, false, details);
             }
             return new Answer(cmd, true, null);
-        } else if (dstore instanceof S3TO) {
-            final S3TO s3 = (S3TO) dstore;
-            final String path = obj.getPath();
-            final String bucket = s3.getBucketName();
-            try {
-                S3Utils.deleteObject(s3, bucket, path);
-                return new Answer(cmd, true, String.format("Deleted snapshot %1%s from bucket %2$s.", path, bucket));
-            } catch (final Exception e) {
-                final String errorMessage =
-                        String.format("Failed to delete snapshot %1$s from bucket %2$s due to the following error: %3$s", path, bucket, e.getMessage());
-                s_logger.error(errorMessage, e);
-                return new Answer(cmd, false, errorMessage);
-            }
-        } else if (dstore instanceof SwiftTO) {
-            final SwiftTO swiftTO = (SwiftTO) dstore;
-            final String path = obj.getPath();
-            SwiftUtil.deleteObject(swiftTO, path);
-
-            return new Answer(cmd, true, "Deleted snapshot " + path + " from swift");
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + dstore);
         }
-    }
-
-    Map<String, TemplateProp> swiftListTemplate(final SwiftTO swift) {
-        final String[] containers = SwiftUtil.list(swift, "", null);
-        if (containers == null) {
-            return null;
-        }
-        final Map<String, TemplateProp> tmpltInfos = new HashMap<>();
-        for (final String container : containers) {
-            if (container.startsWith("T-")) {
-                final String[] files = SwiftUtil.list(swift, container, "template.properties");
-                if (files.length != 1) {
-                    continue;
-                }
-                try {
-                    final File tempFile = File.createTempFile("template", ".tmp");
-                    final File tmpFile = SwiftUtil.getObject(swift, tempFile, container + File.separator + "template.properties");
-                    if (tmpFile == null) {
-                        continue;
-                    }
-                    try (FileReader fr = new FileReader(tmpFile);
-                         BufferedReader brf = new BufferedReader(fr)) {
-                        String line = null;
-                        String uniqName = null;
-                        Long size = null;
-                        String name = null;
-                        while ((line = brf.readLine()) != null) {
-                            if (line.startsWith("uniquename=")) {
-                                uniqName = line.split("=")[1];
-                            } else if (line.startsWith("size=")) {
-                                size = Long.parseLong(line.split("=")[1]);
-                            } else if (line.startsWith("filename=")) {
-                                name = line.split("=")[1];
-                            }
-                        }
-                        tempFile.delete();
-                        if (uniqName != null) {
-                            final TemplateProp prop = new TemplateProp(uniqName, container + File.separator + name, size, size, true, false);
-                            tmpltInfos.put(uniqName, prop);
-                        }
-                    } catch (final IOException ex) {
-                        s_logger.debug("swiftListTemplate:Exception:" + ex.getMessage());
-                        continue;
-                    }
-                } catch (final IOException e) {
-                    s_logger.debug("Failed to create templ file:" + e.toString());
-                    continue;
-                } catch (final Exception e) {
-                    s_logger.debug("Failed to get properties: " + e.toString());
-                    continue;
-                }
-            }
-        }
-        return tmpltInfos;
-    }
-
-    Map<String, TemplateProp> s3ListTemplate(final S3TO s3) {
-        final String bucket = s3.getBucketName();
-        // List the objects in the source directory on S3
-        final List<S3ObjectSummary> objectSummaries = S3Utils.listDirectory(s3, bucket, TEMPLATE_ROOT_DIR);
-        if (objectSummaries == null) {
-            return null;
-        }
-        final Map<String, TemplateProp> tmpltInfos = new HashMap<>();
-        for (final S3ObjectSummary objectSummary : objectSummaries) {
-            final String key = objectSummary.getKey();
-            // String installPath = StringUtils.substringBeforeLast(key,
-            // S3Utils.SEPARATOR);
-            final String uniqueName = determineS3TemplateNameFromKey(key);
-            // TODO: isPublic value, where to get?
-            final TemplateProp tInfo = new TemplateProp(uniqueName, key, objectSummary.getSize(), objectSummary.getSize(), true, false);
-            tmpltInfos.put(uniqueName, tInfo);
-        }
-        return tmpltInfos;
-    }
-
-    Map<Long, TemplateProp> s3ListVolume(final S3TO s3) {
-        final String bucket = s3.getBucketName();
-        // List the objects in the source directory on S3
-        final List<S3ObjectSummary> objectSummaries = S3Utils.listDirectory(s3, bucket, VOLUME_ROOT_DIR);
-        if (objectSummaries == null) {
-            return null;
-        }
-        final Map<Long, TemplateProp> tmpltInfos = new HashMap<>();
-        for (final S3ObjectSummary objectSummary : objectSummaries) {
-            final String key = objectSummary.getKey();
-            // String installPath = StringUtils.substringBeforeLast(key,
-            // S3Utils.SEPARATOR);
-            final Long id = determineS3VolumeIdFromKey(key);
-            // TODO: how to get volume template name
-            final TemplateProp tInfo = new TemplateProp(id.toString(), key, objectSummary.getSize(), objectSummary.getSize(), true, false);
-            tmpltInfos.put(id, tInfo);
-        }
-        return tmpltInfos;
     }
 
     private Answer execute(final ListTemplateCommand cmd) {
@@ -1467,14 +884,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             final String root = getRootDir(secUrl);
             final Map<String, TemplateProp> templateInfos = _dlMgr.gatherTemplateInfo(root);
             return new ListTemplateAnswer(secUrl, templateInfos);
-        } else if (store instanceof SwiftTO) {
-            final SwiftTO swift = (SwiftTO) store;
-            final Map<String, TemplateProp> templateInfos = swiftListTemplate(swift);
-            return new ListTemplateAnswer(swift.toString(), templateInfos);
-        } else if (store instanceof S3TO) {
-            final S3TO s3 = (S3TO) store;
-            final Map<String, TemplateProp> templateInfos = s3ListTemplate(s3);
-            return new ListTemplateAnswer(s3.getBucketName(), templateInfos);
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + store);
         }
@@ -1489,10 +898,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             final String root = getRootDir(cmd.getSecUrl());
             final Map<Long, TemplateProp> templateInfos = _dlMgr.gatherVolumeInfo(root);
             return new ListVolumeAnswer(cmd.getSecUrl(), templateInfos);
-        } else if (store instanceof S3TO) {
-            final S3TO s3 = (S3TO) store;
-            final Map<Long, TemplateProp> templateInfos = s3ListVolume(s3);
-            return new ListVolumeAnswer(s3.getBucketName(), templateInfos);
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + store);
         }
@@ -1643,10 +1048,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     protected GetStorageStatsAnswer execute(final GetStorageStatsCommand cmd) {
         final DataStoreTO store = cmd.getStore();
-        if (store instanceof S3TO || store instanceof SwiftTO) {
-            final long infinity = Integer.MAX_VALUE;
-            return new GetStorageStatsAnswer(cmd, infinity, 0L);
-        }
 
         final String rootDir = getRootDir(((NfsTO) store).getUrl());
         final long usedSize = getUsedSize(rootDir);
@@ -1744,37 +1145,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 return new Answer(cmd, false, details);
             }
             return new Answer(cmd, true, null);
-        } else if (dstore instanceof S3TO) {
-            final S3TO s3 = (S3TO) dstore;
-            final String path = obj.getPath();
-            final String bucket = s3.getBucketName();
-            try {
-                S3Utils.deleteDirectory(s3, bucket, path);
-                return new Answer(cmd, true, String.format("Deleted template %1$s from bucket %2$s.", path, bucket));
-            } catch (final Exception e) {
-                final String errorMessage =
-                        String.format("Failed to delete template %1$s from bucket %2$s due to the following error: %3$s", path, bucket, e.getMessage());
-                s_logger.error(errorMessage, e);
-                return new Answer(cmd, false, errorMessage);
-            }
-        } else if (dstore instanceof SwiftTO) {
-            final SwiftTO swift = (SwiftTO) dstore;
-            final String container = "T-" + obj.getId();
-            final String object = "";
-
-            try {
-                final String result = swiftDelete(swift, container, object);
-                if (result != null) {
-                    final String errMsg = "failed to delete object " + container + "/" + object + " , err=" + result;
-                    s_logger.warn(errMsg);
-                    return new Answer(cmd, false, errMsg);
-                }
-                return new Answer(cmd, true, "success");
-            } catch (final Exception e) {
-                final String errMsg = cmd + " Command failed due to " + e.toString();
-                s_logger.warn(errMsg, e);
-                return new Answer(cmd, false, errMsg);
-            }
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + dstore);
         }
@@ -1848,39 +1218,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 return new Answer(cmd, false, details);
             }
             return new Answer(cmd, true, null);
-        } else if (dstore instanceof S3TO) {
-            final S3TO s3 = (S3TO) dstore;
-            final String path = obj.getPath();
-            final String bucket = s3.getBucketName();
-            try {
-                S3Utils.deleteDirectory(s3, bucket, path);
-                return new Answer(cmd, true, String.format("Deleted volume %1%s from bucket %2$s.", path, bucket));
-            } catch (final Exception e) {
-                final String errorMessage = String.format("Failed to delete volume %1$s from bucket %2$s due to the following error: %3$s", path, bucket, e.getMessage());
-                s_logger.error(errorMessage, e);
-                return new Answer(cmd, false, errorMessage);
-            }
-        } else if (dstore instanceof SwiftTO) {
-            final Long volumeId = obj.getId();
-            final String path = obj.getPath();
-            final String filename = StringUtils.substringAfterLast(path, "/"); // assuming
-            // that
-            // the
-            // filename
-            // is
-            // the
-            // last
-            // section
-            // in
-            // the
-            // path
-            final String result = swiftDelete((SwiftTO) dstore, "V-" + volumeId.toString(), filename);
-            if (result != null) {
-                final String errMsg = "failed to delete volume " + filename + " , err=" + result;
-                s_logger.warn(errMsg);
-                return new Answer(cmd, false, errMsg);
-            }
-            return new Answer(cmd, true, "Deleted volume " + path + " from swift");
         } else {
             return new Answer(cmd, false, "Unsupported image data store: " + dstore);
         }

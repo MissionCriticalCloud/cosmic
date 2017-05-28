@@ -1400,20 +1400,10 @@
 
                             $.ajax({
                                 url: createURL('listImageStores'),
-                                data: {
-                                    provider: 'S3'
-                                },
                                 async: true,
                                 success: function (json) {
-                                    var s3stores = json.listimagestoresresponse.imagestore;
-                                    if (s3stores != null && s3stores.length > 0) {
-                                        storageproviders.push({id: 'S3', description: 'S3'}); //if (region-wide) S3 store exists already, only "S3" option should be included here. Any other type of store is not allowed to be created since cloudstack doesn't support multiple types of store at this point.
-                                    } else {
-                                        storageproviders.push({id: 'NFS', description: 'NFS'});
-                                        storageproviders.push({id: 'SMB', description: 'SMB/CIFS'});
-                                        storageproviders.push({id: 'S3', description: 'S3'});
-                                        storageproviders.push({id: 'Swift', description: 'Swift'});
-                                    }
+                                    storageproviders.push({id: 'NFS', description: 'NFS'});
+                                    storageproviders.push({id: 'SMB', description: 'SMB/CIFS'});
                                     args.response.success({
                                         data: storageproviders
                                     });
@@ -1434,27 +1424,6 @@
                                             $fields.filter('[rel=smbUsername]').hide();
                                             $fields.filter('[rel=smbPassword]').hide();
                                             $fields.filter('[rel=smbDomain]').hide();
-
-                                            //S3
-                                            $fields.filter('[rel=accesskey]').hide();
-                                            $fields.filter('[rel=secretkey]').hide();
-                                            $fields.filter('[rel=bucket]').hide();
-                                            $fields.filter('[rel=endpoint]').hide();
-                                            $fields.filter('[rel=usehttps]').hide();
-                                            $fields.filter('[rel=connectiontimeout]').hide();
-                                            $fields.filter('[rel=maxerrorretry]').hide();
-                                            $fields.filter('[rel=sockettimeout]').hide();
-
-                                            $fields.filter('[rel=createNfsCache]').hide();
-                                            $fields.filter('[rel=createNfsCache]').find('input').removeAttr('checked');
-                                            $fields.filter('[rel=nfsCacheNfsServer]').hide();
-                                            $fields.filter('[rel=nfsCachePath]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
                                         } else if ($(this).val() == "NFS") {
                                             $fields.filter('[rel=name]').css('display', 'inline-block');
 
@@ -1467,27 +1436,6 @@
                                             $fields.filter('[rel=smbUsername]').hide();
                                             $fields.filter('[rel=smbPassword]').hide();
                                             $fields.filter('[rel=smbDomain]').hide();
-
-                                            //S3
-                                            $fields.filter('[rel=accesskey]').hide();
-                                            $fields.filter('[rel=secretkey]').hide();
-                                            $fields.filter('[rel=bucket]').hide();
-                                            $fields.filter('[rel=endpoint]').hide();
-                                            $fields.filter('[rel=usehttps]').hide();
-                                            $fields.filter('[rel=connectiontimeout]').hide();
-                                            $fields.filter('[rel=maxerrorretry]').hide();
-                                            $fields.filter('[rel=sockettimeout]').hide();
-
-                                            $fields.filter('[rel=createNfsCache]').hide();
-                                            $fields.filter('[rel=createNfsCache]').find('input').removeAttr('checked');
-                                            $fields.filter('[rel=nfsCacheNfsServer]').hide();
-                                            $fields.filter('[rel=nfsCachePath]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
                                         } else if ($(this).val() == "SMB") {
                                             $fields.filter('[rel=name]').css('display', 'inline-block');
 
@@ -1500,112 +1448,6 @@
                                             $fields.filter('[rel=smbUsername]').css('display', 'inline-block');
                                             $fields.filter('[rel=smbPassword]').css('display', 'inline-block');
                                             $fields.filter('[rel=smbDomain]').css('display', 'inline-block');
-
-                                            //S3
-                                            $fields.filter('[rel=accesskey]').hide();
-                                            $fields.filter('[rel=secretkey]').hide();
-                                            $fields.filter('[rel=bucket]').hide();
-                                            $fields.filter('[rel=endpoint]').hide();
-                                            $fields.filter('[rel=usehttps]').hide();
-                                            $fields.filter('[rel=connectiontimeout]').hide();
-                                            $fields.filter('[rel=maxerrorretry]').hide();
-                                            $fields.filter('[rel=sockettimeout]').hide();
-
-                                            $fields.filter('[rel=createNfsCache]').hide();
-                                            $fields.filter('[rel=createNfsCache]').find('input').removeAttr('checked');
-                                            $fields.filter('[rel=nfsCacheNfsServer]').hide();
-                                            $fields.filter('[rel=nfsCachePath]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
-                                        } else if ($(this).val() == "S3") {
-                                            $fields.filter('[rel=name]').css('display', 'inline-block');
-
-                                            if (s3stores != null && s3stores.length > 0) {
-                                                $fields.filter('[rel=name]').find('input').val(s3stores[0].name);
-                                                $fields.filter('[rel=name]').find('input').attr("disabled", "disabled");
-                                            } else {
-                                                //$fields.filter('[rel=name]').find('input').val("");
-                                                $fields.filter('[rel=name]').find('input').removeAttr("disabled");
-                                            }
-
-                                            //NFS
-                                            $fields.filter('[rel=zoneid]').hide();
-                                            $fields.filter('[rel=nfsServer]').hide();
-                                            $fields.filter('[rel=path]').hide();
-
-                                            //SMB
-                                            $fields.filter('[rel=smbUsername]').hide();
-                                            $fields.filter('[rel=smbPassword]').hide();
-                                            $fields.filter('[rel=smbDomain]').hide();
-
-                                            //S3
-                                            if (s3stores != null && s3stores.length > 0) {
-                                                $fields.filter('[rel=accesskey]').hide();
-                                                $fields.filter('[rel=secretkey]').hide();
-                                                $fields.filter('[rel=bucket]').hide();
-                                                $fields.filter('[rel=endpoint]').hide();
-                                                $fields.filter('[rel=usehttps]').hide();
-                                                $fields.filter('[rel=connectiontimeout]').hide();
-                                                $fields.filter('[rel=maxerrorretry]').hide();
-                                                $fields.filter('[rel=sockettimeout]').hide();
-                                            } else {
-                                                $fields.filter('[rel=accesskey]').css('display', 'inline-block');
-                                                $fields.filter('[rel=secretkey]').css('display', 'inline-block');
-                                                $fields.filter('[rel=bucket]').css('display', 'inline-block');
-                                                $fields.filter('[rel=endpoint]').css('display', 'inline-block');
-                                                $fields.filter('[rel=usehttps]').css('display', 'inline-block');
-                                                $fields.filter('[rel=connectiontimeout]').css('display', 'inline-block');
-                                                $fields.filter('[rel=maxerrorretry]').css('display', 'inline-block');
-                                                $fields.filter('[rel=sockettimeout]').css('display', 'inline-block');
-                                            }
-                                            $fields.filter('[rel=createNfsCache]').find('input').attr('checked', 'checked');
-                                            $fields.filter('[rel=createNfsCache]').find('input').attr("disabled", "disabled");  //Create NFS staging is required for S3 at this moment. So, disallow user to uncheck "Create NFS Secondary Staging" checkbox
-                                            $fields.filter('[rel=createNfsCache]').css('display', 'inline-block');
-                                            $fields.filter('[rel=nfsCacheNfsServer]').css('display', 'inline-block');
-                                            $fields.filter('[rel=nfsCachePath]').css('display', 'inline-block');
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').hide();
-                                            $fields.filter('[rel=account]').hide();
-                                            $fields.filter('[rel=username]').hide();
-                                            $fields.filter('[rel=key]').hide();
-                                        } else if ($(this).val() == "Swift") {
-                                            $fields.filter('[rel=name]').css('display', 'inline-block');
-
-                                            //NFS
-                                            $fields.filter('[rel=zoneid]').hide();
-                                            $fields.filter('[rel=nfsServer]').hide();
-                                            $fields.filter('[rel=path]').hide();
-
-                                            //SMB
-                                            $fields.filter('[rel=smbUsername]').hide();
-                                            $fields.filter('[rel=smbPassword]').hide();
-                                            $fields.filter('[rel=smbDomain]').hide();
-
-                                            //S3
-                                            $fields.filter('[rel=accesskey]').hide();
-                                            $fields.filter('[rel=secretkey]').hide();
-                                            $fields.filter('[rel=bucket]').hide();
-                                            $fields.filter('[rel=endpoint]').hide();
-                                            $fields.filter('[rel=usehttps]').hide();
-                                            $fields.filter('[rel=connectiontimeout]').hide();
-                                            $fields.filter('[rel=maxerrorretry]').hide();
-                                            $fields.filter('[rel=sockettimeout]').hide();
-
-                                            $fields.filter('[rel=createNfsCache]').hide();
-                                            $fields.filter('[rel=createNfsCache]').find('input').removeAttr('checked');
-                                            $fields.filter('[rel=nfsCacheNfsServer]').hide();
-                                            $fields.filter('[rel=nfsCachePath]').hide();
-
-                                            //Swift
-                                            $fields.filter('[rel=url]').css('display', 'inline-block');
-                                            $fields.filter('[rel=account]').css('display', 'inline-block');
-                                            $fields.filter('[rel=username]').css('display', 'inline-block');
-                                            $fields.filter('[rel=key]').css('display', 'inline-block');
                                         }
                                     });
                                     args.$select.change();
@@ -1657,97 +1499,6 @@
                         }
                     },
                     //SMB (end)
-
-                    //S3 (begin)
-                    accesskey: {
-                        label: 'label.s3.access_key',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    secretkey: {
-                        label: 'label.s3.secret_key',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    bucket: {
-                        label: 'label.s3.bucket',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    endpoint: {
-                        label: 'label.s3.endpoint',
-                        isHidden: true
-                    },
-                    usehttps: {
-                        label: 'label.s3.use_https',
-                        isBoolean: true,
-                        isChecked: true,
-                        isHidden: true
-                    },
-                    connectiontimeout: {
-                        label: 'label.s3.connection_timeout',
-                        isHidden: true
-                    },
-                    maxerrorretry: {
-                        label: 'label.s3.max_error_retry',
-                        isHidden: true
-                    },
-                    sockettimeout: {
-                        label: 'label.s3.socket_timeout',
-                        isHidden: true
-                    },
-
-                    createNfsCache: {
-                        label: 'label.create.nfs.secondary.staging.storage',
-                        isBoolean: true,
-                        isChecked: true,
-                        isHidden: true
-                    },
-                    nfsCacheNfsServer: {
-                        dependsOn: 'createNfsCache',
-                        label: 'label.s3.nfs.server',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    nfsCachePath: {
-                        dependsOn: 'createNfsCache',
-                        label: 'label.s3.nfs.path',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    //S3 (end)
-
-                    //Swift (begin)
-                    url: {
-                        label: 'label.url',
-                        validation: {
-                            required: true
-                        },
-                        isHidden: true
-                    },
-                    account: {
-                        label: 'label.account',
-                        isHidden: true
-                    },
-                    username: {
-                        label: 'label.username',
-                        isHidden: true
-                    },
-                    key: {
-                        label: 'label.key',
-                        isHidden: true
-                    }
-                    //Swift (end)
                 }
             }
         },
@@ -3578,137 +3329,6 @@
                             url: createURL('addImageStore'),
                             data: data,
                             success: function (json) {
-                                complete({
-                                    data: $.extend(args.data, {
-                                        returnedSecondaryStorage: json.addimagestoreresponse.secondarystorage
-                                    })
-                                });
-                            },
-                            error: function (XMLHttpResponse) {
-                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                error('addSecondaryStorage', errorMsg, {
-                                    fn: 'addSecondaryStorage',
-                                    args: args
-                                });
-                            }
-                        });
-                    } else if (args.data.secondaryStorage.provider == 'S3') {
-                        if ($wizard.find('form[rel=secondaryStorage]').find('div[rel=name]').find('input').attr("disabled") == "disabled") { //Name textbox is disabled (and populated with S3 image setore name) when S3 image store exists. In this case, do not call addImageStore to create S3 image store.
-                            complete({
-                                data: args.data
-                            });
-                        } else { //Name textbox is not disabled when S3 image store does not exist. In this case, call addImageStore to create S3 image store.
-                            $.extend(data, {
-                                provider: args.data.secondaryStorage.provider,
-                                'details[0].key': 'accesskey',
-                                'details[0].value': args.data.secondaryStorage.accesskey,
-                                'details[1].key': 'secretkey',
-                                'details[1].value': args.data.secondaryStorage.secretkey,
-                                'details[2].key': 'bucket',
-                                'details[2].value': args.data.secondaryStorage.bucket,
-                                'details[3].key': 'usehttps',
-                                'details[3].value': (args.data.secondaryStorage.usehttps != null && args.data.secondaryStorage.usehttps == 'on' ? 'true' : 'false')
-                            });
-
-                            var index = 4;
-                            if (args.data.secondaryStorage.endpoint != null && args.data.secondaryStorage.endpoint.length > 0) {
-                                data['details[' + index.toString() + '].key'] = 'endpoint';
-                                data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.endpoint;
-                                index++;
-                            }
-                            if (args.data.secondaryStorage.connectiontimeout != null && args.data.secondaryStorage.connectiontimeout.length > 0) {
-                                data['details[' + index.toString() + '].key'] = 'connectiontimeout';
-                                data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.connectiontimeout;
-                                index++;
-                            }
-                            if (args.data.secondaryStorage.maxerrorretry != null && args.data.secondaryStorage.maxerrorretry.length > 0) {
-                                data['details[' + index.toString() + '].key'] = 'maxerrorretry';
-                                data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.maxerrorretry;
-                                index++;
-                            }
-                            if (args.data.secondaryStorage.sockettimeout != null && args.data.secondaryStorage.sockettimeout.length > 0) {
-                                data['details[' + index.toString() + '].key'] = 'sockettimeout';
-                                data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.sockettimeout;
-                                index++;
-                            }
-                            $.ajax({
-                                url: createURL('addImageStore'),
-                                data: data,
-                                success: function (json) {
-                                    g_regionsecondaryenabled = true;
-
-                                    complete({
-                                        data: $.extend(args.data, {
-                                            returnedSecondaryStorage: json.addimagestoreresponse.secondarystorage
-                                        })
-                                    });
-                                },
-                                error: function (XMLHttpResponse) {
-                                    var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                    error('addSecondaryStorage', errorMsg, {
-                                        fn: 'addSecondaryStorage',
-                                        args: args
-                                    });
-                                }
-                            });
-                        }
-
-                        //NFS Cache
-                        if ($wizard.find('form[rel=secondaryStorage]').find('div[rel=createNfsCache]').find("input[type=checkbox]").is(':checked') == true) {
-                            var zoneid = args.data.secondaryStorage.nfsCacheZoneid;
-                            var nfs_server = args.data.secondaryStorage.nfsCacheNfsServer;
-                            var path = args.data.secondaryStorage.nfsCachePath;
-                            var url = nfsURL(nfs_server, path);
-
-                            var nfsCacheData = {
-                                provider: 'NFS',
-                                zoneid: args.data.returnedZone.id,
-                                url: url
-                            };
-
-                            $.ajax({
-                                url: createURL('createSecondaryStagingStore'),
-                                data: nfsCacheData,
-                                success: function (json) {
-                                    //do nothing
-                                },
-                                error: function (XMLHttpResponse) {
-                                    var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                    error('addSecondaryStorage', errorMsg, {
-                                        fn: 'addSecondaryStorage',
-                                        args: args
-                                    });
-                                }
-                            });
-                        }
-                    } else if (args.data.secondaryStorage.provider == 'Swift') {
-                        $.extend(data, {
-                            provider: args.data.secondaryStorage.provider,
-                            url: args.data.secondaryStorage.url
-                        });
-
-                        var index = 0;
-                        if (args.data.secondaryStorage.account != null && args.data.secondaryStorage.account.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'account';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.account;
-                            index++;
-                        }
-                        if (args.data.secondaryStorage.username != null && args.data.secondaryStorage.username.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'username';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.username;
-                            index++;
-                        }
-                        if (args.data.secondaryStorage.key != null && args.data.secondaryStorage.key.length > 0) {
-                            data['details[' + index.toString() + '].key'] = 'key';
-                            data['details[' + index.toString() + '].value'] = args.data.secondaryStorage.key;
-                            index++;
-                        }
-                        $.ajax({
-                            url: createURL('addImageStore'),
-                            data: data,
-                            success: function (json) {
-                                g_regionsecondaryenabled = true;
-
                                 complete({
                                     data: $.extend(args.data, {
                                         returnedSecondaryStorage: json.addimagestoreresponse.secondarystorage

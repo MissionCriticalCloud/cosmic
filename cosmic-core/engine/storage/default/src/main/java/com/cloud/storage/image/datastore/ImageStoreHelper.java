@@ -88,7 +88,7 @@ public class ImageStoreHelper {
                 detail.setName(key);
                 String value = details.get(key);
                 // encrypt swift key or s3 secret key
-                if (key.equals(ApiConstants.KEY) || key.equals(ApiConstants.S3_SECRET_KEY)) {
+                if (key.equals(ApiConstants.KEY)) {
                     value = DBEncryptionUtil.encrypt(value);
                 }
                 detail.setValue(value);
@@ -96,20 +96,5 @@ public class ImageStoreHelper {
             }
         }
         return store;
-    }
-
-    /**
-     * Convert current NFS secondary storage to Staging store to be ready to migrate to S3 object store.
-     *
-     * @param store NFS image store.
-     * @return true if successful.
-     */
-    public boolean convertToStagingStore(final DataStore store) {
-        final ImageStoreVO nfsStore = imageStoreDao.findById(store.getId());
-        nfsStore.setRole(DataStoreRole.ImageCache);
-        imageStoreDao.update(store.getId(), nfsStore);
-        // clear snapshot entry on primary store to make next snapshot become full snapshot
-        snapshotStoreDao.deleteSnapshotRecordsOnPrimary();
-        return true;
     }
 }

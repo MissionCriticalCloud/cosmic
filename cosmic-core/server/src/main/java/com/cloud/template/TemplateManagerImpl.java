@@ -1593,12 +1593,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 throw new CloudRuntimeException("Failed to create template", e);
             }
         } finally {
-      /*if (snapshot != null && snapshot.getSwiftId() != null
-                    && secondaryStorageURL != null && zoneId != null
-                    && accountId != null && volumeId != null) {
-                _snapshotMgr.deleteSnapshotsForVolume(secondaryStorageURL,
-                        zoneId, accountId, volumeId);
-            }*/
             if (privateTemplate == null) {
                 final VolumeVO volumeFinal = volume;
                 final SnapshotVO snapshotFinal = snapshot;

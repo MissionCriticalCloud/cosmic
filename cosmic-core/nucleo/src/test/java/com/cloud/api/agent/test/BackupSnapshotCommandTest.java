@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.api.BackupSnapshotCommand;
-import com.cloud.agent.api.to.SwiftTO;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePool;
@@ -187,14 +186,6 @@ public class BackupSnapshotCommandTest {
         } catch (final ParseException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void testGetSwift() {
-        final SwiftTO s1 = new SwiftTO();
-        bsc.setSwift(s1);
-        final SwiftTO s2 = bsc.getSwift();
-        assertEquals(s1, s2);
     }
 
     @Test

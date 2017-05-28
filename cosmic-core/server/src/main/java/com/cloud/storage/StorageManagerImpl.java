@@ -1964,41 +1964,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         return (ImageStore) _dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Image);
     }
 
-    @Override
-    public ImageStore migrateToObjectStore(final String name, final String url, final String providerName, final Map details) throws IllegalArgumentException, DiscoveryException,
-            InvalidParameterValueException {
-        // check if current cloud is ready to migrate, we only support cloud with only NFS secondary storages
-        final List<ImageStoreVO> imgStores = _imageStoreDao.listImageStores();
-        final List<ImageStoreVO> nfsStores = new ArrayList<>();
-        if (imgStores != null && imgStores.size() > 0) {
-            for (final ImageStoreVO store : imgStores) {
-                if (!store.getProviderName().equals(DataStoreProvider.NFS_IMAGE)) {
-                    throw new InvalidParameterValueException("We only support migrate NFS secondary storage to use object store!");
-                } else {
-                    nfsStores.add(store);
-                }
-            }
-        }
-        // convert all NFS secondary storage to staging store
-        if (nfsStores != null && nfsStores.size() > 0) {
-            for (final ImageStoreVO store : nfsStores) {
-                final long storeId = store.getId();
-
-                _accountMgr.checkAccessAndSpecifyAuthority(CallContext.current().getCallingAccount(), store.getDataCenterId());
-
-                final DataStoreProvider provider = _dataStoreProviderMgr.getDataStoreProvider(store.getProviderName());
-                final DataStoreLifeCycle lifeCycle = provider.getDataStoreLifeCycle();
-                final DataStore secStore = _dataStoreMgr.getDataStore(storeId, DataStoreRole.Image);
-                lifeCycle.migrateToObjectStore(secStore);
-                // update store_role in template_store_ref and snapshot_store_ref to ImageCache
-                _templateStoreDao.updateStoreRoleToCachce(storeId);
-                _snapshotStoreDao.updateStoreRoleToCache(storeId);
-            }
-        }
-        // add object store
-        return discoverImageStore(name, url, providerName, null, details);
-    }
-
     private void associateCrosszoneTemplatesToZone(final Long zoneId) {
         VMTemplateZoneVO tmpltZone;
 
