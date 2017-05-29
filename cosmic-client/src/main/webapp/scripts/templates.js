@@ -836,7 +836,8 @@
                                         displaytext: args.data.displaytext,
                                         ostypeid: args.data.ostypeid,
                                         passwordenabled: (args.data.passwordenabled == "on"),
-                                        isdynamicallyscalable: (args.data.isdynamicallyscalable == "on")
+                                        isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
+                                        url: args.data.url
                                     };
                                     $.ajax({
                                         url: createURL('updateTemplate'),
@@ -1188,6 +1189,14 @@
 
                                     templatetype: {
                                         label: 'label.type'
+                                    },
+
+                                    url: {
+                                        label: 'label.url',
+                                        isEditable: true,
+                                        validation: {
+                                            required: true
+                                        }
                                     },
 
                                     id: {
