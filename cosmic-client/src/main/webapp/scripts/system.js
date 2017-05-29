@@ -11950,6 +11950,7 @@
                                                             $form.find('.form-item[rel=smbUsername]').css('display', 'inline-block');
                                                             $form.find('.form-item[rel=smbPassword]').css('display', 'inline-block');
                                                             $form.find('.form-item[rel=smbDomain]').css('display', 'inline-block');
+                                                        }
                                                     });
 
                                                     args.$select.change();
