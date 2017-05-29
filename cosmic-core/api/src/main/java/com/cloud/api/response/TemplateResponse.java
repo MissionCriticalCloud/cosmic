@@ -169,6 +169,10 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
     @Param(description = "true if template contains XS tools inorder to support dynamic scaling of VM cpu/memory")
     private Boolean isDynamicallyScalable;
 
+    @SerializedName(ApiConstants.URL)
+    @Param(description = "The URL where the templates originally was downloaded from")
+    private String url;
+
     public TemplateResponse() {
         //  zones = new LinkedHashSet<TemplateZoneResponse>();
         tags = new LinkedHashSet<>();
@@ -342,5 +346,13 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
 
     public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(final String url) {
+        this.url = url;
     }
 }
