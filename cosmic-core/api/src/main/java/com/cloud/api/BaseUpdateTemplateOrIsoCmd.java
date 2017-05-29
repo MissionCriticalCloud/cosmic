@@ -47,6 +47,10 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
             type = CommandType.BOOLEAN,
             description = "true if template/ISO contains XS tools inorder to support dynamic scaling of VM cpu/memory")
     private Boolean isDynamicallyScalable;
+    @Parameter(name = ApiConstants.URL,
+            type = CommandType.STRING,
+            description = "The URL where the templates originally was downloaded from")
+    private String url;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -94,6 +98,10 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
 
     public Boolean isRoutingType() {
         return isRoutingType;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public Map getDetails() {

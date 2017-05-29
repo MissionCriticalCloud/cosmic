@@ -1652,6 +1652,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final Integer sortKey = cmd.getSortKey();
         final Map details = cmd.getDetails();
         final Account account = CallContext.current().getCallingAccount();
+        final String url = cmd.getUrl();
 
         // verify that template exists
         VMTemplateVO template = _tmpltDao.findById(id);
@@ -1683,6 +1684,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         sortKey == null &&
                         isDynamicallyScalable == null &&
                         isRoutingTemplate == null &&
+                        url == null &&
                         details == null);
         if (!updateNeeded) {
             return template;
@@ -1751,6 +1753,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         if (isDynamicallyScalable != null) {
             template.setDynamicallyScalable(isDynamicallyScalable);
+        }
+
+        if (url != null) {
+            template.setUrl(url);
         }
 
         if (isRoutingTemplate != null) {
