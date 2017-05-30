@@ -447,4 +447,5 @@ class CSTestClient(object):
         return self.__scenarioManager
 
     def finalize(self):
-        self.__scenarioManager.finalize()
+        if self.__scenarioManager:
+            self.__scenarioManager.finalize()
