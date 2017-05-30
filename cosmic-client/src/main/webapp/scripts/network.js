@@ -1205,7 +1205,7 @@
                             },
 
                             createForm: {
-                                title: 'label.add.isolated.guest.network.with.sourcenat',
+                                title: 'label.add.isolated.guest.network',
                                 fields: {
                                     name: {
                                         label: 'label.name',
@@ -1259,7 +1259,6 @@
                                             var data = {
                                                 zoneid: args.zoneId,
                                                 guestiptype: 'Isolated',
-                                                supportedServices: 'SourceNat',
                                                 state: 'Enabled'
                                             };
 
