@@ -5949,7 +5949,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6049,7 +6049,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6350,7 +6350,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6418,7 +6418,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
