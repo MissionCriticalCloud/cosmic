@@ -4221,11 +4221,9 @@ class VPC:
         if "cidr" in services:
             cmd.cidr = services["cidr"]
         if account:
-            cmd.account = account.name
+            cmd.account = account
         if domainid:
             cmd.domainid = domainid
-        elif account:
-            cmd.domainid = account.domainid
         if networkDomain:
             cmd.networkDomain = networkDomain
         [setattr(cmd, k, v) for k, v in kwargs.items()]
