@@ -7,7 +7,8 @@ from marvin.lib.base import (
     FireWallRule,
     VirtualMachine,
     Network,
-    Account
+    Account,
+    PublicIPAddress
 )
 from marvin.lib.common import (
     list_nat_rules,
@@ -148,25 +149,16 @@ class TestIsolatedNetworks(cloudstackTestCase):
             "Check list router response for router state"
         )
 
-        public_ips = list_public_ip(
-            self.apiclient,
-            account=self.account.name,
-            domainid=self.account.domainid,
-            zoneid=self.zone.id
+        self.logger.debug("Acquiring Public IP for Network ID: %s" % network.id)
+        public_ip = PublicIPAddress.create(
+            api_client=self.apiclient,
+            networkid=network.id
         )
-
-        self.assertEqual(
-            isinstance(public_ips, list),
-            True,
-            "Check for list public IPs response return valid data"
-        )
-
-        public_ip = public_ips[0]
 
         self.logger.debug("Creating Firewall rule for VM ID: %s" % virtual_machine.id)
         FireWallRule.create(
             self.apiclient,
-            ipaddressid=public_ip.id,
+            ipaddressid=public_ip.ipaddress.id,
             protocol=self.services["natrule_ssh"]["protocol"],
             cidrlist=['0.0.0.0/0'],
             startport=self.services["natrule_ssh"]["publicport"],
@@ -179,7 +171,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
             self.apiclient,
             virtual_machine,
             self.services["natrule_ssh"],
-            public_ip.id
+            public_ip.ipaddress.id
         )
 
         nat_rules = list_nat_rules(
