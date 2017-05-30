@@ -74,6 +74,7 @@ public class ApiConstants {
     public static final String IP6_DNS2 = "ip6dns2";
     public static final String DOMAIN = "domain";
     public static final String DOMAIN_ID = "domainid";
+    public static final String DOMAIN_NAME = "domainname";
     public static final String DOMAIN__ID = "domainId";
     public static final String DURATION = "duration";
     public static final String EMAIL = "email";
@@ -235,11 +236,13 @@ public class ApiConstants {
     public static final String START_PORT = "startport";
     public static final String STATE = "state";
     public static final String STATUS = "status";
+    public static final String STEP = "step";
     public static final String STORAGE_TYPE = "storagetype";
     public static final String STORAGE_MOTION_ENABLED = "storagemotionenabled";
     public static final String STORAGE_CAPABILITIES = "storagecapabilities";
     public static final String SYSTEM_VM_TYPE = "systemvmtype";
     public static final String TAGS = "tags";
+    public static final String TAKEN = "taken";
     public static final String TARGET_IQN = "targetiqn";
     public static final String TEMPLATE_FILTER = "templatefilter";
     public static final String TEMPLATE_ID = "templateid";
@@ -259,6 +262,8 @@ public class ApiConstants {
     public static final String USE_VIRTUAL_NETWORK = "usevirtualnetwork";
     public static final String VALUE = "value";
     public static final String VIRTUAL_MACHINE_ID = "virtualmachineid";
+    public static final String VIRTUAL_MACHINE_NAME = "virtualmachinename";
+    public static final String VIRTUAL_MACHINE_STATE = "virtualmachinestate";
     public static final String VIRTUAL_MACHINE_IDS = "virtualmachineids";
     public static final String VIRTUAL_MACHINE_ID_IP = "vmidipmap";
     public static final String VIRTUAL_MACHINE_COUNT = "virtualmachinecount";
@@ -360,6 +365,7 @@ public class ApiConstants {
     public static final String CAN_CHOOSE_SERVICE_CAPABILITY = "canchooseservicecapability";
     public static final String PROVIDER = "provider";
     public static final String MANAGED = "managed";
+    public static final String MANAGEMENT_SERVER_NAME = "managementservername";
     public static final String CAPACITY_BYTES = "capacitybytes";
     public static final String CAPACITY_IOPS = "capacityiops";
     public static final String NETWORK_SPEED = "networkspeed";

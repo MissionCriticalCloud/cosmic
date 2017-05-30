@@ -1,6 +1,7 @@
 package com.cloud.query;
 
 import com.cloud.affinity.AffinityGroupResponse;
+import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
@@ -35,6 +36,7 @@ import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.EventResponse;
+import com.cloud.api.response.HAWorkerResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.HostTagResponse;
 import com.cloud.api.response.ImageStoreResponse;
@@ -123,4 +125,6 @@ public interface QueryService {
     ListResponse<StorageTagResponse> searchForStorageTags(ListStorageTagsCmd cmd);
 
     ListResponse<HostTagResponse> searchForHostTags(ListHostTagsCmd cmd);
+
+    ListResponse<HAWorkerResponse> listHAWorkers(ListHAWorkersCmd cmd);
 }

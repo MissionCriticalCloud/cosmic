@@ -26,6 +26,7 @@ import com.cloud.api.command.admin.affinitygroup.UpdateVMAffinityGroupCmdByAdmin
 import com.cloud.api.command.admin.alert.GenerateAlertCmd;
 import com.cloud.api.command.admin.autoscale.CreateCounterCmd;
 import com.cloud.api.command.admin.autoscale.DeleteCounterCmd;
+import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.cluster.ListClustersCmd;
@@ -3821,6 +3822,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(UpdateRemoteAccessVpnCmd.class);
         cmdList.add(UpdateVpnConnectionCmd.class);
         cmdList.add(UpdateVpnGatewayCmd.class);
+        cmdList.add(ListHAWorkersCmd.class);
         // separated admin commands
         cmdList.add(ListAccountsCmdByAdmin.class);
         cmdList.add(ListZonesCmdByAdmin.class);

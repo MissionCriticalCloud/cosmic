@@ -25,16 +25,16 @@ public class DomainVO implements Domain {
     private long id;
 
     @Column(name = "parent")
-    private Long parent = null;
+    private Long parent;
 
     @Column(name = "name")
-    private String name = null;
+    private String name;
 
     @Column(name = "owner")
     private long accountId;
 
     @Column(name = "path")
-    private String path = null;
+    private String path;
 
     @Column(name = "level")
     private int level;

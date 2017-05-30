@@ -1,7 +1,7 @@
 package com.cloud.ha.dao;
 
+import com.cloud.ha.HaWork.WorkType;
 import com.cloud.ha.HaWorkVO;
-import com.cloud.ha.HighAvailabilityManager.WorkType;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

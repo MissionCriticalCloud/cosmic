@@ -4,63 +4,67 @@ import java.io.Serializable;
 
 public interface ResponseObject extends Serializable {
     /**
-     * Get the name of the API response
+     * Gets the name of the API response
      *
-     * @return the name of the API response
+     * @return The name of the API response
      */
     String getResponseName();
 
     /**
-     * Set the name of the API response
+     * Sets the name of the API response
      *
-     * @param name
+     * @param name The name of the API response
      */
     void setResponseName(String name);
 
     /**
-     * Get the name of the API object
+     * Gets the name of the API object
      *
-     * @return the name of the API object
+     * @return The name of the API object
      */
     String getObjectName();
 
     /**
-     * @param name
+     * Sets the name of the object
+     *
+     * @param name The name of the object
      */
     void setObjectName(String name);
 
     /**
-     * Returns the object UUid
+     * Returns the object UUID
      */
     String getObjectId();
 
     /**
-     * Returns the job id
+     * Gets the ID of the job
      *
-     * @return
+     * @return The ID of the job
      */
     String getJobId();
 
     /**
-     * Sets the job id
+     * Sets the ID of the job
      *
-     * @param jobId
+     * @param jobId The ID of the job
      */
     void setJobId(String jobId);
 
     /**
-     * Returns the job status
+     * Gets the job status
      *
-     * @return
+     * @return The job status
      */
     Integer getJobStatus();
 
     /**
-     * @param jobStatus
+     * Sets the job status
+     *
+     * @param jobStatus The job status
      */
     void setJobStatus(Integer jobStatus);
 
-    public enum ResponseView {
+    enum ResponseView {
         Full,
         Restricted
     }
