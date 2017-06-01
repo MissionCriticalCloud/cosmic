@@ -20,7 +20,7 @@ from marvin.lib.base import (
 from marvin.lib.common import (
     list_hosts,
     list_routers,
-    get_default_acl,
+    get_network_acl,
     get_default_private_network_offering,
     get_default_virtual_machine_offering,
     get_default_network_offering,
@@ -153,7 +153,7 @@ class TestPrivateGateway(cloudstackTestCase):
         cls.private_network_offering = get_default_private_network_offering(cls.api_client)
         cls.logger.debug("Private Network Offering '%s' selected", cls.private_network_offering.name)
 
-        cls.default_allow_acl = get_default_acl(cls.api_client, 'default_allow')
+        cls.default_allow_acl = get_network_acl(cls.api_client, 'default_allow')
         cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,

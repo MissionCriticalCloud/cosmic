@@ -1,6 +1,6 @@
-from base import NetworkACLList
 from marvin.cloudstackAPI import (
     listConfigurations,
+    listNetworkACLLists,
     listDomains,
     listZones,
     listTemplates,
@@ -16,7 +16,9 @@ from marvin.cloudstackAPI import (
     listLoadBalancerRules,
     listServiceOfferings,
     listNetworkOfferings,
-    listVPCOfferings
+    listVPCOfferings,
+    listVPCs,
+    listVpnGateways
 )
 from marvin.codes import (
     PASS,
@@ -147,6 +149,16 @@ def list_networks(api_client, **kwargs):
     return api_client.listNetworks(cmd)
 
 
+def list_vpcs(api_client, **kwargs):
+    """List all VPCs matching criteria"""
+
+    cmd = listVPCs.listVPCsCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listVPCs(cmd)
+
+
 def list_ssvms(api_client, **kwargs):
     """List all SSVMs matching criteria"""
 
@@ -257,6 +269,16 @@ def list_network_offerings(api_client, **kwargs):
     return api_client.listNetworkOfferings(cmd)
 
 
+def list_vpngateways(api_client, **kwargs):
+    """ Lists VPN gateways """
+
+    cmd = listVpnGateways.listVpnGatewaysCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listVpnGateways(cmd)
+
+
 def list_vpc_offerings(api_client, **kwargs):
     """ Lists VPC offerings """
 
@@ -265,6 +287,16 @@ def list_vpc_offerings(api_client, **kwargs):
     if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
         cmd.listall = True
     return api_client.listVPCOfferings(cmd)
+
+
+def list_network_acl_lists(api_client, **kwargs):
+    """List Network ACL lists"""
+
+    cmd = listNetworkACLLists.listNetworkACLListsCmd()
+    [setattr(cmd, k, v) for k, v in kwargs.items()]
+    if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
+        cmd.listall = True
+    return api_client.listNetworkACLLists(cmd)
 
 
 def get_hypervisor_type(api_client):
@@ -279,89 +311,104 @@ def get_hypervisor_type(api_client):
     return hosts_list_validation_result[1].hypervisor
 
 
+def get_vpc_offering(api_client, name):
+    offerings = list_vpc_offerings(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
+
+
 def get_default_vpc_offering(api_client):
-    offerings = list_vpc_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Default VPC offering']
-    return next(iter(offerings or []), None)
+    return get_vpc_offering(api_client, 'Default VPC offering')
 
 
 def get_default_redundant_vpc_offering(api_client):
-    offerings = list_vpc_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Redundant VPC offering']
-    return next(iter(offerings or []), None)
+    return get_vpc_offering(api_client, 'Redundant VPC offering')
+
+
+def get_network_offering(api_client, name):
+    offerings = list_network_offerings(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
 
 
 def get_default_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworks']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingForVpcNetworks')
 
 
 def get_default_guest_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithSourceNatService']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingWithSourceNatService')
 
 
 def get_default_network_offering_no_load_balancer(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB')
 
 
 def get_default_isolated_network_offering(api_client):
-
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOffering')
 
 
 def get_default_isolated_network_offering_with_egress(api_client):
-
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultIsolatedNetworkOfferingWithEgress']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultIsolatedNetworkOfferingWithEgress')
 
 
 def get_default_redundant_isolated_network_offering(api_client):
-
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultRedundantIsolatedNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultRedundantIsolatedNetworkOffering')
 
 
 def get_default_redundant_isolated_network_offering_with_egress(api_client):
-
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultRedundantIsolatedNetworkOfferingWithEgress']
-    return next(iter(offerings or []), None)
-
-
-def get_default_virtual_machine_offering(api_client):
-    offerings = list_service_offering(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'Small Instance']
-    return next(iter(offerings or []), None)
-
-
-def get_default_acl(api_client, name):
-    acls = NetworkACLList.list(api_client)
-    acls = [acl for acl in acls if acl.name == name]
-    return next(iter(acls or []), None)
-
-
-def get_default_allow_vpc_acl(api_client, vpc):
-    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
-    acls = [acl for acl in acls if acl.name == 'default_allow']
-    return next(iter(acls or []), None)
-
-
-def get_default_deny_vpc_acl(api_client, vpc):
-    acls = NetworkACLList.list(api_client, vpcid=vpc.id)
-    acls = [acl for acl in acls if acl.name == 'default_deny']
-    return next(iter(acls or []), None)
+    return get_network_offering(api_client, 'DefaultRedundantIsolatedNetworkOfferingWithEgress')
 
 
 def get_default_private_network_offering(api_client):
-    offerings = list_network_offerings(api_client)
-    offerings = [offering for offering in offerings if offering.name == 'DefaultPrivateGatewayNetworkOffering']
-    return next(iter(offerings or []), None)
+    return get_network_offering(api_client, 'DefaultPrivateGatewayNetworkOffering')
+
+
+def get_default_virtual_machine_offering(api_client):
+    return get_virtual_machine_offering(api_client, 'Small Instance')
+
+
+def get_virtual_machine_offering(api_client, name):
+    offerings = list_service_offering(api_client, name=name)
+    return find_exact_match_by_name(offerings, name)
+
+
+def get_network_acl(api_client, name, vpc=None):
+    if vpc:
+        acls = list_network_acl_lists(api_client, name=name, vpcid=vpc.id, listall=True)
+    else:
+        acls = list_network_acl_lists(api_client, name=name, listall=True)
+    return find_exact_match_by_name(acls, name)
+
+
+def get_default_allow_vpc_acl(api_client, vpc):
+    return get_network_acl(api_client, 'default_allow', vpc)
+
+
+def get_default_deny_vpc_acl(api_client, vpc):
+    return get_network_acl(api_client, 'default_deny', vpc)
+
+
+def get_vpc(api_client, name):
+    vpcs = list_vpcs(api_client, name=name, listall=True)
+    return find_exact_match_by_name(vpcs, name)
+
+
+def get_network(api_client, name, vpc=None):
+    if vpc:
+        networks = list_networks(api_client, name=name, vpcid=vpc.id)
+    else:
+        networks = list_networks(api_client, name=name)
+    return find_exact_match_by_name(networks, name)
+
+
+def get_virtual_machine(api_client, name, network):
+    virtual_machines = list_virtual_machines(api_client, name=name, networkid=network.id, listall=True)
+    return find_exact_match_by_name(virtual_machines, name)
+
+
+def get_vpngateway(api_client, vpc=None):
+    vpngateways = list_vpngateways(api_client, vpcid=vpc.id, listall=True)
+    return next(iter(vpngateways or []), None)
+
+
+def find_exact_match_by_name(items, name):
+    items = [item for item in items if item.name == name]
+    return next(iter(items or []), None)

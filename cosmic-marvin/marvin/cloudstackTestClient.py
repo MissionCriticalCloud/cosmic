@@ -1,4 +1,5 @@
 import copy
+import traceback
 
 from asyncJobMgr import asyncJobMgr
 from cloudstackConnection import CSConnection
@@ -16,6 +17,9 @@ from dbConnection import DbConnection
 from lib.utils import (random_gen, validate_list)
 from marvin.cloudstackAPI import *
 from marvin.cloudstackAPI.cloudstackAPIClient import CloudStackAPIClient
+
+from marvin.lib.common import get_zone
+from marvin.testScenarioManager import TestScenarioManager
 from marvin.utils.MarvinLog import MarvinLog
 
 
@@ -57,6 +61,7 @@ class CSTestClient(object):
         self.__parsedTestDataConfig = None
         self.__zone = zone
         self.__setHypervisorInfo()
+        self.__scenarioManager = None
 
     @property
     def identifier(self):
@@ -421,3 +426,26 @@ class CSTestClient(object):
             self.__asyncJobMgr = asyncJobMgr(self.__apiClient,
                                              self.__dbConnection)
         self.__asyncJobMgr.submitJobs(jobs, nums_threads, interval)
+
+    def getScenarioManager(self, scenarioName):
+        if not self.__scenarioManager:
+            scenarioHumanReadableName = self.getParsedTestDataConfig()[scenarioName]['metadata']['name']
+            self.__logger.info("=== Scenario Manager, Scenario \"%s\" Started ===", scenarioHumanReadableName)
+
+            self.__scenarioManager = TestScenarioManager(
+                self.getApiClient(),
+                self.getParsedTestDataConfig()[scenarioName],
+                get_zone(self.getApiClient(), self.getZoneForTests())
+            )
+
+            try:
+                self.__scenarioManager.setup_infra()
+            except:
+                self.__logger.exception(">>>>>>>>>>>>>>>>>>>>>>> %s ", traceback.format_exc())
+                raise
+            self.__logger.info("=== Scenario Manager, Scenario \"%s\" Created ===", scenarioHumanReadableName)
+        return self.__scenarioManager
+
+    def finalize(self):
+        if self.__scenarioManager:
+            self.__scenarioManager.finalize()

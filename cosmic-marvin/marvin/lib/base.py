@@ -30,6 +30,7 @@ from utils import (
     random_gen
 )
 
+import common
 
 class Domain:
     """ Domain Life Cycle """
@@ -38,7 +39,7 @@ class Domain:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, name=None, networkdomain=None,
+    def create(cls, api_client, services=None, name=None, networkdomain=None,
                parentdomainid=None):
         """Creates an domain"""
 
@@ -97,8 +98,11 @@ class Account:
         """Creates an account"""
         cmd = createAccount.createAccountCmd()
 
-        # 0 - User, 1 - Root Admin, 2 - Domain Admin
-        cmd.accounttype = 2 if (admin and domainid) else int(admin)
+        if "accounttype" in services:
+            cmd.accounttype = services["accounttype"]
+        else:
+            # 0 - User, 1 - Root Admin, 2 - Domain Admin
+            cmd.accounttype = 2 if (admin and domainid) else int(admin)
 
         cmd.email = services["email"]
         cmd.firstname = services["firstname"]
@@ -414,27 +418,31 @@ class VirtualMachine:
         virtual_machine.public_ip = nat_rule.ipaddress
 
     @classmethod
-    def create(cls, api_client, services, templateid=None, accountid=None,
-               domainid=None, zoneid=None, networkids=None,
-               serviceofferingid=None, securitygroupids=None,
-               projectid=None, startvm=None, diskofferingid=None,
-               affinitygroupnames=None, affinitygroupids=None, group=None,
-               hostid=None, keypair=None, ipaddress=None, mode='default',
-               method='GET', hypervisor=None, customcpunumber=None,
-               customcpuspeed=None, custommemory=None, rootdisksize=None):
+    def create(cls, api_client, services=None, templateid=None, accountid=None, domainid=None, zoneid=None,
+               networkids=None, serviceofferingid=None, securitygroupids=None, projectid=None, startvm=None,
+               diskofferingid=None, affinitygroupnames=None, affinitygroupids=None, group=None, hostid=None,
+               keypair=None, ipaddress=None, mode='default', method='GET', hypervisor=None, customcpunumber=None,
+               customcpuspeed=None, custommemory=None, rootdisksize=None, zone=None, networks=None, account=None,
+               network_and_ip_list=None, data=None):
         """Create the instance"""
-
+        if data:
+            services = data
         cmd = deployVirtualMachine.deployVirtualMachineCmd()
 
         if serviceofferingid:
             cmd.serviceofferingid = serviceofferingid
         elif "serviceoffering" in services:
             cmd.serviceofferingid = services["serviceoffering"]
+        elif "serviceofferingname" in services:
+            serviceoffering = common.get_virtual_machine_offering(api_client, services["serviceofferingname"])
+            cmd.serviceofferingid = serviceoffering.id
 
         if zoneid:
             cmd.zoneid = zoneid
         elif "zoneid" in services:
             cmd.zoneid = services["zoneid"]
+        elif zone:
+            cmd.zoneid = zone.id
 
         if hypervisor:
             cmd.hypervisor = hypervisor
@@ -449,11 +457,14 @@ class VirtualMachine:
             cmd.account = accountid
         elif "account" in services:
             cmd.account = services["account"]
-
+        elif account:
+            cmd.account = account.name
         if domainid:
             cmd.domainid = domainid
         elif "domainid" in services:
             cmd.domainid = services["domainid"]
+        elif account:
+            cmd.domainid = account.domainid
 
         if networkids:
             cmd.networkids = networkids
@@ -461,6 +472,13 @@ class VirtualMachine:
         elif "networkids" in services:
             cmd.networkids = services["networkids"]
             allow_egress = False
+        elif networks:
+            cmd.networkids = []
+            for network in networks:
+                cmd.networkids.append(network.id)
+            allow_egress = False
+        elif network_and_ip_list:
+            cmd.iptonetworklist = network_and_ip_list
         else:
             # When no networkids are passed, network
             # is created using the "defaultOfferingWithSourceNAT"
@@ -472,6 +490,9 @@ class VirtualMachine:
             cmd.templateid = templateid
         elif "template" in services:
             cmd.templateid = services["template"]
+        elif "templatename" in services:
+            template = common.get_template(api_client, template_name=services["templatename"])
+            cmd.templateid = template.id
 
         if diskofferingid:
             cmd.diskofferingid = diskofferingid
@@ -1490,8 +1511,10 @@ class PublicIPAddress:
     @classmethod
     def create(cls, api_client, accountid=None, zoneid=None, domainid=None,
                services=None, networkid=None, projectid=None, vpcid=None,
-               isportable=False):
+               isportable=False, vpc=None, data=None, network=None):
         """Associate Public IP address"""
+        if data:
+            services = data
         cmd = associateIpAddress.associateIpAddressCmd()
 
         if accountid:
@@ -1514,12 +1537,17 @@ class PublicIPAddress:
 
         if networkid:
             cmd.networkid = networkid
+        elif network:
+            cmd.networkid = network.id
 
         if projectid:
             cmd.projectid = projectid
 
         if vpcid:
             cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
+
         return PublicIPAddress(api_client.associateIpAddress(cmd).__dict__)
 
     def delete(self, api_client):
@@ -1547,16 +1575,20 @@ class NATRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, virtual_machine, services, ipaddressid=None,
-               projectid=None, openfirewall=False, networkid=None, vpcid=None,
-               vmguestip=None):
+    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None, openfirewall=False,
+               networkid=None, network=None, vpcid=None, vpc=None, vmguestip=None, ipaddress=None, data=None):
         """Create Port forwarding rule"""
+        if data:
+            services = data
+
         cmd = createPortForwardingRule.createPortForwardingRuleCmd()
 
         if ipaddressid:
             cmd.ipaddressid = ipaddressid
         elif "ipaddressid" in services:
             cmd.ipaddressid = services["ipaddressid"]
+        elif ipaddress:
+            cmd.ipaddressid = ipaddress.ipaddress.id
 
         cmd.privateport = services["privateport"]
         cmd.publicport = services["publicport"]
@@ -1575,9 +1607,13 @@ class NATRule:
 
         if networkid:
             cmd.networkid = networkid
+        elif network:
+            cmd.networkid = network.id
 
         if vpcid:
             cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
 
         if vmguestip:
             cmd.vmguestip = vmguestip
@@ -1697,18 +1733,30 @@ class EgressFireWallRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, networkid, protocol, cidrlist=None,
-               startport=None, endport=None, type=None, code=None):
+    def create(cls, api_client, networkid=None, protocol=None, cidrlist=None,
+               startport=None, endport=None, type=None, code=None, network=None, data=None):
         """Create Egress Firewall Rule"""
         cmd = createEgressFirewallRule.createEgressFirewallRuleCmd()
-        cmd.networkid = networkid
-        cmd.protocol = protocol
+        if networkid:
+            cmd.networkid = networkid
+        elif network:
+            cmd.networkid = network.id
+        if protocol:
+            cmd.protocol = protocol
+        elif 'protocol' in data:
+            cmd.protocol = data['protocol']
         if cidrlist:
             cmd.cidrlist = cidrlist
+        elif 'cidrlist' in data:
+            cmd.cidrlist = data['cidrlist']
         if startport:
             cmd.startport = startport
+        elif 'startport' in data:
+            cmd.startport = data['startport']
         if endport:
             cmd.endport = endport
+        elif 'endport' in data:
+            cmd.endport = data['endport']
         if type:
             cmd.type = type
         if code:
@@ -1742,18 +1790,30 @@ class FireWallRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, ipaddressid, protocol, cidrlist=None,
-               startport=None, endport=None, projectid=None, vpcid=None):
+    def create(cls, api_client, ipaddressid=None, protocol=None, cidrlist=None,
+               startport=None, endport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
         """Create Firewall Rule"""
         cmd = createFirewallRule.createFirewallRuleCmd()
-        cmd.ipaddressid = ipaddressid
-        cmd.protocol = protocol
+        if ipaddressid:
+            cmd.ipaddressid = ipaddressid
+        elif ipaddress:
+            cmd.ipaddressid = ipaddress.ipaddress.id
+        if protocol:
+            cmd.protocol = protocol
+        elif 'protocol' in data:
+            cmd.protocol = data['protocol']
         if cidrlist:
             cmd.cidrlist = cidrlist
+        elif 'cidrlist' in data:
+            cmd.cidrlist = data['cidrlist']
         if startport:
             cmd.startport = startport
+        elif 'startport' in data:
+            cmd.startport = data['startport']
         if endport:
             cmd.endport = endport
+        elif 'endport' in data:
+            cmd.endport = data['endport']
 
         if projectid:
             cmd.projectid = projectid
@@ -2724,12 +2784,13 @@ class Network:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, accountid=None, domainid=None,
-               networkofferingid=None, projectid=None,
-               subdomainaccess=None, zoneid=None,
-               gateway=None, netmask=None, cidr=None,
-               vpcid=None, aclid=None, vlan=None, ipexclusionlist=None):
+    def create(cls, api_client, services=None, accountid=None, domainid=None, networkofferingid=None, projectid=None,
+               subdomainaccess=None, zoneid=None, gateway=None, netmask=None,  cidr=None, vpcid=None, aclid=None,
+               vlan=None, ipexclusionlist=None, domain=None, account=None, vpc=None, zone=None, acl=None, data=None):
         """Create Network for account"""
+        if data:
+            services = data
+
         cmd = createNetwork.createNetworkCmd()
         cmd.name = services["name"]
         cmd.displaytext = services["displaytext"]
@@ -2738,11 +2799,16 @@ class Network:
             cmd.networkofferingid = networkofferingid
         elif "networkoffering" in services:
             cmd.networkofferingid = services["networkoffering"]
+        elif "networkofferingname" in services:
+            networkoffering = common.get_network_offering(api_client, services["networkofferingname"])
+            cmd.networkofferingid = networkoffering.id
 
         if zoneid:
             cmd.zoneid = zoneid
         elif "zoneid" in services:
             cmd.zoneid = services["zoneid"]
+        elif zone:
+            cmd.zoneid = zone.id
 
         if ipexclusionlist:
             cmd.ipexclusionlist = ipexclusionlist
@@ -2777,14 +2843,33 @@ class Network:
 
         if accountid:
             cmd.account = accountid
+        elif account:
+            cmd.account = account.name
+        elif vpc:
+            cmd.account = vpc.account
+        elif account:
+            cmd.account = account.name
         if domainid:
             cmd.domainid = domainid
+        elif domain:
+            cmd.domainid = domain.id
+        elif vpc:
+            cmd.domainid = vpc.domainid
+        elif account:
+            cmd.domainid = account.domainid
         if projectid:
             cmd.projectid = projectid
         if vpcid:
             cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
         if aclid:
             cmd.aclid = aclid
+        elif acl:
+            cmd.aclid = acl.id
+        elif "aclname" in services:
+            acl = common.get_network_acl(api_client, services['aclname'])
+            cmd.aclid = acl.id
         return Network(api_client.createNetwork(cmd).__dict__)
 
     def delete(self, api_client):
@@ -2829,10 +2914,11 @@ class NetworkACL:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, networkid=None, protocol=None,
-               number=None, aclid=None, action='Allow',
-               traffictype=None, cidrlist=None):
+    def create(cls, api_client, services=None, networkid=None, protocol=None, number=None, aclid=None, action='Allow',
+               traffictype=None, cidrlist=None, acl=None, data=None):
         """Create network ACL rules(Ingress/Egress)"""
+        if data:
+            services = data
 
         if cidrlist is None:
             cidrlist = []
@@ -2879,6 +2965,8 @@ class NetworkACL:
             cmd.aclid = services["aclid"]
         elif aclid:
             cmd.aclid = aclid
+        elif acl:
+            cmd.aclid = acl.id
 
         # Defaulted to Ingress
         return NetworkACL(api_client.createNetworkACL(cmd).__dict__)
@@ -2909,8 +2997,10 @@ class NetworkACLList:
 
     @classmethod
     def create(
-            cls, api_client, services, name=None, description=None, vpcid=None):
+            cls, api_client, services=None, name=None, description=None, vpcid=None, vpc=None, data=None):
         """Create network ACL container list"""
+        if data:
+            services = data
 
         cmd = createNetworkACLList.createNetworkACLListCmd()
         if "name" in services:
@@ -2927,6 +3017,8 @@ class NetworkACLList:
             cmd.vpcid = services["vpcid"]
         elif vpcid:
             cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
 
         return NetworkACLList(api_client.createNetworkACLList(cmd).__dict__)
 
@@ -2979,10 +3071,13 @@ class Vpn:
         return Vpn(api_client.createRemoteAccessVpn(cmd).__dict__)
 
     @classmethod
-    def createVpnGateway(cls, api_client, vpcid):
+    def createVpnGateway(cls, api_client, vpcid=None, vpc=None):
         """Create VPN Gateway """
         cmd = createVpnGateway.createVpnGatewayCmd()
-        cmd.vpcid = vpcid
+        if vpcid:
+            cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
         return api_client.createVpnGateway(cmd).__dict__
 
     @classmethod
@@ -3572,31 +3667,48 @@ class VpnCustomerGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, name, gateway, cidrlist,
-               account=None, domainid=None):
+    def create(cls, api_client, services=None, name=None, gateway=None, cidrlist=None, account=None, domainid=None,
+               presharedkey=None, ikepolicy=None, esppolicy=None):
         """Create VPN Customer Gateway"""
         cmd = createVpnCustomerGateway.createVpnCustomerGatewayCmd()
         cmd.name = name
         cmd.gateway = gateway
         cmd.cidrlist = cidrlist
+
+        if not services:
+            services = {}
         if "ipsecpsk" in services:
             cmd.ipsecpsk = services["ipsecpsk"]
+        elif presharedkey:
+            cmd.ipsecpsk = presharedkey
+
         if "ikepolicy" in services:
             cmd.ikepolicy = services["ikepolicy"]
+        elif ikepolicy:
+            cmd.ikepolicy = ikepolicy
+
         if "ikelifetime" in services:
             cmd.ikelifetime = services["ikelifetime"]
+
         if "esppolicy" in services:
             cmd.esppolicy = services["esppolicy"]
+        elif esppolicy:
+            cmd.esppolicy = esppolicy
+
         if "esplifetime" in services:
             cmd.esplifetime = services["esplifetime"]
+
         if "dpd" in services:
             cmd.dpd = services["dpd"]
+
         if "forceencap" in services:
             cmd.forceencap = services["forceencap"]
+
         if account:
             cmd.account = account
         if domainid:
             cmd.domainid = domainid
+
         return VpnCustomerGateway(
             api_client.createVpnCustomerGateway(cmd).__dict__)
 
@@ -4080,16 +4192,34 @@ class VPC:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, vpcofferingid,
-               zoneid, networkDomain=None, account=None,
-               domainid=None, **kwargs):
+    def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
+               domainid=None, zone=None, data=None, **kwargs):
         """Creates the virtual private connection (VPC)"""
+        if data:
+            services = data
 
         cmd = createVPC.createVPCCmd()
-        cmd.name = "-".join([services["name"], random_gen()])
-        cmd.displaytext = "-".join([services["displaytext"], random_gen()])
-        cmd.vpcofferingid = vpcofferingid
-        cmd.zoneid = zoneid
+
+        random_name = "-".join([services["name"], random_gen()])
+        cmd.name = random_name
+
+        if "displaytext" in services:
+            random_displaytext = "-".join([services["displaytext"], random_gen()])
+        else:
+            random_displaytext = random_name
+        cmd.displaytext = random_displaytext
+
+        if vpcofferingid:
+            cmd.vpcofferingid = vpcofferingid
+        elif "vpcofferingname" in services:
+            vpcoffering = common.get_vpc_offering(api_client, services["vpcofferingname"])
+            cmd.vpcofferingid = vpcoffering.id
+
+        if zoneid:
+            cmd.zoneid = zoneid
+        elif zone:
+            cmd.zoneid = zone.id
+
         if "cidr" in services:
             cmd.cidr = services["cidr"]
         if account:
@@ -4099,6 +4229,7 @@ class VPC:
         if networkDomain:
             cmd.networkDomain = networkDomain
         [setattr(cmd, k, v) for k, v in kwargs.items()]
+
         return VPC(api_client.createVPC(cmd).__dict__)
 
     def update(self, api_client, name=None, displaytext=None):
@@ -4145,17 +4276,35 @@ class PrivateGateway:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, ipaddress, networkid, vpcid, sourcenatsupported=None, aclid=None):
+    def create(cls, api_client, ipaddress=None, networkid=None, vpcid=None, sourcenatsupported=None, aclid=None,
+               vpc=None, data=None):
         """Create private gateway"""
 
         cmd = createPrivateGateway.createPrivateGatewayCmd()
-        cmd.ipaddress = ipaddress
-        cmd.networkid = networkid
-        cmd.vpcid = vpcid
+        if ipaddress:
+            cmd.ipaddress = ipaddress
+        elif "ip" in data:
+            cmd.ipaddress = data["ip"]
+
+        if networkid:
+            cmd.networkid = networkid
+        elif "privatenetworkname" in data:
+            network = common.get_network(api_client, data["privatenetworkname"])
+            cmd.networkid = network.id
+
+        if vpcid:
+            cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
+
         if sourcenatsupported:
             cmd.sourcenatsupported = sourcenatsupported
+
         if aclid:
             cmd.aclid = aclid
+        elif "aclname" in data:
+            acl = common.get_network_acl(api_client, data["aclname"])
+            cmd.aclid = acl.id
 
         return PrivateGateway(api_client.createPrivateGateway(cmd).__dict__)
 
@@ -4219,19 +4368,28 @@ class StaticRoute:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, vpcid, cidr=None, nexthop=None):
+    def create(cls, api_client, services=None, vpcid=None, cidr=None, nexthop=None, vpc=None, data=None):
         """Create static route"""
 
         cmd = createStaticRoute.createStaticRouteCmd()
+        if data:
+            services = data
+
         if "cidr" in services:
             cmd.cidr = services["cidr"]
         elif cidr:
             cmd.cidr = cidr
+
         if "nexthop" in services:
             cmd.nexthop = services["nexthop"]
         elif nexthop:
             cmd.nexthop = nexthop
-        cmd.vpcid = vpcid
+
+        if vpcid:
+            cmd.vpcid = vpcid
+        elif vpc:
+            cmd.vpcid = vpc.id
+
         return StaticRoute(api_client.createStaticRoute(cmd).__dict__)
 
     def delete(self, api_client):
