@@ -2805,6 +2805,8 @@ class Network:
 
         if zoneid:
             cmd.zoneid = zoneid
+        elif "zoneid" in services:
+            cmd.zoneid = services["zoneid"]
         elif zone:
             cmd.zoneid = zone.id
 
