@@ -61,7 +61,7 @@
         <cs.amqp-client.version>3.5.4</cs.amqp-client.version>
         <cs.axis-jaxrpc.version>1.4</cs.axis-jaxrpc.version>
         <cs.axis.version>1.4</cs.axis.version>
-        <cs.batik-css.version>1.8</cs.batik-css.version>
+        <cs.batik-css.version>1.9</cs.batik-css.version>
         <cs.bcprov-jdk16.version>1.46</cs.bcprov-jdk16.version>
         <cs.cglib-nodep.version>3.2.2</cs.cglib-nodep.version>
         <cs.commons-beanutils-core.version>1.8.3</cs.commons-beanutils-core.version>
