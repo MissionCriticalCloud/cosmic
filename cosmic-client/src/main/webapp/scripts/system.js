@@ -10300,8 +10300,8 @@
                                         isdedicated: {
                                             label: 'label.dedicated'
                                         },
-                                        domainid: {
-                                            label: 'label.domain.id'
+                                        domainname: {
+                                            label: 'label.domain'
                                         }
                                     }],
 
@@ -10323,6 +10323,12 @@
                                                             $.extend(item, {
                                                                 isdedicated: _l('label.yes'),
                                                                 domainid: hostItem.domainid
+                                                            });
+                                                        }
+                                                        if (hostItem.domainname != null) {
+                                                            $.extend(item, {
+                                                                isdedicated: _l('label.yes'),
+                                                                domainname: hostItem.domainname
                                                             });
                                                         }
                                                     } else
