@@ -22,9 +22,17 @@ public class DedicateHostResponse extends BaseResponse {
     @Param(description = "the domain ID of the host")
     private String domainId;
 
+    @SerializedName("domainname")
+    @Param(description = "the domain name of the host")
+    private String domainName;
+
     @SerializedName("accountid")
     @Param(description = "the Account ID of the host")
     private String accountId;
+
+    @SerializedName("accountname")
+    @Param(description = "the Account name of the host")
+    private String accountName;
 
     @SerializedName("affinitygroupid")
     @Param(description = "the Dedication Affinity Group ID of the host")
@@ -76,5 +84,13 @@ public class DedicateHostResponse extends BaseResponse {
 
     public void setAffinityGroupId(final String affinityGroupId) {
         this.affinityGroupId = affinityGroupId;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
     }
 }
