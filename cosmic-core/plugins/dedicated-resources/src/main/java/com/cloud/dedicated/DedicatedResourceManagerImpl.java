@@ -115,9 +115,11 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         dedicatePodResponse.setPodId(pod.getUuid());
         dedicatePodResponse.setPodName(pod.getName());
         dedicatePodResponse.setDomainId(domain.getUuid());
+        dedicatePodResponse.setDomainName(domain.getName());
         dedicatePodResponse.setAffinityGroupId(group.getUuid());
         if (account != null) {
             dedicatePodResponse.setAccountId(account.getUuid());
+            dedicatePodResponse.setAccountName(account.getAccountName());
         }
         dedicatePodResponse.setObjectName("dedicatedpod");
         return dedicatePodResponse;
@@ -134,9 +136,11 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         dedicateClusterResponse.setClusterId(cluster.getUuid());
         dedicateClusterResponse.setClusterName(cluster.getName());
         dedicateClusterResponse.setDomainId(domain.getUuid());
+        dedicateClusterResponse.setDomainName(domain.getName());
         dedicateClusterResponse.setAffinityGroupId(group.getUuid());
         if (account != null) {
             dedicateClusterResponse.setAccountId(account.getUuid());
+            dedicateClusterResponse.setAccountName(account.getAccountName());
         }
         dedicateClusterResponse.setObjectName("dedicatedcluster");
         return dedicateClusterResponse;
@@ -153,9 +157,11 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         dedicateHostResponse.setHostId(host.getUuid());
         dedicateHostResponse.setHostName(host.getName());
         dedicateHostResponse.setDomainId(domain.getUuid());
+        dedicateHostResponse.setDomainName(domain.getName());
         dedicateHostResponse.setAffinityGroupId(group.getUuid());
         if (account != null) {
             dedicateHostResponse.setAccountId(account.getUuid());
+            dedicateHostResponse.setAccountName(account.getAccountName());
         }
         dedicateHostResponse.setObjectName("dedicatedhost");
         return dedicateHostResponse;
@@ -292,9 +298,11 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         dedicateZoneResponse.setZoneId(dc.getUuid());
         dedicateZoneResponse.setZoneName(dc.getName());
         dedicateZoneResponse.setDomainId(domain.getUuid());
+        dedicateZoneResponse.setDomainName(domain.getName());
         dedicateZoneResponse.setAffinityGroupId(group.getUuid());
         if (account != null) {
             dedicateZoneResponse.setAccountId(account.getUuid());
+            dedicateZoneResponse.setAccountName(account.getAccountName());
         }
         dedicateZoneResponse.setObjectName("dedicatedzone");
         return dedicateZoneResponse;

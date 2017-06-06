@@ -25,9 +25,17 @@ public class DedicatePodResponse extends BaseResponse {
     @Param(description = "the domain ID to which the Pod is dedicated")
     private String domainId;
 
+    @SerializedName("domainname")
+    @Param(description = "the domain name of the host")
+    private String domainName;
+
     @SerializedName("accountid")
     @Param(description = "the Account Id to which the Pod is dedicated")
     private String accountId;
+
+    @SerializedName("accountname")
+    @Param(description = "the Account name of the host")
+    private String accountName;
 
     @SerializedName("affinitygroupid")
     @Param(description = "the Dedication Affinity Group ID of the pod")
@@ -79,5 +87,13 @@ public class DedicatePodResponse extends BaseResponse {
 
     public void setAffinityGroupId(final String affinityGroupId) {
         this.affinityGroupId = affinityGroupId;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
     }
 }
