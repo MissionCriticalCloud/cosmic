@@ -16,6 +16,8 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
 
     List<IPAddressVO> listByVlanId(long vlanId);
 
+    List<IPAddressVO> listByIpAddress(String ipAddress);
+
     List<IPAddressVO> listByDcIdIpAddress(long dcId, String ipAddress);
 
     List<IPAddressVO> listByDcId(long dcId);
@@ -75,4 +77,7 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
     List<IPAddressVO> listByAssociatedVmId(long vmId);
 
     IPAddressVO findByVmIdAndNetworkId(long networkId, long vmId);
+
+    IPAddressVO findByIpAddress(final String ipAddress);
+
 }

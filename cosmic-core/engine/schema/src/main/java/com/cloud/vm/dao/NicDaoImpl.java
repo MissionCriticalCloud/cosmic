@@ -30,6 +30,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     private SearchBuilder<NicVO> NonReleasedSearch;
     private GenericSearchBuilder<NicVO, Integer> deviceIdSearch;
     private GenericSearchBuilder<NicVO, Integer> CountByForStartingVms;
+    private SearchBuilder<NicVO> IpFuzzySearch;
 
     public NicDaoImpl() {
 
@@ -50,6 +51,10 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
         AllFieldsSearch.and("strategy", AllFieldsSearch.entity().getReservationStrategy(), Op.EQ);
         AllFieldsSearch.and("macAddress", AllFieldsSearch.entity().getMacAddress(), Op.EQ);
         AllFieldsSearch.done();
+
+        IpFuzzySearch = createSearchBuilder();
+        IpFuzzySearch.and("address", IpFuzzySearch.entity().getIPv4Address(), Op.LIKE);
+        IpFuzzySearch.done();
 
         IpSearch = createSearchBuilder(String.class);
         IpSearch.select(null, Func.DISTINCT, IpSearch.entity().getIPv4Address());
@@ -92,7 +97,12 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
         sc.setParameters("instance", instanceId);
         return listBy(sc);
     }
-
+    @Override
+    public List<NicVO> listByIpAddress(final String ipAddress) {
+        final SearchCriteria<NicVO> sc = IpFuzzySearch.create();
+        sc.setParameters("address", "%" + ipAddress + "%");
+        return listBy(sc);
+    }
     @Override
     public List<String> listIpAddressInNetwork(final long networkId) {
         final SearchCriteria<String> sc = IpSearch.create();

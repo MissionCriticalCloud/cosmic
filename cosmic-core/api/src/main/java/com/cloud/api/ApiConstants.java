@@ -587,8 +587,12 @@ public class ApiConstants {
     public static final String NETWORK_SPANNED_ZONES = "zonesnetworkspans";
     public static final String METADATA = "metadata";
     public static final String PHYSICAL_SIZE = "physicalsize";
+    public static final String NICS_MAC_ADDRESS = "nicsmacaddress";
 
     public static final String ADMIN = "admin";
+    public static final String BROADCAST_URI = "broadcasturi";
+    public static final String IP4_ADDRESS = "ip4address";
+    public static final String NIC_STATE = "nicstate";
 
     public enum HostDetails {
         all, capacity, events, stats, min
