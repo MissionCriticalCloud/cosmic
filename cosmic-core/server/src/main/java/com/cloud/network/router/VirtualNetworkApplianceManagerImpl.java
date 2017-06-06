@@ -41,7 +41,6 @@ import com.cloud.configuration.ZoneConfig;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -69,6 +68,7 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.MonitoringService;
@@ -900,7 +900,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         return startRouter(id, true);
     }
 
-    public boolean updateVR(final Vpc vpc, final DomainRouterVO router) { return false; }
+    public boolean updateVR(final Vpc vpc, final DomainRouterVO router) {
+        return false;
+    }
 
     @Override
     public VirtualRouter destroyRouter(final long routerId, final Account caller, final Long callerUserId) throws ResourceUnavailableException, ConcurrentOperationException {

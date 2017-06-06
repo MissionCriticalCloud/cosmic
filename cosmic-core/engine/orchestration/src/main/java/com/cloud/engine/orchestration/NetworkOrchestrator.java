@@ -20,7 +20,6 @@ import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.PodVlanMapVO;
 import com.cloud.dc.Vlan;
@@ -58,6 +57,7 @@ import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -651,7 +651,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     @DB
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                                 final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType,
-                                                final Boolean subdomainAccess, final Long vpcId, final Boolean isDisplayNetworkEnabled, final String dns1, final String dns2, final String ipExclusionList)
+                                                final Boolean subdomainAccess, final Long vpcId, final Boolean isDisplayNetworkEnabled, final String dns1, final String dns2,
+                                                final String ipExclusionList)
             throws ConcurrentOperationException {
         final Account locked = _accountDao.acquireInLockTable(owner.getId());
         if (locked == null) {
@@ -1846,7 +1847,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, String vlanId,
                                       String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork pNtwk, final long zoneId, final ACLType aclType,
                                       Boolean subdomainAccess, final Long vpcId, final String ip6Gateway, final String ip6Cidr, final Boolean isDisplayNetworkEnabled,
-                                      final String isolatedPvlan, final String dns1, final String dns2, final String ipExclusionList) throws ConcurrentOperationException, InsufficientCapacityException,
+                                      final String isolatedPvlan, final String dns1, final String dns2, final String ipExclusionList) throws ConcurrentOperationException,
+            InsufficientCapacityException,
             ResourceAllocationException {
         final NetworkOfferingVO ntwkOff = _networkOfferingDao.findById(networkOfferingId);
         // this method supports only guest network creation

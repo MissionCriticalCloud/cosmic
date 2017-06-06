@@ -18,6 +18,7 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
@@ -82,10 +83,10 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     }
 
     @Override
-    protected boolean canHandle(final NetworkOffering offering, final DataCenter.NetworkType networkType, final PhysicalNetwork physicalNetwork) {
+    protected boolean canHandle(final NetworkOffering offering, final NetworkType networkType, final PhysicalNetwork physicalNetwork) {
         s_logger.debug("Checking of guru can handle request");
         // This guru handles only Guest Isolated network that supports Source nat service
-        if (networkType == DataCenter.NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() != Network.GuestType.Shared
+        if (networkType == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() != Network.GuestType.Shared
                 && isMyIsolationMethod(physicalNetwork) && ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;
         } else {

@@ -4,6 +4,7 @@ import com.cloud.api.Identity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network.Provider;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;

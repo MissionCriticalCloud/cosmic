@@ -40,7 +40,6 @@ import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterIpAddressVO;
 import com.cloud.dc.DataCenterLinkLocalIpAddressVO;
 import com.cloud.dc.DataCenterVO;
@@ -87,6 +86,7 @@ import com.cloud.gpu.GPU;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -1794,11 +1794,11 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     // default physical network with public traffic in the zone
                     physicalNetworkId = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Public).getId();
                 } else {
-                    if (zone.getNetworkType() == DataCenter.NetworkType.Basic) {
+                    if (zone.getNetworkType() == NetworkType.Basic) {
                         // default physical network with guest traffic in the
                         // zone
                         physicalNetworkId = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Guest).getId();
-                    } else if (zone.getNetworkType() == DataCenter.NetworkType.Advanced) {
+                    } else if (zone.getNetworkType() == NetworkType.Advanced) {
                         if (zone.isSecurityGroupEnabled()) {
                             physicalNetworkId = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Guest).getId();
                         } else {
@@ -1816,7 +1816,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
         }
 
-        if (zone.isSecurityGroupEnabled() && zone.getNetworkType() != DataCenter.NetworkType.Basic && forVirtualNetwork) {
+        if (zone.isSecurityGroupEnabled() && zone.getNetworkType() != NetworkType.Basic && forVirtualNetwork) {
             throw new InvalidParameterValueException("Can't add virtual ip range into a zone with security group enabled");
         }
 
@@ -1832,7 +1832,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         } else {
             if (network == null) {
-                if (zone.getNetworkType() == DataCenter.NetworkType.Basic) {
+                if (zone.getNetworkType() == NetworkType.Basic) {
                     networkId = _networkModel.getExclusiveGuestNetwork(zoneId).getId();
                     network = _networkModel.getNetwork(networkId);
                 } else {
@@ -1856,7 +1856,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new InvalidParameterValueException("Network " + network + " doesn't support adding ip ranges");
         }
 
-        if (zone.getNetworkType() == DataCenter.NetworkType.Advanced) {
+        if (zone.getNetworkType() == NetworkType.Advanced) {
             if (network.getTrafficType() == TrafficType.Guest) {
                 if (network.getGuestType() != GuestType.Shared) {
                     throw new InvalidParameterValueException("Can execute createVLANIpRanges on shared guest network, but type of this guest network " + network.getId() + " is "

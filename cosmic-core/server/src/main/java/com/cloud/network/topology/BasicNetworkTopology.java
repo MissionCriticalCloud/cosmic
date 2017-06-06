@@ -1,7 +1,6 @@
 package com.cloud.network.topology;
 
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -10,6 +9,7 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.TrafficType;
@@ -99,7 +99,8 @@ public class BasicNetworkTopology implements NetworkTopology {
     }
 
     @Override
-    public boolean applyPublicIpACLs(final Network network, final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws ResourceUnavailableException {
+    public boolean applyPublicIpACLs(final Network network, final IpAddress publicIp, final List<? extends NetworkACLItem> rules, final VirtualRouter router) throws
+            ResourceUnavailableException {
         throw new CloudRuntimeException("applyPublicIpACLs not implemented in Basic Network Topology.");
     }
 

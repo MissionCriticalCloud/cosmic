@@ -1,7 +1,7 @@
 package com.cloud.network.topology;
 
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
+import com.cloud.model.enumeration.NetworkType;
 
 import javax.inject.Inject;
 import java.util.Hashtable;

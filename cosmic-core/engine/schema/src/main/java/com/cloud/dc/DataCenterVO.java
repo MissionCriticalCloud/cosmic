@@ -1,6 +1,7 @@
 package com.cloud.dc;
 
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network.Provider;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;

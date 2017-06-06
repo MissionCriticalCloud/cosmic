@@ -8,13 +8,13 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.cloud.acl.ControlledEntity.ACLType;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;

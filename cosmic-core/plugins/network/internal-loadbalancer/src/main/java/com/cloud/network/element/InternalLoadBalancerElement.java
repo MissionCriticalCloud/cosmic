@@ -7,13 +7,13 @@ import com.cloud.api.command.admin.internallb.ListInternalLoadBalancerElementsCm
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
