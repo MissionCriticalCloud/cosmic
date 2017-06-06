@@ -205,6 +205,13 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
                         new AffinityGroupVO(affinityGroupName, affinityGroupType, description, owner.getDomainId(), owner.getId(), aclType);
                 _affinityGroupDao.persist(group);
 
+                if (aclType == ACLType.Domain) {
+                    boolean subDomainAccess;
+                    subDomainAccess = processor.subDomainAccess();
+                    AffinityGroupDomainMapVO domainMap = new AffinityGroupDomainMapVO(group.getId(), owner.getDomainId(), subDomainAccess);
+                    _affinityGroupDomainMapDao.persist(domainMap);
+                }
+
                 return group;
             }
         });
