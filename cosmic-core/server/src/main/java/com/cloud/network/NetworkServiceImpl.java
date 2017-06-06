@@ -46,6 +46,7 @@ import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.host.dao.HostDao;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
@@ -97,7 +98,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.org.Grouping;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -723,7 +723,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw new InvalidParameterValueException("Specified zone id was not found");
         }
 
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
+        if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
             // See DataCenterVO.java
             final PermissionDeniedException ex = new PermissionDeniedException("Cannot perform this operation since specified Zone is currently disabled");
             ex.addProxyObject(zone.getUuid(), "zoneId");
@@ -1977,7 +1977,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }
 
-        if (Grouping.AllocationState.Enabled == zone.getAllocationState()) {
+        if (AllocationState.Enabled == zone.getAllocationState()) {
             // TBD: Send uuid instead of zoneId; may have to hardcode tablename in call to addProxyObject().
             throw new PermissionDeniedException("Cannot create PhysicalNetwork since the Zone is currently enabled, zone Id: " + zoneId);
         }
@@ -3408,7 +3408,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     }
                 });
             }
-        } else if(network.getTrafficType() == TrafficType.Public) {
+        } else if (network.getTrafficType() == TrafficType.Public) {
             final IPAddressVO publicIpVO = _ipAddressDao.findByIpAndSourceNetworkId(secIpVO.getNetworkId(), secIpVO.getIp4Address());
             final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
             final Account callerAccount = _accountMgr.getActiveAccountById(callerUser.getAccountId());

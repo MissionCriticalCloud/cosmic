@@ -3,7 +3,7 @@ package com.cloud.api.query.vo;
 import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
 import com.cloud.dc.DataCenter.NetworkType;
-import com.cloud.org.Grouping.AllocationState;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

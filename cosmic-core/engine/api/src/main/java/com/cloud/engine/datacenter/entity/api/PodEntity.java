@@ -1,6 +1,6 @@
 package com.cloud.engine.datacenter.entity.api;
 
-import com.cloud.org.Grouping.AllocationState;
+import com.cloud.model.enumeration.AllocationState;
 
 public interface PodEntity extends DataCenterResourceEntity {
 

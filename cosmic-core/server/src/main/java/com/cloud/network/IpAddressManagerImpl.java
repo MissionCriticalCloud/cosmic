@@ -44,6 +44,7 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
@@ -92,7 +93,6 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.org.Grouping;
 import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpDao;
 import com.cloud.region.PortableIpVO;
@@ -442,7 +442,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         }
 
         // Remove the tags corresponding to IP.
-        if(success) {
+        if (success) {
             _resourceTagDao.removeByIdAndType(ipId, ResourceTag.ResourceObjectType.PublicIpAddress);
         }
 
@@ -1051,7 +1051,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         final VlanType vlanType = VlanType.VirtualNetwork;
         final boolean assign = false;
 
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
+        if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
             // zone is of type DataCenter. See DataCenterVO.java.
             final PermissionDeniedException ex = new PermissionDeniedException("Cannot perform this operation, " + "Zone is currently disabled");
             ex.addProxyObject(zone.getUuid(), "zoneId");

@@ -3,7 +3,7 @@ package com.cloud.engine.datacenter.entity.api.db;
 import com.cloud.api.Identity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;
@@ -73,7 +73,7 @@ public class EngineHostPodVO implements EnginePod, Identity {
         this.cidrAddress = cidrAddress;
         this.cidrSize = cidrSize;
         this.description = description;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.allocationState = AllocationState.Enabled;
         this.externalDhcp = false;
         this.uuid = UUID.randomUUID().toString();
         this.state = State.Disabled;

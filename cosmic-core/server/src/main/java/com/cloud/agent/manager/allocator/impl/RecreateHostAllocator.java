@@ -14,14 +14,14 @@ import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.host.dao.HostDao;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
-import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -109,7 +109,7 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
         }
 
         for (final PodCluster p : pcs) {
-            if (p.getPod().getAllocationState() != Grouping.AllocationState.Enabled) {
+            if (p.getPod().getAllocationState() != AllocationState.Enabled) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Pod name: " + p.getPod().getName() + ", podId: " + p.getPod().getId() + " is in " + p.getPod().getAllocationState().name() +
                             " state, skipping this and trying other pods");
@@ -117,7 +117,7 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
                 continue;
             }
             final Long clusterId = p.getCluster() == null ? null : p.getCluster().getId();
-            if (p.getCluster() != null && p.getCluster().getAllocationState() != Grouping.AllocationState.Enabled) {
+            if (p.getCluster() != null && p.getCluster().getAllocationState() != AllocationState.Enabled) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Cluster name: " + p.getCluster().getName() + ", clusterId: " + clusterId + " is in " + p.getCluster().getAllocationState().name() +
                             " state, skipping this and trying other pod-clusters");

@@ -86,6 +86,7 @@ import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.gpu.GPU;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -118,8 +119,6 @@ import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.org.Grouping;
-import com.cloud.org.Grouping.AllocationState;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.region.PortableIp;
@@ -469,7 +468,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         int paramCountCheck = 0;
 
         // Non-ROOT may only update the Account scope
-        if (! _accountMgr.isRootAdmin(caller.getId()) && accountId == null) {
+        if (!_accountMgr.isRootAdmin(caller.getId()) && accountId == null) {
             throw new InvalidParameterValueException("Please specify AccountId to update the config for the given account.");
         }
 
@@ -1235,7 +1234,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Long userId = CallContext.current().getCallingUserId();
 
         if (allocationState == null) {
-            allocationState = Grouping.AllocationState.Enabled.toString();
+            allocationState = AllocationState.Enabled.toString();
         }
         return createPod(userId.longValue(), name, zoneId, gateway, cidr, startIp, endIp, allocationState, false);
     }
@@ -1333,7 +1332,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final boolean isLocalStorageEnabled = cmd.getLocalStorageEnabled();
 
         if (allocationState == null) {
-            allocationState = Grouping.AllocationState.Disabled.toString();
+            allocationState = AllocationState.Disabled.toString();
         }
 
         if (!type.equalsIgnoreCase(NetworkType.Basic.toString()) && !type.equalsIgnoreCase(NetworkType.Advanced.toString())) {
@@ -1513,9 +1512,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 zone.setDetails(updatedDetails);
 
                 if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
-                    final Grouping.AllocationState allocationState = Grouping.AllocationState.valueOf(allocationStateStr);
+                    final AllocationState allocationState = AllocationState.valueOf(allocationStateStr);
 
-                    if (allocationState == Grouping.AllocationState.Enabled) {
+                    if (allocationState == AllocationState.Enabled) {
                         // check if zone has necessary trafficTypes before enabling
                         try {
                             final PhysicalNetwork mgmtPhyNetwork;
@@ -1812,7 +1811,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         // Check if zone is enabled
         final Account caller = CallContext.current().getCallingAccount();
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState()
+        if (AllocationState.Disabled == zone.getAllocationState()
                 && !_accountMgr.isRootAdmin(caller.getId())) {
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
         }
@@ -3455,7 +3454,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         // Check if zone is disabled
         final DataCenterVO zone = _zoneDao.findById(zoneId);
         final Account account = CallContext.current().getCallingAccount();
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState()
+        if (AllocationState.Disabled == zone.getAllocationState()
                 && !_accountMgr.isRootAdmin(account.getId())) {
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
         }
@@ -3484,9 +3483,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         final HostPodVO podFinal = new HostPodVO(podName, zoneId, gateway, cidrAddress, cidrSize, ipRange);
 
-        final Grouping.AllocationState allocationState;
+        final AllocationState allocationState;
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
-            allocationState = Grouping.AllocationState.valueOf(allocationStateStr);
+            allocationState = AllocationState.valueOf(allocationStateStr);
             podFinal.setAllocationState(allocationState);
         }
 
@@ -3545,12 +3544,12 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final DataCenterVO zoneFinal = new DataCenterVO(zoneName, null, dns1, dns2, internalDns1, internalDns2, guestCidr, domain, domainId, zoneType, zoneToken, networkDomain,
                 isSecurityGroupEnabled, isLocalStorageEnabled, ip6Dns1, ip6Dns2);
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
-            final Grouping.AllocationState allocationState = Grouping.AllocationState.valueOf(allocationStateStr);
+            final AllocationState allocationState = AllocationState.valueOf(allocationStateStr);
             zoneFinal.setAllocationState(allocationState);
         } else {
             // Zone will be disabled since 3.0. Admin should enable it after
             // physical network and providers setup.
-            zoneFinal.setAllocationState(Grouping.AllocationState.Disabled);
+            zoneFinal.setAllocationState(AllocationState.Disabled);
         }
 
         return Transaction.execute(new TransactionCallback<DataCenterVO>() {
@@ -3704,9 +3703,10 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @Override
     @DB
     public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan,
-                                                   final Availability availability,  final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap,
+                                                   final Availability availability, final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap,
                                                    final boolean isDefault, final Network.GuestType type, final boolean systemOnly, final Long serviceOfferingId,
-                                                   final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service, Map<Capability, String>> serviceCapabilityMap,
+                                                   final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service, Map<Capability, String>>
+                                                           serviceCapabilityMap,
                                                    final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,
                                                    final boolean egressDefaultPolicy, final Integer maxconn, final boolean enableKeepAlive) {
 
@@ -4351,9 +4351,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
                     final String ipRange = startIp + "-" + endIp;
                     pod.setDescription(ipRange);
-                    final Grouping.AllocationState allocationState;
+                    final AllocationState allocationState;
                     if (allocationStateStrFinal != null && !allocationStateStrFinal.isEmpty()) {
-                        allocationState = Grouping.AllocationState.valueOf(allocationStateStrFinal);
+                        allocationState = AllocationState.valueOf(allocationStateStrFinal);
                         pod.setAllocationState(allocationState);
                     }
 
@@ -4782,7 +4782,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             try {
-                Grouping.AllocationState.valueOf(allocationStateStr);
+                AllocationState.valueOf(allocationStateStr);
             } catch (final IllegalArgumentException ex) {
                 throw new InvalidParameterValueException("Unable to resolve Allocation State '" + allocationStateStr + "' to a supported state");
             }
@@ -4923,7 +4923,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             try {
-                Grouping.AllocationState.valueOf(allocationStateStr);
+                AllocationState.valueOf(allocationStateStr);
             } catch (final IllegalArgumentException ex) {
                 throw new InvalidParameterValueException("Unable to resolve Allocation State '" + allocationStateStr + "' to a supported state");
             }

@@ -114,6 +114,7 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
@@ -152,7 +153,6 @@ import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.projects.ProjectManager;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
@@ -4348,7 +4348,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         assert !(requestedIps != null && (defaultIps.getIp4Address() != null || defaultIps.getIp6Address() != null)) : "requestedIp list and defaultNetworkIp should never be " +
                 "specified together";
 
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState()
+        if (AllocationState.Disabled == zone.getAllocationState()
                 && !_accountMgr.isRootAdmin(caller.getId())) {
             throw new PermissionDeniedException(
                     "Cannot perform this operation, Zone is currently disabled: "

@@ -6,9 +6,9 @@ import com.cloud.dc.DataCenterLinkLocalIpAddressVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.PodVlanVO;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
-import com.cloud.org.Grouping;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
@@ -381,7 +381,7 @@ public class DataCenterDaoImpl extends GenericDaoBase<DataCenterVO, Long> implem
     @Override
     public List<DataCenterVO> listDisabledZones() {
         final SearchCriteria<DataCenterVO> sc = DisabledZonesSearch.create();
-        sc.setParameters("allocationState", Grouping.AllocationState.Disabled);
+        sc.setParameters("allocationState", AllocationState.Disabled);
 
         final List<DataCenterVO> dcs = listBy(sc);
 
@@ -391,7 +391,7 @@ public class DataCenterDaoImpl extends GenericDaoBase<DataCenterVO, Long> implem
     @Override
     public List<DataCenterVO> listEnabledZones() {
         final SearchCriteria<DataCenterVO> sc = DisabledZonesSearch.create();
-        sc.setParameters("allocationState", Grouping.AllocationState.Enabled);
+        sc.setParameters("allocationState", AllocationState.Enabled);
 
         final List<DataCenterVO> dcs = listBy(sc);
 

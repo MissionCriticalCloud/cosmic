@@ -10,7 +10,7 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.PermissionDeniedException;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.utils.exception.InvalidParameterValueException;
@@ -60,7 +60,7 @@ public class ResourceCheckerTest {
     @Test(expected = PermissionDeniedException.class)
     public void test_checkIfDataCenterIsUsable_whenDataCenterIsDisabledAndAccountIsNotRoot() throws Exception {
         final DataCenterVO dataCenter = new DataCenterVO();
-        dataCenter.setAllocationState(Grouping.AllocationState.Disabled);
+        dataCenter.setAllocationState(AllocationState.Disabled);
         final AccountVO account = new AccountVO(1L);
         when(accountManager.isRootAdmin(1L)).thenReturn(false);
         final ResourceChecker resourceChecker = buildResourceChecker();
@@ -71,7 +71,7 @@ public class ResourceCheckerTest {
     @Test
     public void test_checkIfDataCenterIsUsable_whenDataCenterIsDisabledAndAccountIsRoot() throws Exception {
         final DataCenterVO dataCenter = new DataCenterVO();
-        dataCenter.setAllocationState(Grouping.AllocationState.Disabled);
+        dataCenter.setAllocationState(AllocationState.Disabled);
         final AccountVO account = new AccountVO(1L);
         when(accountManager.isRootAdmin(1L)).thenReturn(true);
         final ResourceChecker resourceChecker = buildResourceChecker();
@@ -86,7 +86,7 @@ public class ResourceCheckerTest {
     @Test
     public void test_checkIfDataCenterIsUsable_whenDataCenterIsEnabledAndAccountIsNotRoot() throws Exception {
         final DataCenterVO dataCenter = new DataCenterVO();
-        dataCenter.setAllocationState(Grouping.AllocationState.Enabled);
+        dataCenter.setAllocationState(AllocationState.Enabled);
         final AccountVO account = new AccountVO(1L);
         when(accountManager.isRootAdmin(1L)).thenReturn(false);
         final ResourceChecker resourceChecker = buildResourceChecker();
@@ -101,7 +101,7 @@ public class ResourceCheckerTest {
     @Test
     public void test_checkIfDataCenterIsUsable_whenDataCenterIsEnabledAndAccountIsRoot() throws Exception {
         final DataCenterVO dataCenter = new DataCenterVO();
-        dataCenter.setAllocationState(Grouping.AllocationState.Enabled);
+        dataCenter.setAllocationState(AllocationState.Enabled);
         final AccountVO account = new AccountVO(1L);
         when(accountManager.isRootAdmin(1L)).thenReturn(true);
         final ResourceChecker resourceChecker = buildResourceChecker();

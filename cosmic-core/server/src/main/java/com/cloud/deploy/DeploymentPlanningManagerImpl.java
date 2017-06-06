@@ -52,9 +52,9 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
 import com.cloud.service.ServiceOfferingDetailsVO;
@@ -1053,19 +1053,19 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     private boolean isEnabledForAllocation(final long zoneId, final Long podId, final Long clusterId) {
         // Check if the zone exists in the system
         final DataCenterVO zone = _dcDao.findById(zoneId);
-        if (zone != null && Grouping.AllocationState.Disabled == zone.getAllocationState()) {
+        if (zone != null && AllocationState.Disabled == zone.getAllocationState()) {
             s_logger.info("Zone is currently disabled, cannot allocate to this zone: " + zoneId);
             return false;
         }
 
         final Pod pod = _podDao.findById(podId);
-        if (pod != null && Grouping.AllocationState.Disabled == pod.getAllocationState()) {
+        if (pod != null && AllocationState.Disabled == pod.getAllocationState()) {
             s_logger.info("Pod is currently disabled, cannot allocate to this pod: " + podId);
             return false;
         }
 
         final Cluster cluster = _clusterDao.findById(clusterId);
-        if (cluster != null && Grouping.AllocationState.Disabled == cluster.getAllocationState()) {
+        if (cluster != null && AllocationState.Disabled == cluster.getAllocationState()) {
             s_logger.info("Cluster is currently disabled, cannot allocate to this cluster: " + clusterId);
             return false;
         }

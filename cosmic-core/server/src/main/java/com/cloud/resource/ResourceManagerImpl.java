@@ -81,10 +81,10 @@ import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
 import com.cloud.model.Zone;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.org.Managed;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
@@ -1942,16 +1942,16 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             clusterType = Cluster.ClusterType.CloudManaged;
         }
 
-        Grouping.AllocationState allocationState = null;
+        AllocationState allocationState = null;
         if (cmd.getAllocationState() != null && !cmd.getAllocationState().isEmpty()) {
             try {
-                allocationState = Grouping.AllocationState.valueOf(cmd.getAllocationState());
+                allocationState = AllocationState.valueOf(cmd.getAllocationState());
             } catch (final IllegalArgumentException ex) {
                 throw new InvalidParameterValueException("Unable to resolve Allocation State '" + cmd.getAllocationState() + "' to a supported state");
             }
         }
         if (allocationState == null) {
-            allocationState = Grouping.AllocationState.Enabled;
+            allocationState = AllocationState.Enabled;
         }
 
         final Discoverer discoverer = getMatchingDiscover(hypervisorType);
@@ -2122,10 +2122,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        final Grouping.AllocationState newAllocationState;
+        final AllocationState newAllocationState;
         if (allocationState != null && !allocationState.isEmpty()) {
             try {
-                newAllocationState = Grouping.AllocationState.valueOf(allocationState);
+                newAllocationState = AllocationState.valueOf(allocationState);
             } catch (final IllegalArgumentException ex) {
                 throw new InvalidParameterValueException("Unable to resolve Allocation State '" + allocationState + "' to a supported state");
             }

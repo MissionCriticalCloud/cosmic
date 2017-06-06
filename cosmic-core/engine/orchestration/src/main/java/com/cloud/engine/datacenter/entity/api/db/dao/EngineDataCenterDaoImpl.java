@@ -4,7 +4,7 @@ import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.engine.datacenter.entity.api.db.EngineDataCenterVO;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -282,7 +282,7 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
     @Override
     public List<EngineDataCenterVO> listDisabledZones() {
         final SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
-        sc.setParameters("allocationState", Grouping.AllocationState.Disabled);
+        sc.setParameters("allocationState", AllocationState.Disabled);
 
         final List<EngineDataCenterVO> dcs = listBy(sc);
 
@@ -292,7 +292,7 @@ public class EngineDataCenterDaoImpl extends GenericDaoBase<EngineDataCenterVO, 
     @Override
     public List<EngineDataCenterVO> listEnabledZones() {
         final SearchCriteria<EngineDataCenterVO> sc = DisabledZonesSearch.create();
-        sc.setParameters("allocationState", Grouping.AllocationState.Enabled);
+        sc.setParameters("allocationState", AllocationState.Enabled);
 
         final List<EngineDataCenterVO> dcs = listBy(sc);
 

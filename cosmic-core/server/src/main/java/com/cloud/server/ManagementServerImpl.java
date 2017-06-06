@@ -530,6 +530,7 @@ import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddress;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -538,7 +539,6 @@ import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping.AllocationState;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.projects.ProjectManager;
@@ -979,7 +979,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         Long id = null;
         int paramCountCheck = 0;
 
-        if (! _accountMgr.isRootAdmin(caller.getId()) && accountId == null) {
+        if (!_accountMgr.isRootAdmin(caller.getId()) && accountId == null) {
             throw new InvalidParameterValueException("Please specify AccountId to list the config for the given account.");
         }
 

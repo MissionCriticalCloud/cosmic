@@ -10,6 +10,7 @@ import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
@@ -19,7 +20,6 @@ import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offerings.NetworkOfferingVO;
-import com.cloud.org.Grouping.AllocationState;
 import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
@@ -49,61 +49,6 @@ public interface ConfigurationManager {
      * @param value
      */
     String updateConfiguration(long userId, String name, String category, String value, String scope, Long id);
-
-    //    /**
-    //     * Creates a new service offering
-    //     *
-    //     * @param name
-    //     * @param cpu
-    //     * @param ramSize
-    //     * @param speed
-    //     * @param displayText
-    //     * @param localStorageRequired
-    //     * @param offerHA
-    //     * @param domainId
-    //     * @param volatileVm
-    //     * @param hostTag
-    //     * @param networkRate
-    //     *            TODO
-    //     * @param id
-    //     * @param useVirtualNetwork
-    //     * @param deploymentPlanner
-    //     * @param details
-    //     * @param bytesReadRate
-    //     * @param bytesWriteRate
-    //     * @param iopsReadRate
-    //     * @param iopsWriteRate
-    //     * @return ID
-    //     */
-    //    ServiceOfferingVO createServiceOffering(long userId, boolean isSystem, VirtualMachine.Type vm_typeType, String name, int cpu, int ramSize, int speed, String
-    // displayText, boolean localStorageRequired,
-    //            boolean offerHA, boolean limitResourceUse, boolean volatileVm, String tags, Long domainId, String hostTag, Integer networkRate, String deploymentPlanner,
-    // Map<String, String> details,
-    //            Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate);
-
-    //    /**
-    //     * Creates a new disk offering
-    //     *
-    //     * @param domainId
-    //     * @param name
-    //     * @param description
-    //     * @param numGibibytes
-    //     * @param tags
-    //     * @param isCustomized
-    //     * @param localStorageRequired
-    //     * @param isDisplayOfferingEnabled
-    //     * @param isCustomizedIops (is admin allowing users to set custom iops?)
-    //     * @param minIops
-    //     * @param maxIops
-    //     * @param bytesReadRate
-    //     * @param bytesWriteRate
-    //     * @param iopsReadRate
-    //     * @param iopsWriteRate
-    //     * @return newly created disk offering
-    //     */
-    //    DiskOfferingVO createDiskOffering(Long domainId, String name, String description, Long numGibibytes, String tags, boolean isCustomized,
-    //            boolean localStorageRequired, boolean isDisplayOfferingEnabled, Boolean isCustomizedIops, Long minIops, Long maxIops,
-    //            Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate);
 
     /**
      * Creates a new pod
@@ -164,24 +109,6 @@ public interface ConfigurationManager {
 
     /**
      * Creates a new network offering
-     *
-     * @param name
-     * @param displayText
-     * @param trafficType
-     * @param tags
-     * @param specifyVlan
-     * @param networkRate        TODO
-     * @param serviceProviderMap TODO
-     * @param isDefault          TODO
-     * @param type               TODO
-     * @param systemOnly         TODO
-     * @param serviceOfferingId
-     * @param conserveMode       ;
-     * @param specifyIpRanges    TODO
-     * @param isPersistent       ;
-     * @param details            TODO
-     * @param id
-     * @return network offering object
      */
 
     NetworkOfferingVO createNetworkOffering(String name, String displayText, TrafficType trafficType, String tags, boolean specifyVlan, Availability availability,
@@ -201,17 +128,6 @@ public interface ConfigurationManager {
 
     /**
      * Edits a pod in the database. Will not allow you to edit pods that are being used anywhere in the system.
-     *
-     * @param id
-     * @param name
-     * @param startIp
-     * @param endIp
-     * @param gateway
-     * @param netmask
-     * @param allocationState
-     * @return Pod
-     * @throws
-     * @throws
      */
     Pod editPod(long id, String name, String startIp, String endIp, String gateway, String netmask, String allocationStateStr);
 

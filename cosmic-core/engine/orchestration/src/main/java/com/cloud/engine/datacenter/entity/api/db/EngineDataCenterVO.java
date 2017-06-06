@@ -3,8 +3,8 @@ package com.cloud.engine.datacenter.entity.api.db;
 import com.cloud.api.Identity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.Network.Provider;
-import com.cloud.org.Grouping;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;
@@ -118,7 +118,7 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
                               final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
         this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, false, null, null);
         this.id = id;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.allocationState = AllocationState.Enabled;
         this.uuid = UUID.randomUUID().toString();
     }
 
@@ -137,7 +137,7 @@ public class EngineDataCenterVO implements EngineDataCenter, Identity {
         this.domain = domain;
         this.domainId = domainId;
         this.networkType = zoneType;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.allocationState = AllocationState.Enabled;
         this.securityGroupEnabled = securityGroupEnabled;
         this.localStorageEnabled = localStorageEnabled;
 

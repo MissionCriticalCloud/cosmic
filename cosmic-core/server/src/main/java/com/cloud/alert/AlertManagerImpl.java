@@ -10,8 +10,8 @@ import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.capacity.dao.CapacityDaoImpl.SummedCapacity;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Vlan.VlanType;
@@ -29,8 +29,10 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.db.model.Zone;
+import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.dao.IPAddressDao;
-import com.cloud.org.Grouping.AllocationState;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -107,6 +109,8 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
     private ResourceManager _resourceMgr;
     @Inject
     private ConfigurationManager _configMgr;
+    @Inject
+    private ZoneRepository _zoneRepository;
     private Timer _timer = null;
     private long _capacityCheckPeriod = 60L * 60L * 1000L; // one hour by default
     private double _publicIPCapacityThreshold = 0.75;
@@ -259,9 +263,11 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
             s_logger.debug("Executing capacity updates for public ip and Vlans");
         }
 
+        final List<Zone> zones = _zoneRepository.findByRemovedIsNull();
+
         final List<DataCenterVO> datacenters = _dcDao.listAll();
-        for (final DataCenterVO datacenter : datacenters) {
-            final long dcId = datacenter.getId();
+        for (final Zone zone : zones) {
+            final long dcId = zone.getId();
 
             //NOTE
             //What happens if we have multiple vlans? Dashboard currently shows stats
@@ -270,16 +276,16 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
             //implementing the same
 
             // Calculate new Public IP capacity for Virtual Network
-            if (datacenter.getNetworkType() == NetworkType.Advanced) {
-                createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, datacenter.getAllocationState());
+            if (zone.getNetworkType() == NetworkType.Advanced) {
+                createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, zone.getAllocationState());
             }
 
             // Calculate new Public IP capacity for Direct Attached Network
-            createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, datacenter.getAllocationState());
+            createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, zone.getAllocationState());
 
-            if (datacenter.getNetworkType() == NetworkType.Advanced) {
+            if (zone.getNetworkType() == NetworkType.Advanced) {
                 //Calculate VLAN's capacity
-                createOrUpdateVlanCapacity(dcId, datacenter.getAllocationState());
+                createOrUpdateVlanCapacity(dcId, zone.getAllocationState());
             }
         }
 
