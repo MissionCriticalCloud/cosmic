@@ -13,7 +13,6 @@ import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.exception.AgentUnavailableException;
@@ -26,6 +25,7 @@ import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.Zone;
 import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.component.ManagerBase;
@@ -236,7 +236,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
      * @see com.cloud.resource.ResourceManager#checkCIDR(com.cloud.dc.HostPodVO, com.cloud.dc.DataCenterVO, java.lang.String, java.lang.String)
      */
     @Override
-    public void checkCIDR(final HostPodVO pod, final DataCenterVO dc, final String serverPrivateIP, final String serverPrivateNetmask) {
+    public void checkCIDR(final HostPodVO pod, final Zone dc, final String serverPrivateIP, final String serverPrivateNetmask) {
         // TODO Auto-generated method stub
 
     }

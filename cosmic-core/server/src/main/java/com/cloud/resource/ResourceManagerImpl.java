@@ -80,6 +80,7 @@ import com.cloud.host.dao.HostTagsDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
+import com.cloud.model.Zone;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.org.Cluster;
@@ -335,7 +336,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public void checkCIDR(final HostPodVO pod, final DataCenterVO dc, final String serverPrivateIP, final String serverPrivateNetmask) throws IllegalArgumentException {
+    public void checkCIDR(final HostPodVO pod, final Zone dc, final String serverPrivateIP, final String serverPrivateNetmask) throws IllegalArgumentException {
         if (serverPrivateIP == null) {
             return;
         }
