@@ -157,7 +157,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
         verifyAffinityGroupNameInUse(owner.getAccountId(), owner.getDomainId(), affinityGroupName);
         verifyDomainLevelAffinityGroupName(domainLevel, owner.getDomainId(), affinityGroupName);
 
-        final AffinityGroupVO group = createAffinityGroup(processor, owner, aclType, affinityGroupName, affinityGroupType, description);
+        final AffinityGroupVO group = createAffinityGroup(processor, owner, aclType, affinityGroupName, affinityGroupType, description, domainLevel, domainId);
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Created affinity group =" + affinityGroupName);
@@ -197,7 +197,14 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     }
 
     private AffinityGroupVO createAffinityGroup(final AffinityGroupProcessor processor, final Account owner, final ACLType aclType, final String affinityGroupName, final String
-            affinityGroupType, final String description) {
+            affinityGroupType, final String description, boolean domainLevel, Long domainId) {
+
+        Long domainIdBasedOnDomainLevel = owner.getDomainId();
+        if (domainLevel) {
+            domainIdBasedOnDomainLevel = domainId;
+        }
+        final Long affinityGroupDomainId = domainIdBasedOnDomainLevel;
+
         return Transaction.execute(new TransactionCallback<AffinityGroupVO>() {
             @Override
             public AffinityGroupVO doInTransaction(final TransactionStatus status) {
@@ -208,7 +215,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
                 if (aclType == ACLType.Domain) {
                     boolean subDomainAccess;
                     subDomainAccess = processor.subDomainAccess();
-                    AffinityGroupDomainMapVO domainMap = new AffinityGroupDomainMapVO(group.getId(), owner.getDomainId(), subDomainAccess);
+                    AffinityGroupDomainMapVO domainMap = new AffinityGroupDomainMapVO(group.getId(), affinityGroupDomainId, subDomainAccess);
                     _affinityGroupDomainMapDao.persist(domainMap);
                 }
 
@@ -237,6 +244,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
         }
     }
 
+    @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_AFFINITY_GROUP_DELETE, eventDescription = "Deleting affinity group")
     public boolean deleteAffinityGroup(final Long affinityGroupId, final String account, final Long projectId, final Long domainId, final String affinityGroupName) {
