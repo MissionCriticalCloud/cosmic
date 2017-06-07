@@ -4084,11 +4084,8 @@ class Tag:
         cmd.resourceIds = resourceIds
         cmd.resourcetype = resourceType
         cmd.tags = []
-        for key, value in tags.items():
-            cmd.tags.append({
-                'key': key,
-                'value': value
-            })
+        for tag in tags:
+            cmd.tags.append(tag)
         return Tag(api_client.createTags(cmd).__dict__)
 
     def delete(self, api_client, resourceIds, resourceType, tags):

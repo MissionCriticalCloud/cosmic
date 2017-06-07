@@ -12,7 +12,8 @@ from marvin.lib.base import (Vpn,
                              Account,
                              Domain,
                              EgressFireWallRule,
-                             FireWallRule)
+                             FireWallRule,
+                             Tag)
 
 from marvin.lib.common import (get_vpngateway,
                                get_vpc,
@@ -250,6 +251,22 @@ class TestScenarioManager:
                                 network=network,
                                 virtual_machine=virtualmachine,
                                 ipaddress=publicipaddress
+                            )
+
+                            Tag.create(
+                                api_client=self.api_client,
+                                resourceType='UserVm',
+                                resourceIds=[virtualmachine.id],
+                                tags=[
+                                    {
+                                        'key': 'sship',
+                                        'value': publicipaddress.ipaddress.ipaddress
+                                    },
+                                    {
+                                        'key': 'sshport',
+                                        'value': portforward_data['data']['publicport']
+                                    }
+                                ]
                             )
 
                             self.logger.debug('>>>  PORT FORWARD  =>  ID: %s  =>  Public Start Port: %s  '
