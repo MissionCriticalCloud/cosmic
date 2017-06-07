@@ -20,6 +20,9 @@ do
   esac
 done
 
+# Set env var so we run the expensive finish_config() calls too often
+# See process_file() in update_config.py
+export DEFER_CONFIG=TRUE
 while read line
 do
     #comment
@@ -77,6 +80,10 @@ done < $cfg
 
 #remove the configuration file, log file should have all the records as well
 mv $cfg /var/cache/cloud/processed/
+
+unset DEFER_CONFIG
+# trigger finish_config()
+/opt/cloud/bin/configure.py
 
 # Flush kernel conntrack table
 log_it "VR config: Flushing conntrack table"
