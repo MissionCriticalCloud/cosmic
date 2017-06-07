@@ -2413,7 +2413,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         logger.debug("Try to stop the vm at first");
         String ret = stopVmInternal(conn, vmName, forceStop);
         if (ret == Script.ERR_TIMEOUT) {
-            ret = stopVm(conn, vmName, true);
+            ret = stopVmInternal(conn, vmName, true);
         } else if (ret != null) {
       /*
        * There is a race condition between libvirt and qemu: libvirt listens on qemu's monitor fd. If qemu is shutdown,
