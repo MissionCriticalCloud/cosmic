@@ -149,50 +149,28 @@ public interface DeploymentPlanner extends Adapter {
             hostIds.addAll(hostList);
         }
 
-        public boolean shouldAvoid(final Host host) {
-            return shouldAvoid(host.getDataCenterId(), host.getPodId(), host.getClusterId(), host.getId());
-        }
-
-        public boolean shouldAvoid(final Cluster cluster) {
-            if (dcIds.contains(cluster.getDataCenterId())) {
-                return true;
-            }
-
-            if (! podIds.isEmpty() && podIds.contains(cluster.getPodId())) {
-                return true;
-            }
-
-            if (! clusterIds.isEmpty() && clusterIds.contains(cluster.getId())) {
-                return true;
-            }
-            return false;
+        public boolean shouldAvoid(final DataCenter dc) {
+            return shouldAvoid(dc.getId(), null, null, null, null);
         }
 
         public boolean shouldAvoid(final Pod pod) {
-            if (dcIds.contains(pod.getDataCenterId())) {
-                return true;
-            }
+            return shouldAvoid(pod.getDataCenterId(), pod.getId(), null, null, null);
+        }
 
-            if (! podIds.isEmpty() && podIds.contains(pod.getId())) {
-                return true;
-            }
+        public boolean shouldAvoid(final Cluster cluster) {
+            return shouldAvoid(cluster.getDataCenterId(), cluster.getPodId(), cluster.getId(), null, null);
+        }
 
-            return false;
+        public boolean shouldAvoid(final Host host) {
+            return shouldAvoid(host.getDataCenterId(), host.getPodId(), host.getClusterId(), null, host.getId());
         }
 
         public boolean shouldAvoid(final StoragePool pool) {
-            return shouldAvoid(pool.getDataCenterId(), pool.getPodId(), pool.getClusterId(), pool.getId());
+            return shouldAvoid(pool.getDataCenterId(), pool.getPodId(), pool.getClusterId(), pool.getId(), null);
         }
 
-        public boolean shouldAvoid(final DataCenter dc) {
-            if (dcIds.contains(dc.getId())) {
-                return true;
-            }
-            return false;
-        }
-
-        private boolean shouldAvoid(final long dataCenterId, final Long podId, final Long clusterId, final long poolId) {
-            if (dcIds.contains(dataCenterId)) {
+        private boolean shouldAvoid(final Long dataCenterId, final Long podId, final Long clusterId, final Long poolId, final Long hostId) {
+            if (dataCenterId != null && ! dcIds.isEmpty() && dcIds.contains(dataCenterId)) {
                 return true;
             }
 
@@ -204,7 +182,11 @@ public interface DeploymentPlanner extends Adapter {
                 return true;
             }
 
-            if (! poolIds.isEmpty() && poolIds.contains(poolId)) {
+            if (poolId != null && ! poolIds.isEmpty() && poolIds.contains(poolId)) {
+                return true;
+            }
+
+            if (hostId != null && ! hostIds.isEmpty() && hostIds.contains(hostId)) {
                 return true;
             }
 
