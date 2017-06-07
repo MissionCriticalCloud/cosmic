@@ -29,9 +29,10 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestScenarioManager:
 
-    def __init__(self, api_client, scenario_data, zone):
+    def __init__(self, api_client, scenario_data, test_data, zone, randomizeNames, cleanup):
         self.api_client = api_client
         self.scenario_data = scenario_data
+        self.test_data = test_data
         self.zone = zone
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
         self.dynamic_names = {
@@ -39,7 +40,19 @@ class TestScenarioManager:
             'vpcs': {},
             'vms': {},
         }
+        self.randomizeNames = randomizeNames
         self.resources_to_cleanup = []
+        self.cleanup = cleanup
+
+    @property
+    def test_data(self):
+        return self.test_data
+
+    def get_dynamic_name(self, section, name):
+        if name in self.dynamic_names[section]:
+            return self.dynamic_names[section][name]
+        else:
+            return name
 
     def setup_infra(self):
         scenario_data = self.scenario_data['data']
@@ -60,7 +73,7 @@ class TestScenarioManager:
             self.logger.debug('>>>  DOMAIN  =>  Creating "%s"...', domain_data['name'])
             domain = Domain.create(
                 api_client=self.api_client,
-                name=domain_data['name'] + '-' + random_gen()
+                name=domain_data['name'] + ('-' + random_gen() if self.randomizeNames else '')
             )
 
         self.logger.debug('>>>  DOMAIN  =>  ID: %s  =>  Name: %s  =>  Path: %s  =>  State: %s', domain.id, domain.name,
@@ -74,11 +87,22 @@ class TestScenarioManager:
 
     def deploy_account(self, account_data, domain):
         self.logger.debug('>>>  ACCOUNT  =>  Creating "%s"...', account_data['username'])
-        account = Account.create(
-            api_client=self.api_client,
-            services=account_data,
-            domainid=domain.uuid
-        )
+        account = None
+        if not self.randomizeNames:
+            account_list = Account.list(api_client=self.api_client, name=account_data['username'], listall=True)
+            if isinstance(account_list, list) and len(account_list) >= 1:
+                if account_list[0].name == account_data['username']:
+                    account = account_list[0]
+                    self.logger.debug('>>>  ACCOUNT  =>  Loaded from (pre) existing account,  ID: %s', account.id)
+                    return
+
+        if not account:
+            account = Account.create(
+                api_client=self.api_client,
+                services=account_data,
+                domainid=domain.uuid,
+                randomizeID=self.randomizeNames
+            )
         self.resources_to_cleanup.append(account)
         self.dynamic_names['accounts'][account_data['username']] = account.name
 
@@ -105,7 +129,8 @@ class TestScenarioManager:
             api_client=self.api_client,
             data=vpc_data,
             zone=self.zone,
-            account=account
+            account=account,
+            randomizeID=self.randomizeNames
         )
         self.dynamic_names['vpcs'][vpc_data['name']] = vpc.name
 
@@ -464,14 +489,69 @@ class TestScenarioManager:
                           firewall.id, firewall.startport, firewall.endport, firewall.cidrlist,
                           firewall.protocol, firewall.state, firewall.networkid, firewall.ipaddress)
 
+    def get_vpc(self, name):
+        vpc = VPC(get_vpc(api_client=self.api_client, name=name).__dict__, api_client=self.api_client)
+        return vpc
+
+    def get_virtual_machine(self, vm_name):
+        virtual_machine = VirtualMachine(get_virtual_machine(
+            api_client=self.api_client,
+            name=self.get_dynamic_name('vms', vm_name)
+        ).__dict__, [])
+
+        virtual_machine_tags = Tag.list(
+                                        api_client=self.api_client,
+                                        resourceId=[virtual_machine.id],
+                                        listall=True)
+
+        for key in virtual_machine_tags:
+            if key.key == 'sshport':
+                virtual_machine.ssh_port = int(key.value.encode('ascii', 'ignore'))
+            if key.key == 'sship':
+                virtual_machine.ssh_ip = key.value.encode('ascii', 'ignore')
+
+        return virtual_machine
+
+    def get_network(self, name=None, id=None):
+        return Network(get_network(api_client=self.api_client, name=name, id=id).__dict__)
+
+    def get_network_acl_list(self, name=None, id=None):
+        return NetworkACLList(get_network_acl(api_client=self.api_client, name=name, id=id).__dict__)
+
+    def get_default_allow_acl_list(self):
+        return self.get_network_acl_list(name='default_allow')
+
+    def get_default_deny_acl_list(self):
+        return self.get_network_acl_list(name='default_deny')
+
+    def deploy_network_acl_list(self, acl_list_name, acl_config, network=None, vpc=None):
+
+        if network:
+            networkid=network.id
+            if network.vpcid:
+                vpcid=network.vpcid
+
+        acl_list = NetworkACLList.create(self.api_client, name=acl_list_name, services=[], vpcid=vpcid, vpc=vpc)
+
+        NetworkACL.create(self.api_client,
+                          acl_config,
+                          networkid=networkid,
+                          aclid=acl_list.id)
+
+        return acl_list
+
     def finalize(self):
-        try:
-            self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Started ===',
-                             self.scenario_data['metadata']['name'])
+        if self.cleanup:
+            try:
+                self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Started ===',
+                                 self.scenario_data['metadata']['name'])
 
-            cleanup_resources(self.api_client, self.resources_to_cleanup, self.logger)
+                cleanup_resources(self.api_client, self.resources_to_cleanup, self.logger)
 
-            self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Finished ===',
-                             self.scenario_data['metadata']['name'])
-        except:
-            self.logger.exception('Oops! Unable to clean up resources of "%s"!', self.scenario_data['metadata']['name'])
+                self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Finished ===',
+                                 self.scenario_data['metadata']['name'])
+            except:
+                self.logger.exception('Oops! Unable to clean up resources of "%s"!', self.scenario_data['metadata']['name'])
+        else:
+            self.logger.info('=== Scenario Manager, Skipping Cleaning Up of "%s" ===',
+                                  self.scenario_data['metadata']['name'])

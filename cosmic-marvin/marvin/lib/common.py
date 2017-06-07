@@ -370,12 +370,12 @@ def get_virtual_machine_offering(api_client, name):
     return find_exact_match_by_name(offerings, name)
 
 
-def get_network_acl(api_client, name, vpc=None):
+def get_network_acl(api_client, name=None, id=None, vpc=None):
     if vpc:
-        acls = list_network_acl_lists(api_client, name=name, vpcid=vpc.id, listall=True)
+        acls = list_network_acl_lists(api_client, name=name, id=id, vpcid=vpc.id, listall=True)
     else:
-        acls = list_network_acl_lists(api_client, name=name, listall=True)
-    return find_exact_match_by_name(acls, name)
+        acls = list_network_acl_lists(api_client, name=name, id=id, listall=True)
+    return find_exact_match_by_name(acls, name) if name else acls[0]
 
 
 def get_default_allow_vpc_acl(api_client, vpc):
@@ -391,16 +391,19 @@ def get_vpc(api_client, name):
     return find_exact_match_by_name(vpcs, name)
 
 
-def get_network(api_client, name, vpc=None):
+def get_network(api_client, name=None, id=None, vpc=None):
     if vpc:
-        networks = list_networks(api_client, name=name, vpcid=vpc.id)
+        networks = list_networks(api_client, name=name, id=id, vpcid=vpc.id)
     else:
-        networks = list_networks(api_client, name=name)
-    return find_exact_match_by_name(networks, name)
+        networks = list_networks(api_client, name=name, id=id)
+    return find_exact_match_by_name(networks, name) if name else networks[0]
 
 
-def get_virtual_machine(api_client, name, network):
-    virtual_machines = list_virtual_machines(api_client, name=name, networkid=network.id, listall=True)
+def get_virtual_machine(api_client, name, network=None):
+    if network:
+        virtual_machines = list_virtual_machines(api_client, name=name, networkid=network.id, listall=True)
+    else:
+        virtual_machines = list_virtual_machines(api_client, name=name, listall=True)
     return find_exact_match_by_name(virtual_machines, name)
 
 

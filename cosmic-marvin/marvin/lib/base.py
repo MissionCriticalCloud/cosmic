@@ -47,18 +47,18 @@ class Domain:
 
     @classmethod
     def create(cls, api_client, services=None, name=None, networkdomain=None,
-               parentdomainid=None):
+               parentdomainid=None, randomizeID=True,):
         """Creates an domain"""
 
         cmd = createDomain.createDomainCmd()
 
         if "domainUUID" in services:
-            cmd.domainid = "-".join([services["domainUUID"], random_gen()])
+            cmd.domainid = ("-".join([services["domainUUID"], random_gen()]) if randomizeID else services["domainUUID"])
 
         if name:
-            cmd.name = "-".join([name, random_gen()])
+            cmd.name = ("-".join([name, random_gen()]) if randomizeID else name)
         elif "name" in services:
-            cmd.name = "-".join([services["name"], random_gen()])
+            cmd.name = ("-".join([services["name"], random_gen()]) if randomizeID else services["name"])
 
         if networkdomain:
             cmd.networkdomain = networkdomain
@@ -101,7 +101,7 @@ class Account:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, admin=False, domainid=None):
+    def create(cls, api_client, services, admin=False, domainid=None, randomizeID=True):
         """Creates an account"""
         cmd = createAccount.createAccountCmd()
 
@@ -117,18 +117,21 @@ class Account:
 
         cmd.password = services["password"]
         username = services["username"]
-        # Limit account username to 99 chars to avoid failure
-        # 6 chars start string + 85 chars api_clientid + 6 chars random string + 2 chars joining hyphen string = 99
-        username = username[:6]
-        api_clientid = api_client.id[-85:] if len(api_client.id) > 85 else api_client.id
-        cmd.username = "-".join([username,
-                                 random_gen(uuid=api_clientid, size=6)])
+        if randomizeID:
+            # Limit account username to 99 chars to avoid failure
+            # 6 chars start string + 85 chars api_clientid + 6 chars random string + 2 chars joining hyphen string = 99
+            username = username[:6]
+            api_clientid = api_client.id[-85:] if len(api_client.id) > 85 else api_client.id
+            cmd.username = "-".join([username,
+                                     random_gen(uuid=api_clientid, size=6)])
+        else:
+            cmd.username = username
 
         if "accountUUID" in services:
-            cmd.accountid = "-".join([services["accountUUID"], random_gen()])
+            cmd.accountid = ("-".join([services["accountUUID"], random_gen()]) if randomizeID else services["accountUUID"])
 
         if "userUUID" in services:
-            cmd.userid = "-".join([services["userUUID"], random_gen()])
+            cmd.userid = ("-".join([services["userUUID"], random_gen()]) if randomizeID else services["userUUID"])
 
         if domainid:
             cmd.domainid = domainid
@@ -168,7 +171,7 @@ class User:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, account, domainid):
+    def create(cls, api_client, services, account, domainid, randomizeID=True):
         cmd = createUser.createUserCmd()
         """Creates an user"""
 
@@ -179,10 +182,10 @@ class User:
         cmd.lastname = services["lastname"]
 
         if "userUUID" in services:
-            cmd.userid = "-".join([services["userUUID"], random_gen()])
+            cmd.userid = ("-".join([services["userUUID"], random_gen()]) if randomizeID else services["userUUID"])
 
         cmd.password = services["password"]
-        cmd.username = "-".join([services["username"], random_gen()])
+        cmd.username = ("-".join([services["username"], random_gen()]) if randomizeID else services["username"])
         user = api_client.createUser(cmd)
 
         return User(user.__dict__)
@@ -4225,18 +4228,18 @@ class VPC:
 
     @classmethod
     def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
-               domainid=None, zone=None, data=None, **kwargs):
+               domainid=None, zone=None, data=None, randomizeID=True,  **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
 
         cmd = createVPC.createVPCCmd()
 
-        random_name = "-".join([services["name"], random_gen()])
+        random_name = ("-".join([services["name"], random_gen()]) if randomizeID else services["name"])
         cmd.name = random_name
 
         if "displaytext" in services:
-            random_displaytext = "-".join([services["displaytext"], random_gen()])
+            random_displaytext = ("-".join([services["displaytext"], random_gen()]) if randomizeID else services["displaytext"])
         else:
             random_displaytext = random_name
         cmd.displaytext = random_displaytext
