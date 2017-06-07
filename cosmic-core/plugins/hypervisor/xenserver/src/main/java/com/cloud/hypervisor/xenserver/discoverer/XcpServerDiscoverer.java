@@ -12,6 +12,7 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
@@ -42,6 +43,7 @@ import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServer650Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServerConnectionPool;
 import com.cloud.hypervisor.xenserver.resource.Xenserver625Resource;
+import com.cloud.model.Zone;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ResourceStateAdapter;
@@ -104,6 +106,8 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     VMTemplateDao _tmpltDao;
     @Inject
     HostPodDao _podDao;
+    @Inject
+    ZoneRepository _zoneRepository;
     private final String xs620snapshothotfix = "Xenserver-Vdi-Copy-HotFix";
 
     protected XcpServerDiscoverer() {
@@ -653,9 +657,10 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         }
 
         final HostPodVO pod = _podDao.findById(host.getPodId());
-        final DataCenterVO dc = _dcDao.findById(host.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+
         s_logger.info("Host: " + host.getName() + " connected with hypervisor type: " + HypervisorType.XenServer + ". Checking CIDR...");
-        _resourceMgr.checkCIDR(pod, dc, ssCmd.getPrivateIpAddress(), ssCmd.getPrivateNetmask());
+        _resourceMgr.checkCIDR(pod, zone, ssCmd.getPrivateIpAddress(), ssCmd.getPrivateNetmask());
         return _resourceMgr.fillRoutingHostVO(host, ssCmd, HypervisorType.XenServer, details, hostTags);
     }
 

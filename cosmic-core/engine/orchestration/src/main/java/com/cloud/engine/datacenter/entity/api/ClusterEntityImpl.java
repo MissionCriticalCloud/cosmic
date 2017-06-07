@@ -3,7 +3,7 @@ package com.cloud.engine.datacenter.entity.api;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.engine.datacenter.entity.api.db.EngineClusterVO;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Grouping.AllocationState;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import java.util.Date;

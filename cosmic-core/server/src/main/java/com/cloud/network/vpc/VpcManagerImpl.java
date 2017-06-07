@@ -31,6 +31,7 @@ import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -66,7 +67,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.org.Grouping;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -794,7 +794,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw new InvalidParameterValueException("Can't find zone by id specified");
         }
 
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
+        if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
             // See DataCenterVO.java
             final PermissionDeniedException ex = new PermissionDeniedException(
                     "Cannot perform this operation since specified Zone is currently disabled");
@@ -931,7 +931,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
-    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final String sourceNatList, final String syslogServerList) {
+    public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final
+    String sourceNatList, final String syslogServerList) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -1007,7 +1008,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         vpc.setRestartRequired(restartWithCleanupRequired);
 
         // always clear the sourceNatList if it is null and only set if sourceNatList is not null and current of new vpcOffering supports sourceNatService
-        if ( sourceNatList == null || (sourceNatList != null && ((vpcOfferingId != null && hasSourceNatService(vpc)) || hasSourceNatService(vpcToUpdate)))) {
+        if (sourceNatList == null || (sourceNatList != null && ((vpcOfferingId != null && hasSourceNatService(vpc)) || hasSourceNatService(vpcToUpdate)))) {
             vpc.setSourceNatList(sourceNatList);
         } else {
             // otherwise throw an exception
@@ -1047,7 +1048,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 for (final DomainRouterVO router : routers) {
                     // Validate that the router is running
                     if (router.getState() == VirtualMachine.State.Running) {
-                        if( !_routerMgr.updateVR(vpc, router)) {
+                        if (!_routerMgr.updateVR(vpc, router)) {
                             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to update VPC config");
                         }
                     }
@@ -1062,15 +1063,15 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final List<NetworkVO> networks = _ntwkDao.listByVpc(currentVpc.getId());
 
         // Services that the new offering supports
-        final List<String> newOfferingSupportedServicesStr =_vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
+        final List<String> newOfferingSupportedServicesStr = _vpcOffSvcMapDao.listServicesForVpcOffering(vpcOfferingId);
 
         final List<String> notSupportedServices = new LinkedList<>();
 
-        for (NetworkVO network: networks) {
+        for (NetworkVO network : networks) {
             final List<String> networkOfferingSupportedServicesStr = _ntwkOffServiceDao.listServicesForNetworkOffering(network.getNetworkOfferingId());
 
             for (final String serviceName : networkOfferingSupportedServicesStr) {
-                if (! newOfferingSupportedServicesStr.contains(serviceName) && ! notSupportedServices.contains(serviceName)) {
+                if (!newOfferingSupportedServicesStr.contains(serviceName) && !notSupportedServices.contains(serviceName)) {
                     notSupportedServices.add(serviceName);
                 }
             }
@@ -1388,7 +1389,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
     }
 
-    private boolean rollingRestartVpc(Vpc vpc, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException, ConcurrentOperationException, InsufficientCapacityException {
+    private boolean rollingRestartVpc(Vpc vpc, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException, ConcurrentOperationException,
+            InsufficientCapacityException {
         final int sleepTimeInMsAfterRouterStart = 10000;
         final int numberOfRoutersWhenSingle = 1;
         final int numberOfRoutersWhenRedundant = 2;
@@ -1399,7 +1401,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         if (routers != null && routers.size() == numberOfRoutersWhenSingle) {
             mainRouter = routers.get(0);
             s_logger.debug("Rolling restart found a single router " + mainRouter.getInstanceName() + " as part of rolling restart of VPC " + vpc);
-        } if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
+        }
+        if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
             DomainRouterVO router1 = routers.get(0);
             DomainRouterVO router2 = routers.get(1);
             if (router1.getRedundantState() == VirtualRouter.RedundantState.MASTER || router2.getRedundantState() == VirtualRouter.RedundantState.BACKUP) {
@@ -1413,7 +1416,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 mainRouter = router1;
                 secondaryRouter = router2;
             }
-            s_logger.debug("Rolling restart of VPC " + vpc + " will first replace router " + secondaryRouter.getInstanceName() + " and then router " + mainRouter.getInstanceName());
+            s_logger.debug("Rolling restart of VPC " + vpc + " will first replace router " + secondaryRouter.getInstanceName() + " and then router " + mainRouter.getInstanceName
+                    ());
         }
 
         DeployDestination dest = new DeployDestination(_dcDao.findById(vpc.getZoneId()), null, null, null);
@@ -1438,7 +1442,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         return true;
     }
 
-    private boolean replaceRouter(final Vpc vpc, final ReservationContext context, final int sleepTimeInMsAfterRouterStart, final DomainRouterVO routerToReplace, final DeployDestination dest) throws ResourceUnavailableException, InsufficientCapacityException {
+    private boolean replaceRouter(final Vpc vpc, final ReservationContext context, final int sleepTimeInMsAfterRouterStart, final DomainRouterVO routerToReplace, final
+    DeployDestination dest) throws ResourceUnavailableException, InsufficientCapacityException {
         if (routerToReplace != null) {
             s_logger.debug("Destroying router " + routerToReplace.getInstanceName() + " as part of rolling restart of VPC " + vpc);
             _routerMgr.destroyRouter(routerToReplace.getId(), context.getAccount(), context.getCaller().getId());
@@ -1458,7 +1463,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             // Both should be in state Running, or else the provisioning went wrong somehow as we started with destroying non-Running routers
             // In order not to kill both routers, we'll stop the procedure.
             if (router.getState() != VirtualMachine.State.Running) {
-                s_logger.debug("Found router " + router.getInstanceName() + " part of VPC " + vpc + " to be in non-Running state " + router.getState() + ", so not proceeding with" +
+                s_logger.debug("Found router " + router.getInstanceName() + " part of VPC " + vpc + " to be in non-Running state " + router.getState() + ", so not proceeding " +
+                        "with" +
                         "next router to prevent downtime. Please try again.");
                 return false;
             }

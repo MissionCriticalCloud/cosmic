@@ -4,7 +4,6 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.exception.AgentUnavailableException;
@@ -15,6 +14,7 @@ import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.Zone;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.fsm.NoTransitionException;
 
@@ -54,7 +54,7 @@ public interface ResourceManager extends ResourceService {
 
     public HostVO createHostVOForConnectedAgent(StartupCommand[] cmds);
 
-    public void checkCIDR(HostPodVO pod, DataCenterVO dc, String serverPrivateIP, String serverPrivateNetmask);
+    public void checkCIDR(HostPodVO pod, Zone zone, String serverPrivateIP, String serverPrivateNetmask);
 
     public HostVO fillRoutingHostVO(HostVO host, StartupRoutingCommand ssCmd, HypervisorType hyType, Map<String, String> details, List<String> hostTags);
 

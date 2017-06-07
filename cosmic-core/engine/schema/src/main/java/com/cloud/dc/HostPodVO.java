@@ -1,6 +1,6 @@
 package com.cloud.dc;
 
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
@@ -52,14 +52,11 @@ public class HostPodVO implements Pod {
         this.cidrAddress = cidrAddress;
         this.cidrSize = cidrSize;
         this.description = description;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.allocationState = AllocationState.Enabled;
         this.externalDhcp = false;
         this.uuid = UUID.randomUUID().toString();
     }
 
-    /*
-     * public HostPodVO(String name, long dcId) { this(null, name, dcId); }
-     */
     public HostPodVO() {
         this.uuid = UUID.randomUUID().toString();
     }

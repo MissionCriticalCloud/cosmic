@@ -1,14 +1,14 @@
 package com.cloud.event;
 
 import com.cloud.configuration.Config;
-import com.cloud.dc.DataCenterVO;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
+import com.cloud.model.Zone;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.component.ComponentContext;
 
@@ -30,14 +30,14 @@ public class AlertGenerator {
     private static final Logger s_logger = LoggerFactory.getLogger(AlertGenerator.class);
     protected static EventBus s_eventBus = null;
     protected static ConfigurationDao s_configDao;
-    private static DataCenterDao s_dcDao;
     private static HostPodDao s_podDao;
-    @Inject
-    DataCenterDao dcDao;
+    private static ZoneRepository s_zoneRepository;
     @Inject
     HostPodDao podDao;
     @Inject
     ConfigurationDao configDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     public AlertGenerator() {
     }
@@ -60,12 +60,12 @@ public class AlertGenerator {
                 new Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
 
         final Map<String, String> eventDescription = new HashMap<>();
-        final DataCenterVO dc = s_dcDao.findById(dataCenterId);
+        final Zone zone = s_zoneRepository.findOne(dataCenterId);
         final HostPodVO pod = s_podDao.findById(podId);
 
         eventDescription.put("event", alertType);
-        if (dc != null) {
-            eventDescription.put("dataCenterId", dc.getUuid());
+        if (zone != null) {
+            eventDescription.put("dataCenterId", zone.getUuid());
         } else {
             eventDescription.put("dataCenterId", null);
         }
@@ -91,8 +91,8 @@ public class AlertGenerator {
 
     @PostConstruct
     void init() {
-        s_dcDao = dcDao;
         s_podDao = podDao;
         s_configDao = configDao;
+        s_zoneRepository = zoneRepository;
     }
 }

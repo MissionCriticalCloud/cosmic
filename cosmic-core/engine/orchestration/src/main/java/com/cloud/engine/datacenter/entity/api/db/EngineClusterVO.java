@@ -4,8 +4,8 @@ import com.cloud.api.Identity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
@@ -76,7 +76,7 @@ public class EngineClusterVO implements EngineCluster, Identity {
 
     public EngineClusterVO() {
         clusterType = Cluster.ClusterType.CloudManaged;
-        allocationState = Grouping.AllocationState.Enabled;
+        allocationState = AllocationState.Enabled;
 
         this.uuid = UUID.randomUUID().toString();
         this.state = State.Disabled;
@@ -87,7 +87,7 @@ public class EngineClusterVO implements EngineCluster, Identity {
         this.podId = podId;
         this.name = name;
         this.clusterType = Cluster.ClusterType.CloudManaged;
-        this.allocationState = Grouping.AllocationState.Enabled;
+        this.allocationState = AllocationState.Enabled;
         this.managedState = ManagedState.Managed;
         this.uuid = UUID.randomUUID().toString();
         this.state = State.Disabled;

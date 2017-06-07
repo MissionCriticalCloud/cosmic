@@ -1,6 +1,7 @@
 package com.cloud.dc;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.org.Cluster;
 import com.cloud.org.Managed.ManagedState;
 import com.cloud.utils.NumbersUtil;

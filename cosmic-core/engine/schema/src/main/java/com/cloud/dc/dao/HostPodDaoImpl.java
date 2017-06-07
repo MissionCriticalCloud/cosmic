@@ -1,7 +1,7 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.HostPodVO;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
@@ -95,7 +95,7 @@ public class HostPodDaoImpl extends GenericDaoBase<HostPodVO, Long> implements H
     public List<Long> listDisabledPods(final long zoneId) {
         final SearchCriteria<Long> sc = PodIdSearch.create();
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
-        sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
+        sc.addAnd("allocationState", SearchCriteria.Op.EQ, AllocationState.Disabled);
         return customSearch(sc, null);
     }
 

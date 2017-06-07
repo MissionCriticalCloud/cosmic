@@ -137,10 +137,10 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.dao.NetworkDetailsDao;
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.network.security.dao.SecurityGroupVMMapDao;
-import com.cloud.org.Grouping;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.projects.ProjectInvitation;
@@ -2611,7 +2611,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                 sc.addAnd("domainId", SearchCriteria.Op.SC, sdc);
 
                 // remove disabled zones
-                sc.addAnd("allocationState", SearchCriteria.Op.NEQ, Grouping.AllocationState.Disabled);
+                sc.addAnd("allocationState", SearchCriteria.Op.NEQ, AllocationState.Disabled);
 
                 // accountId == null (zones dedicated to a domain) or
                 // accountId = caller
@@ -2658,7 +2658,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                 sc.addAnd("domainId", SearchCriteria.Op.SC, sdc);
 
                 // remove disabled zones
-                sc.addAnd("allocationState", SearchCriteria.Op.NEQ, Grouping.AllocationState.Disabled);
+                sc.addAnd("allocationState", SearchCriteria.Op.NEQ, AllocationState.Disabled);
 
                 // remove Dedicated zones not dedicated to this domainId or
                 // subdomainId

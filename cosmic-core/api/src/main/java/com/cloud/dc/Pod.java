@@ -3,12 +3,12 @@ package com.cloud.dc;
 import com.cloud.acl.InfrastructureEntity;
 import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 
 /**
  * Represents one pod in the cloud stack.
  */
-public interface Pod extends InfrastructureEntity, Grouping, Identity, InternalIdentity {
+public interface Pod extends InfrastructureEntity, Identity, InternalIdentity {
 
     String getCidrAddress();
 

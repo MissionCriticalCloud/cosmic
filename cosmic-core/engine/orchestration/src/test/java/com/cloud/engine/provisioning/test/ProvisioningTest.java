@@ -3,7 +3,6 @@
  */
 package com.cloud.engine.provisioning.test;
 
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.engine.datacenter.entity.api.ClusterEntity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.HostEntity;
@@ -18,6 +17,7 @@ import com.cloud.engine.datacenter.entity.api.db.dao.EngineDataCenterDao;
 import com.cloud.engine.datacenter.entity.api.db.dao.EngineHostDao;
 import com.cloud.engine.datacenter.entity.api.db.dao.EngineHostPodDao;
 import com.cloud.engine.service.api.ProvisioningService;
+import com.cloud.model.enumeration.NetworkType;
 
 import javax.inject.Inject;
 import java.util.HashMap;

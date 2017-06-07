@@ -3,7 +3,7 @@ package com.cloud.dc.dao;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.JoinBuilder;
@@ -186,7 +186,7 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
         if (podId != null) {
             sc.addAnd("podId", SearchCriteria.Op.EQ, podId);
         }
-        sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
+        sc.addAnd("allocationState", SearchCriteria.Op.EQ, AllocationState.Disabled);
         return customSearch(sc, null);
     }
 
@@ -206,7 +206,7 @@ public class ClusterDaoImpl extends GenericDaoBase<ClusterVO, Long> implements C
 
         final SearchCriteria<Long> sc = clusterIdSearch.create();
         sc.setJoinParameters("disabledPodIdSearch", "dataCenterId", zoneId);
-        sc.setJoinParameters("disabledPodIdSearch", "allocationState", Grouping.AllocationState.Disabled);
+        sc.setJoinParameters("disabledPodIdSearch", "allocationState", AllocationState.Disabled);
 
         return customSearch(sc, null);
     }

@@ -8,7 +8,6 @@ import com.cloud.configuration.Resource.ResourceOwnerType;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCountVO;
 import com.cloud.configuration.dao.ResourceCountDao;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -22,6 +21,7 @@ import com.cloud.framework.config.ConfigDepotAdmin;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
@@ -462,7 +462,8 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         final NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
         _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOffering);
 
-        final NetworkOfferingVO privateGatewayNetworkOfferingSpecifyVlan = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOfferingSpecifyVlan, GuestType.Private, true);
+        final NetworkOfferingVO privateGatewayNetworkOfferingSpecifyVlan = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOfferingSpecifyVlan, GuestType
+                .Private, true);
         _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOfferingSpecifyVlan);
 
         // Populate providers

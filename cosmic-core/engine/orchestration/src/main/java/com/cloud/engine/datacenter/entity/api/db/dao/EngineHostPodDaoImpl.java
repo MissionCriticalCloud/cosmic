@@ -4,7 +4,7 @@ import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State;
 import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Event;
 import com.cloud.engine.datacenter.entity.api.db.EngineHostPodVO;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
@@ -110,7 +110,7 @@ public class EngineHostPodDaoImpl extends GenericDaoBase<EngineHostPodVO, Long> 
 
         final SearchCriteria<Long> sc = podIdSearch.create();
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
-        sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
+        sc.addAnd("allocationState", SearchCriteria.Op.EQ, AllocationState.Disabled);
         return customSearch(sc, null);
     }
 

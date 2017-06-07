@@ -6,7 +6,7 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.PermissionDeniedException;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.exception.InvalidParameterValueException;
@@ -47,7 +47,7 @@ public class ResourceChecker {
     public void checkIfDataCenterIsUsable(final DataCenter dataCenter, final Account account) {
         final long dataCenterId = dataCenter.getId();
         logger.debug("Checking if data center " + dataCenterId + " is usable.");
-        if (Grouping.AllocationState.Disabled == dataCenter.getAllocationState() && !accountManager.isRootAdmin(account.getId())) {
+        if (AllocationState.Disabled == dataCenter.getAllocationState() && !accountManager.isRootAdmin(account.getId())) {
             final PermissionDeniedException ex = new PermissionDeniedException("Cannot perform this operation, data center with specified id is currently disabled");
             ex.addProxyObject(dataCenter.getUuid(), "dcId");
             throw ex;

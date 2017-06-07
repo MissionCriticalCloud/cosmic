@@ -6,7 +6,6 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -15,6 +14,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.State;
@@ -44,7 +44,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -121,8 +120,9 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     protected boolean canHandle(final NetworkOffering offering, final DataCenter dc, final PhysicalNetwork physicalNetwork) {
         // This guru handles only system Guest network
         if (dc.getNetworkType() == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) &&
-                isMyIsolationMethod(physicalNetwork) && ((offering.getGuestType() == GuestType.Isolated && offering.isSystemOnly()) || (offering.getGuestType() == GuestType.Private && !offering.isSystemOnly()))
-        ) {
+                isMyIsolationMethod(physicalNetwork) && ((offering.getGuestType() == GuestType.Isolated && offering.isSystemOnly()) || (offering.getGuestType() == GuestType
+                .Private && !offering.isSystemOnly()))
+                ) {
             return true;
         } else {
             s_logger.trace("We only take care of system Guest networks of type   " + GuestType.Isolated + " in zone of type " + NetworkType.Advanced);

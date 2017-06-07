@@ -32,7 +32,7 @@ import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.server.StatsCollector;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
@@ -163,7 +163,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
 
                 // Check if zone is disabled
-                if (Grouping.AllocationState.Disabled == zone.getAllocationState()) {
+                if (AllocationState.Disabled == zone.getAllocationState()) {
                     s_logger.info("Zone " + zoneId + " is disabled, so skip downloading template to its image store " + imageStore.getId());
                     continue;
                 }
@@ -418,7 +418,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                         }
 
                         // Check if zone is disabled
-                        if (Grouping.AllocationState.Disabled == zone.getAllocationState()) {
+                        if (AllocationState.Disabled == zone.getAllocationState()) {
                             s_logger.info("Zone " + zoneId + " is disabled, so skip downloading template to its image store " + imageStore.getId());
                             continue;
                         }

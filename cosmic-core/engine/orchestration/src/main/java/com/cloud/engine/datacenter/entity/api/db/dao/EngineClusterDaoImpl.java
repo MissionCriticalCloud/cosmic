@@ -6,7 +6,7 @@ import com.cloud.engine.datacenter.entity.api.DataCenterResourceEntity.State.Eve
 import com.cloud.engine.datacenter.entity.api.db.EngineClusterVO;
 import com.cloud.engine.datacenter.entity.api.db.EngineHostPodVO;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.JoinBuilder;
@@ -193,7 +193,7 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
         if (podId != null) {
             sc.addAnd("podId", SearchCriteria.Op.EQ, podId);
         }
-        sc.addAnd("allocationState", SearchCriteria.Op.EQ, Grouping.AllocationState.Disabled);
+        sc.addAnd("allocationState", SearchCriteria.Op.EQ, AllocationState.Disabled);
         return customSearch(sc, null);
     }
 
@@ -213,7 +213,7 @@ public class EngineClusterDaoImpl extends GenericDaoBase<EngineClusterVO, Long> 
 
         final SearchCriteria<Long> sc = clusterIdSearch.create();
         sc.setJoinParameters("disabledPodIdSearch", "dataCenterId", zoneId);
-        sc.setJoinParameters("disabledPodIdSearch", "allocationState", Grouping.AllocationState.Disabled);
+        sc.setJoinParameters("disabledPodIdSearch", "allocationState", AllocationState.Disabled);
 
         return customSearch(sc, null);
     }

@@ -79,8 +79,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.org.Grouping;
-import com.cloud.org.Grouping.AllocationState;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.resource.ResourceState;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementServer;
@@ -1390,7 +1389,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         }
         // Check if zone is disabled
         final Account account = CallContext.current().getCallingAccount();
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(account.getId())) {
+        if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(account.getId())) {
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
         }
 
@@ -1491,7 +1490,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         }
 
         final Account account = CallContext.current().getCallingAccount();
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(account.getId())) {
+        if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(account.getId())) {
             final PermissionDeniedException ex = new PermissionDeniedException(
                     "Cannot perform this operation, Zone with specified id is currently disabled");
             ex.addProxyObject(zone.getUuid(), "dcId");
@@ -1915,7 +1914,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             }
 
             final Account account = CallContext.current().getCallingAccount();
-            if (Grouping.AllocationState.Disabled == zone.getAllocationState()
+            if (AllocationState.Disabled == zone.getAllocationState()
                     && !_accountMgr.isRootAdmin(account.getId())) {
                 final PermissionDeniedException ex = new PermissionDeniedException(
                         "Cannot perform this operation, Zone with specified id is currently disabled");

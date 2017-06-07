@@ -21,7 +21,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
 import com.cloud.projects.ProjectManager;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.storage.GuestOS;
@@ -401,7 +401,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
                 throw new IllegalArgumentException("Please specify a valid zone.");
             }
             final Account caller = CallContext.current().getCallingAccount();
-            if (Grouping.AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
+            if (AllocationState.Disabled == zone.getAllocationState() && !_accountMgr.isRootAdmin(caller.getId())) {
                 throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
             }
         }

@@ -3,14 +3,12 @@ package com.cloud.dc;
 import com.cloud.acl.InfrastructureEntity;
 import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
-import com.cloud.org.Grouping;
+import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 
 import java.util.Map;
 
-/**
- *
- */
-public interface DataCenter extends InfrastructureEntity, Grouping, Identity, InternalIdentity {
+public interface DataCenter extends InfrastructureEntity, Identity, InternalIdentity {
 
     String getDns1();
 
@@ -61,8 +59,4 @@ public interface DataCenter extends InfrastructureEntity, Grouping, Identity, In
     String getZoneToken();
 
     boolean isLocalStorageEnabled();
-
-    public enum NetworkType {
-        Basic, Advanced,
-    }
 }

@@ -54,7 +54,6 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenter.NetworkType;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
@@ -114,6 +113,8 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
@@ -152,7 +153,6 @@ import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.org.Cluster;
-import com.cloud.org.Grouping;
 import com.cloud.projects.ProjectManager;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
@@ -1595,7 +1595,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             collectVmDiskStatistics(vm);
             final DataCenterVO dc = _dcDao.findById(vm.getDataCenterId());
             try {
-                if (dc.getNetworkType() == DataCenter.NetworkType.Advanced) {
+                if (dc.getNetworkType() == NetworkType.Advanced) {
                     //List all networks of vm
                     final List<Long> vmNetworks = _vmNetworkMapDao.getNetworks(vmId);
                     final List<DomainRouterVO> routers = new ArrayList<>();
@@ -1881,7 +1881,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Verify that zone is not Basic
         final DataCenterVO dc = _dcDao.findById(vmInstance.getDataCenterId());
-        if (dc.getNetworkType() == DataCenter.NetworkType.Basic) {
+        if (dc.getNetworkType() == NetworkType.Basic) {
             throw new CloudRuntimeException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't add a new NIC to a VM on a Basic Network");
         }
 
@@ -1969,7 +1969,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Verify that zone is not Basic
         final DataCenterVO dc = _dcDao.findById(vmInstance.getDataCenterId());
-        if (dc.getNetworkType() == DataCenter.NetworkType.Basic) {
+        if (dc.getNetworkType() == NetworkType.Basic) {
             throw new InvalidParameterValueException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't remove a NIC from a VM on a Basic Network");
         }
 
@@ -2040,7 +2040,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Verify that zone is not Basic
         final DataCenterVO dc = _dcDao.findById(vmInstance.getDataCenterId());
-        if (dc.getNetworkType() == DataCenter.NetworkType.Basic) {
+        if (dc.getNetworkType() == NetworkType.Basic) {
             throw new CloudRuntimeException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't change default NIC on a Basic Network");
         }
 
@@ -4348,7 +4348,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         assert !(requestedIps != null && (defaultIps.getIp4Address() != null || defaultIps.getIp6Address() != null)) : "requestedIp list and defaultNetworkIp should never be " +
                 "specified together";
 
-        if (Grouping.AllocationState.Disabled == zone.getAllocationState()
+        if (AllocationState.Disabled == zone.getAllocationState()
                 && !_accountMgr.isRootAdmin(caller.getId())) {
             throw new PermissionDeniedException(
                     "Cannot perform this operation, Zone is currently disabled: "
