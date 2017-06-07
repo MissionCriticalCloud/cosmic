@@ -55,6 +55,8 @@
 
     <logger name="org.springframework" level="WARN" />
 
+    <logger name="org.hibernate" level="WARN" />
+
     <logger name="com.cloud.api.ApiServlet" level="DEBUG" additivity="false">
         <appender-ref ref="API" />
     </logger>
