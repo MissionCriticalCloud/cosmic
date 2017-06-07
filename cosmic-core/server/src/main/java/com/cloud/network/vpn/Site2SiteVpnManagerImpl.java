@@ -494,6 +494,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         final boolean listAll = cmd.listAll();
         final long startIndex = cmd.getStartIndex();
         final long pageSizeVal = cmd.getPageSizeVal();
+        String keyword = cmd.getKeyword();
 
         final Account caller = CallContext.current().getCallingAccount();
         final List<Long> permittedAccounts = new ArrayList<>();
@@ -509,12 +510,16 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         _accountMgr.buildACLSearchBuilder(sb, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
 
         sb.and("id", sb.entity().getId(), SearchCriteria.Op.EQ);
+        sb.and("name", sb.entity().getName(), SearchCriteria.Op.LIKE);
 
         final SearchCriteria<Site2SiteCustomerGatewayVO> sc = sb.create();
         _accountMgr.buildACLSearchCriteria(sc, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
 
         if (id != null) {
-            sc.addAnd("id", SearchCriteria.Op.EQ, id);
+            sc.setParameters("id", id);
+        }
+        if(keyword != null && !keyword.isEmpty()) {
+            sc.setParameters("name", "%" + keyword + "%");
         }
 
         final Pair<List<Site2SiteCustomerGatewayVO>, Integer> result = _customerGatewayDao.searchAndCount(sc, searchFilter);
