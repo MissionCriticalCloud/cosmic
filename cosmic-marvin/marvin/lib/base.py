@@ -1602,7 +1602,11 @@ class NATRule:
         if projectid:
             cmd.projectid = projectid
 
+        if 'openfirewall' in services:
+            cmd.openfirewall = services['openfirewall']
+
         if openfirewall:
+            # FIXME: it should be `cmd.openfirewall = openfirewall`, not changed for backwards compatibility
             cmd.openfirewall = True
 
         if networkid:
