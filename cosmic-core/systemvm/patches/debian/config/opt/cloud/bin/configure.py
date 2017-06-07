@@ -821,7 +821,7 @@ class CsRemoteAccessVpn(CsDataBag):
 
         self.fw.append(["", "","-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
         self.fw.append(["", "","-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
-        self.fw.append(["nat", "","-I PREROUTING -i ppp+ -m tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
+        self.fw.append(["nat", "front","-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
 
         if self.config.is_vpc():
             return
