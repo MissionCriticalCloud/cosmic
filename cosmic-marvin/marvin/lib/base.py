@@ -30,8 +30,15 @@ from utils import (
     random_gen
 )
 
-import common
-
+from common import (
+    list_routers,
+    get_virtual_machine_offering,
+    get_template,
+    get_network_offering,
+    get_network_acl,
+    get_network,
+    get_vpc_offering
+)
 class Domain:
     """ Domain Life Cycle """
 
@@ -434,7 +441,7 @@ class VirtualMachine:
         elif "serviceoffering" in services:
             cmd.serviceofferingid = services["serviceoffering"]
         elif "serviceofferingname" in services:
-            serviceoffering = common.get_virtual_machine_offering(api_client, services["serviceofferingname"])
+            serviceoffering = get_virtual_machine_offering(api_client, services["serviceofferingname"])
             cmd.serviceofferingid = serviceoffering.id
 
         if zoneid:
@@ -491,7 +498,7 @@ class VirtualMachine:
         elif "template" in services:
             cmd.templateid = services["template"]
         elif "templatename" in services:
-            template = common.get_template(api_client, template_name=services["templatename"])
+            template = get_template(api_client, template_name=services["templatename"])
             cmd.templateid = template.id
 
         if diskofferingid:
@@ -666,6 +673,20 @@ class VirtualMachine:
             key_pair_file_location=keyPairFileLocation
         )
         return self.ssh_client
+
+    def test_ssh_connectivity(self, retries=2, expect_connection=True, retryinterv=None, timeout=None):
+
+        got_connection = False
+
+        try:
+            self.get_ssh_client(reconnect=True, retries=retries, retryinterv=retryinterv, timeout=timeout)
+            got_connection = True
+
+        except Exception as e:
+            if expect_connection:
+                raise Exception("Exception: %s" % e)
+
+        return expect_connection == got_connection
 
     def validateState(self, api_client, state, timeout=600, interval=5):
         """List VM and check if its state is as expected
@@ -2804,7 +2825,7 @@ class Network:
         elif "networkoffering" in services:
             cmd.networkofferingid = services["networkoffering"]
         elif "networkofferingname" in services:
-            networkoffering = common.get_network_offering(api_client, services["networkofferingname"])
+            networkoffering = get_network_offering(api_client, services["networkofferingname"])
             cmd.networkofferingid = networkoffering.id
 
         if zoneid:
@@ -2872,7 +2893,7 @@ class Network:
         elif acl:
             cmd.aclid = acl.id
         elif "aclname" in services:
-            acl = common.get_network_acl(api_client, services['aclname'])
+            acl = get_network_acl(api_client, services['aclname'])
             cmd.aclid = acl.id
         return Network(api_client.createNetwork(cmd).__dict__)
 
@@ -3042,6 +3063,15 @@ class NetworkACLList:
         if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
             cmd.listall = True
         return api_client.listNetworkACLLists(cmd)
+
+    def attach(self, api_client, network=None):
+        cmd = replaceNetworkACLList.replaceNetworkACLListCmd()
+        cmd.aclid = self.id
+
+        if network:
+            cmd.networkid = network.id
+
+        return api_client.replaceNetworkACLList(cmd)
 
 
 class Vpn:
@@ -4189,8 +4219,9 @@ class VpcOffering:
 class VPC:
     """Manage Virtual Private Connection"""
 
-    def __init__(self, items):
+    def __init__(self, items, api_client=None):
         self.__dict__.update(items)
+        self.api_client = api_client
 
     @classmethod
     def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
@@ -4213,7 +4244,7 @@ class VPC:
         if vpcofferingid:
             cmd.vpcofferingid = vpcofferingid
         elif "vpcofferingname" in services:
-            vpcoffering = common.get_vpc_offering(api_client, services["vpcofferingname"])
+            vpcoffering = get_vpc_offering(api_client, services["vpcofferingname"])
             cmd.vpcofferingid = vpcoffering.id
 
         if zoneid:
@@ -4256,13 +4287,15 @@ class VPC:
         cmd.id = self.id
         return api_client.deleteVPC(cmd)
 
-    def restart(self, api_client, cleanup=False):
+    def restart(self, api_client=None, cleanup=False):
         """Restarts the VPC connections"""
+        if api_client:
+            self.api_client = api_client
 
         cmd = restartVPC.restartVPCCmd()
         cmd.id = self.id
         cmd.cleanup = cleanup
-        return api_client.restartVPC(cmd)
+        return self.api_client.restartVPC(cmd)
 
     @classmethod
     def list(cls, api_client, **kwargs):
@@ -4273,6 +4306,41 @@ class VPC:
         if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
             cmd.listall = True
         return api_client.listVPCs(cmd)
+
+    def get_routers(self):
+        return list_routers(api_client=self.api_client, domainid=self.domainid, account=self.account, vpcid=self.id)
+
+    def stop_master_router(self):
+        routers = self.get_routers()
+
+        for router in routers:
+            if router.redundantstate == 'MASTER':
+                cmd = stopRouter.stopRouterCmd()
+                cmd.id = router.id
+                cmd.forced = 'true'
+                self.api_client.stopRouter(cmd)
+                break
+
+    def is_master_backup(self):
+        routers = self.get_routers()
+
+        if len(routers) != 2:
+            return False
+
+        for router in routers:
+            if router.state == 'Running':
+                if router.redundantstate == 'MASTER':
+                    master = router.hostid
+                elif router.redundantstate == 'BACKUP':
+                    backup = router.hostid
+                else:
+                    master = None
+                    backup = None
+
+        if master and backup and master != backup:
+            return True
+
+        return False
 
 
 class PrivateGateway:
@@ -4295,7 +4363,7 @@ class PrivateGateway:
         if networkid:
             cmd.networkid = networkid
         elif "privatenetworkname" in data:
-            network = common.get_network(api_client, data["privatenetworkname"])
+            network = get_network(api_client, data["privatenetworkname"])
             cmd.networkid = network.id
 
         if vpcid:
@@ -4309,7 +4377,7 @@ class PrivateGateway:
         if aclid:
             cmd.aclid = aclid
         elif "aclname" in data:
-            acl = common.get_network_acl(api_client, data["aclname"])
+            acl = get_network_acl(api_client, data["aclname"])
             cmd.aclid = acl.id
 
         return PrivateGateway(api_client.createPrivateGateway(cmd).__dict__)
