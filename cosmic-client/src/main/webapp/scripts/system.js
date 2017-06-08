@@ -10296,12 +10296,18 @@
                                             label: 'label.id'
                                         }
                                     }, {
-
-                                        isdedicated: {
-                                            label: 'label.dedicated'
+                                        dedicated: {
+                                            label: 'label.dedicated',
+                                            converter: cloudStack.converters.toBooleanText
                                         },
                                         domainname: {
                                             label: 'label.domain'
+                                        },
+                                        accountname: {
+                                            label: 'label.account'
+                                        },
+                                        affinitygroupname: {
+                                            label: 'label.affinity.group'
                                         }
                                     }],
 
@@ -10311,38 +10317,9 @@
                                         dataType: "json",
                                         async: true,
                                         success: function (json) {
-                                            var item = json.listhostsresponse.host[0];
-                                            $.ajax({
-                                                url: createURL("listDedicatedHosts&hostid=" + args.context.hosts[0].id),
-                                                dataType: "json",
-                                                async: false,
-                                                success: function (json) {
-                                                    if (json.listdedicatedhostsresponse.dedicatedhost != undefined) {
-                                                        var hostItem = json.listdedicatedhostsresponse.dedicatedhost[0];
-                                                        if (hostItem.domainid != null) {
-                                                            $.extend(item, {
-                                                                isdedicated: _l('label.yes'),
-                                                                domainid: hostItem.domainid
-                                                            });
-                                                        }
-                                                        if (hostItem.domainname != null) {
-                                                            $.extend(item, {
-                                                                isdedicated: _l('label.yes'),
-                                                                domainname: hostItem.domainname
-                                                            });
-                                                        }
-                                                    } else
-                                                        $.extend(item, {
-                                                            isdedicated: _l('label.no')
-                                                        })
-                                                },
-                                                error: function (json) {
-                                                    args.response.error(parseXMLHttpResponse(XMLHttpResponse));
-                                                }
-                                            });
                                             args.response.success({
                                                 actionFilter: hostActionfilter,
-                                                data: item
+                                                data: json.listhostsresponse.host[0]
                                             });
                                         }
                                     });
