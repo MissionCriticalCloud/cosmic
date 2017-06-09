@@ -11,7 +11,9 @@ public interface ManagementServerHost {
 
     String getServiceIP();
 
-    public static enum State {
+    String getName();
+
+    enum State {
         Up, Starting, Down
     }
 }

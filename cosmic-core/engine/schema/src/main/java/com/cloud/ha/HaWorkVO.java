@@ -1,8 +1,5 @@
 package com.cloud.ha;
 
-import com.cloud.api.InternalIdentity;
-import com.cloud.ha.HighAvailabilityManager.Step;
-import com.cloud.ha.HighAvailabilityManager.WorkType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -21,16 +18,15 @@ import java.util.Date;
 
 @Entity
 @Table(name = "op_ha_work")
-public class HaWorkVO implements InternalIdentity {
-    @Column(name = "tried")
-    int timesTried;
+public class HaWorkVO implements HaWork {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @Column(name = "instance_id", updatable = false, nullable = false)
     private long instanceId;    // vm_instance id
-    @Column(name = "mgmt_server_id", nullable = true)
+    @Column(name = "mgmt_server_id")
     private Long serverId;
     @Column(name = GenericDao.CREATED_COLUMN)
     private Date created;
@@ -39,10 +35,10 @@ public class HaWorkVO implements InternalIdentity {
     private State previousState;
     @Column(name = "host_id", nullable = false)
     private long hostId;
-    @Column(name = "taken", nullable = true)
+    @Column(name = "taken")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date dateTaken;
-    @Column(name = "time_to_try", nullable = true)
+    @Column(name = "time_to_try")
     private long timeToTry;
     @Column(name = "type", updatable = false, nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -51,10 +47,12 @@ public class HaWorkVO implements InternalIdentity {
     private long updateTime;
     @Column(name = "step", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private HighAvailabilityManager.Step step;
+    private Step step;
     @Column(name = "vm_type", updatable = false, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private VirtualMachine.Type type;
+    @Column(name = "tried")
+    private int timesTried;
 
     protected HaWorkVO() {
     }
@@ -79,14 +77,17 @@ public class HaWorkVO implements InternalIdentity {
         return id;
     }
 
+    @Override
     public long getInstanceId() {
         return instanceId;
     }
 
+    @Override
     public WorkType getWorkType() {
         return workType;
     }
 
+    @Override
     public Long getServerId() {
         return serverId;
     }
@@ -95,22 +96,26 @@ public class HaWorkVO implements InternalIdentity {
         this.serverId = serverId;
     }
 
+    @Override
     public VirtualMachine.Type getType() {
         return type;
     }
 
+    @Override
     public Date getCreated() {
         return created;
     }
 
-    public HighAvailabilityManager.Step getStep() {
+    @Override
+    public Step getStep() {
         return step;
     }
 
-    public void setStep(final HighAvailabilityManager.Step step) {
+    public void setStep(final Step step) {
         this.step = step;
     }
 
+    @Override
     public State getPreviousState() {
         return previousState;
     }
@@ -119,6 +124,7 @@ public class HaWorkVO implements InternalIdentity {
         this.previousState = state;
     }
 
+    @Override
     public Date getDateTaken() {
         return dateTaken;
     }
@@ -127,6 +133,7 @@ public class HaWorkVO implements InternalIdentity {
         this.dateTaken = taken;
     }
 
+    @Override
     public long getHostId() {
         return hostId;
     }
@@ -139,6 +146,7 @@ public class HaWorkVO implements InternalIdentity {
         return (timeToTry + interval) < (System.currentTimeMillis() >> 10);
     }
 
+    @Override
     public int getTimesTried() {
         return timesTried;
     }
@@ -147,6 +155,7 @@ public class HaWorkVO implements InternalIdentity {
         timesTried = time;
     }
 
+    @Override
     public long getUpdateTime() {
         return updateTime;
     }
@@ -155,6 +164,7 @@ public class HaWorkVO implements InternalIdentity {
         updateTime = time;
     }
 
+    @Override
     public long getTimeToTry() {
         return timeToTry;
     }

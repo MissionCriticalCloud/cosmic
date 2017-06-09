@@ -6,9 +6,9 @@
             var sections = [];
 
             if (isAdmin()) {
-                sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "domains", "events", "system", "global-settings", "configuration", "projects", "regions", "affinityGroups"];
+                sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "domains", "events", "system", "cloudOps", "global-settings", "projects", "configuration", "regions", "affinityGroups"];
             } else if (isDomainAdmin()) {
-                sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "domains", "events", "projects", "configuration", "regions", "affinityGroups"];
+                sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "domains", "events", "cloudOps", "projects", "configuration", "regions", "affinityGroups"];
             } else if (g_userProjectsEnabled) {
                 sections = ["dashboard", "instances", "storage", "network", "templates", "accounts", "events", "projects", "regions", "affinityGroups"];
             } else { //normal user
@@ -42,6 +42,7 @@
 
             regions: {}, //root-admin only
             system: {}, //root-admin only
+            cloudOps: {},
             'global-settings': {}, //root-admin only
             configuration: {}, //root-admin only
             plugins: {}

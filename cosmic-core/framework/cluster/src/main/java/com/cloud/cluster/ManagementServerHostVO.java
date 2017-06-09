@@ -23,36 +23,36 @@ public class ManagementServerHostVO implements ManagementServerHost {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "msid", updatable = true, nullable = false)
+    @Column(name = "msid", nullable = false)
     private long msid;
 
-    @Column(name = "runid", updatable = true, nullable = false)
+    @Column(name = "runid", nullable = false)
     private long runid;
 
-    @Column(name = "name", updatable = true, nullable = true)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "state", updatable = true, nullable = false)
+    @Column(name = "state", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ManagementServerHost.State state;
 
-    @Column(name = "version", updatable = true, nullable = true)
+    @Column(name = "version")
     private String version;
 
-    @Column(name = "service_ip", updatable = true, nullable = false)
+    @Column(name = "service_ip", nullable = false)
     private String serviceIP;
 
-    @Column(name = "service_port", updatable = true, nullable = false)
+    @Column(name = "service_port", nullable = false)
     private int servicePort;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_update", updatable = true, nullable = true)
+    @Column(name = "last_update")
     private Date lastUpdateTime;
 
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
-    @Column(name = "alert_count", updatable = true, nullable = false)
+    @Column(name = "alert_count", nullable = false)
     private int alertCount;
 
     public ManagementServerHostVO() {

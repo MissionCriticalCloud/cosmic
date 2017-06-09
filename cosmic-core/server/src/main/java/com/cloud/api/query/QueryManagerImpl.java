@@ -10,6 +10,7 @@ import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.ResourceDetail;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
+import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmdByAdmin;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
@@ -97,6 +98,7 @@ import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.EventResponse;
+import com.cloud.api.response.HAWorkerResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.HostTagResponse;
 import com.cloud.api.response.ImageStoreResponse;
@@ -116,6 +118,8 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.cluster.ManagementServerHost;
+import com.cloud.cluster.dao.ManagementServerHostDao;
 import com.cloud.context.CallContext;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DataCenterDetailsDao;
@@ -134,7 +138,11 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.ha.HaWorkVO;
 import com.cloud.ha.HighAvailabilityManager;
+import com.cloud.ha.dao.HighAvailabilityDao;
+import com.cloud.host.Host;
+import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.AllocationState;
@@ -211,23 +219,23 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
     private static final String ID_FIELD = "id";
     @Inject
-    UserVmDetailsDao _userVmDetailDao;
+    private UserVmDetailsDao _userVmDetailDao;
     @Inject
-    ResourceManager _resourceMgr;
+    private ResourceManager _resourceMgr;
     @Inject
-    AffinityGroupVMMapDao _affinityGroupVMMapDao;
+    private AffinityGroupVMMapDao _affinityGroupVMMapDao;
     @Inject
-    DataCenterDetailsDao _dcDetailsDao;
+    private DataCenterDetailsDao _dcDetailsDao;
     @Inject
-    DomainManager _domainMgr;
+    private DomainManager _domainMgr;
     @Inject
-    AffinityGroupDomainMapDao _affinityGroupDomainMapDao;
+    private AffinityGroupDomainMapDao _affinityGroupDomainMapDao;
     @Inject
-    NetworkDetailsDao _networkDetailsDao;
+    private NetworkDetailsDao _networkDetailsDao;
     @Inject
-    ResourceTagDao _resourceTagDao;
+    private ResourceTagDao _resourceTagDao;
     @Inject
-    DataStoreManager dataStoreManager;
+    private DataStoreManager dataStoreManager;
     @Inject
     private AccountManager _accountMgr;
     @Inject
@@ -298,6 +306,12 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     private DomainRouterDao _routerDao;
     @Inject
     private HighAvailabilityManager _haMgr;
+    @Inject
+    private HighAvailabilityDao _haDao;
+    @Inject
+    private ManagementServerHostDao _mgmtServerHostDao;
+    @Inject
+    private HostDao _hostDao;
     @Inject
     private VMTemplateDao _templateDao;
     @Inject
@@ -3431,6 +3445,62 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         response.setResponses(tagResponses, result.second());
 
         return response;
+    }
+
+    @Override
+    public ListResponse<HAWorkerResponse> listHAWorkers(final ListHAWorkersCmd cmd) {
+        final ListResponse<HAWorkerResponse> haWorkerList = new ListResponse<>();
+
+        final List<HaWorkVO> haWorkers = _haDao.listAll();
+        final List<HAWorkerResponse> haWorkerResponses = new ArrayList<>();
+
+        haWorkers.stream().filter(
+                haWorker -> {
+                    final Account account = CallContext.current().getCallingAccount();
+                    final VirtualMachine virtualMachine = _vmInstanceDao.findById(haWorker.getInstanceId());
+
+                    return (account.getDomainId() == Domain.ROOT_DOMAIN || account.getDomainId() == virtualMachine.getDomainId())
+                            && (cmd.getId() == null || (cmd.getId() != null && haWorker.getId() == cmd.getId()));
+                }
+        ).forEach(
+                haWorker -> {
+                    final VirtualMachine virtualMachine = _vmInstanceDao.findById(haWorker.getInstanceId());
+                    final Domain domain = _domainDao.findById(virtualMachine.getDomainId());
+                    final Host host = _hostDao.findById(haWorker.getHostId());
+
+                    final HAWorkerResponse haWorkerResponse = new HAWorkerResponse();
+                    haWorkerResponse.setObjectName("haworker");
+
+                    haWorkerResponse.setId(haWorker.getId());
+                    haWorkerResponse.setType(haWorker.getWorkType());
+                    haWorkerResponse.setCreated(haWorker.getCreated());
+                    haWorkerResponse.setStep(haWorker.getStep());
+                    haWorkerResponse.setTaken(haWorker.getDateTaken());
+                    haWorkerResponse.setState(haWorker.getPreviousState());
+
+                    haWorkerResponse.setVirtualMachineId(virtualMachine.getUuid());
+                    haWorkerResponse.setVirtualMachineName(virtualMachine.getInstanceName());
+                    haWorkerResponse.setVirtualMachineState(virtualMachine.getState());
+
+                    haWorkerResponse.setHypervisor(host.getName());
+
+                    if (haWorker.getServerId() != null) {
+                        final ManagementServerHost managementServerHost = _mgmtServerHostDao.findByMsid(haWorker.getServerId());
+                        if (managementServerHost != null) {
+                            haWorkerResponse.setManagementServerName(managementServerHost.getName());
+                        }
+                    }
+
+                    haWorkerResponse.setDomainId(domain.getUuid());
+                    haWorkerResponse.setDomainName(domain.getName());
+
+                    haWorkerResponses.add(haWorkerResponse);
+                }
+        );
+
+        haWorkerList.setResponses(haWorkerResponses);
+
+        return haWorkerList;
     }
 
     private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {

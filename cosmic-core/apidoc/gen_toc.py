@@ -36,7 +36,6 @@ dirname_to_dirname = {
 
 known_categories = {
     'Cisco': 'External Device',
-    'SystemVm': 'System VM',
     'VirtualMachine': 'Virtual Machine',
     'VM': 'Virtual Machine',
     'Domain': 'Domain',
@@ -141,7 +140,8 @@ known_categories = {
     'releaseDedicatedHost': 'Dedicate Resources',
     'CacheStores': 'Cache Stores',
     'CacheStore': 'Cache Store',
-    'StratosphereSsp': ' Stratosphere SSP'
+    'StratosphereSsp': ' Stratosphere SSP',
+    'listHAWorkers': 'CloudOps'
 }
 
 categories = { }
