@@ -25,11 +25,11 @@ import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.alert.AlertManager;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConnectionException;
@@ -144,8 +144,6 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
     @Inject
     protected HostDao _hostDao = null;
     @Inject
-    protected DataCenterDao _dcDao = null;
-    @Inject
     protected HostPodDao _podDao = null;
     @Inject
     protected ConfigurationDao _configDao = null;
@@ -165,9 +163,11 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
     protected ScheduledExecutorService _cronJobExecutor;
     protected ScheduledExecutorService _monitorExecutor;
     protected StateMachine2<Status, Status.Event, Host> _statusStateMachine = Status.getStateMachine();
+    private int _directAgentThreadCap;
     @Inject
     ResourceManager _resourceMgr;
-    private int _directAgentThreadCap;
+    @Inject
+    private ZoneRepository _zoneRepository;
 
     protected AgentManagerImpl() {
     }
@@ -475,9 +475,9 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                             return false;
                         }
                     } else if (currentStatus == Status.Up) {
-                        final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                        final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
                         final HostPodVO podVO = _podDao.findById(host.getPodId());
-                        final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
+                        final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
                         if (host.getType() != Host.Type.SecondaryStorage && host.getType() != Host.Type.ConsoleProxy) {
                             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Host disconnected, " + hostDesc,
                                     "If the agent for host [" + hostDesc + "] is not restarted within " + AlertWait + " seconds, host will go to Alert state");
@@ -486,10 +486,10 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                     }
                 } else {
                     // if we end up here we are in alert state, send an alert
-                    final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
                     final HostPodVO podVO = _podDao.findById(host.getPodId());
                     final String podName = podVO != null ? podVO.getName() : "NO POD";
-                    final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podName;
+                    final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podName;
                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Host in ALERT state, " + hostDesc,
                             "In availability zone " + host.getDataCenterId() + ", host is in alert state: " + host.getId() + "-" + host.getName());
                 }
@@ -1449,10 +1449,10 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                                 if (!gatewayAccessible) {
                                     // alert that host lost connection to
                                     // gateway (cannot ping the default route)
-                                    final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
                                     final HostPodVO podVO = _podDao.findById(host.getPodId());
                                     final String hostDesc =
-                                            "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: "
+                                            "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: "
                                                     + podVO.getName();
 
                                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_ROUTING, host.getDataCenterId(), host.getPodId(),
@@ -1537,9 +1537,9 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
 
             for (final HostVO host : hosts) {
                 if (_resourceMgr.checkAndMaintain(host.getId())) {
-                    final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
                     final HostPodVO podVO = _podDao.findById(host.getPodId());
-                    final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
+                    final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Migration Complete for host " + hostDesc, "Host ["
                             + hostDesc + "] is ready for maintenance");
                 }
