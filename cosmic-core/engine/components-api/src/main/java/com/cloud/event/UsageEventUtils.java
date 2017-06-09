@@ -1,7 +1,7 @@
 package com.cloud.event;
 
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.event.dao.UsageEventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.Event;
@@ -30,15 +30,15 @@ public class UsageEventUtils {
     protected static ConfigurationDao s_configDao;
     private static UsageEventDao s_usageEventDao;
     private static AccountDao s_accountDao;
-    private static DataCenterDao s_dcDao;
+    private static ZoneRepository s_zoneRepository;
     @Inject
     UsageEventDao usageEventDao;
     @Inject
     AccountDao accountDao;
     @Inject
-    DataCenterDao dcDao;
-    @Inject
     ConfigurationDao configDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     public UsageEventUtils() {
     }
@@ -69,7 +69,7 @@ public class UsageEventUtils {
         }
 
         final Account account = s_accountDao.findById(accountId);
-        final DataCenterVO dc = s_dcDao.findById(zoneId);
+        final Zone zone = s_zoneRepository.findOne(zoneId);
 
         // if account has been deleted, this might be called during cleanup of resources and results in null pointer
         if (account == null) {
@@ -78,8 +78,8 @@ public class UsageEventUtils {
 
         // if an invalid zone is passed in, create event without zone UUID
         String zoneUuid = null;
-        if (dc != null) {
-            zoneUuid = dc.getUuid();
+        if (zone != null) {
+            zoneUuid = zone.getUuid();
         }
 
         final Event event = new Event(Name, EventCategory.USAGE_EVENT.getName(), usageEventType, resourceType, resourceUUID);
@@ -204,7 +204,7 @@ public class UsageEventUtils {
     void init() {
         s_usageEventDao = usageEventDao;
         s_accountDao = accountDao;
-        s_dcDao = dcDao;
         s_configDao = configDao;
+        s_zoneRepository = zoneRepository;
     }
 }
