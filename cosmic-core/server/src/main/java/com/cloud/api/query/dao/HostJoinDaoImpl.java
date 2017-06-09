@@ -1,5 +1,7 @@
 package com.cloud.api.query.dao;
 
+import com.cloud.affinity.AffinityGroupVO;
+import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.api.ApiConstants.HostDetails;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.vo.HostJoinVO;
@@ -7,6 +9,10 @@ import com.cloud.api.response.GpuResponse;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.VgpuResponse;
+import com.cloud.dc.DedicatedResourceVO;
+import com.cloud.dc.dao.DedicatedResourceDao;
+import com.cloud.domain.DomainVO;
+import com.cloud.domain.dao.DomainDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
@@ -16,6 +22,8 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.storage.StorageStats;
+import com.cloud.user.AccountVO;
+import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
@@ -43,6 +51,14 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
     private ConfigurationDao _configDao;
     @Inject
     private HostDao hostDao;
+    @Inject
+    private DedicatedResourceDao dedicatedResourceDao;
+    @Inject
+    private DomainDao domainDao;
+    @Inject
+    private AccountDao accountDao;
+    @Inject
+    private AffinityGroupDao affinityGroupDao;
 
     protected HostJoinDaoImpl() {
 
@@ -79,6 +95,29 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setIpAddress(host.getPrivateIpAddress());
         hostResponse.setVersion(host.getVersion());
         hostResponse.setCreated(host.getCreated());
+
+        final DedicatedResourceVO dedicatedResourceVO = dedicatedResourceDao.findByHostId(host.getId());
+        if (dedicatedResourceVO != null) {
+            hostResponse.setDedicated(true);
+
+            final DomainVO domainVO = domainDao.findById(dedicatedResourceVO.getDomainId());
+            if (domainVO != null) {
+                hostResponse.setDomainId(domainVO.getUuid());
+                hostResponse.setDomainName(domainVO.getName());
+            }
+
+            final AccountVO accountVO = accountDao.findById(dedicatedResourceVO.getAccountId());
+            if (accountVO != null) {
+                hostResponse.setAccountId(accountVO.getUuid());
+                hostResponse.setAccountName(accountVO.getAccountName());
+            }
+
+            final AffinityGroupVO affinityGroupVO = affinityGroupDao.findById(dedicatedResourceVO.getAffinityGroupId());
+            if (affinityGroupVO != null) {
+                hostResponse.setAffinityGroupId(affinityGroupVO.getUuid());
+                hostResponse.setAffinityGroupName(affinityGroupVO.getName());
+            }
+        }
 
         final List<HostGpuGroupsVO> gpuGroups = ApiDBUtils.getGpuGroups(host.getId());
         if (gpuGroups != null && !gpuGroups.isEmpty()) {

@@ -202,6 +202,34 @@ public class HostResponse extends BaseResponse {
     @Param(description = "Host details in key/value pairs.", since = "4.5")
     private Map details;
 
+    @SerializedName(ApiConstants.DEDICATED)
+    @Param(description = "Is the host dedicated?")
+    private Boolean dedicated = Boolean.FALSE;
+
+    @SerializedName(ApiConstants.DOMAIN_ID)
+    @Param(description = "Domain ID to which the host is dedicated")
+    private String domainId;
+
+    @SerializedName(ApiConstants.DOMAIN_NAME)
+    @Param(description = "Domain name to which the host is dedicated")
+    private String domainName;
+
+    @SerializedName(ApiConstants.ACCOUNT_ID)
+    @Param(description = "Account ID to which the host is dedicated")
+    private String accountId;
+
+    @SerializedName(ApiConstants.ACCOUNT_NAME)
+    @Param(description = "Account name to which the host is dedicated")
+    private String accountName;
+
+    @SerializedName(ApiConstants.AFFINITY_GROUP_ID)
+    @Param(description = "Affinity group ID to which the host is dedicated")
+    private String affinityGroupId;
+
+    @SerializedName(ApiConstants.AFFINITY_GROUP_NAME)
+    @Param(description = "Affinity group name to which the host is dedicated")
+    private String affinityGroupName;
+
     // Default visibility to support accessing the details from unit tests
     Map getDetails() {
         return details;
@@ -427,5 +455,33 @@ public class HostResponse extends BaseResponse {
 
     public void setHaHost(final Boolean haHost) {
         this.haHost = haHost;
+    }
+
+    public void setDedicated(final boolean dedicated) {
+        this.dedicated = dedicated;
+    }
+
+    public void setDomainId(final String domainId) {
+        this.domainId = domainId;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setAccountId(final String accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void setAffinityGroupId(final String affinityGroupId) {
+        this.affinityGroupId = affinityGroupId;
+    }
+
+    public void setAffinityGroupName(final String affinityGroupName) {
+        this.affinityGroupName = affinityGroupName;
     }
 }
