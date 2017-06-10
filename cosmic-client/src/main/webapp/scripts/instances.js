@@ -1506,11 +1506,11 @@
                                                     'Not Suitable-Storage migration required': 'notsuitable notsuitable-storage-migration-required'
                                                 }
                                             },
-                                            cpuused: {
-                                                label: 'label.cpu.utilized'
+                                            cpuallocated: {
+                                                label: 'label.cpu.allocated'
                                             },
-                                            memoryused: {
-                                                label: 'label.memory.used'
+                                            memoryavailable: {
+                                                label: 'label.memory.available'
                                             }
                                         },
                                         dataProvider: function(args) {
@@ -1529,6 +1529,11 @@
                                                 success: function(json) {
                                                     if (json.findhostsformigrationresponse.host != undefined) {
                                                         vmMigrationHostObjs = json.findhostsformigrationresponse.host;
+                                                        if (vmMigrationHostObjs != null && vmMigrationHostObjs.length > 0) {
+                                                            vmMigrationHostObjs.sort(function (a, b) {
+                                                                return a.name.localeCompare(b.name);
+                                                            });
+                                                        }
                                                         var items = [];
                                                         $(vmMigrationHostObjs).each(function() {
                                                             var suitability = (this.suitableformigration ? "Suitable" : "Not Suitable");
@@ -1539,8 +1544,8 @@
                                                                 id: this.id,
                                                                 availableHostName: this.name,
                                                                 availableHostSuitability: suitability,
-                                                                cpuused: this.cpuused,
-                                                                memoryused: (parseFloat(this.memoryused)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB'
+                                                                cpuallocated: this.cpuallocated,
+                                                                memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB'
                                                             });
                                                         });
                                                         args.response.success({
