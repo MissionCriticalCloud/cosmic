@@ -24,22 +24,23 @@ tools, and/or a full-featured query based API.
 
 Cosmic officials Git repository is located at:
 
-    https://github.com/missioncriticalcloud/cosmic
+    https://github.com/MissionCriticalCloud/cosmic
 
 ## Building from Source
 
 Cosmic requires:
 - Java 8
-- GitHub account with an [enabled SSH key] (https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/) because you need to clone over SSH to get all the submodules
-- Maven settings configured to use [Cosmic's Nexus repository](https://beta-nexus.mcc.schubergphilis.com) (see [Maven settings](#maven-settings) bellow)
+- Maven settings configured to use [Cosmic's Nexus repository](https://beta-nexus.mcc.schubergphilis.com) (see [Maven settings](#maven-settings) below)
 
-In order to build Cosmic, you have to follow the steps below:
+In order to build Cosmic, you have to follow these steps:
 
-    git clone git@github.com:MissionCriticalCloud/cosmic.git
+    git clone https://github.com/MissionCriticalCloud/cosmic.git
     cd cosmic
     mvn clean install -P developer,systemvm
 
 The steps above will build the essentials to get Cosmic management server working. Besides that, you will also need a hypervisor. See our [build stream configuration](https://beta-jenkins.mcc.schubergphilis.com) for more details.
+
+This will run the UI and API:
 
     cd cosmic-client
     mvn -pl :cloud-client-ui jetty:run
@@ -97,22 +98,27 @@ Either enable the `beta-nexus` profile on the command line, or make it enabled b
 ...
 ```
 
-## Building RPM Packages
-
-In order to build Cosmic RPM packages, please refer to the [Packaging repository](https://github.com/MissionCriticalCloud/packaging) README section.
-
 ## Links
 
-Cosmic is a fork of Apache CloudStack and its API is backwards compatible with CloudStack's API. So, all the documentation can be accessed from:
+Cosmic is a fork of Apache CloudStack and its API is mostly backwards compatible with CloudStack's API. So, all the documentation can be accessed from http://docs.cloudstack.apache.org.
 
-* [Documentation](http://docs.cloudstack.apache.org)
-* [API documentation](http://cloudstack.apache.org/docs/api)
+[API documentation](http://apidoc.cosmiccloud.io/) for Cosmic is on a separate page.
 
 ## Getting Involved
 
 Please, join our Slack channel for more details:
 
 * [Mission Critical Cloud](https://missioncriticalcloud.slack.com)
+
+If you want an invite, please e-mail `int-cloud@schubergphilis.com` and we'll welcome you on Slack soon.
+
+## Development environment "The Bubble"
+
+For ease of development, testing and evaluating we created a project called [The Bubble](https://github.com/MissionCriticalCloud/bubble-blueprint). The Bubble is a single host or VM, that hosts all the VMs to build a Cosmic Cloud. A special [Bubble Toolkit](https://github.com/MissionCriticalCloud/bubble-toolkit) project exists to automate common tasks. This is also where our CI scripts live.
+
+## Submitting code
+
+Feel free to open a Pull Request. Our [CI system](https://beta-jenkins.mcc.schubergphilis.com/job/cosmic/) will automatically kick-in and build a real cloud based on your branch. The test results will be reported on the Gighub Pull Request. Our policy is to only merge when Pull Requests builds are green. After merge, another build is started to verify it once in master.
 
 ## Reporting Security Vulnerabilities
 
