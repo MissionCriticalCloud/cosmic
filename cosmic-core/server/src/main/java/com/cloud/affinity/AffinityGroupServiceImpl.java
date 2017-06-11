@@ -9,6 +9,8 @@ import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.api.command.user.affinitygroup.CreateAffinityGroupCmd;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.dc.DedicatedResourceVO;
+import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
@@ -74,6 +76,8 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     private String _name;
     @Inject
     private UserVmDao _userVmDao;
+    @Inject
+    DedicatedResourceDao _dedicatedDao;
 
     public List<AffinityGroupProcessor> getAffinityGroupProcessors() {
         return _affinityProcessors;
@@ -397,24 +401,43 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
 
         // check that the affinity groups exist
         for (final Long affinityGroupId : affinityGroupIds) {
-            final AffinityGroupVO ag = _affinityGroupDao.findById(affinityGroupId);
-            if (ag == null) {
+            final AffinityGroupVO AffinityGroupVO = _affinityGroupDao.findById(affinityGroupId);
+            if (AffinityGroupVO == null) {
                 throw new InvalidParameterValueException("Unable to find affinity group by id " + affinityGroupId);
             } else {
                 // verify permissions (same as when deploying VM)
-                _accountMgr.checkAccess(caller, null, false, owner, ag);
+                _accountMgr.checkAccess(caller, null, false, owner, AffinityGroupVO);
 
                 // Only Explicit Dedication can be handled in non-Stopped state
-                if (!ag.getType().equals("ExplicitDedication") && !vmInstance.getState().equals(State.Stopped)) {
-                    throw new InvalidParameterValueException("Unable update affinity groups of the virtual machine " + vmInstance.toString() + " " + "in state " +
-                            vmInstance.getState() + "; make sure the virtual machine is stopped and not in an error state before updating.");
-                }
+                if ("ExplicitDedication".equals(AffinityGroupVO.getType())) {
+                    // Check if VM is currently running on host Explicitly Dedicated to this domain
+                    Boolean VmRunsOnDedicatedHost = false;
 
+                    final Pair<List<DedicatedResourceVO>, Integer> result =
+                            _dedicatedDao.searchDedicatedHosts(vmInstance.getHostId(), vmInstance.getDomainId(), null, affinityGroupId);
+                    final List<DedicatedResourceVO> DedicatedResourceList = result.first();
+                    for (final DedicatedResourceVO dedicatedResourceVO : DedicatedResourceList) {
+                        if (dedicatedResourceVO.getHostId() != null && dedicatedResourceVO.getHostId().equals(vmInstance.getHostId())) {
+                            VmRunsOnDedicatedHost = true;
+                        }
+                    }
+
+                    if (!VmRunsOnDedicatedHost) {
+                        throw new InvalidParameterValueException("Unable update Explicit Dedication affinity groups of the virtual machine " + vmInstance.toString() +
+                                " " + "in state " + vmInstance.getState() + "; make sure the virtual machine is either stopped or running on a host that is part of the " +
+                                "Explicit Dedication Affinity Group.");
+                    }
+                } else {
+                    if (!State.Stopped.equals(vmInstance.getState())) {
+                        throw new InvalidParameterValueException("Unable update affinity groups of the virtual machine " + vmInstance.toString() + " " + "in state " +
+                                vmInstance.getState() + "; make sure the virtual machine is stopped and not in an error state before updating.");
+                    }
+                }
                 // Root admin has access to both VM and AG by default, but make sure the
                 // owner of these entities is same
                 if (caller.getId() == Account.ACCOUNT_ID_SYSTEM || _accountMgr.isRootAdmin(caller.getId())) {
-                    if (ag.getAccountId() != owner.getAccountId()) {
-                        throw new PermissionDeniedException("Affinity Group " + ag + " does not belong to the VM's account");
+                    if (AffinityGroupVO.getAccountId() != owner.getAccountId()) {
+                        throw new PermissionDeniedException("Affinity Group " + AffinityGroupVO + " does not belong to the VM's account");
                     }
                 }
             }
