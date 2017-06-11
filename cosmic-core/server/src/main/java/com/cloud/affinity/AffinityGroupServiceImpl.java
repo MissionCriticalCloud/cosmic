@@ -408,8 +408,9 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
             if (ag == null) {
                 throw new InvalidParameterValueException("Unable to find affinity group by id " + affinityGroupId);
             } else {
-                // verify permissions
-                _accountMgr.checkAccess(caller, null, true, owner, ag);
+                // verify permissions (same as when deploying VM)
+                _accountMgr.checkAccess(caller, null, false, owner, ag);
+
                 // Root admin has access to both VM and AG by default, but make sure the
                 // owner of these entities is same
                 if (caller.getId() == Account.ACCOUNT_ID_SYSTEM || _accountMgr.isRootAdmin(caller.getId())) {
