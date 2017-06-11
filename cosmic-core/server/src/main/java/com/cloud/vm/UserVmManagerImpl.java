@@ -2972,31 +2972,41 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         //if srcHost is explicitly dedicated and destination Host is not
         if (srcExplDedicated && !destExplDedicated) {
             //raise an alert
-            final String msg = "VM is being migrated from a explicitly dedicated host " + srcHost.getName() + " to non-dedicated host " + destHost.getName();
+            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a explicitly dedicated host " + srcHost.getName() + " to non-dedicated host " + destHost.getName();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
             s_logger.warn(msg);
         }
         //if srcHost is non dedicated but destination Host is explicitly dedicated
         if (!srcExplDedicated && destExplDedicated) {
             //raise an alert
-            final String msg = "VM is being migrated from a non dedicated host " + srcHost.getName() + " to a explicitly dedicated host " + destHost.getName();
+            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a non dedicated host " + srcHost.getName() + " to a explicitly dedicated host " + destHost.getName();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
             s_logger.warn(msg);
         }
 
-        //if hosts are dedicated to different account/domains, raise an alert
+        // Don't allow it when hosts are dedicated to different account/domains
         if (srcExplDedicated && destExplDedicated) {
             if (!(accountOfDedicatedHost(srcHost) == null || accountOfDedicatedHost(srcHost).equals(accountOfDedicatedHost(destHost)))) {
-                final String msg = "VM is being migrated from host " + srcHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost(srcHost) + " to host "
+                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost(srcHost) + " to host "
                         + destHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost(destHost);
-                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
-                s_logger.warn(msg);
+                s_logger.error(msg);
+                throw new InvalidParameterValueException(msg);
             }
             if (!(domainOfDedicatedHost(srcHost) == null || domainOfDedicatedHost(srcHost).equals(domainOfDedicatedHost(destHost)))) {
-                final String msg = "VM is being migrated from host " + srcHost.getName() + " explicitly dedicated to domain " + domainOfDedicatedHost(srcHost) + " to host "
-                        + destHost.getName() + " explicitly dedicated to domain " + domainOfDedicatedHost(destHost);
-                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
-                s_logger.warn(msg);
+                final Domain srcDomain = _domainDao.findById(domainOfDedicatedHost(srcHost));
+                String srcDomainName = domainOfDedicatedHost(srcHost).toString();
+                if (srcDomain != null) {
+                    srcDomainName = srcDomain.getName();
+                }
+                final Domain destDomain = _domainDao.findById(domainOfDedicatedHost(destHost));
+                String destDomainName = domainOfDedicatedHost(destHost).toString();
+                if (destDomain != null) {
+                    destDomainName = destDomain.getName();
+                }
+                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to domain " + srcDomainName + " to host "
+                        + destHost.getName() + " explicitly dedicated to domain " + destDomainName;
+                s_logger.error(msg);
+                throw new InvalidParameterValueException(msg);
             }
         }
 
