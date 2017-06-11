@@ -1497,6 +1497,9 @@
                                             availableHostName: {
                                                 label: 'label.name'
                                             },
+                                            dedicated: {
+                                                label: 'label.dedicated'
+                                            },
                                             availableHostSuitability: {
                                                 label: 'label.suitability',
                                                 indicator: {
@@ -1540,12 +1543,15 @@
                                                             if (this.requiresStorageMotion == true) {
                                                                 suitability += ("-Storage migration required");
                                                             }
+                                                            var dedicated = (this.dedicated ? "Yes, to " + this.domainname : _l('label.no'));
+
                                                             items.push({
                                                                 id: this.id,
                                                                 availableHostName: this.name,
                                                                 availableHostSuitability: suitability,
                                                                 cpuallocated: this.cpuallocated,
-                                                                memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB'
+                                                                memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB',
+                                                                dedicated: dedicated
                                                             });
                                                         });
                                                         args.response.success({
