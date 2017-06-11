@@ -392,13 +392,6 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
             throw new InvalidParameterValueException("Unable to find a virtual machine with id " + vmId);
         }
 
-        // Check that the VM is stopped
-        if (!vmInstance.getState().equals(State.Stopped)) {
-            s_logger.warn("Unable to update affinity groups of the virtual machine " + vmInstance.toString() + " in state " + vmInstance.getState());
-            throw new InvalidParameterValueException("Unable update affinity groups of the virtual machine " + vmInstance.toString() + " " + "in state " +
-                    vmInstance.getState() + "; make sure the virtual machine is stopped and not in an error state before updating.");
-        }
-
         final Account caller = CallContext.current().getCallingAccount();
         final Account owner = _accountMgr.getAccount(vmInstance.getAccountId());
 
@@ -410,6 +403,12 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
             } else {
                 // verify permissions (same as when deploying VM)
                 _accountMgr.checkAccess(caller, null, false, owner, ag);
+
+                // Only Explicit Dedication can be handled in non-Stopped state
+                if (!ag.getType().equals("ExplicitDedication") && !vmInstance.getState().equals(State.Stopped)) {
+                    throw new InvalidParameterValueException("Unable update affinity groups of the virtual machine " + vmInstance.toString() + " " + "in state " +
+                            vmInstance.getState() + "; make sure the virtual machine is stopped and not in an error state before updating.");
+                }
 
                 // Root admin has access to both VM and AG by default, but make sure the
                 // owner of these entities is same

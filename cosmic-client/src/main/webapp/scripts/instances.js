@@ -2833,6 +2833,8 @@
 
             allowedActions.push("resetPassword");
 
+            allowedActions.push("changeAffinity");
+
             allowedActions.push("viewConsole");
         } else if (jsonObj.state == 'Stopped') {
             allowedActions.push("edit");
