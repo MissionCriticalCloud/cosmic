@@ -653,7 +653,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                     vmData = _networkModel.generateVmData(userVm.getUserData(), serviceOffering, zoneName, vm.getInstanceName(), vm.getId(),
                             (String) profile.getParameter(VirtualMachineProfile.Param.VmSshPubKey), (String) profile.getParameter(VirtualMachineProfile.Param.VmPassword),
-                            isWindows);
+                            isWindows, network);
                     final String vmName = vm.getInstanceName();
                     final String configDriveIsoRootFolder = "/tmp";
                     final String isoFile = configDriveIsoRootFolder + "/" + vmName + "/configDrive/" + vmName + ".iso";

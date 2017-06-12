@@ -723,9 +723,14 @@ public class CommandSetupHelper {
 
     private VmDataCommand generateVmDataCommand(final VirtualRouter router, final String vmPrivateIpAddress, final String userData, final String serviceOffering,
                                                 final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId, final
-                                                String vmUuid, final String publicKey,
-                                                final long guestNetworkId) {
+                                                String vmUuid, final String publicKey, final long guestNetworkId) {
         final VmDataCommand cmd = new VmDataCommand(vmPrivateIpAddress, vmName, _networkModel.getExecuteInSeqNtwkElmtCmd());
+
+        final NetworkVO networkVO = _networkDao.findById(guestNetworkId);
+        String vmNameFQDN = vmName;
+        if (networkVO != null) {
+            vmNameFQDN = vmName + "." + networkVO.getNetworkDomain();
+        }
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId()));
@@ -738,7 +743,7 @@ public class CommandSetupHelper {
         cmd.addVmData("metadata", "service-offering", StringUtils.unicodeEscape(serviceOffering));
         cmd.addVmData("metadata", "availability-zone", StringUtils.unicodeEscape(zoneName));
         cmd.addVmData("metadata", "local-ipv4", guestIpAddress);
-        cmd.addVmData("metadata", "local-hostname", StringUtils.unicodeEscape(vmName));
+        cmd.addVmData("metadata", "local-hostname", StringUtils.unicodeEscape(vmNameFQDN));
         if (dcVo.getNetworkType() == NetworkType.Basic) {
             cmd.addVmData("metadata", "public-ipv4", guestIpAddress);
             cmd.addVmData("metadata", "public-hostname", StringUtils.unicodeEscape(vmName));
