@@ -1,240 +1,872 @@
 test_data = {
-    "scenario_1": {
-        "metadata": {
-            "name": "Scenario #1",
-            "description": "This scenario contains an account with 1 VPC 1 tier and 1 VM, there will be a port forward "
-                           "from the public ip address to the VM.",
-            "hierarchy": "domain -> account (user) -> vpc (static routes, publicips (acl) -> portforward, "
-                         "private gateways) -> tiers (acl) -> vms"
-        },
-        "data": {
-            "domains": [
-                {
-                    "metadata": {},
-                    "data": {
-                        "name": "ROOT",
-                        "accounts": [
-                            {
-                                "metadata": {},
-                                "data": {
-                                    "accounttype": 2,
-                                    "email": "john@doe.com",
-                                    "firstname": "John",
-                                    "lastname": "Doe",
-                                    "password": "password",
-                                    "username": "john",
-                                    "vpcs": [
-                                        {
-                                            "metadata": {},
-                                            "data": {
-                                                "cidr": "10.0.0.0/16",
-                                                "displaytext": "vpc001",
-                                                "name": "vpc001",
-                                                "vpcofferingname": "Default VPC offering",
-                                                "networks": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "displaytext": "tier001",
-                                                            "name": "tier001",
-                                                            "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
-                                                            "aclname": "default_allow",
-                                                            "cidr": "10.0.0.0/24",
-                                                            "gateway": "10.0.0.1",
+    "scenarios": {
+        "scenario_1": {
+            "metadata": {
+                "name": "Scenario #1",
+                "description": "This scenario contains an account with 1 VPC 1 tier and 1 VM, there will be a port forward "
+                               "from the public ip address to the VM.",
+                "hierarchy": "domain -> account (user) -> vpc (static routes, publicips (acl) -> portforward, "
+                             "private gateways) -> tiers (acl) -> vms"
+            },
+            "data": {
+                "domains": [
+                    {
+                        "metadata": {},
+                        "data": {
+                            "name": "ROOT",
+                            "accounts": [
+                                {
+                                    "metadata": {},
+                                    "data": {
+                                        "accounttype": 2,
+                                        "email": "john@doe.com",
+                                        "firstname": "John",
+                                        "lastname": "Doe",
+                                        "password": "password",
+                                        "username": "john",
+                                        "vpcs": [
+                                            # vpc01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.1.0.0/16",
+                                                    "displaytext": "vpc01",
+                                                    "name": "vpc01",
+                                                    "vpcofferingname": "Redundant VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc01-tier01",
+                                                                "name": "vpc01-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.1.1.0/24",
+                                                                "gateway": "10.1.1.254",
+                                                            }
+                                                        },
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc01-tier02",
+                                                                "name": "vpc01-tier02",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.1.2.0/24",
+                                                                "gateway": "10.1.2.1",
+                                                            }
                                                         }
-                                                    }
-                                                ],
-                                                "acls": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "name": "acl001",
-                                                            "rules": [
-                                                                {
-                                                                    "metadata": {},
-                                                                    "data": {
-                                                                        "protocol": "TCP",
-                                                                        "cidrlist": "0.0.0.0/0",
-                                                                        "startport": 22,
-                                                                        "endport": 22,
-                                                                        "traffictype": "Ingress"
+                                                    ],
+                                                    "acls": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "name": "acl01",
+                                                                "rules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 22,
+                                                                            "endport": 22,
+                                                                            "traffictype": "Ingress"
+                                                                        }
                                                                     }
-                                                                }
-                                                            ]
+                                                                ]
+                                                            }
                                                         }
-                                                    }
-                                                ],
-                                                "publicipaddresses": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "portforwards": [
-                                                                {
-                                                                    "metadata": {},
-                                                                    "data": {
-                                                                        "privateport": 22,
-                                                                        "publicport": 22,
-                                                                        "protocol": "TCP",
-                                                                        "virtualmachinename": "vm001",
-                                                                        "nic": "10.0.0.2"
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc01-tier01-vm01",
+                                                                            "nic": "10.1.1.11"
+                                                                        }
                                                                     }
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                ],
-                                                # TODO: remote networks/connections
-                                                "privategateways": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "ip": "172.16.1.1",
-                                                            "aclname": "default_allow",
-                                                            "privatenetworkname": "private_gateways_network",
-                                                            "staticroutes": [
-                                                                {
-                                                                    "metadata": {},
-                                                                    "data": {
-                                                                        "cidr": "10.2.0.0/16",
-                                                                        "nexthop": "172.16.1.2"
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc01-tier02-vm01",
+                                                                            "nic": "10.1.2.11"
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2202,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc01-tier02-vm02",
+                                                                            "nic": "10.1.2.12"
+                                                                        }
                                                                     }
-                                                                }
-                                                            ]
+                                                                ]
+                                                            }
                                                         }
-                                                    }
-                                                ],
-                                                "vpnconnections": ["vpc002"]
-                                            }
-                                        },
-                                        {
-                                            "metadata": {},
-                                            "data": {
-                                                "cidr": "10.1.0.0/16",
-                                                "displaytext": "vpc002",
-                                                "name": "vpc002",
-                                                "vpcofferingname": "Default VPC offering",
-                                                "networks": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "displaytext": "tier002",
-                                                            "name": "tier002",
-                                                            "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
-                                                            "aclname": "default_allow",
-                                                            "cidr": "10.1.0.0/24",
-                                                            "gateway": "10.1.0.1",
-                                                        }
-                                                    }
-                                                ],
-                                                "acls": [],
-                                                "publicipaddresses": [],
-                                                "privategateways": [],
-                                                "vpnconnections": ["vpc001"]
-                                            }
-                                        }
-                                    ],
-                                    "virtualmachines": [
-                                        {
-                                            "metadata": {},
-                                            "data": {
-                                                "name": "vm001",
-                                                "displayname": "vm001",
-                                                "templatename": "tiny linux kvm",
-                                                "serviceofferingname": "Small Instance",
-                                                "nics": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "guestip": "10.0.0.2",
-                                                            "networkname": "tier001"
-                                                        }
-                                                    },
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "guestip": "10.1.1.2",
-                                                            "networkname": "guest_network1"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "privatenetworks": [
-                                        {
-                                            "metadata": {},
-                                            "data": {
-                                                "name": "private_gateways_network",
-                                                "displaytext": "private_gateways_network",
-                                                "cidr": "172.16.1.0/24",
-                                                "networkofferingname": "DefaultPrivateGatewayNetworkOffering",
-                                                "aclname": "default_allow"
-                                            }
-                                        }
-                                    ],
-                                    "isolatednetworks": [
-                                        {
-                                            "metadata": {},
-                                            "data": {
-                                                "name": "guest_network1",
-                                                "displaytext": "guest_network1",
-                                                "networkofferingname": "DefaultIsolatedNetworkOfferingWithSourceNatService",
-                                                "guestgateway": "10.1.1.1",
-                                                "guestnetmask": "255.255.255.0",
-                                                "egressrules": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "protocol": "TCP",
-                                                            "cidrlist": "0.0.0.0/0",
-                                                            "startport": 22,
-                                                            "endport": 22
-                                                        }
-                                                    }
-                                                ],
-                                                "publicipaddresses": [
-                                                    {
-                                                        "metadata": {},
-                                                        "data": {
-                                                            "firewallrules": [
-                                                                {
-                                                                    "metadata": {},
-                                                                    "data": {
-                                                                        "cidrlist": "0.0.0.0/0",
-                                                                        "protocol": "TCP",
-                                                                        "startport": 22,
-                                                                        "endport": 22
+                                                    ],
+                                                    "privategateways": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "ip": "172.16.100.1",
+                                                                "aclname": "default_allow",
+                                                                "privatenetworkname": "private_gateways_network",
+                                                                "staticroutes": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "cidr": "10.3.0.0/16",
+                                                                            "nexthop": "172.16.100.3"
+                                                                        }
                                                                     }
-                                                                }
-                                                            ],
-                                                            "portforwards": [
-                                                                {
-                                                                    "metadata": {},
-                                                                    "data": {
-                                                                        "privateport": 22,
-                                                                        "publicport": 22,
-                                                                        "protocol": "TCP",
-                                                                        "virtualmachinename": "vm",
-                                                                        "nic": "10.1.1.2"
-                                                                    }
-                                                                }
-                                                            ]
+                                                                ]
+                                                            }
                                                         }
-                                                    }
-                                                ]
+                                                    ],
+                                                    "vpnconnections": []
+                                                }
+                                            },
+                                            # vpc02
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.2.0.0/16",
+                                                    "displaytext": "vpc02",
+                                                    "name": "vpc02",
+                                                    "vpcofferingname": "Default VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc02-tier01",
+                                                                "name": "vpc02-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.2.1.0/24",
+                                                                "gateway": "10.2.1.1",
+                                                            }
+                                                        }
+                                                    ],
+                                                    "acls": [],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc02-tier01-vm01",
+                                                                            "nic": "10.2.1.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "privategateways": [],
+                                                    "vpnconnections": ["vpc04"]
+                                                }
+                                            },
+                                            # vpc03
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.3.0.0/16",
+                                                    "displaytext": "vpc03",
+                                                    "name": "vpc03",
+                                                    "vpcofferingname": "Default VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc03-tier01",
+                                                                "name": "vpc03-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.3.1.0/24",
+                                                                "gateway": "10.3.1.1",
+                                                            }
+                                                        }
+                                                    ],
+                                                    "acls": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "name": "acl03",
+                                                                "rules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 22,
+                                                                            "endport": 22,
+                                                                            "traffictype": "Ingress"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc03-tier01-vm01",
+                                                                            "nic": "10.3.1.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "privategateways": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "ip": "172.16.100.3",
+                                                                "aclname": "default_allow",
+                                                                "privatenetworkname": "private_gateways_network",
+                                                                "staticroutes": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "cidr": "10.1.0.0/16",
+                                                                            "nexthop": "172.16.100.1"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "vpnconnections": []
+                                                }
+                                            },
+                                            # vpc04
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.4.0.0/16",
+                                                    "displaytext": "vpc04",
+                                                    "name": "vpc04",
+                                                    "vpcofferingname": "Redundant VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc04-tier01",
+                                                                "name": "vpc04-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.4.1.0/24",
+                                                                "gateway": "10.4.1.1",
+                                                            }
+                                                        }
+                                                    ],
+                                                    "acls": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "name": "acl04",
+                                                                "rules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 22,
+                                                                            "endport": 22,
+                                                                            "traffictype": "Ingress"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc04-tier01-vm01",
+                                                                            "nic": "10.4.1.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "privategateways": [],
+                                                    "vpnconnections": ["vpc02"]
+                                                }
                                             }
-                                        }
-                                    ]
+                                        ],
+                                        "isolatednetworks": [
+                                            # isonet01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "isonet01",
+                                                    "displaytext": "isonet01",
+                                                    "networkofferingname": "DefaultRedundantIsolatedNetworkOffering",
+                                                    "gateway": "172.16.1.1",
+                                                    "netmask": "255.255.255.0",
+                                                    "egressrules": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "protocol": "TCP",
+                                                                "cidrlist": "0.0.0.0/0",
+                                                                "startport": 2200,
+                                                                "endport": 2299
+                                                            }
+                                                        }
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "firewallrules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 2200,
+                                                                            "endport": 2299
+                                                                        }
+                                                                    }
+                                                                ],
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "openfirewall": False,
+                                                                            "virtualmachinename": "isonet01-vm01",
+                                                                            "nic": "172.16.1.11"
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "privateport": 22,
+                                                                            "publicport": 2202,
+                                                                            "openfirewall": False,
+                                                                            "virtualmachinename": "isonet01-vm02",
+                                                                            "nic": "172.16.1.12"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # isonet02
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "isonet02",
+                                                    "displaytext": "isonet02",
+                                                    "networkofferingname": "DefaultIsolatedNetworkOffering",
+                                                    "gateway": "172.16.2.1",
+                                                    "netmask": "255.255.255.0",
+                                                    "egressrules": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "protocol": "TCP",
+                                                                "cidrlist": "0.0.0.0/0",
+                                                                "startport": 2200,
+                                                                "endport": 2299
+                                                            }
+                                                        }
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "firewallrules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 2200,
+                                                                            "endport": 2299
+                                                                        }
+                                                                    }
+                                                                ],
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "openfirewall": False,
+                                                                            "virtualmachinename": "isonet02-vm01",
+                                                                            "nic": "172.16.2.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "privatenetworks": [
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "private_gateways_network",
+                                                    "displaytext": "private_gateways_network",
+                                                    "cidr": "172.16.100.0/24",
+                                                    "networkofferingname": "DefaultPrivateGatewayNetworkOffering",
+                                                    "aclname": "default_allow"
+                                                }
+                                            }
+                                        ],
+                                        "virtualmachines": [
+                                            # vpc01-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc01-tier01-vm011",
+                                                    "displayname": "vpc01-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.1.1.11",
+                                                                "networkname": "vpc01-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc01-tier02-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc01-tier02-vm01",
+                                                    "displayname": "vpc01-tier02-vm011",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.1.2.11",
+                                                                "networkname": "vpc01-tier02"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc01-tier02-vm02
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc01-tier02-vm02",
+                                                    "displayname": "vpc01-tier02-vm02",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.1.2.12",
+                                                                "networkname": "vpc01-tier02"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc02-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc02-tier01-vm01",
+                                                    "displayname": "vpc02-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.2.1.11",
+                                                                "networkname": "vpc02-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc03-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc03-tier01-vm01",
+                                                    "displayname": "vpc03-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.3.1.11",
+                                                                "networkname": "vpc03-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc04-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc04-tier01-vm01",
+                                                    "displayname": "vpc04-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.4.1.11",
+                                                                "networkname": "vpc04-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # isonet01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "isonet01-vm01",
+                                                    "displayname": "isonet01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "172.16.1.11",
+                                                                "networkname": "isonet01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # isonet01-vm02
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "isonet01-vm02",
+                                                    "displayname": "isonet01-vm02",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "172.16.1.12",
+                                                                "networkname": "isonet01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # isonet02-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "isonet02-vm01",
+                                                    "displayname": "isonet02-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "172.16.2.11",
+                                                                "networkname": "isonet02"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
                                 }
-                            }
-                        ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "scenario_2": {
+            "metadata": {
+                "name": "Scenario #2",
+                "description": "This scenario contains an account with 2 VPC (each) 1 tier and 1 VM,"
+                "there will be a port forward from the public ip address to the VM.",
+                "hierarchy": "domain -> account (user) -> vpc (static routes, publicips (acl) -> portforward, "
+                             "private gateways) -> tiers (acl) -> vms"
+            },
+            "data": {
+                "domains": [
+                    {
+                        "metadata": {},
+                        "data": {
+                            "name": "ROOT",
+                            "accounts": [
+                                {
+                                    "metadata": {},
+                                    "data": {
+                                        "accounttype": 2,
+                                        "email": "jane@doe.com",
+                                        "firstname": "Jane",
+                                        "lastname": "Doe",
+                                        "password": "password",
+                                        "username": "jane",
+                                        "vpcs": [
+                                            # vpc01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.1.0.0/16",
+                                                    "displaytext": "vpc01",
+                                                    "name": "vpc01",
+                                                    "vpcofferingname": "Redundant VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc01-tier01",
+                                                                "name": "vpc01-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.1.1.0/24",
+                                                                "gateway": "10.1.1.254",
+                                                            }
+                                                        }
+                                                    ],
+                                                    "acls": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "name": "acl01",
+                                                                "rules": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "protocol": "TCP",
+                                                                            "cidrlist": "0.0.0.0/0",
+                                                                            "startport": 22,
+                                                                            "endport": 22,
+                                                                            "traffictype": "Ingress"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc01-tier01-vm01",
+                                                                            "nic": "10.1.1.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "privategateways": [],
+                                                    "vpnconnections": []
+                                                }
+                                            },
+                                            # vpc02
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "cidr": "10.2.0.0/16",
+                                                    "displaytext": "vpc02",
+                                                    "name": "vpc02",
+                                                    "vpcofferingname": "Default VPC offering",
+                                                    "networks": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "displaytext": "vpc02-tier01",
+                                                                "name": "vpc02-tier01",
+                                                                "networkofferingname": "DefaultIsolatedNetworkOfferingForVpcNetworks",
+                                                                "aclname": "default_allow",
+                                                                "cidr": "10.2.1.0/24",
+                                                                "gateway": "10.2.1.1",
+                                                            }
+                                                        }
+                                                    ],
+                                                    "acls": [],
+                                                    "publicipaddresses": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "portforwards": [
+                                                                    {
+                                                                        "metadata": {},
+                                                                        "data": {
+                                                                            "privateport": 22,
+                                                                            "publicport": 2201,
+                                                                            "protocol": "TCP",
+                                                                            "virtualmachinename": "vpc02-tier01-vm01",
+                                                                            "nic": "10.2.1.11"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "privategateways": [],
+                                                    "vpnconnections": []
+                                                }
+                                            }
+                                        ],
+                                        "isolatednetworks": [],
+                                        "privatenetworks": [],
+                                        "virtualmachines": [
+                                            # vpc01-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc01-tier01-vm01",
+                                                    "displayname": "vpc01-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.1.1.11",
+                                                                "networkname": "vpc01-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            # vpc02-tier01-vm01
+                                            {
+                                                "metadata": {},
+                                                "data": {
+                                                    "name": "vpc02-tier01-vm01",
+                                                    "displayname": "vpc02-tier01-vm01",
+                                                    "templatename": "tiny linux kvm",
+                                                    "serviceofferingname": "Small Instance",
+                                                    "nics": [
+                                                        {
+                                                            "metadata": {},
+                                                            "data": {
+                                                                "guestip": "10.2.1.11",
+                                                                "networkname": "vpc02-tier01"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "test_data": {
+        "TestPublicIpAcl": {
+            "acls": {
+                "acl1": {
+                    "name": "acl1",
+                    "description": "acl1",
+                    "entries": {
+                        "entry1": {
+                            "protocol": "TCP",
+                            "action": "Allow",
+                            "traffictype": "Ingress",
+                            "startport": 22,
+                            "endport": 22
+                        }
+                    }
+                },
+                "acl2": {
+                    "name": "acl2",
+                    "description": "acl2",
+                    "entries": {
+                        "entry1": {
+                            "protocol": "TCP",
+                            "action": "Deny",
+                            "traffictype": "Ingress",
+                            "startport": 22,
+                            "endport": 22
+                        }
                     }
                 }
-            ]
+            }
         }
-
     },
-
     "region": {
         "regionid": "2",
         "regionname": "Region2",

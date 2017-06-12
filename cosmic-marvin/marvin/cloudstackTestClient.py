@@ -427,15 +427,18 @@ class CSTestClient(object):
                                              self.__dbConnection)
         self.__asyncJobMgr.submitJobs(jobs, nums_threads, interval)
 
-    def getScenarioManager(self, scenarioName):
+    def getScenarioManager(self, scenarioName, randomizeNames=True, cleanup=True):
         if not self.__scenarioManager:
-            scenarioHumanReadableName = self.getParsedTestDataConfig()[scenarioName]['metadata']['name']
+            scenarioHumanReadableName = self.getParsedTestDataConfig()['scenarios'][scenarioName]['metadata']['name']
             self.__logger.info("=== Scenario Manager, Scenario \"%s\" Started ===", scenarioHumanReadableName)
 
             self.__scenarioManager = TestScenarioManager(
-                self.getApiClient(),
-                self.getParsedTestDataConfig()[scenarioName],
-                get_zone(self.getApiClient(), self.getZoneForTests())
+                api_client=self.getApiClient(),
+                scenario_data=self.getParsedTestDataConfig()['scenarios'][scenarioName],
+                test_data=self.getParsedTestDataConfig()['test_data'],
+                zone=get_zone(self.getApiClient(), self.getZoneForTests()),
+                randomizeNames=randomizeNames,
+                cleanup=cleanup
             )
 
             try:

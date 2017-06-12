@@ -30,8 +30,15 @@ from utils import (
     random_gen
 )
 
-import common
-
+from common import (
+    list_routers,
+    get_virtual_machine_offering,
+    get_template,
+    get_network_offering,
+    get_network_acl,
+    get_network,
+    get_vpc_offering
+)
 class Domain:
     """ Domain Life Cycle """
 
@@ -40,18 +47,18 @@ class Domain:
 
     @classmethod
     def create(cls, api_client, services=None, name=None, networkdomain=None,
-               parentdomainid=None):
+               parentdomainid=None, randomizeID=True,):
         """Creates an domain"""
 
         cmd = createDomain.createDomainCmd()
 
         if "domainUUID" in services:
-            cmd.domainid = "-".join([services["domainUUID"], random_gen()])
+            cmd.domainid = ("-".join([services["domainUUID"], random_gen()]) if randomizeID else services["domainUUID"])
 
         if name:
-            cmd.name = "-".join([name, random_gen()])
+            cmd.name = ("-".join([name, random_gen()]) if randomizeID else name)
         elif "name" in services:
-            cmd.name = "-".join([services["name"], random_gen()])
+            cmd.name = ("-".join([services["name"], random_gen()]) if randomizeID else services["name"])
 
         if networkdomain:
             cmd.networkdomain = networkdomain
@@ -94,7 +101,7 @@ class Account:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, admin=False, domainid=None):
+    def create(cls, api_client, services, admin=False, domainid=None, randomizeID=True):
         """Creates an account"""
         cmd = createAccount.createAccountCmd()
 
@@ -110,18 +117,21 @@ class Account:
 
         cmd.password = services["password"]
         username = services["username"]
-        # Limit account username to 99 chars to avoid failure
-        # 6 chars start string + 85 chars api_clientid + 6 chars random string + 2 chars joining hyphen string = 99
-        username = username[:6]
-        api_clientid = api_client.id[-85:] if len(api_client.id) > 85 else api_client.id
-        cmd.username = "-".join([username,
-                                 random_gen(uuid=api_clientid, size=6)])
+        if randomizeID:
+            # Limit account username to 99 chars to avoid failure
+            # 6 chars start string + 85 chars api_clientid + 6 chars random string + 2 chars joining hyphen string = 99
+            username = username[:6]
+            api_clientid = api_client.id[-85:] if len(api_client.id) > 85 else api_client.id
+            cmd.username = "-".join([username,
+                                     random_gen(uuid=api_clientid, size=6)])
+        else:
+            cmd.username = username
 
         if "accountUUID" in services:
-            cmd.accountid = "-".join([services["accountUUID"], random_gen()])
+            cmd.accountid = ("-".join([services["accountUUID"], random_gen()]) if randomizeID else services["accountUUID"])
 
         if "userUUID" in services:
-            cmd.userid = "-".join([services["userUUID"], random_gen()])
+            cmd.userid = ("-".join([services["userUUID"], random_gen()]) if randomizeID else services["userUUID"])
 
         if domainid:
             cmd.domainid = domainid
@@ -161,7 +171,7 @@ class User:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, services, account, domainid):
+    def create(cls, api_client, services, account, domainid, randomizeID=True):
         cmd = createUser.createUserCmd()
         """Creates an user"""
 
@@ -172,10 +182,10 @@ class User:
         cmd.lastname = services["lastname"]
 
         if "userUUID" in services:
-            cmd.userid = "-".join([services["userUUID"], random_gen()])
+            cmd.userid = ("-".join([services["userUUID"], random_gen()]) if randomizeID else services["userUUID"])
 
         cmd.password = services["password"]
-        cmd.username = "-".join([services["username"], random_gen()])
+        cmd.username = ("-".join([services["username"], random_gen()]) if randomizeID else services["username"])
         user = api_client.createUser(cmd)
 
         return User(user.__dict__)
@@ -434,7 +444,7 @@ class VirtualMachine:
         elif "serviceoffering" in services:
             cmd.serviceofferingid = services["serviceoffering"]
         elif "serviceofferingname" in services:
-            serviceoffering = common.get_virtual_machine_offering(api_client, services["serviceofferingname"])
+            serviceoffering = get_virtual_machine_offering(api_client, services["serviceofferingname"])
             cmd.serviceofferingid = serviceoffering.id
 
         if zoneid:
@@ -491,7 +501,7 @@ class VirtualMachine:
         elif "template" in services:
             cmd.templateid = services["template"]
         elif "templatename" in services:
-            template = common.get_template(api_client, template_name=services["templatename"])
+            template = get_template(api_client, template_name=services["templatename"])
             cmd.templateid = template.id
 
         if diskofferingid:
@@ -666,6 +676,20 @@ class VirtualMachine:
             key_pair_file_location=keyPairFileLocation
         )
         return self.ssh_client
+
+    def test_ssh_connectivity(self, retries=2, expect_connection=True, retryinterv=None, timeout=None):
+
+        got_connection = False
+
+        try:
+            self.get_ssh_client(reconnect=True, retries=retries, retryinterv=retryinterv, timeout=timeout)
+            got_connection = True
+
+        except Exception as e:
+            if expect_connection:
+                raise Exception("Exception: %s" % e)
+
+        return expect_connection == got_connection
 
     def validateState(self, api_client, state, timeout=600, interval=5):
         """List VM and check if its state is as expected
@@ -1602,7 +1626,11 @@ class NATRule:
         if projectid:
             cmd.projectid = projectid
 
+        if 'openfirewall' in services:
+            cmd.openfirewall = services['openfirewall']
+
         if openfirewall:
+            # FIXME: it should be `cmd.openfirewall = openfirewall`, not changed for backwards compatibility
             cmd.openfirewall = True
 
         if networkid:
@@ -2800,7 +2828,7 @@ class Network:
         elif "networkoffering" in services:
             cmd.networkofferingid = services["networkoffering"]
         elif "networkofferingname" in services:
-            networkoffering = common.get_network_offering(api_client, services["networkofferingname"])
+            networkoffering = get_network_offering(api_client, services["networkofferingname"])
             cmd.networkofferingid = networkoffering.id
 
         if zoneid:
@@ -2868,7 +2896,7 @@ class Network:
         elif acl:
             cmd.aclid = acl.id
         elif "aclname" in services:
-            acl = common.get_network_acl(api_client, services['aclname'])
+            acl = get_network_acl(api_client, services['aclname'])
             cmd.aclid = acl.id
         return Network(api_client.createNetwork(cmd).__dict__)
 
@@ -3038,6 +3066,15 @@ class NetworkACLList:
         if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
             cmd.listall = True
         return api_client.listNetworkACLLists(cmd)
+
+    def attach(self, api_client, network=None):
+        cmd = replaceNetworkACLList.replaceNetworkACLListCmd()
+        cmd.aclid = self.id
+
+        if network:
+            cmd.networkid = network.id
+
+        return api_client.replaceNetworkACLList(cmd)
 
 
 class Vpn:
@@ -4084,11 +4121,8 @@ class Tag:
         cmd.resourceIds = resourceIds
         cmd.resourcetype = resourceType
         cmd.tags = []
-        for key, value in tags.items():
-            cmd.tags.append({
-                'key': key,
-                'value': value
-            })
+        for tag in tags:
+            cmd.tags.append(tag)
         return Tag(api_client.createTags(cmd).__dict__)
 
     def delete(self, api_client, resourceIds, resourceType, tags):
@@ -4188,23 +4222,24 @@ class VpcOffering:
 class VPC:
     """Manage Virtual Private Connection"""
 
-    def __init__(self, items):
+    def __init__(self, items, api_client=None):
         self.__dict__.update(items)
+        self.api_client = api_client
 
     @classmethod
     def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
-               domainid=None, zone=None, data=None, **kwargs):
+               domainid=None, zone=None, data=None, randomizeID=True,  **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
 
         cmd = createVPC.createVPCCmd()
 
-        random_name = "-".join([services["name"], random_gen()])
+        random_name = ("-".join([services["name"], random_gen()]) if randomizeID else services["name"])
         cmd.name = random_name
 
         if "displaytext" in services:
-            random_displaytext = "-".join([services["displaytext"], random_gen()])
+            random_displaytext = ("-".join([services["displaytext"], random_gen()]) if randomizeID else services["displaytext"])
         else:
             random_displaytext = random_name
         cmd.displaytext = random_displaytext
@@ -4212,7 +4247,7 @@ class VPC:
         if vpcofferingid:
             cmd.vpcofferingid = vpcofferingid
         elif "vpcofferingname" in services:
-            vpcoffering = common.get_vpc_offering(api_client, services["vpcofferingname"])
+            vpcoffering = get_vpc_offering(api_client, services["vpcofferingname"])
             cmd.vpcofferingid = vpcoffering.id
 
         if zoneid:
@@ -4223,9 +4258,14 @@ class VPC:
         if "cidr" in services:
             cmd.cidr = services["cidr"]
         if account:
-            cmd.account = account
+            if isinstance(account, basestring):
+                cmd.account = account
+            else:
+                cmd.account = account.name
         if domainid:
             cmd.domainid = domainid
+        elif account and not type(account) is str:
+                cmd.domainid = account.domainid
         if networkDomain:
             cmd.networkDomain = networkDomain
         [setattr(cmd, k, v) for k, v in kwargs.items()]
@@ -4250,13 +4290,15 @@ class VPC:
         cmd.id = self.id
         return api_client.deleteVPC(cmd)
 
-    def restart(self, api_client, cleanup=False):
+    def restart(self, api_client=None, cleanup=False):
         """Restarts the VPC connections"""
+        if api_client:
+            self.api_client = api_client
 
         cmd = restartVPC.restartVPCCmd()
         cmd.id = self.id
         cmd.cleanup = cleanup
-        return api_client.restartVPC(cmd)
+        return self.api_client.restartVPC(cmd)
 
     @classmethod
     def list(cls, api_client, **kwargs):
@@ -4267,6 +4309,41 @@ class VPC:
         if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
             cmd.listall = True
         return api_client.listVPCs(cmd)
+
+    def get_routers(self):
+        return list_routers(api_client=self.api_client, domainid=self.domainid, account=self.account, vpcid=self.id)
+
+    def stop_master_router(self):
+        routers = self.get_routers()
+
+        for router in routers:
+            if router.redundantstate == 'MASTER':
+                cmd = stopRouter.stopRouterCmd()
+                cmd.id = router.id
+                cmd.forced = 'true'
+                self.api_client.stopRouter(cmd)
+                break
+
+    def is_master_backup(self):
+        routers = self.get_routers()
+
+        if len(routers) != 2:
+            return False
+
+        for router in routers:
+            if router.state == 'Running':
+                if router.redundantstate == 'MASTER':
+                    master = router.hostid
+                elif router.redundantstate == 'BACKUP':
+                    backup = router.hostid
+                else:
+                    master = None
+                    backup = None
+
+        if master and backup and master != backup:
+            return True
+
+        return False
 
 
 class PrivateGateway:
@@ -4289,7 +4366,7 @@ class PrivateGateway:
         if networkid:
             cmd.networkid = networkid
         elif "privatenetworkname" in data:
-            network = common.get_network(api_client, data["privatenetworkname"])
+            network = get_network(api_client, data["privatenetworkname"])
             cmd.networkid = network.id
 
         if vpcid:
@@ -4303,7 +4380,7 @@ class PrivateGateway:
         if aclid:
             cmd.aclid = aclid
         elif "aclname" in data:
-            acl = common.get_network_acl(api_client, data["aclname"])
+            acl = get_network_acl(api_client, data["aclname"])
             cmd.aclid = acl.id
 
         return PrivateGateway(api_client.createPrivateGateway(cmd).__dict__)

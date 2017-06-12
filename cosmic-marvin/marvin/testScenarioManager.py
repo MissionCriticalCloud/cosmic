@@ -12,7 +12,8 @@ from marvin.lib.base import (Vpn,
                              Account,
                              Domain,
                              EgressFireWallRule,
-                             FireWallRule)
+                             FireWallRule,
+                             Tag)
 
 from marvin.lib.common import (get_vpngateway,
                                get_vpc,
@@ -28,9 +29,10 @@ from marvin.utils.MarvinLog import MarvinLog
 
 class TestScenarioManager:
 
-    def __init__(self, api_client, scenario_data, zone):
+    def __init__(self, api_client, scenario_data, test_data, zone, randomizeNames, cleanup):
         self.api_client = api_client
         self.scenario_data = scenario_data
+        self.test_data = test_data
         self.zone = zone
         self.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
         self.dynamic_names = {
@@ -38,7 +40,19 @@ class TestScenarioManager:
             'vpcs': {},
             'vms': {},
         }
+        self.randomizeNames = randomizeNames
         self.resources_to_cleanup = []
+        self.cleanup = cleanup
+
+    @property
+    def test_data(self):
+        return self.test_data
+
+    def get_dynamic_name(self, section, name):
+        if name in self.dynamic_names[section]:
+            return self.dynamic_names[section][name]
+        else:
+            return name
 
     def setup_infra(self):
         scenario_data = self.scenario_data['data']
@@ -56,10 +70,10 @@ class TestScenarioManager:
             )
             domain = domain_list[0]
         else:
-            self.logger.debug('>>>  DOMAIN  =>  Creating...')
+            self.logger.debug('>>>  DOMAIN  =>  Creating "%s"...', domain_data['name'])
             domain = Domain.create(
                 api_client=self.api_client,
-                name=domain_data['name'] + '-' + random_gen()
+                name=domain_data['name'] + ('-' + random_gen() if self.randomizeNames else '')
             )
 
         self.logger.debug('>>>  DOMAIN  =>  ID: %s  =>  Name: %s  =>  Path: %s  =>  State: %s', domain.id, domain.name,
@@ -72,12 +86,23 @@ class TestScenarioManager:
             self.deploy_account(account['data'], domain)
 
     def deploy_account(self, account_data, domain):
-        self.logger.debug('>>>  ACCOUNT  =>  Creating...')
-        account = Account.create(
-            api_client=self.api_client,
-            services=account_data,
-            domainid=domain.uuid
-        )
+        self.logger.debug('>>>  ACCOUNT  =>  Creating "%s"...', account_data['username'])
+        account = None
+        if not self.randomizeNames:
+            account_list = Account.list(api_client=self.api_client, name=account_data['username'], listall=True)
+            if isinstance(account_list, list) and len(account_list) >= 1:
+                if account_list[0].name == account_data['username']:
+                    account = account_list[0]
+                    self.logger.debug('>>>  ACCOUNT  =>  Loaded from (pre) existing account,  ID: %s', account.id)
+                    return
+
+        if not account:
+            account = Account.create(
+                api_client=self.api_client,
+                services=account_data,
+                domainid=domain.uuid,
+                randomizeID=self.randomizeNames
+            )
         self.resources_to_cleanup.append(account)
         self.dynamic_names['accounts'][account_data['username']] = account.name
 
@@ -99,12 +124,13 @@ class TestScenarioManager:
             self.deploy_vpc(vpc['data'], account)
 
     def deploy_vpc(self, vpc_data, account):
-        self.logger.debug('>>>  VPC  =>  Creating...')
+        self.logger.debug('>>>  VPC  =>  Creating "%s"...', vpc_data['name'])
         vpc = VPC.create(
             api_client=self.api_client,
             data=vpc_data,
             zone=self.zone,
-            account=account
+            account=account,
+            randomizeID=self.randomizeNames
         )
         self.dynamic_names['vpcs'][vpc_data['name']] = vpc.name
 
@@ -120,7 +146,7 @@ class TestScenarioManager:
             self.deploy_acl(acl['data'], vpc)
 
     def deploy_acl(self, acl_data, vpc):
-        self.logger.debug('>>>  ACL  =>  Creating...')
+        self.logger.debug('>>>  ACL  =>  Creating "%s"...', acl_data['name'])
         acl = NetworkACLList.create(
             api_client=self.api_client,
             data=acl_data,
@@ -155,7 +181,7 @@ class TestScenarioManager:
     def deploy_network(self, network_data, vpc):
         acl = get_network_acl(api_client=self.api_client, name=network_data['aclname'], vpc=vpc)
 
-        self.logger.debug('>>>  NETWORK  =>  Creating...')
+        self.logger.debug('>>>  TIER  =>  Creating "%s"...', network_data['name'])
         network = Network.create(
             self.api_client,
             data=network_data,
@@ -164,7 +190,7 @@ class TestScenarioManager:
             acl=acl
         )
 
-        self.logger.debug('>>>  NETWORK  =>  ID: %s  =>  Name: %s  =>  CIDR: %s  =>  Gateway: %s  =>  Type: %s  '
+        self.logger.debug('>>>  TIER  =>  ID: %s  =>  Name: %s  =>  CIDR: %s  =>  Gateway: %s  =>  Type: %s  '
                           '=>  Traffic Type: %s  =>  State: %s  =>  Offering: %s  =>  ACL: %s  '
                           '=>  Physical Network: %s  =>  VPC: %s  =>  Domain: %s', network.id, network.name,
                           network.cidr, network.gateway, network.type, network.traffictype, network.state,
@@ -186,7 +212,7 @@ class TestScenarioManager:
                 network_and_ip['ip'] = nic['data']['guestip']
             network_and_ip_list.append(network_and_ip)
 
-        self.logger.debug('>>>  VM  =>  Creating...')
+        self.logger.debug('>>>  VM  =>  Creating "%s"...', vm_data['name'])
         vm = VirtualMachine.create(
             self.api_client,
             data=vm_data,
@@ -196,10 +222,9 @@ class TestScenarioManager:
         )
         self.dynamic_names['vms'][vm_data['name']] = vm.name
 
-        self.logger.debug('>>>  VM  =>  ID: %s  =>  Name: %s  =>  IP: %s  =>  SSH IP: %s  =>  State: %s  '
-                          '=>  Offering: %s  =>  Template: %s  =>  Hypervisor: %s  =>  Domain: %s', vm.id, vm.name,
-                          vm.ipaddress, vm.ssh_ip, vm.state, vm.serviceofferingid, vm.templateid, vm.hypervisor,
-                          vm.domainid)
+        self.logger.debug('>>>  VM  =>  ID: %s  =>  Name: %s  =>  IP: %s  =>  State: %s  =>  Offering: %s  '
+                          '=>  Template: %s  =>  Hypervisor: %s  =>  Domain: %s', vm.id, vm.name, vm.ipaddress,
+                          vm.state, vm.serviceofferingid, vm.templateid, vm.hypervisor, vm.domainid)
 
     def deploy_vpcs_publicipaddresses(self, vpcs_data, virtualmachines_data):
         for vpc in vpcs_data:
@@ -253,6 +278,22 @@ class TestScenarioManager:
                                 ipaddress=publicipaddress
                             )
 
+                            Tag.create(
+                                api_client=self.api_client,
+                                resourceType='UserVm',
+                                resourceIds=[virtualmachine.id],
+                                tags=[
+                                    {
+                                        'key': 'sship',
+                                        'value': publicipaddress.ipaddress.ipaddress
+                                    },
+                                    {
+                                        'key': 'sshport',
+                                        'value': portforward_data['data']['publicport']
+                                    }
+                                ]
+                            )
+
                             self.logger.debug('>>>  PORT FORWARD  =>  ID: %s  =>  Public Start Port: %s  '
                                               '=>  Public End Port: %s  =>  Private Start Port: %s  '
                                               '=>  Private End Port: %s  =>  CIDR List: %s  =>  Protocol: %s  '
@@ -267,7 +308,7 @@ class TestScenarioManager:
             self.deploy_privatenetwork(privatenetwork['data'], account, domain)
 
     def deploy_privatenetwork(self, privatenetwork_data, account, domain):
-        self.logger.debug('>>>  PRIVATE GATEWAY NETWORK  =>  Creating...')
+        self.logger.debug('>>>  PRIVATE GATEWAY NETWORK  =>  Creating "%s"...', privatenetwork_data['name'])
         private_gateways_network = Network.create(
             api_client=self.api_client,
             data=privatenetwork_data,
@@ -295,7 +336,7 @@ class TestScenarioManager:
             self.deploy_privategateway(privategateway['data'], vpc)
 
     def deploy_privategateway(self, privategateway_data, vpc):
-        self.logger.debug('>>>  PRIVATE GATEWAY  =>  Creating...')
+        self.logger.debug('>>>  PRIVATE GATEWAY  =>  Creating "%s"...', privategateway_data['ip'])
         private_gateway = PrivateGateway.create(
             api_client=self.api_client,
             data=privategateway_data,
@@ -327,7 +368,7 @@ class TestScenarioManager:
         for vpc_data in vpcs_data:
             vpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpc_data['data']['name']])
             if vpc_data['data']['vpnconnections']:
-                self.logger.debug('>>>  VPN LOCAL GATEWAY  =>  Creating...')
+                self.logger.debug('>>>  VPN LOCAL GATEWAY  =>  Creating on VPC "%s"...', vpc_data['data']['name'])
                 localvpngateway = Vpn.createVpnGateway(api_client=self.api_client, vpc=vpc)
 
                 self.logger.debug('>>>  VPN LOCAL GATEWAY  =>  ID: %s  =>  IP: %s  =>  VPC: %s  =>  Domain: %s',
@@ -343,7 +384,7 @@ class TestScenarioManager:
                 remotevpc = get_vpc(api_client=self.api_client, name=self.dynamic_names['vpcs'][vpnconnection_data])
                 remotevpc_vpngateway = get_vpngateway(api_client=self.api_client, vpc=remotevpc)
 
-                self.logger.debug('>>>  VPN CUSTOMER GATEWAY  =>  Creating...')
+                self.logger.debug('>>>  VPN CUSTOMER GATEWAY  =>  Creating to VPC "%s"...', vpnconnection_data)
                 vpncustomergateway = VpnCustomerGateway.create(
                     api_client=self.api_client,
                     name="remotegateway_to_" + remotevpc.name,
@@ -360,7 +401,8 @@ class TestScenarioManager:
                                   '=>  Gateway: %s  =>  Domain: %s', vpncustomergateway.id, vpncustomergateway.name,
                                   vpncustomergateway.cidrlist, vpncustomergateway.gateway, vpncustomergateway.domainid)
 
-                self.logger.debug('>>>  VPN CONNECTION  =>  Creating...')
+                self.logger.debug('>>>  VPN CONNECTION  =>  Creating from VPC "%s" to VPC "%s"...',
+                                  vpc_data['data']['name'], vpnconnection_data)
                 vpnconnection = Vpn.createVpnConnection(
                     api_client=self.api_client,
                     s2svpngatewayid=vpc_vpngateway.id,
@@ -377,14 +419,14 @@ class TestScenarioManager:
             self.deploy_isolatednetwork(isolatednetwork['data'], account)
 
     def deploy_isolatednetwork(self, isolatednetwork_data, account):
-        self.logger.debug('>>>  ISOLATED NETWORKS  =>  Creating...')
+        self.logger.debug('>>>  ISOLATED NETWORK  =>  Creating "%s"...', isolatednetwork_data['name'])
         isolatednetwork = Network.create(
             self.api_client,
             data=isolatednetwork_data,
             account=account,
             zone=self.zone
         )
-        self.logger.debug('>>>  ISOLATED NETWORKS   =>  ID: %s  =>  Name: %s  =>  CIDR: %s  '
+        self.logger.debug('>>>  ISOLATED NETWORK   =>  ID: %s  =>  Name: %s  =>  CIDR: %s  '
                           '=>  Gateway: %s  =>  Type: %s  =>  Traffic Type: %s  =>  State: %s  '
                           '=>  Offering: %s  =>  Physical Network: %s  =>  Domain: %s',
                           isolatednetwork.id, isolatednetwork.name, isolatednetwork.cidr,
@@ -399,7 +441,7 @@ class TestScenarioManager:
             self.deploy_isolatednetwork_publicipaddresses(isolatednetwork['data'], virtualmachines_data, network)
 
     def deploy_isolatednetwork_egresses(self, isolatednetwork_data, network):
-        self.logger.debug('>>>  ISOLATED NETWORKS EGRESS RULES  =>  Creating...')
+        self.logger.debug('>>>  ISOLATED NETWORK EGRESS RULE  =>  Creating...')
         for egress_data in isolatednetwork_data['egressrules']:
             egress = EgressFireWallRule.create(
                 self.api_client,
@@ -407,9 +449,9 @@ class TestScenarioManager:
                 data=egress_data['data']
             )
 
-            self.logger.debug('>>>  ISOLATED NETWORKS EGRESS RULES  =>  ID: %s  =>  Startport: %s  '
-                              '=>  Endport: %s  =>  CIDR: %s  =>  Protocol: %s  =>  State: %s  '
-                              '=>  Network ID: %s',
+            self.logger.debug('>>>  ISOLATED NETWORK EGRESS RULE  =>  ID: %s  =>  Start Port: %s  '
+                              '=>  End Port: %s  =>  CIDR: %s  =>  Protocol: %s  =>  State: %s  '
+                              '=> Network: %s',
                               egress.id, egress.startport, egress.endport, egress.cidrlist,
                               egress.protocol, egress.state, egress.networkid)
 
@@ -424,11 +466,14 @@ class TestScenarioManager:
             data=ipaddress_data,
             network=network
         )
+
+        self.logger.debug('>>>  ISOLATED NETWORK PUBLIC IP ADDRESS  =>  Created!  TODO:  MISSING FIELDS!')
+
         self.deploy_firewallrules(ipaddress_data, publicipaddress)
         self.deploy_portforwards(ipaddress_data['portforwards'], virtualmachines_data, None, publicipaddress)
 
     def deploy_firewallrules(self, ipaddress_data, publicipaddress):
-        self.logger.debug('>>>  ISOLATED NETWORK FIREWALL RULES  =>  Creating...')
+        self.logger.debug('>>>  ISOLATED NETWORK FIREWALL RULE  =>  Creating...')
         for firewallrule in ipaddress_data['firewallrules']:
             self.deploy_firewallrule(firewallrule, publicipaddress)
 
@@ -438,20 +483,75 @@ class TestScenarioManager:
             data=firewallrule['data'],
             ipaddress=publicipaddress
         )
-        self.logger.debug('>>>  ISOLATED NETWORKS FIREWALL RULES  =>  ID: %s  =>  Startport: %s  '
-                          '=>  Endport: %s  =>  CIDR: %s  =>  Protocol: %s  =>  State: %s  '
-                          '=>  Network ID: %s  =>  IP Address: %s',
+        self.logger.debug('>>>  ISOLATED NETWORKS FIREWALL RULE  =>  ID: %s  =>  Start Port: %s  '
+                          '=>  End Port: %s  =>  CIDR: %s  =>  Protocol: %s  =>  State: %s  '
+                          '=> Network: %s  =>  IP: %s',
                           firewall.id, firewall.startport, firewall.endport, firewall.cidrlist,
                           firewall.protocol, firewall.state, firewall.networkid, firewall.ipaddress)
 
+    def get_vpc(self, name):
+        vpc = VPC(get_vpc(api_client=self.api_client, name=name).__dict__, api_client=self.api_client)
+        return vpc
+
+    def get_virtual_machine(self, vm_name):
+        virtual_machine = VirtualMachine(get_virtual_machine(
+            api_client=self.api_client,
+            name=self.get_dynamic_name('vms', vm_name)
+        ).__dict__, [])
+
+        virtual_machine_tags = Tag.list(
+                                        api_client=self.api_client,
+                                        resourceId=[virtual_machine.id],
+                                        listall=True)
+
+        for key in virtual_machine_tags:
+            if key.key == 'sshport':
+                virtual_machine.ssh_port = int(key.value.encode('ascii', 'ignore'))
+            if key.key == 'sship':
+                virtual_machine.ssh_ip = key.value.encode('ascii', 'ignore')
+
+        return virtual_machine
+
+    def get_network(self, name=None, id=None):
+        return Network(get_network(api_client=self.api_client, name=name, id=id).__dict__)
+
+    def get_network_acl_list(self, name=None, id=None):
+        return NetworkACLList(get_network_acl(api_client=self.api_client, name=name, id=id).__dict__)
+
+    def get_default_allow_acl_list(self):
+        return self.get_network_acl_list(name='default_allow')
+
+    def get_default_deny_acl_list(self):
+        return self.get_network_acl_list(name='default_deny')
+
+    def deploy_network_acl_list(self, acl_list_name, acl_config, network=None, vpc=None):
+
+        if network:
+            networkid=network.id
+            if network.vpcid:
+                vpcid=network.vpcid
+
+        acl_list = NetworkACLList.create(self.api_client, name=acl_list_name, services=[], vpcid=vpcid, vpc=vpc)
+
+        NetworkACL.create(self.api_client,
+                          acl_config,
+                          networkid=networkid,
+                          aclid=acl_list.id)
+
+        return acl_list
+
     def finalize(self):
-        try:
-            self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Started ===',
-                             self.scenario_data['metadata']['name'])
+        if self.cleanup:
+            try:
+                self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Started ===',
+                                 self.scenario_data['metadata']['name'])
 
-            cleanup_resources(self.api_client, self.resources_to_cleanup, self.logger)
+                cleanup_resources(self.api_client, self.resources_to_cleanup, self.logger)
 
-            self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Finished ===',
-                             self.scenario_data['metadata']['name'])
-        except:
-            self.logger.exception('Oops! Unable to clean up resources of "%s"!', self.scenario_data['metadata']['name'])
+                self.logger.info('=== Scenario Manager, Cleaning Up of "%s" Finished ===',
+                                 self.scenario_data['metadata']['name'])
+            except:
+                self.logger.exception('Oops! Unable to clean up resources of "%s"!', self.scenario_data['metadata']['name'])
+        else:
+            self.logger.info('=== Scenario Manager, Skipping Cleaning Up of "%s" ===',
+                                  self.scenario_data['metadata']['name'])
