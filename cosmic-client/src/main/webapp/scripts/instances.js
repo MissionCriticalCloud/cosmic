@@ -2618,6 +2618,9 @@
                             ipaddress: {
                                 label: 'label.ip.address'
                             },
+                            macaddress: {
+                              label: 'label.macaddress'
+                            },
                             secondaryips: {
                                 label: 'label.secondary.ips'
                             },
