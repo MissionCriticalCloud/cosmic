@@ -1,5 +1,7 @@
 package com.cloud.network.guru;
 
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
@@ -82,6 +84,8 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     IpAddressManager _ipAddrMgr;
     @Inject
     NetworkOfferingServiceMapDao _ntwkOfferingSrvcDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     protected DirectNetworkGuru() {
         super();
@@ -166,7 +170,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     public NicProfile allocate(final Network network, NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
             InsufficientAddressCapacityException, ConcurrentOperationException {
 
-        final DataCenter dc = _dcDao.findById(network.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
         if (nic == null) {
             nic = new NicProfile(ReservationStrategy.Create, null, null, null, null);
@@ -176,7 +180,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
             nic.setReservationStrategy(ReservationStrategy.Create);
         }
 
-        allocateDirectIp(nic, network, vm, dc, nic.getRequestedIPv4(), nic.getRequestedIPv6());
+        allocateDirectIp(nic, network, vm, zone, nic.getRequestedIPv4(), nic.getRequestedIPv6());
         nic.setReservationStrategy(ReservationStrategy.Create);
 
         if (nic.getMacAddress() == null) {
@@ -193,7 +197,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     public void reserve(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
         if (nic.getIPv4Address() == null && nic.getIPv6Address() == null) {
-            allocateDirectIp(nic, network, vm, dest.getDataCenter(), null, null);
+            allocateDirectIp(nic, network, vm, dest.getZone(), null, null);
             nic.setReservationStrategy(ReservationStrategy.Create);
         }
     }
@@ -316,7 +320,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     }
 
     @DB
-    protected void allocateDirectIp(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DataCenter dc, final String requestedIp4Addr,
+    protected void allocateDirectIp(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final Zone zone, final String requestedIp4Addr,
                                     final String requestedIp6Addr) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
 
         try {
@@ -325,9 +329,9 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
                 public void doInTransactionWithoutResult(final TransactionStatus status) throws InsufficientVirtualNetworkCapacityException,
                         InsufficientAddressCapacityException {
                     if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
-                        _ipAddrMgr.allocateNicValues(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
+                        _ipAddrMgr.allocateNicValues(nic, zone, vm, network, requestedIp4Addr, requestedIp6Addr);
                     } else {
-                        _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, requestedIp4Addr, requestedIp6Addr);
+                        _ipAddrMgr.allocateDirectIp(nic, zone, vm, network, requestedIp4Addr, requestedIp6Addr);
                         //save the placeholder nic if the vm is the Virtual router
                         if (vm.getType() == VirtualMachine.Type.DomainRouter) {
                             final Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);

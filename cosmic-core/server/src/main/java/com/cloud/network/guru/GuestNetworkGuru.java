@@ -2,6 +2,8 @@ package com.cloud.network.guru;
 
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
@@ -103,6 +105,9 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     ConfigurationServer _configServer;
     @Inject
     IpAddressManager _ipAddrMgr;
+    @Inject
+    ZoneRepository zoneRepository;
+
     Random _rand = new Random(System.currentTimeMillis());
     String _defaultGateway;
     String _defaultCidr;
@@ -214,7 +219,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             throws InsufficientVirtualNetworkCapacityException {
         assert network.getState() == State.Implementing : "Why are we implementing " + network;
 
-        final long dcId = dest.getDataCenter().getId();
+        final long dcId = dest.getZone().getId();
 
         //get physical network id
         Long physicalNetworkId = network.getPhysicalNetworkId();
@@ -266,7 +271,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             nic = new NicProfile(ReservationStrategy.Start, null, null, null, null);
         }
 
-        final DataCenter dc = _dcDao.findById(network.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
         if (nic.getIPv4Address() == null) {
             nic.setBroadcastUri(network.getBroadcastUri());
@@ -275,7 +280,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
             final String guestIp;
             if (network.getSpecifyIpRanges()) {
-                _ipAddrMgr.allocateDirectIp(nic, dc, vm, network, nic.getRequestedIPv4(), null);
+                _ipAddrMgr.allocateDirectIp(nic, zone, vm, network, nic.getRequestedIPv4(), null);
             } else {
                 final VirtualMachine.Type vmtype = vm.getVirtualMachine().getType();
 
@@ -311,18 +316,18 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 if (guestIp == null) {
                     throw new InsufficientVirtualNetworkCapacityException("Unable to acquire Guest IP" +
                             " address for network " + network, DataCenter.class,
-                            dc.getId());
+                            zone.getId());
                 }
                 nic.setIPv4Address(guestIp);
                 nic.setIPv4Netmask(NetUtils.cidr2Netmask(network.getCidr()));
 
                 if (network.getDns1() != null && network.getDns1().equals("")) {
-                    nic.setIPv4Dns1(dc.getDns1());
+                    nic.setIPv4Dns1(zone.getDns1());
                 } else {
                     nic.setIPv4Dns1(network.getDns1());
                 }
                 if (network.getDns2() != null && network.getDns2().equals("")) {
-                    nic.setIPv4Dns2(dc.getDns2());
+                    nic.setIPv4Dns2(zone.getDns2());
                 } else {
                     nic.setIPv4Dns2(network.getDns2());
                 }

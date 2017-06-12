@@ -1,6 +1,6 @@
 package com.cloud.deploy;
 
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.Pod;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientServerCapacityException;
@@ -52,7 +52,7 @@ public interface DeploymentPlanner extends Adapter {
     class ExcludeList implements Serializable {
         private static final long serialVersionUID = -482175549460148301L;
 
-        private final Set<Long> dcIds = new TreeSet<>();
+        private final Set<Long> zoneIds = new TreeSet<>();
         private final Set<Long> podIds = new TreeSet<>();
         private final Set<Long> clusterIds = new TreeSet<>();
         private final Set<Long> hostIds = new TreeSet<>();
@@ -61,8 +61,8 @@ public interface DeploymentPlanner extends Adapter {
         public ExcludeList() {
         }
 
-        public ExcludeList(final Set<Long> dcIds, final Set<Long> podIds, final Set<Long> clusterIds, final Set<Long> hostIds, final Set<Long> poolIds) {
-            this.dcIds.addAll(dcIds);
+        public ExcludeList(final Set<Long> zoneIds, final Set<Long> podIds, final Set<Long> clusterIds, final Set<Long> hostIds, final Set<Long> poolIds) {
+            this.zoneIds.addAll(zoneIds);
             this.podIds.addAll(podIds);
             this.clusterIds.addAll(clusterIds);
             this.hostIds.addAll(hostIds);
@@ -80,8 +80,8 @@ public interface DeploymentPlanner extends Adapter {
                 addHost(e.getId());
             } else if (Pod.class.isAssignableFrom(scope)) {
                 addPod(e.getId());
-            } else if (DataCenter.class.isAssignableFrom(scope)) {
-                addDataCenter(e.getId());
+            } else if (Zone.class.isAssignableFrom(scope)) {
+                addZone(e.getId());
             } else if (Cluster.class.isAssignableFrom(scope)) {
                 addCluster(e.getId());
             } else if (StoragePool.class.isAssignableFrom(scope)) {
@@ -101,8 +101,8 @@ public interface DeploymentPlanner extends Adapter {
             podIds.add(podId);
         }
 
-        public void addDataCenter(final long dataCenterId) {
-            dcIds.add(dataCenterId);
+        public void addZone(final long zoneId) {
+            zoneIds.add(zoneId);
         }
 
         public void addCluster(final long clusterId) {
@@ -124,8 +124,8 @@ public interface DeploymentPlanner extends Adapter {
                 addHost(e.getResourceId());
             } else if (Pod.class.isAssignableFrom(scope)) {
                 addPod(e.getResourceId());
-            } else if (DataCenter.class.isAssignableFrom(scope)) {
-                addDataCenter(e.getResourceId());
+            } else if (Zone.class.isAssignableFrom(scope)) {
+                addZone(e.getResourceId());
             } else if (Cluster.class.isAssignableFrom(scope)) {
                 addCluster(e.getResourceId());
             } else if (StoragePool.class.isAssignableFrom(scope)) {
@@ -149,8 +149,8 @@ public interface DeploymentPlanner extends Adapter {
             hostIds.addAll(hostList);
         }
 
-        public boolean shouldAvoid(final DataCenter dc) {
-            return shouldAvoid(dc.getId(), null, null, null, null);
+        public boolean shouldAvoid(final Zone zone) {
+            return shouldAvoid(zone.getId(), null, null, null, null);
         }
 
         public boolean shouldAvoid(final Pod pod) {
@@ -169,32 +169,32 @@ public interface DeploymentPlanner extends Adapter {
             return shouldAvoid(pool.getDataCenterId(), pool.getPodId(), pool.getClusterId(), pool.getId(), null);
         }
 
-        private boolean shouldAvoid(final Long dataCenterId, final Long podId, final Long clusterId, final Long poolId, final Long hostId) {
-            if (dataCenterId != null && ! dcIds.isEmpty() && dcIds.contains(dataCenterId)) {
+        private boolean shouldAvoid(final Long zoneId, final Long podId, final Long clusterId, final Long poolId, final Long hostId) {
+            if (zoneId != null && !zoneIds.isEmpty() && zoneIds.contains(zoneId)) {
                 return true;
             }
 
-            if (podId != null && ! podIds.isEmpty() && podIds.contains(podId)) {
+            if (podId != null && !podIds.isEmpty() && podIds.contains(podId)) {
                 return true;
             }
 
-            if (clusterId != null && ! clusterIds.isEmpty() && clusterIds.contains(clusterId)) {
+            if (clusterId != null && !clusterIds.isEmpty() && clusterIds.contains(clusterId)) {
                 return true;
             }
 
-            if (poolId != null && ! poolIds.isEmpty() && poolIds.contains(poolId)) {
+            if (poolId != null && !poolIds.isEmpty() && poolIds.contains(poolId)) {
                 return true;
             }
 
-            if (hostId != null && ! hostIds.isEmpty() && hostIds.contains(hostId)) {
+            if (hostId != null && !hostIds.isEmpty() && hostIds.contains(hostId)) {
                 return true;
             }
 
             return false;
         }
 
-        public Set<Long> getDataCentersToAvoid() {
-            return dcIds;
+        public Set<Long> getZonesToAvoid() {
+            return zoneIds;
         }
 
         public Set<Long> getPodsToAvoid() {
@@ -215,7 +215,7 @@ public interface DeploymentPlanner extends Adapter {
 
         @Override
         public String toString() {
-            return "avoid: dcs " + dcIds + ", pods " + podIds + ", clusters " + clusterIds + ", hosts " + hostIds + ", pools " + poolIds;
+            return "avoid: zones " + zoneIds + ", pods " + podIds + ", clusters " + clusterIds + ", hosts " + hostIds + ", pools " + poolIds;
         }
     }
 }

@@ -121,9 +121,9 @@ public class ControlNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         assert nic.getTrafficType() == TrafficType.Control;
 
-        final String ip = _dcDao.allocateLinkLocalIpAddress(dest.getDataCenter().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
+        final String ip = _dcDao.allocateLinkLocalIpAddress(dest.getZone().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
         if (ip == null) {
-            throw new InsufficientAddressCapacityException("Insufficient link local address capacity", DataCenter.class, dest.getDataCenter().getId());
+            throw new InsufficientAddressCapacityException("Insufficient link local address capacity", DataCenter.class, dest.getZone().getId());
         }
         nic.setIPv4Address(ip);
         nic.setMacAddress(NetUtils.long2Mac(NetUtils.ip2Long(ip) | 14l << 40));

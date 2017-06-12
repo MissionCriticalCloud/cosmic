@@ -93,7 +93,7 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
         Pair<String, Long> ip = null;
 
         _ipAllocDao.releaseIpAddress(nic.getId());
-        final DataCenterIpAddressVO vo = _ipAllocDao.takeIpAddress(dest.getDataCenter().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
+        final DataCenterIpAddressVO vo = _ipAllocDao.takeIpAddress(dest.getZone().getId(), dest.getPod().getId(), nic.getId(), context.getReservationId());
 
         if (vo != null) {
             ip = new Pair<>(vo.getIpAddress(), vo.getMacAddress());

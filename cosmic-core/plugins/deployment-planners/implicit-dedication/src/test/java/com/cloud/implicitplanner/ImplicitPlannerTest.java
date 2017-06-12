@@ -11,8 +11,9 @@ import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
@@ -129,6 +130,8 @@ public class ImplicitPlannerTest {
     ServiceOfferingDetailsDao serviceOfferingDetailsDao;
     @Inject
     ResourceManager resourceMgr;
+    @Inject
+    ZoneRepository zoneRepository;
     long dataCenterId = 1L;
     long accountId = 200L;
     long offeringId = 12L;
@@ -157,16 +160,16 @@ public class ImplicitPlannerTest {
 
     @Test
     public void checkWhenDcInAvoidList() throws InsufficientServerCapacityException {
-        final DataCenterVO mockDc = mock(DataCenterVO.class);
+        final Zone zone = mock(Zone.class);
         final ExcludeList avoids = mock(ExcludeList.class);
         final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
         final VMInstanceVO vm = mock(VMInstanceVO.class);
         final DataCenterDeployment plan = mock(DataCenterDeployment.class);
 
-        when(avoids.shouldAvoid(mockDc)).thenReturn(true);
+        when(avoids.shouldAvoid(zone)).thenReturn(true);
         when(vmProfile.getVirtualMachine()).thenReturn(vm);
         when(vm.getDataCenterId()).thenReturn(1L);
-        when(dcDao.findById(1L)).thenReturn(mockDc);
+        when(zoneRepository.findOne(1L)).thenReturn(zone);
 
         final List<Long> clusterList = planner.orderClusters(vmProfile, plan, avoids);
         assertTrue("Cluster list should be null/empty if the dc is in avoid list", (clusterList == null || clusterList.isEmpty()));
@@ -207,7 +210,7 @@ public class ImplicitPlannerTest {
     }
 
     private void initializeForTest(final VirtualMachineProfileImpl vmProfile, final DataCenterDeployment plan) {
-        final DataCenterVO mockDc = mock(DataCenterVO.class);
+        final Zone zone = mock(Zone.class);
         final VMInstanceVO vm = mock(VMInstanceVO.class);
         final UserVmVO userVm = mock(UserVmVO.class);
         final ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
@@ -222,7 +225,7 @@ public class ImplicitPlannerTest {
         when(userVm.getAccountId()).thenReturn(accountId);
 
         when(vm.getDataCenterId()).thenReturn(dataCenterId);
-        when(dcDao.findById(1L)).thenReturn(mockDc);
+        when(zoneRepository.findOne(1L)).thenReturn(zone);
         when(plan.getDataCenterId()).thenReturn(dataCenterId);
         when(plan.getClusterId()).thenReturn(null);
         when(plan.getPodId()).thenReturn(null);
@@ -324,8 +327,7 @@ public class ImplicitPlannerTest {
 
     @Test
     public void checkStrictModeHostWithCurrentAccountVmsFull() throws InsufficientServerCapacityException {
-        final
-        VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
+        final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
         final DataCenterDeployment plan = mock(DataCenterDeployment.class);
         final ExcludeList avoids = new ExcludeList();
 
@@ -361,8 +363,7 @@ public class ImplicitPlannerTest {
 
     @Test
     public void checkStrictModeNoHostsAvailable() throws InsufficientServerCapacityException {
-        final
-        VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
+        final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
         final DataCenterDeployment plan = mock(DataCenterDeployment.class);
         final ExcludeList avoids = new ExcludeList();
 
@@ -382,8 +383,7 @@ public class ImplicitPlannerTest {
 
     @Test
     public void checkPreferredModePreferredHostAvailable() throws InsufficientServerCapacityException {
-        final
-        VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
+        final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
         final DataCenterDeployment plan = mock(DataCenterDeployment.class);
         final ExcludeList avoids = new ExcludeList();
 
@@ -420,8 +420,7 @@ public class ImplicitPlannerTest {
 
     @Test
     public void checkPreferredModeNoHostsAvailable() throws InsufficientServerCapacityException {
-        final
-        VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
+        final VirtualMachineProfileImpl vmProfile = mock(VirtualMachineProfileImpl.class);
         final DataCenterDeployment plan = mock(DataCenterDeployment.class);
         final ExcludeList avoids = new ExcludeList();
 
@@ -564,6 +563,11 @@ public class ImplicitPlannerTest {
         @Bean
         public ResourceManager resourceManager() {
             return Mockito.mock(ResourceManager.class);
+        }
+
+        @Bean
+        public ZoneRepository zoneRepository() {
+            return Mockito.mock(ZoneRepository.class);
         }
 
         public static class Library implements TypeFilter {

@@ -628,7 +628,7 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
             long internalLbVmOfferingId = _internalLbVmOfferingId;
             if (internalLbVmOfferingId == 0L) {
                 final ServiceOfferingVO serviceOffering = _serviceOfferingDao.findDefaultSystemOffering(ServiceOffering.internalLbVmDefaultOffUniqueName,
-                        ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(dest.getDataCenter().getId()));
+                        ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(dest.getZone().getId()));
                 internalLbVmOfferingId = serviceOffering.getId();
             }
             //Pass startVm=false as we are holding the network lock that needs to be released at the end of vm allocation
@@ -704,7 +704,7 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
     }
 
     protected Pair<DeploymentPlan, List<DomainRouterVO>> getDeploymentPlanAndInternalLbVms(final DeployDestination dest, final long guestNetworkId, final Ip requestedGuestIp) {
-        final long dcId = dest.getDataCenter().getId();
+        final long dcId = dest.getZone().getId();
         final DeploymentPlan plan = new DataCenterDeployment(dcId);
         final List<DomainRouterVO> internalLbVms = findInternalLbVms(guestNetworkId, requestedGuestIp);
 
@@ -748,15 +748,15 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
             try {
                 final long id = _internalLbVmDao.getNextInSequence(Long.class, "id");
                 if (s_logger.isDebugEnabled()) {
-                    s_logger.debug("Creating the internal lb vm " + id + " in datacenter " + dest.getDataCenter() + " with hypervisor type " + hType);
+                    s_logger.debug("Creating the internal lb vm " + id + " in datacenter " + dest.getZone() + " with hypervisor type " + hType);
                 }
                 String templateName = null;
                 switch (hType) {
                     case XenServer:
-                        templateName = VirtualNetworkApplianceManager.RouterTemplateXen.valueIn(dest.getDataCenter().getId());
+                        templateName = VirtualNetworkApplianceManager.RouterTemplateXen.valueIn(dest.getZone().getId());
                         break;
                     case KVM:
-                        templateName = VirtualNetworkApplianceManager.RouterTemplateKvm.valueIn(dest.getDataCenter().getId());
+                        templateName = VirtualNetworkApplianceManager.RouterTemplateKvm.valueIn(dest.getZone().getId());
                         break;
                     default:
                         break;
@@ -824,12 +824,12 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
             throws InsufficientServerCapacityException {
         List<HypervisorType> hypervisors = new ArrayList<>();
 
-        final HypervisorType defaults = _resourceMgr.getDefaultHypervisor(dest.getDataCenter().getId());
+        final HypervisorType defaults = _resourceMgr.getDefaultHypervisor(dest.getZone().getId());
         if (defaults != HypervisorType.None) {
             hypervisors.add(defaults);
         } else {
             //if there is no default hypervisor, get it from the cluster
-            hypervisors = _resourceMgr.getSupportedHypervisorTypes(dest.getDataCenter().getId(), true, plan.getPodId());
+            hypervisors = _resourceMgr.getSupportedHypervisorTypes(dest.getZone().getId(), true, plan.getPodId());
         }
 
         //keep only elements defined in supported hypervisors
@@ -843,7 +843,7 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
 
         if (hypervisors.isEmpty()) {
             throw new InsufficientServerCapacityException("Unable to create internal lb vm, " + "there are no clusters in the zone ", DataCenter.class,
-                    dest.getDataCenter().getId());
+                    dest.getZone().getId());
         }
         return hypervisors;
     }

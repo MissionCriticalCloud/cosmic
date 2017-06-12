@@ -40,6 +40,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
@@ -358,6 +360,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     AsyncJobManager _asyncMgr;
     @Inject
     OpRouterMonitorServiceDao _opRouterMonitorServiceDao;
+    @Inject
+    ZoneRepository zoneRepository;
+
     int _routerRamSize;
     int _routerCpuMHz;
     int _retry = 2;
@@ -740,12 +745,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         // Check if all networks are implemented for the domR; if not -
         // implement them
-        final DataCenter dc = _dcDao.findById(router.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         HostPodVO pod = null;
         if (router.getPodIdToDeployIn() != null) {
             pod = _podDao.findById(router.getPodIdToDeployIn());
         }
-        final DeployDestination dest = new DeployDestination(dc, pod, null, null);
+        final DeployDestination dest = new DeployDestination(zone, pod, null, null);
 
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser, owner);
 
@@ -1092,7 +1097,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         boolean dnsProvided = true;
         boolean dhcpProvided = true;
         boolean publicNetwork = false;
-        final DataCenterVO dc = _dcDao.findById(dest.getDataCenter().getId());
+        final DataCenterVO dc = _dcDao.findById(dest.getZone().getId());
         _dcDao.loadDetails(dc);
 
         // 1) Set router details

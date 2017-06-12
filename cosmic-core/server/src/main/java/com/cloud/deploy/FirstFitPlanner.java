@@ -4,14 +4,13 @@ import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.configuration.Config;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
-import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -42,8 +41,6 @@ import com.cloud.vm.dao.VMInstanceDao;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +52,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     private static final Logger s_logger = LoggerFactory.getLogger(FirstFitPlanner.class);
     @Inject
     protected HostDao hostDao;
-    @Inject
-    protected DataCenterDao dcDao;
     @Inject
     protected HostPodDao podDao;
     @Inject
@@ -99,17 +94,17 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     protected String globalDeploymentPlanner = "FirstFitPlanner";
     protected String[] implicitHostTags;
     @Inject
-    DataStoreManager dataStoreMgr;
+    ZoneRepository zoneRepository;
 
     @Override
     public List<Long> orderClusters(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws InsufficientServerCapacityException {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
-        final DataCenter dc = dcDao.findById(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
 
         //check if datacenter is in avoid set
-        if (avoid.shouldAvoid(dc)) {
+        if (avoid.shouldAvoid(zone)) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("DataCenter id = '" + dc.getId() + "' provided is in avoid set, DeploymentPlanner cannot allocate the VM, returning.");
+                s_logger.debug("DataCenter id = '" + zone.getId() + "' provided is in avoid set, DeploymentPlanner cannot allocate the VM, returning.");
             }
             return null;
         }
@@ -334,7 +329,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final ServiceOffering offering = vmProfile.getServiceOffering();
-        final DataCenter dc = dcDao.findById(vm.getDataCenterId());
         final int requiredCpu = offering.getCpu() * offering.getSpeed();
         final long requiredRam = offering.getRamSize() * 1024L * 1024L;
 

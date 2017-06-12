@@ -169,7 +169,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
             throws InsufficientVirtualNetworkCapacityException {
         assert network.getState() == State.Implementing : "Why are we implementing " + network;
 
-        final long dcId = dest.getDataCenter().getId();
+        final long dcId = dest.getZone().getId();
 
         //get physical network id
         Long physicalNetworkId = network.getPhysicalNetworkId();

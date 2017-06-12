@@ -15,6 +15,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DataCenterVnetVO;
@@ -288,6 +290,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     LoadBalancingRulesService _lbService;
     @Inject
     MessageBus _messageBus;
+    @Inject
+    ZoneRepository zoneRepository;
 
     int _cidrLimit;
     boolean _allowSubdomainNetworkAccess;
@@ -718,7 +722,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             displayNetwork = true;
         }
 
-        final DataCenter zone = _dcDao.findById(zoneId);
+        final Zone zone = zoneRepository.findOne(zoneId);
         if (zone == null) {
             throw new InvalidParameterValueException("Specified zone id was not found");
         }
@@ -1000,7 +1004,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return network;
     }
 
-    public void checkIpExclusionList(final String ipExclusionList, final String cidr, List<NicVO> nicsPresent) {
+    public void checkIpExclusionList(final String ipExclusionList, final String cidr, final List<NicVO> nicsPresent) {
         if (StringUtils.isNotBlank(ipExclusionList)) {
             // validate ipExclusionList
             // Perform a "syntax" check on the list
@@ -1924,7 +1928,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         // 3) Implement the elements and rules again
         if (restartNetwork) {
             if (network.getState() != Network.State.Allocated) {
-                final DeployDestination dest = new DeployDestination(_dcDao.findById(network.getDataCenterId()), null, null, null);
+                final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
                 s_logger.debug("Implementing the network " + network + " elements and resources as a part of network update");
                 try {
                     if (!changeCidr) {
@@ -1946,7 +1950,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (networkOfferingChanged && !oldNtwkOff.getIsPersistent() && networkOffering.getIsPersistent()) {
             if (network.getState() == Network.State.Allocated) {
                 try {
-                    final DeployDestination dest = new DeployDestination(_dcDao.findById(network.getDataCenterId()), null, null, null);
+                    final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
                     _networkMgr.implementNetwork(network.getId(), dest, context);
                 } catch (final Exception ex) {
                     s_logger.warn("Failed to implement network " + network + " elements and resources as a part o" + "f network update due to ", ex);

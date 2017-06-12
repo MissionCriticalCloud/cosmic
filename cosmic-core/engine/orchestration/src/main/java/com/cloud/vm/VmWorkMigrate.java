@@ -1,7 +1,8 @@
 package com.cloud.vm;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.host.Host;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class VmWorkMigrate extends VmWork {
     private static final long serialVersionUID = 1689203333114836522L;
     static private EntityManager s_entityMgr;
+    static private ZoneRepository s_zoneRepository;
     private final Map<String, String> storage;
     Long zoneId;
     Long podId;
@@ -26,7 +28,7 @@ public class VmWorkMigrate extends VmWork {
                          final long srcHostId, final DeployDestination dst) {
         super(userId, accountId, vmId, handlerName);
         this.srcHostId = srcHostId;
-        zoneId = dst.getDataCenter() != null ? dst.getDataCenter().getId() : null;
+        zoneId = dst.getZone() != null ? dst.getZone().getId() : null;
         podId = dst.getPod() != null ? dst.getPod().getId() : null;
         clusterId = dst.getCluster() != null ? dst.getCluster().getId() : null;
         hostId = dst.getHost() != null ? dst.getHost().getId() : null;
@@ -40,12 +42,13 @@ public class VmWorkMigrate extends VmWork {
         }
     }
 
-    static public void init(final EntityManager entityMgr) {
+    static public void init(final EntityManager entityMgr, final ZoneRepository zoneRepository) {
         s_entityMgr = entityMgr;
+        s_zoneRepository = zoneRepository;
     }
 
     public DeployDestination getDeployDestination() {
-        final DataCenter zone = zoneId != null ? s_entityMgr.findById(DataCenter.class, zoneId) : null;
+        final Zone zone = zoneId != null ? s_zoneRepository.findOne(zoneId) : null;
         final Pod pod = podId != null ? s_entityMgr.findById(Pod.class, podId) : null;
         final Cluster cluster = clusterId != null ? s_entityMgr.findById(Cluster.class, clusterId) : null;
         final Host host = hostId != null ? s_entityMgr.findById(Host.class, hostId) : null;

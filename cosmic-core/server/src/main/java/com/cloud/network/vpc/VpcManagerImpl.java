@@ -10,6 +10,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.Vlan.VlanType;
@@ -213,11 +215,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     ServiceOfferingDao _serviceOfferingDao;
     @Inject
     VpcVirtualNetworkApplianceManager _routerMgr;
+    @Inject
+    private VpcPrivateGatewayTransactionCallable vpcTxCallable;
+    @Inject
+    ZoneRepository zoneRepository;
+
     int _cleanupInterval;
     int _maxNetworks;
     SearchBuilder<IPAddressVO> IpAddressSearch;
-    @Inject
-    private VpcPrivateGatewayTransactionCallable vpcTxCallable;
     private List<VpcProvider> vpcElements = null;
 
     @PostConstruct
@@ -1067,7 +1072,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         final List<String> notSupportedServices = new LinkedList<>();
 
-        for (NetworkVO network : networks) {
+        for (final NetworkVO network : networks) {
             final List<String> networkOfferingSupportedServicesStr = _ntwkOffServiceDao.listServicesForNetworkOffering(network.getNetworkOfferingId());
 
             for (final String serviceName : networkOfferingSupportedServicesStr) {
@@ -1259,9 +1264,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         // permission check
         _accountMgr.checkAccess(caller, null, false, vpc);
 
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, vpc.getZoneId());
+        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
 
-        final DeployDestination dest = new DeployDestination(dc, null, null, null);
+        final DeployDestination dest = new DeployDestination(zone, null, null, null);
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser,
                 _accountMgr.getAccount(vpc.getAccountId()));
 
@@ -1389,7 +1394,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
     }
 
-    private boolean rollingRestartVpc(Vpc vpc, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException, ConcurrentOperationException,
+    private boolean rollingRestartVpc(final Vpc vpc, final List<DomainRouterVO> routers, final ReservationContext context) throws ResourceUnavailableException,
+            ConcurrentOperationException,
             InsufficientCapacityException {
         final int sleepTimeInMsAfterRouterStart = 10000;
         final int numberOfRoutersWhenSingle = 1;
@@ -1403,8 +1409,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             s_logger.debug("Rolling restart found a single router " + mainRouter.getInstanceName() + " as part of rolling restart of VPC " + vpc);
         }
         if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
-            DomainRouterVO router1 = routers.get(0);
-            DomainRouterVO router2 = routers.get(1);
+            final DomainRouterVO router1 = routers.get(0);
+            final DomainRouterVO router2 = routers.get(1);
             if (router1.getRedundantState() == VirtualRouter.RedundantState.MASTER || router2.getRedundantState() == VirtualRouter.RedundantState.BACKUP) {
                 mainRouter = router1;
                 secondaryRouter = router2;
@@ -1420,7 +1426,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                     ());
         }
 
-        DeployDestination dest = new DeployDestination(_dcDao.findById(vpc.getZoneId()), null, null, null);
+        final DeployDestination dest = new DeployDestination(zoneRepository.findOne(vpc.getZoneId()), null, null, null);
 
         // If we are supposed to be redundant, let's replace the backup router
         // We do this even when backupRouter is null, so we first spin a new router before replacing the other router
@@ -1453,12 +1459,12 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         try {
             // wait for the keepalived/conntrackd on router
             Thread.sleep(sleepTimeInMsAfterRouterStart);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             s_logger.trace("Ignoring InterruptedException.", e);
         }
 
         // Routers after this action
-        List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
+        final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
         for (final DomainRouterVO router : routers) {
             // Both should be in state Running, or else the provisioning went wrong somehow as we started with destroying non-Running routers
             // In order not to kill both routers, we'll stop the procedure.

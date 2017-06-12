@@ -13,6 +13,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
@@ -575,7 +576,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (_sslEnabled) {
             buf.append(" premium=true");
         }
-        buf.append(" zone=").append(dest.getDataCenter().getId());
+        buf.append(" zone=").append(dest.getZone().getId());
         buf.append(" pod=").append(dest.getPod().getId());
         buf.append(" guid=Proxy.").append(profile.getId());
         buf.append(" proxy_vm=").append(profile.getId());
@@ -640,9 +641,9 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
     public boolean finalizeDeployment(final Commands cmds, final VirtualMachineProfile profile, final DeployDestination dest, final ReservationContext context) {
         finalizeCommandsOnStart(cmds, profile);
         final ConsoleProxyVO proxy = _consoleProxyDao.findById(profile.getId());
-        final DataCenter dc = dest.getDataCenter();
+        final Zone zone = dest.getZone();
         final List<NicProfile> nics = profile.getNics();
-        computeVmIps(proxy, dc, nics);
+        computeVmIps(proxy, zone, nics);
         _consoleProxyDao.update(proxy.getId(), proxy);
         return true;
     }

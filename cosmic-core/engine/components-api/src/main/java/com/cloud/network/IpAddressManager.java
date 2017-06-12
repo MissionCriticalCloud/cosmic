@@ -1,5 +1,6 @@
 package com.cloud.network;
 
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.exception.ConcurrentOperationException;
@@ -87,7 +88,7 @@ public interface IpAddressManager {
 
     boolean handleSystemIpRelease(IpAddress ip);
 
-    void allocateDirectIp(NicProfile nic, DataCenter dc, VirtualMachineProfile vm, Network network, String requestedIpv4, String requestedIpv6)
+    void allocateDirectIp(NicProfile nic, Zone zone, VirtualMachineProfile vm, Network network, String requestedIpv4, String requestedIpv6)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException;
 
     /**
@@ -148,7 +149,7 @@ public interface IpAddressManager {
                                             boolean isSystem) throws InsufficientAddressCapacityException;
 
     @DB
-    void allocateNicValues(NicProfile nic, DataCenter dc, VirtualMachineProfile vm, Network network, String requestedIpv4,
+    void allocateNicValues(NicProfile nic, Zone zone, VirtualMachineProfile vm, Network network, String requestedIpv4,
                            String requestedIpv6) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException;
 
     int getRuleCountForIp(Long addressId, FirewallRule.Purpose purpose, FirewallRule.State state);

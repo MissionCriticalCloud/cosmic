@@ -4,6 +4,7 @@ import static com.cloud.utils.CloudConstants.PROPERTY_LIST_SEPARATOR;
 
 import com.cloud.cluster.ClusterManager;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -41,10 +42,10 @@ import org.slf4j.LoggerFactory;
 public abstract class SystemVmManagerBase extends ManagerBase implements SystemVmLoadScanHandler<Long> {
     private static final Logger logger = LoggerFactory.getLogger(SystemVmManagerBase.class);
 
-    protected void computeVmIps(final SystemVm vmVO, final DataCenter dc, final List<NicProfile> nics) {
+    protected void computeVmIps(final SystemVm vmVO, final Zone zone, final List<NicProfile> nics) {
         for (final NicProfile nic : nics) {
-            if ((nic.getTrafficType() == TrafficType.Public && dc.getNetworkType() == NetworkType.Advanced) ||
-                    (nic.getTrafficType() == TrafficType.Guest && (dc.getNetworkType() == NetworkType.Basic || dc.isSecurityGroupEnabled()))) {
+            if ((nic.getTrafficType() == TrafficType.Public && zone.getNetworkType() == NetworkType.Advanced) ||
+                    (nic.getTrafficType() == TrafficType.Guest && (zone.getNetworkType() == NetworkType.Basic || zone.isSecurityGroupEnabled()))) {
                 vmVO.setPublicIpAddress(nic.getIPv4Address());
                 vmVO.setPublicNetmask(nic.getIPv4Netmask());
                 vmVO.setPublicMacAddress(nic.getMacAddress());

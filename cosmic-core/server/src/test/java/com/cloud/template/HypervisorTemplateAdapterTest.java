@@ -9,7 +9,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
@@ -90,7 +90,7 @@ public class HypervisorTemplateAdapterTest {
     @Mock
     AccountDao _accountDao;
     @Mock
-    DataCenterDao _dcDao;
+    ZoneRepository _zoneRepository;
     @Mock
     ConfigurationDao _configDao;
     @InjectMocks
@@ -130,8 +130,7 @@ public class HypervisorTemplateAdapterTest {
         when(result.isSuccess()).thenReturn(true);
         when(result.isFailed()).thenReturn(false);
 
-        final
-        AsyncCallFuture<TemplateApiResult> future = mock(AsyncCallFuture.class);
+        final AsyncCallFuture<TemplateApiResult> future = mock(AsyncCallFuture.class);
         when(future.get()).thenReturn(result);
 
         final AccountVO acct = mock(AccountVO.class);
@@ -195,7 +194,7 @@ public class HypervisorTemplateAdapterTest {
         final Map<String, String> usageUtilsFields = new HashMap<>();
         usageUtilsFields.put("usageEventDao", "_usageEventDao");
         usageUtilsFields.put("accountDao", "_accountDao");
-        usageUtilsFields.put("dcDao", "_dcDao");
+        usageUtilsFields.put("zoneRepository", "_zoneRepository");
         usageUtilsFields.put("configDao", "_configDao");
 
         for (final String fieldName : usageUtilsFields.keySet()) {
