@@ -266,7 +266,7 @@ public class NetworkHelperImpl implements NetworkHelper {
                 if (state != State.Running) {
                     final Account caller = CallContext.current().getCallingAccount();
                     final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
-                    router = startVirtualRouter(router,callerUser, caller, routerDeploymentDefinition.getParams());
+                    router = startVirtualRouter(router, callerUser, caller, routerDeploymentDefinition.getParams());
                 }
                 if (router != null) {
                     runningRouters.add(router);
@@ -470,10 +470,9 @@ public class NetworkHelperImpl implements NetworkHelper {
                     continue;
                 }
 
-                logger.debug(String.format("Allocating the VR with id=%s in datacenter %s with the hypervisor type %s", id, routerDeploymentDefinition.getDest()
-                                                                                                                                                      .getDataCenter(), hType));
+                logger.debug(String.format("Allocating the VR with id=%s in datacenter %s with the hypervisor type %s", id, routerDeploymentDefinition.getDest().getZone(), hType));
 
-                final String templateName = retrieveTemplateName(hType, routerDeploymentDefinition.getDest().getDataCenter().getId());
+                final String templateName = retrieveTemplateName(hType, routerDeploymentDefinition.getDest().getZone().getId());
                 final VMTemplateVO template = _templateDao.findRoutingTemplate(hType, templateName);
 
                 if (template == null) {
@@ -550,12 +549,12 @@ public class NetworkHelperImpl implements NetworkHelper {
         if (dest.getCluster() != null) {
             hypervisors.add(dest.getCluster().getHypervisorType());
         } else {
-            final HypervisorType defaults = _resourceMgr.getDefaultHypervisor(dest.getDataCenter().getId());
+            final HypervisorType defaults = _resourceMgr.getDefaultHypervisor(dest.getZone().getId());
             if (defaults != HypervisorType.None) {
                 hypervisors.add(defaults);
             } else {
                 // if there is no default hypervisor, get it from the cluster
-                hypervisors = _resourceMgr.getSupportedHypervisorTypes(dest.getDataCenter().getId(), true, routerDeploymentDefinition.getPlan().getPodId());
+                hypervisors = _resourceMgr.getSupportedHypervisorTypes(dest.getZone().getId(), true, routerDeploymentDefinition.getPlan().getPodId());
             }
         }
 
@@ -567,7 +566,7 @@ public class NetworkHelperImpl implements NetworkHelper {
                         routerDeploymentDefinition.getPodId());
             }
             throw new InsufficientServerCapacityException("Unable to create virtual router, there are no clusters in the zone." + getNoHypervisorsErrMsgDetails(),
-                    DataCenter.class, dest.getDataCenter().getId());
+                    DataCenter.class, dest.getZone().getId());
         }
         return hypervisors;
     }

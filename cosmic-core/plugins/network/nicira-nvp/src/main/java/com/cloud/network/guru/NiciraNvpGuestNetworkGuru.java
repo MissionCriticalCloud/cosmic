@@ -151,13 +151,13 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
             throws InsufficientVirtualNetworkCapacityException {
         assert network.getState() == Network.State.Implementing : "Why are we implementing " + network;
 
-        final long dcId = dest.getDataCenter().getId();
+        final long zoneId = dest.getZone().getId();
 
         Long physicalNetworkId = network.getPhysicalNetworkId();
 
         // physical network id can be null in Guest Network in Basic zone, so locate the physical network
         if (physicalNetworkId == null) {
-            physicalNetworkId = networkModel.findPhysicalNetworkId(dcId, offering.getTags(), offering.getTrafficType());
+            physicalNetworkId = networkModel.findPhysicalNetworkId(zoneId, offering.getTags(), offering.getTrafficType());
         }
 
         final NetworkVO implemented = new NetworkVO(network.getTrafficType(), network.getMode(), network.getBroadcastDomainType(), network.getNetworkOfferingId(),

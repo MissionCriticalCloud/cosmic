@@ -67,7 +67,7 @@ public class GarbageCollectingStoragePoolAllocator extends AbstractStoragePoolAl
 
         // Try to find a storage pool after cleanup
         final ExcludeList myAvoids =
-                new ExcludeList(avoid.getDataCentersToAvoid(), avoid.getPodsToAvoid(), avoid.getClustersToAvoid(), avoid.getHostsToAvoid(), avoid.getPoolsToAvoid());
+                new ExcludeList(avoid.getZonesToAvoid(), avoid.getPodsToAvoid(), avoid.getClustersToAvoid(), avoid.getHostsToAvoid(), avoid.getPoolsToAvoid());
 
         return allocator.allocateToPool(dskCh, vmProfile, plan, myAvoids, returnUpTo);
     }

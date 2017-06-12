@@ -1,6 +1,6 @@
 package com.cloud.deploy;
 
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.Pod;
 import com.cloud.host.Host;
 import com.cloud.org.Cluster;
@@ -14,19 +14,19 @@ import java.util.Map;
 public class DeployDestination implements Serializable {
     private static final long serialVersionUID = 7113840781939014695L;
 
-    DataCenter _dc;
+    Zone _zone;
     Pod _pod;
     Cluster _cluster;
     Host _host;
     Map<Volume, StoragePool> _storage;
 
-    public DeployDestination(final DataCenter dc, final Pod pod, final Cluster cluster, final Host host, final Map<Volume, StoragePool> storage) {
-        this(dc, pod, cluster, host);
+    public DeployDestination(final Zone zone, final Pod pod, final Cluster cluster, final Host host, final Map<Volume, StoragePool> storage) {
+        this(zone, pod, cluster, host);
         _storage = storage;
     }
 
-    public DeployDestination(final DataCenter dc, final Pod pod, final Cluster cluster, final Host host) {
-        _dc = dc;
+    public DeployDestination(final Zone zone, final Pod pod, final Cluster cluster, final Host host) {
+        _zone = zone;
         _pod = pod;
         _cluster = cluster;
         _host = host;
@@ -35,8 +35,8 @@ public class DeployDestination implements Serializable {
     public DeployDestination() {
     }
 
-    public DataCenter getDataCenter() {
-        return _dc;
+    public Zone getZone() {
+        return _zone;
     }
 
     public Pod getPod() {
@@ -63,10 +63,10 @@ public class DeployDestination implements Serializable {
     @Override
     public boolean equals(final Object obj) {
         final DeployDestination that = (DeployDestination) obj;
-        if (_dc == null || that._dc == null) {
+        if (_zone == null || that._zone == null) {
             return false;
         }
-        if (_dc.getId() != that._dc.getId()) {
+        if (_zone.getId() != that._zone.getId()) {
             return false;
         }
         if (_pod == null || that._pod == null) {
@@ -90,13 +90,13 @@ public class DeployDestination implements Serializable {
     @Override
     public String toString() {
 
-        Long dcId = null;
+        Long zoneId = null;
         Long podId = null;
         Long clusterId = null;
         Long hostId = null;
 
-        if (_dc != null) {
-            dcId = _dc.getId();
+        if (_zone != null) {
+            zoneId = _zone.getId();
         }
 
         if (_pod != null) {
@@ -112,7 +112,7 @@ public class DeployDestination implements Serializable {
         }
 
         final StringBuilder destination = new StringBuilder("Dest[Zone(Id)-Pod(Id)-Cluster(Id)-Host(Id)-Storage(Volume(Id|Type-->Pool(Id))] : Dest[");
-        destination.append("Zone(").append(dcId).append(")").append("-");
+        destination.append("Zone(").append(zoneId).append(")").append("-");
         destination.append("Pod(").append(podId).append(")").append("-");
         destination.append("Cluster(").append(clusterId).append(")").append("-");
         destination.append("Host(").append(hostId).append(")").append("-");

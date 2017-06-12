@@ -25,6 +25,7 @@ import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.consoleproxy.ConsoleProxyManager;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -361,7 +362,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final Map<String, String> details = _vmDetailsDao.listDetailsKeyPairs(vm.getId());
         vm.setDetails(details);
 
-        final DataStore secStore = _dataStoreMgr.getImageStore(dest.getDataCenter().getId());
+        final DataStore secStore = _dataStoreMgr.getImageStore(dest.getZone().getId());
         assert (secStore != null);
 
         final StringBuilder buf = profile.getBootArgsBuilder();
@@ -370,7 +371,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         buf.append(" port=").append(_mgmtPort);
         buf.append(" name=").append(profile.getVirtualMachine().getHostName());
 
-        buf.append(" zone=").append(dest.getDataCenter().getId());
+        buf.append(" zone=").append(dest.getZone().getId());
         buf.append(" pod=").append(dest.getPod().getId());
 
         buf.append(" guid=").append(profile.getVirtualMachine().getHostName());
@@ -449,9 +450,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         finalizeCommandsOnStart(cmds, profile);
 
         final SecondaryStorageVmVO secVm = _secStorageVmDao.findById(profile.getId());
-        final DataCenter dc = dest.getDataCenter();
+        final Zone zone = dest.getZone();
         final List<NicProfile> nics = profile.getNics();
-        computeVmIps(secVm, dc, nics);
+        computeVmIps(secVm, zone, nics);
         _secStorageVmDao.update(secVm.getId(), secVm);
         return true;
     }

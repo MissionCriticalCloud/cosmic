@@ -26,8 +26,8 @@ import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
@@ -176,10 +176,6 @@ public class UserVmManagerTest {
     @Mock
     NetworkVO _networkMock;
     @Mock
-    DataCenterDao _dcDao;
-    @Mock
-    DataCenterVO _dcMock;
-    @Mock
     IpAddressManager _ipAddrMgr;
     @Mock
     IPAddressDao _ipAddressDao;
@@ -189,6 +185,10 @@ public class UserVmManagerTest {
     NetworkOfferingVO _networkOfferingMock;
     @Mock
     NetworkOrchestrationService _networkMgr;
+    @Mock
+    ZoneRepository zoneRepository;
+    @Mock
+    Zone zone;
 
     @Before
     public void setup() {
@@ -217,11 +217,11 @@ public class UserVmManagerTest {
         _userVmMgr._nicDao = _nicDao;
         _userVmMgr._networkModel = _networkModel;
         _userVmMgr._networkDao = _networkDao;
-        _userVmMgr._dcDao = _dcDao;
         _userVmMgr._ipAddrMgr = _ipAddrMgr;
         _userVmMgr._ipAddressDao = _ipAddressDao;
         _userVmMgr._networkOfferingDao = _networkOfferingDao;
         _userVmMgr._networkMgr = _networkMgr;
+        _userVmMgr.zoneRepository = zoneRepository;
 
         doReturn(3L).when(_account).getId();
         doReturn(8L).when(_vmMock).getAccountId();
@@ -706,8 +706,8 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Isolated);
-        when(_dcDao.findById(anyLong())).thenReturn(_dcMock);
-        when(_dcMock.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn("10.10.10.10");
         doNothing().when(_networkMgr).implementNetworkElementsAndResources(Mockito.any(DeployDestination.class), Mockito.any(ReservationContext.class), Mockito.eq(_networkMock),
@@ -754,8 +754,8 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Shared);
-        when(_dcDao.findById(anyLong())).thenReturn(_dcMock);
-        when(_dcMock.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn("10.10.10.10");
         when(_ipAddressDao.findByIpAndSourceNetworkId(anyLong(), anyString())).thenReturn(null);
@@ -841,8 +841,8 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Isolated);
-        when(_dcDao.findById(anyLong())).thenReturn(_dcMock);
-        when(_dcMock.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn(null);
 
@@ -888,8 +888,8 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Shared);
-        when(_dcDao.findById(anyLong())).thenReturn(_dcMock);
-        when(_dcMock.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn(null);
 

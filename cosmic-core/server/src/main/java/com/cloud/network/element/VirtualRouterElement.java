@@ -926,7 +926,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         if (_networkMdl.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, getProvider())) {
             publicNetwork = true;
         }
-        final boolean isPodBased = (dest.getDataCenter().getNetworkType() == NetworkType.Basic || _networkMdl.isSecurityGroupSupportedInNetwork(network))
+        final boolean isPodBased = (dest.getZone().getNetworkType() == NetworkType.Basic || _networkMdl.isSecurityGroupSupportedInNetwork(network))
                 && network.getTrafficType() == TrafficType.Guest;
 
         final List<DomainRouterVO> routers;

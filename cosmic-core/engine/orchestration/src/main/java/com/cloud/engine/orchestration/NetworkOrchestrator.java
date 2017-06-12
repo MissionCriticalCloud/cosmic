@@ -2351,9 +2351,9 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             prepare) throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
-        final DeployDestination dest = new DeployDestination(dc, null, null, host);
+        final DeployDestination dest = new DeployDestination(zone, null, null, host);
 
         NicProfile nic = getNicProfileForVm(network, requested, vm);
 
@@ -2414,7 +2414,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
         if (cleanup) {
             if (_networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId()).getRedundantRouter()) {
-                List<DomainRouterVO> routers = _routerDao.findByNetwork(network.getId());
+                final List<DomainRouterVO> routers = _routerDao.findByNetwork(network.getId());
                 if (routers != null && !routers.isEmpty()) {
                     return rollingRestartIsolatedNetwork(network, routers, context);
                 }
@@ -2433,7 +2433,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         // implement the network elements and rules again
-        final DeployDestination dest = new DeployDestination(_dcDao.findById(network.getDataCenterId()), null, null, null);
+        final DeployDestination dest = new DeployDestination(_zoneRepository.findOne(network.getDataCenterId()), null, null, null);
 
         s_logger.debug("Implementing the network " + network + " elements and resources as a part of network restart");
         final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
@@ -2448,10 +2448,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
     }
 
-    private boolean rollingRestartIsolatedNetwork(NetworkVO network, List<DomainRouterVO> routers, ReservationContext context) throws ResourceUnavailableException,
+    private boolean rollingRestartIsolatedNetwork(final NetworkVO network, final List<DomainRouterVO> routers, final ReservationContext context) throws
+            ResourceUnavailableException,
             ConcurrentOperationException, InsufficientCapacityException {
-        Account caller = CallContext.current().getCallingAccount();
-        long callerUserId = CallContext.current().getCallingUserId();
+        final Account caller = CallContext.current().getCallingAccount();
+        final long callerUserId = CallContext.current().getCallingUserId();
 
         final int sleepTimeInMsAfterRouterStart = 10000;
         final int numberOfRoutersWhenSingle = 1;
@@ -2464,8 +2465,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             masterRouter = routers.get(0);
         }
         if (routers != null && routers.size() == numberOfRoutersWhenRedundant) {
-            DomainRouterVO router1 = routers.get(0);
-            DomainRouterVO router2 = routers.get(1);
+            final DomainRouterVO router1 = routers.get(0);
+            final DomainRouterVO router2 = routers.get(1);
             if (router1.getRedundantState() == RedundantState.MASTER || router2.getRedundantState() == RedundantState.BACKUP) {
                 masterRouter = router1;
                 backupRouter = router2;
@@ -2479,9 +2480,9 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             }
         }
 
-        NetworkOfferingVO offering = _networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId());
-        DeployDestination dest = new DeployDestination(_dcDao.findById(network.getDataCenterId()), null, null, null);
-        List<Provider> providersToImplement = getNetworkProviders(network.getId());
+        final NetworkOfferingVO offering = _networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId());
+        final DeployDestination dest = new DeployDestination(_zoneRepository.findOne(network.getDataCenterId()), null, null, null);
+        final List<Provider> providersToImplement = getNetworkProviders(network.getId());
 
         // destroy backup router
         if (backupRouter != null) {
@@ -2495,7 +2496,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             try {
                 // wait for the keepalived/conntrackd on router
                 Thread.sleep(sleepTimeInMsAfterRouterStart);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 s_logger.trace("Ignoring InterruptedException.", e);
             }
             _routerService.destroyRouter(masterRouter.getId(), caller, callerUserId);

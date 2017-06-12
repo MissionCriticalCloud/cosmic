@@ -38,11 +38,12 @@ import com.cloud.alert.AlertManager;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.ClusterDao;
@@ -318,6 +319,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     VolumeOrchestrationService volumeMgr;
     @Inject
     DeploymentPlanningManager _dpMgr;
+    @Inject
+    ZoneRepository _zoneRepository;
+
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachine.Type, VirtualMachineGuru> _vmGurus = new HashMap<>();
     ScheduledExecutorService _executor = null;
@@ -349,7 +353,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     public boolean configure(final String name, final Map<String, Object> xmlParams) throws ConfigurationException {
         ReservationContextImpl.init(_entityMgr);
         VirtualMachineProfileImpl.init(_entityMgr);
-        VmWorkMigrate.init(_entityMgr);
+        VmWorkMigrate.init(_entityMgr, _zoneRepository);
 
         _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("Vm-Operations-Cleanup"));
         _nodeId = ManagementServerNode.getManagementServerId();
@@ -588,10 +592,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final HostVO destHost = _hostDao.findById(destHostId);
         final VirtualMachineGuru vmGuru = getVmGuru(vm);
 
-        final DataCenterVO dc = _dcDao.findById(destHost.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(destHost.getDataCenterId());
         final HostPodVO pod = _podDao.findById(destHost.getPodId());
         final Cluster cluster = _clusterDao.findById(destHost.getClusterId());
-        final DeployDestination destination = new DeployDestination(dc, pod, cluster, destHost);
+        final DeployDestination destination = new DeployDestination(zone, pod, cluster, destHost);
 
         // Create a map of which volume should go in which storage pool.
         final VirtualMachineProfile profile = new VirtualMachineProfileImpl(vm);
@@ -695,7 +699,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             if (!migrated) {
                 s_logger.info("Migration was unsuccessful.  Cleaning up: " + vm);
                 _alertMgr.sendAlert(alertType, srcHost.getDataCenterId(), srcHost.getPodId(),
-                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + srcHost.getName() + " in zone " + dc.getName() + " and pod " + dc.getName(),
+                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + srcHost.getName() + " in zone " + zone.getName() + " and pod " + zone.getName(),
                         "Migrate Command failed.  Please check logs.");
                 try {
                     _agentMgr.send(destHostId, new Commands(cleanup(vm.getInstanceName())), null);
@@ -1806,7 +1810,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             } else {
                                 plan = new DataCenterDeployment(rootVolDcId, rootVolPodId, rootVolClusterId, null, vol.getPoolId(), null, ctx);
                                 s_logger.debug(vol + " is READY, changing deployment plan to use this pool's dcId: " + rootVolDcId + " , podId: " + rootVolPodId +
-                                            " , and clusterId: " + rootVolClusterId);
+                                        " , and clusterId: " + rootVolClusterId);
                                 planChangedByVolume = true;
                             }
                         }
@@ -2212,7 +2216,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 _networkMgr.rollbackNicForMigration(vmSrc, profile);
 
                 _alertMgr.sendAlert(alertType, fromHost.getDataCenterId(), fromHost.getPodId(),
-                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + fromHost.getName() + " in zone " + dest.getDataCenter().getName() + " and pod " +
+                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + fromHost.getName() + " in zone " + dest.getZone().getName() + " and pod " +
                                 dest.getPod().getName(), "Migrate Command failed.  Please check logs.");
                 try {
                     _agentMgr.send(dstHostId, new Commands(cleanup(vm)), null);
@@ -2508,7 +2512,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 s_logger.info("Migration was unsuccessful.  Cleaning up: " + vm);
 
                 _alertMgr.sendAlert(alertType, fromHost.getDataCenterId(), fromHost.getPodId(),
-                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + fromHost.getName() + " in zone " + dest.getDataCenter().getName() + " and pod " +
+                        "Unable to migrate vm " + vm.getInstanceName() + " from host " + fromHost.getName() + " in zone " + dest.getZone().getName() + " and pod " +
                                 dest.getPod().getName(), "Migrate Command failed.  Please check logs.");
                 try {
                     _agentMgr.send(dstHostId, new Commands(cleanup(vm.getInstanceName())), null);
@@ -2577,7 +2581,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             ResourceUnavailableException {
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, vm.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(vm.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
         if (host == null) {
             // Should findById throw an Exception is the host is not found?
@@ -2585,7 +2589,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
         final Cluster cluster = _entityMgr.findById(Cluster.class, host.getClusterId());
         final Pod pod = _entityMgr.findById(Pod.class, host.getPodId());
-        final DeployDestination dest = new DeployDestination(dc, pod, cluster, host);
+        final DeployDestination dest = new DeployDestination(zone, pod, cluster, host);
 
         try {
 
@@ -2675,9 +2679,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
-        final DeployDestination dest = new DeployDestination(dc, null, null, host);
+        final DeployDestination dest = new DeployDestination(zone, null, null, host);
 
         //check vm state
         if (vm.getState() == State.Running) {
@@ -2852,9 +2856,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
-        final DeployDestination dest = new DeployDestination(dc, null, null, host);
+        final DeployDestination dest = new DeployDestination(zone, null, null, host);
         final HypervisorGuru hvGuru = _hvGuruMgr.getGuru(vmProfile.getVirtualMachine().getHypervisorType());
         final VirtualMachineTO vmTO = hvGuru.implement(vmProfile);
 
@@ -3000,9 +3004,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
+        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
-        final DeployDestination dest = new DeployDestination(dc, null, null, host);
+        final DeployDestination dest = new DeployDestination(zone, null, null, host);
         final HypervisorGuru hvGuru = _hvGuruMgr.getGuru(vmProfile.getVirtualMachine().getHypervisorType());
         final VirtualMachineTO vmTO = hvGuru.implement(vmProfile);
 

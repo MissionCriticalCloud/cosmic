@@ -10,10 +10,10 @@ import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
@@ -79,8 +79,6 @@ public class FirstFitPlannerTest {
     @Inject
     FirstFitPlanner planner = new FirstFitPlanner();
     @Inject
-    DataCenterDao dcDao;
-    @Inject
     ClusterDao clusterDao;
     @Inject
     UserVmDao vmDao;
@@ -98,6 +96,9 @@ public class FirstFitPlannerTest {
     HostGpuGroupsDao hostGpuGroupsDao;
     @Inject
     HostTagsDao hostTagsDao;
+    @Inject
+    ZoneRepository zoneRepository;
+
     long dataCenterId = 1L;
     long accountId = 1L;
     long offeringId = 12L;
@@ -143,7 +144,7 @@ public class FirstFitPlannerTest {
     }
 
     private void initializeForTest(final VirtualMachineProfileImpl vmProfile, final DataCenterDeployment plan, final ExcludeList avoids) {
-        final DataCenterVO mockDc = mock(DataCenterVO.class);
+        final Zone zone = mock(Zone.class);
         final VMInstanceVO vm = mock(VMInstanceVO.class);
         final UserVmVO userVm = mock(UserVmVO.class);
         final ServiceOfferingVO offering = mock(ServiceOfferingVO.class);
@@ -158,8 +159,8 @@ public class FirstFitPlannerTest {
         when(userVm.getAccountId()).thenReturn(accountId);
 
         when(vm.getDataCenterId()).thenReturn(dataCenterId);
-        when(dcDao.findById(1L)).thenReturn(mockDc);
-        when(avoids.shouldAvoid(mockDc)).thenReturn(false);
+        when(zoneRepository.findOne(1L)).thenReturn(zone);
+        when(avoids.shouldAvoid(zone)).thenReturn(false);
         when(plan.getDataCenterId()).thenReturn(dataCenterId);
         when(plan.getClusterId()).thenReturn(null);
         when(plan.getPodId()).thenReturn(null);
@@ -251,11 +252,6 @@ public class FirstFitPlannerTest {
         @Bean
         public HostGpuGroupsDao hostGpuGroupsDao() {
             return Mockito.mock(HostGpuGroupsDao.class);
-        }
-
-        @Bean
-        public DataCenterDao dcDao() {
-            return Mockito.mock(DataCenterDao.class);
         }
 
         @Bean
@@ -356,6 +352,11 @@ public class FirstFitPlannerTest {
         @Bean
         public ResourceManager resourceManager() {
             return Mockito.mock(ResourceManager.class);
+        }
+
+        @Bean
+        public ZoneRepository zoneRepository() {
+            return Mockito.mock(ZoneRepository.class);
         }
 
         public static class Library implements TypeFilter {

@@ -160,7 +160,7 @@ public class RouterDeploymentDefinition {
     }
 
     public boolean isBasic() {
-        return dest.getDataCenter().getNetworkType() == NetworkType.Basic;
+        return dest.getZone().getNetworkType() == NetworkType.Basic;
     }
 
     public boolean isPublicNetwork() {
@@ -184,7 +184,7 @@ public class RouterDeploymentDefinition {
     }
 
     protected void generateDeploymentPlan() {
-        final long dcId = dest.getDataCenter().getId();
+        final long dcId = dest.getZone().getId();
         Long podId = null;
         if (isBasic()) {
             if (dest.getPod() == null) {
@@ -273,7 +273,7 @@ public class RouterDeploymentDefinition {
         // restart scenario otherwise it is a vm deployment scenario
         if (isBasic() && dest.getPod() == null) {
             // Find all pods in the data center with running or starting user vms
-            final long dcId = dest.getDataCenter().getId();
+            final long dcId = dest.getZone().getId();
             final List<HostPodVO> pods = listByDataCenterIdVMTypeAndStates(dcId, VirtualMachine.Type.User, VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
             // Loop through all the pods skip those with running or starting VRs
@@ -297,7 +297,7 @@ public class RouterDeploymentDefinition {
                     continue;
                 }
                 // Add new DeployDestination for this pod
-                destinations.add(new DeployDestination(dest.getDataCenter(), pod, null, null));
+                destinations.add(new DeployDestination(dest.getZone(), pod, null, null));
             }
         } else {
             // Else, just add the supplied dest
@@ -382,7 +382,7 @@ public class RouterDeploymentDefinition {
 
     protected void findDefaultServiceOfferingId() {
         final ServiceOfferingVO serviceOffering = serviceOfferingDao.findDefaultSystemOffering(ServiceOffering.routerDefaultOffUniqueName, ConfigurationManagerImpl
-                .SystemVMUseLocalStorage.valueIn(dest.getDataCenter().getId()));
+                .SystemVMUseLocalStorage.valueIn(dest.getZone().getId()));
         serviceOfferingId = serviceOffering.getId();
     }
 

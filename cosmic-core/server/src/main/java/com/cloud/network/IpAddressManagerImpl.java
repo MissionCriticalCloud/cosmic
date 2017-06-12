@@ -9,6 +9,8 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DomainVlanMapVO;
@@ -267,6 +269,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     VpcDao _vpcDao;
     @Inject
     ResourceTagDao _resourceTagDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     SearchBuilder<IPAddressVO> AssignIpAddressSearch;
     SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
@@ -1602,7 +1606,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
         // if the network offering has persistent set to true, implement the network
         if (createNetwork && requiredOfferings.get(0).getIsPersistent()) {
-            final DataCenter zone = _dcDao.findById(zoneId);
+            final Zone zone = zoneRepository.findOne(zoneId);
             final DeployDestination dest = new DeployDestination(zone, null, null, null);
             final Account callerAccount = CallContext.current().getCallingAccount();
             final UserVO callerUser = _userDao.findById(CallContext.current().getCallingUserId());
@@ -1856,7 +1860,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     @Override
     @DB
-    public void allocateDirectIp(final NicProfile nic, final DataCenter dc, final VirtualMachineProfile vm, final Network network, final String requestedIpv4,
+    public void allocateDirectIp(final NicProfile nic, final Zone zone, final VirtualMachineProfile vm, final Network network, final String requestedIpv4,
                                  final String requestedIpv6) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientAddressCapacityException>() {
             @Override
@@ -1880,7 +1884,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         }
 
                         if (ip == null) {
-                            ip = assignPublicIpAddress(dc.getId(), null, vm.getOwner(), VlanType.DirectAttached, network.getId(), requestedIpv4, false);
+                            ip = assignPublicIpAddress(zone.getId(), null, vm.getOwner(), VlanType.DirectAttached, network.getId(), requestedIpv4, false);
                         }
 
                         nic.setIPv4Address(ip.getAddress().toString());
@@ -1899,14 +1903,14 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setReservationId(String.valueOf(ip.getVlanTag()));
                         nic.setMacAddress(ip.getMacAddress());
                     }
-                    nic.setIPv4Dns1(dc.getDns1());
-                    nic.setIPv4Dns2(dc.getDns2());
+                    nic.setIPv4Dns1(zone.getDns1());
+                    nic.setIPv4Dns2(zone.getDns2());
                 }
 
                 //FIXME - get ipv6 address from the placeholder if it's stored there
                 if (network.getIp6Gateway() != null) {
                     if (nic.getIPv6Address() == null) {
-                        final UserIpv6Address ip = _ipv6Mgr.assignDirectIp6Address(dc.getId(), vm.getOwner(), network.getId(), requestedIpv6);
+                        final UserIpv6Address ip = _ipv6Mgr.assignDirectIp6Address(zone.getId(), vm.getOwner(), network.getId(), requestedIpv6);
                         final Vlan vlan = _vlanDao.findById(ip.getVlanId());
                         nic.setIPv6Address(ip.getAddress().toString());
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
@@ -1922,8 +1926,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                             nic.setMacAddress(ip.getMacAddress());
                         }
                     }
-                    nic.setIPv6Dns1(dc.getIp6Dns1());
-                    nic.setIPv6Dns2(dc.getIp6Dns2());
+                    nic.setIPv6Dns1(zone.getIp6Dns1());
+                    nic.setIPv6Dns2(zone.getIp6Dns2());
                 }
             }
         });
@@ -1931,7 +1935,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     @Override
     @DB
-    public void allocateNicValues(final NicProfile nic, final DataCenter dc, final VirtualMachineProfile vm, final Network network, final String requestedIpv4,
+    public void allocateNicValues(final NicProfile nic, final Zone zone, final VirtualMachineProfile vm, final Network network, final String requestedIpv4,
                                   final String requestedIpv6) throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException {
         Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientAddressCapacityException>() {
             @Override
@@ -1968,15 +1972,15 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
                         nic.setMacAddress(_networkModel.getNextAvailableMacAddressInNetwork(network.getId()));
                     }
-                    nic.setIPv4Dns1(dc.getDns1());
-                    nic.setIPv4Dns2(dc.getDns2());
+                    nic.setIPv4Dns1(zone.getDns1());
+                    nic.setIPv4Dns2(zone.getDns2());
                 }
 
                 // TODO: the IPv6 logic is not changed.
                 //FIXME - get ipv6 address from the placeholder if it's stored there
                 if (network.getIp6Gateway() != null) {
                     if (nic.getIPv6Address() == null) {
-                        final UserIpv6Address ip = _ipv6Mgr.assignDirectIp6Address(dc.getId(), vm.getOwner(), network.getId(), requestedIpv6);
+                        final UserIpv6Address ip = _ipv6Mgr.assignDirectIp6Address(zone.getId(), vm.getOwner(), network.getId(), requestedIpv6);
                         final Vlan vlan = _vlanDao.findById(ip.getVlanId());
                         nic.setIPv6Address(ip.getAddress().toString());
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
@@ -1992,8 +1996,8 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                             nic.setMacAddress(ip.getMacAddress());
                         }
                     }
-                    nic.setIPv6Dns1(dc.getIp6Dns1());
-                    nic.setIPv6Dns2(dc.getIp6Dns2());
+                    nic.setIPv6Dns1(zone.getIp6Dns1());
+                    nic.setIPv6Dns2(zone.getIp6Dns2());
                 }
             }
         });

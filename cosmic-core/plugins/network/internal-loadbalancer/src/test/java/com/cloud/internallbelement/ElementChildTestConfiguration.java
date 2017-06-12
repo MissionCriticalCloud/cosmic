@@ -2,6 +2,7 @@ package com.cloud.internallbelement;
 
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
@@ -97,6 +98,11 @@ public class ElementChildTestConfiguration {
         @Bean
         public DataCenterDao dataCenterDao() {
             return Mockito.mock(DataCenterDao.class);
+        }
+
+        @Bean
+        public ZoneRepository zoneRepository() {
+            return Mockito.mock(ZoneRepository.class);
         }
 
         @Override

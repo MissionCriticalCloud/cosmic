@@ -222,7 +222,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
 
     @Override
     public void generateDeploymentPlan() {
-        plan = new DataCenterDeployment(dest.getDataCenter().getId());
+        plan = new DataCenterDeployment(dest.getZone().getId());
     }
 
     @Override

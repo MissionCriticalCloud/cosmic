@@ -6,6 +6,7 @@ import com.cloud.api.command.admin.internallb.CreateInternalLoadBalancerElementC
 import com.cloud.api.command.admin.internallb.ListInternalLoadBalancerElementsCmd;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
@@ -86,6 +87,8 @@ public class InternalLoadBalancerElement extends AdapterBase implements LoadBala
     ApplicationLoadBalancerRuleDao _appLbDao;
     @Inject
     EntityManager _entityMgr;
+    @Inject
+    ZoneRepository zoneRepository;
 
     protected InternalLoadBalancerElement() {
     }
@@ -175,12 +178,9 @@ public class InternalLoadBalancerElement extends AdapterBase implements LoadBala
                 //2.2 Start Internal LB vm per IP address
                 final List<? extends VirtualRouter> internalLbVms;
                 try {
-                    final DeployDestination dest = new DeployDestination(_entityMgr.findById(DataCenter.class, network.getDataCenterId()), null, null, null);
+                    final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
                     internalLbVms = _internalLbMgr.deployInternalLbVm(network, sourceIp, dest, _accountMgr.getAccount(network.getAccountId()), null);
-                } catch (final InsufficientCapacityException e) {
-                    s_logger.warn("Failed to apply lb rule(s) for ip " + sourceIp.addr() + "on the element " + getName() + " due to:", e);
-                    return false;
-                } catch (final ConcurrentOperationException e) {
+                } catch (final InsufficientCapacityException | ConcurrentOperationException e) {
                     s_logger.warn("Failed to apply lb rule(s) for ip " + sourceIp.addr() + "on the element " + getName() + " due to:", e);
                     return false;
                 }

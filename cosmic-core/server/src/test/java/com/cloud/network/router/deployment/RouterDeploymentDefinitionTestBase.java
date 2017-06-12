@@ -2,7 +2,7 @@ package com.cloud.network.router.deployment;
 
 import static org.mockito.Mockito.when;
 
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.HostPodDao;
@@ -44,7 +44,7 @@ public abstract class RouterDeploymentDefinitionTestBase {
 
     protected static final long OFFERING_ID = 16L;
     protected static final long DEFAULT_OFFERING_ID = 17L;
-    protected static final Long DATA_CENTER_ID = 100l;
+    protected static final Long ZONE_ID = 100l;
     protected static final Long NW_ID_1 = 101l;
     protected static final Long POD_ID1 = 111l;
     protected static final Long POD_ID2 = 112l;
@@ -84,7 +84,7 @@ public abstract class RouterDeploymentDefinitionTestBase {
     @Mock
     protected DeployDestination mockDestination;
     @Mock
-    protected DataCenter mockDataCenter;
+    protected Zone mockZone;
     @Mock
     protected Pod mockPod;
     @Mock
@@ -107,8 +107,8 @@ public abstract class RouterDeploymentDefinitionTestBase {
     ServiceOfferingVO mockSvcOfferingVO;
 
     protected void initMocks() {
-        when(mockDestination.getDataCenter()).thenReturn(mockDataCenter);
-        when(mockDataCenter.getId()).thenReturn(DATA_CENTER_ID);
+        when(mockDestination.getZone()).thenReturn(mockZone);
+        when(mockZone.getId()).thenReturn(ZONE_ID);
         when(mockPod.getId()).thenReturn(POD_ID1);
         when(mockHostPodVO1.getId()).thenReturn(POD_ID1);
         when(mockHostPodVO2.getId()).thenReturn(POD_ID2);

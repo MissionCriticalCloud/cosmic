@@ -1,6 +1,7 @@
 package com.cloud.network.guru;
 
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -115,7 +116,7 @@ public class ExternalGuestNetworkGuru extends GuestNetworkGuru {
             return super.implement(config, offering, dest, context);
         }
 
-        final DataCenter zone = dest.getDataCenter();
+        final Zone zone = dest.getZone();
         final NetworkVO implemented =
                 new NetworkVO(config.getTrafficType(), config.getMode(), config.getBroadcastDomainType(), config.getNetworkOfferingId(), State.Allocated,
                         config.getDataCenterId(), config.getPhysicalNetworkId(), offering.getRedundantRouter());

@@ -170,13 +170,13 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testGenerateDeploymentPlanNoPodNeeded() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         // Execute
         deployment.generateDeploymentPlan();
 
         // Assert
-        assertEquals("", DATA_CENTER_ID, (Long) deployment.plan.getDataCenterId());
+        assertEquals("", ZONE_ID, (Long) deployment.plan.getDataCenterId());
         assertEquals("", mockDestination, deployment.dest);
         assertEquals("", null, deployment.getPod());
         assertEquals("", null, deployment.getPodId());
@@ -189,13 +189,13 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testGenerateDeploymentPlanBasic() {
         // Prepare
         when(mockDestination.getPod()).thenReturn(mockPod);
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
 
         // Execute
         deployment.generateDeploymentPlan();
 
         // Assert
-        assertEquals("", DATA_CENTER_ID, (Long) deployment.plan.getDataCenterId());
+        assertEquals("", ZONE_ID, (Long) deployment.plan.getDataCenterId());
         assertEquals("", mockDestination, deployment.dest);
         assertEquals("", mockPod, deployment.getPod());
         assertEquals("", POD_ID1, deployment.getPodId());
@@ -209,13 +209,13 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testGenerateDeploymentPlanBasicFailNoPod() {
         // Prepare
         when(mockDestination.getPod()).thenReturn(null);
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
 
         // Execute
         deployment.generateDeploymentPlan();
 
         // Assert
-        assertEquals("", DATA_CENTER_ID, (Long) deployment.plan.getDataCenterId());
+        assertEquals("", ZONE_ID, (Long) deployment.plan.getDataCenterId());
         assertEquals("", mockDestination, deployment.dest);
     }
 
@@ -266,7 +266,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testFindDestinationsNonBasicZone() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         // Execute
         final List<DeployDestination> destinations = deployment.findDestinations();
@@ -281,7 +281,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testFindDestinationsPredefinedPod() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
         when(mockDestination.getPod()).thenReturn(mockPod);
 
         // Execute
@@ -297,7 +297,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testFindDestinations() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
         when(mockDestination.getPod()).thenReturn(null);
 
         // Stub local method listByDataCenterIdVMTypeAndStates
@@ -306,7 +306,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockPods.add(mockHostPodVO3);
         final RouterDeploymentDefinition deployment = Mockito.spy(this.deployment);
         doReturn(mockPods).when(deployment).listByDataCenterIdVMTypeAndStates(
-                DATA_CENTER_ID, VirtualMachine.Type.User,
+                ZONE_ID, VirtualMachine.Type.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
         // Leave this one empty to force adding add destination for this pod
@@ -333,11 +333,11 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         assertEquals("",
                 2, destinations.size());
         assertEquals("",
-                mockDataCenter, destinations.get(0).getDataCenter());
+                mockZone, destinations.get(0).getZone());
         assertEquals("",
                 mockHostPodVO1, destinations.get(0).getPod());
         assertEquals("",
-                mockDataCenter, destinations.get(1).getDataCenter());
+                mockZone, destinations.get(1).getZone());
         assertEquals("",
                 mockHostPodVO3, destinations.get(1).getPod());
     }
@@ -345,7 +345,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test(expected = CloudRuntimeException.class)
     public void testFindDestinationsMoreThan1PodPerBasicZone() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
         when(mockDestination.getPod()).thenReturn(null);
 
         // Stub local method listByDataCenterIdVMTypeAndStates
@@ -354,7 +354,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         // Deployment under test is a Mockito spy
         final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doReturn(mockPods).when(deploymentUT).listByDataCenterIdVMTypeAndStates(
-                DATA_CENTER_ID, VirtualMachine.Type.User,
+                ZONE_ID, VirtualMachine.Type.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
         // Leave this one empty to force adding add destination for this pod
@@ -380,7 +380,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testPlanDeploymentRoutersBasic() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Basic);
         when(mockDestination.getPod()).thenReturn(mockPod);
 
         // Execute
@@ -394,7 +394,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     @Test
     public void testPlanDeploymentRoutersNonBasic() {
         // Prepare
-        when(mockDataCenter.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(mockZone.getNetworkType()).thenReturn(NetworkType.Advanced);
         when(mockDestination.getPod()).thenReturn(mockPod);
 
         // Execute
@@ -422,14 +422,14 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         final HostPodVO hostPodVO = mock(HostPodVO.class);
         when(podIdSearch.entity()).thenReturn(hostPodVO);
         when(hostPodVO.getId()).thenReturn(POD_ID1);
-        when(hostPodVO.getDataCenterId()).thenReturn(DATA_CENTER_ID);
+        when(hostPodVO.getDataCenterId()).thenReturn(ZONE_ID);
         when(podIdSearch.create()).thenReturn(sc);
 
         final List<HostPodVO> expectedPods = mock(List.class);
         when(mockPodDao.search(sc, null)).thenReturn(expectedPods);
 
         // Execute
-        final List<HostPodVO> pods = deployment.listByDataCenterIdVMTypeAndStates(DATA_CENTER_ID,
+        final List<HostPodVO> pods = deployment.listByDataCenterIdVMTypeAndStates(ZONE_ID,
                 VirtualMachine.Type.User,
                 VirtualMachine.State.Starting,
                 VirtualMachine.State.Running);
@@ -437,7 +437,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         // Assert
         assertNotNull(pods);
         assertEquals(expectedPods, pods);
-        verify(sc, times(1)).setParameters("dc", DATA_CENTER_ID);
+        verify(sc, times(1)).setParameters("dc", ZONE_ID);
         verify(sc, times(1)).setJoinParameters("vmInstanceSearch", "type", VirtualMachine.Type.User);
         verify(sc, times(1)).setJoinParameters("vmInstanceSearch", "states",
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);

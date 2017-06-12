@@ -14,7 +14,7 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -248,8 +248,8 @@ public class NiciraNvpGuestNetworkGuruTest {
 
         final DeployDestination dest = mock(DeployDestination.class);
 
-        final DataCenter dc = mock(DataCenter.class);
-        when(dest.getDataCenter()).thenReturn(dc);
+        final Zone zone = mock(Zone.class);
+        when(dest.getZone()).thenReturn(zone);
 
         final HostVO niciraHost = mock(HostVO.class);
         when(hostdao.findById(anyLong())).thenReturn(niciraHost);
@@ -305,8 +305,8 @@ public class NiciraNvpGuestNetworkGuruTest {
 
         final DeployDestination dest = mock(DeployDestination.class);
 
-        final DataCenter dc = mock(DataCenter.class);
-        when(dest.getDataCenter()).thenReturn(dc);
+        final Zone zone = mock(Zone.class);
+        when(dest.getZone()).thenReturn(zone);
 
         final HostVO niciraHost = mock(HostVO.class);
         when(hostdao.findById(anyLong())).thenReturn(niciraHost);
@@ -362,8 +362,8 @@ public class NiciraNvpGuestNetworkGuruTest {
 
         final DeployDestination dest = mock(DeployDestination.class);
 
-        final DataCenter dc = mock(DataCenter.class);
-        when(dest.getDataCenter()).thenReturn(dc);
+        final Zone zone = mock(Zone.class);
+        when(dest.getZone()).thenReturn(zone);
 
         final HostVO niciraHost = mock(HostVO.class);
         when(hostdao.findById(anyLong())).thenReturn(niciraHost);
@@ -420,8 +420,8 @@ public class NiciraNvpGuestNetworkGuruTest {
 
         final DeployDestination dest = mock(DeployDestination.class);
 
-        final DataCenter dc = mock(DataCenter.class);
-        when(dest.getDataCenter()).thenReturn(dc);
+        final Zone zone = mock(Zone.class);
+        when(dest.getZone()).thenReturn(zone);
 
         final HostVO niciraHost = mock(HostVO.class);
         when(hostdao.findById(anyLong())).thenReturn(niciraHost);

@@ -212,7 +212,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                 if (resourceList != null && resourceList.size() != 0) {
                     avoid = updateAvoidList(resourceList, avoid, dc);
                 } else {
-                    avoid.addDataCenter(dc.getId());
+                    avoid.addZone(dc.getId());
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("No dedicated resources available for this domain or account under this group");
                     }
@@ -274,7 +274,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
             }
 
             if (dr.getDataCenterId() != null) {
-                includeList.addDataCenter(dr.getDataCenterId());
+                includeList.addZone(dr.getDataCenterId());
                 //add all Pod under this data center in includeList
                 final List<HostPodVO> podList = _podDao.listByDataCenterId(dr.getDataCenterId());
                 for (final HostPodVO pod : podList) {
