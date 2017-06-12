@@ -291,6 +291,29 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setVersion(host.getVersion());
         hostResponse.setCreated(host.getCreated());
 
+        final DedicatedResourceVO dedicatedResourceVO = dedicatedResourceDao.findByHostId(host.getId());
+        if (dedicatedResourceVO != null) {
+            hostResponse.setDedicated(true);
+
+            final DomainVO domainVO = domainDao.findById(dedicatedResourceVO.getDomainId());
+            if (domainVO != null) {
+                hostResponse.setDomainId(domainVO.getUuid());
+                hostResponse.setDomainName(domainVO.getName());
+            }
+
+            final AccountVO accountVO = accountDao.findById(dedicatedResourceVO.getAccountId());
+            if (accountVO != null) {
+                hostResponse.setAccountId(accountVO.getUuid());
+                hostResponse.setAccountName(accountVO.getAccountName());
+            }
+
+            final AffinityGroupVO affinityGroupVO = affinityGroupDao.findById(dedicatedResourceVO.getAffinityGroupId());
+            if (affinityGroupVO != null) {
+                hostResponse.setAffinityGroupId(affinityGroupVO.getUuid());
+                hostResponse.setAffinityGroupName(affinityGroupVO.getName());
+            }
+        }
+
         if (details.contains(HostDetails.all) || details.contains(HostDetails.capacity) || details.contains(HostDetails.stats) || details.contains(HostDetails.events)) {
 
             hostResponse.setOsCategoryId(host.getOsCategoryUuid());

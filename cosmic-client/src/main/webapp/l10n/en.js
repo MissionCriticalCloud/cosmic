@@ -929,6 +929,7 @@ var dictionary = {
     "label.md5.checksum": "MD5 checksum",
     "label.memory": "Memory",
     "label.memory.allocated": "Memory Allocated",
+    "label.memory.available": "Memory Available",
     "label.memory.limits": "Memory limits (MiB)",
     "label.memory.mb": "Memory (in MB)",
     "label.memory.total": "Memory Total",

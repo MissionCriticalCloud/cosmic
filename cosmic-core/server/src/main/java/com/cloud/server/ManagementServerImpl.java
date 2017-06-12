@@ -477,6 +477,7 @@ import com.cloud.context.CallContext;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
+import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
 import com.cloud.dc.PodVlanMapVO;
@@ -486,6 +487,7 @@ import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
@@ -493,6 +495,7 @@ import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.DeploymentPlanningManager;
+import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
@@ -683,6 +686,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     private ConsoleProxyDao _consoleProxyDao;
     @Inject
     private ClusterDao _clusterDao;
+    @Inject
+    private DedicatedResourceDao dedicatedResourceDao;
     @Inject
     private SecondaryStorageVmDao _secStorageVmDao;
     @Inject
@@ -2885,6 +2890,18 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         if (vmGroupCount > 0) {
             for (final AffinityGroupProcessor processor : _affinityProcessors) {
                 processor.process(vmProfile, plan, excludes);
+            }
+        }
+
+        final Account account = vmProfile.getOwner();
+        for (final HostVO host : allHosts) {
+            final DedicatedResourceVO dedicatedResourceVO = dedicatedResourceDao.findByHostId(host.getId());
+            if (dedicatedResourceVO != null && dedicatedResourceVO.getDomainId() != account.getDomainId()) {
+                final Domain domain = _domainDao.findById(dedicatedResourceVO.getDomainId());
+                if (domain != null) {
+                    s_logger.debug("Host " + host.getName() + " is dedicated to domain " + domain.getName() + " so not suitable for migration for VM " + vmProfile.getInstanceName());
+                }
+                excludes.addHost(host.getId());
             }
         }
 
