@@ -2215,15 +2215,22 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public List<String[]> generateVmData(final String userData, final String serviceOffering, final String zoneName,
-                                         final String vmName, final long vmId, final String publicKey, final String password, final Boolean isWindows) {
+                                         final String vmName, final long vmId, final String publicKey, final String password, final Boolean isWindows,
+                                         final Network network) {
         final List<String[]> vmData = new ArrayList<>();
 
         if (userData != null) {
             vmData.add(new String[]{"userdata", "user-data", new String(Base64.decodeBase64(userData), StringUtils.getPreferredCharset())});
         }
+
+        String vmNameFQDN = vmName;
+        if (network != null) {
+            vmNameFQDN = vmName + "." + network.getNetworkDomain();
+        }
+
         vmData.add(new String[]{"metadata", "service-offering", StringUtils.unicodeEscape(serviceOffering)});
         vmData.add(new String[]{"metadata", "availability-zone", StringUtils.unicodeEscape(zoneName)});
-        vmData.add(new String[]{"metadata", "local-hostname", StringUtils.unicodeEscape(vmName)});
+        vmData.add(new String[]{"metadata", "local-hostname", StringUtils.unicodeEscape(vmNameFQDN)});
         vmData.add(new String[]{"metadata", "instance-id", vmName});
         vmData.add(new String[]{"metadata", "vm-id", String.valueOf(vmId)});
         vmData.add(new String[]{"metadata", "public-keys", publicKey});
