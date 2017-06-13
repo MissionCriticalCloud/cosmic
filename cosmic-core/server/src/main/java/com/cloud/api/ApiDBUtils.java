@@ -88,6 +88,8 @@ import com.cloud.configuration.ConfigurationService;
 import com.cloud.configuration.Resource;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
@@ -403,6 +405,7 @@ public class ApiDBUtils {
     static ResourceMetaDataService s_resourceDetailsService;
     static HostGpuGroupsDao s_hostGpuGroupsDao;
     static VGPUTypesDao s_vgpuTypesDao;
+    static ZoneRepository s_zoneRepository;
     private static ManagementServer s_ms;
     @Inject
     public AsyncJobManager asyncMgr;
@@ -631,6 +634,8 @@ public class ApiDBUtils {
     private HostGpuGroupsDao hostGpuGroupsDao;
     @Inject
     private VGPUTypesDao vgpuTypesDao;
+    @Inject
+    private ZoneRepository zoneRepository;
 
     public static long getStorageCapacitybyPool(final Long poolId, final short capacityType) {
         // TODO: This method is for the API only, but it has configuration values (ramSize for system vms)
@@ -1040,12 +1045,9 @@ public class ApiDBUtils {
     }
 
     public static boolean isSecurityGroupEnabledInZone(final long zoneId) {
-        final DataCenterVO dc = s_zoneDao.findById(zoneId);
-        if (dc == null) {
-            return false;
-        } else {
-            return dc.isSecurityGroupEnabled();
-        }
+        final Zone zone = s_zoneRepository.findOne(zoneId);
+
+        return zone != null && zone.isSecurityGroupEnabled();
     }
 
     public static Long getDedicatedNetworkDomain(final long networkId) {
@@ -1899,5 +1901,6 @@ public class ApiDBUtils {
         s_resourceDetailsService = resourceDetailsService;
         s_hostGpuGroupsDao = hostGpuGroupsDao;
         s_vgpuTypesDao = vgpuTypesDao;
+        s_zoneRepository = zoneRepository;
     }
 }
