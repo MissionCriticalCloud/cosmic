@@ -2,13 +2,12 @@ package com.cloud.affinity;
 
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeploymentPlan;
@@ -46,8 +45,6 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
     @Inject
     protected VMInstanceDao _vmInstanceDao;
     @Inject
-    protected DataCenterDao _dcDao;
-    @Inject
     protected DedicatedResourceDao _dedicatedDao;
     @Inject
     protected HostPodDao _podDao;
@@ -61,6 +58,8 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
     protected AffinityGroupDao _affinityGroupDao;
     @Inject
     protected AffinityGroupVMMapDao _affinityGroupVMMapDao;
+    @Inject
+    protected ZoneRepository zoneRepository;
 
     /**
      * This method will process the affinity group of type 'Explicit Dedication' for a deployment of a VM that demands dedicated resources.
@@ -73,7 +72,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
     public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, ExcludeList avoid) throws AffinityConflictException {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final List<AffinityGroupVMMapVO> vmGroupMappings = _affinityGroupVMMapDao.findByVmIdType(vm.getId(), getType());
-        final DataCenter dc = _dcDao.findById(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
         final List<DedicatedResourceVO> resourceList = new ArrayList<>();
 
         if (vmGroupMappings != null && !vmGroupMappings.isEmpty()) {
@@ -97,7 +96,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                 final HostVO host = _hostDao.findById(plan.getHostId());
                 final ClusterVO clusterofHost = _clusterDao.findById(host.getClusterId());
                 final HostPodVO podOfHost = _podDao.findById(host.getPodId());
-                final DataCenterVO zoneOfHost = _dcDao.findById(host.getDataCenterId());
+                final Zone zoneOfHost = zoneRepository.findOne(host.getDataCenterId());
                 if (resourceList != null && resourceList.size() != 0) {
                     for (final DedicatedResourceVO resource : resourceList) {
                         if ((resource.getHostId() != null && resource.getHostId().longValue() == plan.getHostId().longValue()) ||
@@ -114,7 +113,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
             } else if (plan.getClusterId() != null) {
                 final ClusterVO cluster = _clusterDao.findById(plan.getClusterId());
                 final HostPodVO podOfCluster = _podDao.findById(cluster.getPodId());
-                final DataCenterVO zoneOfCluster = _dcDao.findById(cluster.getDataCenterId());
+                final Zone zoneOfCluster = zoneRepository.findOne(cluster.getDataCenterId());
                 final List<HostVO> hostToUse = new ArrayList<>();
                 // check whether this cluster or its pod is dedicated
                 if (resourceList != null && resourceList.size() != 0) {
@@ -153,7 +152,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                 }
             } else if (plan.getPodId() != null) {
                 final HostPodVO pod = _podDao.findById(plan.getPodId());
-                final DataCenterVO zoneOfPod = _dcDao.findById(pod.getDataCenterId());
+                final Zone zoneOfPod = zoneRepository.findOne(pod.getDataCenterId());
                 final List<ClusterVO> clustersToUse = new ArrayList<>();
                 final List<HostVO> hostsToUse = new ArrayList<>();
                 // check whether this cluster or its pod is dedicated
@@ -210,9 +209,9 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
             } else {
                 // check all resources under this zone
                 if (resourceList != null && resourceList.size() != 0) {
-                    avoid = updateAvoidList(resourceList, avoid, dc);
+                    avoid = updateAvoidList(resourceList, avoid, zone);
                 } else {
-                    avoid.addZone(dc.getId());
+                    avoid.addZone(zone.getId());
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("No dedicated resources available for this domain or account under this group");
                     }
@@ -223,7 +222,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
         }
     }
 
-    private ExcludeList updateAvoidList(final List<DedicatedResourceVO> dedicatedResources, final ExcludeList avoidList, final DataCenter dc) {
+    private ExcludeList updateAvoidList(final List<DedicatedResourceVO> dedicatedResources, final ExcludeList avoidList, final Zone zone) {
         final ExcludeList includeList = new ExcludeList();
         for (final DedicatedResourceVO dr : dedicatedResources) {
             if (dr.getHostId() != null) {
@@ -309,9 +308,9 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
         //Update avoid list using includeList.
         //add resources in avoid list which are not in include list.
 
-        final List<HostPodVO> pods = _podDao.listByDataCenterId(dc.getId());
-        final List<ClusterVO> clusters = _clusterDao.listClustersByDcId(dc.getId());
-        final List<HostVO> hosts = _hostDao.listByDataCenterId(dc.getId());
+        final List<HostPodVO> pods = _podDao.listByDataCenterId(zone.getId());
+        final List<ClusterVO> clusters = _clusterDao.listClustersByDcId(zone.getId());
+        final List<HostVO> hosts = _hostDao.listByDataCenterId(zone.getId());
         final Set<Long> podsInIncludeList = includeList.getPodsToAvoid();
         final Set<Long> clustersInIncludeList = includeList.getClustersToAvoid();
         final Set<Long> hostsInIncludeList = includeList.getHostsToAvoid();
