@@ -15,6 +15,7 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
 import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
@@ -65,6 +66,8 @@ public class NiciraNvpGuestNetworkGuruTest {
     NetworkDao netdao = mock(NetworkDao.class);
     NiciraNvpGuestNetworkGuru guru;
 
+    ZoneRepository zoneRepository = mock(ZoneRepository.class);
+
     @Before
     public void setUp() {
         guru = new NiciraNvpGuestNetworkGuru();
@@ -72,6 +75,7 @@ public class NiciraNvpGuestNetworkGuruTest {
         guru.physicalNetworkDao = physnetdao;
         guru.niciraNvpDao = nvpdao;
         guru._dcDao = dcdao;
+        guru.zoneRepository = zoneRepository;
         guru.ntwkOfferingSrvcDao = nosd;
         guru.networkModel = netmodel;
         guru.hostDao = hostdao;
@@ -81,8 +85,12 @@ public class NiciraNvpGuestNetworkGuruTest {
         final DataCenterVO dc = mock(DataCenterVO.class);
         when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
         when(dc.getGuestNetworkCidr()).thenReturn("10.1.1.1/24");
-
         when(dcdao.findById((Long) any())).thenReturn(dc);
+
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zone.getGuestNetworkCidr()).thenReturn("10.1.1.1/24");
+        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
     }
 
     @Test
