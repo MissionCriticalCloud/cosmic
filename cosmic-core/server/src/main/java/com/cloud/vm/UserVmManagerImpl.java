@@ -55,7 +55,6 @@ import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -2376,7 +2375,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
-    public UserVm createBasicSecurityGroupVirtualMachine(final DataCenter zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, List<Long>
+    public UserVm createBasicSecurityGroupVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, List<Long>
             securityGroupIdList,
                                                          final Account owner, final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize,
                                                          final String group, final HypervisorType hypervisor, final HTTPMethod httpmethod,
@@ -2432,7 +2431,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
-    public UserVm createAdvancedSecurityGroupVirtualMachine(final DataCenter zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
+    public UserVm createAdvancedSecurityGroupVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
             networkIdList,
                                                             List<Long> securityGroupIdList, final Account owner, final String hostName, final String displayName, final Long
                                                                     diskOfferingId, final Long diskSize, final String group, final HypervisorType hypervisor,
@@ -2540,7 +2539,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
-    public UserVm createAdvancedVirtualMachine(final DataCenter zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
+    public UserVm createAdvancedVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
             networkIdList, final Account owner,
                                                final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize, final String group, final
                                                HypervisorType hypervisor, final HTTPMethod httpmethod, final String userData,
@@ -2972,14 +2971,16 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         //if srcHost is explicitly dedicated and destination Host is not
         if (srcExplDedicated && !destExplDedicated) {
             //raise an alert
-            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a explicitly dedicated host " + srcHost.getName() + " to non-dedicated host " + destHost.getName();
+            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a explicitly dedicated host " + srcHost.getName() + " to non-dedicated host " + destHost
+                    .getName();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
             s_logger.warn(msg);
         }
         //if srcHost is non dedicated but destination Host is explicitly dedicated
         if (!srcExplDedicated && destExplDedicated) {
             //raise an alert
-            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a non dedicated host " + srcHost.getName() + " to a explicitly dedicated host " + destHost.getName();
+            final String msg = "VM " + vm.getInstanceName() + " is being migrated from a non dedicated host " + srcHost.getName() + " to a explicitly dedicated host " + destHost
+                    .getName();
             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
             s_logger.warn(msg);
         }
@@ -2987,7 +2988,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         // Don't allow it when hosts are dedicated to different account/domains
         if (srcExplDedicated && destExplDedicated) {
             if (!(accountOfDedicatedHost(srcHost) == null || accountOfDedicatedHost(srcHost).equals(accountOfDedicatedHost(destHost)))) {
-                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost(srcHost) + " to host "
+                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost
+                        (srcHost) + " to host "
                         + destHost.getName() + " explicitly dedicated to account " + accountOfDedicatedHost(destHost);
                 s_logger.error(msg);
                 throw new InvalidParameterValueException(msg);
@@ -3003,7 +3005,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 if (destDomain != null) {
                     destDomainName = destDomain.getName();
                 }
-                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to domain " + srcDomainName + " to host "
+                final String msg = "Cannot migrate VM " + vm.getInstanceName() + " from host " + srcHost.getName() + " explicitly dedicated to domain " + srcDomainName + " to " +
+                        "host "
                         + destHost.getName() + " explicitly dedicated to domain " + destDomainName;
                 s_logger.error(msg);
                 throw new InvalidParameterValueException(msg);
@@ -4333,7 +4336,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @DB
-    protected UserVm createVirtualMachine(final DataCenter zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String
+    protected UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String
             displayName, final Account owner,
                                           final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final List<Long> securityGroupIdList, final String
                                                   group, final HTTPMethod httpmethod, final String userData,
@@ -4691,7 +4694,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return _instance + "-" + uuidName;
     }
 
-    private UserVmVO commitUserVm(final DataCenter zone, final VirtualMachineTemplate template, final String hostName, final String displayName, final Account owner,
+    private UserVmVO commitUserVm(final Zone zone, final VirtualMachineTemplate template, final String hostName, final String displayName, final Account owner,
                                   final Long diskOfferingId, final Long diskSize, final String userData, final Account caller, final Boolean isDisplayVm, final String keyboard,
                                   final long accountId, final long userId, final ServiceOfferingVO offering, final boolean isIso, final String sshPublicKey, final
                                   LinkedHashMap<String, NicProfile> networkNicMap,

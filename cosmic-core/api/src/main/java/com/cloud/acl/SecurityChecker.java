@@ -1,6 +1,6 @@
 package com.cloud.acl;
 
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.domain.Domain;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.offering.DiskOffering;
@@ -87,7 +87,7 @@ public interface SecurityChecker extends Adapter {
      */
     boolean checkAccess(User user, ControlledEntity entity) throws PermissionDeniedException;
 
-    boolean checkAccess(Account account, DataCenter zone) throws PermissionDeniedException;
+    boolean checkAccess(Account account, Zone zone) throws PermissionDeniedException;
 
     public boolean checkAccess(Account account, ServiceOffering so) throws PermissionDeniedException;
 

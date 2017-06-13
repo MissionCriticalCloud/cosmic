@@ -3,7 +3,6 @@ package com.cloud.acl;
 import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupService;
-import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
 import com.cloud.domain.DomainVO;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.projects.ProjectVO;
@@ -24,8 +23,6 @@ public class AffinityGroupAccessChecker extends DomainChecker {
     AffinityGroupService _affinityGroupService;
     @Inject
     AccountManager _accountMgr;
-    @Inject
-    AffinityGroupDomainMapDao _affinityGroupDomainMapDao;
     @Inject
     ProjectDao _projectDao;
     @Inject

@@ -1,7 +1,7 @@
 package com.cloud.configuration;
 
+import com.cloud.db.model.Zone;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Pod;
@@ -103,7 +103,7 @@ public interface ConfigurationManager {
      */
     boolean deleteVlanAndPublicIpRange(long userId, long vlanDbId, Account caller);
 
-    void checkZoneAccess(Account caller, DataCenter zone);
+    void checkZoneAccess(Account caller, Zone zone);
 
     void checkDiskOfferingAccess(Account caller, DiskOffering dof);
 
