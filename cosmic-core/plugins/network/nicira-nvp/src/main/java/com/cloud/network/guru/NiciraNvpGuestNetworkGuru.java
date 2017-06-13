@@ -8,7 +8,6 @@ import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchCommand;
 import com.cloud.agent.api.FindLogicalSwitchCommand;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.exception.AgentUnavailableException;
@@ -58,8 +57,6 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     protected NetworkModel networkModel;
     @Inject
     protected NetworkDao networkDao;
-    @Inject
-    protected DataCenterDao zoneDao;
     @Inject
     protected PhysicalNetworkDao physicalNetworkDao;
     @Inject

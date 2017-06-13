@@ -1,6 +1,7 @@
 package com.cloud.internallbvmmgr;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -147,6 +148,11 @@ public class LbChildTestConfiguration {
         @Bean
         public AccountDao accountDao() {
             return Mockito.mock(AccountDao.class);
+        }
+
+        @Bean
+        public ZoneRepository zoneRepository() {
+            return Mockito.mock(ZoneRepository.class);
         }
 
         @Override

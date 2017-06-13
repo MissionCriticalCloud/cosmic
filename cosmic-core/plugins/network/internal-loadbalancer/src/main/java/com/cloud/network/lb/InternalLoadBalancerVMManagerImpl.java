@@ -14,9 +14,9 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -116,8 +116,6 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
     @Inject
     AgentManager _agentMgr;
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     VirtualRouterProviderDao _vrProviderDao;
     @Inject
     ApplicationLoadBalancerRuleDao _lbDao;
@@ -145,6 +143,8 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
     ResourceManager _resourceMgr;
     @Inject
     UserDao _userDao;
+    @Inject
+    ZoneRepository zoneRepository;
     private String _instance;
     private String _mgmtHost;
     private String _mgmtCidr;
@@ -458,8 +458,8 @@ public class InternalLoadBalancerVMManagerImpl extends ManagerBase implements In
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, getInternalLbControlIp(internalLbVm.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, guestNic.getIPv4Address());
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, internalLbVm.getInstanceName());
-        final DataCenterVO dcVo = _dcDao.findById(internalLbVm.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, dcVo.getNetworkType().toString());
+        final Zone zone = zoneRepository.findOne(internalLbVm.getDataCenterId());
+        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand(cmd);
     }
 

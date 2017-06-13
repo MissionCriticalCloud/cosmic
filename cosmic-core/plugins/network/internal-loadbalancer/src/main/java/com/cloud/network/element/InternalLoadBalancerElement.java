@@ -14,6 +14,7 @@ import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
+import com.cloud.model.Zone;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -122,9 +123,9 @@ public class InternalLoadBalancerElement extends AdapterBase implements LoadBala
 
     private boolean canHandle(final Network config, final Scheme lbScheme) {
         //works in Advance zone only
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, config.getDataCenterId());
-        if (dc.getNetworkType() != NetworkType.Advanced) {
-            s_logger.trace("Not hanling zone of network type " + dc.getNetworkType());
+        final Zone zone = zoneRepository.findOne(config.getDataCenterId());
+        if (zone.getNetworkType() != NetworkType.Advanced) {
+            s_logger.trace("Not hanling zone of network type " + zone.getNetworkType());
             return false;
         }
         if (config.getGuestType() != Network.GuestType.Isolated || config.getTrafficType() != TrafficType.Guest) {

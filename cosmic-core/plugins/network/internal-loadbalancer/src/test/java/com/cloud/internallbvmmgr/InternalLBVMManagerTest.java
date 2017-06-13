@@ -3,8 +3,8 @@ package com.cloud.internallbvmmgr;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.manager.Commands;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.OperationTimedoutException;
@@ -83,9 +83,9 @@ public class InternalLBVMManagerTest extends TestCase {
     @Inject
     VirtualMachineManager _itMgr;
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     NetworkOfferingDao _offeringDao;
+    @Inject
+    ZoneRepository zoneRepository;
     long validNtwkId = 1L;
     long invalidNtwkId = 2L;
     String requestedIp = "10.1.1.1";
@@ -149,8 +149,10 @@ public class InternalLBVMManagerTest extends TestCase {
 
         Mockito.when(_itMgr.toNicTO(Matchers.any(NicProfile.class), Matchers.any(HypervisorType.class))).thenReturn(null);
         Mockito.when(_domainRouterDao.findById(Matchers.anyLong())).thenReturn(vm);
-        final DataCenterVO dc = new DataCenterVO(1L, null, null, null, null, null, null, null, null, null, NetworkType.Advanced, null, null);
-        Mockito.when(_dcDao.findById(Matchers.anyLong())).thenReturn(dc);
+        final Zone zone = new Zone();
+        zone.setId(1L);
+        zone.setNetworkType(NetworkType.Advanced);
+        Mockito.when(zoneRepository.findOne(Matchers.anyLong())).thenReturn(zone);
         final NetworkOfferingVO networkOfferingVO = new NetworkOfferingVO();
         networkOfferingVO.setConcurrentConnections(500);
         Mockito.when(_offeringDao.findById(Matchers.anyLong())).thenReturn(networkOfferingVO);
