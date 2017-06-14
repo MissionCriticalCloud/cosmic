@@ -4,8 +4,8 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.ExternalNetworkResourceUsageAnswer;
 import com.cloud.agent.api.ExternalNetworkResourceUsageCommand;
 import com.cloud.configuration.Config;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -80,8 +80,6 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     @Inject
     HostDao _hostDao;
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     InlineLoadBalancerNicMapDao _inlineLoadBalancerNicMapDao;
     @Inject
     NicDao _nicDao;
@@ -123,6 +121,8 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
     NetworkServiceMapDao _ntwkSrvcProviderDao;
     @Inject
     NetworkModel _networkModel;
+    @Inject
+    ZoneRepository zoneRepository;
     ScheduledExecutorService _executor;
     private int _externalNetworkStatsInterval;
 
@@ -202,7 +202,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         }
 
         final String publicIp = _networkModel.getIp(lb.getSourceIpAddressId()).getAddress().addr();
-        final DataCenterVO zone = _dcDao.findById(network.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
         String statsEntryIdentifier =
                 "account " + account.getAccountName() + ", zone " + zone.getName() + ", network ID " + networkId + ", host ID " + externalLoadBalancer.getName();
 
@@ -252,7 +252,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         return null;
     }
 
-    private void commitStats(final long networkId, final HostVO externalLoadBalancer, final long accountId, final String publicIp, final DataCenterVO zone,
+    private void commitStats(final long networkId, final HostVO externalLoadBalancer, final long accountId, final String publicIp, final Zone zone,
                              final String statsEntryIdentifier, final long newCurrentBytesSent, final long newCurrentBytesReceived) {
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
@@ -329,13 +329,12 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         protected void runExternalDeviceNetworkUsageTask() {
             s_logger.debug("External devices stats collector is running...");
 
-            for (final DataCenterVO zone : _dcDao.listAll()) {
+            for (final Zone zone : zoneRepository.findByRemovedIsNull()) {
                 final List<DomainRouterVO> domainRoutersInZone = _routerDao.listByDataCenter(zone.getId());
                 if (domainRoutersInZone == null) {
                     continue;
                 }
                 final Map<Long, ExternalNetworkResourceUsageAnswer> lbDeviceUsageAnswerMap = new HashMap<>();
-                final Map<Long, ExternalNetworkResourceUsageAnswer> fwDeviceUsageAnswerMap = new HashMap<>();
                 final List<Long> accountsProcessed = new ArrayList<>();
 
                 for (final DomainRouterVO domainRouter : domainRoutersInZone) {
@@ -488,7 +487,7 @@ public class ExternalDeviceUsageManagerImpl extends ManagerBase implements Exter
         ExternalNetworkResourceUsageAnswer answer,
                                          final boolean inline) {
             final AccountVO account = _accountDao.findById(accountId);
-            final DataCenterVO zone = _dcDao.findById(zoneId);
+            final Zone zone = zoneRepository.findOne(zoneId);
             final NetworkVO network = _networkDao.findById(networkId);
             final HostVO host = _hostDao.findById(hostId);
             String statsEntryIdentifier =
