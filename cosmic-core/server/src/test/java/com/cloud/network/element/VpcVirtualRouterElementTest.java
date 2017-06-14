@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
@@ -35,8 +35,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class VpcVirtualRouterElementTest {
     @Mock
-    DataCenterDao _dcDao;
-    @Mock
     EntityManager _entityMgr;
     @Mock
     NetworkTopologyContext networkTopologyContext;
@@ -46,6 +44,8 @@ public class VpcVirtualRouterElementTest {
     VpcVirtualRouterElement vpcVirtualRouterElement;
     @Mock
     private DomainRouterDao _routerDao;
+    @Mock
+    ZoneRepository zoneRepository;
 
     @Test
     public void testApplyVpnUsers() {
@@ -59,7 +59,7 @@ public class VpcVirtualRouterElementTest {
         networkTopologyContext.init();
 
         final Vpc vpc = Mockito.mock(Vpc.class);
-        final DataCenterVO dataCenterVO = Mockito.mock(DataCenterVO.class);
+        final Zone zone = Mockito.mock(Zone.class);
         final RemoteAccessVpn remoteAccessVpn = Mockito.mock(RemoteAccessVpn.class);
         final DomainRouterVO domainRouterVO1 = Mockito.mock(DomainRouterVO.class);
         final DomainRouterVO domainRouterVO2 = Mockito.mock(DomainRouterVO.class);
@@ -81,8 +81,8 @@ public class VpcVirtualRouterElementTest {
         when(_vpcRouterMgr.getVpcRouters(vpcId)).thenReturn(routers);
         when(_entityMgr.findById(Vpc.class, vpcId)).thenReturn(vpc);
         when(vpc.getZoneId()).thenReturn(zoneId);
-        when(_dcDao.findById(zoneId)).thenReturn(dataCenterVO);
-        when(networkTopologyContext.retrieveNetworkTopology(dataCenterVO)).thenReturn(advancedNetworkTopology);
+        when(zoneRepository.findOne(zoneId)).thenReturn(zone);
+        when(networkTopologyContext.retrieveNetworkTopology(zone)).thenReturn(advancedNetworkTopology);
 
         try {
             when(advancedNetworkTopology.applyVpnUsers(remoteAccessVpn, users, domainRouterVO1)).thenReturn(new String[]{"user1", "user2"});
@@ -105,8 +105,8 @@ public class VpcVirtualRouterElementTest {
 
         verify(remoteAccessVpn, times(1)).getVpcId();
         verify(vpc, times(1)).getZoneId();
-        verify(_dcDao, times(1)).findById(zoneId);
-        verify(networkTopologyContext, times(1)).retrieveNetworkTopology(dataCenterVO);
+        verify(zoneRepository, times(1)).findOne(zoneId);
+        verify(networkTopologyContext, times(1)).retrieveNetworkTopology(zone);
     }
 
     @Test

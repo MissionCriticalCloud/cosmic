@@ -1,8 +1,8 @@
 package com.cloud.network.element;
 
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
@@ -133,7 +133,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 
         final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create().setVpc(vpc).setDeployDestination(dest)
-                .setAccountOwner(_accountMgr.getAccount(vpc.getAccountId())).setParams(params).build();
+                                                                                                       .setAccountOwner(_accountMgr.getAccount(vpc.getAccountId())).setParams
+                        (params).build();
 
         routerDeploymentDefinition.deployVirtualRouter();
 
@@ -167,8 +168,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final DataCenterVO dcVO = _dcDao.findById(gateway.getZoneId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(gateway.getZoneId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
         final Network network = _networkDao.findById(gateway.getNetworkId());
@@ -220,8 +221,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final DataCenterVO dcVO = _dcDao.findById(vpc.getZoneId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         if (!networkTopology.applyStaticRoutes(routes, routers)) {
             throw new CloudRuntimeException("Failed to apply static routes in vpc " + vpc);
@@ -242,8 +243,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         final Network privateNetwork = _networkModel.getNetwork(gateway.getNetworkId());
 
@@ -268,8 +269,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final DataCenterVO dcVO = _dcDao.findById(publicIp.getDataCenterId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(publicIp.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         final Network publicNetwork = _networkModel.getNetwork(publicIp.getNetworkId());
 
@@ -295,8 +296,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
                 return true;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 try {
@@ -585,8 +586,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         }
 
         final Vpc vpc = _entityMgr.findById(Vpc.class, vpcId);
-        final DataCenterVO dcVO = _dcDao.findById(vpc.getZoneId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         String[] result;
         final List<String> combinedResults = new ArrayList<>();
@@ -657,8 +658,8 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
                 return false;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.associatePublicIP(network, ipAddress, domainRouterVO);
