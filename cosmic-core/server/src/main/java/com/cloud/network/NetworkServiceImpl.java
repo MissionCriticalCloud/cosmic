@@ -1976,7 +1976,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }
 
-        final DataCenterVO zone = _dcDao.findById(zoneId);
+        final Zone zone = zoneRepository.findOne(zoneId);
         if (zone == null) {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }
