@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.alert.AlertManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -64,8 +64,6 @@ public class HighAvailabilityManagerImplTest {
     @Mock
     HostDao _hostDao;
     @Mock
-    DataCenterDao _dcDao;
-    @Mock
     HostPodDao _podDao;
     @Mock
     ClusterDetailsDao _clusterDetailsDao;
@@ -97,6 +95,8 @@ public class HighAvailabilityManagerImplTest {
     VolumeOrchestrationService volumeMgr;
     @Mock
     HostVO hostVO;
+    @Mock
+    ZoneRepository zoneRepository;
     HighAvailabilityManagerImpl highAvailabilityManager;
     HighAvailabilityManagerImpl highAvailabilityManagerSpy;
 
@@ -140,7 +140,7 @@ public class HighAvailabilityManagerImplTest {
         Mockito.when(hostVO.getHypervisorType()).thenReturn(HypervisorType.KVM);
         Mockito.when(_instanceDao.listByHostId(42l)).thenReturn(Arrays.asList(Mockito.mock(VMInstanceVO.class)));
         Mockito.when(_podDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(HostPodVO.class));
-        Mockito.when(_dcDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(DataCenterVO.class));
+        Mockito.when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(Mockito.mock(Zone.class));
 
         highAvailabilityManager.scheduleRestartForVmsOnHost(hostVO, true);
     }
@@ -167,7 +167,7 @@ public class HighAvailabilityManagerImplTest {
         Mockito.when(_instanceDao.findByUuid(vm1.getUuid())).thenReturn(vm1);
         Mockito.when(_instanceDao.findByUuid(vm2.getUuid())).thenReturn(vm2);
         Mockito.when(_podDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(HostPodVO.class));
-        Mockito.when(_dcDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(DataCenterVO.class));
+        Mockito.when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(Mockito.mock(Zone.class));
         Mockito.when(_haDao.findPreviousHA(Mockito.anyLong())).thenReturn(Arrays.asList(Mockito.mock(HaWorkVO.class)));
         Mockito.when(_haDao.persist((HaWorkVO) Mockito.anyObject())).thenReturn(Mockito.mock(HaWorkVO.class));
 
