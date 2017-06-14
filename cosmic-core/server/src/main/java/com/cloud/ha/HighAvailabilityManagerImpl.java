@@ -5,10 +5,10 @@ import com.cloud.alert.AlertManager;
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.configuration.Config;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.HAPlanner;
@@ -98,23 +98,13 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     @Inject
     HostDao _hostDao;
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     HostPodDao _podDao;
     @Inject
     ClusterDetailsDao _clusterDetailsDao;
-
     @Inject
     ServiceOfferingDao _serviceOfferingDao;
-
-    long _serverId;
-
     @Inject
     ManagedContext _managedContext;
-
-    List<Investigator> investigators;
-    List<FenceBuilder> fenceBuilders;
-    List<HAPlanner> _haPlanners;
     @Inject
     AgentManager _agentMgr;
     @Inject
@@ -137,6 +127,12 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     ConfigurationDao _configDao;
     @Inject
     VolumeOrchestrationService volumeMgr;
+    @Inject
+    ZoneRepository zoneRepository;
+    List<Investigator> investigators;
+    List<FenceBuilder> fenceBuilders;
+    List<HAPlanner> _haPlanners;
+    long _serverId;
     String _instance;
     ScheduledExecutorService _executor;
     int _stopRetryInterval;
@@ -308,7 +304,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         s_logger.warn("Scheduling restart for VMs on host " + host.getId() + "-" + host.getName());
 
         final List<VMInstanceVO> vms = _instanceDao.listByHostId(host.getId());
-        final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
 
         // send an email alert that the host is down
         StringBuilder sb = null;
@@ -332,7 +328,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
         // send an email alert that the host is down, include VMs
         final HostPodVO podVO = _podDao.findById(host.getPodId());
-        final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
+        final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
         _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Host is down, " + hostDesc,
                 "Host [" + hostDesc + "] is down." + (sb != null ? sb.toString() : ""));
 
@@ -541,9 +537,9 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             }
         }
 
-        final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
         final HostPodVO podVO = _podDao.findById(host.getPodId());
-        final String hostDesc = "name: " + host.getName() + "(id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
+        final String hostDesc = "name: " + host.getName() + "(id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
 
         Boolean alive = null;
         if (work.getStep() == Step.Investigating) {

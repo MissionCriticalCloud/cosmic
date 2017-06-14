@@ -35,6 +35,8 @@ import com.cloud.config.Configuration;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
@@ -320,6 +322,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     AffinityGroupService _affinityGroupService;
     @Inject
     StorageManager _storageManager;
+    @Inject
+    ZoneRepository zoneRepository;
+
     private int _maxVolumeSizeInGb = Integer.parseInt(Config.MaxVolumeSize.getDefaultValue());
     private long _defaultPageSize = Long.parseLong(Config.DefaultPageSize.getDefaultValue());
     private Set<String> weightBasedParametersForValidation;
@@ -2122,7 +2127,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     private VlanVO commitVlanAndIpRange(final long zoneId, final long networkId, final long physicalNetworkId, final Long podId, final String startIP, final String endIP,
                                         final String vlanGateway, final String vlanNetmask, final String vlanId, final Domain domain, final Account vlanOwner, final String
                                                 vlanIp6Gateway, final String vlanIp6Cidr,
-                                        final boolean ipv4, final DataCenterVO zone, final VlanType vlanType, final String ipv6Range, final String ipRange) {
+                                        final boolean ipv4, final Zone zone, final VlanType vlanType, final String ipv6Range, final String ipRange) {
         return Transaction.execute(new TransactionCallback<VlanVO>() {
             @Override
             public VlanVO doInTransaction(final TransactionStatus status) {
@@ -3667,7 +3672,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     }
 
     @Override
-    public void checkZoneAccess(final Account caller, final DataCenter zone) {
+    public void checkZoneAccess(final Account caller, final Zone zone) {
         for (final SecurityChecker checker : _secChecker) {
             if (checker.checkAccess(caller, zone)) {
                 if (s_logger.isDebugEnabled()) {
@@ -3929,7 +3934,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Validate the zone
-        final DataCenterVO zone = _zoneDao.findById(zoneId);
+        final Zone zone = zoneRepository.findOne(zoneId);
         if (zone == null) {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }

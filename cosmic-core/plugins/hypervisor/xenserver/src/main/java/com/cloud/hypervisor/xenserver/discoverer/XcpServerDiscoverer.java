@@ -14,7 +14,6 @@ import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.AgentUnavailableException;
@@ -107,7 +106,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     @Inject
     HostPodDao _podDao;
     @Inject
-    ZoneRepository _zoneRepository;
+    ZoneRepository zoneRepository;
     private final String xs620snapshothotfix = "Xenserver-Vdi-Copy-HotFix";
 
     protected XcpServerDiscoverer() {
@@ -274,7 +273,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                     details.put("storage.network.device1", storageNetworkLabel);
                 }
 
-                final DataCenterVO zone = _dcDao.findById(dcId);
+                final Zone zone = zoneRepository.findOne(dcId);
                 final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
                 params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
 
@@ -517,7 +516,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     @Override
     protected HashMap<String, Object> buildConfigParams(final HostVO host) {
         final HashMap<String, Object> params = super.buildConfigParams(host);
-        final DataCenterVO zone = _dcDao.findById(host.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
         if (zone != null) {
             final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
             params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
@@ -657,7 +656,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         }
 
         final HostPodVO pod = _podDao.findById(host.getPodId());
-        final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
 
         s_logger.info("Host: " + host.getName() + " connected with hypervisor type: " + HypervisorType.XenServer + ". Checking CIDR...");
         _resourceMgr.checkCIDR(pod, zone, ssCmd.getPrivateIpAddress(), ssCmd.getPrivateNetmask());

@@ -19,7 +19,7 @@ import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.command.user.vmgroup.CreateVMGroupCmd;
 import com.cloud.api.command.user.vmgroup.DeleteVMGroupCmd;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ManagementServerException;
@@ -164,7 +164,7 @@ public interface UserVmService {
      * @throws ResourceUnavailableException  if the resources required to deploy the VM is not currently
      *                                       available.
      */
-    UserVm createBasicSecurityGroupVirtualMachine(DataCenter zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> securityGroupIdList,
+    UserVm createBasicSecurityGroupVirtualMachine(Zone zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> securityGroupIdList,
                                                   Account owner, String hostName, String displayName, Long diskOfferingId, Long diskSize, String group, HypervisorType
                                                           hypervisor, HTTPMethod httpmethod,
                                                   String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIp, Boolean displayVm, String
@@ -217,7 +217,7 @@ public interface UserVmService {
      * @throws ResourceUnavailableException  if the resources required to deploy the VM is not currently
      *                                       available.
      */
-    UserVm createAdvancedSecurityGroupVirtualMachine(DataCenter zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList,
+    UserVm createAdvancedSecurityGroupVirtualMachine(Zone zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList,
                                                      List<Long> securityGroupIdList, Account owner, String hostName, String displayName, Long diskOfferingId, Long diskSize,
                                                      String group, HypervisorType hypervisor,
                                                      HTTPMethod httpmethod, String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps,
@@ -269,7 +269,7 @@ public interface UserVmService {
      * @throws ResourceUnavailableException  if the resources required to deploy the VM is not currently
      *                                       available.
      */
-    UserVm createAdvancedVirtualMachine(DataCenter zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList, Account owner,
+    UserVm createAdvancedVirtualMachine(Zone zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList, Account owner,
                                         String hostName, String displayName, Long diskOfferingId, Long diskSize, String group, HypervisorType hypervisor, HTTPMethod httpmethod,
                                         String userData,
                                         String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps, Boolean displayVm, String keyboard, List<Long>

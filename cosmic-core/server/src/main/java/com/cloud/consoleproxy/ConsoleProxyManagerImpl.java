@@ -14,7 +14,7 @@ import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.db.model.Zone;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -186,6 +186,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
     private KeysManager _keysMgr;
     @Inject
     private VirtualMachineManager _itMgr;
+    @Inject
+    private ZoneRepository zoneRepository;
     private ConsoleProxyListener _listener;
     private ServiceOfferingVO _serviceOffering;
     private long _capacityScanInterval = DEFAULT_CAPACITY_SCAN_INTERVAL;
@@ -621,14 +623,15 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (externalDhcp) {
             buf.append(" bootproto=dhcp");
         }
-        final DataCenterVO dc = _dcDao.findById(profile.getVirtualMachine().getDataCenterId());
-        buf.append(" internaldns1=").append(dc.getInternalDns1());
-        if (dc.getInternalDns2() != null) {
-            buf.append(" internaldns2=").append(dc.getInternalDns2());
+
+        final Zone zone = zoneRepository.findOne(profile.getVirtualMachine().getDataCenterId());
+        buf.append(" internaldns1=").append(zone.getInternalDns1());
+        if (zone.getInternalDns2() != null) {
+            buf.append(" internaldns2=").append(zone.getInternalDns2());
         }
-        buf.append(" dns1=").append(dc.getDns1());
-        if (dc.getDns2() != null) {
-            buf.append(" dns2=").append(dc.getDns2());
+        buf.append(" dns1=").append(zone.getDns1());
+        if (zone.getDns2() != null) {
+            buf.append(" dns2=").append(zone.getDns2());
         }
 
         final String bootArgs = buf.toString();
@@ -1004,12 +1007,12 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
         final long id = _consoleProxyDao.getNextInSequence(Long.class, "id");
         final String name = VirtualMachineName.getConsoleProxyName(id, _instance);
-        final DataCenterVO dc = _dcDao.findById(dataCenterId);
+        final Zone zone = zoneRepository.findOne(dataCenterId);
         final Account systemAcct = _accountMgr.getSystemAccount();
 
         final DataCenterDeployment plan = new DataCenterDeployment(dataCenterId);
 
-        final NetworkVO defaultNetwork = getDefaultNetworkForCreation(dc);
+        final NetworkVO defaultNetwork = getDefaultNetworkForCreation(zone);
 
         final List<? extends NetworkOffering> offerings =
                 _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork);
@@ -1043,7 +1046,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         }
 
         final Map<String, Object> context = new HashMap<>();
-        context.put("dc", dc);
+        context.put("dc", zone);
         final HostPodVO pod = _podDao.findById(proxy.getPodIdToDeployIn());
         context.put("pod", pod);
         context.put("proxyVmId", proxy.getId());
@@ -1061,11 +1064,11 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         return true;
     }
 
-    protected NetworkVO getDefaultNetworkForCreation(final DataCenter dc) {
-        if (dc.getNetworkType() == NetworkType.Advanced) {
-            return getDefaultNetworkForAdvancedZone(dc);
+    protected NetworkVO getDefaultNetworkForCreation(final Zone zone) {
+        if (zone.getNetworkType() == NetworkType.Advanced) {
+            return getDefaultNetworkForAdvancedZone(zone);
         } else {
-            return getDefaultNetworkForBasicZone(dc);
+            return getDefaultNetworkForBasicZone(zone);
         }
     }
 
@@ -1074,24 +1077,24 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
      * is security group-enabled, the first network found that supports SG services is returned.
      * If the zone is not SG-enabled, the Public network is returned.
      *
-     * @param dc - The zone.
+     * @param zone - The zone.
      * @return The selected default network.
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
-    protected NetworkVO getDefaultNetworkForAdvancedZone(final DataCenter dc) {
-        return getNetworkForAdvancedZone(dc, _networkDao);
+    protected NetworkVO getDefaultNetworkForAdvancedZone(final Zone zone) {
+        return getNetworkForAdvancedZone(zone, _networkDao);
     }
 
     /**
      * Get default network for console proxy VM for starting up in a basic zone. Basic zones select
      * the Guest network whether or not the zone is SG-enabled.
      *
-     * @param dc - The zone.
+     * @param zone - The zone.
      * @return The default network according to the zone's network selection rules.
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
-    protected NetworkVO getDefaultNetworkForBasicZone(final DataCenter dc) {
-        return getNetworkForBasicZone(dc, _networkDao);
+    protected NetworkVO getDefaultNetworkForBasicZone(final Zone zone) {
+        return getNetworkForBasicZone(zone, _networkDao);
     }
 
     @Override

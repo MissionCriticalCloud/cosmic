@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.context.CallContext;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
@@ -293,6 +294,11 @@ public class DedicatedApiUnitTest {
         @Bean
         public AffinityGroupDao affinityGroupDao() {
             return Mockito.mock(AffinityGroupDao.class);
+        }
+
+        @Bean
+        public ZoneRepository zoneRepository() {
+            return Mockito.mock(ZoneRepository.class);
         }
 
         public static class Library implements TypeFilter {

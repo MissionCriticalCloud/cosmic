@@ -26,6 +26,7 @@ import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.config.Configuration;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationService;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
@@ -387,7 +388,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
      * @see com.cloud.configuration.ConfigurationManager#checkZoneAccess(com.cloud.user.Account, com.cloud.dc.DataCenter)
      */
     @Override
-    public void checkZoneAccess(final Account caller, final DataCenter zone) {
+    public void checkZoneAccess(final Account caller, final Zone zone) {
         // TODO Auto-generated method stub
 
     }

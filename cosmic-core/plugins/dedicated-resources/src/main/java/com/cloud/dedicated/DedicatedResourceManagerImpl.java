@@ -21,8 +21,9 @@ import com.cloud.api.response.DedicatePodResponse;
 import com.cloud.api.response.DedicateZoneResponse;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DedicatedResources;
 import com.cloud.dc.HostPodVO;
@@ -93,9 +94,10 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
     ConfigurationDao _configDao;
     @Inject
     AffinityGroupDao _affinityGroupDao;
-
     @Inject
     AffinityGroupService _affinityGroupService;
+    @Inject
+    ZoneRepository zoneRepository;
 
     private int capacityReleaseInterval;
 
@@ -264,13 +266,13 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                     }
                     if (zoneId != null) {
                         // remove the domainId set in zone
-                        final DataCenterVO dc = _zoneDao.findById(zoneId);
-                        if (dc != null) {
-                            dc.setDomainId(null);
-                            dc.setDomain(null);
-                            if (!_zoneDao.update(zoneId, dc)) {
-                                throw new CloudRuntimeException("Failed to release dedicated zone, could not clear domainId. Please contact Cloud Support.");
-                            }
+                        final Zone zone = zoneRepository.findOne(zoneId);
+
+                        if (zone != null) {
+                            zone.setDomainId(null);
+                            zone.setDomain(null);
+
+                            zoneRepository.save(zone);
                         }
                     }
                 }
@@ -290,13 +292,13 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
     @Override
     public DedicateZoneResponse createDedicateZoneResponse(final DedicatedResources resource) {
         final DedicateZoneResponse dedicateZoneResponse = new DedicateZoneResponse();
-        final DataCenterVO dc = _zoneDao.findById(resource.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(resource.getDataCenterId());
         final DomainVO domain = _domainDao.findById(resource.getDomainId());
         final AccountVO account = _accountDao.findById(resource.getAccountId());
         final AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
         dedicateZoneResponse.setId(resource.getUuid());
-        dedicateZoneResponse.setZoneId(dc.getUuid());
-        dedicateZoneResponse.setZoneName(dc.getName());
+        dedicateZoneResponse.setZoneId(zone.getUuid());
+        dedicateZoneResponse.setZoneName(zone.getName());
         dedicateZoneResponse.setDomainId(domain.getUuid());
         dedicateZoneResponse.setDomainName(domain.getName());
         dedicateZoneResponse.setAffinityGroupId(group.getUuid());
@@ -344,19 +346,19 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         final List<Long> childDomainIds = getDomainChildIds(domainId);
         childDomainIds.add(domainId);
         checkAccountAndDomain(accountId, domainId);
-        final DataCenterVO dc = _zoneDao.findById(zoneId);
-        if (dc == null) {
+        final Zone zone = zoneRepository.findOne(zoneId);
+        if (zone == null) {
             throw new InvalidParameterValueException("Unable to find zone by id " + zoneId);
         } else {
             final DedicatedResourceVO dedicatedZone = _dedicatedDao.findByZoneId(zoneId);
             //check if zone is dedicated
             if (dedicatedZone != null) {
-                s_logger.error("Zone " + dc.getName() + " is already dedicated");
-                throw new CloudRuntimeException("Zone  " + dc.getName() + " is already dedicated");
+                s_logger.error("Zone " + zone.getName() + " is already dedicated");
+                throw new CloudRuntimeException("Zone  " + zone.getName() + " is already dedicated");
             }
 
             //check if any resource under this zone is dedicated to different account or sub-domain
-            final List<HostPodVO> pods = _podDao.listByDataCenterId(dc.getId());
+            final List<HostPodVO> pods = _podDao.listByDataCenterId(zone.getId());
             final List<DedicatedResourceVO> podsToRelease = new ArrayList<>();
             final List<DedicatedResourceVO> clustersToRelease = new ArrayList<>();
             final List<DedicatedResourceVO> hostsToRelease = new ArrayList<>();
@@ -364,14 +366,14 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 final DedicatedResourceVO dPod = _dedicatedDao.findByPodId(pod.getId());
                 if (dPod != null) {
                     if (!(childDomainIds.contains(dPod.getDomainId()))) {
-                        throw new CloudRuntimeException("Pod " + pod.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
+                        throw new CloudRuntimeException("Pod " + pod.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
                     }
                     if (accountId != null) {
                         if (dPod.getAccountId().equals(accountId)) {
                             podsToRelease.add(dPod);
                         } else {
-                            s_logger.error("Pod " + pod.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
-                            throw new CloudRuntimeException("Pod " + pod.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
+                            s_logger.error("Pod " + pod.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
+                            throw new CloudRuntimeException("Pod " + pod.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
                         }
                     } else {
                         if (dPod.getAccountId() == null && dPod.getDomainId().equals(domainId)) {
@@ -385,19 +387,19 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 releaseDedicatedResource(null, dr.getPodId(), null, null);
             }
 
-            final List<ClusterVO> clusters = _clusterDao.listClustersByDcId(dc.getId());
+            final List<ClusterVO> clusters = _clusterDao.listClustersByDcId(zone.getId());
             for (final ClusterVO cluster : clusters) {
                 final DedicatedResourceVO dCluster = _dedicatedDao.findByClusterId(cluster.getId());
                 if (dCluster != null) {
                     if (!(childDomainIds.contains(dCluster.getDomainId()))) {
-                        throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
+                        throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
                     }
                     if (accountId != null) {
                         if (dCluster.getAccountId().equals(accountId)) {
                             clustersToRelease.add(dCluster);
                         } else {
-                            s_logger.error("Cluster " + cluster.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
-                            throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Zone " + dc.getName() +
+                            s_logger.error("Cluster " + cluster.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
+                            throw new CloudRuntimeException("Cluster " + cluster.getName() + " under this Zone " + zone.getName() +
                                     " is dedicated to different account/domain");
                         }
                     } else {
@@ -412,19 +414,19 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 releaseDedicatedResource(null, null, dr.getClusterId(), null);
             }
 
-            hosts = _hostDao.listByDataCenterId(dc.getId());
+            hosts = _hostDao.listByDataCenterId(zone.getId());
             for (final HostVO host : hosts) {
                 final DedicatedResourceVO dHost = _dedicatedDao.findByHostId(host.getId());
                 if (dHost != null) {
                     if (!(childDomainIds.contains(dHost.getDomainId()))) {
-                        throw new CloudRuntimeException("Host " + host.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
+                        throw new CloudRuntimeException("Host " + host.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
                     }
                     if (accountId != null) {
                         if (dHost.getAccountId().equals(accountId)) {
                             hostsToRelease.add(dHost);
                         } else {
-                            s_logger.error("Host " + host.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
-                            throw new CloudRuntimeException("Host " + host.getName() + " under this Zone " + dc.getName() + " is dedicated to different account/domain");
+                            s_logger.error("Host " + host.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
+                            throw new CloudRuntimeException("Host " + host.getName() + " under this Zone " + zone.getName() + " is dedicated to different account/domain");
                         }
                     } else {
                         if (dHost.getAccountId() == null && dHost.getDomainId().equals(domainId)) {
@@ -461,10 +463,8 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                     dedicatedResource = _dedicatedDao.persist(dedicatedResource);
 
                     // save the domainId in the zone
-                    dc.setDomainId(domainId);
-                    if (!_zoneDao.update(zoneId, dc)) {
-                        throw new CloudRuntimeException("Failed to dedicate zone, could not set domainId. Please contact Cloud Support.");
-                    }
+                    zone.setDomainId(domainId);
+                    zoneRepository.save(zone);
                 } catch (final Exception e) {
                     s_logger.error("Unable to dedicate zone due to " + e.getMessage(), e);
                     throw new CloudRuntimeException("Failed to dedicate zone. Please contact Cloud Support.");
@@ -508,7 +508,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 //can dedicate a pod to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfPod.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfPod.getDomainId().equals(domainId) || domainIdInChildreanList))) {
-                    final DataCenterVO zone = _zoneDao.findById(pod.getDataCenterId());
+                    final Zone zone = zoneRepository.findOne(pod.getDataCenterId());
                     s_logger.error("Cannot dedicate Pod. Its zone is already dedicated");
                     throw new CloudRuntimeException("Pod's Zone " + zone.getName() + " is already dedicated");
                 }
@@ -649,7 +649,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 if (dedicatedZoneOfCluster.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     s_logger.error("Cannot dedicate Cluster. Its zone is already dedicated");
-                    final DataCenterVO zone = _zoneDao.findById(cluster.getDataCenterId());
+                    final Zone zone = zoneRepository.findOne(cluster.getDataCenterId());
                     throw new CloudRuntimeException("Cluster's Zone " + zone.getName() + " is already dedicated");
                 }
             }
@@ -774,7 +774,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 //can dedicate a host to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfHost.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
-                    final DataCenterVO zone = _zoneDao.findById(host.getDataCenterId());
+                    final Zone zone = zoneRepository.findOne(host.getDataCenterId());
                     s_logger.error("Host's Data Center " + zone.getName() + " is already dedicated");
                     throw new CloudRuntimeException("Host's Data Center " + zone.getName() + " is already dedicated");
                 }

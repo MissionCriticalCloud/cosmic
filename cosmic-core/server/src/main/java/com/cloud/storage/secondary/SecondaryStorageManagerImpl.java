@@ -26,7 +26,7 @@ import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.consoleproxy.ConsoleProxyManager;
 import com.cloud.db.model.Zone;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DataCenterDeployment;
@@ -212,6 +212,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     private AccountService _accountMgr;
     @Inject
     private VirtualMachineManager _itMgr;
+    @Inject
+    private ZoneRepository zoneRepository;
     private int _secStorageVmMtuSize;
     private String _instance;
     private boolean _useSSlCopy;
@@ -1076,9 +1078,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final Account systemAcct = _accountMgr.getSystemAccount();
 
         final DataCenterDeployment plan = new DataCenterDeployment(dataCenterId);
-        final DataCenter dc = _dcDao.findById(plan.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(plan.getDataCenterId());
 
-        final NetworkVO defaultNetwork = getDefaultNetworkForCreation(dc);
+        final NetworkVO defaultNetwork = getDefaultNetworkForCreation(zone);
 
         final List<? extends NetworkOffering> offerings;
         if (_sNwMgr.isStorageIpRangeAvailable(dataCenterId)) {
@@ -1132,11 +1134,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return context;
     }
 
-    protected NetworkVO getDefaultNetworkForCreation(final DataCenter dc) {
-        if (dc.getNetworkType() == NetworkType.Advanced) {
-            return getDefaultNetworkForAdvancedZone(dc);
+    protected NetworkVO getDefaultNetworkForCreation(final Zone zone) {
+        if (zone.getNetworkType() == NetworkType.Advanced) {
+            return getDefaultNetworkForAdvancedZone(zone);
         } else {
-            return getDefaultNetworkForBasicZone(dc);
+            return getDefaultNetworkForBasicZone(zone);
         }
     }
 
@@ -1145,24 +1147,24 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
      * is security group-enabled, the first network found that supports SG services is returned.
      * If the zone is not SG-enabled, the Public network is returned.
      *
-     * @param dc - The zone.
+     * @param zone - The zone.
      * @return The selected default network.
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
-    protected NetworkVO getDefaultNetworkForAdvancedZone(final DataCenter dc) {
-        return getNetworkForAdvancedZone(dc, _networkDao);
+    protected NetworkVO getDefaultNetworkForAdvancedZone(final Zone zone) {
+        return getNetworkForAdvancedZone(zone, _networkDao);
     }
 
     /**
      * Get default network for secondary storage VM for starting up in a basic zone. Basic zones select
      * the Guest network whether or not the zone is SG-enabled.
      *
-     * @param dc - The zone.
+     * @param zone - The zone.
      * @return The default network according to the zone's network selection rules.
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
-    protected NetworkVO getDefaultNetworkForBasicZone(final DataCenter dc) {
-        return getNetworkForBasicZone(dc, _networkDao);
+    protected NetworkVO getDefaultNetworkForBasicZone(final Zone zone) {
+        return getNetworkForBasicZone(zone, _networkDao);
     }
 
     @Override

@@ -27,6 +27,8 @@ import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.event.ActionEvent;
@@ -164,6 +166,8 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
     LoadBalancerVMMapDao _lbVmMapDao;
     @Inject
     LoadBalancingRulesService _loadBalancingRulesService;
+    @Inject
+    ZoneRepository zoneRepository;
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_AUTOSCALEPOLICY_CREATE, eventDescription = "creating autoscale policy", create = true)
@@ -1268,7 +1272,7 @@ public class AutoScaleManagerImpl<Type> extends ManagerBase implements AutoScale
             //Verify that all objects exist before passing them to the service
             final Account owner = _accountService.getActiveAccountById(profileVo.getAccountId());
 
-            final DataCenter zone = _entityMgr.findById(DataCenter.class, profileVo.getZoneId());
+            final Zone zone = zoneRepository.findOne(profileVo.getZoneId());
             if (zone == null) {
                 throw new InvalidParameterValueException("Unable to find zone by id=" + profileVo.getZoneId());
             }

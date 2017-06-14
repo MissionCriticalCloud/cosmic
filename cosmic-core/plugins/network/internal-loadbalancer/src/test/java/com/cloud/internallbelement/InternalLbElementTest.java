@@ -8,8 +8,8 @@ import static org.junit.Assert.assertTrue;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 import com.cloud.model.enumeration.NetworkType;
@@ -64,6 +64,8 @@ public class InternalLbElementTest {
     ConfigurationManager _configMgr;
     @Inject
     EntityManager _entityMgr;
+    @Inject
+    ZoneRepository zoneRepository;
 
     long validElId = 1L;
     long nonExistingElId = 2L;
@@ -99,8 +101,10 @@ public class InternalLbElementTest {
 
         Mockito.when(_vrProviderDao.persist(Matchers.any(VirtualRouterProviderVO.class))).thenReturn(validElement);
 
-        final DataCenterVO dc = new DataCenterVO(1L, null, null, null, null, null, null, null, null, null, NetworkType.Advanced, null, null);
-        Mockito.when(_entityMgr.findById(Matchers.eq(DataCenter.class), Matchers.anyLong())).thenReturn(dc);
+        final Zone zone = new Zone();
+        zone.setId(1L);
+        zone.setNetworkType(NetworkType.Advanced);
+        Mockito.when(zoneRepository.findOne(Matchers.anyLong())).thenReturn(zone);
     }
 
     //TEST FOR getProvider() method

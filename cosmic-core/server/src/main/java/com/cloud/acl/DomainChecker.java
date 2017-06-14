@@ -1,7 +1,7 @@
 package com.cloud.acl;
 
 import com.cloud.affinity.AffinityGroup;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.Domain;
@@ -12,7 +12,6 @@ import com.cloud.network.NetworkModel;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.projects.ProjectManager;
-import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.storage.LaunchPermissionVO;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.template.VirtualMachineTemplate;
@@ -37,8 +36,6 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     LaunchPermissionDao _launchPermissionDao;
     @Inject
     ProjectManager _projectMgr;
-    @Inject
-    ProjectAccountDao _projecAccountDao;
     @Inject
     NetworkModel _networkMgr;
     @Inject
@@ -226,7 +223,7 @@ public class DomainChecker extends AdapterBase implements SecurityChecker {
     }
 
     @Override
-    public boolean checkAccess(final Account account, final DataCenter zone) throws PermissionDeniedException {
+    public boolean checkAccess(final Account account, final Zone zone) throws PermissionDeniedException {
         if (account == null || zone.getDomainId() == null) {//public zone
             return true;
         } else {

@@ -7,8 +7,8 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
@@ -27,10 +27,10 @@ import org.mockito.MockitoAnnotations;
 
 public class SecondaryStorageManagerTest {
     @Mock
-    DataCenterDao _dcDao;
+    NetworkDao _networkDao;
 
     @Mock
-    NetworkDao _networkDao;
+    ZoneRepository zoneRepository;
 
     @InjectMocks
     SecondaryStorageManagerImpl _ssMgr = new SecondaryStorageManagerImpl();
@@ -42,11 +42,11 @@ public class SecondaryStorageManagerTest {
 
     @Test
     public void getDefaultNetworkForAdvancedNonSG() {
-        final DataCenterVO dc = mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(dc.isSecurityGroupEnabled()).thenReturn(false);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zone.isSecurityGroupEnabled()).thenReturn(false);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -59,7 +59,7 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
                 .thenReturn(Collections.singletonList(badNetwork));
 
-        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(dc);
+        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(zone);
 
         Assert.assertNotNull(returnedNetwork);
         Assert.assertEquals(network, returnedNetwork);
@@ -68,11 +68,11 @@ public class SecondaryStorageManagerTest {
 
     @Test
     public void getDefaultNetworkForAdvancedSG() {
-        final DataCenterVO dc = Mockito.mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(dc.isSecurityGroupEnabled()).thenReturn(true);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zone.isSecurityGroupEnabled()).thenReturn(true);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -82,7 +82,7 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
                 .thenReturn(Collections.singletonList(network));
 
-        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(dc);
+        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForAdvancedZone(zone);
 
         Assert.assertEquals(network, returnedNetwork);
         Assert.assertNotEquals(badNetwork, returnedNetwork);
@@ -90,11 +90,11 @@ public class SecondaryStorageManagerTest {
 
     @Test
     public void getDefaultNetworkForBasicNonSG() {
-        final DataCenterVO dc = Mockito.mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(dc.isSecurityGroupEnabled()).thenReturn(false);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(zone.isSecurityGroupEnabled()).thenReturn(false);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -104,7 +104,7 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
                 .thenReturn(Collections.singletonList(badNetwork));
 
-        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(dc);
+        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(zone);
 
         Assert.assertNotNull(returnedNetwork);
         Assert.assertEquals(network, returnedNetwork);
@@ -113,11 +113,11 @@ public class SecondaryStorageManagerTest {
 
     @Test
     public void getDefaultNetworkForBasicSG() {
-        final DataCenterVO dc = Mockito.mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(dc.isSecurityGroupEnabled()).thenReturn(true);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(zone.isSecurityGroupEnabled()).thenReturn(true);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -127,8 +127,7 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
                 .thenReturn(Collections.singletonList(badNetwork));
 
-        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(dc);
-
+        final NetworkVO returnedNetwork = _ssMgr.getDefaultNetworkForBasicZone(zone);
         Assert.assertNotNull(returnedNetwork);
         Assert.assertEquals(network, returnedNetwork);
         Assert.assertNotEquals(badNetwork, returnedNetwork);
@@ -137,11 +136,11 @@ public class SecondaryStorageManagerTest {
     //also test invalid input
     @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForBasicSGWrongZoneType() {
-        final DataCenterVO dc = Mockito.mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(dc.isSecurityGroupEnabled()).thenReturn(true);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
+        when(zone.isSecurityGroupEnabled()).thenReturn(true);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -151,16 +150,16 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
                 .thenReturn(Collections.singletonList(badNetwork));
 
-        _ssMgr.getDefaultNetworkForBasicZone(dc);
+        _ssMgr.getDefaultNetworkForBasicZone(zone);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void getDefaultNetworkForAdvancedWrongZoneType() {
-        final DataCenterVO dc = Mockito.mock(DataCenterVO.class);
-        when(dc.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(dc.isSecurityGroupEnabled()).thenReturn(true);
+        final Zone zone = mock(Zone.class);
+        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
+        when(zone.isSecurityGroupEnabled()).thenReturn(true);
 
-        when(_dcDao.findById(Mockito.anyLong())).thenReturn(dc);
+        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
@@ -170,6 +169,6 @@ public class SecondaryStorageManagerTest {
         when(_networkDao.listByZoneSecurityGroup(anyLong()))
                 .thenReturn(Collections.singletonList(network));
 
-        _ssMgr.getDefaultNetworkForAdvancedZone(dc);
+        _ssMgr.getDefaultNetworkForAdvancedZone(zone);
     }
 }

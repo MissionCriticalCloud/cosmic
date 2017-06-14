@@ -10,6 +10,7 @@ import com.cloud.capacity.dao.CapacityDaoImpl;
 import com.cloud.cluster.agentlb.dao.HostTransferMapDaoImpl;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.dao.AccountVlanMapDaoImpl;
 import com.cloud.dc.dao.ClusterDaoImpl;
@@ -318,6 +319,11 @@ ChildTestConfiguration {
     @Bean
     public StorageManager storageManager() {
         return Mockito.mock(StorageManager.class);
+    }
+
+    @Bean
+    public ZoneRepository zoneRepository() {
+        return Mockito.mock(ZoneRepository.class);
     }
 
     public static class Library implements TypeFilter {

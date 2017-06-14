@@ -26,7 +26,6 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.Pod;
 import com.cloud.dc.dao.ClusterDao;
@@ -746,7 +745,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
             final DiskProfile diskProfile = new DiskProfile(toBeCreated, diskOffering, vmProfile.getHypervisorType());
             boolean useLocalStorage = false;
             if (vmProfile.getType() != VirtualMachine.Type.User) {
-                final DataCenterVO zone = _dcDao.findById(plan.getDataCenterId());
+                final Zone zone = zoneRepository.findOne(plan.getDataCenterId());
                 assert (zone != null) : "Invalid zone in deployment plan";
                 final Boolean useLocalStorageForSystemVM = ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(zone.getId());
                 if (useLocalStorageForSystemVM != null) {
@@ -1054,7 +1053,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
     private boolean isEnabledForAllocation(final long zoneId, final Long podId, final Long clusterId) {
         // Check if the zone exists in the system
-        final DataCenterVO zone = _dcDao.findById(zoneId);
+        final Zone zone = zoneRepository.findOne(zoneId);
         if (zone != null && AllocationState.Disabled == zone.getAllocationState()) {
             s_logger.info("Zone is currently disabled, cannot allocate to this zone: " + zoneId);
             return false;

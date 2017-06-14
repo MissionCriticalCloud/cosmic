@@ -5,7 +5,6 @@ import static com.cloud.utils.CloudConstants.PROPERTY_LIST_SEPARATOR;
 import com.cloud.cluster.ClusterManager;
 import com.cloud.context.CallContext;
 import com.cloud.db.model.Zone;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.host.dao.HostDao;
@@ -93,21 +92,21 @@ public abstract class SystemVmManagerBase extends ManagerBase implements SystemV
         return dcIdList;
     }
 
-    protected static NetworkVO getNetworkForAdvancedZone(final DataCenter dc, final NetworkDao _networkDao) {
-        if (dc.getNetworkType() != NetworkType.Advanced) {
-            throw new CloudRuntimeException("Zone " + dc + " is not advanced.");
+    protected static NetworkVO getNetworkForAdvancedZone(final Zone zone, final NetworkDao _networkDao) {
+        if (zone.getNetworkType() != NetworkType.Advanced) {
+            throw new CloudRuntimeException("Zone " + zone + " is not advanced.");
         }
 
-        if (dc.isSecurityGroupEnabled()) {
-            final List<NetworkVO> networks = _networkDao.listByZoneSecurityGroup(dc.getId());
+        if (zone.isSecurityGroupEnabled()) {
+            final List<NetworkVO> networks = _networkDao.listByZoneSecurityGroup(zone.getId());
             if (CollectionUtils.isEmpty(networks)) {
-                throw new CloudRuntimeException("Can not found security enabled network in SG Zone " + dc);
+                throw new CloudRuntimeException("Can not found security enabled network in SG Zone " + zone);
             }
 
             return networks.get(0);
         } else {
             final TrafficType defaultTrafficType = TrafficType.Public;
-            final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
+            final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(zone.getId(), defaultTrafficType);
             // api should never allow this situation to happen
             if (defaultNetworks.size() != 1) {
                 throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");
@@ -117,13 +116,13 @@ public abstract class SystemVmManagerBase extends ManagerBase implements SystemV
         }
     }
 
-    protected static NetworkVO getNetworkForBasicZone(final DataCenter dc, final NetworkDao _networkDao) {
-        if (dc.getNetworkType() != NetworkType.Basic) {
-            throw new CloudRuntimeException("Zone " + dc + "is not basic.");
+    protected static NetworkVO getNetworkForBasicZone(final Zone zone, final NetworkDao _networkDao) {
+        if (zone.getNetworkType() != NetworkType.Basic) {
+            throw new CloudRuntimeException("Zone " + zone + " is not basic.");
         }
 
         final TrafficType defaultTrafficType = TrafficType.Guest;
-        final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(dc.getId(), defaultTrafficType);
+        final List<NetworkVO> defaultNetworks = _networkDao.listByZoneAndTrafficType(zone.getId(), defaultTrafficType);
         // api should never allow this situation to happen
         if (defaultNetworks.size() != 1) {
             throw new CloudRuntimeException("Found " + defaultNetworks.size() + " networks of type " + defaultTrafficType + " when expect to find 1");

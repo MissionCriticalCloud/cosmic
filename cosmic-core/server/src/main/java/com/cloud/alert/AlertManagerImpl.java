@@ -10,9 +10,9 @@ import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.capacity.dao.CapacityDaoImpl.SummedCapacity;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.dao.ClusterDao;
@@ -29,7 +29,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.managed.context.ManagedContextTimerTask;
-import com.cloud.db.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.dao.IPAddressDao;
@@ -110,7 +109,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
     @Inject
     private ConfigurationManager _configMgr;
     @Inject
-    private ZoneRepository _zoneRepository;
+    private ZoneRepository zoneRepository;
     private Timer _timer = null;
     private long _capacityCheckPeriod = 60L * 60L * 1000L; // one hour by default
     private double _publicIPCapacityThreshold = 0.75;
@@ -263,11 +262,10 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
             s_logger.debug("Executing capacity updates for public ip and Vlans");
         }
 
-        final List<Zone> zones = _zoneRepository.findByRemovedIsNull();
+        final List<Zone> zones = zoneRepository.findByRemovedIsNull();
 
-        final List<DataCenterVO> datacenters = _dcDao.listAll();
         for (final Zone zone : zones) {
-            final long dcId = zone.getId();
+            final long zoneId = zone.getId();
 
             //NOTE
             //What happens if we have multiple vlans? Dashboard currently shows stats
@@ -277,15 +275,15 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
 
             // Calculate new Public IP capacity for Virtual Network
             if (zone.getNetworkType() == NetworkType.Advanced) {
-                createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, zone.getAllocationState());
+                createOrUpdateIpCapacity(zoneId, null, Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP, zone.getAllocationState());
             }
 
             // Calculate new Public IP capacity for Direct Attached Network
-            createOrUpdateIpCapacity(dcId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, zone.getAllocationState());
+            createOrUpdateIpCapacity(zoneId, null, Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP, zone.getAllocationState());
 
             if (zone.getNetworkType() == NetworkType.Advanced) {
                 //Calculate VLAN's capacity
-                createOrUpdateVlanCapacity(dcId, zone.getAllocationState());
+                createOrUpdateVlanCapacity(zoneId, zone.getAllocationState());
             }
         }
 
@@ -339,7 +337,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         }
 
         //Get all datacenters, pods and clusters in the system.
-        final List<DataCenterVO> dataCenterList = _dcDao.listAll();
+        final List<Zone> zones = zoneRepository.findByRemovedIsNull();
         final List<ClusterVO> clusterList = _clusterDao.listAll();
         final List<HostPodVO> podList = _podDao.listAll();
         //Get capacity types at different levels
@@ -348,13 +346,13 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         final List<Short> clusterCapacityTypes = getCapacityTypesAtClusterLevel();
 
         // Generate Alerts for Zone Level capacities
-        for (final DataCenterVO dc : dataCenterList) {
+        for (final Zone zone : zones) {
             for (final Short capacityType : dataCenterCapacityTypes) {
                 final List<SummedCapacity> capacity;
-                capacity = _capacityDao.findCapacityBy(capacityType.intValue(), dc.getId(), null, null);
+                capacity = _capacityDao.findCapacityBy(capacityType.intValue(), zone.getId(), null, null);
 
                 if (capacityType == Capacity.CAPACITY_TYPE_SECONDARY_STORAGE) {
-                    capacity.add(getUsedStats(capacityType, dc.getId(), null, null));
+                    capacity.add(getUsedStats(capacityType, zone.getId(), null, null));
                 }
                 if (capacity == null || capacity.size() == 0) {
                     continue;
@@ -362,7 +360,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 final double totalCapacity = capacity.get(0).getTotalCapacity();
                 final double usedCapacity = capacity.get(0).getUsedCapacity();
                 if (totalCapacity != 0 && usedCapacity / totalCapacity > _capacityTypeThresholdMap.get(capacityType)) {
-                    generateEmailAlert(dc, null, null, totalCapacity, usedCapacity, capacityType);
+                    generateEmailAlert(zone, null, null, totalCapacity, usedCapacity, capacityType);
                 }
             }
         }
@@ -377,7 +375,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 final double totalCapacity = capacity.get(0).getTotalCapacity();
                 final double usedCapacity = capacity.get(0).getUsedCapacity();
                 if (totalCapacity != 0 && usedCapacity / totalCapacity > _capacityTypeThresholdMap.get(capacityType)) {
-                    generateEmailAlert(ApiDBUtils.findZoneById(pod.getDataCenterId()), pod, null, totalCapacity, usedCapacity, capacityType);
+                    generateEmailAlert(zoneRepository.findOne(pod.getDataCenterId()), pod, null, totalCapacity, usedCapacity, capacityType);
                 }
             }
         }
@@ -414,8 +412,8 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 final double totalCapacity = capacity.get(0).getTotalCapacity();
                 final double usedCapacity = capacity.get(0).getUsedCapacity() + capacity.get(0).getReservedCapacity();
                 if (totalCapacity != 0 && usedCapacity / totalCapacity > threshold) {
-                    generateEmailAlert(ApiDBUtils.findZoneById(cluster.getDataCenterId()), ApiDBUtils.findPodById(cluster.getPodId()), cluster, totalCapacity,
-                            usedCapacity, capacityType);
+                    generateEmailAlert(zoneRepository.findOne(cluster.getDataCenterId()), ApiDBUtils.findPodById(cluster.getPodId()), cluster, totalCapacity, usedCapacity,
+                            capacityType);
                 }
             }
         }
@@ -463,9 +461,8 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
         }
     }
 
-    private void generateEmailAlert(final DataCenterVO dc, final HostPodVO pod, final ClusterVO cluster, final double totalCapacity, final double usedCapacity, final short
+    private void generateEmailAlert(final Zone zone, final HostPodVO pod, final ClusterVO cluster, final double totalCapacity, final double usedCapacity, final short
             capacityType) {
-
         String msgSubject = null;
         String msgContent = null;
         final String totalStr;
@@ -479,21 +476,21 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
 
             //Cluster Level
             case Capacity.CAPACITY_TYPE_MEMORY:
-                msgSubject = "System Alert: Low Available Memory in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + dc.getName();
+                msgSubject = "System Alert: Low Available Memory in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + zone.getName();
                 totalStr = formatBytesToMegabytes(totalCapacity);
                 usedStr = formatBytesToMegabytes(usedCapacity);
                 msgContent = "System memory is low, total: " + totalStr + " MB, used: " + usedStr + " MB (" + pctStr + "%)";
                 alertType = AlertManager.AlertType.ALERT_TYPE_MEMORY;
                 break;
             case Capacity.CAPACITY_TYPE_CPU:
-                msgSubject = "System Alert: Low Unallocated CPU in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + dc.getName();
+                msgSubject = "System Alert: Low Unallocated CPU in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + zone.getName();
                 totalStr = DfWhole.format(totalCapacity);
                 usedStr = DfWhole.format(usedCapacity);
                 msgContent = "Unallocated CPU is low, total: " + totalStr + " Mhz, used: " + usedStr + " Mhz (" + pctStr + "%)";
                 alertType = AlertManager.AlertType.ALERT_TYPE_CPU;
                 break;
             case Capacity.CAPACITY_TYPE_STORAGE:
-                msgSubject = "System Alert: Low Available Storage in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + dc.getName();
+                msgSubject = "System Alert: Low Available Storage in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " + zone.getName();
                 totalStr = formatBytesToMegabytes(totalCapacity);
                 usedStr = formatBytesToMegabytes(usedCapacity);
                 msgContent = "Available storage space is low, total: " + totalStr + " MB, used: " + usedStr + " MB (" + pctStr + "%)";
@@ -502,7 +499,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
             case Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED:
                 msgSubject =
                         "System Alert: Remaining unallocated Storage is low in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " +
-                                dc.getName();
+                                zone.getName();
                 totalStr = formatBytesToMegabytes(totalCapacity);
                 usedStr = formatBytesToMegabytes(usedCapacity);
                 msgContent = "Unallocated storage space is low, total: " + totalStr + " MB, allocated: " + usedStr + " MB (" + pctStr + "%)";
@@ -511,7 +508,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
             case Capacity.CAPACITY_TYPE_LOCAL_STORAGE:
                 msgSubject =
                         "System Alert: Remaining unallocated Local Storage is low in cluster " + cluster.getName() + " pod " + pod.getName() + " of availability zone " +
-                                dc.getName();
+                                zone.getName();
                 totalStr = formatBytesToMegabytes(totalCapacity);
                 usedStr = formatBytesToMegabytes(usedCapacity);
                 msgContent = "Unallocated storage space is low, total: " + totalStr + " MB, allocated: " + usedStr + " MB (" + pctStr + "%)";
@@ -520,7 +517,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
 
             //Pod Level
             case Capacity.CAPACITY_TYPE_PRIVATE_IP:
-                msgSubject = "System Alert: Number of unallocated private IPs is low in pod " + pod.getName() + " of availability zone " + dc.getName();
+                msgSubject = "System Alert: Number of unallocated private IPs is low in pod " + pod.getName() + " of availability zone " + zone.getName();
                 totalStr = Double.toString(totalCapacity);
                 usedStr = Double.toString(usedCapacity);
                 msgContent = "Number of unallocated private IPs is low, total: " + totalStr + ", allocated: " + usedStr + " (" + pctStr + "%)";
@@ -529,28 +526,28 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
 
             //Zone Level
             case Capacity.CAPACITY_TYPE_SECONDARY_STORAGE:
-                msgSubject = "System Alert: Low Available Secondary Storage in availability zone " + dc.getName();
+                msgSubject = "System Alert: Low Available Secondary Storage in availability zone " + zone.getName();
                 totalStr = formatBytesToMegabytes(totalCapacity);
                 usedStr = formatBytesToMegabytes(usedCapacity);
                 msgContent = "Available secondary storage space is low, total: " + totalStr + " MB, used: " + usedStr + " MB (" + pctStr + "%)";
                 alertType = AlertManager.AlertType.ALERT_TYPE_SECONDARY_STORAGE;
                 break;
             case Capacity.CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP:
-                msgSubject = "System Alert: Number of unallocated virtual network public IPs is low in availability zone " + dc.getName();
+                msgSubject = "System Alert: Number of unallocated virtual network public IPs is low in availability zone " + zone.getName();
                 totalStr = Double.toString(totalCapacity);
                 usedStr = Double.toString(usedCapacity);
                 msgContent = "Number of unallocated public IPs is low, total: " + totalStr + ", allocated: " + usedStr + " (" + pctStr + "%)";
                 alertType = AlertManager.AlertType.ALERT_TYPE_VIRTUAL_NETWORK_PUBLIC_IP;
                 break;
             case Capacity.CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP:
-                msgSubject = "System Alert: Number of unallocated shared network IPs is low in availability zone " + dc.getName();
+                msgSubject = "System Alert: Number of unallocated shared network IPs is low in availability zone " + zone.getName();
                 totalStr = Double.toString(totalCapacity);
                 usedStr = Double.toString(usedCapacity);
                 msgContent = "Number of unallocated shared network IPs is low, total: " + totalStr + ", allocated: " + usedStr + " (" + pctStr + "%)";
                 alertType = AlertManager.AlertType.ALERT_TYPE_DIRECT_ATTACHED_PUBLIC_IP;
                 break;
             case Capacity.CAPACITY_TYPE_VLAN:
-                msgSubject = "System Alert: Number of unallocated VLANs is low in availability zone " + dc.getName();
+                msgSubject = "System Alert: Number of unallocated VLANs is low in availability zone " + zone.getName();
                 totalStr = Double.toString(totalCapacity);
                 usedStr = Double.toString(usedCapacity);
                 msgContent = "Number of unallocated VLANs is low, total: " + totalStr + ", allocated: " + usedStr + " (" + pctStr + "%)";
@@ -563,7 +560,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 s_logger.debug(msgSubject);
                 s_logger.debug(msgContent);
             }
-            _emailAlert.sendAlert(alertType, dc.getId(), podId, clusterId, msgSubject, msgContent);
+            _emailAlert.sendAlert(alertType, zone.getId(), podId, clusterId, msgSubject, msgContent);
         } catch (final Exception ex) {
             s_logger.error("Exception in CapacityChecker", ex);
         }

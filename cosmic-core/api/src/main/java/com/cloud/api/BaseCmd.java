@@ -7,6 +7,7 @@ import com.cloud.configuration.ConfigurationService;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
@@ -157,6 +158,9 @@ public abstract class BaseCmd {
     public AlertService _alertSvc;
     @Inject
     public UUIDManager _uuidMgr;
+    @Inject
+    public ZoneRepository zoneRepository;
+
     private Object _responseObject;
     private Map<String, String> fullUrlParams;
     private HTTPMethod httpMethod;

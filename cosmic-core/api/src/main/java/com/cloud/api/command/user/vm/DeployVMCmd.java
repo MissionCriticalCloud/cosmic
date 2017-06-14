@@ -22,7 +22,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -537,7 +537,8 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
             verifyDetails();
 
-            final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
+            final Zone zone = zoneRepository.findOne(zoneId);
+
             if (zone == null) {
                 throw new InvalidParameterValueException("Unable to find zone by id=" + zoneId);
             }
