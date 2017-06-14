@@ -5,9 +5,9 @@ import com.cloud.api.command.admin.router.ConfigureVirtualRouterElementCmd;
 import com.cloud.api.command.admin.router.CreateVirtualRouterElementCmd;
 import com.cloud.api.command.admin.router.ListVirtualRouterElementsCmd;
 import com.cloud.configuration.ConfigurationManager;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
@@ -129,11 +129,11 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
     @Inject
     IPAddressDao _ipAddressDao;
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     NetworkModel _networkModel;
     @Inject
     NetworkTopologyContext networkTopologyContext;
+    @Inject
+    ZoneRepository zoneRepository;
 
     private static Map<Service, Map<Capability, String>> setCapabilities() {
         final Map<Service, Map<Capability, String>> capabilities = new HashMap<>();
@@ -286,8 +286,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 }
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyFirewallRules(network, rules, domainRouterVO);
@@ -339,8 +339,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyLoadBalancingRules(network, rules, domainRouterVO);
@@ -663,8 +663,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return null;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             return networkTopology.applyVpnUsers(network, users, routers);
         } else {
@@ -730,8 +730,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.associatePublicIP(network, ipAddress, domainRouterVO);
@@ -750,8 +750,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyStaticNats(network, rules, domainRouterVO);
@@ -840,8 +840,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyFirewallRules(network, rules, domainRouterVO);
@@ -871,8 +871,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyDhcpEntry(network, nic, uservm, dest, domainRouterVO);
@@ -897,8 +897,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             return networkTopology.configDhcpForSubnet(network, nic, uservm, dest, routers);
         }
@@ -980,8 +980,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
                 result = result && networkTopology.applyUserData(network, nic, uservm, dest, domainRouterVO);
@@ -1003,8 +1003,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         // If any router is running then send save password command otherwise
         // save the password in DB
@@ -1040,8 +1040,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
         for (final DomainRouterVO domainRouterVO : routers) {
@@ -1063,8 +1063,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
         for (final DomainRouterVO domainRouterVO : routers) {
@@ -1087,8 +1087,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {
                 networkTopology.setupDhcpForPvlan(false, router, router.getHostId(), nic);
@@ -1112,8 +1112,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {
                 networkTopology.setupDhcpForPvlan(true, router, router.getHostId(), nic);
@@ -1136,8 +1136,8 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(dcVO);
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {
                 networkTopology.setupDhcpForPvlan(true, router, router.getHostId(), nic);

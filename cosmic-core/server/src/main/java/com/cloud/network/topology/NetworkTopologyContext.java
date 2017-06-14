@@ -1,6 +1,6 @@
 package com.cloud.network.topology;
 
-import com.cloud.dc.DataCenter;
+import com.cloud.db.model.Zone;
 import com.cloud.model.enumeration.NetworkType;
 
 import javax.inject.Inject;
@@ -25,12 +25,12 @@ public class NetworkTopologyContext {
         _flyweight.put(NetworkType.Advanced, _advancedNetworkTopology);
     }
 
-    public NetworkTopology retrieveNetworkTopology(final DataCenter dc) {
-        if (!_flyweight.containsKey(dc.getNetworkType())) {
+    public NetworkTopology retrieveNetworkTopology(final Zone zone) {
+        if (!_flyweight.containsKey(zone.getNetworkType())) {
             throw new IllegalArgumentException("The given type cannot be related to a NetworkTopology implementation. "
                     + "Please, give a correct type.");
         }
-        return _flyweight.get(dc.getNetworkType());
+        return _flyweight.get(zone.getNetworkType());
     }
 
     /**

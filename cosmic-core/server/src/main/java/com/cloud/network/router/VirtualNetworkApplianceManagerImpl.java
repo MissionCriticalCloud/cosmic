@@ -1297,7 +1297,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final long guestNetworkId = guestNic.getNetworkId();
         final NetworkVO guestNetwork = _networkDao.findById(guestNetworkId);
         String dhcpRange = null;
-        final DataCenterVO dc = _dcDao.findById(guestNetwork.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(guestNetwork.getDataCenterId());
 
         final StringBuilder buf = new StringBuilder();
 
@@ -1323,7 +1323,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         long cidrSize = 0;
 
         // setup dhcp range
-        if (dc.getNetworkType() == NetworkType.Basic) {
+        if (zone.getNetworkType() == NetworkType.Basic) {
             if (guestNic.isDefaultNic()) {
                 cidrSize = NetUtils.getCidrSize(guestNic.getIPv4Netmask());
                 final String cidr = NetUtils.getCidrSubNet(guestNic.getIPv4Gateway(), cidrSize);
@@ -1331,7 +1331,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     dhcpRange = NetUtils.getIpRangeStartIpFromCidr(cidr, cidrSize);
                 }
             }
-        } else if (dc.getNetworkType() == NetworkType.Advanced) {
+        } else if (zone.getNetworkType() == NetworkType.Advanced) {
             final String cidr = guestNetwork.getCidr();
             if (cidr != null) {
                 cidrSize = NetUtils.getCidrSize(NetUtils.getCidrNetmask(cidr));
@@ -1372,9 +1372,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     protected NicProfile getControlNic(final VirtualMachineProfile profile) {
         final DomainRouterVO router = _routerDao.findById(profile.getId());
-        final DataCenterVO dcVo = _dcDao.findById(router.getDataCenterId());
+        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         NicProfile controlNic = null;
-        if (dcVo.getNetworkType() == NetworkType.Basic) {
+        if (zone.getNetworkType() == NetworkType.Basic) {
             // for basic network mode, we will use the guest NIC for control NIC
             for (final NicProfile nic : profile.getNics()) {
                 if (nic.getTrafficType() == TrafficType.Guest && nic.getIPv4Address() != null) {
@@ -1721,14 +1721,14 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         for (final Nic nic : routerNics) {
             final Network network = _networkModel.getNetwork(nic.getNetworkId());
 
-            final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
+            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
             if (network.getTrafficType() == TrafficType.Guest) {
                 guestNetworks.add(network);
                 if (nic.getBroadcastUri().getScheme().equals("pvlan")) {
                     final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
 
-                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(dcVO);
+                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
                     try {
                         result = networkTopology.setupDhcpForPvlan(true, router, router.getHostId(), nicProfile);
                     } catch (final ResourceUnavailableException e) {
@@ -1819,12 +1819,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final List<? extends Nic> routerNics = _nicDao.listByVmId(profile.getId());
             for (final Nic nic : routerNics) {
                 final Network network = _networkModel.getNetwork(nic.getNetworkId());
-                final DataCenterVO dcVO = _dcDao.findById(network.getDataCenterId());
+                final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
                 if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
                     final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
 
-                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(dcVO);
+                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
                     try {
                         networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
                     } catch (final ResourceUnavailableException e) {

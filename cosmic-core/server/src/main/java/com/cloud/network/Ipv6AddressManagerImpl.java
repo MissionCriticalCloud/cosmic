@@ -1,11 +1,11 @@
 package com.cloud.network;
 
 import com.cloud.configuration.Config;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
-import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.Vlan;
 import com.cloud.dc.VlanVO;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -32,8 +32,6 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
     int _ipv6RetryMax = 0;
 
     @Inject
-    DataCenterDao _dcDao;
-    @Inject
     VlanDao _vlanDao;
     @Inject
     NetworkModel _networkModel;
@@ -43,6 +41,8 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
     NetworkDao _networkDao;
     @Inject
     ConfigurationDao _configDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -109,11 +109,12 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
                 throw new CloudRuntimeException("The requested IP is already taken!");
             }
         }
-        final DataCenterVO dc = _dcDao.findById(dcId);
-        final Long mac = dc.getMacAddress();
+
+        final Zone zone = zoneRepository.findOne(dcId);
+        final Long mac = zone.getMacAddress();
         final Long nextMac = mac + 1;
-        dc.setMacAddress(nextMac);
-        _dcDao.update(dc.getId(), dc);
+        zone.setMacAddress(nextMac);
+        zoneRepository.save(zone);
 
         final String macAddress = NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(mac));
         final UserIpv6AddressVO ipVO = new UserIpv6AddressVO(ip, dcId, macAddress, ipVlan.getId());

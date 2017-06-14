@@ -16,7 +16,8 @@ import com.cloud.api.command.admin.usage.AddTrafficMonitorCmd;
 import com.cloud.api.command.admin.usage.DeleteTrafficMonitorCmd;
 import com.cloud.api.command.admin.usage.ListTrafficMonitorsCmd;
 import com.cloud.configuration.Config;
-import com.cloud.dc.DataCenterVO;
+import com.cloud.db.model.Zone;
+import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventVO;
@@ -102,6 +103,8 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
     NetworkDao _networksDao = null;
     @Inject
     ResourceManager _resourceMgr;
+    @Inject
+    ZoneRepository zoneRepository;
     ScheduledExecutorService _executor;
     int _networkStatsInterval;
     String _TSinclZones;
@@ -112,7 +115,7 @@ public class NetworkUsageManagerImpl extends ManagerBase implements NetworkUsage
 
         final long zoneId = cmd.getZoneId();
 
-        final DataCenterVO zone = _dcDao.findById(zoneId);
+        final Zone zone = zoneRepository.findOne(zoneId);
         final String zoneName;
         if (zone == null) {
             throw new InvalidParameterValueException("Could not find zone with ID: " + zoneId);
