@@ -13102,6 +13102,7 @@
     //action filters (begin)
     var zoneActionfilter = cloudStack.actionFilter.zoneActionfilter = function (args) {
         var jsonObj = args.context.item;
+        var allowedActions = [];
 
         if (jsonObj.domainid != null)
             allowedActions.push("releaseDedicatedZone"); else
