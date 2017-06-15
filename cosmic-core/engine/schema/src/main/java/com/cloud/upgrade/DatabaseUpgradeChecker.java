@@ -191,7 +191,7 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
                 Upgrade530to531(), new Upgrade531to532(), new Upgrade532to533(), new Upgrade533to534(), new Upgrade534to535(), new Upgrade535to536()});
 
         _upgradeMap.put("5.0.1", new DbUpgrade[]{new Upgrade501to510(), new Upgrade510to511(), new Upgrade511to520(), new Upgrade520to530(), new Upgrade530to531(), new
-                Upgrade531to532(), new Upgrade533to534(), new Upgrade534to535(), new Upgrade535to536()});
+                Upgrade531to532(), new Upgrade532to533(), new Upgrade533to534(), new Upgrade534to535(), new Upgrade535to536()});
 
         _upgradeMap.put("5.1.0", new DbUpgrade[]{new Upgrade510to511(), new Upgrade511to520(), new Upgrade520to530(), new Upgrade530to531(), new Upgrade531to532(), new
                 Upgrade532to533(), new Upgrade533to534(), new Upgrade534to535(), new Upgrade535to536()});
@@ -214,7 +214,6 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
         _upgradeMap.put("5.3.4", new DbUpgrade[]{new Upgrade534to535(), new Upgrade535to536()});
 
         _upgradeMap.put("5.3.5", new DbUpgrade[]{new Upgrade535to536()});
-
     }
 
     @Override
@@ -312,17 +311,17 @@ public class DatabaseUpgradeChecker implements SystemIntegrityChecker {
 
                 txn.start();
 
-                Connection conn;
+                final Connection conn;
                 try {
                     conn = txn.getConnection();
-                } catch (SQLException e) {
+                } catch (final SQLException e) {
                     s_logger.error("Unable to cleanup the database", e);
                     throw new CloudRuntimeException("Unable to cleanup the database", e);
                 }
 
-                File[] scripts = upgrade.getCleanupScripts();
+                final File[] scripts = upgrade.getCleanupScripts();
                 if (scripts != null) {
-                    for (File script : scripts) {
+                    for (final File script : scripts) {
                         runScript(conn, script);
                         s_logger.debug("Cleanup script " + script.getAbsolutePath() + " is executed successfully");
                     }
