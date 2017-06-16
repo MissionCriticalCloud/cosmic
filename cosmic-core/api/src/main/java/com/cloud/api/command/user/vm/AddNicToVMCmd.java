@@ -14,8 +14,10 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
+import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
@@ -45,6 +47,9 @@ public class AddNicToVMCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "IP Address for the new network")
     private String ipaddr;
 
+    @Parameter(name = ApiConstants.MAC_ADDRESS, type = CommandType.STRING, description = "MAC-Address for the new network")
+    private String macaddr;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -60,6 +65,18 @@ public class AddNicToVMCmd extends BaseAsyncCmd {
     @Override
     public String getEventType() {
         return EventTypes.EVENT_NIC_CREATE;
+    }
+
+    public String getMacAddress() {
+        if (macaddr == null) {
+            return null;
+        }
+        if(!NetUtils.isValidMac(macaddr)) {
+            throw new InvalidParameterValueException("MAC-Address is not valid: " + macaddr);
+        } else if(!NetUtils.isUnicastMac(macaddr)) {
+            throw new InvalidParameterValueException("MAC-Address is not unicast: " + macaddr);
+        }
+        return NetUtils.standardizeMacAddress(macaddr);
     }
 
     /////////////////////////////////////////////////////

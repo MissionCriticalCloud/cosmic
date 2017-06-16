@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.apache.commons.validator.routines.RegexValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1073,6 +1074,23 @@ public class NetUtils {
         }
     }
 
+    public static boolean isValidMac(final String macAddr) {
+        RegexValidator mv = new RegexValidator("^(?:[0-9a-f]{1,2}([-:\\.]))(?:[0-9a-f]{1,2}\\1){4}[0-9a-f]{1,2}$", false);
+        return mv.isValid(macAddr);
+    }
+
+    public static boolean isUnicastMac(final String macAddr) {
+        String std = standardizeMacAddress(macAddr);
+        if(std == null) {
+            return false;
+        }
+        long stdl = mac2Long(std);
+        // libvirt refuses to attach a mac address that is multicast, as defined
+        // by the least significant bit of the first octet of the mac.
+        long mask = 0x1l << 40l;
+        return (stdl & mask) != mask;
+    }
+
     public static boolean isNetworkAWithinNetworkB(final String cidrA, final String cidrB) {
         if (!areCidrsNotEmpty(cidrA, cidrB)) {
             return false;
@@ -1345,6 +1363,15 @@ public class NetUtils {
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid IPv6 CIDR: " + e.getMessage(), e);
         }
+    }
+
+    public static String standardizeMacAddress(final String macAddr) {
+        if (!isValidMac(macAddr)) {
+            return null;
+        }
+        String norm = macAddr.replace('.', ':');
+        norm = norm.replace('-',  ':');
+        return long2Mac(mac2Long(norm));
     }
 
     public static boolean isValidVlan(String vlan) {
