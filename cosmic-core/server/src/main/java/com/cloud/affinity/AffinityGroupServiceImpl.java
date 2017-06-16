@@ -422,7 +422,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
                         }
                     }
 
-                    if (!VmRunsOnDedicatedHost) {
+                    if (!VmRunsOnDedicatedHost && !State.Stopped.equals(vmInstance.getState())) {
                         throw new InvalidParameterValueException("Unable update Explicit Dedication affinity groups of the virtual machine " + vmInstance.toString() +
                                 " " + "in state " + vmInstance.getState() + "; make sure the virtual machine is either stopped or running on a host that is part of the " +
                                 "Explicit Dedication Affinity Group.");
