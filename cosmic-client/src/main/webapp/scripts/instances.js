@@ -2825,7 +2825,7 @@
             allowedActions.push("stop");
             allowedActions.push("restart");
 
-            if ((jsonObj.hypervisor != 'KVM' || g_kvmsnapshotenabled == true)) {
+            if (jsonObj.hypervisor != 'KVM') {
                 allowedActions.push("snapshot");
             }
 
@@ -2859,7 +2859,7 @@
             allowedActions.push("destroy");
             allowedActions.push("reinstall");
 
-            if ((jsonObj.hypervisor != 'KVM' || g_kvmsnapshotenabled == true)) {
+            if (jsonObj.hypervisor != 'KVM') {
                 allowedActions.push("snapshot");
             }
 
