@@ -1052,7 +1052,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         final String rootDir = getRootDir(((NfsTO) store).getUrl());
         final long usedSize = getUsedSize(rootDir);
         final long totalSize = getTotalSize(rootDir);
-        if (usedSize == -1 || totalSize == -1) {
+        if ((usedSize == 0 && totalSize == 0) || usedSize < 0 || totalSize < 0) {
             return new GetStorageStatsAnswer(cmd, "Unable to get storage stats");
         } else {
             return new GetStorageStatsAnswer(cmd, totalSize, usedSize);
