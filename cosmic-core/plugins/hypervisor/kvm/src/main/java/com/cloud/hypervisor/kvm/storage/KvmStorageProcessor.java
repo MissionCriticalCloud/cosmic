@@ -71,6 +71,7 @@ import org.apache.commons.io.FileUtils;
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.DomainInfo;
+import org.libvirt.DomainInfo.DomainState;
 import org.libvirt.DomainSnapshot;
 import org.libvirt.LibvirtException;
 import org.slf4j.Logger;
@@ -147,7 +148,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         try {
             secondaryPool = storagePoolMgr.getStoragePoolByUri(mountpoint);
 
-      /* Get template vol */
+            /* Get template vol */
             if (tmpltname == null) {
                 secondaryPool.refresh();
                 final List<KvmPhysicalDisk> disks = secondaryPool.listPhysicalDisks();
@@ -168,12 +169,12 @@ public class KvmStorageProcessor implements StorageProcessor {
                 return new PrimaryStorageDownloadAnswer("Failed to get template from pool: " + secondaryPool.getUuid());
             }
 
-      /* Copy volume to primary storage */
+            /* Copy volume to primary storage */
             logger.debug("Copying template to primary storage, template format is " + tmplVol.getFormat());
             final KvmStoragePool primaryPool = storagePoolMgr.getStoragePool(primaryStore.getPoolType(),
                     primaryStore.getUuid());
 
-            KvmPhysicalDisk primaryVol = null;
+            KvmPhysicalDisk primaryVol;
             if (destData instanceof VolumeObjectTO) {
                 final VolumeObjectTO volume = (VolumeObjectTO) destData;
                 // pass along volume's target size if it's bigger than template's size, for storage types that copy template
@@ -240,9 +241,9 @@ public class KvmStorageProcessor implements StorageProcessor {
         final DataStoreTO imageStore = template.getDataStore();
         final VolumeObjectTO volume = (VolumeObjectTO) destData;
         final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) volume.getDataStore();
-        KvmPhysicalDisk baseVolume = null;
-        KvmStoragePool primaryPool = null;
-        KvmPhysicalDisk vol = null;
+        KvmPhysicalDisk baseVolume;
+        KvmStoragePool primaryPool;
+        KvmPhysicalDisk vol;
 
         try {
             primaryPool = storagePoolMgr.getStoragePool(primaryStore.getPoolType(), primaryStore.getUuid());
@@ -250,7 +251,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             String templatePath = template.getPath();
 
             if (primaryPool.getType() == StoragePoolType.CLVM) {
-                templatePath = ((NfsTO) imageStore).getUrl() + File.separator + templatePath;
+                templatePath = imageStore.getUrl() + File.separator + templatePath;
                 vol = templateToPrimaryDownload(templatePath, primaryPool, volume.getUuid(), volume.getSize(),
                         cmd.getWaitInMillSeconds());
             } else {
@@ -299,7 +300,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         KvmStoragePool secondaryPool = null;
         try {
             secondaryPool = storagePoolMgr.getStoragePoolByUri(mountpoint);
-      /* Get template vol */
+            /* Get template vol */
             if (templateName == null) {
                 secondaryPool.refresh();
                 final List<KvmPhysicalDisk> disks = secondaryPool.listPhysicalDisks();
@@ -321,8 +322,7 @@ public class KvmStorageProcessor implements StorageProcessor {
                 templateVol = secondaryPool.getPhysicalDisk(templateName);
             }
 
-      /* Copy volume to primary storage */
-
+            /* Copy volume to primary storage */
             if (size > templateVol.getSize()) {
                 logger.debug("Overriding provided template's size with new size " + size);
                 templateVol.setSize(size);
@@ -332,8 +332,7 @@ public class KvmStorageProcessor implements StorageProcessor {
                         "Using templates disk size of " + templateVol.getVirtualSize() + "since size passed was " + size);
             }
 
-            final KvmPhysicalDisk primaryVol = storagePoolMgr.copyPhysicalDisk(templateVol, volUuid, primaryPool, timeout);
-            return primaryVol;
+            return storagePoolMgr.copyPhysicalDisk(templateVol, volUuid, primaryPool, timeout);
         } catch (final CloudRuntimeException e) {
             logger.error("Failed to download template to primary storage", e);
             return null;
@@ -360,7 +359,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         final String srcVolumePath = srcData.getPath();
         final String secondaryStorageUrl = nfsStore.getUrl();
         KvmStoragePool secondaryStoragePool = null;
-        KvmStoragePool primaryPool = null;
+        KvmStoragePool primaryPool;
         try {
             try {
                 primaryPool = storagePoolMgr.getStoragePool(primaryStore.getPoolType(), primaryStore.getUuid());
@@ -464,7 +463,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         final NfsTO nfsImageStore = (NfsTO) imageStore;
 
         KvmStoragePool secondaryStorage = null;
-        KvmStoragePool primary = null;
+        KvmStoragePool primary;
         try {
             final String templateFolder = template.getPath();
 
@@ -553,9 +552,6 @@ public class KvmStorageProcessor implements StorageProcessor {
         } catch (final QemuImgException e) {
             logger.error(e.getMessage());
             return new CopyCmdAnswer(e.toString());
-        } catch (final IOException e) {
-            logger.debug("Failed to createTemplateFromVolume: ", e);
-            return new CopyCmdAnswer(e.toString());
         } catch (final Exception e) {
             logger.debug("Failed to createTemplateFromVolume: ", e);
             return new CopyCmdAnswer(e.toString());
@@ -585,11 +581,13 @@ public class KvmStorageProcessor implements StorageProcessor {
         final String secondaryStoragePoolUrl = nfsImageStore.getUrl();
         // NOTE: snapshot name is encoded in snapshot path
         final int index = snapshot.getPath().lastIndexOf("/");
+        final boolean isCreatedFromVmSnapshot = index == -1; // -1 means the snapshot is created from existing vm snapshot
 
         final String snapshotName = snapshot.getPath().substring(index + 1);
+        String descName = snapshotName;
         final String volumePath = snapshot.getVolume().getPath();
-        String snapshotDestPath = null;
-        String snapshotRelPath = null;
+        String snapshotDestPath;
+        String snapshotRelPath;
         final String vmName = snapshot.getVmName();
         KvmStoragePool secondaryStoragePool = null;
         Connect conn = null;
@@ -653,70 +651,74 @@ public class KvmStorageProcessor implements StorageProcessor {
                 command.add("-b", snapshotDisk.getPath());
                 command.add("-n", snapshotName);
                 command.add("-p", snapshotDestPath);
-                command.add("-t", snapshotName);
+                if (isCreatedFromVmSnapshot) {
+                    descName = UUID.randomUUID().toString();
+                }
+                command.add("-t", descName);
                 final String result = command.execute();
                 if (result != null) {
                     logger.debug("Failed to backup snaptshot: " + result);
                     return new CopyCmdAnswer(result);
                 }
-                final File snapFile = new File(snapshotDestPath + "/" + snapshotName);
+                final File snapFile = new File(snapshotDestPath + "/" + descName);
                 if (snapFile.exists()) {
                     size = snapFile.length();
                 }
             }
 
             final SnapshotObjectTO newSnapshot = new SnapshotObjectTO();
-            newSnapshot.setPath(snapshotRelPath + File.separator + snapshotName);
+            newSnapshot.setPath(snapshotRelPath + File.separator + descName);
             newSnapshot.setPhysicalSize(size);
             return new CopyCmdAnswer(newSnapshot);
-        } catch (final LibvirtException e) {
-            logger.debug("Failed to backup snapshot: ", e);
-            return new CopyCmdAnswer(e.toString());
-        } catch (final CloudRuntimeException e) {
+        } catch (final LibvirtException | CloudRuntimeException e) {
             logger.debug("Failed to backup snapshot: ", e);
             return new CopyCmdAnswer(e.toString());
         } finally {
-            try {
-        /* Delete the snapshot on primary */
-                DomainInfo.DomainState state = null;
-                Domain vm = null;
-                if (vmName != null) {
-                    try {
-                        vm = resource.getDomain(conn, vmName);
-                        state = vm.getInfo().state;
-                    } catch (final LibvirtException e) {
-                        logger.trace("Ignoring libvirt error.", e);
-                    }
-                }
-
-                final KvmStoragePool primaryStorage = storagePoolMgr.getStoragePool(primaryStore.getPoolType(),
-                        primaryStore.getUuid());
-                if (state == DomainInfo.DomainState.VIR_DOMAIN_RUNNING && !primaryStorage.isExternalSnapshot()) {
-                    final DomainSnapshot snap = vm.snapshotLookupByName(snapshotName);
-                    snap.delete(0);
-
-          /*
-           * libvirt on RHEL6 doesn't handle resume event emitted from qemu
-           */
-                    vm = resource.getDomain(conn, vmName);
-                    state = vm.getInfo().state;
-                    if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
-                        vm.resume();
-                    }
-                } else {
-                    if (primaryPool.getType() != StoragePoolType.RBD) {
-                        final Script command = new Script(manageSnapshotPath, cmdsTimeout, logger);
-                        command.add("-d", snapshotDisk.getPath());
-                        command.add("-n", snapshotName);
-                        final String result = command.execute();
-                        if (result != null) {
-                            logger.debug("Failed to delete snapshot on primary: " + result);
-                            // return new CopyCmdAnswer("Failed to backup snapshot: " + result);
+            if (isCreatedFromVmSnapshot) {
+                logger.debug("Ignoring removal of vm snapshot on primary as this snapshot is created from vm snapshot");
+            } else {
+                try {
+                    /* Delete the snapshot on primary */
+                    DomainState state = null;
+                    Domain vm = null;
+                    if (vmName != null) {
+                        try {
+                            vm = resource.getDomain(conn, vmName);
+                            state = vm.getInfo().state;
+                        } catch (final LibvirtException e) {
+                            logger.trace("Ignoring libvirt error.", e);
                         }
                     }
+
+                    final KvmStoragePool primaryStorage = storagePoolMgr.getStoragePool(primaryStore.getPoolType(), primaryStore.getUuid());
+                    if (state == DomainState.VIR_DOMAIN_RUNNING && !primaryStorage.isExternalSnapshot()) {
+                        final DomainSnapshot snap = vm.snapshotLookupByName(snapshotName);
+                        snap.delete(0);
+
+                        /*
+                         * libvirt on RHEL6 doesn't handle resume event emitted from
+                         * qemu
+                         */
+                        vm = resource.getDomain(conn, vmName);
+                        state = vm.getInfo().state;
+                        if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
+                            vm.resume();
+                        }
+                    } else {
+                        if (primaryPool.getType() != StoragePoolType.RBD) {
+                            final Script command = new Script(manageSnapshotPath, cmdsTimeout, logger);
+                            command.add("-d", snapshotDisk.getPath());
+                            command.add("-n", snapshotName);
+                            final String result = command.execute();
+                            if (result != null) {
+                                logger.debug("Failed to delete snapshot on primary: " + result);
+                                // return new CopyCmdAnswer("Failed to backup snapshot: " + result);
+                            }
+                        }
+                    }
+                } catch (final Exception ex) {
+                    logger.debug("Failed to delete snapshots on primary", ex);
                 }
-            } catch (final Exception ex) {
-                logger.debug("Failed to delete snapshots on primary", ex);
             }
 
             try {
@@ -741,11 +743,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(cmd.getVmName());
             attachOrDetachIso(conn, cmd.getVmName(), nfsStore.getUrl() + File.separator + isoTo.getPath(), true);
-        } catch (final LibvirtException e) {
-            return new Answer(cmd, false, e.toString());
-        } catch (final URISyntaxException e) {
-            return new Answer(cmd, false, e.toString());
-        } catch (final InternalErrorException e) {
+        } catch (final LibvirtException | URISyntaxException | InternalErrorException e) {
             return new Answer(cmd, false, e.toString());
         }
 
@@ -940,7 +938,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         final String vmName = volume.getVmName();
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(vmName);
-            DomainInfo.DomainState state = null;
+            DomainState state = null;
             Domain vm = null;
             if (vmName != null) {
                 try {
@@ -956,7 +954,7 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             final KvmPhysicalDisk disk = storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     volume.getPath());
-            if (state == DomainInfo.DomainState.VIR_DOMAIN_RUNNING && !primaryPool.isExternalSnapshot()) {
+            if (state == DomainState.VIR_DOMAIN_RUNNING && !primaryPool.isExternalSnapshot()) {
                 final String vmUuid = vm.getUUIDString();
                 final Object[] args = new Object[]{snapshotName, vmUuid};
                 final String snapshot = SnapshotXML.format(args);
@@ -971,7 +969,7 @@ public class KvmStorageProcessor implements StorageProcessor {
          */
                 vm = resource.getDomain(conn, vmName);
                 state = vm.getInfo().state;
-                if (state == DomainInfo.DomainState.VIR_DOMAIN_PAUSED) {
+                if (state == DomainState.VIR_DOMAIN_PAUSED) {
                     vm.resume();
                 }
             } else {

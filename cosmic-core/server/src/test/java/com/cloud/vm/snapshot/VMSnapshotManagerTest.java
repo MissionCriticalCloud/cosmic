@@ -136,21 +136,21 @@ public class VMSnapshotManagerTest {
     @Test(expected = InvalidParameterValueException.class)
     public void testAllocVMSnapshotF1() throws ResourceAllocationException {
         when(_userVMDao.findById(TEST_VM_ID)).thenReturn(null);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 
     // vm state not in [running, stopped] case
     @Test(expected = InvalidParameterValueException.class)
     public void testAllocVMSnapshotF2() throws ResourceAllocationException {
         when(vmMock.getState()).thenReturn(State.Starting);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 
     // VM in stopped state & snapshotmemory case
     @Test(expected = InvalidParameterValueException.class)
     public void testCreateVMSnapshotF3() throws AgentUnavailableException, OperationTimedoutException, ResourceAllocationException {
         when(vmMock.getState()).thenReturn(State.Stopped);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 
     // max snapshot limit case
@@ -159,7 +159,7 @@ public class VMSnapshotManagerTest {
         final List<VMSnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(10);
         when(_vmSnapshotDao.findByVm(TEST_VM_ID)).thenReturn(mockList);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 
     // active volume snapshots case
@@ -168,13 +168,13 @@ public class VMSnapshotManagerTest {
         final List<SnapshotVO> mockList = mock(List.class);
         when(mockList.size()).thenReturn(1);
         when(_snapshotDao.listByInstanceId(TEST_VM_ID, Snapshot.State.Creating, Snapshot.State.CreatedOnPrimary, Snapshot.State.BackingUp)).thenReturn(mockList);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 
     // successful creation case
     @Test
     public void testCreateVMSnapshot() throws AgentUnavailableException, OperationTimedoutException, ResourceAllocationException, NoTransitionException {
         when(vmMock.getState()).thenReturn(State.Running);
-        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "", true);
+        _vmSnapshotMgr.allocVMSnapshot(TEST_VM_ID, "", "");
     }
 }

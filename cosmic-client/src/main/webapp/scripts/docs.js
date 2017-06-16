@@ -291,8 +291,8 @@ cloudStack.docs = {
     helpCreateInstanceSnapshotDescription: {
         desc: 'A short description of for the snapshot'
     },
-    helpCreateInstanceSnapshotMemory: {
-        desc: 'Check this to include CPU/memory state. Does not quiesce the VM. If not checked, the snapshot contain only volumes.'
+    helpCreateInstanceSnapshotQuiesce: {
+        desc: 'Check this to snapshot the VM in "Quiesce" mode. It will allow the VM to achieve a consistent state. For example, flushing any outstanding writes.'
     },
     // Add disk offering
     helpDiskOfferingName: {

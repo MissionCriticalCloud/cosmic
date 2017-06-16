@@ -19,6 +19,8 @@ import com.cloud.agent.api.PlugNicCommand;
 import com.cloud.agent.api.PrepareForMigrationCommand;
 import com.cloud.agent.api.RebootAnswer;
 import com.cloud.agent.api.RebootCommand;
+import com.cloud.agent.api.RestoreVMSnapshotAnswer;
+import com.cloud.agent.api.RestoreVMSnapshotCommand;
 import com.cloud.agent.api.ScaleVmCommand;
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.StartCommand;
@@ -164,6 +166,7 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
+import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 
 import javax.inject.Inject;
@@ -2280,6 +2283,18 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
         }
 
+        UserVmVO userVm = _userVmDao.findById(vm.getId());
+        if (userVm != null) {
+            List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(vm.getId());
+            RestoreVMSnapshotCommand command = _vmSnapshotMgr.createRestoreCommand(userVm, vmSnapshots);
+            if (command != null) {
+                RestoreVMSnapshotAnswer restoreVMSnapshotAnswer = (RestoreVMSnapshotAnswer) _agentMgr.send(hostId, command);
+                if (restoreVMSnapshotAnswer == null || !restoreVMSnapshotAnswer.getResult()) {
+                    s_logger.warn("Unable to restore the vm snapshot from image file after live migration of vm with vmsnapshots: " + restoreVMSnapshotAnswer.getDetails());
+                }
+            }
+        }
+
         return true;
     }
 
@@ -2580,6 +2595,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     private void orchestrateReboot(final String vmUuid, final Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException, ConcurrentOperationException,
             ResourceUnavailableException {
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
+        // if there are active vm snapshots task, state change is not allowed
+        if(_vmSnapshotMgr.hasActiveVMSnapshotTasks(vm.getId())){
+            s_logger.error("Unable to reboot VM " + vm + " due to: " + vm.getInstanceName() + " has active VM snapshots tasks");
+            throw new CloudRuntimeException("Unable to reboot VM " + vm + " due to: " + vm.getInstanceName() + " has active VM snapshots tasks");
+        }
 
         final Zone zone = _zoneRepository.findOne(vm.getDataCenterId());
         final Host host = _hostDao.findById(vm.getHostId());
@@ -2592,7 +2612,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final DeployDestination dest = new DeployDestination(zone, pod, cluster, host);
 
         try {
-
             final Commands cmds = new Commands(Command.OnError.Stop);
             cmds.addCommand(new RebootCommand(vm.getInstanceName(), getExecuteInSequence(vm.getHypervisorType())));
             _agentMgr.send(host.getId(), cmds);

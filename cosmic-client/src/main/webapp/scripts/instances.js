@@ -12,6 +12,7 @@
             addRow: 'false',
             createForm: {
                 title: 'label.action.vmsnapshot.create',
+                desc: 'message.action.vmsnapshot.create',
                 fields: {
                     name: {
                         label: 'label.name',
@@ -23,25 +24,11 @@
                         docID: 'helpCreateInstanceSnapshotDescription',
                         isTextarea: true
                     },
-                    snapshotMemory: {
-                        label: 'label.vmsnapshot.memory',
-                        docID: 'helpCreateInstanceSnapshotMemory',
-                        isBoolean: true,
-                        isChecked: false,
-                        isHidden: function (args) {
-                            if (args.context.instances[0].vgpu != undefined) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    },
                     quiescevm: {
                         label: 'label.quiesce.vm',
+                        docID: 'helpCreateInstanceSnapshotQuiesce',
                         isBoolean: true,
-                        isChecked: false,
-                        isHidden: function (args) {
-                            return true;
-                        }
+                        isChecked: false
                     }
                 }
             },
@@ -50,7 +37,6 @@
 
                 $(instances).map(function (index, instance) {
                     var array1 = [];
-                    array1.push("&snapshotmemory=" + (args.data.snapshotMemory == "on"));
                     array1.push("&quiescevm=" + (args.data.quiescevm == "on"));
                     var displayname = args.data.name;
                     if (displayname != null && displayname.length > 0) {
@@ -428,6 +414,9 @@
                 viewAll: [{
                     path: 'storage.volumes',
                     label: 'label.volumes'
+                }, {
+                    path: 'storage.vmsnapshots',
+                    label: 'label.snapshots'
                 }, {
                     path: 'affinityGroups',
                     label: 'label.affinity.groups'
@@ -2824,26 +2813,24 @@
         } else if (jsonObj.state == 'Running') {
             allowedActions.push("stop");
             allowedActions.push("restart");
-
-            if ((jsonObj.hypervisor != 'KVM' || g_kvmsnapshotenabled == true)) {
-                allowedActions.push("snapshot");
-            }
-
+            allowedActions.push("snapshot");
             allowedActions.push("destroy");
             allowedActions.push("reinstall");
 
-            //when userVm is running, scaleUp is not supported for KVM
+            // when userVm is running, scaleUp is not supported for KVM
             if (jsonObj.hypervisor != 'KVM') {
                 allowedActions.push("scaleUp");
             }
 
-            if (isAdmin())
+            if (isAdmin()) {
                 allowedActions.push("migrate");
+            }
 
-            if (jsonObj.isoid == null)
+            if (jsonObj.isoid == null) {
                 allowedActions.push("attachISO");
-            else
+            } else {
                 allowedActions.push("detachISO");
+            }
 
             allowedActions.push("resetPassword");
 
@@ -2852,18 +2839,19 @@
             allowedActions.push("viewConsole");
         } else if (jsonObj.state == 'Stopped') {
             allowedActions.push("edit");
-            if (isAdmin())
-                allowedActions.push("startByAdmin");
-            else
-                allowedActions.push("start");
-            allowedActions.push("destroy");
-            allowedActions.push("reinstall");
 
-            if ((jsonObj.hypervisor != 'KVM' || g_kvmsnapshotenabled == true)) {
-                allowedActions.push("snapshot");
+            if (isAdmin()) {
+                allowedActions.push("startByAdmin");
+            } else {
+                allowedActions.push("start");
             }
 
-            allowedActions.push("scaleUp");  //when vm is stopped, scaleUp is supported for all hypervisors
+            allowedActions.push("destroy");
+            allowedActions.push("reinstall");
+            allowedActions.push("snapshot");
+
+            // when vm is stopped, scaleUp is supported for all hypervisors
+            allowedActions.push("scaleUp");
             allowedActions.push("changeAffinity");
 
             if (isAdmin())

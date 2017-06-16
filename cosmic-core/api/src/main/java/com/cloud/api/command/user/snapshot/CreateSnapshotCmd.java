@@ -35,24 +35,18 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     // ////////////// API parameters /////////////////////
     // ///////////////////////////////////////////////////
 
-    @Parameter(name = ApiConstants.ACCOUNT,
-            type = CommandType.STRING,
-            description = "The account of the snapshot. The account parameter must be used with the domainId parameter.")
+    @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "The account of the snapshot. The account parameter must be used with the domainId parameter.")
     private String accountName;
 
-    @Parameter(name = ApiConstants.DOMAIN_ID,
-            type = CommandType.UUID,
-            entityType = DomainResponse.class,
-            description = "The domain ID of the snapshot. If used with the account parameter, specifies a domain for the account associated with the disk volume.")
+    @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class,
+               description = "The domain ID of the snapshot. If used with the account parameter, specifies a domain for the account associated with the disk volume.")
     private Long domainId;
 
     @Parameter(name = ApiConstants.VOLUME_ID, type = CommandType.UUID, entityType = VolumeResponse.class, required = true, description = "The ID of the disk volume")
     private Long volumeId;
 
-    @Parameter(name = ApiConstants.POLICY_ID,
-            type = CommandType.UUID,
-            entityType = SnapshotPolicyResponse.class,
-            description = "policy id of the snapshot, if this is null, then use MANUAL_POLICY.")
+    @Parameter(name = ApiConstants.POLICY_ID, type = CommandType.UUID, entityType = SnapshotPolicyResponse.class,
+               description = "policy id of the snapshot, if this is null, then use MANUAL_POLICY.")
     private Long policyId;
 
     @Parameter(name = ApiConstants.SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, required = false, description = "quiesce vm if true")
@@ -61,14 +55,12 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the snapshot")
     private String snapshotName;
 
-    private final String syncObjectType = BaseAsyncCmd.snapshotHostSyncObject;
-
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
 
     public static String getResultObjectName() {
-        return "snapshot";
+        return ApiConstants.SNAPSHOT;
     }
 
     public String getAccountName() {
@@ -113,7 +105,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     @Override
     public String getSyncObjType() {
         if (getSyncObjId() != null) {
-            return syncObjectType;
+            return BaseAsyncCmd.snapshotHostSyncObject;
         }
         return null;
     }
@@ -163,8 +155,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
         CallContext.current().setEventDetails("Volume Id: " + getVolumeUuid());
         final Snapshot snapshot;
         try {
-            snapshot =
-                    _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), getQuiescevm());
+            snapshot = _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), getQuiescevm());
             if (snapshot != null) {
                 final SnapshotResponse response = _responseGenerator.createSnapshotResponse(snapshot);
                 response.setResponseName(getCommandName());
@@ -203,8 +194,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
         if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
             final Project project = _projectService.findByProjectAccountId(volume.getAccountId());
             if (project.getState() != Project.State.Active) {
-                throw new PermissionDeniedException("Can't add resources to the project id=" + project.getId() + " in state=" + project.getState() +
-                        " as it's no longer active");
+                throw new PermissionDeniedException("Can't add resources to the project id=" + project.getId() + " in state=" + project.getState() + " as it's no longer active");
             }
         } else if (account.getState() == Account.State.disabled) {
             throw new PermissionDeniedException("The owner of template is disabled: " + account);
