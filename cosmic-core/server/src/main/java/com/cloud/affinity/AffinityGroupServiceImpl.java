@@ -78,6 +78,8 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     private UserVmDao _userVmDao;
     @Inject
     DedicatedResourceDao _dedicatedDao;
+    @Inject
+    AffinityGroupService _affinityGroupService;
 
     public List<AffinityGroupProcessor> getAffinityGroupProcessors() {
         return _affinityProcessors;
@@ -436,8 +438,8 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
                 // Root admin has access to both VM and AG by default, but make sure the
                 // owner of these entities is same
                 if (caller.getId() == Account.ACCOUNT_ID_SYSTEM || _accountMgr.isRootAdmin(caller.getId())) {
-                    if (AffinityGroupVO.getAccountId() != owner.getAccountId()) {
-                        throw new PermissionDeniedException("Affinity Group " + AffinityGroupVO + " does not belong to the VM's account");
+                    if (!_affinityGroupService.isAffinityGroupAvailableInDomain(AffinityGroupVO.getId(), owner.getDomainId())) {
+                        throw new PermissionDeniedException("Affinity Group " + AffinityGroupVO + " does not belong to the VM's domain");
                     }
                 }
             }
