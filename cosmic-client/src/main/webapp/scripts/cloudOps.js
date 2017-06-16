@@ -2,6 +2,9 @@
     cloudStack.sections.cloudOps = {
         title: 'label.menu.cloudOps',
         id: 'cloudOps',
+        sectionSelect: {
+            label: 'label.select-view'
+        },
         sections: {
             haworkers: {
                 type: 'select',
@@ -139,7 +142,75 @@
                         }
                     }
                 }
+            },
+            whohasthisip: {
+                type: 'select',
+                title: 'label.whohasthisip',
+                listView: {
+                    id: 'whohasthisip',
+                    label: 'label.whohasthisip',
+                    fields: {
+                        virtualmachine: {
+                            label: 'label.virtual.machine'
+                        },
+                        networkname: {
+                            label: 'label.network.name'
+                        },
+                        associatednetwork: {
+                            label: 'label.associated.network.short'
+                        },
+                        macaddress: {
+                            label: 'label.macaddress'
+                        },
+                        ipaddress: {
+                            label: 'label.ipaddress'
+                        },
+                        netmask: {
+                            label: 'label.ipv4.netmask'
+                        },
+                        mode: {
+                            label: 'label.mode'
+                        },
+                        ipstate: {
+                            label: 'label.state'
+                        },
+                        created: {
+                            label:'label.created',
+                            converter: cloudStack.converters.toLocalDate
+                        }
+                    },
+                    dataProvider: function (args) {
+                        console.log(args.filterBy.search.value);
+                        $.ajax({
+                            url: createURL('listWhoHasThisIp'),
+                            data: {
+                                ipaddress: args.filterBy.search.value
+                            },
+                            async: true,
+                            success: function (json) {
+                                whohasthisip = json.listwhohasthisipresponse.whohasthisip ? json.listwhohasthisipresponse.whohasthisip : [];
+                                args.response.success({
+                                    data: $.map(whohasthisip, function (whohasthisip) {
+                                        return {
+                                            id: whohasthisip.id,
+                                            virtualmachine: whohasthisip.virtualmachinename,
+                                            networkname: whohasthisip.networkname,
+                                            associatednetwork: whohasthisip.associatednetworkname,
+                                            macaddress: whohasthisip.privatemacaddress,
+                                            ipaddress: whohasthisip.ipaddress,
+                                            netmask: whohasthisip.netmask,
+                                            mode: whohasthisip.mode,
+                                            ipstate: whohasthisip.state,
+                                            created: whohasthisip.created
+                                        };
+                                    })
+                                });
+                            }
+                        });
+                    }
+                }
             }
+
         }
     };
 })(jQuery, cloudStack);
