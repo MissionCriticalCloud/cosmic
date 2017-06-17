@@ -450,6 +450,20 @@
                                 label: 'label.full.path'
                             },
 
+                            ldapenabledinsystem: {
+                                label: 'label.ldap.authentication.enabled',
+                                converter: cloudStack.converters.toBooleanText
+                            },
+
+                            ldaplink: {
+                              label: 'label.ldap.linkedou'
+                            },
+
+                            ldapaccounttype: {
+                                label: 'label.ldap.type',
+                                converter: cloudStack.converters.toRole
+                            },
+
                             networkdomain: {
                                 label: 'label.network.domain',
                                 isEditable: function (args) {
@@ -609,35 +623,34 @@
                             domainObj["vmTotal"] = totalVMs;
                             domainObj["volumeTotal"] = totalVolumes;
 
-                            /* $.ajax({
-                             url: createURL("listVirtualMachines&details=min&domainid=" + domainObj.id),
-                             async: false,
-                             dataType: "json",
-                             success: function(json) {
-                             var items = json.listvirtualmachinesresponse.virtualmachine;
-                             var total;
-                             if (items != null)
-                             total = items.length;
-                             else
-                             total = 0;
-                             domainObj["vmTotal"] = total;
-                             }
-                             });
+                            $.ajax({
+                                 url: createURL("listDomainLdapLink&domainid=" + domainObj.id),
+                                 async: false,
+                                 dataType: "json",
+                                 success: function(json) {
+                                     var items = json.linkdomaintoldapresponse.LinkDomainToLdap;
+                                     if (items != null) {
+                                         domainObj["ldapenabled"] = items.ldapenabled;
+                                         if (items.name != undefined) {
+                                             domainObj["ldaplink"] = items.name;
+                                             domainObj["ldapaccounttype"] = items.accounttype;
 
-                             $.ajax({
-                             url: createURL("listVolumes&domainid=" + domainObj.id),
-                             async: false,
-                             dataType: "json",
-                             success: function(json) {
-                             var items = json.listvolumesresponse.volume;
-                             var total;
-                             if (items != null)
-                             total = items.length;
-                             else
-                             total = 0;
-                             domainObj["volumeTotal"] = total;
-                             }
-                             });*/
+                                         } else {
+                                             domainObj["ldaplink"] = _l('label.ldap.not.linked');
+                                             domainObj["ldapaccounttype"] = "";
+                                         }
+                                     } else {
+                                         domainObj["ldapenabled"] = _l('label.no');
+                                         domainObj["ldaplink"] = _l('label.ldap.not.linked');
+                                         domainObj["ldapaccounttype"] = "";
+                                     }
+                                     if (isLdapEnabled()) {
+                                         domainObj["ldapenabledinsystem"] = true;
+                                     } else {
+                                         domainObj["ldapenabledinsystem"] = false;
+                                     }
+                                 }
+                            });
 
                             $.ajax({
                                 url: createURL("listResourceLimits&domainid=" + domainObj.id),
