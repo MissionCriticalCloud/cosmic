@@ -9,8 +9,8 @@ import com.google.gson.annotations.SerializedName;
 public class LinkDomainToLdapResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.DOMAIN_ID)
-    @Param(description = "id of the Domain which is linked to LDAP")
-    private final long domainId;
+    @Param(description = "uuid of the Domain which is linked to LDAP")
+    private final String domainId;
 
     @SerializedName(ApiConstants.NAME)
     @Param(description = "name of the group or OU in LDAP which is linked to the domain")
@@ -28,14 +28,27 @@ public class LinkDomainToLdapResponse extends BaseResponse {
     @Param(description = "Domain Admin accountId that is created")
     private String adminId;
 
-    public LinkDomainToLdapResponse(final long domainId, final String type, final String name, final short accountType) {
+    @SerializedName(ApiConstants.LDAP_ENABLED)
+    @Param(description = "Is LDAP enabled")
+    private Boolean isLdapEnabled;
+
+    public LinkDomainToLdapResponse(final String domainId, final String type, final String name, final short accountType) {
         this.domainId = domainId;
         this.name = name;
         this.type = type;
         this.accountType = accountType;
+        this.isLdapEnabled = true;
     }
 
-    public long getDomainId() {
+    public LinkDomainToLdapResponse(final String domainId) {
+        this.domainId = domainId;
+        this.name = null;
+        this.type = null;
+        this.accountType = 0;
+        this.isLdapEnabled = false;
+    }
+
+    public String getDomainId() {
         return domainId;
     }
 
@@ -57,5 +70,9 @@ public class LinkDomainToLdapResponse extends BaseResponse {
 
     public void setAdminId(final String adminId) {
         this.adminId = adminId;
+    }
+
+    public Boolean getLdapEnabled() {
+        return isLdapEnabled;
     }
 }

@@ -139,6 +139,7 @@ public class ApiConstants {
     public static final String ISO_GUEST_OS_NONE = "Non-bootable ISO";
     public static final String JOB_ID = "jobid";
     public static final String JOB_STATUS = "jobstatus";
+    public static final String LDAP_ENABLED = "ldapenabled";
     public static final String LASTNAME = "lastname";
     public static final String LEVEL = "level";
     public static final String LENGTH = "length";
