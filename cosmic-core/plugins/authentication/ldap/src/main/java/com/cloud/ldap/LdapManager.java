@@ -38,6 +38,8 @@ public interface LdapManager extends PluggableService {
 
     LinkDomainToLdapResponse linkDomainToLdap(Long domainId, String type, String name, short accountType);
 
+    LinkDomainToLdapResponse listLinkDomainToLdap (Long domainId);
+
     public LdapTrustMapVO getDomainLinkedToLdap(long domainId);
 
     enum LinkType {GROUP, OU}
