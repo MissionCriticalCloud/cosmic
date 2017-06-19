@@ -160,6 +160,23 @@ public class NetUtilsTest {
     }
 
     @Test
+    public void testIsValidMacAddr() {
+        assertTrue(NetUtils.isValidMac("ee:12:34:5:32:ff"));
+        assertTrue(NetUtils.isValidMac("ee.12.34.5.32.ff"));
+        assertTrue(NetUtils.isValidMac("ee-12-34-5-32-ff"));
+        assertFalse(NetUtils.isValidMac("aa.12:34:5:32:ff"));
+        assertFalse(NetUtils.isValidMac("gg.gg:gg:gg:gg:gg"));
+    }
+
+    @Test
+    public void testIsUnicastMac() {
+        assertTrue(NetUtils.isUnicastMac("ee:12:34:5:32:ff"));
+        assertFalse(NetUtils.isUnicastMac("ff:12:34:5:32:ff"));
+        assertFalse(NetUtils.isUnicastMac("01:12:34:5:32:ff"));
+        assertTrue(NetUtils.isUnicastMac("00:ff:ff:ff:ff:ff"));
+    }
+
+    @Test
     public void testGetIp6CidrSize() {
         assertEquals(NetUtils.getIp6CidrSize("1234:5678::1/32"), 32);
         assertEquals(NetUtils.getIp6CidrSize("1234:5678::1"), 0);

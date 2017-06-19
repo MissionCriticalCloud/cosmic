@@ -315,10 +315,24 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
     class IpAddresses {
         private String ip4Address;
         private String ip6Address;
+        private String macAddress;
 
         public IpAddresses(final String ip4Address, final String ip6Address) {
             setIp4Address(ip4Address);
             setIp6Address(ip6Address);
+        }
+
+        public IpAddresses(String ipAddress, String ip6Address, String macAddress) {
+            this(ipAddress, ip6Address);
+            setMacAddress(macAddress);
+        }
+
+        public String getMacAddress() {
+            return macAddress;
+        }
+
+        public void setMacAddress(final String macAddress) {
+            this.macAddress = macAddress;
         }
 
         public String getIp4Address() {

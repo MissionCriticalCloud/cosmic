@@ -24,6 +24,7 @@ import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
+import com.cloud.network.Network.IpAddresses;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.TrafficType;
@@ -2070,7 +2071,10 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public void checkRequestedIpAddresses(final long networkId, final String ip4, final String ip6) throws InvalidParameterValueException {
+    public void checkRequestedIpAddresses(long networkId, IpAddresses ips) throws InvalidParameterValueException {
+        final String ip4 = ips.getIp4Address();
+        final String ip6 = ips.getIp6Address();
+        final String mac = ips.getMacAddress();
         if (ip4 != null) {
             if (!NetUtils.isValidIp4(ip4)) {
                 throw new InvalidParameterValueException("Invalid specified IPv4 address " + ip4);
@@ -2097,6 +2101,14 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             }
             if (ipVlan == null) {
                 throw new InvalidParameterValueException("Requested IPv6 is not in the predefined range!");
+            }
+            if (mac != null) {
+                if(!NetUtils.isValidMac(mac)) {
+                    throw new InvalidParameterValueException("Invalid specified MAC-Address " + mac);
+                }
+                if (_nicDao.findByNetworkIdAndMacAddress(networkId, mac) != null) {
+                    throw new InvalidParameterValueException("The requested MAC-Address is already taken! " + mac);
+                }
             }
         }
     }
