@@ -4461,8 +4461,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                         // but
                         // make sure the owner of these entities is same
                         if (caller.getId() == Account.ACCOUNT_ID_SYSTEM || _accountMgr.isRootAdmin(caller.getId())) {
-                            if (ag.getAccountId() != owner.getAccountId()) {
-                                throw new PermissionDeniedException("Affinity Group " + ag + " does not belong to the VM's account");
+                            if (ag.getDomainId() != owner.getDomainId()) {
+                                throw new PermissionDeniedException("Affinity Group " + ag + " does not belong to the VM's domain");
                             }
                         }
                     }
