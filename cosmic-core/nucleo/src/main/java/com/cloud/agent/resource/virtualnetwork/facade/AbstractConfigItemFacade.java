@@ -92,9 +92,7 @@ public abstract class AbstractConfigItemFacade {
             throw new CloudRuntimeException("Unable to process the configuration for " + key.getClass().getName());
         }
 
-        final AbstractConfigItemFacade instance = flyweight.get(key);
-
-        return instance;
+        return flyweight.get(key);
     }
 
     protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
@@ -116,7 +114,7 @@ public abstract class AbstractConfigItemFacade {
     }
 
     private static String appendUuidToJsonFiles(final String filename) {
-        String remoteFileName = new String(filename);
+        String remoteFileName = filename;
         if (remoteFileName.endsWith("json")) {
             remoteFileName += "." + UUID.randomUUID().toString();
         }

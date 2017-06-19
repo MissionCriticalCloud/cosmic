@@ -40,9 +40,10 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
         final List<AclRule> ingressRules = new ArrayList<>();
         final List<AclRule> egressRules = new ArrayList<>();
 
-        for (int i = 0; i < aclRules.length; i++) {
+        for (final String aclRule1 : aclRules) {
             final AclRule aclRule;
-            final String[] ruleParts = aclRules[i].split(":");
+            final String[] ruleParts = aclRule1.split(":");
+
             switch (ruleParts[1].toLowerCase()) {
                 case "icmp":
                     aclRule = new IcmpAclRule(ruleParts[4], "ACCEPT".equals(ruleParts[5]), Integer.parseInt(ruleParts[2]), Integer.parseInt(ruleParts[3]));
@@ -61,10 +62,9 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
                     // If we check the size of the array, it will fail to setup the network.
                     // So, let's catch the exception and continue in the loop.
                     try {
-                        aclRule = new ProtocolAclRule(ruleParts[5], false, Integer.parseInt(ruleParts[1]));
+                        aclRule = new ProtocolAclRule(ruleParts[4], "ACCEPT".equals(ruleParts[5]), Integer.parseInt(ruleParts[1]));
                     } catch (final Exception e) {
-                        s_logger.warn("Problem occured when reading the entries in the ruleParts array. Actual array size is '" + ruleParts.length + "', but trying to read from " +
-                                "index 5.");
+                        s_logger.warn("Unable to read ACL rule definition, string format is different than expected. Original message => " + e.getMessage());
                         continue;
                     }
             }
@@ -75,8 +75,15 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
             }
         }
 
-        final NetworkACL networkACL = new NetworkACL(dev, nic.getMac(), privateGw != null, nic.getIp(), netmask, ingressRules.toArray(new AclRule[ingressRules.size()]),
-                egressRules.toArray(new AclRule[egressRules.size()]));
+        final NetworkACL networkACL = new NetworkACL(
+                dev,
+                nic.getMac(),
+                privateGw != null,
+                nic.getIp(),
+                netmask,
+                ingressRules.toArray(new AclRule[ingressRules.size()]),
+                egressRules.toArray(new AclRule[egressRules.size()])
+        );
 
         return generateConfigItems(networkACL);
     }

@@ -4,13 +4,12 @@ import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NicTO;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class SetNetworkACLCommand extends NetworkElementCommand {
-    NetworkACLTO[] rules;
-    NicTO nic;
+
+    private NetworkACLTO[] rules;
+    private NicTO nic;
 
     protected SetNetworkACLCommand() {
     }
@@ -36,9 +35,9 @@ public class SetNetworkACLCommand extends NetworkElementCommand {
              *  each entry format      Ingress/Egress:protocol:start port: end port:scidrs:action:
              *  reverted entry format  Ingress/Egress:reverted:0:0:0:
              */
-            if (aclTO.revoked() == true) {
+            if (aclTO.revoked()) {
                 final StringBuilder sb = new StringBuilder();
-                /* This entry is added just to make sure atleast there will one entry in the list to get the ipaddress */
+                /* This entry is added just to make sure at least there will one entry in the list to get the IP address */
                 sb.append(aclTO.getTrafficType().toString()).append(":reverted:0:0:0:");
                 final String aclRuleEntry = sb.toString();
                 result[0][i++] = aclRuleEntry;
@@ -48,7 +47,7 @@ public class SetNetworkACLCommand extends NetworkElementCommand {
             final List<String> cidr;
             final StringBuilder sb = new StringBuilder();
             sb.append(aclTO.getTrafficType().toString()).append(":").append(aclTO.getProtocol()).append(":");
-            if ("icmp".compareTo(aclTO.getProtocol()) == 0) {
+            if ("icmp".equals(aclTO.getProtocol())) {
                 sb.append(aclTO.getIcmpType()).append(":").append(aclTO.getIcmpCode()).append(":");
             } else {
                 sb.append(aclTO.getStringPortRange()).append(":");
@@ -75,12 +74,7 @@ public class SetNetworkACLCommand extends NetworkElementCommand {
     }
 
     protected void orderNetworkAclRulesByRuleNumber(final List<NetworkACLTO> aclList) {
-        Collections.sort(aclList, new Comparator<NetworkACLTO>() {
-            @Override
-            public int compare(final NetworkACLTO acl1, final NetworkACLTO acl2) {
-                return acl1.getNumber() > acl2.getNumber() ? 1 : -1;
-            }
-        });
+        aclList.sort((acl1, acl2) -> acl1.getNumber() > acl2.getNumber() ? 1 : -1);
     }
 
     public NicTO getNic() {

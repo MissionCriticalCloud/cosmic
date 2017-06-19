@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkACLTO implements InternalIdentity {
-    long id;
-    String vlanTag;
-    String protocol;
-    int[] portRange;
-    boolean revoked;
-    boolean alreadyAdded;
-    String action;
-    int number;
+    private long id;
+    private String vlanTag;
+    private String protocol;
+    private int[] portRange;
+    private boolean revoked;
+    private boolean alreadyAdded;
+    private String action;
+    private int number;
     private List<String> cidrList;
     private Integer icmpType;
     private Integer icmpCode;
@@ -25,25 +25,27 @@ public class NetworkACLTO implements InternalIdentity {
     protected NetworkACLTO() {
     }
 
-    public NetworkACLTO(final NetworkACLItem rule, final String vlanTag, final NetworkACLItem.TrafficType trafficType) {
-        this(rule.getId(),
+    public NetworkACLTO(final NetworkACLItem rule, final String vlanTag, final TrafficType trafficType) {
+        this(
+                rule.getId(),
                 vlanTag,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
                 rule.getSourcePortEnd(),
-                rule.getState() == NetworkACLItem.State.Revoke,
-                rule.getState() == NetworkACLItem.State.Active,
+                NetworkACLItem.State.Revoke.equals(rule.getState()),
+                NetworkACLItem.State.Active.equals(rule.getState()),
                 rule.getSourceCidrList(),
                 rule.getIcmpType(),
                 rule.getIcmpCode(),
                 trafficType,
-                rule.getAction() == NetworkACLItem.Action.Allow,
-                rule.getNumber());
+                NetworkACLItem.Action.Allow.equals(rule.getAction()),
+                rule.getNumber()
+        );
     }
 
-    public NetworkACLTO(final long id, final String vlanTag, final String protocol, final Integer portStart, final Integer portEnd, final boolean revoked, final boolean
-            alreadyAdded, final List<String> cidrList,
-                        final Integer icmpType, final Integer icmpCode, final TrafficType trafficType, final boolean allow, final int number) {
+    public NetworkACLTO(final long id, final String vlanTag, final String protocol, final Integer portStart, final Integer portEnd, final boolean revoked,
+                        final boolean alreadyAdded, final List<String> cidrList, final Integer icmpType, final Integer icmpCode, final TrafficType trafficType,
+                        final boolean allow, final int number) {
         this.vlanTag = vlanTag;
         this.protocol = protocol;
 
@@ -57,7 +59,7 @@ public class NetworkACLTO implements InternalIdentity {
             portRange = new int[range.size()];
             int i = 0;
             for (final Integer port : range) {
-                portRange[i] = port.intValue();
+                portRange[i] = port;
                 i++;
             }
         }

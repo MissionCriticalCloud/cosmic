@@ -70,8 +70,7 @@ public class NetworkACLItemVO implements NetworkACLItem {
     }
 
     public NetworkACLItemVO(final Integer portStart, final Integer portEnd, final String protocol, final long aclId, final List<String> sourceCidrs, final Integer icmpCode,
-                            final Integer icmpType,
-                            final TrafficType trafficType, final Action action, final int number) {
+                            final Integer icmpType, final TrafficType trafficType, final Action action, final int number) {
         sourcePortStart = portStart;
         sourcePortEnd = portEnd;
         this.protocol = protocol;
@@ -97,7 +96,7 @@ public class NetworkACLItemVO implements NetworkACLItem {
 
     @Override
     public String toString() {
-        return new StringBuilder("Rule[").append(id).append("-").append("NetworkACL").append("-").append(state).append("]").toString();
+        return "Rule[" + id + "-NetworkACL-" + state + "]";
     }
 
     @Override
