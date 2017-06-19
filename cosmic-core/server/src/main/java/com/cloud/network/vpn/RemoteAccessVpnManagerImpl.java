@@ -467,6 +467,10 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
         s_logger.debug("Applying vpn users for " + owner);
         final List<RemoteAccessVpnVO> vpns = _remoteAccessVpnDao.findByAccount(vpnOwnerId);
 
+        if (vpns.size() == 0) {
+            throw new InvalidParameterValueException("No Remote Access VPN configuration can be found for account " + owner.getAccountName());
+        }
+
         final List<VpnUserVO> users = _vpnUsersDao.listByAccount(vpnOwnerId);
 
         //If user is in Active state, we still have to resend them therefore their status has to be Add
