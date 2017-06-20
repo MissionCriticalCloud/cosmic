@@ -13,7 +13,7 @@ def merge(dbag, data):
         if key == "vpc_name":
             dbag[key] = data[key]
 
-        if key == "source_nat_list":
+        if key == "source_nat_list" and data[key].strip() != "":
             # let's verify that the list contains valid CIDRs
             cidrs = data[key].split(',')
             for cidr in cidrs:
@@ -25,7 +25,7 @@ def merge(dbag, data):
 
             dbag[key] = data[key]
 
-        if key == "syslog_server_list":
+        if key == "syslog_server_list" and data[key].strip() != "":
             # let's verify that the list contains valid CIDRs
             ips = data[key].split(',')
             for ip in ips:

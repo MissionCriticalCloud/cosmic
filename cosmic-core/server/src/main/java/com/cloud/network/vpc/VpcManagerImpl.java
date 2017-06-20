@@ -968,7 +968,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             vpc.setDisplay(displayVpc);
         }
 
-        vpc.setSyslogServerList(syslogServerList);
+        if (syslogServerList !=null) {
+            vpc.setSyslogServerList(syslogServerList);
+        }
 
         if (vpcOfferingId != null) {
             final VpcOfferingVO newVpcOffering = _vpcOffDao.findById(vpcOfferingId);
@@ -1012,12 +1014,17 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         }
         vpc.setRestartRequired(restartWithCleanupRequired);
 
-        // always clear the sourceNatList if it is null and only set if sourceNatList is not null and current of new vpcOffering supports sourceNatService
-        if (sourceNatList == null || (sourceNatList != null && ((vpcOfferingId != null && hasSourceNatService(vpc)) || hasSourceNatService(vpcToUpdate)))) {
-            vpc.setSourceNatList(sourceNatList);
-        } else {
-            // otherwise throw an exception
+        if (sourceNatList != null && !sourceNatList.isEmpty() && vpcOfferingId != null && !hasSourceNatService(vpc)) {
             throw new InvalidParameterValueException("Source NAT is not enabled on the VPC, so source NAT list is not allowed!");
+        }
+
+        if (sourceNatList != null) {
+            vpc.setSourceNatList(sourceNatList);
+        }
+
+        if (vpcOfferingId != null && !hasSourceNatService(vpc) && hasSourceNatService(vpcToUpdate)) {
+            s_logger.warn("SourceNat service not available on VPC " + vpc.getName() + " so setting SourceNatList to null!");
+            vpc.setSourceNatList(null);
         }
 
         // Save the new config
