@@ -2,11 +2,9 @@ package com.cloud.api.response;
 
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
-import com.cloud.network.IpAddress;
 import com.cloud.network.Networks;
 import com.cloud.serializer.Param;
-import com.cloud.utils.net.Ip;
-import com.cloud.vm.Nic;
+import com.cloud.vm.VirtualMachine;
 
 import java.net.URI;
 import java.util.Date;
@@ -17,7 +15,15 @@ public class WhoHasThisIpResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.VPC_NAME)
     @Param(description = "VPC name")
-    private String vpcname;
+    private String vpcName;
+
+    @SerializedName(ApiConstants.UUID)
+    @Param(description = "UUID of the nic or users_ip_address")
+    private String uuid;
+
+    @SerializedName(ApiConstants.VPC_UUID)
+    @Param(description = "VPC uuid")
+    private String vpcUuid;
 
     @SerializedName(ApiConstants.IP_ADDRESS)
     @Param(description = "IP address")
@@ -25,13 +31,21 @@ public class WhoHasThisIpResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.NETWORK_NAME)
     @Param(description = "Network name")
-    private String networkname;
+    private String networkName;
+
+    @SerializedName(ApiConstants.NETWORK_UUID)
+    @Param(description = "Network uuid")
+    private String networkUuid;
 
     @SerializedName(ApiConstants.ASSOCIATED_NETWORK_NAME)
-    @Param(description = "Network name")
+    @Param(description = "Associated network name")
     private String associatedNetworkName;
 
-    @SerializedName(ApiConstants.PRIVATE_MAC_ADDRESS)
+    @SerializedName(ApiConstants.ASSOCIATED_NETWORK_UUID)
+    @Param(description = "Associated network uuid")
+    private String associatedNetworkUuid;
+
+    @SerializedName(ApiConstants.MAC_ADDRESS)
     @Param(description = "Nics MAC Address")
     private String macAddress;
 
@@ -59,12 +73,28 @@ public class WhoHasThisIpResponse extends BaseResponse {
     @Param(description = "VM Name")
     private String vmName;
 
-    public String getNetworkname() {
-        return networkname;
+    @SerializedName(ApiConstants.VIRTUAL_MACHINE_UUID)
+    @Param(description = "VM uuid")
+    private String vmUuid;
+
+    @SerializedName(ApiConstants.VIRTUAL_MACHINE_TYPE)
+    @Param(description = "VM type")
+    private VirtualMachine.Type vmType;
+
+    @SerializedName(ApiConstants.DOMAIN_NAME)
+    @Param(description = "Domain name")
+    private String domainName;
+
+    @SerializedName(ApiConstants.DOMAIN_UUID)
+    @Param(description = "Domain uuid")
+    private String domainUuid;
+
+    public String getNetworkName() {
+        return networkName;
     }
 
-    public void setNetworkname(final String networkname) {
-        this.networkname = networkname;
+    public void setNetworkName(final String networkName) {
+        this.networkName = networkName;
     }
 
     public String getMacAddress() {
@@ -123,12 +153,12 @@ public class WhoHasThisIpResponse extends BaseResponse {
         this.vmName = vmName;
     }
 
-    public String getVpcname() {
-        return vpcname;
+    public String getVpcName() {
+        return vpcName;
     }
 
-    public void setVpcname(final String vpcname) {
-        this.vpcname = vpcname;
+    public void setVpcName(final String vpcName) {
+        this.vpcName = vpcName;
     }
 
     public String getIpaddress() {
@@ -145,6 +175,70 @@ public class WhoHasThisIpResponse extends BaseResponse {
 
     public void setAssociatedNetworkName(final String associatedNetworkName) {
         this.associatedNetworkName = associatedNetworkName;
+    }
+
+    public String getVpcUuid() {
+        return vpcUuid;
+    }
+
+    public void setVpcUuid(final String vpcUuid) {
+        this.vpcUuid = vpcUuid;
+    }
+
+    public String getNetworkUuid() {
+        return networkUuid;
+    }
+
+    public void setNetworkUuid(final String networkUuid) {
+        this.networkUuid = networkUuid;
+    }
+
+    public String getAssociatedNetworkUuid() {
+        return associatedNetworkUuid;
+    }
+
+    public void setAssociatedNetworkUuid(final String associatedNetworkUuid) {
+        this.associatedNetworkUuid = associatedNetworkUuid;
+    }
+
+    public String getVmUuid() {
+        return vmUuid;
+    }
+
+    public void setVmUuid(final String vmUuid) {
+        this.vmUuid = vmUuid;
+    }
+
+    public void setVmType(final VirtualMachine.Type vmType) {
+        this.vmType = vmType;
+    }
+
+    public VirtualMachine.Type getVmType() {
+        return vmType;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
+    }
+
+    public String getDomainUuid() {
+        return domainUuid;
+    }
+
+    public void setDomainUuid(final String domainUuid) {
+        this.domainUuid = domainUuid;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

@@ -587,12 +587,17 @@ public class ApiConstants {
     public static final String NETWORK_SPANNED_ZONES = "zonesnetworkspans";
     public static final String METADATA = "metadata";
     public static final String PHYSICAL_SIZE = "physicalsize";
-    public static final String NICS_MAC_ADDRESS = "nicsmacaddress";
 
     public static final String ADMIN = "admin";
     public static final String BROADCAST_URI = "broadcasturi";
-    public static final String IP4_ADDRESS = "ip4address";
-    public static final String NIC_STATE = "nicstate";
+    public static final String MAC_ADDRESS = "macaddress";
+    public static final String VPC_UUID = "vpcuuid";
+    public static final String NICS_UUID = "nicsuuid";
+    public static final String NETWORK_UUID = "networkuuid";
+    public static final String ASSOCIATED_NETWORK_UUID = "associatednetworkuuid";
+    public static final String VIRTUAL_MACHINE_UUID = "virtualmachineuuid";
+    public static final String VIRTUAL_MACHINE_TYPE = "virtualmachinetype";
+    public static final String DOMAIN_UUID = "domainuuid";
 
     public enum HostDetails {
         all, capacity, events, stats, min

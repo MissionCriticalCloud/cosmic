@@ -217,6 +217,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -3525,36 +3526,51 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     @Override
     public ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
         final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
-        List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+        final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+
         List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
-        List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
         ipAddresses.forEach(ipAddress -> {
-            Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
-            Network network = _networkDao.findById(ipAddress.getNetworkId());
-            NicVO nic = _nicDao.findByIp4AddressAndNetworkId(ipAddress.getAddress().addr(), network.getId());
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
             response.setIpaddress(ipAddress.getAddress().toString());
+            response.setUuid(ipAddress.getUuid());
             response.setState(ipAddress.getState().toString());
+
+            Domain domain = _domainDao.findById(ipAddress.getDomainId());
+            if (domain != null) {
+                response.setDomainName(domain.getName());
+                response.setDomainUuid(domain.getUuid());
+            }
+            Network network = _networkDao.findById(ipAddress.getNetworkId());
             if (ipAddress.getVpcId() != null) {
                 Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
-                response.setNetworkname(vpc.getName());
+                response.setNetworkName(vpc.getName());
+                response.setVpcName(vpc.getName());
+                response.setVpcUuid(vpc.getUuid());
             } else if (!StringUtils.isEmpty(network.getName())) {
-                response.setNetworkname(network.getName());
+                response.setNetworkName(network.getName());
             }
 
+            response.setNetworkUuid(network.getUuid());
             response.setCreated(ipAddress.getAllocatedTime());
             response.setMode(network.getMode());
+
+            Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
             if (associatedNetwork != null) {
                 response.setAssociatedNetworkName(associatedNetwork.getName());
+                response.setAssociatedNetworkUuid(associatedNetwork.getUuid());
             }
             responsesList.add(response);
         });
 
+        List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
         nics.forEach(nic -> {
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
+
             response.setIpaddress(nic.getIPv4Address());
+            response.setUuid(nic.getUuid());
+
             response.setCreated(nic.getCreated());
             response.setMode(nic.getMode());
             response.setBroadcastUri(nic.getBroadcastUri());
@@ -3564,10 +3580,27 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
             VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
             response.setVmName(vm.getHostName());
+            response.setVmUuid(vm.getUuid());
+            response.setVmType(nic.getVmType());
+
+            Domain domain = _domainDao.findById(vm.getDomainId());
+            response.setDomainName(domain.getName());
+            response.setDomainUuid(domain.getUuid());
+
             responsesList.add(response);
         });
 
-        whoHasThisIpList.setResponses(responsesList);
+        List<WhoHasThisIpResponse> filteredResponsesList = new ArrayList<>();
+        if (!StringUtils.isEmpty(cmd.getUuid())) {
+            for (WhoHasThisIpResponse response :
+                    responsesList) {
+                if (response.getUuid().equals(cmd.getUuid())) {
+                    filteredResponsesList.add(response);
+                }
+            }
+        }
+
+        whoHasThisIpList.setResponses(filteredResponsesList.isEmpty()?  responsesList : filteredResponsesList);
         return whoHasThisIpList;
     }
 
