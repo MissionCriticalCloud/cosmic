@@ -150,23 +150,23 @@
                     id: 'whohasthisip',
                     label: 'label.whohasthisip',
                     fields: {
-                        virtualmachine: {
-                            label: 'label.virtual.machine'
+                        ipaddress: {
+                            label: 'label.ipaddress'
+                        },
+                        domain: {
+                            label: 'label.domain'
                         },
                         networkname: {
                             label: 'label.network.name'
+                        },
+                        virtualmachine: {
+                            label: 'label.virtual.machine'
                         },
                         associatednetwork: {
                             label: 'label.associated.network.short'
                         },
                         macaddress: {
                             label: 'label.macaddress'
-                        },
-                        ipaddress: {
-                            label: 'label.ipaddress'
-                        },
-                        netmask: {
-                            label: 'label.ipv4.netmask'
                         },
                         mode: {
                             label: 'label.mode'
@@ -180,7 +180,6 @@
                         }
                     },
                     dataProvider: function (args) {
-                        console.log(args.filterBy.search.value);
                         $.ajax({
                             url: createURL('listWhoHasThisIp'),
                             data: {
@@ -192,13 +191,13 @@
                                 args.response.success({
                                     data: $.map(whohasthisip, function (whohasthisip) {
                                         return {
-                                            id: whohasthisip.id,
-                                            virtualmachine: whohasthisip.virtualmachinename,
+                                            ipaddress: whohasthisip.ipaddress,
+                                            uuid: whohasthisip.uuid,
+                                            domain: whohasthisip.domainname,
                                             networkname: whohasthisip.networkname,
                                             associatednetwork: whohasthisip.associatednetworkname,
-                                            macaddress: whohasthisip.privatemacaddress,
-                                            ipaddress: whohasthisip.ipaddress,
-                                            netmask: whohasthisip.netmask,
+                                            virtualmachine: whohasthisip.virtualmachinename,
+                                            macaddress: whohasthisip.macaddress,
                                             mode: whohasthisip.mode,
                                             ipstate: whohasthisip.state,
                                             created: whohasthisip.created
@@ -207,6 +206,101 @@
                                 });
                             }
                         });
+                    },
+                    detailView: {
+                        name: 'Who has this IP details',
+                        tabs: {
+                            details: {
+                                title: 'label.details',
+                                fields: {
+                                    uuid: {
+                                        label: 'label.id'
+                                    },
+                                    ipaddress: {
+                                        label: 'label.ipaddress'
+                                    },
+                                    domainid: {
+                                        label: 'label.domain.id'
+                                    },
+                                    domainname: {
+                                        label: 'label.domain.name'
+                                    },
+                                    networkname: {
+                                        label: 'label.network.name'
+                                    },
+                                    networkid: {
+                                        label: 'label.network.id'
+                                    },
+                                    associatednetworkname: {
+                                        label: 'label.associated.network'
+                                    },
+                                    associatednetworkid: {
+                                        label: 'label.associated.network.id'
+                                    },
+                                    virtualmachineid: {
+                                        label: 'label.virtual.machine.id'
+                                    },
+                                    virtualmachinename: {
+                                        label: 'label.virtual.machine.name'
+                                    },
+                                    type: {
+                                        label: 'label.type'
+                                    },
+                                    macaddress: {
+                                        label: 'label.macaddress'
+                                    },
+                                    netmask: {
+                                        label: 'label.ipv4.netmask'
+                                    },
+                                    broadcasturi: {
+                                        label: 'label.broadcasturi'
+                                    },
+                                    mode: {
+                                        label: 'label.mode'
+                                    },
+                                    ipstate: {
+                                        label: 'label.state'
+                                    },
+                                    created: {
+                                        label: 'label.created',
+                                        converter: cloudStack.converters.toLocalDate
+                                    }
+                                },
+                                dataProvider: function (args) {
+                                    $.ajax({
+                                        url: createURL("listWhoHasThisIp"),
+                                        data: {
+                                            ipaddress: args.context.whohasthisip[0].ipaddress,
+                                            uuid: args.context.whohasthisip[0].uuid
+                                        },
+                                        success: function (json) {
+                                            whohasthisip = json.listwhohasthisipresponse.whohasthisip ? json.listwhohasthisipresponse.whohasthisip[0] : {};
+                                            args.response.success({
+                                                data: {
+                                                    ipaddress: whohasthisip.ipaddress,
+                                                    uuid: whohasthisip.uuid,
+                                                    domainid: whohasthisip.domainuuid,
+                                                    domainname: whohasthisip.domainname,
+                                                    networkid: whohasthisip.networkuuid,
+                                                    networkname: whohasthisip.networkname,
+                                                    associatednetworkid: whohasthisip.associatednetworkuuid,
+                                                    associatednetworkname: whohasthisip.associatednetworkname,
+                                                    virtualmachineid: whohasthisip.virtualmachineuuid,
+                                                    virtualmachinename: whohasthisip.virtualmachinename,
+                                                    type: whohasthisip.virtualmachinetype,
+                                                    macaddress: whohasthisip.macaddress,
+                                                    netmask: whohasthisip.netmask,
+                                                    broadcasturi: whohasthisip.broadcasturi,
+                                                    mode: whohasthisip.mode,
+                                                    ipstate: whohasthisip.state,
+                                                    created: whohasthisip.created
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
             }

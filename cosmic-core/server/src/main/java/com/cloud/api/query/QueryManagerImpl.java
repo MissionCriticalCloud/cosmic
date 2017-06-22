@@ -217,7 +217,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -3532,16 +3531,16 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         ipAddresses.forEach(ipAddress -> {
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
-            response.setIpaddress(ipAddress.getAddress().toString());
+            response.setIpAddress(ipAddress.getAddress().toString());
             response.setUuid(ipAddress.getUuid());
             response.setState(ipAddress.getState().toString());
 
-            Domain domain = _domainDao.findById(ipAddress.getDomainId());
+            final Domain domain = _domainDao.findById(ipAddress.getDomainId());
             if (domain != null) {
                 response.setDomainName(domain.getName());
                 response.setDomainUuid(domain.getUuid());
             }
-            Network network = _networkDao.findById(ipAddress.getNetworkId());
+            final Network network = _networkDao.findById(ipAddress.getNetworkId());
             if (ipAddress.getVpcId() != null) {
                 Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
                 response.setNetworkName(vpc.getName());
@@ -3555,7 +3554,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             response.setCreated(ipAddress.getAllocatedTime());
             response.setMode(network.getMode());
 
-            Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
+            final Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
             if (associatedNetwork != null) {
                 response.setAssociatedNetworkName(associatedNetwork.getName());
                 response.setAssociatedNetworkUuid(associatedNetwork.getUuid());
@@ -3568,7 +3567,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
 
-            response.setIpaddress(nic.getIPv4Address());
+            response.setIpAddress(nic.getIPv4Address());
             response.setUuid(nic.getUuid());
 
             response.setCreated(nic.getCreated());
@@ -3578,19 +3577,19 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             response.setMacAddress(nic.getMacAddress());
             response.setState(nic.getState().toString());
 
-            VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
+            final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
             response.setVmName(vm.getHostName());
             response.setVmUuid(vm.getUuid());
             response.setVmType(nic.getVmType());
 
-            Domain domain = _domainDao.findById(vm.getDomainId());
+            final Domain domain = _domainDao.findById(vm.getDomainId());
             response.setDomainName(domain.getName());
             response.setDomainUuid(domain.getUuid());
 
             responsesList.add(response);
         });
 
-        List<WhoHasThisIpResponse> filteredResponsesList = new ArrayList<>();
+        final List<WhoHasThisIpResponse> filteredResponsesList = new ArrayList<>();
         if (!StringUtils.isEmpty(cmd.getUuid())) {
             for (WhoHasThisIpResponse response :
                     responsesList) {

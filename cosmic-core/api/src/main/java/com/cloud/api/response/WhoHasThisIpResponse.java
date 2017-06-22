@@ -27,7 +27,7 @@ public class WhoHasThisIpResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.IP_ADDRESS)
     @Param(description = "IP address")
-    private String ipaddress;
+    private String ipAddress;
 
     @SerializedName(ApiConstants.NETWORK_NAME)
     @Param(description = "Network name")
@@ -161,12 +161,12 @@ public class WhoHasThisIpResponse extends BaseResponse {
         this.vpcName = vpcName;
     }
 
-    public String getIpaddress() {
-        return ipaddress;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    public void setIpaddress(final String ipaddress) {
-        this.ipaddress = ipaddress;
+    public void setIpAddress(final String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
     public String getAssociatedNetworkName() {
