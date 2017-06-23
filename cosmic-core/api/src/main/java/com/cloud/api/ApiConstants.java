@@ -590,7 +590,6 @@ public class ApiConstants {
 
     public static final String ADMIN = "admin";
     public static final String BROADCAST_URI = "broadcasturi";
-    public static final String MAC_ADDRESS = "macaddress";
     public static final String VPC_UUID = "vpcuuid";
     public static final String NETWORK_UUID = "networkuuid";
     public static final String ASSOCIATED_NETWORK_UUID = "associatednetworkuuid";

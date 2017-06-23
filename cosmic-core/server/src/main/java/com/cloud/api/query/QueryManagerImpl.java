@@ -217,6 +217,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -3527,7 +3528,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
         final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
 
-        List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
         ipAddresses.forEach(ipAddress -> {
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
@@ -3562,7 +3563,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             responsesList.add(response);
         });
 
-        List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
+        final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
         nics.forEach(nic -> {
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
@@ -3589,17 +3590,15 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             responsesList.add(response);
         });
 
-        final List<WhoHasThisIpResponse> filteredResponsesList = new ArrayList<>();
-        if (!StringUtils.isEmpty(cmd.getUuid())) {
-            for (WhoHasThisIpResponse response :
-                    responsesList) {
-                if (response.getUuid().equals(cmd.getUuid())) {
-                    filteredResponsesList.add(response);
-                }
-            }
-        }
+        final Account account = CallContext.current().getCallingAccount();
+        final Domain domain = _domainDao.findById(account.getDomainId());
 
-        whoHasThisIpList.setResponses(filteredResponsesList.isEmpty()?  responsesList : filteredResponsesList);
+        final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
+                response -> ((account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid()))
+                        && (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid()))))
+        ).collect(Collectors.toList());
+
+        whoHasThisIpList.setResponses(filteredResponsesList);
         return whoHasThisIpList;
     }
 
