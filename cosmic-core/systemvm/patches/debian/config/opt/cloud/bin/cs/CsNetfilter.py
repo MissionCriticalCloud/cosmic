@@ -8,6 +8,7 @@ from cs_iptables_save import Tables
 import CsHelper
 from CsDatabag import CsCmdLine
 
+from subprocess import Popen, PIPE
 
 class CsChain(object):
     def __init__(self):
@@ -163,11 +164,14 @@ class CsNetfilters(object):
         chains.table_printout()
 
         # COMMIT all rules.
-        result = CsHelper.execute("iptables-restore < /tmp/rules.save")
-        if result:
-            logging.info("iptables-restore result: %s", result)
-        else:
+        p = Popen("iptables-restore < /tmp/rules.save", shell=True, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate()
+        if not stderr:
             logging.info("iptables-restore result: success!")
+        else:
+            print("iptables-restore failed, resulted in %s" % stderr)
+            logging.info("iptables-restore failed, result: %s", stderr)
+            exit(1)
 
     def del_standard(self):
         """ Del rules that are there but should not be deleted
