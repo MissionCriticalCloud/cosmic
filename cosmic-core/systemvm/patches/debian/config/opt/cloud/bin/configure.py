@@ -535,9 +535,9 @@ class CsSite2SiteVpn(CsDataBag):
             logging.info("Configured vpn %s %s", leftpeer, rightpeer)
             CsHelper.execute("ipsec rereadsecrets")
 
-        # This will load the new config and start the connection when needed since auto=start in the config
-        CsHelper.execute("ipsec reload")
-        os.chmod(vpnsecretsfile, 0400)
+            # This will load the new config and start the connection when needed since auto=start in the config
+            CsHelper.execute("ipsec reload")
+            os.chmod(vpnsecretsfile, 0400)
 
     def convert_sec_to_h(self, val):
         hrs = int(val) / 3600
