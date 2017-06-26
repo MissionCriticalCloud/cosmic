@@ -452,8 +452,7 @@ class CsSite2SiteVpn(CsDataBag):
 
     def deletevpn(self, ip):
         logging.info("Removing VPN configuration for %s", ip)
-        CsHelper.execute("ipsec down vpn-%s" % ip)
-        CsHelper.execute("ipsec down vpn-%s" % ip)
+        CsHelper.execute("ipsec down vpn-%s" % ip, wait=False)
         vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, ip)
         vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, ip)
         os.remove(vpnconffile)
@@ -478,7 +477,7 @@ class CsSite2SiteVpn(CsDataBag):
     def configure_ipsec(self, obj):
         leftpeer = obj['local_public_ip']
         rightpeer = obj['peer_gateway_ip']
-        peerlist = obj['peer_guest_cidr_list'].replace(' ', '')
+        peerlist = obj['peer_guest_cidr_list'].split(',')
         vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, rightpeer)
         vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, rightpeer)
         ikepolicy=obj['ike_policy'].replace(';','-')
@@ -498,30 +497,36 @@ class CsSite2SiteVpn(CsDataBag):
         if rightpeer in self.confips:
             self.confips.remove(rightpeer)
         file = CsFile(vpnconffile)
-        file.add("#conn for vpn-%s" % rightpeer, 0)
-        file.search("conn ", "conn vpn-%s" % rightpeer)
-        file.addeq(" left=%s" % leftpeer)
-        file.addeq(" leftsubnet=%s" % obj['local_guest_cidr'])
-        file.addeq(" leftnexthop=%s" % obj['local_public_gateway'])
-        file.addeq(" right=%s" % rightpeer)
-        file.addeq(" rightsubnet=%s" % peerlist)
-        file.addeq(" type=tunnel")
-        file.addeq(" authby=secret")
-        file.addeq(" keyexchange=ike")
-        file.addeq(" ike=%s" % ikepolicy)
-        file.addeq(" ikelifetime=%s" % self.convert_sec_to_h(obj['ike_lifetime']))
-        file.addeq(" esp=%s" % esppolicy)
-        file.addeq(" lifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']))
-        file.addeq(" pfs=%s" % pfs)
-        file.addeq(" keyingtries=2")
-        file.addeq(" auto=start")
-        if 'encap' not in obj:
-            obj['encap']=False
-        file.addeq(" forceencaps=%s" % CsHelper.bool_to_yn(obj['encap']))
-        if obj['dpd']:
-            file.addeq(" dpddelay=30")
-            file.addeq(" dpdtimeout=120")
-            file.addeq(" dpdaction=restart")
+        for idx, p in enumerate(peerlist):
+            if idx == 0:
+                file.add("#conn for vpn-%s" % rightpeer, -1)
+                file.add("conn vpn-%s" % rightpeer, -1)
+            else:
+                file.add("#conn for vpn-%s-%i" % (rightpeer,idx), -1)
+                file.add("conn vpn-%s-%i" % (rightpeer,idx), -1)
+            file.add(" left=%s" % leftpeer, -1)
+            file.add(" leftsubnet=%s" % obj['local_guest_cidr'], -1)
+            file.add(" right=%s" % rightpeer, -1)
+            file.add(" rightsubnet=%s" % p, -1)
+            file.add(" type=tunnel", -1)
+            file.add(" authby=secret", -1)
+            file.add(" keyexchange=ike", -1)
+            file.add(" ike=%s" % ikepolicy, -1)
+            file.add(" ikelifetime=%s" % self.convert_sec_to_h(obj['ike_lifetime']), -1)
+            file.add(" esp=%s" % esppolicy, -1)
+            file.add(" lifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']), -1)
+            file.add(" keyingtries=2", -1)
+            file.add(" auto=start", -1)
+            file.add(" closeaction=restart", -1)
+            file.add(" inactivity=0", -1)
+            if 'encap' not in obj:
+                obj['encap']=False
+            file.add(" forceencaps=%s" % CsHelper.bool_to_yn(obj['encap']), -1)
+            if obj['dpd']:
+                file.add(" dpddelay=30", -1)
+                file.add(" dpdtimeout=120", -1)
+                file.add(" dpdaction=restart", -1)
+            file.add(" ", -1)
         secret = CsFile(vpnsecretsfile)
         secret.search("%s " % leftpeer, "%s %s : PSK \"%s\"" % (leftpeer, rightpeer, obj['ipsec_psk']))
         if secret.is_changed() or file.is_changed():
