@@ -374,6 +374,7 @@
                         advZoneObjs = json.listzonesresponse ? json.listzonesresponse.zone : null;
                         if (advZoneObjs != null && advZoneObjs.length > 0) {
                             sectionsToShow.push('vpc');
+                            sectionsToShow.push('vpcTiers');
                             sectionsToShow.push('vpnCustomerGateway');
 
                             //At the same time check if any advanced zone has securitygroupsenabled is true.
@@ -439,13 +440,8 @@
                         name: {
                             label: 'label.name'
                         },
-                        displaytext: {
-                            label: 'label.description',
-                            truncate: true
-                        },
-                        zonename: {
-                            label: 'label.zone',
-                            truncate: true
+                        domain: {
+                            label: 'label.domain',
                         },
                         cidr: {
                             label: 'label.cidr'
@@ -1198,6 +1194,489 @@
                     }
                 }
             },
+            vpcTiers: {
+                id: 'vpcTiers',
+                type: 'select',
+                title: 'VPC Tiers',
+                listView: {
+                    actions: {
+                        domainAdminAddPrivateNetwork: $.extend({}, addPrivateNetworkDialog.def, {
+                            isHeader: true
+                        })
+
+                    },
+                    id: 'networks',
+                    fields: {
+                        name: {
+                            label: 'label.name'
+                        },
+                        domain: {
+                            label: 'label.domain'
+                        },
+                        vpcname: {
+                            label: 'label.vpc'
+                        },
+                        cidr: {
+                            label: 'label.cidr'
+                        },
+                        broadcasturi: {
+                            label: 'label.vlan'
+                        }
+                    },
+
+                    advSearchFields: {
+                        zoneid: {
+                            label: 'label.zone',
+                            select: function (args) {
+                                $.ajax({
+                                    url: createURL('listZones'),
+                                    data: {
+                                        listAll: true
+                                    },
+                                    success: function (json) {
+                                        var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
+
+                                        args.response.success({
+                                            data: $.map(zones, function (zone) {
+                                                return {
+                                                    id: zone.id,
+                                                    description: zone.name
+                                                };
+                                            })
+                                        });
+                                    }
+                                });
+                            }
+                        },
+
+                        domainid: {
+                            label: 'label.domain',
+                            select: function (args) {
+                                if (isAdmin() || isDomainAdmin()) {
+                                    $.ajax({
+                                        url: createURL('listDomains'),
+                                        data: {
+                                            listAll: true,
+                                            details: 'min'
+                                        },
+                                        success: function (json) {
+                                            var array1 = [{
+                                                id: '',
+                                                description: ''
+                                            }];
+                                            var domains = json.listdomainsresponse.domain;
+                                            if (domains != null && domains.length > 0) {
+                                                for (var i = 0; i < domains.length; i++) {
+                                                    array1.push({
+                                                        id: domains[i].id,
+                                                        description: domains[i].path
+                                                    });
+                                                }
+                                            }
+                                            array1.sort(function (a, b) {
+                                                return a.description.localeCompare(b.description);
+                                            });
+                                            args.response.success({
+                                                data: array1
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    args.response.success({
+                                        data: null
+                                    });
+                                }
+                            },
+                            isHidden: function (args) {
+                                if (isAdmin() || isDomainAdmin())
+                                    return false;
+                                else
+                                    return true;
+                            }
+                        },
+
+                        account: {
+                            label: 'label.account',
+                            isHidden: function (args) {
+                                if (isAdmin() || isDomainAdmin())
+                                    return false;
+                                else
+                                    return true;
+                            }
+                        },
+                        tagKey: {
+                            label: 'label.tag.key'
+                        },
+                        tagValue: {
+                            label: 'label.tag.value'
+                        }
+                    },
+
+                    dataProvider: function (args) {
+                        var data = { 'forvpc': 'true' };
+                        listViewDataProvider(args, data);
+                        $.ajax({
+                            url: createURL('listNetworks'),
+                            data: data,
+                            async: false,
+                            success: function (data) {
+                                args.response.success({
+                                    data: data.listnetworksresponse.network
+                                });
+                            },
+                            error: function (data) {
+                                args.response.error(parseXMLHttpResponse(data));
+                            }
+                        });
+                    },
+
+                    detailView: {
+                        name: 'label.guest.network.details',
+                        viewAll: {
+                            path: 'network.ipAddresses',
+                            label: 'label.menu.ipaddresses',
+                        },
+                        actions: {
+                            edit: {
+                                label: 'label.edit',
+                                messages: {
+                                    notification: function (args) {
+                                        return 'label.edit.network.details';
+                                    }
+                                },
+                                action: function (args) {
+                                    var data = {
+                                        id: args.context.vpcTiers[0].id,
+                                        name: args.data.name,
+                                        displaytext: args.data.displaytext
+                                    };
+
+                                    //args.data.networkdomain is null when networkdomain field is hidden
+                                    if (args.data.networkdomain != null && args.data.networkdomain.length > 0 && args.data.networkdomain != args.context.vpcTiers[0].networkdomain) {
+                                        $.extend(data, {
+                                            networkdomain: args.data.networkdomain
+                                        });
+                                    }
+
+                                    if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.vpcTiers[0].ipexclusionlist) {
+                                        $.extend(data, {
+                                            ipexclusionlist: args.data.ipexclusionlist
+                                        });
+                                    }
+
+                                    var oldcidr;
+                                    $.ajax({
+                                        url: createURL("listNetworks&id=" + args.context.vpcTiers[0].id + "&listAll=true"),
+                                        dataType: "json",
+                                        async: false,
+                                        success: function (json) {
+                                            oldcidr = json.listnetworksresponse.network[0].cidr;
+
+                                        }
+                                    });
+
+
+                                    if (args.data.cidr != "" && args.data.cidr != oldcidr) {
+                                        $.extend(data, {
+                                            guestvmcidr: args.data.cidr
+                                        });
+                                    }
+                                },
+                            },
+                        },
+
+                        tabFilter: function (args) {
+                            var networkHavingELB = false;
+                            var hasNetworkACL = false;
+                            var hasSRXFirewall = false;
+                            var isVPC = false;
+                            var isPrivateNet = false;
+                            var isAdvancedSGZone = false;
+                            var hiddenTabs = [];
+                            var isSharedNetwork;
+
+                            var thisNetwork = args.context.vpcTiers[0];
+                            if (thisNetwork.vpcid != null) {
+                                isVPC = true;
+                            }
+                            if (thisNetwork.type == 'Shared') {
+                                isSharedNetwork = true;
+                            }
+                            if (thisNetwork.type == 'Private') {
+                                isPrivateNet = true;
+                            }
+
+                            $(thisNetwork.service).each(function () {
+                                var thisService = this;
+
+                                if (thisService.name == 'NetworkACL') {
+                                    hasNetworkACL = true;
+                                } else if (thisService.name == "Lb") {
+                                    $(thisService.capability).each(function () {
+                                        if (this.name == "ElasticLb" && this.value == "true") {
+                                            networkHavingELB = true;
+                                        }
+                                    });
+                                }
+
+                                if (thisService.name == 'Firewall') {
+                                    $(thisService.provider).each(function () {
+                                        if (this.name == 'JuniperSRX') {
+                                            hasSRXFirewall = true;
+
+                                            return false;
+                                        }
+
+                                        return true;
+                                    });
+                                }
+                            });
+
+                            // Get zone data
+                            $.ajax({
+                                url: createURL('listZones'),
+                                data: {
+                                    id: args.context.vpcTiers[0].zoneid
+                                },
+                                async: false,
+                                success: function (json) {
+                                    var zone = json.listzonesresponse.zone[0];
+
+                                    isAdvancedSGZone = zone.securitygroupsenabled;
+                                }
+                            });
+
+                            if (isVPC || isAdvancedSGZone || isSharedNetwork || isPrivateNet) {
+                                hiddenTabs.push('egressRules');
+                            }
+
+                            if (!(isAdmin() || isDomainAdmin())) {
+                                hiddenTabs.push("virtualRouters");
+                            }
+                            return hiddenTabs;
+                        },
+
+                        isMaximized: true,
+                        tabs: {
+                            details: {
+                                title: 'label.details',
+                                preFilter: function (args) {
+                                    var hiddenFields = [];
+                                    var zone;
+
+                                    $.ajax({
+                                        url: createURL('listZones'),
+                                        data: {
+                                            id: args.context.vpcTiers[0].zoneid
+                                        },
+                                        async: false,
+                                        success: function (json) {
+                                            zone = json.listzonesresponse.zone[0];
+                                        }
+                                    });
+
+                                    if (zone.networktype == "Basic") {
+                                        hiddenFields.push("account");
+                                        hiddenFields.push("gateway");
+                                        hiddenFields.push("vlan");
+                                        hiddenFields.push("cidr");
+                                    }
+
+                                    if (args.context.vpcTiers[0].type == "Isolated") {
+                                        hiddenFields.push("networkofferingdisplaytext");
+                                        hiddenFields.push("networkdomaintext");
+                                        hiddenFields.push("gateway");
+                                        hiddenFields.push("networkofferingname");
+                                    } else { //selectedGuestNetworkObj.type == "Shared"
+                                        hiddenFields.push("networkofferingid");
+                                        hiddenFields.push("networkdomain");
+                                    }
+
+                                    if (!isAdmin()) {
+                                        hiddenFields.push("vlan");
+                                    }
+
+                                    return hiddenFields;
+                                },
+
+                                fields: [{
+                                    name: {
+                                        label: 'label.name',
+                                        isEditable: true
+                                    }
+                                }, {
+                                    id: {
+                                        label: 'label.id'
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
+                                    },
+                                    displaytext: {
+                                        label: 'label.description',
+                                        isEditable: true
+                                    },
+                                    type: {
+                                        label: 'label.type'
+                                    },
+                                    state: {
+                                        label: 'label.state'
+                                    },
+
+                                    vpcname: {
+                                        label: 'label.vpc',
+                                    },
+
+                                    ispersistent: {
+                                        label: 'label.persistent',
+                                        converter: cloudStack.converters.toBooleanText
+
+                                    },
+                                    restartrequired: {
+                                        label: 'label.restart.required',
+                                        converter: function (booleanValue) {
+                                            if (booleanValue == true)
+                                                return "Yes";
+                                            else if (booleanValue == false)
+                                                return "No";
+                                        }
+                                    },
+                                    vlan: {
+                                        label: 'label.vnet.id'
+                                    },
+
+                                    broadcasturi: {
+                                        label: 'label.broadcasturi'
+                                    },
+
+                                    networkofferingid: {
+                                        label: 'label.network.offering',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            if (args.context.vpcTiers[0].type == 'Shared') { //Shared network is not allowed to upgrade to a different network offering
+                                                args.response.success({
+                                                    data: []
+                                                });
+                                                return;
+                                            }
+
+                                            if (args.context.vpcTiers[0].state == 'Destroyed') {
+                                                args.response.success({
+                                                    data: []
+                                                });
+                                                return;
+                                            }
+
+                                            var items = [];
+                                            $.ajax({
+                                                url: createURL("listNetworkOfferings&networkid=" + args.context.vpcTiers[0].id),
+                                                dataType: "json",
+                                                async: false,
+                                                success: function (json) {
+                                                    var networkOfferingObjs = json.listnetworkofferingsresponse.networkoffering;
+                                                    $(networkOfferingObjs).each(function () {
+                                                        items.push({
+                                                            id: this.id,
+                                                            description: this.displaytext
+                                                        });
+                                                    });
+                                                }
+                                            });
+
+                                            //include currently selected network offeirng to dropdown
+                                            items.push({
+                                                id: args.context.vpcTiers[0].networkofferingid,
+                                                description: args.context.vpcTiers[0].networkofferingdisplaytext
+                                            });
+
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+
+                                    gateway: {
+                                        label: 'label.gateway'
+                                    },
+
+                                    cidr: {
+                                        label: 'label.cidr',
+                                        isEditable: false
+                                    },
+
+                                    networkcidr: {
+                                        label: 'label.network.cidr'
+                                    },
+
+                                    ipexclusionlist: {
+                                        label: 'label.ipexclusionlist',
+                                        isEditable: true
+                                    },
+
+                                    ip6gateway: {
+                                        label: 'label.ipv6.gateway'
+                                    },
+
+                                    ip6cidr: {
+                                        label: 'label.ipv6.CIDR'
+                                    },
+
+                                    reservediprange: {
+                                        label: 'label.reserved.ip.range'
+                                    },
+
+
+                                    networkdomaintext: {
+                                        label: 'label.network.domain.text'
+                                    },
+                                    networkdomain: {
+                                        label: 'label.network.domain',
+                                        isEditable: true
+                                    },
+
+                                    domain: {
+                                        label: 'label.domain'
+                                    },
+                                    account: {
+                                        label: 'label.account'
+                                    }
+                                }],
+
+                                tags: cloudStack.api.tags({
+                                    resourceType: 'Network',
+                                    contextId: 'networks'
+                                }),
+
+
+                                dataProvider: function (args) {
+                                    $.ajax({
+                                        url: createURL("listNetworks"),
+                                        data: {
+                                            listAll: true,
+                                            id: args.context.vpcTiers[0].id
+                                        },
+                                        dataType: "json",
+                                        async: true,
+                                        success: function (json) {
+                                            var jsonObj = json.listnetworksresponse.network[0];
+                                            addExtraPropertiesToGuestNetworkObject(jsonObj);
+
+                                            $(window).trigger('cloudStack.module.sharedFunctions.addExtraProperties', {
+                                                obj: jsonObj,
+                                                objType: "vpcTiers"
+                                            });
+
+                                            args.response.success({
+                                                actionFilter: cloudStack.actionFilter.guestNetwork,
+                                                data: jsonObj
+                                            });
+                                        }
+                                    });
+                                }
+                            },
+                        }
+                    }
+                }
+            },
             networks: {
                 id: 'networks',
                 type: 'select',
@@ -1553,8 +2032,8 @@
                         name: {
                             label: 'label.name'
                         },
-                        account: {
-                            label: 'label.account'
+                        domain: {
+                            label: 'label.domain'
                         },
                         type: {
                             label: 'label.type'
@@ -2037,17 +2516,6 @@
                                     state: {
                                         label: 'label.state'
                                     },
-
-                                    vpcid: {
-                                        label: 'label.vpc.id',
-                                        converter: function (args) {
-                                            if (args != null)
-                                                return args;
-                                            else
-                                                return _l('label.na');
-                                        }
-                                    },
-
                                     ispersistent: {
                                         label: 'label.persistent',
                                         converter: cloudStack.converters.toBooleanText
@@ -2683,6 +3151,10 @@
                                     $.extend(dataObj, {
                                         id: args.context.networks[0].zoneid
                                     });
+                                } else if ('vpcTiers' in args.context) { //from VPC Tiers section
+                                    $.extend(dataObj, {
+                                        id: args.context.vpcTiers[0].zoneid
+                                    });
                                 }
 
                                 $.ajax({
@@ -2737,7 +3209,7 @@
                                 }
 
                                 //*** from Guest Network section ***
-                                if (!('vpc' in args.context)) {
+                                if ('networks' in args.context) {
                                     if (args.context.networks[0].vpcid == null) { //Guest Network section > non-VPC network, show Acquire IP button
                                         return true;
                                     } else { //Guest Network section > VPC network, hide Acquire IP button
@@ -2745,8 +3217,8 @@
                                     }
                                 }
                                 //*** from VPC section ***
-                                else { //'vpc' in args.context //args.context.networks[0] has only one property => name: 'Router'
-                                    return true; //VPC section, show Acquire IP button
+                                else {
+                                    return false;
                                 }
                             },
                             messages: {
@@ -2872,7 +3344,10 @@
                             $.extend(data, {
                                 vpcid: args.context.vpc[0].id
                             });
-                        }
+                        } else if ('vpcTiers' in args.context) {
+                            $.extend(data, {
+                                associatedNetworkId: args.context.vpcTiers[0].id
+                            });                        }
 
                         $.ajax({
                             url: createURL('listPublicIpAddresses'),
@@ -3917,112 +4392,6 @@
                                     },
 
                                     vmDetails: cloudStack.sections.instances.listView.detailView,
-
-
-                                    //"NAT Port Range" multiEdit screen for StaticNAT is obsolete in cloudstack 3.0 because createIpForwardingRule/deleteIpForwardingRule/listIpForwardingRules API are obsolete in cloudstack 3.0.
-                                    //cloudstack 3.0 is using createFirewallRule/listFirewallRules/deleteFirewallRule API for both staticNAT and non-staticNAT .
-                                    /*
-                                     staticNAT: {
-                                     noSelect: true,
-                                     fields: {
-                                     'protocol': {
-                                     label: 'label.protocol',
-                                     select: function(args) {
-                                     args.response.success({
-                                     data: [
-                                     { name: 'tcp', description: 'TCP' },
-                                     { name: 'udp', description: 'UDP' }
-                                     ]
-                                     });
-                                     }
-                                     },
-                                     'startport': { edit: true, label: 'label.start.port' },
-                                     'endport': { edit: true, label: 'label.end.port' },
-                                     'add-rule': {
-                                     label: 'label.add.rule',
-                                     addButton: true
-                                     }
-                                     },
-                                     add: {
-                                     label: 'label.add',
-                                     action: function(args) {
-                                     $.ajax({
-                                     url: createURL('createIpForwardingRule'),
-                                     data: $.extend(args.data, {
-                                     ipaddressid: args.context.ipAddresses[0].id
-                                     }),
-                                     dataType: 'json',
-                                     success: function(data) {
-                                     args.response.success({
-                                     _custom: {
-                                     jobId: data.createipforwardingruleresponse.jobid
-                                     },
-                                     notification: {
-                                     label: 'label.add.static.nat.rule',
-                                     poll: pollAsyncJobResult
-                                     }
-                                     });
-                                     },
-                                     error: function(data) {
-                                     args.response.error(parseXMLHttpResponse(data));
-                                     }
-                                     });
-                                     }
-                                     },
-                                     actions: {
-                                     destroy: {
-                                     label: 'label.remove.rule',
-                                     action: function(args) {
-                                     $.ajax({
-                                     url: createURL('deleteIpForwardingRule'),
-                                     data: {
-                                     id: args.context.multiRule[0].id
-                                     },
-                                     dataType: 'json',
-                                     async: true,
-                                     success: function(data) {
-                                     var jobID = data.deleteipforwardingruleresponse.jobid;
-                                     args.response.success({
-                                     _custom: {
-                                     jobId: jobID
-                                     },
-                                     notification: {
-                                     label: 'label.remove.static.nat.rule',
-                                     poll: pollAsyncJobResult
-                                     }
-                                     });
-                                     },
-                                     error: function(data) {
-                                     args.response.error(parseXMLHttpResponse(data));
-                                     }
-                                     });
-                                     }
-                                     }
-                                     },
-                                     dataProvider: function(args) {
-                                     setTimeout(function() {
-                                     $.ajax({
-                                     url: createURL('listIpForwardingRules'),
-                                     data: {
-                                     listAll: true,
-                                     ipaddressid: args.context.ipAddresses[0].id
-                                     },
-                                     dataType: 'json',
-                                     async: true,
-                                     success: function(data) {
-                                     args.response.success({
-                                     data: data.listipforwardingrulesresponse.ipforwardingrule
-                                     });
-                                     },
-                                     error: function(data) {
-                                     args.response.error(parseXMLHttpResponse(data));
-                                     }
-                                     });
-                                     }, 100);
-                                     }
-                                     },
-                                     */
-
 
                                     // Load balancing rules
                                     loadBalancing: {
@@ -5730,14 +6099,14 @@
                         name: {
                             label: 'label.name'
                         },
+                        domain: {
+                            label: 'label.domain'
+                        },
                         gateway: {
                             label: 'label.gateway'
                         },
                         cidrlist: {
                             label: 'label.CIDR.list'
-                        },
-                        ipsecpsk: {
-                            label: 'label.IPsec.preshared.key'
                         }
                     },
 
@@ -6734,7 +7103,7 @@
     };
 
     function getExtaPropertiesForIpObj(ipObj, args) {
-        if (!('vpc' in args.context)) { //***** Guest Network section > Guest Network page > IP Address page *****
+        if ('networks' in args.context) {
             var services = args.context.networks[0].service;
             if (services != null) {
                 for (var i = 0; i < services.length; i++) {
