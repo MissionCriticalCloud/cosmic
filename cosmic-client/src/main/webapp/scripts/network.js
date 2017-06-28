@@ -1657,9 +1657,8 @@
                     },
 
                     dataProvider: function (args) {
-                        var data = {};
+                        var data = { 'forvpc': 'false' };
                         listViewDataProvider(args, data);
-
                         $.ajax({
                             url: createURL('listNetworks'),
                             data: data,
