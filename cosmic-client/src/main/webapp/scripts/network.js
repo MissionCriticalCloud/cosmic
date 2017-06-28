@@ -390,7 +390,6 @@
                         $.ajax({
                             url: createURL('listRemoteAccessVpns'),
                             data: {
-                                account: g_account,
                                 domainid: g_domainid,
                                 listAll: true
                             },
