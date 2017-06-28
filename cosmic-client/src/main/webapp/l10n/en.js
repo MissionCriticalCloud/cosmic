@@ -733,7 +733,7 @@ var dictionary = {
     "label.guest.netmask": "Guest Netmask",
     "label.guest.network.details": "Guest network details",
     "label.guest.networks": "Guest networks",
-    "label.networks.long": "Networks (Guest, Tiers, Private)",
+    "label.networks.long": "Isolated Networks (Guest and Private)",
     "label.guest.start.ip": "Guest start IP",
     "label.guest.traffic": "Guest Traffic",
     "label.guest.traffic.vswitch.name": "Guest Traffic vSwitch Name",
