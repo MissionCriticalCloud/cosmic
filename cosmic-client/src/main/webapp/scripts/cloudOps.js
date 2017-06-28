@@ -42,8 +42,11 @@
                         }
                     },
                     dataProvider: function (args) {
+                        const data = {};
+                        listViewDataProvider(args, data);
                         $.ajax({
                             url: createURL('listHAWorkers'),
+                            data: data,
                             async: true,
                             success: function (json) {
                                 haworkers = json.listhaworkersresponse.haworker ? json.listhaworkersresponse.haworker : [];
@@ -110,7 +113,6 @@
                                     }
                                 },
                                 dataProvider: function (args) {
-                                    console.log(args.context.haworkers);
                                     $.ajax({
                                         url: createURL("listHAWorkers"),
                                         data: {
@@ -168,23 +170,23 @@
                         macaddress: {
                             label: 'label.macaddress'
                         },
-                        mode: {
-                            label: 'label.mode'
-                        },
                         ipstate: {
-                            label: 'label.state'
-                        },
-                        created: {
-                            label:'label.created',
-                            converter: cloudStack.converters.toLocalDate
+                            label: 'label.state',
+                            indicator: {
+                                'Free': 'on',
+                                'Allocated': 'off'
+                            }
                         }
                     },
                     dataProvider: function (args) {
+                        const data = {};
+                        listViewDataProvider(args, data);
+                        $.extend(data, {
+                            ipaddress: args.filterBy.search.value
+                        });
                         $.ajax({
                             url: createURL('listWhoHasThisIp'),
-                            data: {
-                                ipaddress: args.filterBy.search.value
-                            },
+                            data: data,
                             async: true,
                             success: function (json) {
                                 whohasthisip = json.listwhohasthisipresponse.whohasthisip ? json.listwhohasthisipresponse.whohasthisip : [];

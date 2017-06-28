@@ -3543,7 +3543,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             }
             final Network network = _networkDao.findById(ipAddress.getNetworkId());
             if (ipAddress.getVpcId() != null) {
-                Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
+                final Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
                 response.setNetworkName(vpc.getName());
                 response.setVpcName(vpc.getName());
                 response.setVpcUuid(vpc.getUuid());
@@ -3594,9 +3594,11 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Domain domain = _domainDao.findById(account.getDomainId());
 
         final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
-                response -> ((account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid()))
-                        && (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid()))))
-        ).collect(Collectors.toList());
+                response -> (
+                        (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
+                                (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
+                )
+        ).skip(cmd.getStartIndex()).limit(cmd.getPageSizeVal()).collect(Collectors.toList());
 
         whoHasThisIpList.setResponses(filteredResponsesList);
         return whoHasThisIpList;
