@@ -497,6 +497,7 @@ class CsSite2SiteVpn(CsDataBag):
         if rightpeer in self.confips:
             self.confips.remove(rightpeer)
         file = CsFile(vpnconffile)
+        file.empty()
         for idx, p in enumerate(peerlist):
             if idx == 0:
                 file.add("#conn for vpn-%s" % rightpeer, -1)
@@ -515,7 +516,7 @@ class CsSite2SiteVpn(CsDataBag):
             file.add(" ikelifetime=%s" % self.convert_sec_to_h(obj['ike_lifetime']), -1)
             file.add(" esp=%s" % esppolicy, -1)
             file.add(" lifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']), -1)
-            file.add(" keyingtries=2", -1)
+            file.add(" keyingtries=%forever", -1)
             file.add(" auto=start", -1)
             file.add(" closeaction=restart", -1)
             file.add(" inactivity=0", -1)
