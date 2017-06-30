@@ -3,6 +3,7 @@ package com.cloud.query;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
+import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
@@ -131,5 +132,7 @@ public interface QueryService {
     ListResponse<HAWorkerResponse> listHAWorkers(ListHAWorkersCmd cmd);
 
     ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(ListWhoHasThisIpCmd cmd);
+
+    ListResponse<WhoHasThisIpResponse> listWhoHasThisMac(ListWhoHasThisMacCmd cmd);
 
 }

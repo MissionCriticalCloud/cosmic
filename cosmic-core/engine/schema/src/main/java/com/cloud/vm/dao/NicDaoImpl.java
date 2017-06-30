@@ -54,6 +54,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
 
         IpFuzzySearch = createSearchBuilder();
         IpFuzzySearch.and("address", IpFuzzySearch.entity().getIPv4Address(), Op.LIKE);
+        IpFuzzySearch.and("mac", IpFuzzySearch.entity().getMacAddress(), Op.LIKE);
         IpFuzzySearch.done();
 
         IpSearch = createSearchBuilder(String.class);
@@ -101,6 +102,12 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     public List<NicVO> listByIpAddress(final String ipAddress) {
         final SearchCriteria<NicVO> sc = IpFuzzySearch.create();
         sc.setParameters("address", "%" + ipAddress + "%");
+        return listBy(sc);
+    }
+    @Override
+    public List<NicVO> listByMacAddress(final String macAddress) {
+        final SearchCriteria<NicVO> sc = IpFuzzySearch.create();
+        sc.setParameters("mac", "%" + macAddress + "%");
         return listBy(sc);
     }
     @Override
