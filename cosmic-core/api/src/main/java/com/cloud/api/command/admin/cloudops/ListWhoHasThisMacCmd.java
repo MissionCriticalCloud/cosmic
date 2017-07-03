@@ -7,12 +7,12 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.WhoHasThisIpResponse;
 
-@APICommand(name = "listWhoHasThisMac", description = "Lists all for this IP address", responseObject = WhoHasThisIpResponse.class)
+@APICommand(name = "listWhoHasThisMac", description = "Lists all for this MAC address", responseObject = WhoHasThisIpResponse.class)
 public class ListWhoHasThisMacCmd extends BaseListDomainResourcesCmd {
 
     private static final String COMMAND_NAME = "listwhohasthismacresponse";
     @Parameter(name = ApiConstants.UUID, type = CommandType.STRING,
-            description = "The UUID of nics or user_ip_address row.")
+            description = "The UUID of nics row.")
     private String uuid;
     @Parameter(name = ApiConstants.MAC_ADDRESS, type = CommandType.STRING,
             description = "The MAC Address that you are searching the owner of.")

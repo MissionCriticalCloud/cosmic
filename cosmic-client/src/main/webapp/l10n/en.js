@@ -1683,6 +1683,7 @@ var dictionary = {
     "label.welcome.cloud.console": "Welcome to Management Console",
     "label.what.is.cloudstack": "What is Cosmic?",
     "label.whohasthisip": "Who has this IP?",
+    "label.whohasthismac": "Who has this MAC?",
     "label.xenserver.tools.version.61.plus": "Original XS Version is 6.1+",
     "label.xenserver.traffic.label": "XenServer traffic label",
     "label.yes": "Yes",

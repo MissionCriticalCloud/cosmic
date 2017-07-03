@@ -3659,7 +3659,8 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         whoHasThisIpList.setResponses(filteredResponsesList);
         return whoHasThisIpList;
     }
-        private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {
+
+    private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {
         final Filter searchFilter = new Filter(HostTagVO.class, "id", Boolean.TRUE, null, null);
 
         final SearchBuilder<HostTagVO> sb = _hostTagDao.createSearchBuilder();
