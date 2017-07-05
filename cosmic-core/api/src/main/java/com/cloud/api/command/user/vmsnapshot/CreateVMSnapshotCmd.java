@@ -30,21 +30,18 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID, type = CommandType.UUID, required = true, entityType = UserVmResponse.class, description = "The ID of the vm")
     private Long vmId;
 
-    @Parameter(name = ApiConstants.VM_SNAPSHOT_DESCRIPTION, type = CommandType.STRING, required = false, description = "The description of the snapshot")
+    @Parameter(name = ApiConstants.VM_SNAPSHOT_DESCRIPTION, type = CommandType.STRING, description = "The description of the snapshot")
     private String description;
 
-    @Parameter(name = ApiConstants.VM_SNAPSHOT_DISPLAYNAME, type = CommandType.STRING, required = false, description = "The display name of the snapshot")
+    @Parameter(name = ApiConstants.VM_SNAPSHOT_DISPLAYNAME, type = CommandType.STRING, description = "The display name of the snapshot")
     private String displayName;
 
-    @Parameter(name = ApiConstants.VM_SNAPSHOT_MEMORY, type = CommandType.BOOLEAN, required = false, description = "snapshot memory if true")
-    private Boolean snapshotMemory;
-
-    @Parameter(name = ApiConstants.VM_SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, required = false, description = "quiesce vm if true")
+    @Parameter(name = ApiConstants.VM_SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, description = "quiesce vm if true")
     private Boolean quiescevm;
 
     @Override
     public void create() throws ResourceAllocationException {
-        final VMSnapshot vmsnapshot = _vmSnapshotService.allocVMSnapshot(getVmId(), getDisplayName(), getDescription(), snapshotMemory());
+        final VMSnapshot vmsnapshot = _vmSnapshotService.allocVMSnapshot(getVmId(), getDisplayName(), getDescription());
         if (vmsnapshot != null) {
             setEntityId(vmsnapshot.getId());
         } else {
@@ -64,14 +61,6 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         return description;
     }
 
-    public Boolean snapshotMemory() {
-        if (snapshotMemory == null) {
-            return false;
-        } else {
-            return snapshotMemory;
-        }
-    }
-
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_SNAPSHOT_CREATE;
@@ -85,7 +74,7 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("VM Id: " + getVmId());
-        final VMSnapshot result = _vmSnapshotService.creatVMSnapshot(getVmId(), getEntityId(), getQuiescevm());
+        final VMSnapshot result = _vmSnapshotService.createVMSnapshot(getVmId(), getEntityId(), isQuiescevm());
         if (result != null) {
             final VMSnapshotResponse response = _responseGenerator.createVMSnapshotResponse(result);
             response.setResponseName(getCommandName());
@@ -95,12 +84,8 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         }
     }
 
-    public Boolean getQuiescevm() {
-        if (quiescevm == null) {
-            return false;
-        } else {
-            return quiescevm;
-        }
+    public boolean isQuiescevm() {
+        return Boolean.TRUE.equals(quiescevm);
     }
 
     @Override

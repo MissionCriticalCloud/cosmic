@@ -15,6 +15,8 @@ import com.cloud.agent.api.GetVmIpAddressCommand;
 import com.cloud.agent.api.GetVmStatsAnswer;
 import com.cloud.agent.api.GetVmStatsCommand;
 import com.cloud.agent.api.PvlanSetupCommand;
+import com.cloud.agent.api.RestoreVMSnapshotAnswer;
+import com.cloud.agent.api.RestoreVMSnapshotCommand;
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
@@ -5042,6 +5044,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
+        finalizeCommandsOnStart(cmds, profile);
         return true;
     }
 
@@ -5122,11 +5125,25 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             return false;
         }
 
+        final Answer answer = cmds.getAnswer("restoreVMSnapshot");
+        if (answer != null && answer instanceof RestoreVMSnapshotAnswer) {
+            final RestoreVMSnapshotAnswer restoreVMSnapshotAnswer = (RestoreVMSnapshotAnswer) answer;
+            if (!restoreVMSnapshotAnswer.getResult()) {
+                s_logger.warn("Unable to restore the vm snapshot from image file to the VM: " + restoreVMSnapshotAnswer.getDetails());
+            }
+        }
+
         return true;
     }
 
     @Override
     public boolean finalizeCommandsOnStart(final Commands cmds, final VirtualMachineProfile profile) {
+        final UserVmVO vm = _vmDao.findById(profile.getId());
+        final List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(vm.getId());
+        final RestoreVMSnapshotCommand command = _vmSnapshotMgr.createRestoreCommand(vm, vmSnapshots);
+        if (command != null) {
+            cmds.addCommand("restoreVMSnapshot", command);
+        }
         return true;
     }
 
@@ -5141,7 +5158,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 final long networkId = ip.getAssociatedWithNetworkId();
                 final Network guestNetwork = _networkDao.findById(networkId);
                 final NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, guestNetwork.getNetworkOfferingId());
-                assert offering.getAssociatePublicIP() == true : "User VM should not have system owned public IP associated with it when offering configured not to associate " +
+                assert offering.getAssociatePublicIP() : "User VM should not have system owned public IP associated with it when offering configured not to associate " +
                         "public IP.";
                 _rulesMgr.disableStaticNat(ip.getId(), ctx.getCallingAccount(), ctx.getCallingUserId(), true);
             } catch (final Exception ex) {

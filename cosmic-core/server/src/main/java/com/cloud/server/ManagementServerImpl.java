@@ -367,6 +367,7 @@ import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
 import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupEgressCmd;
 import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupIngressCmd;
 import com.cloud.api.command.user.snapshot.CreateSnapshotCmd;
+import com.cloud.api.command.user.snapshot.CreateSnapshotFromVMSnapshotCmd;
 import com.cloud.api.command.user.snapshot.CreateSnapshotPolicyCmd;
 import com.cloud.api.command.user.snapshot.DeleteSnapshotCmd;
 import com.cloud.api.command.user.snapshot.DeleteSnapshotPoliciesCmd;
@@ -3677,6 +3678,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(RevokeSecurityGroupEgressCmd.class);
         cmdList.add(RevokeSecurityGroupIngressCmd.class);
         cmdList.add(CreateSnapshotCmd.class);
+        cmdList.add(CreateSnapshotFromVMSnapshotCmd.class);
         cmdList.add(DeleteSnapshotCmd.class);
         cmdList.add(CreateSnapshotPolicyCmd.class);
         cmdList.add(UpdateSnapshotPolicyCmd.class);

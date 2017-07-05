@@ -10,6 +10,7 @@ import com.cloud.hypervisor.kvm.resource.MigrateKvmAsync;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
+import com.cloud.utils.Ternary;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -28,8 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = MigrateCommand.class)
-public final class LibvirtMigrateCommandWrapper
-        extends CommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateCommandWrapper.class);
 
@@ -40,13 +40,14 @@ public final class LibvirtMigrateCommandWrapper
         String result = null;
 
         List<InterfaceDef> ifaces = null;
-        List<DiskDef> disks = null;
+        List<DiskDef> disks;
 
         Domain dm = null;
         Connect dconn = null;
         Domain destDomain = null;
         Connect conn = null;
-        String xmlDesc = null;
+        String xmlDesc;
+        List<Ternary<String, Boolean, String>> vmsnapshots = null;
         try {
             final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
 
@@ -54,25 +55,27 @@ public final class LibvirtMigrateCommandWrapper
             ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
             disks = libvirtComputingResource.getDisks(conn, vmName);
             dm = conn.domainLookupByName(vmName);
-      /*
-       * We replace the private IP address with the address of the destination host. This is because the VNC listens on
-       * the private IP address of the hypervisor, but that address is ofcourse different on the target host.
-       *
-       * MigrateCommand.getDestinationIp() returns the private IP address of the target hypervisor. So it's safe to use.
-       *
-       * The Domain.migrate method from libvirt supports passing a different XML description for the instance to be used
-       * on the target host.
-       *
-       * This is supported by libvirt-java from version 0.50.0
-       *
-       * CVE-2015-3252: Get XML with sensitive information suitable for migration by using VIR_DOMAIN_XML_MIGRATABLE
-       * flag (value = 8) https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainXMLFlags
-       *
-       * Use VIR_DOMAIN_XML_SECURE (value = 1) prior to v1.0.0.
-       */
+            /*
+             * We replace the private IP address with the address of the destination host. This is because the VNC listens on
+             * the private IP address of the hypervisor, but that address is ofcourse different on the target host.
+             *
+             * MigrateCommand.getDestinationIp() returns the private IP address of the target hypervisor. So it's safe to use.
+             *
+             * The Domain.migrate method from libvirt supports passing a different XML description for the instance to be used
+             * on the target host.
+             *
+             * This is supported by libvirt-java from version 0.50.0
+             *
+             * CVE-2015-3252: Get XML with sensitive information suitable for migration by using VIR_DOMAIN_XML_MIGRATABLE
+             * flag (value = 8) https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainXMLFlags
+             *
+             * Use VIR_DOMAIN_XML_SECURE (value = 1) prior to v1.0.0.
+             */
             final int xmlFlag = conn.getLibVirVersion() >= 1000000 ? 8 : 1; // 1000000 equals v1.0.0
 
             xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
+            // delete the metadata of vm snapshots before migration
+            vmsnapshots = libvirtComputingResource.cleanVMSnapshotMetadata(dm);
 
             dconn = libvirtUtilitiesHelper.retrieveQemuConnection("qemu+tcp://" + command.getDestinationIp() + "/system");
 
@@ -93,12 +96,10 @@ public final class LibvirtMigrateCommandWrapper
                         try {
                             final int setDowntime = dm.migrateSetMaxDowntime(migrateDowntime);
                             if (setDowntime == 0) {
-                                s_logger.debug(
-                                        "Set max downtime for migration of " + vmName + " to " + String.valueOf(migrateDowntime) + "ms");
+                                s_logger.debug("Set max downtime for migration of " + vmName + " to " + String.valueOf(migrateDowntime) + "ms");
                             }
                         } catch (final LibvirtException e) {
-                            s_logger.debug(
-                                    "Failed to set max downtime for migration, perhaps migration completed? Error: " + e.getMessage());
+                            s_logger.debug("Failed to set max downtime for migration, perhaps migration completed? Error: " + e.getMessage());
                         }
                     }
                 }
@@ -108,10 +109,8 @@ public final class LibvirtMigrateCommandWrapper
 
                 // pause vm if we meet the vm.migrate.pauseafter threshold and not already paused
                 final int migratePauseAfter = libvirtComputingResource.getMigratePauseAfter();
-                if (migratePauseAfter > 0 && sleeptime > migratePauseAfter
-                        && dm.getInfo().state == DomainState.VIR_DOMAIN_RUNNING) {
-                    s_logger.info("Pausing VM " + vmName + " due to property vm.migrate.pauseafter setting to "
-                            + migratePauseAfter + "ms to complete migration");
+                if (migratePauseAfter > 0 && sleeptime > migratePauseAfter && dm.getInfo().state == DomainState.VIR_DOMAIN_RUNNING) {
+                    s_logger.info("Pausing VM " + vmName + " due to property vm.migrate.pauseafter setting to " + migratePauseAfter + "ms to complete migration");
                     try {
                         dm.suspend();
                     } catch (final LibvirtException e) {
@@ -143,6 +142,12 @@ public final class LibvirtMigrateCommandWrapper
             result = e.getMessage();
         } finally {
             try {
+                if (dm != null && result != null) {
+                    // restore vm snapshots in case of failed migration
+                    if (vmsnapshots != null) {
+                        libvirtComputingResource.restoreVMSnapshotMetadata(dm, vmName, vmsnapshots);
+                    }
+                }
                 if (dm != null) {
                     if (dm.isPersistent() == 1) {
                         dm.undefine();

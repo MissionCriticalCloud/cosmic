@@ -1,5 +1,6 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.storage.StorageLayer;
@@ -33,8 +34,7 @@ public class LibvirtUtilitiesHelper {
     }
 
     public TemplateLocation buildTemplateLocation(final StorageLayer storage, final String templatePath) {
-        final TemplateLocation location = new TemplateLocation(storage, templatePath);
-        return location;
+        return new TemplateLocation(storage, templatePath);
     }
 
     public Processor buildQcow2Processor(final StorageLayer storage) throws ConfigurationException {
@@ -76,7 +76,17 @@ public class LibvirtUtilitiesHelper {
     }
 
     public Script buildScript(final String scriptPath) {
-        final Script script = new Script(scriptPath, TIMEOUT);
-        return script;
+        return new Script(scriptPath, TIMEOUT);
+    }
+
+    public String generateVMSnapshotXML(final VMSnapshotTO snapshot, final VMSnapshotTO parent, final String domainXmlDesc) {
+        final String parentName = (parent == null) ? "" : ("  <parent><name>" + parent.getSnapshotName() + "</name></parent>\n");
+        return "<domainsnapshot>\n"
+               + "  <name>" + snapshot.getSnapshotName() + "</name>\n"
+               + "  <state>running</state>\n"
+               + parentName
+               + "  <creationTime>" + (int) Math.rint(snapshot.getCreateTime()/1000) + "</creationTime>\n"
+               + domainXmlDesc
+               + "</domainsnapshot>";
     }
 }

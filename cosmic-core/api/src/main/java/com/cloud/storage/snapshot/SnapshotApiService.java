@@ -63,7 +63,7 @@ public interface SnapshotApiService {
 
     boolean deleteSnapshotPolicies(DeleteSnapshotPoliciesCmd cmd);
 
-    Snapshot allocSnapshot(Long volumeId, Long policyId, String snapshotName) throws ResourceAllocationException;
+    Snapshot allocSnapshot(Long volumeId, Long policyId, String snapshotName, boolean fromVmSnapshot) throws ResourceAllocationException;
 
     /**
      * Create a snapshot of a volume
@@ -81,6 +81,8 @@ public interface SnapshotApiService {
     Long getHostIdForSnapshotOperation(Volume vol);
 
     Snapshot revertSnapshot(Long snapshotId);
+
+    Snapshot backupSnapshotFromVmSnapshot(Long snapshotId, Long vmId, Long volumeId, Long vmSnapshotId);
 
     SnapshotPolicy updateSnapshotPolicy(UpdateSnapshotPolicyCmd updateSnapshotPolicyCmd);
 }

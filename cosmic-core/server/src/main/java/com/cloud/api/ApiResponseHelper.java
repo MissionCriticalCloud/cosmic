@@ -3306,6 +3306,7 @@ public class ApiResponseHelper implements ResponseGenerator {
                 vmSnapshotResponse.setParentName(vmSnapshotParent.getDisplayName());
             }
         }
+        populateOwner(vmSnapshotResponse, vmSnapshot);
         final Project project = ApiDBUtils.findProjectByProjectAccountId(vmSnapshot.getAccountId());
         if (project != null) {
             vmSnapshotResponse.setProjectId(project.getUuid());

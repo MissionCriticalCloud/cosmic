@@ -20,6 +20,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
+import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.SnapshotService;
@@ -555,10 +556,13 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
     }
 
     @Override
-    public Snapshot allocSnapshot(final Long volumeId, final Long policyId, String snapshotName) throws ResourceAllocationException {
+    public Snapshot allocSnapshot(final Long volumeId, final Long policyId, String snapshotName, final boolean fromVmSnapshot) throws ResourceAllocationException {
         final Account caller = CallContext.current().getCallingAccount();
         final VolumeInfo volume = volFactory.getVolume(volumeId);
-        supportedByHypervisor(volume);
+
+        if (!fromVmSnapshot) {
+            supportedByHypervisor(volume);
+        }
 
         // Verify permissions
         _accountMgr.checkAccess(caller, null, true, volume);
@@ -567,7 +571,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
 
         try {
             _resourceLimitMgr.checkResourceLimit(owner, ResourceType.snapshot);
-            _resourceLimitMgr.checkResourceLimit(owner, ResourceType.secondary_storage, new Long(volume.getSize()).longValue());
+            _resourceLimitMgr.checkResourceLimit(owner, ResourceType.secondary_storage, volume.getSize());
         } catch (final ResourceAllocationException e) {
             if (snapshotType != Type.MANUAL) {
                 final String msg = "Snapshot resource limit exceeded for account id : " + owner.getId() + ". Failed to create recurring snapshots";
@@ -690,6 +694,11 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
             if (vm.getState() != State.Stopped && vm.getState() != State.Shutdowned) {
                 throw new InvalidParameterValueException("The VM the specified disk is attached to is not in the shutdown state.");
             }
+            // If target VM has associated VM snapshots then don't allow to revert from snapshot
+            final List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(instanceId);
+            if (vmSnapshots.size() > 0) {
+                throw new InvalidParameterValueException("Unable to revert snapshot for VM, please remove VM snapshots before reverting VM from snapshot");
+            }
         }
 
         final SnapshotInfo snapshotInfo = snapshotFactory.getSnapshot(snapshotId, DataStoreRole.Image);
@@ -707,8 +716,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
         final boolean result = snapshotStrategy.revertSnapshot(snapshotInfo);
         if (result) {
             // update volume size and primary storage count
-            _resourceLimitMgr.decrementResourceCount(snapshot.getAccountId(), ResourceType.primary_storage,
-                    new Long(volume.getSize() - snapshot.getSize()));
+            _resourceLimitMgr.decrementResourceCount(snapshot.getAccountId(), ResourceType.primary_storage, volume.getSize() - snapshot.getSize());
             volume.setSize(snapshot.getSize());
             _volsDao.update(volume.getId(), volume);
             return snapshotInfo;
@@ -1082,6 +1090,77 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
 
         return snapshotSrv.backupSnapshot(snapshot);
     }
+
+     @Override
+    public Snapshot backupSnapshotFromVmSnapshot(final Long snapshotId, final Long vmId, final Long volumeId, final Long vmSnapshotId) {
+        final VMInstanceVO vm = _vmDao.findById(vmId);
+        if (vm == null) {
+            throw new InvalidParameterValueException("Creating snapshot failed due to vm:" + vmId + " doesn't exist");
+        }
+        if (!HypervisorType.KVM.equals(vm.getHypervisorType())) {
+            throw new InvalidParameterValueException("Unsupported hypervisor type " + vm.getHypervisorType() + ". This supports KVM only");
+        }
+
+        final VMSnapshotVO vmSnapshot = _vmSnapshotDao.findById(vmSnapshotId);
+        if (vmSnapshot == null) {
+            throw new InvalidParameterValueException("Creating snapshot failed due to vmSnapshot:" + vmSnapshotId + " doesn't exist");
+        }
+        // check vmsnapshot permissions
+        final Account caller = CallContext.current().getCallingAccount();
+        _accountMgr.checkAccess(caller, null, true, vmSnapshot);
+
+        final SnapshotVO snapshot = _snapshotDao.findById(snapshotId);
+        if (snapshot == null) {
+            throw new InvalidParameterValueException("Creating snapshot failed due to snapshot:" + snapshotId + " doesn't exist");
+        }
+
+        final VolumeInfo volume = volFactory.getVolume(volumeId);
+        if (volume == null) {
+            throw new InvalidParameterValueException("Creating snapshot failed due to volume:" + volumeId + " doesn't exist");
+        }
+
+        if (volume.getState() != Volume.State.Ready) {
+            throw new InvalidParameterValueException("VolumeId: " + volumeId + " is not in " + Volume.State.Ready + " state but " + volume.getState() + ". Cannot take snapshot.");
+        }
+
+        final DataStore store = volume.getDataStore();
+        final SnapshotDataStoreVO parentSnapshotDataStoreVO = _snapshotStoreDao.findParent(store.getRole(), store.getId(), volumeId);
+        if (parentSnapshotDataStoreVO != null) {
+            //Double check the snapshot is removed or not
+            final SnapshotVO parentSnap = _snapshotDao.findById(parentSnapshotDataStoreVO.getSnapshotId());
+            if (parentSnap != null && parentSnapshotDataStoreVO.getInstallPath() != null && parentSnapshotDataStoreVO.getInstallPath().equals(vmSnapshot.getName())) {
+                throw new InvalidParameterValueException("Creating snapshot failed due to snapshot : " + parentSnap.getUuid() + " is created from the same vm snapshot");
+            }
+        }
+        SnapshotInfo snapshotInfo = this.snapshotFactory.getSnapshot(snapshotId, store);
+        snapshotInfo = (SnapshotInfo) store.create(snapshotInfo);
+        final SnapshotDataStoreVO snapshotOnPrimaryStore = this._snapshotStoreDao.findBySnapshot(snapshot.getId(), store.getRole());
+        snapshotOnPrimaryStore.setState(ObjectInDataStoreStateMachine.State.Ready);
+        snapshotOnPrimaryStore.setInstallPath(vmSnapshot.getName());
+        _snapshotStoreDao.update(snapshotOnPrimaryStore.getId(), snapshotOnPrimaryStore);
+        snapshot.setState(Snapshot.State.CreatedOnPrimary);
+        _snapshotDao.update(snapshot.getId(), snapshot);
+
+        snapshotInfo = this.snapshotFactory.getSnapshot(snapshotId, store);
+
+        final Long snapshotOwnerId = vm.getAccountId();
+
+        try {
+            final SnapshotStrategy snapshotStrategy = _storageStrategyFactory.getSnapshotStrategy(snapshot, SnapshotOperation.BACKUP);
+            if (snapshotStrategy == null) {
+                throw new CloudRuntimeException("Unable to find snaphot strategy to handle snapshot with id '" + snapshotId + "'");
+            }
+            snapshotInfo = snapshotStrategy.backupSnapshot(snapshotInfo);
+
+        } catch(final Exception e) {
+            s_logger.debug("Failed to backup snapshot from vm snapshot", e);
+            _resourceLimitMgr.decrementResourceCount(snapshotOwnerId, ResourceType.snapshot);
+            _resourceLimitMgr.decrementResourceCount(snapshotOwnerId, ResourceType.secondary_storage, volume.getSize());
+            throw new CloudRuntimeException("Failed to backup snapshot from vm snapshot", e);
+        }
+        return snapshotInfo;
+    }
+
 
     @Override
     @DB

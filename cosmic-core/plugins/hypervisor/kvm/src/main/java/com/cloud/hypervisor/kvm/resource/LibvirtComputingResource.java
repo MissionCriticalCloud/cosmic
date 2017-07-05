@@ -99,6 +99,7 @@ import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.Ternary;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
@@ -116,12 +117,16 @@ import com.cloud.vm.VmDetailConstants;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -148,10 +153,17 @@ import org.libvirt.DomainBlockStats;
 import org.libvirt.DomainInfo;
 import org.libvirt.DomainInfo.DomainState;
 import org.libvirt.DomainInterfaceStats;
+import org.libvirt.DomainSnapshot;
 import org.libvirt.LibvirtException;
 import org.libvirt.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * LibvirtComputingResource execute requests on the computing/routing host using the libvirt API
@@ -2387,10 +2399,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             msg = stopVm(conn, vmName, false);
             msg = startVm(conn, vmName, vmDef);
             return null;
-        } catch (final LibvirtException e) {
-            logger.warn("Failed to create vm", e);
-            msg = e.getMessage();
-        } catch (final InternalErrorException e) {
+        } catch (final LibvirtException | InternalErrorException e) {
             logger.warn("Failed to create vm", e);
             msg = e.getMessage();
         } finally {
@@ -2409,6 +2418,22 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     public String stopVm(final Connect conn, final String vmName, final boolean forceStop) {
         DomainState state = null;
         Domain dm = null;
+
+        // delete the metadata of vm snapshots before stopping
+        try {
+            dm = conn.domainLookupByName(vmName);
+            cleanVMSnapshotMetadata(dm);
+        } catch (final LibvirtException e) {
+            logger.debug("Failed to get vm :" + e.getMessage());
+        } finally {
+            try {
+                if (dm != null) {
+                    dm.free();
+                }
+            } catch (final LibvirtException l) {
+                logger.trace("Ignoring libvirt error.", l);
+            }
+        }
 
         logger.debug("Try to stop the vm at first");
         String ret = stopVmInternal(conn, vmName, forceStop);
@@ -2554,6 +2579,72 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         return null;
+    }
+
+    public List<Ternary<String, Boolean, String>> cleanVMSnapshotMetadata(final Domain dm) throws LibvirtException {
+        logger.debug("Cleaning the metadata of vm snapshots of vm " + dm.getName());
+        final List<Ternary<String, Boolean, String>> vmsnapshots = new ArrayList<>();
+        if (dm.snapshotNum() == 0) {
+            return vmsnapshots;
+        }
+        String currentSnapshotName = null;
+        try {
+            final DomainSnapshot snapshotCurrent = dm.snapshotCurrent();
+            final String snapshotXML = snapshotCurrent.getXMLDesc();
+            snapshotCurrent.free();
+            try {
+                final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                final InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(snapshotXML));
+                final Document doc = builder.parse(is);
+                final Element rootElement = doc.getDocumentElement();
+
+                currentSnapshotName = getTagValue("name", rootElement);
+            } catch (final ParserConfigurationException | SAXException | IOException e) {
+                logger.debug(e.toString());
+            }
+        } catch (final LibvirtException e) {
+            logger.debug("Fail to get the current vm snapshot for vm: " + dm.getName() + ", continue");
+        }
+        int flags = 2; // VIR_DOMAIN_SNAPSHOT_DELETE_METADATA_ONLY = 2
+        final String[] snapshotNames = dm.snapshotListNames();
+        Arrays.sort(snapshotNames);
+        for (final String snapshotName : snapshotNames) {
+            final DomainSnapshot snapshot = dm.snapshotLookupByName(snapshotName);
+            final Boolean isCurrent = currentSnapshotName != null && currentSnapshotName.equals(snapshotName);
+            vmsnapshots.add(new Ternary<>(snapshotName, isCurrent, snapshot.getXMLDesc()));
+        }
+        for (final String snapshotName : snapshotNames) {
+            final DomainSnapshot snapshot = dm.snapshotLookupByName(snapshotName);
+            snapshot.delete(flags); // clean metadata of vm snapshot
+        }
+        return vmsnapshots;
+    }
+
+    private static String getTagValue(final String tag, final Element eElement) {
+        final NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
+        final Node nValue = nlList.item(0);
+
+        return nValue.getNodeValue();
+    }
+
+    public void restoreVMSnapshotMetadata(final Domain dm, final String vmName, final List<Ternary<String, Boolean, String>> vmsnapshots) {
+        logger.debug("Restoring the metadata of vm snapshots of vm " + vmName);
+        for (final Ternary<String, Boolean, String> vmsnapshot : vmsnapshots) {
+            final String snapshotName = vmsnapshot.first();
+            final Boolean isCurrent = vmsnapshot.second();
+            final String snapshotXML = vmsnapshot.third();
+            logger.debug("Restoring vm snapshot " + snapshotName + " on " + vmName + " with XML:\n " + snapshotXML);
+            try {
+                int flags = 1; // VIR_DOMAIN_SNAPSHOT_CREATE_REDEFINE = 1
+                if (isCurrent) {
+                    flags += 2; // VIR_DOMAIN_SNAPSHOT_CREATE_CURRENT = 2
+                }
+                dm.snapshotCreateXML(snapshotXML, flags);
+            } catch (final LibvirtException e) {
+                logger.debug("Failed to restore vm snapshot " + snapshotName + ", continue");
+            }
+        }
     }
 
     private int getStopScriptTimeout() {

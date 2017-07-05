@@ -17,9 +17,9 @@ public interface VMSnapshotService {
 
     VMSnapshot getVMSnapshotById(Long id);
 
-    VMSnapshot creatVMSnapshot(Long vmId, Long vmSnapshotId, Boolean quiescevm);
+    VMSnapshot createVMSnapshot(Long vmId, Long vmSnapshotId, Boolean quiescevm);
 
-    VMSnapshot allocVMSnapshot(Long vmId, String vsDisplayName, String vsDescription, Boolean snapshotMemory) throws ResourceAllocationException;
+    VMSnapshot allocVMSnapshot(Long vmId, String vsDisplayName, String vsDescription) throws ResourceAllocationException;
 
     boolean deleteVMSnapshot(Long vmSnapshotId);
 

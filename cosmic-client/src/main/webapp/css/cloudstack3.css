@@ -2957,6 +2957,10 @@ div.detail-group.actions td {
     background: url(../images/sprites.png) no-repeat -365px -377px;
 }
 
+#navigation ul li.vmsnapshots span.icon {
+    background: url(../images/sprites.png) no-repeat -34px -666px;
+}
+
 /*Browser*/
 #browser {
     width: 994px;
@@ -12774,6 +12778,7 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 }
 
 .revertSnapshot .icon,
+.revertToVMSnapshot .icon,
 .restoreVM .icon,
 .restore .icon,
 .recover .icon {
@@ -12790,6 +12795,7 @@ div.ui-dialog div.autoscaler div.field-group div.form-container form div.form-it
 }
 
 .revertSnapshot:hover .icon,
+.revertToVMSnapshot:hover .icon,
 .restoreVM:hover .icon,
 .restore:hover .icon {
     background-position: -168px -613px;
