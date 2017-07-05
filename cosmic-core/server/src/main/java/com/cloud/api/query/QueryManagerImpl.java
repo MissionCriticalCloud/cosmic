@@ -3457,17 +3457,18 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         haWorkers.stream().filter(
                 haWorker -> {
                     final Account account = CallContext.current().getCallingAccount();
-                    final VirtualMachine virtualMachine = _vmInstanceDao.findById(haWorker.getInstanceId());
 
-                    return (account.getDomainId() == Domain.ROOT_DOMAIN || account.getDomainId() == virtualMachine.getDomainId())
-                            && (cmd.getId() == null || (cmd.getId() != null && haWorker.getId() == cmd.getId()));
+                    if (account.getDomainId() == Domain.ROOT_DOMAIN) {
+                        return cmd.getId() == null || (cmd.getId() != null && cmd.getId() == haWorker.getId());
+                    }
+
+                    // Not a root administrator, check if the user owns the virtual machine
+                    final VirtualMachine virtualMachine = _vmInstanceDao.findByIdIncludingRemoved(haWorker.getInstanceId());
+                    return virtualMachine != null && virtualMachine.getDomainId() == account.getDomainId() &&
+                            (cmd.getId() == null || (cmd.getId() != null && haWorker.getId() == cmd.getId()));
                 }
         ).forEach(
                 haWorker -> {
-                    final VirtualMachine virtualMachine = _vmInstanceDao.findById(haWorker.getInstanceId());
-                    final Domain domain = _domainDao.findById(virtualMachine.getDomainId());
-                    final Host host = _hostDao.findById(haWorker.getHostId());
-
                     final HAWorkerResponse haWorkerResponse = new HAWorkerResponse();
                     haWorkerResponse.setObjectName("haworker");
 
@@ -3478,11 +3479,23 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                     haWorkerResponse.setTaken(haWorker.getDateTaken());
                     haWorkerResponse.setState(haWorker.getPreviousState());
 
-                    haWorkerResponse.setVirtualMachineId(virtualMachine.getUuid());
-                    haWorkerResponse.setVirtualMachineName(virtualMachine.getInstanceName());
-                    haWorkerResponse.setVirtualMachineState(virtualMachine.getState());
+                    final VirtualMachine virtualMachine = _vmInstanceDao.findByIdIncludingRemoved(haWorker.getInstanceId());
+                    if (virtualMachine != null) {
+                        haWorkerResponse.setVirtualMachineId(virtualMachine.getUuid());
+                        haWorkerResponse.setVirtualMachineName(virtualMachine.getInstanceName());
+                        haWorkerResponse.setVirtualMachineState(virtualMachine.getState());
 
-                    haWorkerResponse.setHypervisor(host.getName());
+                        final Domain domain = _domainDao.findById(virtualMachine.getDomainId());
+                        if (domain != null) {
+                            haWorkerResponse.setDomainId(domain.getUuid());
+                            haWorkerResponse.setDomainName(domain.getName());
+                        }
+                    }
+
+                    final Host host = _hostDao.findById(haWorker.getHostId());
+                    if (host != null) {
+                        haWorkerResponse.setHypervisor(host.getName());
+                    }
 
                     if (haWorker.getServerId() != null) {
                         final ManagementServerHost managementServerHost = _mgmtServerHostDao.findByMsid(haWorker.getServerId());
@@ -3490,9 +3503,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                             haWorkerResponse.setManagementServerName(managementServerHost.getName());
                         }
                     }
-
-                    haWorkerResponse.setDomainId(domain.getUuid());
-                    haWorkerResponse.setDomainName(domain.getName());
 
                     haWorkerResponses.add(haWorkerResponse);
                 }
