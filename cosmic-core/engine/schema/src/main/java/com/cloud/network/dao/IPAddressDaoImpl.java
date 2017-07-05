@@ -35,6 +35,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     private static final Logger s_logger = LoggerFactory.getLogger(IPAddressDaoImpl.class);
 
     protected SearchBuilder<IPAddressVO> AllFieldsSearch;
+    protected SearchBuilder<IPAddressVO> IpFuzzySearch;
     protected SearchBuilder<IPAddressVO> VlanDbIdSearchUnallocated;
     protected GenericSearchBuilder<IPAddressVO, Integer> AllIpCount;
     protected GenericSearchBuilder<IPAddressVO, Integer> AllIpCountForDc;
@@ -73,6 +74,10 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         AllFieldsSearch.and("associatedVmIp", AllFieldsSearch.entity().getVmIp(), Op.EQ);
         AllFieldsSearch.and("ipACLId", AllFieldsSearch.entity().getIpACLId(), Op.EQ);
         AllFieldsSearch.done();
+
+        IpFuzzySearch = createSearchBuilder();
+        IpFuzzySearch.and("ipAddress", IpFuzzySearch.entity().getAddress(), Op.LIKE);
+        IpFuzzySearch.done();
 
         VlanDbIdSearchUnallocated = createSearchBuilder();
         VlanDbIdSearchUnallocated.and("allocated", VlanDbIdSearchUnallocated.entity().getAllocatedTime(), Op.NULL);
@@ -182,12 +187,25 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
+    public IPAddressVO findByIpAddress(final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("ipAddress", ipAddress);
+        return findOneBy(sc);
+    }
+
+    @Override
     public List<IPAddressVO> listByVlanId(final long vlanId) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vlan", vlanId);
         return listBy(sc);
     }
 
+    @Override
+    public List<IPAddressVO> listByIpAddress(final String ipAddress) {
+        final SearchCriteria<IPAddressVO> sc = IpFuzzySearch.create();
+        sc.setParameters("ipAddress", "%" + ipAddress + "%");
+        return listBy(sc);
+    }
     @Override
     public List<IPAddressVO> listByDcIdIpAddress(final long dcId, final String ipAddress) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();

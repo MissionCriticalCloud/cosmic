@@ -10,6 +10,8 @@ import java.util.List;
 public interface NicDao extends GenericDao<NicVO, Long> {
     List<NicVO> listByVmId(long instanceId);
 
+    List<NicVO> listByIpAddress(final String ipAddress);
+
     List<String> listIpAddressInNetwork(long networkConfigId);
 
     List<NicVO> listByVmIdIncludingRemoved(long instanceId);

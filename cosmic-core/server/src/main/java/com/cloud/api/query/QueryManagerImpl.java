@@ -11,6 +11,7 @@ import com.cloud.api.ResourceDetail;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
+import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmdByAdmin;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
@@ -117,6 +118,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
+import com.cloud.api.response.WhoHasThisIpResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.cluster.dao.ManagementServerHostDao;
@@ -146,9 +148,15 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.network.Network;
+import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
+import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDetailsDao;
 import com.cloud.network.security.SecurityGroupVMMapVO;
 import com.cloud.network.security.dao.SecurityGroupVMMapDao;
+import com.cloud.network.vpc.Vpc;
+import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.projects.ProjectInvitation;
@@ -192,10 +200,12 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.DomainRouterVO;
+import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.DomainRouterDao;
+import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -207,7 +217,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -258,6 +270,10 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     private UserVmDao _userVmDao;
     @Inject
     private VMInstanceDao _vmInstanceDao;
+    @Inject
+    private IPAddressDao _ipAddressDao;
+    @Inject
+    private VpcDao _vpcDao;
     @Inject
     private SecurityGroupJoinDao _securityGroupJoinDao;
     @Inject
@@ -324,6 +340,10 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     private AffinityGroupJoinDao _affinityGroupJoinDao;
     @Inject
     private DedicatedResourceDao _dedicatedDao;
+    @Inject
+    private NetworkDao _networkDao;
+    @Inject
+    private NicDao _nicDao;
 
     /*
      * (non-Javadoc)
@@ -3511,6 +3531,87 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         haWorkerList.setResponses(haWorkerResponses);
 
         return haWorkerList;
+    }
+
+    @Override
+    public ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
+        final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
+        final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
+        ipAddresses.forEach(ipAddress -> {
+            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            response.setObjectName("whohasthisip");
+            response.setIpAddress(ipAddress.getAddress().toString());
+            response.setUuid(ipAddress.getUuid());
+            response.setState(ipAddress.getState().toString());
+
+            final Domain domain = _domainDao.findById(ipAddress.getDomainId());
+            if (domain != null) {
+                response.setDomainName(domain.getName());
+                response.setDomainUuid(domain.getUuid());
+            }
+            final Network network = _networkDao.findById(ipAddress.getNetworkId());
+            if (ipAddress.getVpcId() != null) {
+                final Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
+                response.setNetworkName(vpc.getName());
+                response.setVpcName(vpc.getName());
+                response.setVpcUuid(vpc.getUuid());
+            } else if (!StringUtils.isEmpty(network.getName())) {
+                response.setNetworkName(network.getName());
+            }
+
+            response.setNetworkUuid(network.getUuid());
+            response.setCreated(ipAddress.getAllocatedTime());
+            response.setMode(network.getMode());
+
+            final Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
+            if (associatedNetwork != null) {
+                response.setAssociatedNetworkName(associatedNetwork.getName());
+                response.setAssociatedNetworkUuid(associatedNetwork.getUuid());
+            }
+            responsesList.add(response);
+        });
+
+        final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
+        nics.forEach(nic -> {
+            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            response.setObjectName("whohasthisip");
+
+            response.setIpAddress(nic.getIPv4Address());
+            response.setUuid(nic.getUuid());
+
+            response.setCreated(nic.getCreated());
+            response.setMode(nic.getMode());
+            response.setBroadcastUri(nic.getBroadcastUri());
+            response.setNetmask(nic.getIPv4Netmask());
+            response.setMacAddress(nic.getMacAddress());
+            response.setState(nic.getState().toString());
+
+            final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
+            response.setVmName(vm.getHostName());
+            response.setVmUuid(vm.getUuid());
+            response.setVmType(nic.getVmType());
+
+            final Domain domain = _domainDao.findById(vm.getDomainId());
+            response.setDomainName(domain.getName());
+            response.setDomainUuid(domain.getUuid());
+
+            responsesList.add(response);
+        });
+
+        final Account account = CallContext.current().getCallingAccount();
+        final Domain domain = _domainDao.findById(account.getDomainId());
+
+        final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
+                response -> (
+                        (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
+                                (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
+                )
+        ).skip(cmd.getStartIndex()).limit(cmd.getPageSizeVal()).collect(Collectors.toList());
+
+        whoHasThisIpList.setResponses(filteredResponsesList);
+        return whoHasThisIpList;
     }
 
     private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {

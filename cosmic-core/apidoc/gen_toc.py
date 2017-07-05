@@ -141,7 +141,8 @@ known_categories = {
     'CacheStores': 'Cache Stores',
     'CacheStore': 'Cache Store',
     'StratosphereSsp': ' Stratosphere SSP',
-    'listHAWorkers': 'CloudOps'
+    'listHAWorkers': 'CloudOps',
+    'listWhoHasThisIp': 'CloudOps'
 }
 
 categories = { }
