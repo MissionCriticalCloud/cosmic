@@ -45,7 +45,7 @@ class CsStaticRoutes(CsDataBag):
                 key = data.pop(0)
                 if key == 'default':
                     key = '0.0.0.0/0'
-                self.routes[key] = data
+                self.routes[key] = data.pop(0)
         logging.debug("Found these existing routes: %s" % self.routes)
         return self.routes
 
@@ -79,6 +79,16 @@ class CsStaticRoutes(CsDataBag):
         if not route['revoke'] and not self.route_exists(route['cidr']):
             logging.debug("Route for %s to %s NOT found, adding.." % (route['cidr'], route['ip_address']))
             command = "ip route add %s via %s" % (route['cidr'], route['ip_address'])
+            result = CsHelper.execute2(command)
+            logging.debug("Executed %s, returncode: %s" % (command, result.returncode))
+            if result.returncode > 0:
+                return False
+
+        # Only replace when route is active but with the wrong gateway
+        if not route['revoke'] and self.route_exists(route['cidr']) and self.routes[route['cidr']] != route['ip_address']:
+            logging.debug("Route for %s to %s found, which is not %s via %s, replacing.." %
+                          (route['cidr'], self.routes[route['cidr']], route['cidr'], route['ip_address']))
+            command = "ip route replace %s via %s" % (route['cidr'], route['ip_address'])
             result = CsHelper.execute2(command)
             logging.debug("Executed %s, returncode: %s" % (command, result.returncode))
             if result.returncode > 0:
