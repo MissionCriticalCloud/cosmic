@@ -65,10 +65,10 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GuestResourceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InputDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef.GuestNetType;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.QemuGuestAgentDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.SerialDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.TermPolicy;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.VideoDef;
@@ -99,6 +99,7 @@ import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.PropertiesUtil;
+import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
@@ -108,7 +109,6 @@ import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.OutputInterpreter.AllLinesParser;
 import com.cloud.utils.script.Script;
-import com.cloud.utils.StringUtils;
 import com.cloud.utils.ssh.SshHelper;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.PowerState;
@@ -1695,7 +1695,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         // add the VNC port passwd here, get the passwd from the vmInstance.
         final String passwd = vmTo.getVncPassword();
-        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, passwd, null);
+        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, true, passwd, null);
         devices.addDevice(grap);
 
         final InputDef input = new InputDef("tablet", "usb");
@@ -1709,7 +1709,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         // If we're using virtio scsi, then we need to add a virtual scsi controller
         if (diskBusType == DiskDef.DiskBus.SCSI) {
             vmTo.getName();
-            final ScsiDef sd = new ScsiDef((short)0, 0, 0, 9, 0);
+            final ScsiDef sd = new ScsiDef((short) 0, 0, 0, 9, 0);
             devices.addDevice(sd);
             logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
         }
@@ -1880,7 +1880,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             } else {
                 final int devId = volume.getDiskSeq().intValue();
 
-                if (diskBusType == DiskDef.DiskBus.SCSI ) {
+                if (diskBusType == DiskDef.DiskBus.SCSI) {
                     disk.setQemuDriver(true);
                     disk.setDiscard(DiscardType.UNMAP);
                 }

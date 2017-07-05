@@ -584,7 +584,7 @@ public class LibvirtVmDef {
             int base = 'z' - 'a' + 1;
             String labelSuffix = "";
             do {
-                char suffix = (char)('a' + (deviceIndex % base));
+                char suffix = (char) ('a' + (deviceIndex % base));
                 labelSuffix = suffix + labelSuffix;
                 deviceIndex = (deviceIndex / base) - 1;
             } while (deviceIndex >= 0);
@@ -826,6 +826,7 @@ public class LibvirtVmDef {
         public enum DiscardType {
             IGNORE("ignore"), UNMAP("unmap");
             String _discardType;
+
             DiscardType(String discardType) {
                 _discardType = discardType;
             }
@@ -851,7 +852,7 @@ public class LibvirtVmDef {
             if (qemuDriver) {
                 diskBuilder.append("<driver name='qemu'" + " type='" + diskFmtType
                         + "' cache='" + diskCacheMode + "' ");
-                if(discard != null && discard != DiscardType.IGNORE) {
+                if (discard != null && discard != DiscardType.IGNORE) {
                     diskBuilder.append("discard='" + discard.toString() + "' ");
                 }
                 diskBuilder.append("/>\n");
@@ -1316,13 +1317,15 @@ public class LibvirtVmDef {
         private final String keyMap;
         private short port = -2;
         private boolean autoPort = false;
+        private boolean websocket = false;
 
-        public GraphicDef(final String type, final short port, final boolean autoPort, final String passwd, final String keyMap) {
+        public GraphicDef(final String type, final short port, final boolean autoPort, final boolean websocket, final String passwd, final String keyMap) {
             this.type = type;
             this.port = port;
             this.autoPort = autoPort;
             this.passwd = StringEscapeUtils.escapeXml(passwd);
             this.keyMap = keyMap;
+            this.websocket = websocket;
         }
 
         @Override
@@ -1333,6 +1336,10 @@ public class LibvirtVmDef {
                 graphicBuilder.append(" autoport='yes'");
             } else if (port != -2) {
                 graphicBuilder.append(" port='" + port + "'");
+            }
+
+            if (websocket) {
+                graphicBuilder.append(" websocket='-1'");
             }
 
             graphicBuilder.append(" listen='0.0.0.0'");
@@ -1361,16 +1368,18 @@ public class LibvirtVmDef {
             this.slot = slot;
             this.function = function;
         }
+
         public ScsiDef() {
 
         }
+
         @Override
         public String toString() {
             StringBuilder scsiBuilder = new StringBuilder();
 
-            scsiBuilder.append(String.format("<controller type='scsi' index='%d' mode='virtio-scsi'>\n", this.index ));
+            scsiBuilder.append(String.format("<controller type='scsi' index='%d' mode='virtio-scsi'>\n", this.index));
             scsiBuilder.append(String.format("<address type='pci' domain='0x%04X' bus='0x%02X' slot='0x%02X' function='0x%01X'/>\n",
-                    this.domain, this.bus, this.slot, this.function ) );
+                    this.domain, this.bus, this.slot, this.function));
             scsiBuilder.append("</controller>");
             return scsiBuilder.toString();
         }
