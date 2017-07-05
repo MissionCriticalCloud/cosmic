@@ -43,6 +43,8 @@ class CsStaticRoutes(CsDataBag):
             data = line.split()
             if data:
                 key = data.pop(0)
+                if key == 'default':
+                    key = '0.0.0.0/0'
                 self.routes[key] = data
         logging.debug("Found these existing routes: %s" % self.routes)
         return self.routes
