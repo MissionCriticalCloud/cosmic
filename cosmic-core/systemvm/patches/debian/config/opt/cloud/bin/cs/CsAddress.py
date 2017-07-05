@@ -85,6 +85,8 @@ class CsAddress(CsDataBag):
         return None
 
     def process(self):
+        has_sourcenat = False
+
         for dev in self.dbag:
             if dev == "id":
                 continue
@@ -93,6 +95,8 @@ class CsAddress(CsDataBag):
             for address in self.dbag[dev]:
                 # Double check interface name based on mac address. If it doesn't match, use discovered device name
                 if address['nw_type'] not in ["control"] and ('vif_mac_address' in address or 'device_mac_address' in address):
+                    if address['source_nat']:
+                        has_sourcenat = True
                     if 'vif_mac_address' in address:
                         mac_address_to_check = address['vif_mac_address']
                     if 'device_mac_address' in address:
@@ -140,7 +144,8 @@ class CsAddress(CsDataBag):
         if self.config.is_vpc():
             vpccidr = cmdline.get_vpccidr()
             self.fw.append(["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
-            self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
+            if has_sourcenat:
+                self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
             # adding logging here for all ingress traffic at once
             self.fw.append(["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
 
