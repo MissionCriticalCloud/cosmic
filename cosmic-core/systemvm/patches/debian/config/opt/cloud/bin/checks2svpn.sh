@@ -20,7 +20,7 @@ fi
 if (( "${SYSTEMVM_VERSION}" > "170312" )); then
     ipsec status  vpn-$1 > /tmp/vpn-$1.status
 
-    cat /tmp/vpn-$1.status | grep "ESTABLISHED" > /dev/null
+    cat /tmp/vpn-$1.status | grep "INSTALLED" > /dev/null
     ipsecok=$?
     if [ $ipsecok -ne 0 ]
     then
