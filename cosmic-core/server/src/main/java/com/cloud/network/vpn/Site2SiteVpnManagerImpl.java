@@ -174,8 +174,8 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
         Long espLifetime = cmd.getEspLifetime();
         if (espLifetime == null) {
-            // Default value of lifetime is 1 hour
-            espLifetime = (long) 3600;
+            // Default value of lifetime is 24 hours
+            espLifetime = (long) 86400;
         }
         if (espLifetime > 86400) {
             throw new InvalidParameterValueException("The ESP lifetime " + espLifetime + " of vpn connection is invalid!");
