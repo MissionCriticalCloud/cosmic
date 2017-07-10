@@ -174,7 +174,8 @@
                             label: 'label.state',
                             indicator: {
                                 'Free': 'on',
-                                'Allocated': 'off'
+                                'Allocated': 'off',
+                                'Reserved': 'off'
                             }
                         }
                     },
@@ -328,9 +329,6 @@
                         virtualmachine: {
                             label: 'label.virtual.machine'
                         },
-                        associatednetwork: {
-                            label: 'label.associated.network.short'
-                        },
                         ipstate: {
                             label: 'label.state',
                             indicator: {
@@ -359,7 +357,6 @@
                                             uuid: whohasthismac.uuid,
                                             domain: whohasthismac.domainname,
                                             networkname: whohasthismac.networkname,
-                                            associatednetwork: whohasthismac.associatednetworkname,
                                             virtualmachine: whohasthismac.virtualmachinename,
                                             macaddress: whohasthismac.macaddress,
                                             mode: whohasthismac.mode,
@@ -394,12 +391,6 @@
                                     },
                                     networkid: {
                                         label: 'label.network.id'
-                                    },
-                                    associatednetworkname: {
-                                        label: 'label.associated.network'
-                                    },
-                                    associatednetworkid: {
-                                        label: 'label.associated.network.id'
                                     },
                                     virtualmachineid: {
                                         label: 'label.virtual.machine.id'
@@ -447,8 +438,6 @@
                                                     domainname: whohasthismac.domainname,
                                                     networkid: whohasthismac.networkuuid,
                                                     networkname: whohasthismac.networkname,
-                                                    associatednetworkid: whohasthismac.associatednetworkuuid,
-                                                    associatednetworkname: whohasthismac.associatednetworkname,
                                                     virtualmachineid: whohasthismac.virtualmachineuuid,
                                                     virtualmachinename: whohasthismac.virtualmachinename,
                                                     type: whohasthismac.virtualmachinetype,
