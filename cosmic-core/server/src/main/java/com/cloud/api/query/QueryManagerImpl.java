@@ -3579,26 +3579,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthisip");
 
-            response.setIpAddress(nic.getIPv4Address());
-            response.setUuid(nic.getUuid());
-
-            response.setCreated(nic.getCreated());
-            response.setMode(nic.getMode());
-            response.setBroadcastUri(nic.getBroadcastUri());
-            response.setNetmask(nic.getIPv4Netmask());
-            response.setMacAddress(nic.getMacAddress());
-            response.setState(nic.getState().toString());
-
-            final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
-            response.setVmName(vm.getHostName());
-            response.setVmUuid(vm.getUuid());
-            response.setVmType(nic.getVmType());
-
-            final Domain domain = _domainDao.findById(vm.getDomainId());
-            response.setDomainName(domain.getName());
-            response.setDomainUuid(domain.getUuid());
-
-            responsesList.add(response);
+            queryNicsTableResponse(responsesList, nic, response);
         });
 
         final Account account = CallContext.current().getCallingAccount();
@@ -3624,26 +3605,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
             response.setObjectName("whohasthismac");
 
-            response.setIpAddress(nic.getIPv4Address());
-            response.setUuid(nic.getUuid());
-
-            response.setCreated(nic.getCreated());
-            response.setMode(nic.getMode());
-            response.setBroadcastUri(nic.getBroadcastUri());
-            response.setNetmask(nic.getIPv4Netmask());
-            response.setMacAddress(nic.getMacAddress());
-            response.setState(nic.getState().toString());
-
-            final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
-            response.setVmName(vm.getHostName());
-            response.setVmUuid(vm.getUuid());
-            response.setVmType(nic.getVmType());
-
-            final Domain domain = _domainDao.findById(vm.getDomainId());
-            response.setDomainName(domain.getName());
-            response.setDomainUuid(domain.getUuid());
-
-            responsesList.add(response);
+            queryNicsTableResponse(responsesList, nic, response);
         });
 
         final Account account = CallContext.current().getCallingAccount();
@@ -3658,6 +3620,35 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         whoHasThisIpList.setResponses(filteredResponsesList);
         return whoHasThisIpList;
+    }
+
+    private void queryNicsTableResponse(final List<WhoHasThisIpResponse> responsesList, final NicVO nic, final WhoHasThisIpResponse response) {
+        response.setIpAddress(nic.getIPv4Address());
+        response.setUuid(nic.getUuid());
+
+        response.setCreated(nic.getCreated());
+        response.setMode(nic.getMode());
+        response.setBroadcastUri(nic.getBroadcastUri());
+        response.setNetmask(nic.getIPv4Netmask());
+        response.setMacAddress(nic.getMacAddress());
+        response.setState(nic.getState().toString());
+
+        final Network network = _networkDao.findById(nic.getNetworkId());
+        response.setNetworkUuid(network.getUuid());
+        if (!StringUtils.isEmpty(network.getName())) {
+            response.setNetworkName(network.getName());
+        }
+
+        final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
+        response.setVmName(vm.getHostName());
+        response.setVmUuid(vm.getUuid());
+        response.setVmType(nic.getVmType());
+
+        final Domain domain = _domainDao.findById(vm.getDomainId());
+        response.setDomainName(domain.getName());
+        response.setDomainUuid(domain.getUuid());
+
+        responsesList.add(response);
     }
 
     private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {
