@@ -3399,15 +3399,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     public boolean stateTransitTo(final VirtualMachine vm1, final VirtualMachine.Event e, final Long hostId) throws NoTransitionException {
         final VMInstanceVO vm = (VMInstanceVO) vm1;
 
-        /*
-         *  Remove the hacking logic here.
-                // if there are active vm snapshots task, state change is not allowed
-                if (_vmSnapshotMgr.hasActiveVMSnapshotTasks(vm.getId())) {
-                    s_logger.error("State transit with event: " + e + " failed due to: " + vm.getInstanceName() + " has active VM snapshots tasks");
-                    return false;
-                }
-         */
-
         final State oldState = vm.getState();
         if (oldState == State.Starting) {
             if (e == Event.OperationSucceeded) {
@@ -3415,7 +3406,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
         } else if (oldState == State.Stopping) {
             if (e == Event.OperationSucceeded) {
-                vm.setLastHostId(vm.getHostId());
+                vm.setLastHostId(null);
             }
         }
         return _stateMachine.transitTo(vm, e, new Pair<>(vm.getHostId(), hostId), _vmDao);
