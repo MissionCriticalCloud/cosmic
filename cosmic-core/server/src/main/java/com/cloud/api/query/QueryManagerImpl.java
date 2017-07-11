@@ -119,7 +119,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.api.response.WhoHasThisIpResponse;
+import com.cloud.api.response.WhoHasThisAddressResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.cluster.dao.ManagementServerHostDao;
@@ -3535,13 +3535,13 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     }
 
     @Override
-    public ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
-        final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
-        final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+    public ListResponse<WhoHasThisAddressResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
+        final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
+        final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
         final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
         ipAddresses.forEach(ipAddress -> {
-            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
             response.setIpAddress(ipAddress.getAddress().toString());
             response.setUuid(ipAddress.getUuid());
@@ -3576,7 +3576,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
         nics.forEach(nic -> {
-            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
 
             queryNicsTableResponse(responsesList, nic, response);
@@ -3585,7 +3585,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Account account = CallContext.current().getCallingAccount();
         final Domain domain = _domainDao.findById(account.getDomainId());
 
-        final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
+        final List<WhoHasThisAddressResponse> filteredResponsesList = responsesList.stream().filter(
                 response -> (
                         (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
                                 (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
@@ -3596,13 +3596,13 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         return whoHasThisIpList;
     }
 
-    public ListResponse<WhoHasThisIpResponse> listWhoHasThisMac(final ListWhoHasThisMacCmd cmd) {
-        final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
-        final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+    public ListResponse<WhoHasThisAddressResponse> listWhoHasThisMac(final ListWhoHasThisMacCmd cmd) {
+        final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
+        final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
         final List<NicVO> nics = _nicDao.listByMacAddress(cmd.getMacAddress());
         nics.forEach(nic -> {
-            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthismac");
 
             queryNicsTableResponse(responsesList, nic, response);
@@ -3611,7 +3611,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Account account = CallContext.current().getCallingAccount();
         final Domain domain = _domainDao.findById(account.getDomainId());
 
-        final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
+        final List<WhoHasThisAddressResponse> filteredResponsesList = responsesList.stream().filter(
                 response -> (
                         (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
                                 (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
@@ -3622,7 +3622,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         return whoHasThisIpList;
     }
 
-    private void queryNicsTableResponse(final List<WhoHasThisIpResponse> responsesList, final NicVO nic, final WhoHasThisIpResponse response) {
+    private void queryNicsTableResponse(final List<WhoHasThisAddressResponse> responsesList, final NicVO nic, final WhoHasThisAddressResponse response) {
         response.setIpAddress(nic.getIPv4Address());
         response.setUuid(nic.getUuid());
 

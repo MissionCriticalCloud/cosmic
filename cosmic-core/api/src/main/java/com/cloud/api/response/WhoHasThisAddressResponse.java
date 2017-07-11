@@ -11,7 +11,7 @@ import java.util.Date;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WhoHasThisIpResponse extends BaseResponse {
+public class WhoHasThisAddressResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.VPC_NAME)
     @Param(description = "VPC name")

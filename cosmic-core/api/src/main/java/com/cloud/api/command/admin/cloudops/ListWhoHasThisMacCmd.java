@@ -5,9 +5,9 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListDomainResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
-import com.cloud.api.response.WhoHasThisIpResponse;
+import com.cloud.api.response.WhoHasThisAddressResponse;
 
-@APICommand(name = "listWhoHasThisMac", description = "Lists all for this MAC address", responseObject = WhoHasThisIpResponse.class)
+@APICommand(name = "listWhoHasThisMac", description = "Lists all for this MAC address", responseObject = WhoHasThisAddressResponse.class)
 public class ListWhoHasThisMacCmd extends BaseListDomainResourcesCmd {
 
     private static final String COMMAND_NAME = "listwhohasthismacresponse";
@@ -28,7 +28,7 @@ public class ListWhoHasThisMacCmd extends BaseListDomainResourcesCmd {
 
     @Override
     public void execute() {
-        final ListResponse<WhoHasThisIpResponse> response = _queryService.listWhoHasThisMac(this);
+        final ListResponse<WhoHasThisAddressResponse> response = _queryService.listWhoHasThisMac(this);
         response.setResponseName(getCommandName());
         setResponseObject(response);
     }
