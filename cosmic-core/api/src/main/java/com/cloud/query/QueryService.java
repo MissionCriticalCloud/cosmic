@@ -3,6 +3,7 @@ package com.cloud.query;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
+import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
@@ -56,7 +57,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.api.response.WhoHasThisIpResponse;
+import com.cloud.api.response.WhoHasThisAddressResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.config.ConfigKey;
@@ -130,6 +131,8 @@ public interface QueryService {
 
     ListResponse<HAWorkerResponse> listHAWorkers(ListHAWorkersCmd cmd);
 
-    ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(ListWhoHasThisIpCmd cmd);
+    ListResponse<WhoHasThisAddressResponse> listWhoHasThisIp(ListWhoHasThisIpCmd cmd);
+
+    ListResponse<WhoHasThisAddressResponse> listWhoHasThisMac(ListWhoHasThisMacCmd cmd);
 
 }

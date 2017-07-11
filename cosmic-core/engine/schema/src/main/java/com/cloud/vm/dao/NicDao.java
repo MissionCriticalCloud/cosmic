@@ -12,6 +12,8 @@ public interface NicDao extends GenericDao<NicVO, Long> {
 
     List<NicVO> listByIpAddress(final String ipAddress);
 
+    List<NicVO> listByMacAddress(final String macAddress);
+
     List<String> listIpAddressInNetwork(long networkConfigId);
 
     List<NicVO> listByVmIdIncludingRemoved(long instanceId);

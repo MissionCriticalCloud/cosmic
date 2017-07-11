@@ -174,7 +174,8 @@
                             label: 'label.state',
                             indicator: {
                                 'Free': 'on',
-                                'Allocated': 'off'
+                                'Allocated': 'off',
+                                'Reserved': 'off'
                             }
                         }
                     },
@@ -305,8 +306,157 @@
                         }
                     }
                 }
+            },
+            whohasthismac: {
+                type: 'select',
+                title: 'label.whohasthismac',
+                listView: {
+                    id: 'whohasthismac',
+                    label: 'label.whohasthismac',
+                    fields: {
+                        macaddress: {
+                            label: 'label.macaddress'
+                        },
+                        ipaddress: {
+                            label: 'label.ipaddress'
+                        },
+                        domain: {
+                            label: 'label.domain'
+                        },
+                        networkname: {
+                            label: 'label.network.name'
+                        },
+                        virtualmachine: {
+                            label: 'label.virtual.machine'
+                        },
+                        ipstate: {
+                            label: 'label.state',
+                            indicator: {
+                                'Free': 'on',
+                                'Allocated': 'off',
+                                'Reserved': 'off'
+                            }
+                        }
+                    },
+                    dataProvider: function (args) {
+                        const data = {};
+                        listViewDataProvider(args, data);
+                        $.extend(data, {
+                            macaddress: args.filterBy.search.value
+                        });
+                        $.ajax({
+                            url: createURL('listWhoHasThisMac'),
+                            data: data,
+                            async: true,
+                            success: function (json) {
+                                whohasthismac = json.listwhohasthismacresponse.whohasthismac ? json.listwhohasthismacresponse.whohasthismac : [];
+                                args.response.success({
+                                    data: $.map(whohasthismac, function (whohasthismac) {
+                                        return {
+                                            ipaddress: whohasthismac.ipaddress,
+                                            uuid: whohasthismac.uuid,
+                                            domain: whohasthismac.domainname,
+                                            networkname: whohasthismac.networkname,
+                                            virtualmachine: whohasthismac.virtualmachinename,
+                                            macaddress: whohasthismac.macaddress,
+                                            mode: whohasthismac.mode,
+                                            ipstate: whohasthismac.state,
+                                            created: whohasthismac.created
+                                        };
+                                    })
+                                });
+                            }
+                        });
+                    },
+                    detailView: {
+                        name: 'Who has this MAC details',
+                        tabs: {
+                            details: {
+                                title: 'label.details',
+                                fields: {
+                                    uuid: {
+                                        label: 'label.id'
+                                    },
+                                    ipaddress: {
+                                        label: 'label.ipaddress'
+                                    },
+                                    domainid: {
+                                        label: 'label.domain.id'
+                                    },
+                                    domainname: {
+                                        label: 'label.domain.name'
+                                    },
+                                    networkname: {
+                                        label: 'label.network.name'
+                                    },
+                                    networkid: {
+                                        label: 'label.network.id'
+                                    },
+                                    virtualmachineid: {
+                                        label: 'label.virtual.machine.id'
+                                    },
+                                    virtualmachinename: {
+                                        label: 'label.virtual.machine.name'
+                                    },
+                                    type: {
+                                        label: 'label.type'
+                                    },
+                                    macaddress: {
+                                        label: 'label.macaddress'
+                                    },
+                                    netmask: {
+                                        label: 'label.ipv4.netmask'
+                                    },
+                                    broadcasturi: {
+                                        label: 'label.broadcasturi'
+                                    },
+                                    mode: {
+                                        label: 'label.mode'
+                                    },
+                                    ipstate: {
+                                        label: 'label.state'
+                                    },
+                                    created: {
+                                        label: 'label.created',
+                                        converter: cloudStack.converters.toLocalDate
+                                    }
+                                },
+                                dataProvider: function (args) {
+                                    $.ajax({
+                                        url: createURL("listWhoHasThisMac"),
+                                        data: {
+                                            macaddress: args.context.whohasthismac[0].macaddress,
+                                            uuid: args.context.whohasthismac[0].uuid
+                                        },
+                                        success: function (json) {
+                                            whohasthismac = json.listwhohasthismacresponse.whohasthismac ? json.listwhohasthismacresponse.whohasthismac[0] : {};
+                                            args.response.success({
+                                                data: {
+                                                    ipaddress: whohasthismac.ipaddress,
+                                                    uuid: whohasthismac.uuid,
+                                                    domainid: whohasthismac.domainuuid,
+                                                    domainname: whohasthismac.domainname,
+                                                    networkid: whohasthismac.networkuuid,
+                                                    networkname: whohasthismac.networkname,
+                                                    virtualmachineid: whohasthismac.virtualmachineuuid,
+                                                    virtualmachinename: whohasthismac.virtualmachinename,
+                                                    type: whohasthismac.virtualmachinetype,
+                                                    macaddress: whohasthismac.macaddress,
+                                                    netmask: whohasthismac.netmask,
+                                                    broadcasturi: whohasthismac.broadcasturi,
+                                                    mode: whohasthismac.mode,
+                                                    ipstate: whohasthismac.state,
+                                                    created: whohasthismac.created
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
         }
     };
 })(jQuery, cloudStack);

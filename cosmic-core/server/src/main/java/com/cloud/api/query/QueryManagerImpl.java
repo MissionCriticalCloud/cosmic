@@ -12,6 +12,7 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.admin.account.ListAccountsCmdByAdmin;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
+import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmdByAdmin;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
@@ -118,7 +119,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.api.response.WhoHasThisIpResponse;
+import com.cloud.api.response.WhoHasThisAddressResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.cluster.dao.ManagementServerHostDao;
@@ -3534,13 +3535,13 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     }
 
     @Override
-    public ListResponse<WhoHasThisIpResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
-        final ListResponse<WhoHasThisIpResponse> whoHasThisIpList = new ListResponse<>();
-        final List<WhoHasThisIpResponse> responsesList = new ArrayList<>();
+    public ListResponse<WhoHasThisAddressResponse> listWhoHasThisIp(final ListWhoHasThisIpCmd cmd) {
+        final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
+        final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
         final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
         ipAddresses.forEach(ipAddress -> {
-            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
             response.setIpAddress(ipAddress.getAddress().toString());
             response.setUuid(ipAddress.getUuid());
@@ -3575,35 +3576,16 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
         nics.forEach(nic -> {
-            final WhoHasThisIpResponse response = new WhoHasThisIpResponse();
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
 
-            response.setIpAddress(nic.getIPv4Address());
-            response.setUuid(nic.getUuid());
-
-            response.setCreated(nic.getCreated());
-            response.setMode(nic.getMode());
-            response.setBroadcastUri(nic.getBroadcastUri());
-            response.setNetmask(nic.getIPv4Netmask());
-            response.setMacAddress(nic.getMacAddress());
-            response.setState(nic.getState().toString());
-
-            final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
-            response.setVmName(vm.getHostName());
-            response.setVmUuid(vm.getUuid());
-            response.setVmType(nic.getVmType());
-
-            final Domain domain = _domainDao.findById(vm.getDomainId());
-            response.setDomainName(domain.getName());
-            response.setDomainUuid(domain.getUuid());
-
-            responsesList.add(response);
+            queryNicsTableResponse(responsesList, nic, response);
         });
 
         final Account account = CallContext.current().getCallingAccount();
         final Domain domain = _domainDao.findById(account.getDomainId());
 
-        final List<WhoHasThisIpResponse> filteredResponsesList = responsesList.stream().filter(
+        final List<WhoHasThisAddressResponse> filteredResponsesList = responsesList.stream().filter(
                 response -> (
                         (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
                                 (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
@@ -3612,6 +3594,61 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         whoHasThisIpList.setResponses(filteredResponsesList);
         return whoHasThisIpList;
+    }
+
+    public ListResponse<WhoHasThisAddressResponse> listWhoHasThisMac(final ListWhoHasThisMacCmd cmd) {
+        final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
+        final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
+
+        final List<NicVO> nics = _nicDao.listByMacAddress(cmd.getMacAddress());
+        nics.forEach(nic -> {
+            final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
+            response.setObjectName("whohasthismac");
+
+            queryNicsTableResponse(responsesList, nic, response);
+        });
+
+        final Account account = CallContext.current().getCallingAccount();
+        final Domain domain = _domainDao.findById(account.getDomainId());
+
+        final List<WhoHasThisAddressResponse> filteredResponsesList = responsesList.stream().filter(
+                response -> (
+                        (account.getDomainId() == Domain.ROOT_DOMAIN || domain.getUuid().equals(response.getDomainUuid())) &&
+                                (StringUtils.isEmpty(cmd.getUuid()) || (!StringUtils.isEmpty(cmd.getUuid()) && response.getUuid().equals(cmd.getUuid())))
+                )
+        ).skip(cmd.getStartIndex()).limit(cmd.getPageSizeVal()).collect(Collectors.toList());
+
+        whoHasThisIpList.setResponses(filteredResponsesList);
+        return whoHasThisIpList;
+    }
+
+    private void queryNicsTableResponse(final List<WhoHasThisAddressResponse> responsesList, final NicVO nic, final WhoHasThisAddressResponse response) {
+        response.setIpAddress(nic.getIPv4Address());
+        response.setUuid(nic.getUuid());
+
+        response.setCreated(nic.getCreated());
+        response.setMode(nic.getMode());
+        response.setBroadcastUri(nic.getBroadcastUri());
+        response.setNetmask(nic.getIPv4Netmask());
+        response.setMacAddress(nic.getMacAddress());
+        response.setState(nic.getState().toString());
+
+        final Network network = _networkDao.findById(nic.getNetworkId());
+        response.setNetworkUuid(network.getUuid());
+        if (!StringUtils.isEmpty(network.getName())) {
+            response.setNetworkName(network.getName());
+        }
+
+        final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
+        response.setVmName(vm.getHostName());
+        response.setVmUuid(vm.getUuid());
+        response.setVmType(nic.getVmType());
+
+        final Domain domain = _domainDao.findById(vm.getDomainId());
+        response.setDomainName(domain.getName());
+        response.setDomainUuid(domain.getUuid());
+
+        responsesList.add(response);
     }
 
     private Pair<List<HostTagVO>, Integer> searchForHostTagsInternal(final ListHostTagsCmd cmd) {

@@ -28,6 +28,7 @@ import com.cloud.api.command.admin.autoscale.CreateCounterCmd;
 import com.cloud.api.command.admin.autoscale.DeleteCounterCmd;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
+import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.cluster.ListClustersCmd;
@@ -3836,6 +3837,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(UpdateVpnGatewayCmd.class);
         cmdList.add(ListHAWorkersCmd.class);
         cmdList.add(ListWhoHasThisIpCmd.class);
+        cmdList.add(ListWhoHasThisMacCmd.class);
         // separated admin commands
         cmdList.add(ListAccountsCmdByAdmin.class);
         cmdList.add(ListZonesCmdByAdmin.class);
