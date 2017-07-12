@@ -231,7 +231,6 @@ public class ApiConstants {
     public static final String SIZE = "size";
     public static final String SNAPSHOT = "snapshot";
     public static final String SNAPSHOT_ID = "snapshotid";
-    public static final String SNAPSHOT_POLICY_ID = "snapshotpolicyid";
     public static final String SNAPSHOT_TYPE = "snapshottype";
     public static final String SNAPSHOT_QUIESCEVM = "quiescevm";
     public static final String SOURCE_ZONE_ID = "sourcezoneid";
@@ -342,8 +341,6 @@ public class ApiConstants {
     public static final String AGGREGATE_NAME = "aggregatename";
     public static final String POOL_NAME = "poolname";
     public static final String VOLUME_NAME = "volumename";
-    public static final String SNAPSHOT_POLICY = "snapshotpolicy";
-    public static final String SNAPSHOT_RESERVATION = "snapshotreservation";
     public static final String IP_NETWORK_LIST = "iptonetworklist";
     public static final String PARAM_LIST = "param";
     public static final String FOR_LOAD_BALANCING = "forloadbalancing";

@@ -2132,7 +2132,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         } else {
             final CreateSnapshotPayload payload = new CreateSnapshotPayload();
             payload.setSnapshotId(snapshotId);
-            payload.setSnapshotPolicyId(policyId);
             payload.setAccount(account);
             payload.setQuiescevm(quiescevm);
             volume.addPayload(payload);
@@ -2155,7 +2154,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final CreateSnapshotPayload payload = new CreateSnapshotPayload();
         payload.setSnapshotId(snapshotId);
-        payload.setSnapshotPolicyId(policyId);
         payload.setAccount(account);
         payload.setQuiescevm(quiescevm);
         volume.addPayload(payload);

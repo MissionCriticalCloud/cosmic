@@ -9,7 +9,6 @@ import com.cloud.api.BaseAsyncCreateCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
-import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.SnapshotResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
@@ -44,10 +43,6 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
 
     @Parameter(name = ApiConstants.VOLUME_ID, type = CommandType.UUID, entityType = VolumeResponse.class, required = true, description = "The ID of the disk volume")
     private Long volumeId;
-
-    @Parameter(name = ApiConstants.POLICY_ID, type = CommandType.UUID, entityType = SnapshotPolicyResponse.class,
-               description = "policy id of the snapshot, if this is null, then use MANUAL_POLICY.")
-    private Long policyId;
 
     @Parameter(name = ApiConstants.SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, required = false, description = "quiesce vm if true")
     private Boolean quiescevm;
@@ -138,11 +133,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     }
 
     public Long getPolicyId() {
-        if (policyId != null) {
-            return policyId;
-        } else {
             return Snapshot.MANUAL_POLICY_ID;
-        }
     }
 
     public String getSnapshotName() {

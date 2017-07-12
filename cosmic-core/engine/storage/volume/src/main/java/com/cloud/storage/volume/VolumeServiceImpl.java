@@ -773,8 +773,6 @@ public class VolumeServiceImpl implements VolumeService {
         // mark volume entry in volumes table as destroy state
         final VolumeInfo vol = volFactory.getVolume(volumeId);
         vol.stateTransit(Volume.Event.DestroyRequested);
-        snapshotMgr.deletePoliciesForVolume(volumeId);
-
         vol.stateTransit(Volume.Event.OperationSucceeded);
 
         return true;

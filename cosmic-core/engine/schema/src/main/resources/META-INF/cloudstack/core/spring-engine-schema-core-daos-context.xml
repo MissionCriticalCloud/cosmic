@@ -243,9 +243,6 @@
     <bean id="site2SiteVpnGatewayDaoImpl" class="com.cloud.network.dao.Site2SiteVpnGatewayDaoImpl" />
     <bean id="snapshotDaoImpl" class="com.cloud.storage.dao.SnapshotDaoImpl" />
     <bean id="snapshotDetailsDaoImpl" class="com.cloud.storage.dao.SnapshotDetailsDaoImpl" />
-    <bean id="snapshotPolicyDaoImpl" class="com.cloud.storage.dao.SnapshotPolicyDaoImpl" />
-    <bean id="snapshotPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.SnapshotPolicyDetailsDaoImpl" />
-    <bean id="snapshotScheduleDaoImpl" class="com.cloud.storage.dao.SnapshotScheduleDaoImpl" />
     <bean id="sslCertDao" class="com.cloud.network.dao.SslCertDaoImpl" />
     <bean id="staticRouteDaoImpl" class="com.cloud.network.vpc.dao.StaticRouteDaoImpl" />
     <bean id="storageNetworkIpAddressDaoImpl" class="com.cloud.dc.dao.StorageNetworkIpAddressDaoImpl" />

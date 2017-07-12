@@ -18,7 +18,6 @@ import com.cloud.resourcedetail.dao.RemoteAccessVpnDetailsDao;
 import com.cloud.resourcedetail.dao.Site2SiteCustomerGatewayDetailsDao;
 import com.cloud.resourcedetail.dao.Site2SiteVpnConnectionDetailsDao;
 import com.cloud.resourcedetail.dao.Site2SiteVpnGatewayDetailsDao;
-import com.cloud.resourcedetail.dao.SnapshotPolicyDetailsDao;
 import com.cloud.resourcedetail.dao.UserDetailsDao;
 import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.resourcedetail.dao.VpcDetailsDao;
@@ -103,8 +102,6 @@ public class ResourceMetaDataManagerImpl extends ManagerBase implements Resource
     LBStickinessPolicyDetailsDao _stickinessPolicyDetailsDao;
     @Inject
     LBHealthCheckPolicyDetailsDao _healthcheckPolicyDetailsDao;
-    @Inject
-    SnapshotPolicyDetailsDao _snapshotPolicyDetailsDao;
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -134,7 +131,6 @@ public class ResourceMetaDataManagerImpl extends ManagerBase implements Resource
         s_daoMap.put(ResourceObjectType.AutoScaleVmGroup, _autoScaleVmGroupDetailsDao);
         s_daoMap.put(ResourceObjectType.LBStickinessPolicy, _stickinessPolicyDetailsDao);
         s_daoMap.put(ResourceObjectType.LBHealthCheckPolicy, _healthcheckPolicyDetailsDao);
-        s_daoMap.put(ResourceObjectType.SnapshotPolicy, _snapshotPolicyDetailsDao);
 
         return true;
     }

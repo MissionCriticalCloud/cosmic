@@ -2253,41 +2253,6 @@ class NetworkOffering:
         return api_client.listNetworkOfferings(cmd)
 
 
-class SnapshotPolicy:
-    """Manage snapshot policies"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, volumeid, services):
-        """Create Snapshot policy"""
-        cmd = createSnapshotPolicy.createSnapshotPolicyCmd()
-        cmd.intervaltype = services["intervaltype"]
-        cmd.maxsnaps = services["maxsnaps"]
-        cmd.schedule = services["schedule"]
-        cmd.timezone = services["timezone"]
-        cmd.volumeid = volumeid
-        return SnapshotPolicy(api_client.createSnapshotPolicy(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete Snapshot policy"""
-        cmd = deleteSnapshotPolicies.deleteSnapshotPoliciesCmd()
-        cmd.id = self.id
-        api_client.deleteSnapshotPolicies(cmd)
-        return
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """Lists snapshot policies."""
-
-        cmd = listSnapshotPolicies.listSnapshotPoliciesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listSnapshotPolicies(cmd)
-
-
 class Hypervisor:
     """Manage Hypervisor"""
 

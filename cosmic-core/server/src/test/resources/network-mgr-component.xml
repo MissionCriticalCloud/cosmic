@@ -136,7 +136,6 @@
              singleton="false">
             <param name="premium">true</param>
         </dao>
-        <dao name="Snapshot policy defaults" class="com.cloud.storage.dao.SnapshotPolicyDaoImpl" singleton="false" />
         <dao name="DiskOffering configuration server" class="com.cloud.storage.dao.DiskOfferingDaoImpl"
              singleton="false" />
         <dao name="ServiceOffering configuration server" class="com.cloud.service.dao.ServiceOfferingDaoImpl"

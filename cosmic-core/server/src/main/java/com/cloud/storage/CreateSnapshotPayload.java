@@ -3,18 +3,9 @@ package com.cloud.storage;
 import com.cloud.user.Account;
 
 public class CreateSnapshotPayload {
-    private Long snapshotPolicyId;
     private Long snapshotId;
     private Account account;
     private boolean quiescevm;
-
-    public Long getSnapshotPolicyId() {
-        return snapshotPolicyId;
-    }
-
-    public void setSnapshotPolicyId(final Long snapshotPolicyId) {
-        this.snapshotPolicyId = snapshotPolicyId;
-    }
 
     public Long getSnapshotId() {
         return snapshotId;
