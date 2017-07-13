@@ -1303,7 +1303,10 @@
                     },
 
                     dataProvider: function (args) {
-                        var data = {};
+                        var data = {
+                            listAll: true,
+                            issystem: true
+                        };
                         listViewDataProvider(args, data);
 
                         $.ajax({
