@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class Upgrade536to537 implements DbUpgrade {
 
-    final static Logger logger = LoggerFactory.getLogger(Upgrade533to534.class);
+    final static Logger logger = LoggerFactory.getLogger(Upgrade536to537.class);
     private static final String PREVIOUS_VERSION = "5.3.6";
     private static final String NEXT_VERSION = "5.3.7";
     private static final String SCHEMA_SCRIPT = "db/schema-536to537.sql";
