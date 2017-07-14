@@ -1262,18 +1262,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='listSnapshotPolicies'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='getCloudIdentifier'">
                                 <tr>
                                     <td>
@@ -1413,18 +1401,6 @@
                                         <br></br>
                                     </td>
                                 </tr>
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
-                            <xsl:if test="name='deleteSnapshotPolicies'">
                                 <td>
                                     <A HREF="resumepage.html">
                                         <xsl:value-of select="name" />
@@ -2115,18 +2091,6 @@
                         </tr>
                         <tr>
                             <xsl:if test="name='updateIso'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
-                            <xsl:if test="name='createSnapshotPolicy'">
                                 <td>
                                     <A HREF="resumepage.html">
                                         <xsl:value-of select="name" />

@@ -69,9 +69,7 @@ import com.cloud.api.response.ServiceResponse;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.api.response.Site2SiteVpnGatewayResponse;
-import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.SnapshotResponse;
-import com.cloud.api.response.SnapshotScheduleResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
 import com.cloud.api.response.StoragePoolResponse;
@@ -158,8 +156,6 @@ import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
-import com.cloud.storage.snapshot.SnapshotPolicy;
-import com.cloud.storage.snapshot.SnapshotSchedule;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.usage.Usage;
 import com.cloud.user.Account;
@@ -197,8 +193,6 @@ public interface ResponseGenerator {
     ConfigurationResponse createConfigurationResponse(Configuration cfg);
 
     SnapshotResponse createSnapshotResponse(Snapshot snapshot);
-
-    SnapshotPolicyResponse createSnapshotPolicyResponse(SnapshotPolicy policy);
 
     List<UserVmResponse> createUserVmResponse(ResponseView view, String objectName, UserVm... userVms);
 
@@ -398,8 +392,6 @@ public interface ResponseGenerator {
     GuestOSResponse createGuestOSResponse(GuestOS os);
 
     GuestOsMappingResponse createGuestOSMappingResponse(GuestOSHypervisor osHypervisor);
-
-    SnapshotScheduleResponse createSnapshotScheduleResponse(SnapshotSchedule sched);
 
     UsageRecordResponse createUsageResponse(Usage usageRecord);
 

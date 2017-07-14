@@ -21,8 +21,6 @@ public interface SnapshotManager {
     public static final int MONTHLYMAX = 12;
     public static final int DELTAMAX = 16;
 
-    void deletePoliciesForVolume(Long volumeId);
-
     /**
      * For each of the volumes in the account, (which can span across multiple zones and multiple secondary storages), delete
      * the dir on the secondary storage which contains the backed up snapshots for that volume. This is called during

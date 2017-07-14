@@ -35,7 +35,6 @@ import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.server.TaggedResourceService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.SnapshotPolicyVO;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
@@ -111,7 +110,6 @@ public class TaggedResourceManagerImpl extends ManagerBase implements TaggedReso
         s_typeMap.put(ResourceObjectType.AutoScaleVmGroup, AutoScaleVmGroupVO.class);
         s_typeMap.put(ResourceObjectType.LBStickinessPolicy, LBStickinessPolicyVO.class);
         s_typeMap.put(ResourceObjectType.LBHealthCheckPolicy, LBHealthCheckPolicyVO.class);
-        s_typeMap.put(ResourceObjectType.SnapshotPolicy, SnapshotPolicyVO.class);
     }
 
     @Inject

@@ -72,8 +72,7 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
         AutoScaleVmProfile(false, true),
         AutoScaleVmGroup(false, true),
         LBStickinessPolicy(false, true),
-        LBHealthCheckPolicy(false, true),
-        SnapshotPolicy(false, true);
+        LBHealthCheckPolicy(false, true);
 
         private final boolean resourceTagsSupport;
         private final boolean metadataSupport;

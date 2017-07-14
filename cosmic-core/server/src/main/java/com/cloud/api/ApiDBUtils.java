@@ -233,14 +233,12 @@ import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
-import com.cloud.storage.dao.SnapshotPolicyDao;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplateDetailsDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.storage.snapshot.SnapshotPolicy;
 import com.cloud.template.TemplateManager;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
@@ -390,7 +388,6 @@ public class ApiDBUtils {
     static VpcGatewayDao s_vpcGatewayDao;
     static VpcDao s_vpcDao;
     static VpcOfferingDao s_vpcOfferingDao;
-    static SnapshotPolicyDao s_snapshotPolicyDao;
     static AsyncJobDao s_asyncJobDao;
     static HostDetailsDao s_hostDetailsDao;
     static VMSnapshotDao s_vmSnapshotDao;
@@ -602,8 +599,6 @@ public class ApiDBUtils {
     private VpcDao vpcDao;
     @Inject
     private VpcOfferingDao vpcOfferingDao;
-    @Inject
-    private SnapshotPolicyDao snapshotPolicyDao;
     @Inject
     private AsyncJobDao asyncJobDao;
     @Inject
@@ -1222,10 +1217,6 @@ public class ApiDBUtils {
 
     public static VpcVO findVpcById(final long vpcId) {
         return s_vpcDao.findById(vpcId);
-    }
-
-    public static SnapshotPolicy findSnapshotPolicyById(final long policyId) {
-        return s_snapshotPolicyDao.findById(policyId);
     }
 
     public static VpcOffering findVpcOfferingById(final long offeringId) {
@@ -1884,7 +1875,6 @@ public class ApiDBUtils {
         s_asVmGroupDao = asVmGroupDao;
         s_vpcDao = vpcDao;
         s_vpcOfferingDao = vpcOfferingDao;
-        s_snapshotPolicyDao = snapshotPolicyDao;
         s_asyncJobDao = asyncJobDao;
         s_hostDetailsDao = hostDetailsDao;
         s_clusterDetailsDao = clusterDetailsDao;

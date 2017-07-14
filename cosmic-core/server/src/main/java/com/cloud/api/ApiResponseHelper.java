@@ -104,9 +104,7 @@ import com.cloud.api.response.ServiceResponse;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.api.response.Site2SiteVpnGatewayResponse;
-import com.cloud.api.response.SnapshotPolicyResponse;
 import com.cloud.api.response.SnapshotResponse;
-import com.cloud.api.response.SnapshotScheduleResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
 import com.cloud.api.response.StoragePoolResponse;
@@ -250,8 +248,6 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.storage.snapshot.SnapshotPolicy;
-import com.cloud.storage.snapshot.SnapshotSchedule;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.usage.Usage;
 import com.cloud.usage.UsageService;
@@ -546,24 +542,6 @@ public class ApiResponseHelper implements ResponseGenerator {
 
         snapshotResponse.setObjectName("snapshot");
         return snapshotResponse;
-    }
-
-    @Override
-    public SnapshotPolicyResponse createSnapshotPolicyResponse(final SnapshotPolicy policy) {
-        final SnapshotPolicyResponse policyResponse = new SnapshotPolicyResponse();
-        policyResponse.setId(policy.getUuid());
-        final Volume vol = ApiDBUtils.findVolumeById(policy.getVolumeId());
-        if (vol != null) {
-            policyResponse.setVolumeId(vol.getUuid());
-        }
-        policyResponse.setSchedule(policy.getSchedule());
-        policyResponse.setIntervalType(policy.getInterval());
-        policyResponse.setMaxSnaps(policy.getMaxSnaps());
-        policyResponse.setTimezone(policy.getTimezone());
-        policyResponse.setForDisplay(policy.isDisplay());
-        policyResponse.setObjectName("snapshotpolicy");
-
-        return policyResponse;
     }
 
     @Override
@@ -2967,28 +2945,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
 
         response.setObjectName("guestosmapping");
-        return response;
-    }
-
-    @Override
-    public SnapshotScheduleResponse createSnapshotScheduleResponse(final SnapshotSchedule snapshotSchedule) {
-        final SnapshotScheduleResponse response = new SnapshotScheduleResponse();
-        response.setId(snapshotSchedule.getUuid());
-        if (snapshotSchedule.getVolumeId() != null) {
-            final Volume vol = ApiDBUtils.findVolumeById(snapshotSchedule.getVolumeId());
-            if (vol != null) {
-                response.setVolumeId(vol.getUuid());
-            }
-        }
-        if (snapshotSchedule.getPolicyId() != null) {
-            final SnapshotPolicy policy = ApiDBUtils.findSnapshotPolicyById(snapshotSchedule.getPolicyId());
-            if (policy != null) {
-                response.setSnapshotPolicyId(policy.getUuid());
-            }
-        }
-        response.setScheduled(snapshotSchedule.getScheduledTimestamp());
-
-        response.setObjectName("snapshot");
         return response;
     }
 
