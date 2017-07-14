@@ -190,6 +190,10 @@ public class DomainResponse extends BaseResponse implements ResourceLimitAndCoun
     @Param(description = "the total secondary storage space (in GiB) available to be used for this domain", since = "4.2.0")
     private String secondaryStorageAvailable;
 
+    @SerializedName("email")
+    @Param(description = "the email address associated with the domain")
+    private String email;
+
     public String getId() {
         return this.id;
     }
@@ -260,6 +264,10 @@ public class DomainResponse extends BaseResponse implements ResourceLimitAndCoun
 
     public void setProjectAvailable(final String projectAvailable) {
         this.projectAvailable = projectAvailable;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
     }
 
     @Override

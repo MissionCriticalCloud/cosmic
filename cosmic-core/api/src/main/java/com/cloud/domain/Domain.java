@@ -39,6 +39,8 @@ public interface Domain extends OwnedBy, Identity, InternalIdentity {
 
     String getNetworkDomain();
 
+    String getEmail();
+
     enum State {
         Active, Inactive
     }

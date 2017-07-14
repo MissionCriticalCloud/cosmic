@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface DomainService {
 
-    Domain createDomain(String name, Long parentId, String networkDomain, String domainUUID);
+    Domain createDomain(String name, Long parentId, String networkDomain, String domainUUID, String email);
 
     Domain getDomain(long id);
 

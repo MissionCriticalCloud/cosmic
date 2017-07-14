@@ -406,6 +406,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         domainResponse.setId(domain.getUuid());
         domainResponse.setLevel(domain.getLevel());
         domainResponse.setNetworkDomain(domain.getNetworkDomain());
+        domainResponse.setEmail(domain.getEmail());
         final Domain parentDomain = ApiDBUtils.findDomainById(domain.getParent());
         if (parentDomain != null) {
             domainResponse.setParentDomainId(parentDomain.getUuid());
@@ -1803,7 +1804,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             }
         }
 
-        ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
+        final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
         if (secondaryServiceOffering != null) {
             response.setSecondaryServiceOfferingId(secondaryServiceOffering.getUuid());
             response.setSecondaryServiceOfferingName(secondaryServiceOffering.getName());
@@ -1942,7 +1943,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             response.setNetmask(NetUtils.cidr2Netmask(network.getCidr()));
         }
 
-        response.setIpExclusionList(((NetworkVO)network).getIpExclusionList());
+        response.setIpExclusionList(((NetworkVO) network).getIpExclusionList());
 
         response.setIp6Gateway(network.getIp6Gateway());
         response.setIp6Cidr(network.getIp6Cidr());
@@ -2499,12 +2500,12 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setState(offering.getState().name());
         response.setSupportsDistributedRouter(offering.supportsDistributedRouter());
         response.setSupportsRegionLevelVpc(offering.offersRegionLevelVPC());
-        ServiceOffering serviceOffering = _serviceOfferingDao.findById(offering.getServiceOfferingId());
+        final ServiceOffering serviceOffering = _serviceOfferingDao.findById(offering.getServiceOfferingId());
         if (serviceOffering != null) {
             response.setServiceOfferingId(serviceOffering.getUuid());
             response.setServiceOfferingName(serviceOffering.getName());
         }
-        ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
+        final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
         if (secondaryServiceOffering != null) {
             response.setSecondaryServiceOfferingId(secondaryServiceOffering.getUuid());
             response.setSecondaryServiceOfferingName(secondaryServiceOffering.getName());
