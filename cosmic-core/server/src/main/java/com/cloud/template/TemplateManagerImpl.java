@@ -1338,9 +1338,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final Boolean passwordEnabled = cmd.isPasswordEnabled();
         Boolean isPublic = cmd.isPublic();
         Boolean featured = cmd.isFeatured();
-        final int bitsValue = bits == null ? 64 : bits.intValue();
-        final boolean requiresHvmValue = requiresHvm == null ? true : requiresHvm.booleanValue();
-        final boolean passwordEnabledValue = passwordEnabled == null ? false : passwordEnabled.booleanValue();
+        final int bitsValue = bits == null ? 64 : bits;
+        final boolean requiresHvmValue = requiresHvm == null || requiresHvm;
+        final boolean passwordEnabledValue = passwordEnabled != null && passwordEnabled;
         if (isPublic == null) {
             isPublic = Boolean.FALSE;
         }
@@ -1361,7 +1361,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                     ") and snapshot ID (" + snapshotId + ")");
         }
 
-        final HypervisorType hyperType;
+        HypervisorType hyperType;
         final VolumeVO volume;
         SnapshotVO snapshot = null;
         final VMTemplateVO privateTemplate;
@@ -1414,7 +1414,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         _resourceLimitMgr.checkResourceLimit(templateOwner, ResourceType.template);
-        _resourceLimitMgr.checkResourceLimit(templateOwner, ResourceType.secondary_storage, new Long(volume != null ? volume.getSize() : snapshot.getSize()).longValue());
+        _resourceLimitMgr.checkResourceLimit(templateOwner, ResourceType.secondary_storage, volume != null ? volume.getSize() : snapshot.getSize());
 
         if (!isAdmin || featured == null) {
             featured = Boolean.FALSE;
@@ -1444,6 +1444,12 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 s_logger.debug("Adding template tag: " + templateTag);
             }
         }
+
+        // if specified from the API, use that one
+        if (cmd.getHypervisor() != null) {
+            hyperType = HypervisorType.getType(cmd.getHypervisor());
+        }
+
         privateTemplate = new VMTemplateVO(nextTemplateId, name, ImageFormat.RAW, isPublic, featured, isExtractable,
                 TemplateType.USER, null, requiresHvmValue, bitsValue, templateOwner.getId(), null, description,
                 passwordEnabledValue, guestOS.getId(), true, hyperType, templateTag, cmd.getDetails(), false, isDynamicScalingEnabled);
