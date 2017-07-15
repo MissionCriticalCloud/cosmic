@@ -9,13 +9,13 @@ import java.sql.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Upgrade535to536 implements DbUpgrade {
+public class Upgrade536to537 implements DbUpgrade {
 
-    final static Logger logger = LoggerFactory.getLogger(Upgrade535to536.class);
-    private static final String PREVIOUS_VERSION = "5.3.5";
-    private static final String NEXT_VERSION = "5.3.6";
-    private static final String SCHEMA_SCRIPT = "db/schema-535to536.sql";
-    private static final String SCHEMA_CLEANUP_SCRIPT = "db/schema-535to536-cleanup.sql";
+    final static Logger logger = LoggerFactory.getLogger(Upgrade536to537.class);
+    private static final String PREVIOUS_VERSION = "5.3.6";
+    private static final String NEXT_VERSION = "5.3.7";
+    private static final String SCHEMA_SCRIPT = "db/schema-536to537.sql";
+    private static final String SCHEMA_CLEANUP_SCRIPT = "db/schema-536to537-cleanup.sql";
 
     @Override
     public String[] getUpgradableVersionRange() {
@@ -39,7 +39,7 @@ public class Upgrade535to536 implements DbUpgrade {
 
     @Override
     public void performDataMigration(final Connection conn) {
-        logger.info("Performing data migration from 5.3.5 to 5.3.6");
+        logger.info("Performing data migration from 5.3.6 to 5.3.7");
     }
 
     @Override
