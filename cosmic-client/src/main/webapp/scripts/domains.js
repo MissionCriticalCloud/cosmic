@@ -99,7 +99,13 @@
                                 });
                             }
 
-                            if ('name' in data || 'networkdomain' in data) {
+                            if (args.data.email != null) { //args.data.email == undefined means email field is not editable (when log in as normal user or domain admin)
+                                $.extend(data, {
+                                    email: args.data.email
+                                });
+                            }
+
+                            if ('name' in data || 'networkdomain' in data || 'email' in data) {
                                 $.ajax({
                                     url: createURL("updateDomain"),
                                     async: false,
@@ -244,7 +250,8 @@
                         action: function (args) {
                             var data = {
                                 parentdomainid: args.context.domains[0].id,
-                                name: args.data.name
+                                name: args.data.name,
+                                email: args.data.email
                             };
 
                             if (args.data.networkdomain != null && args.data.networkdomain.length > 0) {
@@ -284,6 +291,14 @@
                                     docID: 'helpDomainName',
                                     validation: {
                                         required: true
+                                    }
+                                },
+                                email: {
+                                    label: 'label.email',
+                                    docID: 'helpDomainEmail',
+                                    validation: {
+                                        required: true,
+                                        email: true
                                     }
                                 },
                                 networkdomain: {
@@ -440,6 +455,12 @@
                                     else
                                         return false;
                                 }
+                            },
+                            email: {
+                                label: 'label.email',
+                                isEditable: function () {
+                                    return !!isAdmin();
+                                }
                             }
                         }, {
                             id: {
@@ -456,7 +477,7 @@
                             },
 
                             ldaplink: {
-                              label: 'label.ldap.linkedou'
+                                label: 'label.ldap.linkedou'
                             },
 
                             ldapaccounttype: {
@@ -624,32 +645,32 @@
                             domainObj["volumeTotal"] = totalVolumes;
 
                             $.ajax({
-                                 url: createURL("listDomainLdapLink&domainid=" + domainObj.id),
-                                 async: false,
-                                 dataType: "json",
-                                 success: function(json) {
-                                     var items = json.linkdomaintoldapresponse.LinkDomainToLdap;
-                                     if (items != null) {
-                                         domainObj["ldapenabled"] = items.ldapenabled;
-                                         if (items.name != undefined) {
-                                             domainObj["ldaplink"] = items.name;
-                                             domainObj["ldapaccounttype"] = items.accounttype;
+                                url: createURL("listDomainLdapLink&domainid=" + domainObj.id),
+                                async: false,
+                                dataType: "json",
+                                success: function (json) {
+                                    var items = json.linkdomaintoldapresponse.LinkDomainToLdap;
+                                    if (items != null) {
+                                        domainObj["ldapenabled"] = items.ldapenabled;
+                                        if (items.name != undefined) {
+                                            domainObj["ldaplink"] = items.name;
+                                            domainObj["ldapaccounttype"] = items.accounttype;
 
-                                         } else {
-                                             domainObj["ldaplink"] = _l('label.ldap.not.linked');
-                                             domainObj["ldapaccounttype"] = "";
-                                         }
-                                     } else {
-                                         domainObj["ldapenabled"] = _l('label.no');
-                                         domainObj["ldaplink"] = _l('label.ldap.not.linked');
-                                         domainObj["ldapaccounttype"] = "";
-                                     }
-                                     if (isLdapEnabled()) {
-                                         domainObj["ldapenabledinsystem"] = true;
-                                     } else {
-                                         domainObj["ldapenabledinsystem"] = false;
-                                     }
-                                 }
+                                        } else {
+                                            domainObj["ldaplink"] = _l('label.ldap.not.linked');
+                                            domainObj["ldapaccounttype"] = "";
+                                        }
+                                    } else {
+                                        domainObj["ldapenabled"] = _l('label.no');
+                                        domainObj["ldaplink"] = _l('label.ldap.not.linked');
+                                        domainObj["ldapaccounttype"] = "";
+                                    }
+                                    if (isLdapEnabled()) {
+                                        domainObj["ldapenabledinsystem"] = true;
+                                    } else {
+                                        domainObj["ldapenabledinsystem"] = false;
+                                    }
+                                }
                             });
 
                             $.ajax({
