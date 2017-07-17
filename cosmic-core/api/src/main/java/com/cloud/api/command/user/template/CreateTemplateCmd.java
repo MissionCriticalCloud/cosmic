@@ -101,6 +101,8 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     private String templateTag;
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "create template for the project")
     private Long projectId;
+    @Parameter(name = ApiConstants.HYPERVISOR, type = CommandType.STRING, description = "the target hypervisor for the template")
+    private String hypervisor;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
@@ -150,6 +152,10 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
 
     public String getTemplateTag() {
         return templateTag;
+    }
+
+    public String getHypervisor() {
+        return hypervisor;
     }
 
     public Map getDetails() {
