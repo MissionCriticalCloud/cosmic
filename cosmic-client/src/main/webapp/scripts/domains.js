@@ -297,7 +297,6 @@
                                     label: 'label.email',
                                     docID: 'helpDomainEmail',
                                     validation: {
-                                        required: true,
                                         email: true
                                     }
                                 },
