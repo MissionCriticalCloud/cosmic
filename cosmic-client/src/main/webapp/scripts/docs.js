@@ -883,6 +883,10 @@ cloudStack.docs = {
         desc: 'The user\'s email address',
         externalLink: ''
     },
+    helpDomainEmail: {
+        desc: 'The domain\'s email address',
+        externalLink: ''
+    },
     helpUserFirstName: {
         desc: 'The user\'s first name, also known as the given name',
         externalLink: ''

@@ -57,6 +57,9 @@ public class DomainVO implements Domain {
     @Column(name = "uuid")
     private String uuid;
 
+    @Column(name = "email")
+    private String email;
+
     public DomainVO() {
     }
 
@@ -71,7 +74,7 @@ public class DomainVO implements Domain {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain, final String uuid) {
+    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain, final String uuid, final String email) {
         this.parent = parentId;
         this.name = name;
         this.accountId = owner;
@@ -80,6 +83,7 @@ public class DomainVO implements Domain {
         this.state = Domain.State.Active;
         this.networkDomain = networkDomain;
         this.uuid = uuid;
+        this.email = email;
     }
 
     @Override
@@ -193,5 +197,14 @@ public class DomainVO implements Domain {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
     }
 }

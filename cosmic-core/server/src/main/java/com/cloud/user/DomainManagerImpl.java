@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -106,7 +108,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
     @Override
     @DB
-    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID) {
+    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID, final String email) {
         // Verify network domain
         if (networkDomain != null) {
             if (!NetUtils.verifyDomainName(networkDomain)) {
@@ -130,11 +132,16 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
             domainUUID = UUID.randomUUID().toString();
         }
 
+        final EmailValidator validator = EmailValidator.getInstance();
+        if (!StringUtils.isEmpty(email) && !validator.isValid(email)) {
+            throw new InvalidParameterValueException("Email address is not formatted correctly");
+        }
+
         final String domainUUIDFinal = domainUUID;
         final DomainVO domain = Transaction.execute(new TransactionCallback<DomainVO>() {
             @Override
             public DomainVO doInTransaction(final TransactionStatus status) {
-                final DomainVO domain = _domainDao.create(new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal));
+                final DomainVO domain = _domainDao.create(new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal, email));
                 _resourceCountDao.createResourceCounts(domain.getId(), ResourceLimit.ResourceOwnerType.Domain);
                 return domain;
             }
@@ -263,6 +270,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         final Long domainId = cmd.getId();
         final String domainName = cmd.getDomainName();
         final String networkDomain = cmd.getNetworkDomain();
+        final String email = cmd.getEmail();
 
         // check if domain exists in the system
         final DomainVO domain = _domainDao.findById(domainId);
@@ -305,6 +313,11 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
             }
         }
 
+        final EmailValidator validator = EmailValidator.getInstance();
+        if (!StringUtils.isEmpty(email) && !validator.isValid(email)) {
+            throw new InvalidParameterValueException("Email address is not formatted correctly");
+        }
+
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
@@ -322,6 +335,15 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
                         domain.setNetworkDomain(networkDomain);
                     }
                 }
+
+                if (email != null) {
+                    if (email.isEmpty()) {
+                        domain.setEmail(null);
+                    } else {
+                        domain.setEmail(email);
+                    }
+                }
+
                 _domainDao.update(domainId, domain);
                 CallContext.current().putContextParameter(Domain.class, domain.getUuid());
             }
@@ -352,7 +374,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_DOMAIN_CREATE, eventDescription = "creating Domain")
-    public Domain createDomain(final String name, Long parentId, final String networkDomain, final String domainUUID) {
+    public Domain createDomain(final String name, Long parentId, final String networkDomain, final String domainUUID, final String email) {
         final Account caller = CallContext.current().getCallingAccount();
 
         if (parentId == null) {
@@ -370,7 +392,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
         _accountMgr.checkAccess(caller, parentDomain);
 
-        return createDomain(name, parentId, caller.getId(), networkDomain, domainUUID);
+        return createDomain(name, parentId, caller.getId(), networkDomain, domainUUID, email);
     }
 
     @Override

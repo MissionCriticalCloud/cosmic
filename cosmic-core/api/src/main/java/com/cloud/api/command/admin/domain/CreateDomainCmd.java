@@ -40,6 +40,11 @@ public class CreateDomainCmd extends BaseCmd {
     @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.STRING, description = "Domain UUID, required for adding domain from another Region")
     private String domainUUID;
 
+    @Parameter(name = ApiConstants.EMAIL,
+            type = CommandType.STRING,
+            description = "Email address associated with this domain")
+    private String email;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -47,7 +52,7 @@ public class CreateDomainCmd extends BaseCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Domain Name: " + getDomainName() + ((getParentDomainId() != null) ? ", Parent DomainId :" + getParentDomainId() : ""));
-        final Domain domain = _domainService.createDomain(getDomainName(), getParentDomainId(), getNetworkDomain(), getDomainUUID());
+        final Domain domain = _domainService.createDomain(getDomainName(), getParentDomainId(), getNetworkDomain(), getDomainUUID(), getEmail());
         if (domain != null) {
             final DomainResponse response = _responseGenerator.createDomainResponse(domain);
             response.setResponseName(getCommandName());
@@ -67,6 +72,10 @@ public class CreateDomainCmd extends BaseCmd {
 
     public String getNetworkDomain() {
         return networkDomain;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     /////////////////////////////////////////////////////

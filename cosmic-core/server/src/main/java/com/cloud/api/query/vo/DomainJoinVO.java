@@ -125,6 +125,9 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
     @Column(name = "secondaryStorageTotal")
     private Long secondaryStorageTotal;
 
+    @Column(name = "email")
+    private String email;
+
     public DomainJoinVO() {
     }
 
@@ -420,5 +423,13 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
 
     public void setSecondaryStorageLimit(final Long secondaryStorageLimit) {
         this.secondaryStorageLimit = secondaryStorageLimit;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
     }
 }

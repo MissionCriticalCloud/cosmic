@@ -36,6 +36,10 @@ public class UpdateDomainCmd extends BaseCmd {
             type = CommandType.STRING,
             description = "Network domain for the domain's networks; empty string will update domainName with NULL value")
     private String networkDomain;
+    @Parameter(name = ApiConstants.EMAIL,
+            type = CommandType.STRING,
+            description = "Email address associated with this domain")
+    private String email;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -47,6 +51,10 @@ public class UpdateDomainCmd extends BaseCmd {
 
     public String getNetworkDomain() {
         return networkDomain;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override
