@@ -327,7 +327,6 @@
     <bean id="UserDetailsDaoImpl" class="com.cloud.resourcedetail.dao.UserDetailsDaoImpl" />
     <bean id="AutoScaleVmProfileDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmProfileDetailsDaoImpl" />
     <bean id="AutoScaleVmGroupDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmGroupDetailsDaoImpl" />
-    <bean id="databaseIntegrityChecker" class="com.cloud.upgrade.DatabaseIntegrityChecker" />
     <bean id="LBStickinessPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBStickinessPolicyDetailsDaoImpl" />
     <bean id="LBHealthCheckPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBHealthCheckPolicyDetailsDaoImpl" />
 
