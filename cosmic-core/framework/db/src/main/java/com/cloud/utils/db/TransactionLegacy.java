@@ -1,5 +1,7 @@
 package com.cloud.utils.db;
 
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
+
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
 
@@ -17,6 +19,8 @@ import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 /**
  * Transaction abstracts away the Connection object in JDBC. It allows the following things that the Connection object
@@ -49,9 +53,18 @@ public class TransactionLegacy implements Closeable {
 
     static {
         try {
-            InitialContext cxt = new InitialContext();
-            s_ds = (DataSource) cxt.lookup("java:/comp/env/jdbc/cosmic");
-            s_usageDS = (DataSource) cxt.lookup("java:/comp/env/jdbc/cosmic_usage");
+            if (Boolean.valueOf(System.getProperty("cosmic.tests.mockdb"))) {
+                final EmbeddedDatabase db = new EmbeddedDatabaseBuilder()
+                        .generateUniqueName(true)
+                        .setType(H2)
+                        .build();
+                s_ds = db;
+                s_usageDS = db;
+            } else {
+                final InitialContext cxt = new InitialContext();
+                s_ds = (DataSource) cxt.lookup("java:/comp/env/jdbc/cosmic");
+                s_usageDS = (DataSource) cxt.lookup("java:/comp/env/jdbc/cosmic_usage");
+            }
         } catch (final Exception e) {
             logger.error("Unable to connect to the database", e);
             throw new RuntimeException("Unable to connect to the database", e);
