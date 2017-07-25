@@ -32,14 +32,7 @@ db.cloud.testOnBorrow=true
 db.cloud.testWhileIdle=true
 db.cloud.timeBetweenEvictionRunsMillis=40000
 db.cloud.minEvictableIdleTimeMillis=240000
-db.cloud.poolPreparedStatements=false
-db.cloud.url.params=prepStmtCacheSize=517&cachePrepStmts=true
 db.cloud.autoReconnect=true
-db.cloud.useSSL=false
-db.cloud.keyStore=
-db.cloud.keyStorePassword=
-db.cloud.trustStore=
-db.cloud.trustStorePassword=
 db.cloud.keyStorePassphrase=vmops.com
 db.cloud.encryption.type=none
 db.cloud.encrypt.secret=
@@ -53,26 +46,7 @@ db.usage.name=cloud_usage
 db.usage.maxActive=100
 db.usage.maxIdle=30
 db.usage.maxWait=10000
-db.usage.url.params=
 db.usage.autoReconnect=true
-
-# HA Config
-db.ha.enabled=false
-db.ha.loadBalanceStrategy=com.cloud.utils.db.StaticStrategy
-db.cloud.slaves=
-db.cloud.failOverReadOnly=false
-db.cloud.reconnectAtTxEnd=true
-db.cloud.autoReconnectForPools=true
-db.cloud.secondsBeforeRetryMaster=3600
-db.cloud.queriesBeforeRetryMaster=5000
-db.cloud.initialTimeout=3600
-db.usage.slaves=
-db.usage.failOverReadOnly=false
-db.usage.reconnectAtTxEnd=true
-db.usage.autoReconnectForPools=true
-db.usage.secondsBeforeRetryMaster=3600
-db.usage.queriesBeforeRetryMaster=5000
-db.usage.initialTimeout=3600
 ```
 
 The properties already filled in the example above are default values, the two mandatory property that is missing (and there is no default for) is:
@@ -84,8 +58,6 @@ Possibilities are:
 * `file`: This option requires a file named `key`, containing the encryption key, to be in the configuration folder (e.g. `/etc/cosmic/management`)
 * `env`: This option expects an environment variable named `CLOUD_SECRET_KEY`, containing the encryption key, to be defined and available
 * `web`: This options expects the key to be delivered via socket on port `8097`
-
-For configuring high-availability at the data base level, the property `db.ha.enabled` must be set to true, and the remaining properties in that section must be set accordingly.
 
 By default the management server will assume that it operates in region 1 (the default region in a single region setup).
 To enable multiple regions, set the property `region.id` to the correct value.
