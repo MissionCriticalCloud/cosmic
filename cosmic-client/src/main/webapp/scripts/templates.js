@@ -1193,10 +1193,7 @@
 
                                     url: {
                                         label: 'label.url',
-                                        isEditable: true,
-                                        validation: {
-                                            required: true
-                                        }
+                                        isEditable: true
                                     },
 
                                     id: {
