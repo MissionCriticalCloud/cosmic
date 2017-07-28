@@ -706,11 +706,16 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                     continue;
                 }
                 final long storeId = store.getId();
-                final Answer answer = ssAhost.sendMessage(command);
-                if (answer != null && answer.getResult()) {
-                    storageStats.put(storeId, (StorageStats) answer);
-                    s_logger.trace("HostId: " + storeId + " Used: " + ((StorageStats) answer).getByteUsed() + " Total Available: " +
-                            ((StorageStats) answer).getCapacityBytes());
+                final Answer answer;
+                try {
+                    answer = ssAhost.sendMessageOrBreak(command);
+                    if (answer != null && answer.getResult()) {
+                        storageStats.put(storeId, (StorageStats) answer);
+                        s_logger.trace("HostId: " + storeId + " Used: " + ((StorageStats) answer).getByteUsed() + " Total Available: " +
+                                ((StorageStats) answer).getCapacityBytes());
+                    }
+                } catch (final Exception e) {
+                    s_logger.warn("Unable to get stats for store: " + storeId, e);
                 }
             }
             _storageStats = storageStats;
@@ -737,9 +742,9 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                         }
                     }
                 } catch (final StorageUnavailableException e) {
-                    s_logger.info("Unable to reach " + pool, e);
+                    s_logger.info("Unable to reach pool: " + pool, e);
                 } catch (final Exception e) {
-                    s_logger.warn("Unable to get stats for " + pool, e);
+                    s_logger.warn("Unable to get stats for pool: " + pool, e);
                 }
             }
             _storagePoolStats = storagePoolStats;

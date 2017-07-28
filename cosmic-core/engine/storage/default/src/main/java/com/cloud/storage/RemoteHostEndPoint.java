@@ -158,19 +158,21 @@ public class RemoteHostEndPoint implements EndPoint {
     }
 
     @Override
+    public Answer sendMessageOrBreak(final Command cmd) throws AgentUnavailableException, OperationTimedoutException {
+        final long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
+        if (newHostId != hostId) {
+            // update endpoint with new host if changed
+            setId(newHostId);
+        }
+        return agentMgr.send(newHostId, cmd);
+    }
+
+    @Override
     public Answer sendMessage(final Command cmd) {
-        String errMsg = null;
+        String errMsg;
         try {
-            final long newHostId = _hvGuruMgr.getGuruProcessedCommandTargetHost(hostId, cmd);
-            if (newHostId != hostId) {
-                // update endpoint with new host if changed
-                setId(newHostId);
-            }
-            return agentMgr.send(newHostId, cmd);
-        } catch (final AgentUnavailableException e) {
-            errMsg = e.toString();
-            s_logger.debug("Failed to send command, due to Agent:" + getId() + ", " + e.toString());
-        } catch (final OperationTimedoutException e) {
+            return sendMessageOrBreak(cmd);
+        } catch (final AgentUnavailableException | OperationTimedoutException e) {
             errMsg = e.toString();
             s_logger.debug("Failed to send command, due to Agent:" + getId() + ", " + e.toString());
         }
