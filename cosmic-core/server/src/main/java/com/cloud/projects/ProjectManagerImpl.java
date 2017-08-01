@@ -241,11 +241,15 @@ public class ProjectManagerImpl extends ManagerBase implements ProjectManager {
     @DB
     private boolean cleanupProject(final Project project, final AccountVO caller, final Long callerUserId) {
         boolean result = true;
+
         //Delete project's account
         final AccountVO account = _accountDao.findById(project.getProjectAccountId());
-        s_logger.debug("Deleting projects " + project + " internal account id=" + account.getId() + " as a part of project cleanup...");
 
-        result = result && _accountMgr.deleteAccount(account, callerUserId, caller);
+        if (account != null) {
+            s_logger.debug("Deleting projects " + project + " internal account id=" + account.getId() + " as a part of project cleanup...");
+
+            result = _accountMgr.deleteAccount(account, callerUserId, caller);
+        }
 
         if (result) {
             //Unassign all users from the project
