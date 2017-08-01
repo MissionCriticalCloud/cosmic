@@ -4,6 +4,8 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
+import com.cloud.exception.AgentUnavailableException;
+import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.managed.context.ManagedContextRunnable;
@@ -68,6 +70,11 @@ public class LocalHostEndpoint implements EndPoint {
         } else {
             return "127.0.0.0";
         }
+    }
+
+    @Override
+    public Answer sendMessageOrBreak(final Command cmd) throws AgentUnavailableException, OperationTimedoutException {
+        return sendMessage(cmd);
     }
 
     @Override
