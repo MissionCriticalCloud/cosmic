@@ -988,6 +988,7 @@
                     dialogClass: 'notice',
                     closeOnEscape: false,
                     zIndex: 5000,
+                    width: args.width,
                     buttons: [{
                         text: _l('label.close'),
                         'class': 'close',

@@ -6,6 +6,9 @@ import com.cloud.api.BaseListAccountResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.UserResponse;
+import com.cloud.utils.StringUtils;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +66,15 @@ public class ListUsersCmd extends BaseListAccountResourcesCmd {
     public void execute() {
         final ListResponse<UserResponse> response = _queryService.searchForUsers(this);
         response.setResponseName(getCommandName());
+        List<UserResponse> responseList = response.getResponses();
+
+        if (responseList != null && responseList.size() > 0) {
+            for (UserResponse userResponse : responseList) {
+                if (StringUtils.isNotBlank(userResponse.getSecretKey())) {
+                    userResponse.setSecretKey("SecretKey only visible when generating a new key");
+                }
+            }
+        }
         this.setResponseObject(response);
     }
 
