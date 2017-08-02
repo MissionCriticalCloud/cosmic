@@ -1,7 +1,4 @@
 import socket
-
-from nose.plugins.attrib import attr
-
 from marvin.cloudstackAPI import stopRouter
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
@@ -21,6 +18,7 @@ from marvin.lib.utils import (
     cleanup_resources
 )
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestRouterIpTablesPolicies(cloudstackTestCase):
@@ -128,7 +126,7 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
                     res = str(result)
 
                     self.assertEqual(
-                        res.count("DROP"),
+                        res.count("policy DROP"),
                         1,
                         "%s Default Policy should be DROP" % table)
 

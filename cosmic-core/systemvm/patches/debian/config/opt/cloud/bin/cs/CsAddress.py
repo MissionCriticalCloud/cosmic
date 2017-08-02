@@ -381,7 +381,6 @@ class CsIP:
         if self.config.is_vpc():
             return
 
-        self.fw.append(["filter", "", "-A FW_OUTBOUND -m state --state RELATED,ESTABLISHED -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -i eth1 -p tcp -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
 
         self.fw.append(["filter", "", "-P INPUT DROP"])
@@ -400,6 +399,9 @@ class CsIP:
             self.fw.append(["mangle", "", "-A VPN_%s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.address['public_ip']])
             self.fw.append(["mangle", "", "-A VPN_%s -j RETURN" % self.address['public_ip']])
 
+            self.fw.append(["nat", "", "-A POSTROUTING -o eth2 -d 10.0.0.0/8 -j RETURN"])
+            self.fw.append(["nat", "", "-A POSTROUTING -o eth2 -d 172.16.0.0/12 -j RETURN"])
+            self.fw.append(["nat", "", "-A POSTROUTING -o eth2 -d 192.168.0.0/16 -j RETURN"])
             self.fw.append(["nat", "", "-A POSTROUTING -o eth2 -j SNAT --to-source %s" % self.address['public_ip']])
 
             self.fw.append(["mangle", "", "-A PREROUTING -i %s -m state --state NEW -j CONNMARK --set-xmark %s/0xffffffff" % (self.dev, self.dnum)])
@@ -420,16 +422,20 @@ class CsIP:
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
+
             self.fw.append(["filter", "", "-A FORWARD -i %s -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A FORWARD -i %s -o %s -m state --state NEW -j ACCEPT" % (self.dev, self.dev)])
             self.fw.append(["filter", "", "-A FORWARD -i eth2 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
             self.fw.append(["filter", "", "-A FORWARD -i eth0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+
+            self.fw.append(["filter", "", "-A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
             self.fw.append(["filter", "", "-A FORWARD -i eth0 -o eth2 -j FW_OUTBOUND"])
             self.fw.append(["mangle", "", "-A PREROUTING -i %s -m state --state NEW -j CONNMARK --set-xmark %s/0xffffffff" % (self.dev, self.dnum)])
 
         self.fw.append(['', 'front', '-A FORWARD -j NETWORK_STATS'])
         self.fw.append(['', 'front', '-A INPUT -j NETWORK_STATS'])
         self.fw.append(['', 'front', '-A OUTPUT -j NETWORK_STATS'])
+
         self.fw.append(['', '', '-A NETWORK_STATS -i eth0 -o eth2'])
         self.fw.append(['', '', '-A NETWORK_STATS -i eth2 -o eth0'])
         self.fw.append(['', '', '-A NETWORK_STATS -o eth2 ! -i eth0 -p tcp'])
@@ -563,8 +569,10 @@ class CsIP:
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:
                 logging.info("Adding SourceNAT for interface %s to %s" % (self.dev, self.address['public_ip']))
-                self.fw.append(
-                    ["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
+                self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 10.0.0.0/8 -j RETURN" % self.dev])
+                self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 172.16.0.0/12 -j RETURN" % self.dev])
+                self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 192.168.0.0/16 -j RETURN" % self.dev])
+                self.fw.append(["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (self.dev, self.address['public_ip'])])
             else:
                 logging.info("Not adding SourceNAT for interface %s to %s, because source_nat=False" % (self.dev, self.address['public_ip']))
 

@@ -23,8 +23,6 @@ from marvin.lib.common import (
     get_default_network_offering,
     list_hosts,
     list_routers,
-    list_vlan_ipranges,
-    list_networks,
     get_default_redundant_vpc_offering,
     get_default_virtual_machine_offering,
     get_template,
@@ -224,26 +222,6 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         self.check_routers_state(status_to_check="MASTER")
         self.do_vpc_test(False)
-
-    def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
-                                 zoneid=self.zone.id,
-                                 listall=True,
-                                 issystem=True,
-                                 traffictype="Public")
-        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
-
-        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-
-        ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid=self.zone.id,
-                                       networkid=networks[0].id)
-        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
-
-        return ip_ranges[0].gateway
 
     def query_routers(self, count=2, showall=False):
         self.logger.debug('query_routers count: %s, showall: %s' % (count, showall))
@@ -584,10 +562,9 @@ class TestVPCRedundancy(cloudstackTestCase):
                 self.check_ssh_into_vm(vm.get_vm(), vm.get_ip(), expectFail=expectFail, retries=retries)
 
     def do_default_routes_test(self):
-        gateway = self.find_public_gateway()
         for o in self.networks:
             for vmObj in o.get_vms():
-                ssh_command = "ping -c 3 %s" % gateway
+                ssh_command = "ping -c 3 8.8.8.8"
 
                 # Should be able to SSH VM
                 result = 'failed'

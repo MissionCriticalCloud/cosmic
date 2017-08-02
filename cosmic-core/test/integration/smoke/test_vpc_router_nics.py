@@ -1,8 +1,5 @@
 import socket
 import time
-
-from nose.plugins.attrib import attr
-
 from marvin.cloudstackAPI import (
     stopRouter,
     destroyRouter
@@ -21,8 +18,6 @@ from marvin.lib.common import (
     get_default_network_offering_no_load_balancer,
     get_default_network_offering,
     list_routers,
-    list_vlan_ipranges,
-    list_networks,
     get_default_vpc_offering,
     get_default_virtual_machine_offering,
     get_template,
@@ -31,6 +26,7 @@ from marvin.lib.common import (
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestVPCNics(cloudstackTestCase):
@@ -136,26 +132,6 @@ class TestVPCNics(cloudstackTestCase):
 
         self.add_nat_rules()
         self.do_default_routes_test()
-
-    def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
-                                 zoneid=self.zone.id,
-                                 listall=True,
-                                 issystem=True,
-                                 traffictype="Public")
-        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
-
-        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-
-        ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid=self.zone.id,
-                                       networkid=networks[0].id)
-        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
-
-        return ip_ranges[0].gateway
 
     def query_routers(self):
         self.routers = list_routers(self.apiclient,
@@ -302,10 +278,9 @@ class TestVPCNics(cloudstackTestCase):
                     self.fail("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 
     def do_default_routes_test(self):
-        gateway = self.find_public_gateway()
         for o in self.networks:
             for vmObj in o.get_vms():
-                ssh_command = "ping -c 3 %s" % gateway
+                ssh_command = "ping -c 3 8.8.8.8"
 
                 # Should be able to SSH VM
                 result = 'failed'
