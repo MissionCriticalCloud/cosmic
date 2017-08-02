@@ -17,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-utils</artifactId>
+            <artifactId>cosmic-utils</artifactId>
             <version>5.3.7.1-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -57,7 +57,9 @@
                 <configuration>
                     <executable>true</executable>
                     <layout>ZIP</layout>
-                    <excludeArtifactIds>antlr,aspectjrt,cosmic-db,cosmic-model,dom4j,hibernate-commons-annotations,hibernate-core,hibernate-entitymanager,hibernate-jpa-2.1-api,jandex,javax.transaction-api,jboss-logging,spring-aspects,spring-boot-starter-aop,spring-boot-starter-data-jpa,spring-boot-starter-jdbc,spring-data-commons,spring-data-jpa,spring-jdbc,spring-orm,spring-tx,tomcat-jdbc,tomcat-juli,xml-apis</excludeArtifactIds>
+                    <excludeArtifactIds>
+                        antlr,aspectjrt,cosmic-db,cosmic-model,dom4j,hibernate-commons-annotations,hibernate-core,hibernate-entitymanager,hibernate-jpa-2.1-api,jandex,javax.transaction-api,jboss-logging,spring-aspects,spring-boot-starter-aop,spring-boot-starter-data-jpa,spring-boot-starter-jdbc,spring-data-commons,spring-data-jpa,spring-jdbc,spring-orm,spring-tx,tomcat-jdbc,tomcat-juli,xml-apis
+                    </excludeArtifactIds>
                 </configuration>
             </plugin>
         </plugins>
