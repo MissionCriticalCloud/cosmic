@@ -168,11 +168,6 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                     continue;
                 }
 
-                // Check if image store has enough capacity for template
-                if (!_statsCollector.imageStoreHasEnoughCapacity(imageStore)) {
-                    s_logger.info("Image store doesn't has enough capacity, so skip downloading template to this image store " + imageStore.getId());
-                    continue;
-                }
                 // We want to download private template to one of the image store in a zone
                 if (isPrivateTemplate(template) && zoneSet.contains(zoneId)) {
                     continue;
