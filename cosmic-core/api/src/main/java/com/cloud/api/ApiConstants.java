@@ -503,7 +503,6 @@ public class ApiConstants {
     public static final String OTHER_DEPLOY_PARAMS = "otherdeployparams";
     public static final String MIN_MEMBERS = "minmembers";
     public static final String MAX_MEMBERS = "maxmembers";
-    public static final String AUTOSCALE_VM_DESTROY_TIME = "destroyvmgraceperiod";
     public static final String VMPROFILE_ID = "vmprofileid";
     public static final String VMGROUP_ID = "vmgroupid";
     public static final String CS_URL = "csurl";
@@ -518,7 +517,6 @@ public class ApiConstants {
     public static final String CONDITION_ID = "conditionid";
     public static final String CONDITION_IDS = "conditionids";
     public static final String COUNTERPARAM_LIST = "counterparam";
-    public static final String AUTOSCALE_USER_ID = "autoscaleuserid";
     public static final String GSLB_PROVIDER = "gslbprovider";
     public static final String EXCLUSIVE_GSLB_PROVIDER = "isexclusivegslbprovider";
     public static final String GSLB_PROVIDER_PUBLIC_IP = "gslbproviderpublicip";

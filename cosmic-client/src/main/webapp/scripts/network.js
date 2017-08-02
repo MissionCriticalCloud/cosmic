@@ -395,7 +395,7 @@
                                 listAll: true
                             },
                             async: false,
-                            success: function(vpnResponse) {
+                            success: function (vpnResponse) {
                                 var isVPNEnabled = vpnResponse.listremoteaccessvpnsresponse.count;
                                 if (isVPNEnabled) {
                                     sectionsToShow.push('vpnuser');
@@ -853,7 +853,7 @@
                                 createForm: {
                                     title: 'label.restart.vpc',
                                     desc: function (args) {
-                                            return 'message.restart.vpc';
+                                        return 'message.restart.vpc';
                                     },
 
                                     preFilter: function (args) {
@@ -872,8 +872,7 @@
                                         args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
 
                                     },
-                                    fields: {
-                                    }
+                                    fields: {}
                                 },
                                 messages: {
                                     confirm: function (args) {
@@ -1313,7 +1312,7 @@
                     },
 
                     dataProvider: function (args) {
-                        var data = { 'forvpc': 'true' };
+                        var data = {'forvpc': 'true'};
                         listViewDataProvider(args, data);
                         $.ajax({
                             url: createURL('listNetworks'),
@@ -2135,7 +2134,7 @@
                     },
 
                     dataProvider: function (args) {
-                        var data = { 'forvpc': 'false' };
+                        var data = {'forvpc': 'false'};
                         listViewDataProvider(args, data);
                         $.ajax({
                             url: createURL('listNetworks'),
@@ -2158,7 +2157,7 @@
                             path: 'network.ipAddresses',
                             label: 'label.menu.ipaddresses',
                             preFilter: function (args) {
-                                if (args.context.networks[0].state == 'Destroyed' || args.context.networks[0].type == 'Private' )
+                                if (args.context.networks[0].state == 'Destroyed' || args.context.networks[0].type == 'Private')
                                     return false;
 
                                 return true;
@@ -2314,8 +2313,7 @@
                                         args.$form.find('.form-item[rel=cleanup]').find('input').attr('checked', 'checked'); //checked
                                         args.$form.find('.form-item[rel=cleanup]').css('display', 'inline-block'); //shown
                                     },
-                                    fields: {
-                                    }
+                                    fields: {}
                                 },
                                 messages: {
                                     notification: function (args) {
@@ -2695,9 +2693,9 @@
                                                             var name = $(this).attr('rel');
 
                                                             return $.inArray(name, [
-                                                                    'icmptype',
-                                                                    'icmpcode'
-                                                                ]) > -1;
+                                                                'icmptype',
+                                                                'icmpcode'
+                                                            ]) > -1;
                                                         });
                                                         var $otherFields = $inputs.filter(function () {
                                                             var name = $(this).attr('rel');
@@ -3347,7 +3345,8 @@
                         } else if ('vpcTiers' in args.context) {
                             $.extend(data, {
                                 associatedNetworkId: args.context.vpcTiers[0].id
-                            });                        }
+                            });
+                        }
 
                         $.ajax({
                             url: createURL('listPublicIpAddresses'),
@@ -3645,8 +3644,8 @@
                                                                         data.listvirtualmachinesresponse.virtualmachine : [],
                                                                     function (instance) {
                                                                         return $.inArray(instance.state, [
-                                                                                'Destroyed', 'Expunging'
-                                                                            ]) == -1;
+                                                                            'Destroyed', 'Expunging'
+                                                                        ]) == -1;
                                                                     }
                                                                 )
                                                             });
@@ -4187,9 +4186,9 @@
                                                             var name = $(this).attr('name');
 
                                                             return $.inArray(name, [
-                                                                    'icmptype',
-                                                                    'icmpcode'
-                                                                ]) > -1;
+                                                                'icmptype',
+                                                                'icmpcode'
+                                                            ]) > -1;
                                                         });
                                                         var $otherFields = $inputs.filter(function () {
                                                             var name = $(this).attr('name');
@@ -4452,18 +4451,6 @@
                                                                 data.listvirtualmachinesresponse.virtualmachine ?
                                                                     data.listvirtualmachinesresponse.virtualmachine : [],
                                                                 function (instance) {
-                                                                    //Hiding the autoScale VMs
-                                                                    var nonAutoScale = 0;
-                                                                    if (instance.displayname == null)
-                                                                        nonAutoScale = 1
-                                                                    else {
-                                                                        if (instance.displayname.match(/AutoScale-LB-/) == null)
-                                                                            nonAutoScale = 1;
-                                                                        else {
-                                                                            if (instance.displayname.match(/AutoScale-LB-/).length)
-                                                                                nonAutoScale = 0;
-                                                                        }
-                                                                    }
                                                                     var isActiveState = $.inArray(instance.state, ['Destroyed', 'Expunging']) == -1;
                                                                     var notExisting = !$.grep(itemData, function (item) {
                                                                         return item.id == instance.id;
@@ -4507,7 +4494,7 @@
                                                                         })
                                                                     }
 
-                                                                    return nonAutoScale && isActiveState && notExisting;
+                                                                    return isActiveState && notExisting;
                                                                 }
                                                             );
 
@@ -4940,25 +4927,6 @@
                                                         //var lbInstances = [];
                                                         var itemData = [];
 
-                                                        // Passing _hideFields array will disable specified fields for this row
-                                                        //lbRule._hideFields = ['autoScale'];
-
-                                                        $.ajax({
-                                                            url: createURL('listAutoScaleVmGroups'),
-                                                            data: {
-                                                                listAll: true,
-                                                                lbruleid: lbRule.id
-                                                            },
-                                                            async: false,
-                                                            success: function (json) {
-                                                                if (json.listautoscalevmgroupsresponse.autoscalevmgroup != null && json.listautoscalevmgroupsresponse.autoscalevmgroup.length > 0) { //from 'autoScale' button
-                                                                    lbRule._hideFields = ['add-vm'];
-                                                                } else { //from 'add-vm' button
-                                                                    lbRule._hideFields = ['autoScale'];
-                                                                }
-                                                            }
-                                                        });
-
                                                         // Get sticky data
                                                         $.ajax({
                                                             url: createURL('listLBStickinessPolicies'),
@@ -5018,8 +4986,6 @@
                                                                     for (var k = 0; k < lbrulevmidips.length; k++) {
                                                                         var lbrulevmidip = lbrulevmidips[k];
                                                                         var lbVM = lbrulevmidip.loadbalancerruleinstance;
-                                                                        if (lbVM.displayname.indexOf('AutoScale-LB-') > -1) //autoscale VM is not allowed to be deleted manually. So, hide destroy button
-                                                                            lbVM._hideActions = ['destroy'];
 
                                                                         if (lbVM.servicestate) {
                                                                             lbVM._itemStateLabel = 'label.service.state';
@@ -5051,10 +5017,7 @@
                                                             _maxLength: {
                                                                 name: 7
                                                             },
-                                                            sticky: stickyData,
-                                                            autoScale: {
-                                                                lbRuleID: lbRule.id
-                                                            }
+                                                            sticky: stickyData
                                                         });
                                                     });
 
@@ -5180,8 +5143,8 @@
                                                                         data.listvirtualmachinesresponse.virtualmachine : [],
                                                                     function (instance) {
                                                                         return $.inArray(instance.state, [
-                                                                                'Destroyed', 'Expunging'
-                                                                            ]) == -1;
+                                                                            'Destroyed', 'Expunging'
+                                                                        ]) == -1;
                                                                     }
                                                                 )
                                                             });
@@ -5632,9 +5595,9 @@
                                                         var name = $(this).attr('rel');
 
                                                         return $.inArray(name, [
-                                                                'icmptype',
-                                                                'icmpcode'
-                                                            ]) > -1;
+                                                            'icmptype',
+                                                            'icmpcode'
+                                                        ]) > -1;
                                                     });
                                                     var $otherFields = $inputs.filter(function () {
                                                         var name = $(this).attr('rel');
@@ -5842,9 +5805,9 @@
                                                         var name = $(this).attr('rel');
 
                                                         return $.inArray(name, [
-                                                                'icmptype',
-                                                                'icmpcode'
-                                                            ]) > -1;
+                                                            'icmptype',
+                                                            'icmpcode'
+                                                        ]) > -1;
                                                     });
                                                     var $otherFields = $inputs.filter(function () {
                                                         var name = $(this).attr('rel');
@@ -6348,7 +6311,7 @@
                                                 id: 'modp1536',
                                                 description: 'Group 5(modp1536)'
                                             });
-                                           items.push({
+                                            items.push({
                                                 id: 'modp2048',
                                                 description: 'Group 14(modp2048)'
                                             });

@@ -10,12 +10,10 @@ import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRuleInstancesCmd;
 import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRulesCmd;
 import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.api.response.ServiceResponse;
-import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.domain.dao.DomainDao;
@@ -32,7 +30,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.lb.ApplicationLoadBalancerRuleVO;
 import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
-import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.ExternalDeviceUsageManager;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
@@ -43,21 +40,6 @@ import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.as.AutoScalePolicy;
-import com.cloud.network.as.AutoScalePolicyConditionMapVO;
-import com.cloud.network.as.AutoScaleVmGroup;
-import com.cloud.network.as.AutoScaleVmGroupPolicyMapVO;
-import com.cloud.network.as.AutoScaleVmGroupVO;
-import com.cloud.network.as.AutoScaleVmProfile;
-import com.cloud.network.as.Condition;
-import com.cloud.network.as.Counter;
-import com.cloud.network.as.dao.AutoScalePolicyConditionMapDao;
-import com.cloud.network.as.dao.AutoScalePolicyDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupPolicyMapDao;
-import com.cloud.network.as.dao.AutoScaleVmProfileDao;
-import com.cloud.network.as.dao.ConditionDao;
-import com.cloud.network.as.dao.CounterDao;
 import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -76,10 +58,6 @@ import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.SslCertVO;
 import com.cloud.network.element.LoadBalancingServiceProvider;
-import com.cloud.network.lb.LoadBalancingRule.LbAutoScalePolicy;
-import com.cloud.network.lb.LoadBalancingRule.LbAutoScaleVmGroup;
-import com.cloud.network.lb.LoadBalancingRule.LbAutoScaleVmProfile;
-import com.cloud.network.lb.LoadBalancingRule.LbCondition;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
 import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
@@ -107,7 +85,6 @@ import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainService;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.uservm.UserVm;
@@ -213,20 +190,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
     VMTemplateDao _templateDao;
     @Inject
     ServiceOfferingDao _offeringsDao;
-    @Inject
-    CounterDao _counterDao;
-    @Inject
-    ConditionDao _conditionDao;
-    @Inject
-    AutoScaleVmProfileDao _autoScaleVmProfileDao;
-    @Inject
-    AutoScalePolicyDao _autoScalePolicyDao;
-    @Inject
-    AutoScalePolicyConditionMapDao _autoScalePolicyConditionMapDao;
-    @Inject
-    AutoScaleVmGroupDao _autoScaleVmGroupDao;
-    @Inject
-    AutoScaleVmGroupPolicyMapDao _autoScaleVmGroupPolicyMapDao;
     @Inject
     ConfigurationDao _configDao;
     @Inject
@@ -722,8 +685,7 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
         }
     }
 
-    // Will return a string. For LB Stickiness this will be a json, for
-    // autoscale this will be "," separated values
+    // Will return a string. For LB Stickiness this will be a json
     @Override
     public String getLBCapability(final long networkid, final String capabilityName) {
         final Map<Service, Map<Capability, String>> serviceCapabilitiesMap = _networkModel.getNetworkCapabilities(networkid);
@@ -744,86 +706,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             }
         }
         return null;
-    }
-
-    @Override
-    @DB
-    public boolean configureLbAutoScaleVmGroup(final long vmGroupid, final String currentState) throws ResourceUnavailableException {
-        final AutoScaleVmGroupVO vmGroup = _autoScaleVmGroupDao.findById(vmGroupid);
-        boolean success = false;
-
-        final LoadBalancerVO loadBalancer = _lbDao.findById(vmGroup.getLoadBalancerId());
-
-        final FirewallRule.State backupState = loadBalancer.getState();
-
-        if (vmGroup.getState().equals(AutoScaleVmGroup.State_New)) {
-            loadBalancer.setState(FirewallRule.State.Add);
-            _lbDao.persist(loadBalancer);
-        } else if (loadBalancer.getState() == FirewallRule.State.Active && vmGroup.getState().equals(AutoScaleVmGroup.State_Revoke)) {
-            loadBalancer.setState(FirewallRule.State.Add);
-            _lbDao.persist(loadBalancer);
-        }
-
-        try {
-            success = applyAutoScaleConfig(loadBalancer, vmGroup, currentState);
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to configure AutoScaleVmGroup to the lb rule: " + loadBalancer.getId() + " because resource is unavaliable:", e);
-            if (isRollBackAllowedForProvider(loadBalancer)) {
-                loadBalancer.setState(backupState);
-                _lbDao.persist(loadBalancer);
-                s_logger.debug("LB Rollback rule id: " + loadBalancer.getId() + " lb state rolback while creating AutoscaleVmGroup");
-            }
-            throw e;
-        } finally {
-            if (!success) {
-                s_logger.warn("Failed to configure LB Auto Scale Vm Group with Id:" + vmGroupid);
-            }
-        }
-
-        if (success) {
-            if (vmGroup.getState().equals(AutoScaleVmGroup.State_New)) {
-                Transaction.execute(new TransactionCallbackNoReturn() {
-                    @Override
-                    public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        loadBalancer.setState(FirewallRule.State.Active);
-                        s_logger.debug("LB rule " + loadBalancer.getId() + " state is set to Active");
-                        _lbDao.persist(loadBalancer);
-                        vmGroup.setState(AutoScaleVmGroup.State_Enabled);
-                        _autoScaleVmGroupDao.persist(vmGroup);
-                        s_logger.debug("LB Auto Scale Vm Group with Id: " + vmGroupid + " is set to Enabled state.");
-                    }
-                });
-            }
-            s_logger.info("Successfully configured LB Autoscale Vm Group with Id: " + vmGroupid);
-        }
-        return success;
-    }
-
-    private boolean applyAutoScaleConfig(final LoadBalancerVO lb, final AutoScaleVmGroupVO vmGroup, final String currentState) throws ResourceUnavailableException {
-        final LbAutoScaleVmGroup lbAutoScaleVmGroup = getLbAutoScaleVmGroup(vmGroup, currentState, lb);
-        /*
-         * Regular config like destinations need not be packed for applying
-         * autoscale config as of today.
-         */
-        final List<LbStickinessPolicy> policyList = getStickinessPolicies(lb.getId());
-        final Ip sourceIp = getSourceIp(lb);
-        final LoadBalancingRule rule = new LoadBalancingRule(lb, null, policyList, null, sourceIp, null, lb.getLbProtocol());
-        rule.setAutoScaleVmGroup(lbAutoScaleVmGroup);
-
-        if (!isRollBackAllowedForProvider(lb)) {
-            // this is for loadbalancer type of devices. if their is failure the db
-            // entries will be rollbacked.
-            return false;
-        }
-
-        final List<LoadBalancingRule> rules = Arrays.asList(rule);
-
-        if (!applyLbRules(rules, false)) {
-            s_logger.debug("LB rules' autoscale config are not completely applied");
-            return false;
-        }
-
-        return true;
     }
 
     @Override
@@ -962,15 +844,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
                                 instanceId + ", vmip " + vmIp);
                     }
                 }
-            }
-
-            if (_autoScaleVmGroupDao.isAutoScaleLoadBalancer(loadBalancerId)) {
-                // For autoscaled loadbalancer, the rules need not be applied,
-                // meaning the call need not reach the resource layer.
-                // We can consider the job done and only need to remove the
-                // rules in DB
-                _lb2VmMapDao.remove(loadBalancer.getId(), instanceIds, null);
-                return true;
             }
 
             if (!applyLoadBalancerConfig(loadBalancerId)) {
@@ -1134,17 +1007,10 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
         final LbSslCert sslCert = getLbSslCert(lb.getId());
         final LoadBalancingRule loadBalancing = new LoadBalancingRule(lb, null, policyList, null, sourceIp, sslCert, lb.getLbProtocol());
 
-        if (_autoScaleVmGroupDao.isAutoScaleLoadBalancer(lb.getId())) {
-            // Get the associated VmGroup
-            final AutoScaleVmGroupVO vmGroup = _autoScaleVmGroupDao.listByAll(lb.getId(), null).get(0);
-            final LbAutoScaleVmGroup lbAutoScaleVmGroup = getLbAutoScaleVmGroup(vmGroup, vmGroup.getState(), lb);
-            loadBalancing.setAutoScaleVmGroup(lbAutoScaleVmGroup);
-        } else {
-            final List<LbDestination> dstList = getExistingDestinations(lb.getId());
-            loadBalancing.setDestinations(dstList);
-            final List<LbHealthCheckPolicy> hcPolicyList = getHealthCheckPolicies(lb.getId());
-            loadBalancing.setHealthCheckPolicies(hcPolicyList);
-        }
+        final List<LbDestination> dstList = getExistingDestinations(lb.getId());
+        loadBalancing.setDestinations(dstList);
+        final List<LbHealthCheckPolicy> hcPolicyList = getHealthCheckPolicies(lb.getId());
+        loadBalancing.setHealthCheckPolicies(hcPolicyList);
 
         return loadBalancing;
     }
@@ -1204,64 +1070,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             }
         }
         return success;
-    }
-
-    private LbAutoScaleVmGroup getLbAutoScaleVmGroup(final AutoScaleVmGroupVO vmGroup, final String currentState, final LoadBalancerVO lb) {
-        final long lbNetworkId = lb.getNetworkId();
-        final String lbName = lb.getName();
-        final List<AutoScaleVmGroupPolicyMapVO> vmGroupPolicyMapList = _autoScaleVmGroupPolicyMapDao.listByVmGroupId(vmGroup.getId());
-        final List<LbAutoScalePolicy> autoScalePolicies = new ArrayList<>();
-        for (final AutoScaleVmGroupPolicyMapVO vmGroupPolicyMap : vmGroupPolicyMapList) {
-            final AutoScalePolicy autoScalePolicy = _autoScalePolicyDao.findById(vmGroupPolicyMap.getPolicyId());
-            final List<AutoScalePolicyConditionMapVO> autoScalePolicyConditionMapList = _autoScalePolicyConditionMapDao.listByAll(autoScalePolicy.getId(), null);
-            final List<LbCondition> lbConditions = new ArrayList<>();
-            for (final AutoScalePolicyConditionMapVO autoScalePolicyConditionMap : autoScalePolicyConditionMapList) {
-                final Condition condition = _conditionDao.findById(autoScalePolicyConditionMap.getConditionId());
-                final Counter counter = _counterDao.findById(condition.getCounterid());
-                lbConditions.add(new LbCondition(counter, condition));
-            }
-            autoScalePolicies.add(new LbAutoScalePolicy(autoScalePolicy, lbConditions));
-        }
-        final AutoScaleVmProfile autoScaleVmProfile = _autoScaleVmProfileDao.findById(vmGroup.getProfileId());
-        final Long autoscaleUserId = autoScaleVmProfile.getAutoScaleUserId();
-        final User user = _userDao.findByIdIncludingRemoved(autoscaleUserId);
-        final String apiKey = user.getApiKey();
-        final String secretKey = user.getSecretKey();
-        final String csUrl = ApiServiceConfiguration.ApiServletPath.value();
-        final String zoneId = _dcDao.findById(autoScaleVmProfile.getZoneId()).getUuid();
-        final String domainId = _domainDao.findById(autoScaleVmProfile.getDomainId()).getUuid();
-        final String serviceOfferingId = _offeringsDao.findById(autoScaleVmProfile.getServiceOfferingId()).getUuid();
-        final String templateId = _templateDao.findById(autoScaleVmProfile.getTemplateId()).getUuid();
-        final String vmName = "AutoScale-LB-" + lbName;
-        String lbNetworkUuid = null;
-
-        final DataCenter zone = _entityMgr.findById(DataCenter.class, vmGroup.getZoneId());
-        if (zone == null) {
-            // This should never happen, but still a cautious check
-            s_logger.warn("Unable to find zone while packaging AutoScale Vm Group, zoneid: " + vmGroup.getZoneId());
-            throw new InvalidParameterValueException("Unable to find zone");
-        } else {
-            if (zone.getNetworkType() == NetworkType.Advanced) {
-                final NetworkVO lbNetwork = _networkDao.findById(lbNetworkId);
-                lbNetworkUuid = lbNetwork.getUuid();
-            }
-        }
-
-        if (apiKey == null) {
-            throw new InvalidParameterValueException("apiKey for user: " + user.getUsername() + " is empty. Please generate it");
-        }
-
-        if (secretKey == null) {
-            throw new InvalidParameterValueException("secretKey for user: " + user.getUsername() + " is empty. Please generate it");
-        }
-
-        if (csUrl == null || csUrl.contains("localhost")) {
-            throw new InvalidParameterValueException("Global setting endpointe.url has to be set to the Management Server's API end point");
-        }
-
-        final LbAutoScaleVmProfile lbAutoScaleVmProfile =
-                new LbAutoScaleVmProfile(autoScaleVmProfile, apiKey, secretKey, csUrl, zoneId, domainId, serviceOfferingId, templateId, vmName, lbNetworkUuid);
-        return new LbAutoScaleVmGroup(vmGroup, autoScalePolicies, lbAutoScaleVmProfile, currentState);
     }
 
     protected boolean applyLbRules(final Network network, final List<LoadBalancingRule> rules) throws ResourceUnavailableException {
@@ -1977,12 +1785,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             }
         });
 
-        if (_autoScaleVmGroupDao.isAutoScaleLoadBalancer(loadBalancerId)) {
-            // For autoscaled loadbalancer, the rules need not be applied,
-            // meaning the call need not reach the resource layer.
-            // We can consider the job done.
-            return true;
-        }
         boolean success = false;
         final FirewallRule.State backupState = loadBalancer.getState();
         try {

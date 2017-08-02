@@ -19,7 +19,6 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
-import com.cloud.network.as.AutoScaleManager;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
@@ -146,8 +145,6 @@ public class AccountManagerImplTest {
     DomainRouterDao _routerDao;
     @Mock
     Site2SiteVpnManager _vpnMgr;
-    @Mock
-    AutoScaleManager _autoscaleMgr;
     @Mock
     VolumeApiService volumeService;
     @Mock

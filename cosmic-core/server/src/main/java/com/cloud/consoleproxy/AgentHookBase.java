@@ -181,7 +181,7 @@ public abstract class AgentHookBase implements AgentHook {
 
     @Override
     public void onAgentDisconnect(final long agentId, final Status state) {
-        // no-op since we do not autoscale
+        // no-op
     }
 
     @Override

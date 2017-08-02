@@ -49,7 +49,6 @@ import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.VpnUserVO;
-import com.cloud.network.as.AutoScaleManager;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
 import com.cloud.network.dao.IPAddressDao;
@@ -92,7 +91,6 @@ import com.cloud.user.Account.State;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.ConstantTimeComparator;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
@@ -127,16 +125,12 @@ import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 
 import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.net.InetAddress;
-import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -244,8 +238,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     private IPAddressDao _ipAddressDao;
     @Inject
     private VpcManager _vpcMgr;
-    @Inject
-    private AutoScaleManager _autoscaleMgr;
     @Inject
     private AffinityGroupDao _affinityGroupDao;
     @Inject
@@ -1239,14 +1231,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 s_logger.warn("Fail to delete site-to-site VPN customer gateways for account " + accountId);
             }
 
-            // Delete autoscale resources if any
-            try {
-                _autoscaleMgr.cleanUpAutoScaleResources(accountId);
-            } catch (final CloudRuntimeException ex) {
-                s_logger.warn("Failed to cleanup AutoScale resources as a part of account id=" + accountId + " cleanup due to exception:", ex);
-                accountCleanupNeeded = true;
-            }
-
             // release account specific Virtual vlans (belong to system Public Network) - only when networks are cleaned
             // up successfully
             if (networksDeleted) {
@@ -2207,7 +2191,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             final DomainVO domain = (DomainVO) _domainMgr.getDomain(account.getDomainId());
 
             // Get the CIDRs from where this account is allowed to make calls
-            final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s","");
+            final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s", "");
             final Boolean ApiSourceCidrChecksEnabled = ApiServiceConfiguration.ApiSourceCidrChecksEnabled.value();
 
             if (ApiSourceCidrChecksEnabled) {
@@ -2215,10 +2199,10 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
 
                 // Block when is not in the list of allowed IPs
                 if (!NetUtils.isIpInCidrList(loginIpAddress, accessAllowedCidrs.split(","))) {
-                    s_logger.warn("Request by account '" + account.toString() + "' was denied since " + loginIpAddress.toString().replaceAll("/","")
+                    s_logger.warn("Request by account '" + account.toString() + "' was denied since " + loginIpAddress.toString().replaceAll("/", "")
                             + " does not match " + accessAllowedCidrs);
                     throw new CloudAuthenticationException("Failed to authenticate user '" + username + "' in domain '" + domain.getPath() + "' from ip "
-                            + loginIpAddress.toString().replaceAll("/","") + "; please provide valid credentials");
+                            + loginIpAddress.toString().replaceAll("/", "") + "; please provide valid credentials");
                 }
             }
 

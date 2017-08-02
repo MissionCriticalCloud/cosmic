@@ -14,7 +14,6 @@ public class NetworkManagerTestComponentLibrary {
         //        addManager("network manager", NetworkManagerImpl.class);
         //        addManager("network model", NetworkModelImpl.class);
         //        addManager("LoadBalancingRulesManager", LoadBalancingRulesManagerImpl.class);
-        //        //addManager("AutoScaleManager", AutoScaleManagerImpl.class);
         //        addManager("RulesManager", RulesManagerImpl.class);
         //        addManager("RemoteAccessVpnManager", RemoteAccessVpnManagerImpl.class);
         //        addManager("FirewallManager", FirewallManagerImpl.class);

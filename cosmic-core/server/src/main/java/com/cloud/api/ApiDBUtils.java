@@ -135,21 +135,6 @@ import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkServiceProvider;
-import com.cloud.network.as.AutoScalePolicy;
-import com.cloud.network.as.AutoScalePolicyConditionMapVO;
-import com.cloud.network.as.AutoScalePolicyVO;
-import com.cloud.network.as.AutoScaleVmGroupPolicyMapVO;
-import com.cloud.network.as.AutoScaleVmGroupVO;
-import com.cloud.network.as.AutoScaleVmProfileVO;
-import com.cloud.network.as.ConditionVO;
-import com.cloud.network.as.CounterVO;
-import com.cloud.network.as.dao.AutoScalePolicyConditionMapDao;
-import com.cloud.network.as.dao.AutoScalePolicyDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupPolicyMapDao;
-import com.cloud.network.as.dao.AutoScaleVmProfileDao;
-import com.cloud.network.as.dao.ConditionDao;
-import com.cloud.network.as.dao.CounterDao;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
 import com.cloud.network.dao.FirewallRulesCidrsDao;
@@ -283,7 +268,6 @@ import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -358,13 +342,6 @@ public class ApiDBUtils {
     static TaggedResourceService s_taggedResourceService;
     static UserVmDetailsDao s_userVmDetailsDao;
     static SSHKeyPairDao s_sshKeyPairDao;
-    static ConditionDao s_asConditionDao;
-    static AutoScalePolicyConditionMapDao s_asPolicyConditionMapDao;
-    static AutoScaleVmGroupPolicyMapDao s_asVmGroupPolicyMapDao;
-    static AutoScalePolicyDao s_asPolicyDao;
-    static AutoScaleVmProfileDao s_asVmProfileDao;
-    static AutoScaleVmGroupDao s_asVmGroupDao;
-    static CounterDao s_counterDao;
     static ResourceTagJoinDao s_tagJoinDao;
     static EventJoinDao s_eventJoinDao;
     static InstanceGroupJoinDao s_vmGroupJoinDao;
@@ -537,21 +514,6 @@ public class ApiDBUtils {
     private UserVmDetailsDao userVmDetailsDao;
     @Inject
     private SSHKeyPairDao sshKeyPairDao;
-
-    @Inject
-    private ConditionDao asConditionDao;
-    @Inject
-    private AutoScalePolicyConditionMapDao asPolicyConditionMapDao;
-    @Inject
-    private AutoScaleVmGroupPolicyMapDao asVmGroupPolicyMapDao;
-    @Inject
-    private AutoScalePolicyDao asPolicyDao;
-    @Inject
-    private AutoScaleVmProfileDao asVmProfileDao;
-    @Inject
-    private AutoScaleVmGroupDao asVmGroupDao;
-    @Inject
-    private CounterDao counterDao;
     @Inject
     private ResourceTagJoinDao tagJoinDao;
     @Inject
@@ -1164,28 +1126,6 @@ public class ApiDBUtils {
         return s_taggedResourceService.listByResourceTypeAndId(type, resourceId);
     }
 
-    public static List<ConditionVO> getAutoScalePolicyConditions(final long policyId) {
-        final List<AutoScalePolicyConditionMapVO> vos = s_asPolicyConditionMapDao.listByAll(policyId, null);
-        final ArrayList<ConditionVO> conditions = new ArrayList<>(vos.size());
-        for (final AutoScalePolicyConditionMapVO vo : vos) {
-            conditions.add(s_asConditionDao.findById(vo.getConditionId()));
-        }
-
-        return conditions;
-    }
-
-    public static void getAutoScaleVmGroupPolicyIds(final long vmGroupId, final List<Long> scaleUpPolicyIds, final List<Long> scaleDownPolicyIds) {
-        final List<AutoScaleVmGroupPolicyMapVO> vos = s_asVmGroupPolicyMapDao.listByVmGroupId(vmGroupId);
-        for (final AutoScaleVmGroupPolicyMapVO vo : vos) {
-            final AutoScalePolicy autoScalePolicy = s_asPolicyDao.findById(vo.getPolicyId());
-            if (autoScalePolicy.getAction().equals("scaleup")) {
-                scaleUpPolicyIds.add(autoScalePolicy.getId());
-            } else {
-                scaleDownPolicyIds.add(autoScalePolicy.getId());
-            }
-        }
-    }
-
     public static String getKeyPairName(final String sshPublicKey) {
         final SSHKeyPairVO sshKeyPair = s_sshKeyPairDao.findByPublicKey(sshPublicKey);
         //key might be removed prior to this point
@@ -1197,18 +1137,6 @@ public class ApiDBUtils {
 
     public static UserVmDetailVO findPublicKeyByVmId(final long vmId) {
         return s_userVmDetailsDao.findDetail(vmId, "SSH.PublicKey");
-    }
-
-    public static void getAutoScaleVmGroupPolicies(final long vmGroupId, final List<AutoScalePolicy> scaleUpPolicies, final List<AutoScalePolicy> scaleDownPolicies) {
-        final List<AutoScaleVmGroupPolicyMapVO> vos = s_asVmGroupPolicyMapDao.listByVmGroupId(vmGroupId);
-        for (final AutoScaleVmGroupPolicyMapVO vo : vos) {
-            final AutoScalePolicy autoScalePolicy = s_asPolicyDao.findById(vo.getPolicyId());
-            if (autoScalePolicy.getAction().equals("scaleup")) {
-                scaleUpPolicies.add(autoScalePolicy);
-            } else {
-                scaleDownPolicies.add(autoScalePolicy);
-            }
-        }
     }
 
     public static GuestOSCategoryVO findGuestOsCategoryById(final long catId) {
@@ -1325,31 +1253,6 @@ public class ApiDBUtils {
             if (gateway != null) {
                 jobInstanceId = gateway.getUuid();
             }
-        } else if (jobInstanceType == ApiCommandJobType.Counter) {
-            final CounterVO counter = ApiDBUtils.getCounter(job.getInstanceId());
-            if (counter != null) {
-                jobInstanceId = counter.getUuid();
-            }
-        } else if (jobInstanceType == ApiCommandJobType.Condition) {
-            final ConditionVO condition = ApiDBUtils.findConditionById(job.getInstanceId());
-            if (condition != null) {
-                jobInstanceId = condition.getUuid();
-            }
-        } else if (jobInstanceType == ApiCommandJobType.AutoScalePolicy) {
-            final AutoScalePolicyVO policy = ApiDBUtils.findAutoScalePolicyById(job.getInstanceId());
-            if (policy != null) {
-                jobInstanceId = policy.getUuid();
-            }
-        } else if (jobInstanceType == ApiCommandJobType.AutoScaleVmProfile) {
-            final AutoScaleVmProfileVO profile = ApiDBUtils.findAutoScaleVmProfileById(job.getInstanceId());
-            if (profile != null) {
-                jobInstanceId = profile.getUuid();
-            }
-        } else if (jobInstanceType == ApiCommandJobType.AutoScaleVmGroup) {
-            final AutoScaleVmGroupVO group = ApiDBUtils.findAutoScaleVmGroupById(job.getInstanceId());
-            if (group != null) {
-                jobInstanceId = group.getUuid();
-            }
         } else if (jobInstanceType == ApiCommandJobType.Network) {
             final NetworkVO networkVO = ApiDBUtils.findNetworkById(job.getInstanceId());
             if (networkVO != null) {
@@ -1432,26 +1335,6 @@ public class ApiDBUtils {
 
     public static VpcGatewayVO findVpcGatewayById(final long gatewayId) {
         return s_vpcGatewayDao.findById(gatewayId);
-    }
-
-    public static CounterVO getCounter(final long counterId) {
-        return s_counterDao.findById(counterId);
-    }
-
-    public static ConditionVO findConditionById(final long conditionId) {
-        return s_asConditionDao.findById(conditionId);
-    }
-
-    public static AutoScalePolicyVO findAutoScalePolicyById(final long policyId) {
-        return s_asPolicyDao.findById(policyId);
-    }
-
-    public static AutoScaleVmProfileVO findAutoScaleVmProfileById(final long profileId) {
-        return s_asVmProfileDao.findById(profileId);
-    }
-
-    public static AutoScaleVmGroupVO findAutoScaleVmGroupById(final long groupId) {
-        return s_asVmGroupDao.findById(groupId);
     }
 
     public static NetworkVO findNetworkById(final long id) {
@@ -1844,11 +1727,6 @@ public class ApiDBUtils {
         s_taggedResourceService = taggedResourceService;
         s_sshKeyPairDao = sshKeyPairDao;
         s_userVmDetailsDao = userVmDetailsDao;
-        s_asConditionDao = asConditionDao;
-        s_asPolicyDao = asPolicyDao;
-        s_asPolicyConditionMapDao = asPolicyConditionMapDao;
-        s_counterDao = counterDao;
-        s_asVmGroupPolicyMapDao = asVmGroupPolicyMapDao;
         s_tagJoinDao = tagJoinDao;
         s_vmGroupJoinDao = vmGroupJoinDao;
         s_eventJoinDao = eventJoinDao;
@@ -1865,14 +1743,11 @@ public class ApiDBUtils {
         s_accountJoinDao = accountJoinDao;
         s_jobJoinDao = jobJoinDao;
         s_templateJoinDao = templateJoinDao;
-
         s_physicalNetworkTrafficTypeDao = physicalNetworkTrafficTypeDao;
         s_physicalNetworkServiceProviderDao = physicalNetworkServiceProviderDao;
         s_firewallRuleDao = firewallRuleDao;
         s_staticRouteDao = staticRouteDao;
         s_vpcGatewayDao = vpcGatewayDao;
-        s_asVmProfileDao = asVmProfileDao;
-        s_asVmGroupDao = asVmGroupDao;
         s_vpcDao = vpcDao;
         s_vpcOfferingDao = vpcOfferingDao;
         s_asyncJobDao = asyncJobDao;

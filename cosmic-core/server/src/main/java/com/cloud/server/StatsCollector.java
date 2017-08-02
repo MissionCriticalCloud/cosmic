@@ -4,7 +4,6 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetStorageStatsCommand;
 import com.cloud.agent.api.HostStatsEntry;
-import com.cloud.agent.api.PerformanceMonitorCommand;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
@@ -14,8 +13,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
@@ -26,28 +23,8 @@ import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.network.as.AutoScaleManager;
-import com.cloud.network.as.AutoScalePolicyConditionMapVO;
-import com.cloud.network.as.AutoScalePolicyVO;
-import com.cloud.network.as.AutoScaleVmGroupPolicyMapVO;
-import com.cloud.network.as.AutoScaleVmGroupVO;
-import com.cloud.network.as.AutoScaleVmGroupVmMapVO;
-import com.cloud.network.as.AutoScaleVmProfileVO;
-import com.cloud.network.as.Condition.Operator;
-import com.cloud.network.as.ConditionVO;
-import com.cloud.network.as.Counter;
-import com.cloud.network.as.CounterVO;
-import com.cloud.network.as.dao.AutoScalePolicyConditionMapDao;
-import com.cloud.network.as.dao.AutoScalePolicyDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupPolicyMapDao;
-import com.cloud.network.as.dao.AutoScaleVmGroupVmMapDao;
-import com.cloud.network.as.dao.AutoScaleVmProfileDao;
-import com.cloud.network.as.dao.ConditionDao;
-import com.cloud.network.as.dao.CounterDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
-import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StorageStats;
@@ -61,7 +38,6 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.user.dao.VmDiskStatisticsDao;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.ComponentMethodInterceptable;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -120,7 +96,6 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
     long hostAndVmStatsInterval = -1L;
     long storageStatsInterval = -1L;
     long volumeStatsInterval = -1L;
-    long autoScaleStatsInterval = -1L;
     int vmDiskStatsInterval = 0;
     List<Long> hostIds = null;
     String externalStatsPrefix = "";
@@ -160,25 +135,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
     @Inject
     private ManagementServerHostDao _msHostDao;
     @Inject
-    private AutoScaleVmGroupDao _asGroupDao;
-    @Inject
-    private AutoScaleVmGroupVmMapDao _asGroupVmDao;
-    @Inject
-    private AutoScaleManager _asManager;
-    @Inject
     private VMInstanceDao _vmInstance;
-    @Inject
-    private AutoScaleVmGroupPolicyMapDao _asGroupPolicyDao;
-    @Inject
-    private AutoScalePolicyDao _asPolicyDao;
-    @Inject
-    private AutoScalePolicyConditionMapDao _asConditionMapDao;
-    @Inject
-    private ConditionDao _asConditionDao;
-    @Inject
-    private CounterDao _asCounterDao;
-    @Inject
-    private AutoScaleVmProfileDao _asProfileDao;
     @Inject
     private ServiceOfferingDao _serviceOfferingDao;
     @Inject
@@ -213,7 +170,6 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
         hostAndVmStatsInterval = NumbersUtil.parseLong(configs.get("vm.stats.interval"), 60000L);
         storageStatsInterval = NumbersUtil.parseLong(configs.get("storage.stats.interval"), 60000L);
         volumeStatsInterval = NumbersUtil.parseLong(configs.get("volume.stats.interval"), -1L);
-        autoScaleStatsInterval = NumbersUtil.parseLong(configs.get("autoscale.stats.interval"), 60000L);
         vmDiskStatsInterval = NumbersUtil.parseInt(configs.get("vm.disk.stats.interval"), 0);
 
         /* URI to send statistics to. Currently only Graphite is supported */
@@ -256,10 +212,6 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
 
         if (storageStatsInterval > 0) {
             _executor.scheduleWithFixedDelay(new StorageCollector(), 15000L, storageStatsInterval, TimeUnit.MILLISECONDS);
-        }
-
-        if (autoScaleStatsInterval > 0) {
-            _executor.scheduleWithFixedDelay(new AutoScaleMonitor(), 15000L, autoScaleStatsInterval, TimeUnit.MILLISECONDS);
         }
 
         if (vmDiskStatsInterval > 0) {
@@ -748,287 +700,6 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                 }
             }
             _storagePoolStats = storagePoolStats;
-        }
-    }
-
-    class AutoScaleMonitor extends ManagedContextRunnable {
-        @Override
-        protected void runInContext() {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("AutoScaling Monitor is running...");
-            }
-            // list all AS VMGroups
-            final List<AutoScaleVmGroupVO> asGroups = _asGroupDao.listAll();
-            for (final AutoScaleVmGroupVO asGroup : asGroups) {
-                // check group state
-                if ((asGroup.getState().equals("enabled")) && (is_native(asGroup.getId()))) {
-                    // check minimum vm of group
-                    final Integer currentVM = _asGroupVmDao.countByGroup(asGroup.getId());
-                    if (currentVM < asGroup.getMinMembers()) {
-                        _asManager.doScaleUp(asGroup.getId(), asGroup.getMinMembers() - currentVM);
-                        continue;
-                    }
-
-                    //check interval
-                    final long now = (new Date()).getTime();
-                    if (asGroup.getLastInterval() != null) {
-                        if ((now - asGroup.getLastInterval().getTime()) < asGroup
-                                .getInterval()) {
-                            continue;
-                        }
-                    }
-
-                    // update last_interval
-                    asGroup.setLastInterval(new Date());
-                    _asGroupDao.persist(asGroup);
-
-                    // collect RRDs data for this group
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("[AutoScale] Collecting RRDs data...");
-                    }
-                    final Map<String, String> params = new HashMap<>();
-                    final List<AutoScaleVmGroupVmMapVO> asGroupVmVOs = _asGroupVmDao.listByGroup(asGroup.getId());
-                    params.put("total_vm", String.valueOf(asGroupVmVOs.size()));
-                    for (int i = 0; i < asGroupVmVOs.size(); i++) {
-                        final long vmId = asGroupVmVOs.get(i).getInstanceId();
-                        final VMInstanceVO vmVO = _vmInstance.findById(vmId);
-                        //xe vm-list | grep vmname -B 1 | head -n 1 | awk -F':' '{print $2}'
-                        params.put("vmname" + String.valueOf(i + 1), vmVO.getInstanceName());
-                        params.put("vmid" + String.valueOf(i + 1), String.valueOf(vmVO.getId()));
-                    }
-                    // get random hostid because all vms are in a cluster
-                    final long vmId = asGroupVmVOs.get(0).getInstanceId();
-                    final VMInstanceVO vmVO = _vmInstance.findById(vmId);
-                    final Long receiveHost = vmVO.getHostId();
-
-                    // setup parameters phase: duration and counter
-                    // list pair [counter, duration]
-                    final List<Pair<String, Integer>> lstPair = getPairofCounternameAndDuration(asGroup.getId());
-                    int total_counter = 0;
-                    final String[] lstCounter = new String[lstPair.size()];
-                    for (int i = 0; i < lstPair.size(); i++) {
-                        final Pair<String, Integer> pair = lstPair.get(i);
-                        final String strCounterNames = pair.first();
-                        final Integer duration = pair.second();
-
-                        lstCounter[i] = strCounterNames.split(",")[0];
-                        total_counter++;
-                        params.put("duration" + String.valueOf(total_counter), duration.toString());
-                        params.put("counter" + String.valueOf(total_counter), lstCounter[i]);
-                        params.put("con" + String.valueOf(total_counter), strCounterNames.split(",")[1]);
-                    }
-                    params.put("total_counter", String.valueOf(total_counter));
-
-                    final PerformanceMonitorCommand perfMon = new PerformanceMonitorCommand(params, 20);
-
-                    try {
-                        final Answer answer = _agentMgr.send(receiveHost, perfMon);
-                        if (answer == null || !answer.getResult()) {
-                            s_logger.debug("Failed to send data to node !");
-                        } else {
-                            final String result = answer.getDetails();
-                            s_logger.debug("[AutoScale] RRDs collection answer: " + result);
-                            final HashMap<Long, Double> avgCounter = new HashMap<>();
-
-                            // extract data
-                            final String[] counterElements = result.split(",");
-                            if ((counterElements != null) && (counterElements.length > 0)) {
-                                for (final String string : counterElements) {
-                                    try {
-                                        final String[] counterVals = string.split(":");
-                                        final String[] counter_vm = counterVals[0].split("\\.");
-
-                                        final Long counterId = Long.parseLong(counter_vm[1]);
-                                        final Long conditionId = Long.parseLong(params.get("con" + counter_vm[1]));
-                                        Double coVal = Double.parseDouble(counterVals[1]);
-
-                                        // Summary of all counter by counterId key
-                                        if (avgCounter.get(counterId) == null) {
-                                                /* initialize if data is not set */
-                                            avgCounter.put(counterId, new Double(0));
-                                        }
-
-                                        final String counterName = getCounternamebyCondition(conditionId.longValue());
-                                        if (Counter.Source.memory.toString().equals(counterName)) {
-                                            // calculate memory in percent
-                                            final Long profileId = asGroup.getProfileId();
-                                            final AutoScaleVmProfileVO profileVo = _asProfileDao.findById(profileId);
-                                            final ServiceOfferingVO serviceOff = _serviceOfferingDao.findById(profileVo.getServiceOfferingId());
-                                            final int maxRAM = serviceOff.getRamSize();
-
-                                            // get current RAM percent
-                                            coVal = coVal / maxRAM;
-                                        } else {
-                                            // cpu
-                                            coVal = coVal * 100;
-                                        }
-
-                                        // update data entry
-                                        avgCounter.put(counterId, avgCounter.get(counterId) + coVal);
-                                    } catch (final Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                final String scaleAction = getAutoscaleAction(avgCounter, asGroup.getId(), currentVM, params);
-                                if (scaleAction != null) {
-                                    s_logger.debug("[AutoScale] Doing scale action: " + scaleAction + " for group " + asGroup.getId());
-                                    if (scaleAction.equals("scaleup")) {
-                                        _asManager.doScaleUp(asGroup.getId(), 1);
-                                    } else {
-                                        _asManager.doScaleDown(asGroup.getId());
-                                    }
-                                }
-                            }
-                        }
-                    } catch (OperationTimedoutException | AgentUnavailableException e) {
-                        s_logger.warn("Caught (previously ignored) exception while running the auto scale monitor", e);
-                    }
-                }
-            }
-        }
-
-        private boolean is_native(final long groupId) {
-            final List<AutoScaleVmGroupPolicyMapVO> vos = _asGroupPolicyDao.listByVmGroupId(groupId);
-            for (final AutoScaleVmGroupPolicyMapVO vo : vos) {
-                final List<AutoScalePolicyConditionMapVO> ConditionPolicies = _asConditionMapDao.findByPolicyId(vo.getPolicyId());
-                for (final AutoScalePolicyConditionMapVO ConditionPolicy : ConditionPolicies) {
-                    final ConditionVO condition = _asConditionDao.findById(ConditionPolicy.getConditionId());
-                    final CounterVO counter = _asCounterDao.findById(condition.getCounterid());
-                    if (counter.getSource() == Counter.Source.cpu || counter.getSource() == Counter.Source.memory) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        private String getAutoscaleAction(final HashMap<Long, Double> avgCounter, final long groupId, final long currentVM, final Map<String, String> params) {
-
-            final List<AutoScaleVmGroupPolicyMapVO> listMap = _asGroupPolicyDao.listByVmGroupId(groupId);
-            if ((listMap == null) || (listMap.size() == 0)) {
-                return null;
-            }
-            for (final AutoScaleVmGroupPolicyMapVO asVmgPmap : listMap) {
-                final AutoScalePolicyVO policyVO = _asPolicyDao.findById(asVmgPmap.getPolicyId());
-                if (policyVO != null) {
-                    final Integer quitetime = policyVO.getQuietTime();
-                    final Date quitetimeDate = policyVO.getLastQuiteTime();
-                    long last_quitetime = 0L;
-                    if (quitetimeDate != null) {
-                        last_quitetime = policyVO.getLastQuiteTime().getTime();
-                    }
-                    final long current_time = (new Date()).getTime();
-
-                    // check quite time for this policy
-                    if ((current_time - last_quitetime) >= (long) quitetime) {
-
-                        // list all condition of this policy
-                        boolean bValid = true;
-                        final List<ConditionVO> lstConditions = getConditionsbyPolicyId(policyVO.getId());
-                        if ((lstConditions != null) && (lstConditions.size() > 0)) {
-                            // check whole conditions of this policy
-                            for (final ConditionVO conditionVO : lstConditions) {
-                                final long thresholdValue = conditionVO.getThreshold();
-                                final Double thresholdPercent = (double) thresholdValue / 100;
-                                final CounterVO counterVO = _asCounterDao.findById(conditionVO.getCounterid());
-                                //Double sum = avgCounter.get(conditionVO.getCounterid());
-                                long counter_count = 1;
-                                do {
-                                    final String counter_param = params.get("counter" + String.valueOf(counter_count));
-                                    final Counter.Source counter_source = counterVO.getSource();
-                                    if (counter_param.equals(counter_source.toString())) {
-                                        break;
-                                    }
-                                    counter_count++;
-                                } while (1 == 1);
-
-                                final Double sum = avgCounter.get(counter_count);
-                                final Double avg = sum / currentVM;
-                                final Operator op = conditionVO.getRelationalOperator();
-                                final boolean bConditionCheck = ((op == com.cloud.network.as.Condition.Operator.EQ) && (thresholdPercent.equals(avg)))
-                                        || ((op == com.cloud.network.as.Condition.Operator.GE) && (avg.doubleValue() >= thresholdPercent.doubleValue()))
-                                        || ((op == com.cloud.network.as.Condition.Operator.GT) && (avg.doubleValue() > thresholdPercent.doubleValue()))
-                                        || ((op == com.cloud.network.as.Condition.Operator.LE) && (avg.doubleValue() <= thresholdPercent.doubleValue()))
-                                        || ((op == com.cloud.network.as.Condition.Operator.LT) && (avg.doubleValue() < thresholdPercent.doubleValue()));
-
-                                if (!bConditionCheck) {
-                                    bValid = false;
-                                    break;
-                                }
-                            }
-                            if (bValid) {
-                                return policyVO.getAction();
-                            }
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        private List<ConditionVO> getConditionsbyPolicyId(final long policyId) {
-            final List<AutoScalePolicyConditionMapVO> conditionMap = _asConditionMapDao.findByPolicyId(policyId);
-            if ((conditionMap == null) || (conditionMap.size() == 0)) {
-                return null;
-            }
-
-            final List<ConditionVO> lstResult = new ArrayList<>();
-            for (final AutoScalePolicyConditionMapVO asPCmap : conditionMap) {
-                lstResult.add(_asConditionDao.findById(asPCmap.getConditionId()));
-            }
-
-            return lstResult;
-        }
-
-        public List<Pair<String, Integer>> getPairofCounternameAndDuration(
-                final long groupId) {
-            final AutoScaleVmGroupVO groupVo = _asGroupDao.findById(groupId);
-            if (groupVo == null) {
-                return null;
-            }
-            final List<Pair<String, Integer>> result = new ArrayList<>();
-            //list policy map
-            final List<AutoScaleVmGroupPolicyMapVO> groupPolicymap = _asGroupPolicyDao.listByVmGroupId(groupVo.getId());
-            if (groupPolicymap == null) {
-                return null;
-            }
-            for (final AutoScaleVmGroupPolicyMapVO gpMap : groupPolicymap) {
-                //get duration
-                final AutoScalePolicyVO policyVo = _asPolicyDao.findById(gpMap.getPolicyId());
-                final Integer duration = policyVo.getDuration();
-                //get collection of counter name
-
-                final StringBuffer buff = new StringBuffer();
-                final List<AutoScalePolicyConditionMapVO> lstPCmap = _asConditionMapDao.findByPolicyId(policyVo.getId());
-                for (final AutoScalePolicyConditionMapVO pcMap : lstPCmap) {
-                    final String counterName = getCounternamebyCondition(pcMap.getConditionId());
-                    buff.append(counterName);
-                    buff.append(",");
-                    buff.append(pcMap.getConditionId());
-                }
-                // add to result
-                final Pair<String, Integer> pair = new Pair<>(buff.toString(), duration);
-                result.add(pair);
-            }
-
-            return result;
-        }
-
-        public String getCounternamebyCondition(final long conditionId) {
-
-            final ConditionVO condition = _asConditionDao.findById(conditionId);
-            if (condition == null) {
-                return "";
-            }
-
-            final long counterId = condition.getCounterid();
-            final CounterVO counter = _asCounterDao.findById(counterId);
-            if (counter == null) {
-                return "";
-            }
-
-            return counter.getSource().toString();
         }
     }
 }

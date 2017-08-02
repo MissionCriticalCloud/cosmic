@@ -115,18 +115,10 @@
     <bean id="accountVlanMapDaoImpl" class="com.cloud.dc.dao.AccountVlanMapDaoImpl" />
     <bean id="alertDaoImpl" class="com.cloud.alert.dao.AlertDaoImpl" />
     <bean id="asyncJobJoinDaoImpl" class="com.cloud.api.query.dao.AsyncJobJoinDaoImpl" />
-    <bean id="autoScalePolicyConditionMapDaoImpl" class="com.cloud.network.as.dao.AutoScalePolicyConditionMapDaoImpl" />
-    <bean id="autoScalePolicyDaoImpl" class="com.cloud.network.as.dao.AutoScalePolicyDaoImpl" />
-    <bean id="autoScaleVmGroupDaoImpl" class="com.cloud.network.as.dao.AutoScaleVmGroupDaoImpl" />
-    <bean id="autoScaleVmGroupPolicyMapDaoImpl" class="com.cloud.network.as.dao.AutoScaleVmGroupPolicyMapDaoImpl" />
-    <bean id="autoScaleVmGroupVmMapDaoImpl" class="com.cloud.network.as.dao.AutoScaleVmGroupVmMapDaoImpl" />
-    <bean id="autoScaleVmProfileDaoImpl" class="com.cloud.network.as.dao.AutoScaleVmProfileDaoImpl" />
     <bean id="capacityDaoImpl" class="com.cloud.capacity.dao.CapacityDaoImpl" />
     <bean id="clusterDaoImpl" class="com.cloud.dc.dao.ClusterDaoImpl" />
     <bean id="clusterDetailsDaoImpl" class="com.cloud.dc.ClusterDetailsDaoImpl" />
-    <bean id="conditionDaoImpl" class="com.cloud.network.as.dao.ConditionDaoImpl" />
     <bean id="consoleProxyDaoImpl" class="com.cloud.vm.dao.ConsoleProxyDaoImpl" />
-    <bean id="counterDaoImpl" class="com.cloud.network.as.dao.CounterDaoImpl" />
     <bean id="dataCenterIpAddressDaoImpl" class="com.cloud.dc.dao.DataCenterIpAddressDaoImpl" />
     <bean id="dataCenterJoinDaoImpl" class="com.cloud.api.query.dao.DataCenterJoinDaoImpl" />
     <bean id="dataCenterLinkLocalIpAddressDaoImpl" class="com.cloud.dc.dao.DataCenterLinkLocalIpAddressDaoImpl" />
@@ -325,8 +317,6 @@
     <bean id="Site2SiteVpnConnectionDetailsDaoImpl" class="com.cloud.resourcedetail.dao.Site2SiteVpnConnectionDetailsDaoImpl" />
     <bean id="DiskOfferingDetailsDaoImpl" class="com.cloud.resourcedetail.dao.DiskOfferingDetailsDaoImpl" />
     <bean id="UserDetailsDaoImpl" class="com.cloud.resourcedetail.dao.UserDetailsDaoImpl" />
-    <bean id="AutoScaleVmProfileDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmProfileDetailsDaoImpl" />
-    <bean id="AutoScaleVmGroupDetailsDaoImpl" class="com.cloud.resourcedetail.dao.AutoScaleVmGroupDetailsDaoImpl" />
     <bean id="LBStickinessPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBStickinessPolicyDetailsDaoImpl" />
     <bean id="LBHealthCheckPolicyDetailsDaoImpl" class="com.cloud.resourcedetail.dao.LBHealthCheckPolicyDetailsDaoImpl" />
 

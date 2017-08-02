@@ -58,9 +58,6 @@ public class NetUtils {
     public final static String ALL_IP6_CIDRS = "::/0";
     public final static int PORT_RANGE_MIN = 0;
     public final static int PORT_RANGE_MAX = 65535;
-    public final static int DEFAULT_AUTOSCALE_VM_DESTROY_TIME = 2 * 60; // Grace period before Vm is destroyed
-    public final static int DEFAULT_AUTOSCALE_POLICY_INTERVAL_TIME = 30;
-    public final static int DEFAULT_AUTOSCALE_POLICY_QUIET_TIME = 5 * 60;
     protected final static Logger s_logger = LoggerFactory.getLogger(NetUtils.class);
     static final String VLAN_PREFIX = "vlan://";
     static final int VLAN_PREFIX_LENGTH = VLAN_PREFIX.length();
@@ -233,8 +230,9 @@ public class NetUtils {
     }
 
     public static boolean isValidIp4(final String ip) {
-        if (ip == null)
+        if (ip == null) {
             return false;
+        }
 
         final InetAddressValidator validator = InetAddressValidator.getInstance();
         return validator.isValidInet4Address(ip);
@@ -379,7 +377,7 @@ public class NetUtils {
     public static boolean isLocalAddress(final String strAddress) {
 
         try {
-            InetAddress addr = InetAddress.getByName(strAddress);
+            final InetAddress addr = InetAddress.getByName(strAddress);
             return isLocalAddress(addr);
         } catch (final UnknownHostException e) {
             s_logger.warn("Cannot determine if address '" + strAddress + "' is local", e);
@@ -466,7 +464,8 @@ public class NetUtils {
             if (ip != null) {
                 return ip.isSiteLocalAddress();
             }
-        } catch (UnknownHostException e) {}
+        } catch (final UnknownHostException e) {
+        }
 
         return false;
     }
@@ -543,7 +542,7 @@ public class NetUtils {
     public static SortedSet<Long> getAllIpsFromCidr(final String cidr_ip, final long size, final Set<Long> usedIps) {
         final SortedSet<Long> result = new TreeSet<>();
         long start = ip2Long(getIpRangeStartIpFromCidr(cidr_ip, size));
-        long end = ip2Long(getIpRangeEndIpFromCidr(cidr_ip, size));
+        final long end = ip2Long(getIpRangeEndIpFromCidr(cidr_ip, size));
 
         while (start <= end) {
             if (!usedIps.contains(start)) {
@@ -556,8 +555,8 @@ public class NetUtils {
     }
 
     public static SortedSet<Long> listIp2LongList(final List<String> ipStringList) {
-        SortedSet<Long> ipLongList = new TreeSet<>();
-        for (String ip : ipStringList) {
+        final SortedSet<Long> ipLongList = new TreeSet<>();
+        for (final String ip : ipStringList) {
             ipLongList.add(ip2Long(ip));
         }
         return ipLongList;
@@ -799,11 +798,6 @@ public class NetUtils {
     public static boolean isValidAlgorithm(final String p) {
         final String algo = p.toLowerCase();
         return algo.equals("roundrobin") || algo.equals("leastconn") || algo.equals("source");
-    }
-
-    public static boolean isValidAutoScaleAction(final String p) {
-        final String action = p.toLowerCase();
-        return action.equals("scaleup") || action.equals("scaledown");
     }
 
     public static String getLinkLocalNetMask() {
@@ -1072,19 +1066,19 @@ public class NetUtils {
     }
 
     public static boolean isValidMac(final String macAddr) {
-        RegexValidator mv = new RegexValidator("^(?:[0-9a-f]{1,2}([-:\\.]))(?:[0-9a-f]{1,2}\\1){4}[0-9a-f]{1,2}$", false);
+        final RegexValidator mv = new RegexValidator("^(?:[0-9a-f]{1,2}([-:\\.]))(?:[0-9a-f]{1,2}\\1){4}[0-9a-f]{1,2}$", false);
         return mv.isValid(macAddr);
     }
 
     public static boolean isUnicastMac(final String macAddr) {
-        String std = standardizeMacAddress(macAddr);
-        if(std == null) {
+        final String std = standardizeMacAddress(macAddr);
+        if (std == null) {
             return false;
         }
-        long stdl = mac2Long(std);
+        final long stdl = mac2Long(std);
         // libvirt refuses to attach a mac address that is multicast, as defined
         // by the least significant bit of the first octet of the mac.
-        long mask = 0x1l << 40l;
+        final long mask = 0x1l << 40l;
         return (stdl & mask) != mask;
     }
 
@@ -1120,8 +1114,9 @@ public class NetUtils {
     }
 
     public static boolean isValidIp6(final String ip) {
-        if (ip == null)
-            return  false;
+        if (ip == null) {
+            return false;
+        }
 
         final InetAddressValidator validator = InetAddressValidator.getInstance();
         return validator.isValidInet6Address(ip);
@@ -1181,8 +1176,8 @@ public class NetUtils {
         }
 
         final List<String> ips = Arrays.asList(excludedIpsExpression.split(","));
-        List<String> result = new ArrayList<>();
-        for (String ip : ips) {
+        final List<String> result = new ArrayList<>();
+        for (final String ip : ips) {
             if (ip.contains("-")) {
                 result.addAll(getAllIpsFromRange(ip));
             } else {
@@ -1193,10 +1188,10 @@ public class NetUtils {
     }
 
     public static List<String> getAllIpsFromRange(final String range) {
-        String[] ips = range.split("-");
-        List<String> result = new ArrayList<>();
-        long startIp = ip2Long(ips[0]);
-        long endIp = ip2Long(ips[1]);
+        final String[] ips = range.split("-");
+        final List<String> result = new ArrayList<>();
+        final long startIp = ip2Long(ips[0]);
+        final long endIp = ip2Long(ips[1]);
 
         for (long tmpIp = startIp; tmpIp <= endIp; tmpIp++) {
             result.add(long2Ip(tmpIp));
@@ -1208,7 +1203,7 @@ public class NetUtils {
     public static Boolean isIpRangeListInCidr(final String ipRangeListExpression, final String cidr) {
         final String[] excludedIpsRangeDelimiters = ipRangeListExpression.split("[,-]");
 
-        for (String ip : excludedIpsRangeDelimiters) {
+        for (final String ip : excludedIpsRangeDelimiters) {
             if (!NetUtils.isIpWithtInCidrRange(ip, cidr)) {
                 return false;
             }
@@ -1361,7 +1356,7 @@ public class NetUtils {
             return null;
         }
         String norm = macAddr.replace('.', ':');
-        norm = norm.replace('-',  ':');
+        norm = norm.replace('-', ':');
         return long2Mac(mac2Long(norm));
     }
 
@@ -1499,7 +1494,7 @@ public class NetUtils {
     public static boolean isIpInCidrList(final InetAddress address, final String[] cidrlist) {
         boolean match = false;
 
-        for (String cidr: cidrlist) {
+        for (final String cidr : cidrlist) {
             try {
                 if (address instanceof Inet6Address && isValidIp6Cidr(cidr)) {
                     if (isIp6InNetwork(IPv6Address.fromInetAddress(address), IPv6Network.fromString(cidr))) {
@@ -1512,7 +1507,7 @@ public class NetUtils {
                         break;
                     }
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 continue;
             }
         }
@@ -1591,9 +1586,9 @@ public class NetUtils {
             return false;
         }
 
-        String[] ipRanges = ipRangeList.split(",");
+        final String[] ipRanges = ipRangeList.split(",");
 
-        for (String ipRange : ipRanges) {
+        for (final String ipRange : ipRanges) {
             if (!(ipRange.contains("-") && validIpRange(ipRange) || isValidIp4(ipRange))) {
                 return false;
             }

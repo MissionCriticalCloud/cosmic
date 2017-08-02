@@ -19,7 +19,6 @@ import com.cloud.network.NetworkService;
 import com.cloud.network.NetworkUsageService;
 import com.cloud.network.StorageNetworkService;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
-import com.cloud.network.as.AutoScaleService;
 import com.cloud.network.element.InternalLoadBalancerElementService;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.lb.ApplicationLoadBalancerService;
@@ -105,8 +104,6 @@ public abstract class BaseCmd {
     public EntityManager _entityMgr;
     @Inject
     public RulesService _rulesService;
-    @Inject
-    public AutoScaleService _autoScaleService;
     @Inject
     public LoadBalancingRulesService _lbService;
     @Inject
