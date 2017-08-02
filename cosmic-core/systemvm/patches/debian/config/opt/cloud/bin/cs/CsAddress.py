@@ -150,7 +150,6 @@ class CsAddress(CsDataBag):
             self.fw.append(["filter", "", "-A FORWARD -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [ingress]\" --log-level 4"])
 
 
-
 class CsInterface:
     """ Hold one single ip """
 
@@ -382,10 +381,8 @@ class CsIP:
         if self.config.is_vpc():
             return
 
-        self.fw.append(
-            ["filter", "", "-A FW_OUTBOUND -m state --state RELATED,ESTABLISHED -j ACCEPT"])
-        self.fw.append(
-            ["filter", "", "-A INPUT -i eth1 -p tcp -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
+        self.fw.append(["filter", "", "-A FW_OUTBOUND -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+        self.fw.append(["filter", "", "-A INPUT -i eth1 -p tcp -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
 
         self.fw.append(["filter", "", "-P INPUT DROP"])
         self.fw.append(["filter", "", "-P FORWARD DROP"])
@@ -393,35 +390,20 @@ class CsIP:
     def fw_router(self):
         if self.config.is_vpc():
             return
-        self.fw.append(["mangle", "front", "-A PREROUTING " +
-                        "-m state --state RELATED,ESTABLISHED " +
-                        "-j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
-
-        self.fw.append(["mangle", "front",
-                        "-A POSTROUTING " +
-                        "-p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
+        self.fw.append(["mangle", "front", "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
+        self.fw.append(["mangle", "front", "-A POSTROUTING -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
 
         if self.get_type() in ["public"]:
-            self.fw.append(["mangle", "front",
-                            "-A PREROUTING " +
-                            "-d %s/32 -j VPN_%s" % (self.address['public_ip'], self.address['public_ip'])])
-            self.fw.append(["mangle", "front",
-                            "-A PREROUTING " +
-                            "-d %s/32 -j FIREWALL_%s" % (self.address['public_ip'], self.address['public_ip'])])
-            self.fw.append(["mangle", "front",
-                            "-A FIREWALL_%s " % self.address['public_ip'] +
-                            "-m state --state RELATED,ESTABLISHED -j ACCEPT"])
-            self.fw.append(["mangle", "",
-                            "-A VPN_%s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.address['public_ip']])
-            self.fw.append(["mangle", "",
-                            "-A VPN_%s -j RETURN" % self.address['public_ip']])
-            self.fw.append(["nat", "",
-                            "-A POSTROUTING -o eth2 -j SNAT --to-source %s" % self.address['public_ip']])
-            self.fw.append(["mangle", "",
-                            "-A PREROUTING -i %s -m state --state NEW " % self.dev +
-                            "-j CONNMARK --set-xmark %s/0xffffffff" % self.dnum])
-            self.fw.append(
-                ["mangle", "", "-A FIREWALL_%s -j DROP" % self.address['public_ip']])
+            self.fw.append(["mangle", "front", "-A PREROUTING -d %s/32 -j VPN_%s" % (self.address['public_ip'], self.address['public_ip'])])
+            self.fw.append(["mangle", "front", "-A PREROUTING -d %s/32 -j FIREWALL_%s" % (self.address['public_ip'], self.address['public_ip'])])
+            self.fw.append(["mangle", "front", "-A FIREWALL_%s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.address['public_ip']])
+            self.fw.append(["mangle", "", "-A VPN_%s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.address['public_ip']])
+            self.fw.append(["mangle", "", "-A VPN_%s -j RETURN" % self.address['public_ip']])
+
+            self.fw.append(["nat", "", "-A POSTROUTING -o eth2 -j SNAT --to-source %s" % self.address['public_ip']])
+
+            self.fw.append(["mangle", "", "-A PREROUTING -i %s -m state --state NEW -j CONNMARK --set-xmark %s/0xffffffff" % (self.dev, self.dnum)])
+            self.fw.append(["mangle", "", "-A FIREWALL_%s -j DROP" % self.address['public_ip']])
 
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.18/32 -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -d 224.0.0.22/32 -j ACCEPT"])
@@ -433,31 +415,17 @@ class CsIP:
 
         if self.get_type() in ["guest"]:
             guestNetworkCidr = self.address['network']
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" %
-                 (self.dev, guestNetworkCidr)])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" %
-                 (self.dev, guestNetworkCidr)])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A FORWARD -i %s -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.dev])
-            self.fw.append(
-                ["filter", "", "-A FORWARD -i %s -o %s -m state --state NEW -j ACCEPT" % (self.dev, self.dev)])
-            self.fw.append(
-                ["filter", "", "-A FORWARD -i eth2 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
-            self.fw.append(
-                ["filter", "", "-A FORWARD -i eth0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
-            self.fw.append(
-                ["filter", "", "-A FORWARD -i eth0 -o eth2 -j FW_OUTBOUND"])
-            self.fw.append(["mangle", "",
-                            "-A PREROUTING -i %s -m state --state NEW " % self.dev +
-                            "-j CONNMARK --set-xmark %s/0xffffffff" % self.dnum])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A FORWARD -i %s -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.dev])
+            self.fw.append(["filter", "", "-A FORWARD -i %s -o %s -m state --state NEW -j ACCEPT" % (self.dev, self.dev)])
+            self.fw.append(["filter", "", "-A FORWARD -i eth2 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+            self.fw.append(["filter", "", "-A FORWARD -i eth0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+            self.fw.append(["filter", "", "-A FORWARD -i eth0 -o eth2 -j FW_OUTBOUND"])
+            self.fw.append(["mangle", "", "-A PREROUTING -i %s -m state --state NEW -j CONNMARK --set-xmark %s/0xffffffff" % (self.dev, self.dnum)])
 
         self.fw.append(['', 'front', '-A FORWARD -j NETWORK_STATS'])
         self.fw.append(['', 'front', '-A INPUT -j NETWORK_STATS'])
@@ -471,9 +439,7 @@ class CsIP:
         if not self.config.is_vpc():
             return
 
-        self.fw.append(["mangle", "front", "-A PREROUTING " +
-                        "-m state --state RELATED,ESTABLISHED " +
-                        "-j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
+        self.fw.append(["mangle", "front", "-A PREROUTING -m state --state RELATED,ESTABLISHED -j CONNMARK --restore-mark --nfmask 0xffffffff --ctmask 0xffffffff"])
 
         self.fw.append(["", "front", "-A FORWARD -j NETWORK_STATS"])
         self.fw.append(["", "front", "-A INPUT -j NETWORK_STATS"])
@@ -481,9 +447,7 @@ class CsIP:
 
         self.fw.append(["filter", "", "-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"])
 
-        self.fw.append(["mangle", "front",
-                        "-A POSTROUTING " +
-                        "-p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
+        self.fw.append(["mangle", "front", "-A POSTROUTING -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
 
         if self.get_type() in ["guest"]:
             guestNetworkCidr = self.address['network']
@@ -504,19 +468,13 @@ class CsIP:
             self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 225.0.0.50/32 -j ACCEPT" % self.dev])
             self.fw.append(["mangle", "front", "-A ACL_OUTBOUND_%s -d 255.255.255.255/32 -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 67 -j ACCEPT" % self.dev])
-            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" %
-                            (self.dev, guestNetworkCidr)])
-            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" %
-                            (self.dev, guestNetworkCidr)])
-            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" %
-                            self.dev])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p udp -m udp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
-            self.fw.append(["", "front", "-A NETWORK_STATS -o %s" %
-                            self.dev])
-            self.fw.append(["", "front", "-A NETWORK_STATS -i %s" %
-                            self.dev])
-            self.fw.append(["nat", "front","-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" %
-                            (guestNetworkCidr, self.dev, self.address['public_ip'])])
+            self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
+            self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
+            self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (guestNetworkCidr, self.dev, self.address['public_ip'])])
 
         if self.get_type() in ["public"]:
             self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % self.dev])
@@ -536,8 +494,7 @@ class CsIP:
             # create egress chain
             self.fw.append(["mangle", "front", "-N ACL_OUTBOUND_%s" % self.dev])
             # jump to egress chain
-            self.fw.append(["mangle", "front", "-A PREROUTING -m state --state NEW -i %s -j ACL_OUTBOUND_%s" %
-                            (self.dev, self.dev)])
+            self.fw.append(["mangle", "front", "-A PREROUTING -m state --state NEW -i %s -j ACL_OUTBOUND_%s" % (self.dev, self.dev)])
 
             # create source nat list chain
             self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
@@ -546,13 +503,12 @@ class CsIP:
             # create egress chain
             self.fw.append(["mangle", "", "-N ACL_OUTBOUND_%s" % self.dev])
             # jump to egress chain
-            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" %
-                            (self.dev, self.address['network'], self.dev)])
+            self.fw.append(["mangle", "", "-A PREROUTING -m state --state NEW -i %s ! -d %s -j ACL_OUTBOUND_%s" % (self.dev, self.address['network'], self.dev)])
             # create ingress chain
             self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % self.dev])
             # jump to ingress chain
-            self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" %
-                            (self.dev, self.dev)])
+            self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" % (self.dev, self.dev)])
+
             self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % self.dev])
             self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % self.dev])
 
