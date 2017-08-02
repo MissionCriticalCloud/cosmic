@@ -17,8 +17,8 @@
     <modules>
         <module>api</module>
         <module>apidoc</module>
-        <module>db-scripts</module>
         <module>cosmic-db</module>
+        <module>cosmic-flyway</module>
         <module>cosmic-model</module>
         <module>engine/api</module>
         <module>engine/components-api</module>

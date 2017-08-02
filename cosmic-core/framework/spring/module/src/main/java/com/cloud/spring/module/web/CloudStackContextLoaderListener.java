@@ -1,5 +1,6 @@
 package com.cloud.spring.module.web;
 
+import com.cloud.flyway.FlywayDB;
 import com.cloud.spring.module.factory.CloudStackSpringContext;
 
 import javax.servlet.ServletContext;
@@ -29,6 +30,9 @@ public class CloudStackContextLoaderListener extends ContextLoaderListener {
     @Override
     public void contextInitialized(final ServletContextEvent event) {
         try {
+            final FlywayDB flywayDB = new FlywayDB();
+            flywayDB.check();
+
             cloudStackContext = new CloudStackSpringContext();
             cloudStackContext.registerShutdownHook();
             event.getServletContext().setAttribute(CloudStackSpringContext.CLOUDSTACK_CONTEXT_SERVLET_KEY, cloudStackContext);

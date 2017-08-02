@@ -227,12 +227,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cosmic-db-scripts</artifactId>
-            <version>5.3.7.1-SNAPSHOT</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-scripts</artifactId>
             <version>5.3.7.1-SNAPSHOT</version>
             <type>pom</type>
@@ -323,14 +317,6 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>cloud.cosmic</groupId>
-                                    <artifactId>cosmic-db-scripts</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/generated-webapp/WEB-INF/classes/</outputDirectory>
-                                    <includes>db/**/*</includes>
-                                </artifactItem>
                                 <artifactItem>
                                     <groupId>cloud.cosmic</groupId>
                                     <artifactId>cosmic-scripts</artifactId>
