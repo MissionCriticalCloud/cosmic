@@ -420,6 +420,7 @@ class CsIP:
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 53 -s %s -j ACCEPT" % (self.dev, guestNetworkCidr)])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 80 -m state --state NEW -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A INPUT -i %s -p tcp -m tcp --dport 8080 -m state --state NEW -j ACCEPT" % self.dev])
+
             self.fw.append(["filter", "", "-A FORWARD -i %s -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.dev])
             self.fw.append(["filter", "", "-A FORWARD -i %s -o %s -m state --state NEW -j ACCEPT" % (self.dev, self.dev)])
             self.fw.append(["filter", "", "-A FORWARD -i eth2 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT"])
@@ -477,6 +478,10 @@ class CsIP:
             self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (guestNetworkCidr, self.dev, self.address['public_ip'])])
 
         if self.get_type() in ["public"]:
+            self.fw.append(["filter", "", "-A FORWARD -o %s -d 10.0.0.0/8 -j DROP" % self.dev])
+            self.fw.append(["filter", "", "-A FORWARD -o %s -d 172.16.0.0/12 -j DROP" % self.dev])
+            self.fw.append(["filter", "", "-A FORWARD -o %s -d 192.168.0.0/16 -j DROP" % self.dev])
+
             self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % self.dev])
             self.fw.append(["mangle", "", "-A VPN_STATS_%s -o %s -m mark --mark 0x525/0xffffffff" % (self.dev, self.dev)])
             self.fw.append(["mangle", "", "-A VPN_STATS_%s -i %s -m mark --mark 0x524/0xffffffff" % (self.dev, self.dev)])
