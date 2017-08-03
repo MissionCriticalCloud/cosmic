@@ -101,6 +101,7 @@
                     g_role = unBoxCookieValue('role');
                     g_userid = unBoxCookieValue('userid');
                     g_domainid = unBoxCookieValue('domainid');
+                    g_domainname = unBoxCookieValue('domainname');
                     g_account = unBoxCookieValue('account');
                     g_username = unBoxCookieValue('username');
                     g_userfullname = unBoxCookieValue('userfullname');
@@ -112,6 +113,7 @@
                     g_userid = g_loginResponse.userid;
                     g_account = g_loginResponse.account;
                     g_domainid = g_loginResponse.domainid;
+                    g_domainname = g_loginResponse.domainname;
                     g_userfullname = g_loginResponse.firstname + ' ' + g_loginResponse.lastname;
                     g_timezone = g_loginResponse.timezone;
                 }
@@ -223,8 +225,9 @@
                         g_userid = loginresponse.userid;
                         g_account = loginresponse.account;
                         g_domainid = loginresponse.domainid;
+                        g_domainname = loginresponse.domainname;
                         g_timezone = loginresponse.timezone;
-                        g_userfullname = loginresponse.firstname + ' ' + loginresponse.lastname;
+                        g_userfullname = '(' + loginresponse.domainname + '/' + loginresponse.username + ') ' + loginresponse.firstname + ' ' + loginresponse.lastname;
 
                         $.cookie('username', g_username, {
                             expires: 1
@@ -275,7 +278,7 @@
                                 args.response.success({
                                     data: {
                                         user: $.extend(true, {}, loginresponse, {
-                                            name: loginresponse.firstname + ' ' + loginresponse.lastname,
+                                            name: '(' + loginresponse.domainname + '/' + loginresponse.username + ') ' + loginresponse.firstname + ' ' + loginresponse.lastname,
                                             role: loginresponse.type == 1 ? 'admin' : 'user',
                                             type: loginresponse.type
                                         })
