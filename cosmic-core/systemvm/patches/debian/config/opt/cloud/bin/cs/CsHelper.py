@@ -211,11 +211,17 @@ def save_iptables(command, iptables_file):
     fIptables.close()
 
 
-def execute2(command):
+def execute2(command, log=True):
     """ Execute command """
     logging.debug("Executing: %s" % command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     p.wait()
+    if log:
+        out, err = p.communicate()
+        if out:
+            logging.info(out)
+        if err:
+            logging.error(err)
     return p
 
 
@@ -232,12 +238,8 @@ def service(name, op):
 
 def start_if_stopped(name):
     logging.info("Start if stopped: %s" % name)
+
     ret = execute2("service %s status" % name)
-    out, err = ret.communicate()
-    if out:
-        logging.info(out)
-    if err:
-        logging.error(err)
     if ret.returncode:
         execute2("service %s start" % name)
 

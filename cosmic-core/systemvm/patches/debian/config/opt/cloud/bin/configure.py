@@ -454,11 +454,16 @@ class CsSite2SiteVpn(CsDataBag):
 
     def check_ipsec(self):
         CsHelper.start_if_stopped("ipsec")
-        ret = CsHelper.get_output_of_command("service ipsec status")
 
-        if "Security Associations" not in ret:
-            logging.debug(CsHelper.get_output_of_command("service ipsec stop"))
-            logging.debug(CsHelper.get_output_of_command("service ipsec start"))
+        logging.info("Checking if ipsec is running correctly: service ipsec status")
+        p = CsHelper.execute2("service ipsec status", log=False)
+
+        out, _ = p.communicate()
+
+        if "Security Associations" not in out:
+            logging.error("Security Associations not found in: %s" % out)
+            CsHelper.execute2("service ipsec stop")
+            CsHelper.execute2("service ipsec start")
 
     def deletevpn(self, ip):
         logging.info("Removing VPN configuration for %s", ip)
