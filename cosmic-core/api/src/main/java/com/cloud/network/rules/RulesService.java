@@ -25,7 +25,7 @@ public interface RulesService {
      * @return PortForwardingRule if created.
      * @throws NetworkRuleConflictException if conflicts in the network rules are detected.
      */
-    PortForwardingRule createPortForwardingRule(PortForwardingRule rule, Long vmId, Ip vmIp, boolean openFirewall, Boolean forDisplay) throws NetworkRuleConflictException;
+    PortForwardingRule createPortForwardingRule(PortForwardingRule rule, Ip vmIp, boolean openFirewall, Boolean forDisplay) throws NetworkRuleConflictException;
 
     /**
      * Revokes a port forwarding rule
