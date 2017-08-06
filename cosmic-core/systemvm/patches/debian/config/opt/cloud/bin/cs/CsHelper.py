@@ -62,6 +62,7 @@ def get_systemvm_version():
         logging.info("Got an exception while trying to find systemvm version. Returning version 0")
         return 0
 
+
 def is_mounted(name):
     for i in execute("mount"):
         vals = i.lstrip().split()
@@ -230,7 +231,13 @@ def service(name, op):
 
 
 def start_if_stopped(name):
+    logging.info("Start if stopped: %s" % name)
     ret = execute2("service %s status" % name)
+    out, err = ret.communicate()
+    if out:
+        logging.info(out)
+    if err:
+        logging.error(err)
     if ret.returncode:
         execute2("service %s start" % name)
 
