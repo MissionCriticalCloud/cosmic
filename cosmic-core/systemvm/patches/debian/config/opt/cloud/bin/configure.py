@@ -443,13 +443,22 @@ class CsSite2SiteVpn(CsDataBag):
                 logging.error("Request for ipsec to %s not possible because ip is not configured", local_ip)
                 continue
 
-            CsHelper.start_if_stopped("ipsec")
             self.configure_iptables(dev, self.dbag[vpn])
             self.configure_ipsec(self.dbag[vpn])
 
         # Delete vpns that are no longer in the configuration
         for ip in self.confips:
             self.deletevpn(ip)
+
+        self.check_ipsec()
+
+    def check_ipsec(self):
+        CsHelper.start_if_stopped("ipsec")
+        ret = CsHelper.get_output_of_command("service ipsec status")
+
+        if "Security Associations" not in ret:
+            logging.debug(CsHelper.get_output_of_command("service ipsec stop"))
+            logging.debug(CsHelper.get_output_of_command("service ipsec start"))
 
     def deletevpn(self, ip):
         logging.info("Removing VPN configuration for %s", ip)
@@ -490,10 +499,6 @@ class CsSite2SiteVpn(CsDataBag):
         file = CsFile(strokefile)
         file.greplace("# timeout = 0", "timeout = 30000")
         file.commit()
-
-        pfs = 'no'
-        if 'modp' in esppolicy:
-            pfs = 'yes'
 
         if rightpeer in self.confips:
             self.confips.remove(rightpeer)
@@ -538,8 +543,8 @@ class CsSite2SiteVpn(CsDataBag):
             CsHelper.execute("ipsec rereadsecrets")
 
         # This will load the new config and start the connection when needed since auto=start in the config
-        CsHelper.execute("ipsec reload")
         os.chmod(vpnsecretsfile, 0400)
+        CsHelper.execute("ipsec reload")
 
     def convert_sec_to_h(self, val):
         hrs = int(val) / 3600
@@ -760,7 +765,6 @@ class CsRemoteAccessVpn(CsDataBag):
         psk = obj['preshared_key']
 
         # l2tp config options
-        file.search("pfs=", "        pfs=no")
         file.search("rekey=", "        rekey=no")
         file.search("keyingtries=", "        keyingtries=3")
         file.search("keyexchange=", "        keyexchange=ikev1")
