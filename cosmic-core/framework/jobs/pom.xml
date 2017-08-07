@@ -11,7 +11,7 @@
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-utils</artifactId>
+            <artifactId>cosmic-utils</artifactId>
             <version>5.3.7.1-SNAPSHOT</version>
         </dependency>
         <dependency>
