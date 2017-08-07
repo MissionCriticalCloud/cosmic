@@ -419,13 +419,12 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final long vmId) {
+    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds) {
         final String ipAssocCommand = "IPAssocCommand";
-        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, vmId);
+        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
     }
 
-    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand, final
-    long vmId) {
+    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand) {
         final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = getVlanIpMap(ips);
 
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
@@ -874,7 +873,7 @@ public class CommandSetupHelper {
                                                    final Map<String, String> vlanMacAddress) {
         final String ipAssocCommand = "IPAssocVpcCommand";
         if (router.getIsRedundantRouter()) {
-            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, 0);
+            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
             return;
         }
 
