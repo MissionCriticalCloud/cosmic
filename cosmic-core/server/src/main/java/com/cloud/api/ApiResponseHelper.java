@@ -814,14 +814,6 @@ public class ApiResponseHelper implements ResponseGenerator {
             ipResponse.setVirtualMachineIp(ipAddr.getVmIp());
         }
 
-        if (ipAddr.getAssociatedWithNetworkId() != null) {
-            final Network ntwk = ApiDBUtils.findNetworkById(ipAddr.getAssociatedWithNetworkId());
-            if (ntwk != null) {
-                ipResponse.setAssociatedNetworkId(ntwk.getUuid());
-                ipResponse.setAssociatedNetworkName(ntwk.getName());
-            }
-        }
-
         if (ipAddr.getVpcId() != null) {
             final Vpc vpc = ApiDBUtils.findVpcById(ipAddr.getVpcId());
             if (vpc != null) {
