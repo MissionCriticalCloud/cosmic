@@ -16,7 +16,7 @@ CREATE TABLE `account` (
   COMMENT '1 if account is default',
   CONSTRAINT `uc_account__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account__default_zone_id`
   ON `account` (`default_zone_id`);
@@ -43,7 +43,7 @@ CREATE TABLE `account_details` (
   CONSTRAINT `fk_account_details__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account_details__account_id`
   ON `account_details` (`account_id`);
@@ -61,7 +61,7 @@ CREATE TABLE `account_network_ref` (
   CONSTRAINT `fk_account_network_ref__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account_network_ref__account_id`
   ON `account_network_ref` (`account_id`);
@@ -79,7 +79,7 @@ CREATE TABLE `account_vlan_map` (
   CONSTRAINT `fk_account_vlan_map__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account_vlan_map__account_id`
   ON `account_vlan_map` (`account_id`);
@@ -102,7 +102,7 @@ CREATE TABLE `account_vnet_map` (
   CONSTRAINT `fk_account_vnet_map__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account_vnet_map__account_id`
   ON `account_vnet_map` (`account_id`);
@@ -127,7 +127,7 @@ CREATE TABLE `affinity_group` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_affinity_group__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_affinity_group__account_id`
   ON `affinity_group` (`account_id`);
@@ -148,7 +148,7 @@ CREATE TABLE `affinity_group_domain_map` (
   CONSTRAINT `fk_affinity_group_domain_map__affinity_group_id`
   FOREIGN KEY (`affinity_group_id`) REFERENCES `cloud`.`affinity_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_affinity_group_domain_map__affinity_group_id`
   ON `affinity_group_domain_map` (`affinity_group_id`);
@@ -164,7 +164,7 @@ CREATE TABLE `affinity_group_vm_map` (
   CONSTRAINT `fk_agvm__group_id`
   FOREIGN KEY (`affinity_group_id`) REFERENCES `cloud`.`affinity_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_affinity_group_vm_map___instance_id`
   ON `affinity_group_vm_map` (`instance_id`);
@@ -194,7 +194,7 @@ CREATE TABLE `alert` (
   COMMENT 'name of the alert',
   CONSTRAINT `uc_alert__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_alert__last_sent`
   ON `alert` (`last_sent`);
@@ -243,7 +243,7 @@ CREATE TABLE `async_job` (
   `job_pending_signals` INT(10) DEFAULT '0' NOT NULL,
   CONSTRAINT `uc_async__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_async_job__removed`
   ON `async_job` (`removed`);
@@ -294,7 +294,7 @@ CREATE TABLE `async_job_join_map` (
   CONSTRAINT `fk_async_job_join_map__job_id`
   FOREIGN KEY (`job_id`) REFERENCES `cloud`.`async_job` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_async_job_join_map__created`
   ON `async_job_join_map` (`created`);
@@ -330,7 +330,7 @@ CREATE TABLE `autoscale_policies` (
   CONSTRAINT `fk_autoscale_policies__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_policies__account_id`
   ON `autoscale_policies` (`account_id`);
@@ -349,7 +349,7 @@ CREATE TABLE `autoscale_policy_condition_map` (
   CONSTRAINT `fk_autoscale_policy_condition_map__policy_id`
   FOREIGN KEY (`policy_id`) REFERENCES `cloud`.`autoscale_policies` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_policy_condition_map__condition_id`
   ON `autoscale_policy_condition_map` (`condition_id`);
@@ -366,7 +366,7 @@ CREATE TABLE `autoscale_vmgroup_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmgroup_details__autoscale_vmgroup_id`
   ON `autoscale_vmgroup_details` (`autoscale_vmgroup_id`);
@@ -378,7 +378,7 @@ CREATE TABLE `autoscale_vmgroup_policy_map` (
   `policy_id` BIGINT NOT NULL,
   CONSTRAINT `fk_autoscale_vmgroup_policy_map__policy_id`
   FOREIGN KEY (`policy_id`) REFERENCES `cloud`.`autoscale_policies` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmgroup_policy_map__policy_id`
   ON `autoscale_vmgroup_policy_map` (`policy_id`);
@@ -391,7 +391,7 @@ CREATE TABLE `autoscale_vmgroup_vm_map` (
     PRIMARY KEY,
   `vmgroup_id` BIGINT NOT NULL,
   `instance_id` BIGINT NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmgroup_vm_map__instance_id`
   ON `autoscale_vmgroup_vm_map` (`instance_id`);
@@ -427,7 +427,7 @@ CREATE TABLE `autoscale_vmgroups` (
   CONSTRAINT `fk_autoscale_vmgroups__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmgroups__account_id`
   ON `autoscale_vmgroups` (`account_id`);
@@ -471,7 +471,7 @@ CREATE TABLE `autoscale_vmprofile_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmprofile_details__autoscale_vmprofile_id`
   ON `autoscale_vmprofile_details` (`autoscale_vmprofile_id`);
@@ -503,7 +503,7 @@ CREATE TABLE `autoscale_vmprofiles` (
   CONSTRAINT `fk_autoscale_vmprofiles__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmprofiles__account_id`
   ON `autoscale_vmprofiles` (`account_id`);
@@ -561,7 +561,7 @@ CREATE TABLE `cluster` (
   UNIQUE (`guid`),
   CONSTRAINT `i_cluster__pod_id__name`
   UNIQUE (`pod_id`, `name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_cluster__data_center_id`
   ON `cluster` (`data_center_id`);
@@ -582,7 +582,7 @@ CREATE TABLE `cluster_details` (
   CONSTRAINT `fk_cluster_details__cluster_id`
   FOREIGN KEY (`cluster_id`) REFERENCES `cloud`.`cluster` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_cluster_details__cluster_id`
   ON `cluster_details` (`cluster_id`);
@@ -611,7 +611,7 @@ CREATE TABLE `conditions` (
   CONSTRAINT `fk_conditions__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_conditions__account_id`
   ON `conditions` (`account_id`);
@@ -644,7 +644,7 @@ CREATE TABLE `configuration` (
   COMMENT 'Can this parameter be scoped',
   `is_dynamic` TINYINT(1) DEFAULT '0' NOT NULL
   COMMENT 'Can the parameter be change dynamically without restarting the server'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_configuration__category`
   ON `configuration` (`category`);
@@ -675,7 +675,7 @@ CREATE TABLE `console_proxy` (
   COMMENT 'session detail info',
   CONSTRAINT `public_mac_address`
   UNIQUE (`public_mac_address`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `counter` (
   `id` BIGINT AUTO_INCREMENT
@@ -694,7 +694,7 @@ CREATE TABLE `counter` (
   COMMENT 'date created',
   CONSTRAINT `uc_counter__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_counter__removed`
   ON `counter` (`removed`);
@@ -756,7 +756,7 @@ CREATE TABLE `data_center` (
   `ip6_dns2` VARCHAR(255) NULL,
   CONSTRAINT `uc_data_center__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_data_center__allocation_state`
   ON `data_center` (`allocation_state`);
@@ -796,7 +796,7 @@ CREATE TABLE `data_center_details` (
   CONSTRAINT `fk_dc_details__dc_id`
   FOREIGN KEY (`dc_id`) REFERENCES `cloud`.`data_center` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_dc_details__dc_id`
   ON `data_center_details` (`dc_id`);
@@ -824,7 +824,7 @@ CREATE TABLE `dc_storage_network_ip_range` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_storage_ip_range__data_center_id`
   FOREIGN KEY (`data_center_id`) REFERENCES `cloud`.`data_center` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_storage_ip_range__data_center_id`
   ON `dc_storage_network_ip_range` (`data_center_id`);
@@ -866,7 +866,7 @@ CREATE TABLE `dedicated_resources` (
   CONSTRAINT `fk_dedicated_resources__affinity_group_id`
   FOREIGN KEY (`affinity_group_id`) REFERENCES `cloud`.`affinity_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_dedicated_resources__cluster_id`
   ON `dedicated_resources` (`cluster_id`);
@@ -943,7 +943,7 @@ CREATE TABLE `disk_offering` (
   UNIQUE (`uuid`),
   CONSTRAINT `unique_name`
   UNIQUE (`unique_name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_disk_offering__removed`
   ON `disk_offering` (`removed`);
@@ -960,7 +960,7 @@ CREATE TABLE `disk_offering_details` (
   CONSTRAINT `fk_offering_details__offering_id`
   FOREIGN KEY (`offering_id`) REFERENCES `cloud`.`disk_offering` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_offering_details__offering_id`
   ON `disk_offering_details` (`offering_id`);
@@ -988,7 +988,7 @@ CREATE TABLE `domain` (
   UNIQUE (`parent`, `name`, `removed`),
   CONSTRAINT `uc_domain__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_domain__path`
   ON `domain` (`path`);
@@ -1050,7 +1050,7 @@ CREATE TABLE `domain_network_ref` (
   CONSTRAINT `fk_domain_network_ref__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_domain_network_ref__domain_id`
   ON `domain_network_ref` (`domain_id`);
@@ -1110,7 +1110,7 @@ CREATE TABLE `domain_vlan_map` (
   CONSTRAINT `fk_domain_vlan_map__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_account_vlan_map__domain_id`
   ON `domain_vlan_map` (`domain_id`);
@@ -1137,7 +1137,7 @@ CREATE TABLE `event` (
   COMMENT 'True if the detail can be displayed to the end user',
   CONSTRAINT `uc_event__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `archived`
   ON `event` (`archived`);
@@ -1195,7 +1195,7 @@ CREATE TABLE `external_load_balancer_devices` (
   COMMENT '1 if load balancer appliance is acting exclusively as gslb service provider in the zone and can not be used for LB',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_external_lb_devices_parent_host_id`
   ON `external_load_balancer_devices` (`host_id`);
@@ -1218,7 +1218,7 @@ CREATE TABLE `external_nicira_nvp_devices` (
   COMMENT 'host id coresponding to the external nicira nvp device',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_external_nicira_nvp_devices__host_id`
   ON `external_nicira_nvp_devices` (`host_id`);
@@ -1241,7 +1241,7 @@ CREATE TABLE `external_nuage_vsp_devices` (
   COMMENT 'host id corresponding to the external nuage vsp device',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_external_nuage_vsp_devices__host_id`
   ON `external_nuage_vsp_devices` (`host_id`);
@@ -1255,7 +1255,7 @@ CREATE TABLE `external_stratosphere_ssp_credentials` (
   `data_center_id` BIGINT NOT NULL,
   `username` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `external_stratosphere_ssp_tenants` (
   `id` BIGINT AUTO_INCREMENT
@@ -1264,7 +1264,7 @@ CREATE TABLE `external_stratosphere_ssp_tenants` (
   COMMENT 'SSP tenant uuid',
   `zone_id` BIGINT NOT NULL
   COMMENT 'cloudstack zone_id'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `external_stratosphere_ssp_uuids` (
   `id` BIGINT AUTO_INCREMENT
@@ -1274,7 +1274,7 @@ CREATE TABLE `external_stratosphere_ssp_uuids` (
   `obj_class` VARCHAR(255) NOT NULL,
   `obj_id` BIGINT NOT NULL,
   `reservation_id` VARCHAR(255) NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `firewall_rule_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -1285,7 +1285,7 @@ CREATE TABLE `firewall_rule_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_firewall_rule_details__firewall_rule_id`
   ON `firewall_rule_details` (`firewall_rule_id`);
@@ -1341,7 +1341,7 @@ CREATE TABLE `firewall_rules` (
   CONSTRAINT `fk_firewall_rules__related`
   FOREIGN KEY (`related`) REFERENCES `cloud`.`firewall_rules` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_firewall_rules__account_id`
   ON `firewall_rules` (`account_id`);
@@ -1381,7 +1381,7 @@ CREATE TABLE `firewall_rules_cidrs` (
   CONSTRAINT `fk_firewall_cidrs_firewall_rules`
   FOREIGN KEY (`firewall_rule_id`) REFERENCES `cloud`.`firewall_rules` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_firewall_cidrs_firewall_rules`
   ON `firewall_rules_cidrs` (`firewall_rule_id`);
@@ -1397,7 +1397,7 @@ CREATE TABLE `global_load_balancer_lb_rule_map` (
   COMMENT '1 is when rule is set for Revoke',
   CONSTRAINT `gslb_rule_id`
   UNIQUE (`gslb_rule_id`, `lb_rule_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_lb_rule_id`
   ON `global_load_balancer_lb_rule_map` (`lb_rule_id`);
@@ -1428,7 +1428,7 @@ CREATE TABLE `global_load_balancing_rules` (
   CONSTRAINT `fk_global_load_balancing_rules_account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_global_load_balancing_rules_account_id`
   ON `global_load_balancing_rules` (`account_id`);
@@ -1458,7 +1458,7 @@ CREATE TABLE `guest_os` (
   COMMENT 'String to put in the Manufacturer field in the XML of a KVM VM',
   CONSTRAINT `uc_guest_os__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_guest_os__category_id`
   ON `guest_os` (`category_id`);
@@ -1470,7 +1470,7 @@ CREATE TABLE `guest_os_category` (
   `uuid` VARCHAR(40) NULL,
   CONSTRAINT `uc_guest_os_category__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `guest_os`
   ADD CONSTRAINT `fk_guest_os__category_id`
@@ -1497,7 +1497,7 @@ CREATE TABLE `guest_os_hypervisor` (
   UNIQUE (`uuid`),
   CONSTRAINT `guest_os_hypervisor_ibfk_1`
   FOREIGN KEY (`guest_os_id`) REFERENCES `cloud`.`guest_os` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `guest_os_id`
   ON `guest_os_hypervisor` (`guest_os_id`);
@@ -1580,7 +1580,7 @@ CREATE TABLE `host` (
   UNIQUE (`guid`),
   CONSTRAINT `fk_host__cluster_id`
   FOREIGN KEY (`cluster_id`) REFERENCES `cloud`.`cluster` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_host__cluster_id`
   ON `host` (`cluster_id`);
@@ -1636,7 +1636,7 @@ CREATE TABLE `host_details` (
   CONSTRAINT `fk_host_details__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_host_details__host_id`
   ON `host_details` (`host_id`);
@@ -1649,7 +1649,7 @@ CREATE TABLE `host_gpu_groups` (
   CONSTRAINT `fk_host_gpu_groups__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_host_gpu_groups__host_id`
   ON `host_gpu_groups` (`host_id`);
@@ -1685,7 +1685,7 @@ CREATE TABLE `host_pod_ref` (
   UNIQUE (`name`, `data_center_id`),
   CONSTRAINT `uc_host_pod_ref__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_host_pod_ref__allocation_state`
   ON `host_pod_ref` (`allocation_state`);
@@ -1722,7 +1722,7 @@ CREATE TABLE `host_tags` (
   CONSTRAINT `fk_host_tags__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_host_tags__host_id`
   ON `host_tags` (`host_id`);
@@ -1748,7 +1748,7 @@ CREATE TABLE `hypervisor_capabilities` (
   UNIQUE (`uuid`),
   CONSTRAINT `uc_hypervisor`
   UNIQUE (`hypervisor_type`, `hypervisor_version`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `image_store` (
   `id` BIGINT AUTO_INCREMENT
@@ -1779,7 +1779,7 @@ CREATE TABLE `image_store` (
   COMMENT 'storage total size statistics',
   `used_bytes` BIGINT NULL
   COMMENT 'storage available bytes statistics'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `image_store_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -1794,7 +1794,7 @@ CREATE TABLE `image_store_details` (
   CONSTRAINT `fk_image_store_details__store_id`
   FOREIGN KEY (`store_id`) REFERENCES `cloud`.`image_store` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_image_store_details__store_id`
   ON `image_store_details` (`store_id`);
@@ -1810,7 +1810,7 @@ CREATE TABLE `inline_load_balancer_nic_map` (
   COMMENT 'nic id',
   CONSTRAINT `nic_id`
   UNIQUE (`nic_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `instance_group` (
   `id` BIGINT AUTO_INCREMENT
@@ -1827,7 +1827,7 @@ CREATE TABLE `instance_group` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_instance_group__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_instance_group__account_id`
   ON `instance_group` (`account_id`);
@@ -1846,7 +1846,7 @@ CREATE TABLE `instance_group_vm_map` (
   CONSTRAINT `fk_instance_group_vm_map___group_id`
   FOREIGN KEY (`group_id`) REFERENCES `cloud`.`instance_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_instance_group_vm_map___group_id`
   ON `instance_group_vm_map` (`group_id`);
@@ -1869,14 +1869,14 @@ CREATE TABLE `keystore` (
   `seq` INT NULL,
   CONSTRAINT `name`
   UNIQUE (`name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `launch_permission` (
   `id` BIGINT AUTO_INCREMENT
     PRIMARY KEY,
   `template_id` BIGINT NOT NULL,
   `account_id` BIGINT NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_launch_permission_template_id`
   ON `launch_permission` (`template_id`);
@@ -1889,7 +1889,7 @@ CREATE TABLE `ldap_configuration` (
   COMMENT 'the hostname of the ldap server',
   `port` INT(10) NULL
   COMMENT 'port that the ldap server is listening on'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ldap_trust_map` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT
@@ -1902,7 +1902,7 @@ CREATE TABLE `ldap_trust_map` (
   UNIQUE (`domain_id`),
   CONSTRAINT `fk_ldap_trust_map__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `legacy_zones` (
   `id` BIGINT AUTO_INCREMENT
@@ -1915,7 +1915,7 @@ CREATE TABLE `legacy_zones` (
   CONSTRAINT `fk_legacy_zones__zone_id`
   FOREIGN KEY (`zone_id`) REFERENCES `cloud`.`data_center` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `load_balancer_cert_map` (
   `id` BIGINT AUTO_INCREMENT
@@ -1924,7 +1924,7 @@ CREATE TABLE `load_balancer_cert_map` (
   `load_balancer_id` BIGINT NOT NULL,
   `certificate_id` BIGINT NOT NULL,
   `revoke` TINYINT(1) DEFAULT '0' NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_load_balancer_cert_map__certificate_id`
   ON `load_balancer_cert_map` (`certificate_id`);
@@ -1949,7 +1949,7 @@ CREATE TABLE `load_balancer_healthcheck_policies` (
   COMMENT 'True if the policy can be displayed to the end user',
   CONSTRAINT `id_UNIQUE`
   UNIQUE (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_load_balancer_healthcheck_policies_loadbalancer_id`
   ON `load_balancer_healthcheck_policies` (`load_balancer_id`);
@@ -1966,7 +1966,7 @@ CREATE TABLE `load_balancer_healthcheck_policy_details` (
   CONSTRAINT `fk_lb_healthcheck_policy_details__lb_healthcheck_policy_id`
   FOREIGN KEY (`lb_policy_id`) REFERENCES `cloud`.`load_balancer_healthcheck_policies` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_lb_healthcheck_policy_details__lb_healthcheck_policy_id`
   ON `load_balancer_healthcheck_policy_details` (`lb_policy_id`);
@@ -1985,7 +1985,7 @@ CREATE TABLE `load_balancer_stickiness_policies` (
   COMMENT '1 is when rule is set for Revoke',
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the policy can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_load_balancer_stickiness_policies__load_balancer_id`
   ON `load_balancer_stickiness_policies` (`load_balancer_id`);
@@ -2002,7 +2002,7 @@ CREATE TABLE `load_balancer_stickiness_policy_details` (
   CONSTRAINT `fk_lb_stickiness_policy_details__lb_stickiness_policy_id`
   FOREIGN KEY (`lb_policy_id`) REFERENCES `cloud`.`load_balancer_stickiness_policies` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_lb_stickiness_policy_details__lb_stickiness_policy_id`
   ON `load_balancer_stickiness_policy_details` (`lb_policy_id`);
@@ -2019,7 +2019,7 @@ CREATE TABLE `load_balancer_vm_map` (
   `instance_ip` VARCHAR(40) NULL,
   CONSTRAINT `load_balancer_id`
   UNIQUE (`load_balancer_id`, `instance_id`, `instance_ip`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_load_balancer_vm_map__instance_id`
   ON `load_balancer_vm_map` (`instance_id`);
@@ -2049,7 +2049,7 @@ CREATE TABLE `load_balancing_rules` (
   CONSTRAINT `fk_load_balancing_rules__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`firewall_rules` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `autoscale_vmgroups`
   ADD CONSTRAINT `fk_autoscale_vmgroup__load_balancer_id`
@@ -2098,7 +2098,7 @@ CREATE TABLE `monitoring_services` (
   COMMENT 'path of the pid file of the service',
   `isDefault` TINYINT(1) NULL
   COMMENT 'Default service'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `mshost` (
   `id` BIGINT AUTO_INCREMENT
@@ -2119,7 +2119,7 @@ CREATE TABLE `mshost` (
   `alert_count` INT DEFAULT '0' NOT NULL,
   CONSTRAINT `msid`
   UNIQUE (`msid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_mshost__last_update`
   ON `mshost` (`last_update`);
@@ -2143,7 +2143,7 @@ CREATE TABLE `mshost_peer` (
     ON DELETE CASCADE,
   CONSTRAINT `fk_mshost_peer__peer_mshost`
   FOREIGN KEY (`peer_mshost`) REFERENCES `cloud`.`mshost` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_mshost_peer__peer_mshost`
   ON `mshost_peer` (`peer_mshost`);
@@ -2160,7 +2160,7 @@ CREATE TABLE `network_acl` (
   `description` VARCHAR(1024) NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the entry can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `network_acl_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -2174,7 +2174,7 @@ CREATE TABLE `network_acl_details` (
   CONSTRAINT `fk_network_acl_details__network_acl_id`
   FOREIGN KEY (`network_acl_id`) REFERENCES `cloud`.`network_acl` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_acl_details__network_acl_id`
   ON `network_acl_details` (`network_acl_id`);
@@ -2215,7 +2215,7 @@ CREATE TABLE `network_acl_item` (
   CONSTRAINT `fk_network_acl_item__acl_id`
   FOREIGN KEY (`acl_id`) REFERENCES `cloud`.`network_acl` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `network_acl_item_cidrs` (
   `id` BIGINT AUTO_INCREMENT
@@ -2226,7 +2226,7 @@ CREATE TABLE `network_acl_item_cidrs` (
   CONSTRAINT `fk_network_acl_item_id`
   FOREIGN KEY (`network_acl_item_id`) REFERENCES `cloud`.`network_acl_item` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_acl_item_id`
   ON `network_acl_item_cidrs` (`network_acl_item_id`);
@@ -2243,7 +2243,7 @@ CREATE TABLE `network_acl_item_details` (
   CONSTRAINT `fk_network_acl_item_details__network_acl_item_id`
   FOREIGN KEY (`network_acl_item_id`) REFERENCES `cloud`.`network_acl_item` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_acl_item_details__network_acl_item_id`
   ON `network_acl_item_details` (`network_acl_item_id`);
@@ -2257,7 +2257,7 @@ CREATE TABLE `network_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_details__network_id`
   ON `network_details` (`network_id`);
@@ -2280,7 +2280,7 @@ CREATE TABLE `network_external_lb_device_map` (
   CONSTRAINT `fk_network_external_lb_devices_device_id`
   FOREIGN KEY (`external_load_balancer_device_id`) REFERENCES `cloud`.`external_load_balancer_devices` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_external_lb_devices_device_id`
   ON `network_external_lb_device_map` (`external_load_balancer_device_id`);
@@ -2295,7 +2295,7 @@ CREATE TABLE `network_offering_details` (
   COMMENT 'network offering id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_offering_details__network_offering_id`
   ON `network_offering_details` (`network_offering_id`);
@@ -2375,7 +2375,7 @@ CREATE TABLE `network_offerings` (
   UNIQUE (`uuid`),
   CONSTRAINT `unique_name`
   UNIQUE (`unique_name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_network_offerings__removed`
   ON `network_offerings` (`removed`);
@@ -2397,7 +2397,7 @@ CREATE TABLE `network_rule_config` (
   `protocol` VARCHAR(16) DEFAULT 'TCP' NOT NULL,
   `create_status` VARCHAR(32) NULL
   COMMENT 'rule creation status'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `networks` (
   `id` BIGINT AUTO_INCREMENT
@@ -2490,7 +2490,7 @@ CREATE TABLE `networks` (
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`),
   CONSTRAINT `fk_networks__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_networks__account_id`
   ON `networks` (`account_id`);
@@ -2619,7 +2619,7 @@ CREATE TABLE `networks_pre520` (
   `redundant` TINYINT(1) DEFAULT '0' NULL,
   CONSTRAINT `uc_networks__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_networks__account_id`
   ON `networks_pre520` (`account_id`);
@@ -2651,7 +2651,7 @@ CREATE TABLE `nic_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_nic_details__nic_id`
   ON `nic_details` (`nic_id`);
@@ -2675,7 +2675,7 @@ CREATE TABLE `nic_ip_alias` (
   `state` CHAR(32) NOT NULL,
   CONSTRAINT `id_UNIQUE`
   UNIQUE (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nic_secondary_ips` (
   `id` BIGINT AUTO_INCREMENT
@@ -2700,7 +2700,7 @@ CREATE TABLE `nic_secondary_ips` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_nic_secondary_ip__networks_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_nic_secondary_ip__networks_id`
   ON `nic_secondary_ips` (`network_id`);
@@ -2722,7 +2722,7 @@ CREATE TABLE `nicira_nvp_nic_map` (
   UNIQUE (`logicalswitchport`),
   CONSTRAINT `nic`
   UNIQUE (`nic`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nicira_nvp_router_map` (
   `id` BIGINT AUTO_INCREMENT
@@ -2739,7 +2739,7 @@ CREATE TABLE `nicira_nvp_router_map` (
   CONSTRAINT `fk_nicira_nvp_router_map__network_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nics` (
   `id` BIGINT AUTO_INCREMENT
@@ -2800,7 +2800,7 @@ CREATE TABLE `nics` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_nics__networks_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_nics__instance_id`
   ON `nics` (`instance_id`);
@@ -2842,7 +2842,7 @@ CREATE TABLE `ntwk_offering_service_map` (
   CONSTRAINT `fk_ntwk_offering_service_map__network_offering_id`
   FOREIGN KEY (`network_offering_id`) REFERENCES `cloud`.`network_offerings` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ntwk_service_map` (
   `id` BIGINT AUTO_INCREMENT
@@ -2860,7 +2860,7 @@ CREATE TABLE `ntwk_service_map` (
   CONSTRAINT `fk_ntwk_service_map__network_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `object_datastore_ref` (
   `id` BIGINT AUTO_INCREMENT
@@ -2885,7 +2885,7 @@ CREATE TABLE `object_datastore_ref` (
   `state` VARCHAR(255) NOT NULL,
   `update_count` BIGINT NOT NULL,
   `updated` DATETIME NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_dc_ip_address_alloc` (
   `id` BIGINT AUTO_INCREMENT
@@ -2913,7 +2913,7 @@ CREATE TABLE `op_dc_ip_address_alloc` (
   CONSTRAINT `fk_op_dc_ip_address_alloc__pod_id`
   FOREIGN KEY (`pod_id`) REFERENCES `cloud`.`host_pod_ref` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_dc_ip_address_alloc__data_center_id`
   ON `op_dc_ip_address_alloc` (`data_center_id`);
@@ -2940,7 +2940,7 @@ CREATE TABLE `op_dc_link_local_ip_address_alloc` (
   COMMENT 'reservation id used to reserve this network',
   `taken` DATETIME NULL
   COMMENT 'Date taken'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_dc_link_local_ip_address_alloc__data_center_id`
   ON `op_dc_link_local_ip_address_alloc` (`data_center_id`);
@@ -2966,7 +2966,7 @@ CREATE TABLE `op_dc_storage_network_ip_address` (
   CONSTRAINT `fk_storage_ip_address__range_id`
   FOREIGN KEY (`range_id`) REFERENCES `cloud`.`dc_storage_network_ip_range` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_storage_ip_address__range_id`
   ON `op_dc_storage_network_ip_address` (`range_id`);
@@ -2995,7 +2995,7 @@ CREATE TABLE `op_dc_vnet_alloc` (
     ON DELETE CASCADE,
   CONSTRAINT `fk_op_dc_vnet_alloc__account_vnet_map_id`
   FOREIGN KEY (`account_vnet_map_id`) REFERENCES `cloud`.`account_vnet_map` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_dc_vnet_alloc__account_vnet_map_id`
   ON `op_dc_vnet_alloc` (`account_vnet_map_id`);
@@ -3038,7 +3038,7 @@ CREATE TABLE `op_ha_work` (
   FOREIGN KEY (`mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`),
   CONSTRAINT `fk_op_ha_work__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_ha_work__host_id`
   ON `op_ha_work` (`host_id`);
@@ -3064,7 +3064,7 @@ CREATE TABLE `op_host` (
   CONSTRAINT `fk_op_host__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_host_capacity` (
   `id` BIGINT AUTO_INCREMENT
@@ -3084,7 +3084,7 @@ CREATE TABLE `op_host_capacity` (
   COMMENT 'time the capacity was last updated',
   `created` DATETIME NULL
   COMMENT 'date created'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_host_capacity__cluster_id`
   ON `op_host_capacity` (`cluster_id`);
@@ -3119,7 +3119,7 @@ CREATE TABLE `op_host_planner_reservation` (
   CONSTRAINT `fk_planner_reservation__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_planner_reservation__cluster_id`
   ON `op_host_planner_reservation` (`cluster_id`);
@@ -3152,7 +3152,7 @@ CREATE TABLE `op_host_transfer` (
   FOREIGN KEY (`initial_mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`),
   CONSTRAINT `fk_op_host_transfer__future_mgmt_server_id`
   FOREIGN KEY (`future_mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_host_transfer__future_mgmt_server_id`
   ON `op_host_transfer` (`future_mgmt_server_id`);
@@ -3170,7 +3170,7 @@ CREATE TABLE `op_host_upgrade` (
   COMMENT 'state',
   CONSTRAINT `host_id`
   UNIQUE (`host_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_it_work` (
   `id` CHAR(40) DEFAULT '' NOT NULL
@@ -3198,7 +3198,7 @@ CREATE TABLE `op_it_work` (
   COMMENT 'resource id being worked on',
   CONSTRAINT `fk_op_it_work__mgmt_server_id`
   FOREIGN KEY (`mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_it_work__instance_id`
   ON `op_it_work` (`instance_id`);
@@ -3228,7 +3228,7 @@ CREATE TABLE `op_lock` (
   COMMENT 'How many have the thread acquired this lock (reentrant)',
   CONSTRAINT `key`
   UNIQUE (`key`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_lock__mac_ip_thread`
   ON `op_lock` (`mac`, `ip`, `thread`);
@@ -3247,7 +3247,7 @@ CREATE TABLE `op_networks` (
   CONSTRAINT `fk_op_networks__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`networks` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_nwgrp_work` (
   `id` BIGINT AUTO_INCREMENT
@@ -3265,7 +3265,7 @@ CREATE TABLE `op_nwgrp_work` (
   COMMENT 'Step in the work',
   `seq_no` BIGINT NULL
   COMMENT 'seq number to be sent to agent, uniquely identifies ruleset update'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_op_nwgrp_work__instance_id`
   ON `op_nwgrp_work` (`instance_id`);
@@ -3296,7 +3296,7 @@ CREATE TABLE `op_pod_vlan_alloc` (
   COMMENT 'account the vlan belongs to right now',
   `taken` DATETIME NULL
   COMMENT 'Date taken'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_router_monitoring_services` (
   `vm_id` BIGINT NOT NULL
@@ -3308,7 +3308,7 @@ CREATE TABLE `op_router_monitoring_services` (
   COMMENT 'Timestamp of the last alert received from Virtual Router',
   CONSTRAINT `vm_id`
   UNIQUE (`vm_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_user_stats_log` (
   `user_stats_id` BIGINT NOT NULL,
@@ -3322,7 +3322,7 @@ CREATE TABLE `op_user_stats_log` (
   COMMENT 'stats update timestamp',
   CONSTRAINT `user_stats_id`
   UNIQUE (`user_stats_id`, `updated`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_vm_ruleset_log` (
   `id` BIGINT AUTO_INCREMENT
@@ -3336,7 +3336,7 @@ CREATE TABLE `op_vm_ruleset_log` (
   COMMENT 'seq number to be sent to agent, uniquely identifies ruleset update',
   CONSTRAINT `u_op_vm_ruleset_log__instance_id`
   UNIQUE (`instance_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_vpc_distributed_router_sequence_no` (
   `id` BIGINT AUTO_INCREMENT
@@ -3350,7 +3350,7 @@ CREATE TABLE `op_vpc_distributed_router_sequence_no` (
   COMMENT 'sequence number to be sent to hypervisor, uniquely identifies a routing policy update',
   CONSTRAINT `u_op_vpc_distributed_router_sequence_no_vpc_id`
   UNIQUE (`vpc_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ovs_providers` (
   `id` BIGINT AUTO_INCREMENT
@@ -3365,7 +3365,7 @@ CREATE TABLE `ovs_providers` (
   COMMENT 'date removed if not null',
   CONSTRAINT `uc_ovs_providers__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_ovs_providers__nsp_id`
   ON `ovs_providers` (`nsp_id`);
@@ -3378,7 +3378,7 @@ CREATE TABLE `ovs_tunnel_interface` (
   `mac` VARCHAR(18) NULL,
   `host_id` BIGINT NULL,
   `label` VARCHAR(45) NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ovs_tunnel_network` (
   `id` BIGINT AUTO_INCREMENT,
@@ -3397,7 +3397,7 @@ CREATE TABLE `ovs_tunnel_network` (
   PRIMARY KEY (`from`, `to`, `network_id`),
   CONSTRAINT `id`
   UNIQUE (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network` (
   `id` BIGINT AUTO_INCREMENT
@@ -3426,7 +3426,7 @@ CREATE TABLE `physical_network` (
     ON DELETE CASCADE,
   CONSTRAINT `fk_physical_network__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_physical_network__data_center_id`
   ON `physical_network` (`data_center_id`);
@@ -3475,7 +3475,7 @@ CREATE TABLE `physical_network_isolation_methods` (
   CONSTRAINT `fk_physical_network_imethods__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network_service_providers` (
   `id` BIGINT AUTO_INCREMENT
@@ -3521,7 +3521,7 @@ CREATE TABLE `physical_network_service_providers` (
   CONSTRAINT `fk_pnetwork_service_providers__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_pnetwork_service_providers__physical_network_id`
   ON `physical_network_service_providers` (`physical_network_id`);
@@ -3544,7 +3544,7 @@ CREATE TABLE `physical_network_tags` (
   CONSTRAINT `fk_physical_network_tags__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network_traffic_types` (
   `id` BIGINT AUTO_INCREMENT
@@ -3570,7 +3570,7 @@ CREATE TABLE `physical_network_traffic_types` (
   CONSTRAINT `fk_physical_network_traffic_types__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `pod_vlan_map` (
   `id` BIGINT AUTO_INCREMENT
@@ -3582,7 +3582,7 @@ CREATE TABLE `pod_vlan_map` (
   CONSTRAINT `fk_pod_vlan_map__pod_id`
   FOREIGN KEY (`pod_id`) REFERENCES `cloud`.`host_pod_ref` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_pod_vlan_map__pod_id`
   ON `pod_vlan_map` (`pod_id`);
@@ -3604,7 +3604,7 @@ CREATE TABLE `port_forwarding_rules` (
   CONSTRAINT `fk_port_forwarding_rules__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`firewall_rules` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_port_forwarding_rules__instance_id`
   ON `port_forwarding_rules` (`instance_id`);
@@ -3632,7 +3632,7 @@ CREATE TABLE `portable_ip_address` (
   COMMENT 'guest network to which portable ip address is associated with',
   `vpc_id` BIGINT NULL
   COMMENT 'vpc to which portable ip address is associated with'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_portable_ip_address__portable_ip_range_id`
   ON `portable_ip_address` (`portable_ip_range_id`);
@@ -3650,7 +3650,7 @@ CREATE TABLE `portable_ip_range` (
   `netmask` VARCHAR(255) NULL,
   `start_ip` VARCHAR(255) NULL,
   `end_ip` VARCHAR(255) NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_portableip__region_id`
   ON `portable_ip_range` (`region_id`);
@@ -3680,7 +3680,7 @@ CREATE TABLE `private_ip_address` (
   CONSTRAINT `fk_private_ip_address__network_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_private_ip_address__network_id`
   ON `private_ip_address` (`network_id`);
@@ -3708,7 +3708,7 @@ CREATE TABLE `project_account` (
   CONSTRAINT `fk_project_account__project_account_id`
   FOREIGN KEY (`project_account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_project_account__project_account_id`
   ON `project_account` (`project_account_id`);
@@ -3748,7 +3748,7 @@ CREATE TABLE `project_invitations` (
   CONSTRAINT `fk_project_invitations__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_project_invitations__account_id`
   ON `project_invitations` (`account_id`);
@@ -3780,7 +3780,7 @@ CREATE TABLE `projects` (
   CONSTRAINT `fk_projects__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_projects__domain_id`
   ON `projects` (`domain_id`);
@@ -3816,7 +3816,7 @@ CREATE TABLE `region` (
   UNIQUE (`id`),
   CONSTRAINT `name`
   UNIQUE (`name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `global_load_balancing_rules`
   ADD CONSTRAINT `fk_global_load_balancing_rules_region_id`
@@ -3861,7 +3861,7 @@ CREATE TABLE `remote_access_vpn` (
   CONSTRAINT `fk_remote_access_vpn__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_remote_access_vpn__account_id`
   ON `remote_access_vpn` (`account_id`);
@@ -3884,7 +3884,7 @@ CREATE TABLE `remote_access_vpn_details` (
   CONSTRAINT `fk_remote_access_vpn_details__remote_access_vpn_id`
   FOREIGN KEY (`remote_access_vpn_id`) REFERENCES `cloud`.`remote_access_vpn` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_remote_access_vpn_details__remote_access_vpn_id`
   ON `remote_access_vpn_details` (`remote_access_vpn_id`);
@@ -3906,7 +3906,7 @@ CREATE TABLE `resource_count` (
   CONSTRAINT `fk_resource_count__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_resource_count__account_id`
   ON `resource_count` (`account_id`);
@@ -3930,7 +3930,7 @@ CREATE TABLE `resource_limit` (
   CONSTRAINT `fk_resource_limit__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_resource_limit__account_id`
   ON `resource_limit` (`account_id`);
@@ -3961,7 +3961,7 @@ CREATE TABLE `resource_tags` (
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`),
   CONSTRAINT `fk_tags__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_tags__account_id`
   ON `resource_tags` (`account_id`);
@@ -3987,7 +3987,7 @@ CREATE TABLE `router_network_ref` (
   CONSTRAINT `fk_router_network_ref__networks_id`
   FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_router_network_ref__networks_id`
   ON `router_network_ref` (`network_id`);
@@ -4019,7 +4019,7 @@ CREATE TABLE `s2s_customer_gateway` (
   CONSTRAINT `fk_s2s_customer_gateway__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_customer_gateway__account_id`
   ON `s2s_customer_gateway` (`account_id`);
@@ -4039,7 +4039,7 @@ CREATE TABLE `s2s_customer_gateway_details` (
   CONSTRAINT `fk_s2s_customer_gateway_details__s2s_customer_gateway_id`
   FOREIGN KEY (`s2s_customer_gateway_id`) REFERENCES `cloud`.`s2s_customer_gateway` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_customer_gateway_details__s2s_customer_gateway_id`
   ON `s2s_customer_gateway_details` (`s2s_customer_gateway_id`);
@@ -4072,7 +4072,7 @@ CREATE TABLE `s2s_vpn_connection` (
   CONSTRAINT `fk_s2s_vpn_connection__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_vpn_connection__account_id`
   ON `s2s_vpn_connection` (`account_id`);
@@ -4098,7 +4098,7 @@ CREATE TABLE `s2s_vpn_connection_details` (
   CONSTRAINT `fk_s2s_vpn_connection_details__s2s_vpn_connection_id`
   FOREIGN KEY (`s2s_vpn_connection_id`) REFERENCES `cloud`.`s2s_vpn_connection` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_vpn_connection_details__s2s_vpn_connection_id`
   ON `s2s_vpn_connection_details` (`s2s_vpn_connection_id`);
@@ -4124,7 +4124,7 @@ CREATE TABLE `s2s_vpn_gateway` (
   CONSTRAINT `fk_s2s_vpn_gateway__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_vpn_gateway__account_id`
   ON `s2s_vpn_gateway` (`account_id`);
@@ -4155,7 +4155,7 @@ CREATE TABLE `s2s_vpn_gateway_details` (
   CONSTRAINT `fk_s2s_vpn_gateway_details__s2s_vpn_gateway_id`
   FOREIGN KEY (`s2s_vpn_gateway_id`) REFERENCES `cloud`.`s2s_vpn_gateway` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_s2s_vpn_gateway_details__s2s_vpn_gateway_id`
   ON `s2s_vpn_gateway_details` (`s2s_vpn_gateway_id`);
@@ -4174,7 +4174,7 @@ CREATE TABLE `saml_token` (
   CONSTRAINT `fk_saml_token__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_saml_token__domain_id`
   ON `saml_token` (`domain_id`);
@@ -4198,7 +4198,7 @@ CREATE TABLE `secondary_storage_vm` (
   COMMENT 'work role of secondary storage host(templateProcessor | commandExecutor)',
   CONSTRAINT `public_mac_address`
   UNIQUE (`public_mac_address`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `security_group` (
   `id` BIGINT AUTO_INCREMENT
@@ -4217,7 +4217,7 @@ CREATE TABLE `security_group` (
   CONSTRAINT `fk_security_group__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_security_group__account_id`
   ON `security_group` (`account_id`);
@@ -4249,7 +4249,7 @@ CREATE TABLE `security_group_rule` (
   CONSTRAINT `fk_security_group_rule___allowed_network_id`
   FOREIGN KEY (`allowed_network_id`) REFERENCES `cloud`.`security_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_security_group_rule_allowed_network`
   ON `security_group_rule` (`allowed_network_id`);
@@ -4265,7 +4265,7 @@ CREATE TABLE `security_group_vm_map` (
   CONSTRAINT `fk_security_group_vm_map___security_group_id`
   FOREIGN KEY (`security_group_id`) REFERENCES `cloud`.`security_group` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_security_group_vm_map___instance_id`
   ON `security_group_vm_map` (`instance_id`);
@@ -4281,7 +4281,7 @@ CREATE TABLE `sequence` (
   COMMENT 'sequence value',
   CONSTRAINT `name`
   UNIQUE (`name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `service_offering` (
   `id` BIGINT AUTO_INCREMENT
@@ -4314,7 +4314,7 @@ CREATE TABLE `service_offering` (
   CONSTRAINT `fk_service_offering__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`disk_offering` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `service_offering_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -4330,7 +4330,7 @@ CREATE TABLE `service_offering_details` (
   CONSTRAINT `fk_service_offering_details__service_offering_id`
   FOREIGN KEY (`service_offering_id`) REFERENCES `cloud`.`service_offering` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `snapshot_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -4340,7 +4340,7 @@ CREATE TABLE `snapshot_details` (
   `value` VARCHAR(255) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `snapshot_policy` (
   `id` BIGINT AUTO_INCREMENT
@@ -4361,7 +4361,7 @@ CREATE TABLE `snapshot_policy` (
   COMMENT 'True if the policy can be displayed to the end user',
   CONSTRAINT `uc_snapshot_policy__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshot_policy__volume_id`
   ON `snapshot_policy` (`volume_id`);
@@ -4378,7 +4378,7 @@ CREATE TABLE `snapshot_policy_details` (
   CONSTRAINT `fk_snapshot_policy_details__snapshot_policy_id`
   FOREIGN KEY (`policy_id`) REFERENCES `cloud`.`snapshot_policy` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshot_policy_details__snapshot_policy_id`
   ON `snapshot_policy_details` (`policy_id`);
@@ -4407,7 +4407,7 @@ CREATE TABLE `snapshot_schedule` (
   CONSTRAINT `fk__snapshot_schedule_async_job_id`
   FOREIGN KEY (`async_job_id`) REFERENCES `cloud`.`async_job` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshot_schedule__async_job_id`
   ON `snapshot_schedule` (`async_job_id`);
@@ -4442,7 +4442,7 @@ CREATE TABLE `snapshot_store_ref` (
   `ref_cnt` BIGINT NULL,
   `updated` DATETIME NULL,
   `volume_id` BIGINT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshot_store_ref__snapshot_id`
   ON `snapshot_store_ref` (`snapshot_id`);
@@ -4498,7 +4498,7 @@ CREATE TABLE `snapshots` (
   UNIQUE (`uuid`),
   CONSTRAINT `fk_snapshots__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshots__account_id`
   ON `snapshots` (`account_id`);
@@ -4549,7 +4549,7 @@ CREATE TABLE `ssh_keypairs` (
   CONSTRAINT `fk_ssh_keypairs__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_ssh_keypairs__account_id`
   ON `ssh_keypairs` (`account_id`);
@@ -4577,7 +4577,7 @@ CREATE TABLE `sslcerts` (
   CONSTRAINT `fk_sslcert__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_sslcert__account_id`
   ON `sslcerts` (`account_id`);
@@ -4599,7 +4599,7 @@ CREATE TABLE `stack_maid` (
   `cleanup_delegate` VARCHAR(128) NULL,
   `cleanup_context` TEXT NULL,
   `created` DATETIME NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_stack_maid_created`
   ON `stack_maid` (`created`);
@@ -4639,7 +4639,7 @@ CREATE TABLE `static_routes` (
   CONSTRAINT `fk_static_routes__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_static_routes__account_id`
   ON `static_routes` (`account_id`);
@@ -4671,7 +4671,7 @@ CREATE TABLE `static_routes_pre510` (
   COMMENT 'Date created',
   CONSTRAINT `uc_static_routes__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_static_routes__account_id`
   ON `static_routes_pre510` (`account_id`);
@@ -4725,7 +4725,7 @@ CREATE TABLE `storage_pool` (
     ON DELETE CASCADE,
   CONSTRAINT `fk_storage_pool__cluster_id`
   FOREIGN KEY (`cluster_id`) REFERENCES `cloud`.`cluster` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_storage_pool__cluster_id`
   ON `storage_pool` (`cluster_id`);
@@ -4750,7 +4750,7 @@ CREATE TABLE `storage_pool_details` (
   CONSTRAINT `fk_storage_pool_details__pool_id`
   FOREIGN KEY (`pool_id`) REFERENCES `cloud`.`storage_pool` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_storage_pool_details__pool_id`
   ON `storage_pool_details` (`pool_id`);
@@ -4772,7 +4772,7 @@ CREATE TABLE `storage_pool_host_ref` (
   CONSTRAINT `fk_storage_pool_host_ref__pool_id`
   FOREIGN KEY (`pool_id`) REFERENCES `cloud`.`storage_pool` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_storage_pool_host_ref__host_id`
   ON `storage_pool_host_ref` (`host_id`);
@@ -4796,7 +4796,7 @@ CREATE TABLE `storage_pool_work` (
   COMMENT 'management server id',
   CONSTRAINT `pool_id`
   UNIQUE (`pool_id`, `vm_id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `sync_queue` (
   `id` BIGINT AUTO_INCREMENT
@@ -4815,7 +4815,7 @@ CREATE TABLE `sync_queue` (
   COMMENT 'max number of items the queue can process concurrently',
   CONSTRAINT `i_sync_queue__objtype__objid`
   UNIQUE (`sync_objtype`, `sync_objid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_sync_queue__created`
   ON `sync_queue` (`created`);
@@ -4840,7 +4840,7 @@ CREATE TABLE `sync_queue_item` (
   CONSTRAINT `fk_sync_queue_item__queue_id`
   FOREIGN KEY (`queue_id`) REFERENCES `cloud`.`sync_queue` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_sync_queue_item__created`
   ON `sync_queue_item` (`created`);
@@ -4880,7 +4880,7 @@ CREATE TABLE `template_host_ref` (
   CONSTRAINT `fk_template_host_ref__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_template_host_ref__host_id`
   ON `template_host_ref` (`host_id`);
@@ -4913,7 +4913,7 @@ CREATE TABLE `template_spool_ref` (
   CONSTRAINT `fk_template_spool_ref__pool_id`
   FOREIGN KEY (`pool_id`) REFERENCES `cloud`.`storage_pool` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_template_spool_ref__pool_id`
   ON `template_spool_ref` (`pool_id`);
@@ -4945,7 +4945,7 @@ CREATE TABLE `template_store_ref` (
   `updated` DATETIME NULL,
   `download_url_created` DATETIME NULL,
   `download_url` VARCHAR(2048) NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_template_store_ref__store_id`
   ON `template_store_ref` (`store_id`);
@@ -4965,7 +4965,7 @@ CREATE TABLE `template_zone_ref` (
   CONSTRAINT `fk_template_zone_ref__zone_id`
   FOREIGN KEY (`zone_id`) REFERENCES `cloud`.`data_center` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_template_zone_ref__removed`
   ON `template_zone_ref` (`removed`);
@@ -4987,7 +4987,7 @@ CREATE TABLE `ucs_blade` (
   `profile_dn` VARCHAR(512) NULL,
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ucs_manager` (
   `id` BIGINT AUTO_INCREMENT
@@ -5001,7 +5001,7 @@ CREATE TABLE `ucs_manager` (
   `password` VARCHAR(255) NOT NULL,
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `upload` (
   `id` BIGINT AUTO_INCREMENT
@@ -5022,7 +5022,7 @@ CREATE TABLE `upload` (
   CONSTRAINT `fk_upload__store_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`image_store` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_upload__host_id`
   ON `upload` (`host_id`);
@@ -5045,7 +5045,7 @@ CREATE TABLE `usage_event` (
   `resource_type` VARCHAR(32) NULL,
   `processed` TINYINT DEFAULT '0' NOT NULL,
   `virtual_size` BIGINT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_usage_event__created`
   ON `usage_event` (`created`);
@@ -5060,7 +5060,7 @@ CREATE TABLE `usage_event_details` (
   CONSTRAINT `fk_usage_event_details__usage_event_id`
   FOREIGN KEY (`usage_event_id`) REFERENCES `cloud`.`usage_event` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_usage_event_details__usage_event_id`
   ON `usage_event_details` (`usage_event_id`);
@@ -5099,7 +5099,7 @@ CREATE TABLE `user` (
   CONSTRAINT `fk_user__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user__account_id`
   ON `user` (`account_id`);
@@ -5127,7 +5127,7 @@ CREATE TABLE `user_details` (
   CONSTRAINT `fk_user_details__user_id`
   FOREIGN KEY (`user_id`) REFERENCES `cloud`.`user` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_details__user_id`
   ON `user_details` (`user_id`);
@@ -5186,7 +5186,7 @@ CREATE TABLE `user_ip_address` (
   CONSTRAINT `fk_user_ip_address__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_ip_address__account_id`
   ON `user_ip_address` (`account_id`);
@@ -5243,7 +5243,7 @@ CREATE TABLE `user_ip_address_details` (
   CONSTRAINT `fk_user_ip_address_details__user_ip_address_id`
   FOREIGN KEY (`user_ip_address_id`) REFERENCES `cloud`.`user_ip_address` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_ip_address_details__user_ip_address_id`
   ON `user_ip_address_details` (`user_ip_address_id`);
@@ -5286,7 +5286,7 @@ CREATE TABLE `user_ipv6_address` (
   CONSTRAINT `fk_user_ipv6_address__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_ipv6_address__account_id`
   ON `user_ipv6_address` (`account_id`);
@@ -5326,7 +5326,7 @@ CREATE TABLE `user_statistics` (
   CONSTRAINT `fk_user_statistics__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_statistics__account_id`
   ON `user_statistics` (`account_id`);
@@ -5342,7 +5342,7 @@ CREATE TABLE `user_vm` (
   `user_data` MEDIUMTEXT NULL,
   `update_parameters` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'Defines if the parameters have been updated for the vm'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `affinity_group_vm_map`
   ADD CONSTRAINT `fk_affinity_group_vm_map___instance_id`
@@ -5365,7 +5365,7 @@ CREATE TABLE `user_vm_clone_setting` (
     PRIMARY KEY,
   `clone_type` VARCHAR(10) NOT NULL
   COMMENT 'Full or Linked Clone (applicable to VMs on ESX)'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user_vm_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -5376,7 +5376,7 @@ CREATE TABLE `user_vm_details` (
   `value` VARCHAR(5120) NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_user_vm_details__vm_id`
   ON `user_vm_details` (`vm_id`);
@@ -5396,7 +5396,7 @@ CREATE TABLE `version` (
   COMMENT 'Step in the upgrade to this version',
   CONSTRAINT `version`
   UNIQUE (`version`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_version__version`
   ON `version` (`version`);
@@ -5424,7 +5424,7 @@ CREATE TABLE `vgpu_types` (
   CONSTRAINT `fk_vgpu_types__gpu_group_id`
   FOREIGN KEY (`gpu_group_id`) REFERENCES `cloud`.`host_gpu_groups` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vgpu_types__gpu_group_id`
   ON `vgpu_types` (`gpu_group_id`);
@@ -5447,7 +5447,7 @@ CREATE TABLE `virtual_router_providers` (
   CONSTRAINT `fk_virtual_router_providers__nsp_id`
   FOREIGN KEY (`nsp_id`) REFERENCES `cloud`.`physical_network_service_providers` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_virtual_router_providers__nsp_id`
   ON `virtual_router_providers` (`nsp_id`);
@@ -5474,7 +5474,7 @@ CREATE TABLE `virtual_supervisor_module` (
   `config_mode` VARCHAR(20) NULL,
   `config_state` VARCHAR(20) NULL,
   `vsm_device_state` VARCHAR(20) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vlan` (
   `id` BIGINT AUTO_INCREMENT
@@ -5503,7 +5503,7 @@ CREATE TABLE `vlan` (
   FOREIGN KEY (`data_center_id`) REFERENCES `cloud`.`data_center` (`id`),
   CONSTRAINT `fk_vlan__physical_network_id`
   FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vlan__data_center_id`
   ON `vlan` (`data_center_id`);
@@ -5544,7 +5544,7 @@ CREATE TABLE `vm_compute_tags` (
   COMMENT 'vm id',
   `compute_tag` VARCHAR(255) NOT NULL
   COMMENT 'name of tag'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_id`
   ON `vm_compute_tags` (`vm_id`);
@@ -5573,7 +5573,7 @@ CREATE TABLE `vm_disk_statistics` (
   CONSTRAINT `fk_vm_disk_statistics__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_disk_statistics__account_id`
   ON `vm_disk_statistics` (`account_id`);
@@ -5657,7 +5657,7 @@ CREATE TABLE `vm_instance` (
   FOREIGN KEY (`service_offering_id`) REFERENCES `cloud`.`service_offering` (`id`),
   CONSTRAINT `fk_vm_instance__power_host`
   FOREIGN KEY (`power_host`) REFERENCES `cloud`.`host` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_instance__account_id`
   ON `vm_instance` (`account_id`);
@@ -5777,7 +5777,7 @@ CREATE TABLE `vm_network_map` (
   COMMENT 'vm id',
   `network_id` BIGINT NOT NULL
   COMMENT 'network id'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_id`
   ON `vm_network_map` (`vm_id`);
@@ -5806,7 +5806,7 @@ CREATE TABLE `vm_reservation` (
   COMMENT 'Preferred deployment planner for the vm',
   CONSTRAINT `uc_vm_reservation__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vm_root_disk_tags` (
   `id` BIGINT AUTO_INCREMENT
@@ -5816,7 +5816,7 @@ CREATE TABLE `vm_root_disk_tags` (
   COMMENT 'vm id',
   `root_disk_tag` VARCHAR(255) NOT NULL
   COMMENT 'name of tag'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_id`
   ON `vm_root_disk_tags` (`vm_id`);
@@ -5829,7 +5829,7 @@ CREATE TABLE `vm_snapshot_details` (
   `value` VARCHAR(255) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vm_snapshots` (
   `id` BIGINT AUTO_INCREMENT
@@ -5858,7 +5858,7 @@ CREATE TABLE `vm_snapshots` (
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`),
   CONSTRAINT `fk_vm_snapshots_domain_id__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_snapshots_domain_id__domain_id`
   ON `vm_snapshots` (`domain_id`);
@@ -5938,7 +5938,7 @@ CREATE TABLE `vm_template` (
   COMMENT 'true if template contains XS/VMWare tools inorder to support dynamic scaling of VM cpu/memory',
   CONSTRAINT `uc_vm_template__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_template__public`
   ON `vm_template` (`public`);
@@ -5979,7 +5979,7 @@ CREATE TABLE `vm_template_details` (
   CONSTRAINT `fk_vm_template_details__template_id`
   FOREIGN KEY (`template_id`) REFERENCES `cloud`.`vm_template` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_template_details__template_id`
   ON `vm_template_details` (`template_id`);
@@ -5996,7 +5996,7 @@ CREATE TABLE `vm_work_job` (
   CONSTRAINT `fk_vm_work_job__instance_id`
   FOREIGN KEY (`vm_instance_id`) REFERENCES `cloud`.`vm_instance` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_work_job__instance_id`
   ON `vm_work_job` (`vm_instance_id`);
@@ -6026,7 +6026,7 @@ CREATE TABLE `vmware_data_center` (
   UNIQUE (`uuid`),
   CONSTRAINT `guid`
   UNIQUE (`guid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vmware_data_center_zone_map` (
   `id` BIGINT AUTO_INCREMENT
@@ -6043,7 +6043,7 @@ CREATE TABLE `vmware_data_center_zone_map` (
   CONSTRAINT `fk_vmware_data_center_zone_map__vmware_data_center_id`
   FOREIGN KEY (`vmware_data_center_id`) REFERENCES `cloud`.`vmware_data_center` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `volume_details` (
   `id` BIGINT AUTO_INCREMENT
@@ -6054,7 +6054,7 @@ CREATE TABLE `volume_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_volume_details__volume_id`
   ON `volume_details` (`volume_id`);
@@ -6085,7 +6085,7 @@ CREATE TABLE `volume_host_ref` (
   CONSTRAINT `fk_volume_host_ref__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_volume_host_ref__host_id`
   ON `volume_host_ref` (`host_id`);
@@ -6108,7 +6108,7 @@ CREATE TABLE `volume_reservation` (
   CONSTRAINT `fk_vm_pool_reservation__vm_reservation_id`
   FOREIGN KEY (`vm_reservation_id`) REFERENCES `cloud`.`vm_reservation` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vm_pool_reservation__vm_reservation_id`
   ON `volume_reservation` (`vm_reservation_id`);
@@ -6143,7 +6143,7 @@ CREATE TABLE `volume_store_ref` (
   CONSTRAINT `fk_volume_store_ref__store_id`
   FOREIGN KEY (`store_id`) REFERENCES `cloud`.`image_store` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_volume_store_ref__store_id`
   ON `volume_store_ref` (`store_id`);
@@ -6233,7 +6233,7 @@ CREATE TABLE `volumes` (
   CONSTRAINT `fk_volumes__instance_id`
   FOREIGN KEY (`instance_id`) REFERENCES `cloud`.`vm_instance` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_volumes__account_id`
   ON `volumes` (`account_id`);
@@ -6327,7 +6327,7 @@ CREATE TABLE `vpc` (
   CONSTRAINT `fk_vpc__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc__account_id`
   ON `vpc` (`account_id`);
@@ -6388,7 +6388,7 @@ CREATE TABLE `vpc_details` (
   CONSTRAINT `fk_vpc_details__vpc_id`
   FOREIGN KEY (`vpc_id`) REFERENCES `cloud`.`vpc` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc_details__vpc_id`
   ON `vpc_details` (`vpc_id`);
@@ -6402,7 +6402,7 @@ CREATE TABLE `vpc_gateway_details` (
   `value` VARCHAR(1024) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the detail can be displayed to the end user'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc_gateway_details__vpc_gateway_id`
   ON `vpc_gateway_details` (`vpc_gateway_id`);
@@ -6448,7 +6448,7 @@ CREATE TABLE `vpc_gateways` (
   CONSTRAINT `fk_vpc_gateways__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc_gateways__account_id`
   ON `vpc_gateways` (`account_id`);
@@ -6507,7 +6507,7 @@ CREATE TABLE `vpc_gateways_pre530` (
   `network_acl_id` BIGINT DEFAULT '1' NOT NULL,
   CONSTRAINT `uc_vpc_gateways__uuid`
   UNIQUE (`uuid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc_gateways__account_id`
   ON `vpc_gateways_pre530` (`account_id`);
@@ -6540,7 +6540,7 @@ CREATE TABLE `vpc_offering_service_map` (
   COMMENT 'date created',
   CONSTRAINT `vpc_offering_id`
   UNIQUE (`vpc_offering_id`, `service`, `provider`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vpc_offerings` (
   `id` BIGINT AUTO_INCREMENT
@@ -6573,7 +6573,7 @@ CREATE TABLE `vpc_offerings` (
   CONSTRAINT `fk_vpc_offerings__service_offering_id`
   FOREIGN KEY (`service_offering_id`) REFERENCES `cloud`.`service_offering` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpc_offerings__service_offering_id`
   ON `vpc_offerings` (`service_offering_id`);
@@ -6606,7 +6606,7 @@ CREATE TABLE `vpc_service_map` (
   CONSTRAINT `fk_vpc_service_map__vpc_id`
   FOREIGN KEY (`vpc_id`) REFERENCES `cloud`.`vpc` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vpn_users` (
   `id` BIGINT AUTO_INCREMENT
@@ -6628,7 +6628,7 @@ CREATE TABLE `vpn_users` (
   CONSTRAINT `fk_vpn_users__domain_id`
   FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`)
     ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_vpn_users__domain_id`
   ON `vpn_users` (`domain_id`);
