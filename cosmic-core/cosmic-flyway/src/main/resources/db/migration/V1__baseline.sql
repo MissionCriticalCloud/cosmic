@@ -1,17 +1,17 @@
 CREATE TABLE `account` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `account_name` VARCHAR(100) NULL
   COMMENT 'an account name set by the creator of the account, defaults to username for single accounts',
   `uuid` VARCHAR(40) NULL,
   `type` INT(1) UNSIGNED NOT NULL,
-  `domain_id` BIGINT NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `state` VARCHAR(10) DEFAULT 'enabled' NOT NULL,
   `removed` DATETIME NULL
   COMMENT 'date removed',
   `cleanup_needed` TINYINT(1) DEFAULT '0' NOT NULL,
   `network_domain` VARCHAR(255) NULL,
-  `default_zone_id` BIGINT NULL,
+  `default_zone_id` BIGINT UNSIGNED NULL,
   `default` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '1 if account is default',
   CONSTRAINT `uc_account__uuid`
@@ -34,9 +34,9 @@ CREATE INDEX `i_account__removed`
   ON `account` (`removed`);
 
 CREATE TABLE `account_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NULL,
@@ -49,12 +49,12 @@ CREATE INDEX `i_account_details__account_id`
   ON `account_details` (`account_id`);
 
 CREATE TABLE `account_network_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id',
   `is_owner` SMALLINT(1) NOT NULL
   COMMENT 'is the owner of the network',
@@ -70,11 +70,11 @@ CREATE INDEX `i_account_network_ref__networks_id`
   ON `account_network_ref` (`network_id`);
 
 CREATE TABLE `account_vlan_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id. foreign key to account table',
-  `vlan_db_id` BIGINT NOT NULL
+  `vlan_db_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'database id of vlan. foreign key to vlan table',
   CONSTRAINT `fk_account_vlan_map__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
@@ -88,14 +88,14 @@ CREATE INDEX `i_account_vlan_map__vlan_id`
   ON `account_vlan_map` (`vlan_db_id`);
 
 CREATE TABLE `account_vnet_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
   `vnet_range` VARCHAR(255) NOT NULL
   COMMENT 'dedicated guest vlan range',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id. foreign key to account table',
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'physical network id. foreign key to the the physical network table',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`),
@@ -111,14 +111,14 @@ CREATE INDEX `i_account_vnet_map__physical_network_id`
   ON `account_vnet_map` (`physical_network_id`);
 
 CREATE TABLE `affinity_group` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `type` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
   `description` VARCHAR(4096) NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `acl_type` VARCHAR(15) NOT NULL
   COMMENT 'ACL access type. can be Account/Domain',
   CONSTRAINT `name`
@@ -136,12 +136,12 @@ CREATE INDEX `i_affinity_group__domain_id`
   ON `affinity_group` (`domain_id`);
 
 CREATE TABLE `affinity_group_domain_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
-  `affinity_group_id` BIGINT NOT NULL
+  `affinity_group_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'affinity group id',
   `subdomain_access` INT(1) UNSIGNED DEFAULT '1' NULL
   COMMENT '1 if affinity group can be accessible from the subdomain',
@@ -157,10 +157,10 @@ CREATE INDEX `i_affinity_group_domain_map__domain_id`
   ON `affinity_group_domain_map` (`domain_id`);
 
 CREATE TABLE `affinity_group_vm_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `affinity_group_id` BIGINT NOT NULL,
-  `instance_id` BIGINT NOT NULL,
+  `affinity_group_id` BIGINT UNSIGNED NOT NULL,
+  `instance_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_agvm__group_id`
   FOREIGN KEY (`affinity_group_id`) REFERENCES `cloud`.`affinity_group` (`id`)
     ON DELETE CASCADE
@@ -173,13 +173,13 @@ CREATE INDEX `i_agvm__group_id`
   ON `affinity_group_vm_map` (`affinity_group_id`);
 
 CREATE TABLE `alert` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `type` INT(1) UNSIGNED NOT NULL,
-  `cluster_id` BIGINT NULL,
-  `pod_id` BIGINT NULL,
-  `data_center_id` BIGINT NOT NULL,
+  `cluster_id` BIGINT UNSIGNED NULL,
+  `pod_id` BIGINT UNSIGNED NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
   `subject` VARCHAR(999) NULL
   COMMENT 'according to SMTP spec, max subject length is 1000 including the CRLF character, so allow enough space to fit long pod/zone/host names',
   `sent_count` INT(3) UNSIGNED NOT NULL,
@@ -203,13 +203,13 @@ CREATE INDEX `type`
   ON `alert` (`type`);
 
 CREATE TABLE `async_job` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `user_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `instance_type` VARCHAR(64) NULL
   COMMENT 'instance_type and instance_id work together to allow attaching an instance object to a job',
-  `instance_id` BIGINT NULL,
+  `instance_id` BIGINT UNSIGNED NULL,
   `job_cmd` VARCHAR(255) NULL,
   `job_cmd_info` TEXT NULL
   COMMENT 'command parameter info',
@@ -270,11 +270,11 @@ CREATE INDEX `i_async__user_id`
   ON `async_job` (`user_id`);
 
 CREATE TABLE `async_job_join_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `job_id` BIGINT NOT NULL,
-  `join_job_id` BIGINT NOT NULL,
+  `job_id` BIGINT UNSIGNED NOT NULL,
+  `join_job_id` BIGINT UNSIGNED NOT NULL,
   `join_status` INT NOT NULL,
   `join_result` VARCHAR(1024) NULL,
   `join_msid` BIGINT NULL,
@@ -312,11 +312,11 @@ CREATE INDEX `i_async_job_join_map__next_wakeup`
   ON `async_job_join_map` (`next_wakeup`);
 
 CREATE TABLE `autoscale_policies` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `duration` INT(10) UNSIGNED NOT NULL,
   `quiet_time` INT(10) UNSIGNED NOT NULL,
   `last_quiet_time` DATETIME NULL,
@@ -342,10 +342,10 @@ CREATE INDEX `i_autoscale_policies__removed`
   ON `autoscale_policies` (`removed`);
 
 CREATE TABLE `autoscale_policy_condition_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `policy_id` BIGINT NOT NULL,
-  `condition_id` BIGINT NOT NULL,
+  `policy_id` BIGINT UNSIGNED NOT NULL,
+  `condition_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_autoscale_policy_condition_map__policy_id`
   FOREIGN KEY (`policy_id`) REFERENCES `cloud`.`autoscale_policies` (`id`)
     ON DELETE CASCADE
@@ -358,9 +358,9 @@ CREATE INDEX `i_autoscale_policy_condition_map__policy_id`
   ON `autoscale_policy_condition_map` (`policy_id`);
 
 CREATE TABLE `autoscale_vmgroup_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `autoscale_vmgroup_id` BIGINT NOT NULL
+  `autoscale_vmgroup_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -372,10 +372,10 @@ CREATE INDEX `i_autoscale_vmgroup_details__autoscale_vmgroup_id`
   ON `autoscale_vmgroup_details` (`autoscale_vmgroup_id`);
 
 CREATE TABLE `autoscale_vmgroup_policy_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vmgroup_id` BIGINT NOT NULL,
-  `policy_id` BIGINT NOT NULL,
+  `vmgroup_id` BIGINT UNSIGNED NOT NULL,
+  `policy_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_autoscale_vmgroup_policy_map__policy_id`
   FOREIGN KEY (`policy_id`) REFERENCES `cloud`.`autoscale_policies` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -387,10 +387,10 @@ CREATE INDEX `i_autoscale_vmgroup_policy_map__vmgroup_id`
   ON `autoscale_vmgroup_policy_map` (`vmgroup_id`);
 
 CREATE TABLE `autoscale_vmgroup_vm_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vmgroup_id` BIGINT NOT NULL,
-  `instance_id` BIGINT NOT NULL
+  `vmgroup_id` BIGINT UNSIGNED NOT NULL,
+  `instance_id` BIGINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_autoscale_vmgroup_vm_map__instance_id`
@@ -400,18 +400,18 @@ CREATE INDEX `i_autoscale_vmgroup_vm_map__vmgroup_id`
   ON `autoscale_vmgroup_vm_map` (`vmgroup_id`);
 
 CREATE TABLE `autoscale_vmgroups` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `zone_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `load_balancer_id` BIGINT NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `load_balancer_id` BIGINT UNSIGNED NOT NULL,
   `min_members` INT(10) UNSIGNED DEFAULT '1' NULL,
   `max_members` INT(10) UNSIGNED NOT NULL,
   `member_port` INT(10) UNSIGNED NOT NULL,
   `interval` INT(10) UNSIGNED NOT NULL,
-  `profile_id` BIGINT NOT NULL,
+  `profile_id` BIGINT UNSIGNED NOT NULL,
   `state` VARCHAR(255) NOT NULL
   COMMENT 'enabled or disabled, a vmgroup is disabled to stop autoscaling activity',
   `created` DATETIME NOT NULL
@@ -463,9 +463,9 @@ FOREIGN KEY (`vmgroup_id`) REFERENCES `cloud`.`autoscale_vmgroups` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `autoscale_vmprofile_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `autoscale_vmprofile_id` BIGINT NOT NULL
+  `autoscale_vmprofile_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -477,15 +477,15 @@ CREATE INDEX `i_autoscale_vmprofile_details__autoscale_vmprofile_id`
   ON `autoscale_vmprofile_details` (`autoscale_vmprofile_id`);
 
 CREATE TABLE `autoscale_vmprofiles` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `zone_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `autoscale_user_id` BIGINT NOT NULL,
-  `service_offering_id` BIGINT NOT NULL,
-  `template_id` BIGINT NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `autoscale_user_id` BIGINT UNSIGNED NOT NULL,
+  `service_offering_id` BIGINT UNSIGNED NOT NULL,
+  `template_id` BIGINT UNSIGNED NOT NULL,
   `other_deploy_params` VARCHAR(1024) NULL
   COMMENT 'other deployment parameters that is in addition to zoneid,serviceofferingid,domainid',
   `destroy_vm_grace_period` INT(10) UNSIGNED NULL
@@ -527,7 +527,7 @@ FOREIGN KEY (`autoscale_vmprofile_id`) REFERENCES `cloud`.`autoscale_vmprofiles`
   ON DELETE CASCADE;
 
 CREATE TABLE `cluster` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(255) NULL
@@ -536,9 +536,9 @@ CREATE TABLE `cluster` (
   COMMENT 'uuid is different with following guid, while the later one is generated by hypervisor resource',
   `guid` VARCHAR(255) NULL
   COMMENT 'guid for the cluster',
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod id',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center id',
   `hypervisor_type` VARCHAR(32) NULL,
   `cluster_type` VARCHAR(64) DEFAULT 'CloudManaged' NULL,
@@ -573,9 +573,9 @@ CREATE INDEX `i_cluster__removed`
   ON `cluster` (`removed`);
 
 CREATE TABLE `cluster_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `cluster_id` BIGINT NOT NULL
+  `cluster_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'cluster id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NULL,
@@ -588,19 +588,19 @@ CREATE INDEX `i_cluster_details__cluster_id`
   ON `cluster_details` (`cluster_id`);
 
 CREATE TABLE `conditions` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `counter_id` BIGINT NOT NULL
+  `counter_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Counter Id',
-  `threshold` BIGINT NOT NULL
+  `threshold` BIGINT UNSIGNED NOT NULL
   COMMENT 'threshold value for the given counter',
   `relational_operator` CHAR(2) NULL
   COMMENT 'relational operator to be used upon the counter and condition',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain the Condition belongs to',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner of this Condition',
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
@@ -659,7 +659,7 @@ CREATE INDEX `i_configuration__name`
   ON `configuration` (`name`);
 
 CREATE TABLE `console_proxy` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `public_mac_address` VARCHAR(17) NULL
   COMMENT 'mac address of the public facing network card',
@@ -678,7 +678,7 @@ CREATE TABLE `console_proxy` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `counter` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -707,7 +707,7 @@ ALTER TABLE `conditions`
 FOREIGN KEY (`counter_id`) REFERENCES `cloud`.`counter` (`id`);
 
 CREATE TABLE `data_center` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NULL,
   `uuid` VARCHAR(40) NULL,
@@ -720,12 +720,12 @@ CREATE TABLE `data_center` (
   `netmask` VARCHAR(15) NULL,
   `router_mac_address` VARCHAR(17) DEFAULT '02:00:00:00:00:01' NOT NULL
   COMMENT 'mac address for the router within the domain',
-  `mac_address` BIGINT DEFAULT '1' NOT NULL
+  `mac_address` BIGINT UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'Next available mac address for the ethernet card interacting with public internet',
   `guest_network_cidr` VARCHAR(18) NULL,
   `domain` VARCHAR(100) NULL
   COMMENT 'Network domain name of the Vms of the zone',
-  `domain_id` BIGINT NULL
+  `domain_id` BIGINT UNSIGNED NULL
   COMMENT 'domain id for the parent domain to this zone (null signifies public zone)',
   `networktype` VARCHAR(255) DEFAULT 'Basic' NOT NULL
   COMMENT 'Network type of the zone',
@@ -785,9 +785,9 @@ FOREIGN KEY (`data_center_id`) REFERENCES `cloud`.`data_center` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `data_center_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `dc_id` BIGINT NOT NULL
+  `dc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'dc id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NULL,
@@ -802,7 +802,7 @@ CREATE INDEX `i_dc_details__dc_id`
   ON `data_center_details` (`dc_id`);
 
 CREATE TABLE `dc_storage_network_ip_range` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `start_ip` CHAR(40) NOT NULL
@@ -815,10 +815,10 @@ CREATE TABLE `dc_storage_network_ip_range` (
   COMMENT 'vlan the storage network on',
   `netmask` VARCHAR(15) NOT NULL
   COMMENT 'netmask for storage network',
-  `data_center_id` BIGINT NOT NULL,
-  `pod_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod it belongs to',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of corresponding network offering',
   CONSTRAINT `uc_storage_ip_range__uuid`
   UNIQUE (`uuid`),
@@ -836,23 +836,23 @@ CREATE INDEX `i_storage_ip_range__pod_id`
   ON `dc_storage_network_ip_range` (`pod_id`);
 
 CREATE TABLE `dedicated_resources` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `data_center_id` BIGINT NULL
+  `data_center_id` BIGINT UNSIGNED NULL
   COMMENT 'data center id',
-  `pod_id` BIGINT NULL
+  `pod_id` BIGINT UNSIGNED NULL
   COMMENT 'pod id',
-  `cluster_id` BIGINT NULL
+  `cluster_id` BIGINT UNSIGNED NULL
   COMMENT 'cluster id',
-  `host_id` BIGINT NULL
+  `host_id` BIGINT UNSIGNED NULL
   COMMENT 'host id',
-  `domain_id` BIGINT NULL
+  `domain_id` BIGINT UNSIGNED NULL
   COMMENT 'domain id of the domain to which resource is dedicated',
-  `account_id` BIGINT NULL
+  `account_id` BIGINT UNSIGNED NULL
   COMMENT 'account id of the account to which resource is dedicated',
-  `affinity_group_id` BIGINT NOT NULL
+  `affinity_group_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'affinity group id associated',
   CONSTRAINT `uc_dedicated_resources__uuid`
   UNIQUE (`uuid`),
@@ -890,14 +890,14 @@ CREATE INDEX `i_dedicated_resources_domain_id`
   ON `dedicated_resources` (`domain_id`);
 
 CREATE TABLE `disk_offering` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `domain_id` BIGINT NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
   `display_text` VARCHAR(4096) NULL
   COMMENT 'Descrianaption text set by the admin for display purpose only',
-  `disk_size` BIGINT NOT NULL
+  `disk_size` BIGINT UNSIGNED NOT NULL
   COMMENT 'disk space in byte',
   `type` VARCHAR(32) NULL
   COMMENT 'inheritted by who?',
@@ -923,9 +923,9 @@ CREATE TABLE `disk_offering` (
   COMMENT 'Should disk offering be displayed to the end user',
   `customized_iops` TINYINT(1) UNSIGNED NULL
   COMMENT 'Should customized IOPS be displayed to the end user',
-  `min_iops` BIGINT NULL
+  `min_iops` BIGINT UNSIGNED NULL
   COMMENT 'Minimum IOPS',
-  `max_iops` BIGINT NULL
+  `max_iops` BIGINT UNSIGNED NULL
   COMMENT 'Maximum IOPS',
   `bytes_read_rate` BIGINT NULL,
   `bytes_write_rate` BIGINT NULL,
@@ -949,9 +949,9 @@ CREATE INDEX `i_disk_offering__removed`
   ON `disk_offering` (`removed`);
 
 CREATE TABLE `disk_offering_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `offering_id` BIGINT NOT NULL
+  `offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'offering id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -966,16 +966,16 @@ CREATE INDEX `i_offering_details__offering_id`
   ON `disk_offering_details` (`offering_id`);
 
 CREATE TABLE `domain` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `parent` BIGINT NULL,
+  `parent` BIGINT UNSIGNED NULL,
   `name` VARCHAR(255) NULL,
   `uuid` VARCHAR(40) NULL,
-  `owner` BIGINT NOT NULL,
+  `owner` BIGINT UNSIGNED NOT NULL,
   `path` VARCHAR(255) NOT NULL,
   `level` INT(10) DEFAULT '0' NOT NULL,
   `child_count` INT(10) DEFAULT '0' NOT NULL,
-  `next_child_seq` BIGINT DEFAULT '1' NOT NULL,
+  `next_child_seq` BIGINT UNSIGNED DEFAULT '1' NOT NULL,
   `removed` DATETIME NULL
   COMMENT 'date removed',
   `state` CHAR(32) DEFAULT 'Active' NOT NULL
@@ -1038,12 +1038,12 @@ ALTER TABLE `dedicated_resources`
 FOREIGN KEY (`domain_id`) REFERENCES `cloud`.`domain` (`id`);
 
 CREATE TABLE `domain_network_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id',
   `subdomain_access` INT(1) UNSIGNED NULL
   COMMENT '1 if network can be accessible from the subdomain',
@@ -1059,9 +1059,9 @@ CREATE INDEX `i_domain_network_ref__networks_id`
   ON `domain_network_ref` (`network_id`);
 
 CREATE TABLE `domain_router` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `element_id` BIGINT NOT NULL
+  `element_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'correlated virtual router provider ID',
   `public_mac_address` VARCHAR(17) NULL
   COMMENT 'mac address of the public facing network card',
@@ -1087,7 +1087,7 @@ CREATE TABLE `domain_router` (
   COMMENT 'template version',
   `scripts_version` VARCHAR(100) NULL
   COMMENT 'scripts version',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'correlated virtual router vpc ID'
 )
   COMMENT 'information about the domR instance';
@@ -1099,11 +1099,11 @@ CREATE INDEX `i_domain_router__vpc_id`
   ON `domain_router` (`vpc_id`);
 
 CREATE TABLE `domain_vlan_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id. foreign key to domain table',
-  `vlan_db_id` BIGINT NOT NULL
+  `vlan_db_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'database id of vlan. foreign key to vlan table',
   CONSTRAINT `id`
   UNIQUE (`id`),
@@ -1119,18 +1119,18 @@ CREATE INDEX `i_account_vlan_map__vlan_id`
   ON `domain_vlan_map` (`vlan_db_id`);
 
 CREATE TABLE `event` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `type` VARCHAR(32) NOT NULL,
   `state` VARCHAR(32) DEFAULT 'Completed' NOT NULL,
   `description` VARCHAR(1024) NOT NULL,
-  `user_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `level` VARCHAR(16) NOT NULL,
-  `start_id` BIGINT DEFAULT '0' NOT NULL,
+  `start_id` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
   `parameters` VARCHAR(1024) NULL,
   `archived` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
@@ -1161,17 +1161,17 @@ CREATE INDEX `state`
   ON `event` (`state`);
 
 CREATE TABLE `external_load_balancer_devices` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network in to which load balancer device is added',
   `provider_name` VARCHAR(255) NOT NULL
   COMMENT 'Service Provider name corresponding to this load balancer device',
   `device_name` VARCHAR(255) NOT NULL
   COMMENT 'name of the load balancer device',
-  `capacity` BIGINT DEFAULT '0' NOT NULL
+  `capacity` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Capacity of the load balancer device',
   `device_state` VARCHAR(32) DEFAULT 'Disabled' NOT NULL
   COMMENT 'state (enabled/disabled/shutdown) of the device',
@@ -1181,9 +1181,9 @@ CREATE TABLE `external_load_balancer_devices` (
   COMMENT '1 if device/appliance is provisioned for dedicated use only',
   `is_managed` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '1 if load balancer appliance is provisioned and its life cycle is managed by by cloudstack',
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id coresponding to the external load balancer device',
-  `parent_host_id` BIGINT NULL
+  `parent_host_id` BIGINT UNSIGNED NULL
   COMMENT 'if the load balancer appliance is cloudstack managed, then host id on which this appliance is provisioned',
   `is_gslb_provider` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '1 if load balancer appliance is acting as gslb service provider in the zone',
@@ -1204,17 +1204,17 @@ CREATE INDEX `i_external_lb_devices_physical_network_id`
   ON `external_load_balancer_devices` (`physical_network_id`);
 
 CREATE TABLE `external_nicira_nvp_devices` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network in to which nicira nvp device is added',
   `provider_name` VARCHAR(255) NOT NULL
   COMMENT 'Service Provider name corresponding to this nicira nvp device',
   `device_name` VARCHAR(255) NOT NULL
   COMMENT 'name of the nicira nvp device',
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id coresponding to the external nicira nvp device',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
@@ -1227,17 +1227,17 @@ CREATE INDEX `i_external_nicira_nvp_devices__physical_network_id`
   ON `external_nicira_nvp_devices` (`physical_network_id`);
 
 CREATE TABLE `external_nuage_vsp_devices` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network in to which nuage vsp is added',
   `provider_name` VARCHAR(255) NOT NULL
   COMMENT 'the service provider name corresponding to this nuage vsp device',
   `device_name` VARCHAR(255) NOT NULL
   COMMENT 'the name of the nuage vsp device',
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id corresponding to the external nuage vsp device',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`)
@@ -1250,15 +1250,15 @@ CREATE INDEX `i_external_nuage_vsp_devices__physical_network_id`
   ON `external_nuage_vsp_devices` (`physical_network_id`);
 
 CREATE TABLE `external_stratosphere_ssp_credentials` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `data_center_id` BIGINT NOT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
   `username` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `external_stratosphere_ssp_tenants` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(255) NOT NULL
   COMMENT 'SSP tenant uuid',
@@ -1267,7 +1267,7 @@ CREATE TABLE `external_stratosphere_ssp_tenants` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `external_stratosphere_ssp_uuids` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(255) NOT NULL
   COMMENT 'uuid provided by SSP',
@@ -1277,9 +1277,9 @@ CREATE TABLE `external_stratosphere_ssp_uuids` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `firewall_rule_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `firewall_rule_id` BIGINT NOT NULL
+  `firewall_rule_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Firewall rule id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -1291,11 +1291,11 @@ CREATE INDEX `i_firewall_rule_details__firewall_rule_id`
   ON `firewall_rule_details` (`firewall_rule_id`);
 
 CREATE TABLE `firewall_rules` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `ip_address_id` BIGINT NULL
+  `ip_address_id` BIGINT UNSIGNED NULL
   COMMENT 'id of the corresponding ip address',
   `start_port` INT(10) NULL
   COMMENT 'starting port of a port range',
@@ -1307,11 +1307,11 @@ CREATE TABLE `firewall_rules` (
   COMMENT 'protocol to open these ports for',
   `purpose` CHAR(32) NOT NULL
   COMMENT 'why are these ports opened?',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id',
   `xid` CHAR(40) NOT NULL
   COMMENT 'external id',
@@ -1321,10 +1321,10 @@ CREATE TABLE `firewall_rules` (
   COMMENT 'The ICMP code (if protocol=ICMP). A value of -1 means all codes for the given ICMP type.',
   `icmp_type` INT(10) NULL
   COMMENT 'The ICMP type (if protocol=ICMP). A value of -1 means all types.',
-  `related` BIGINT NULL
+  `related` BIGINT UNSIGNED NULL
   COMMENT 'related to what other firewall rule',
   `type` VARCHAR(10) DEFAULT 'USER' NOT NULL,
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc the firewall rule is associated with',
   `traffic_type` CHAR(32) NULL
   COMMENT 'the traffic type of the rule, can be Ingress or Egress',
@@ -1370,10 +1370,10 @@ FOREIGN KEY (`firewall_rule_id`) REFERENCES `cloud`.`firewall_rules` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `firewall_rules_cidrs` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `firewall_rule_id` BIGINT NOT NULL
+  `firewall_rule_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'firewall rule id',
   `source_cidr` VARCHAR(18) NULL,
   CONSTRAINT `unique_rule_cidrs`
@@ -1387,11 +1387,11 @@ CREATE INDEX `i_firewall_cidrs_firewall_rules`
   ON `firewall_rules_cidrs` (`firewall_rule_id`);
 
 CREATE TABLE `global_load_balancer_lb_rule_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `gslb_rule_id` BIGINT NOT NULL,
-  `lb_rule_id` BIGINT NOT NULL,
-  `weight` BIGINT DEFAULT '1' NOT NULL
+  `gslb_rule_id` BIGINT UNSIGNED NOT NULL,
+  `lb_rule_id` BIGINT UNSIGNED NOT NULL,
+  `weight` BIGINT UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'weight of the site in gslb',
   `revoke` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '1 is when rule is set for Revoke',
@@ -1403,13 +1403,13 @@ CREATE INDEX `i_lb_rule_id`
   ON `global_load_balancer_lb_rule_map` (`lb_rule_id`);
 
 CREATE TABLE `global_load_balancing_rules` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
   `region_id` INT(10) UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
@@ -1442,9 +1442,9 @@ FOREIGN KEY (`gslb_rule_id`) REFERENCES `cloud`.`global_load_balancing_rules` (`
   ON DELETE CASCADE;
 
 CREATE TABLE `guest_os` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `category_id` BIGINT NOT NULL,
+  `category_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NULL,
   `uuid` VARCHAR(40) NULL,
   `display_name` VARCHAR(255) NOT NULL,
@@ -1464,7 +1464,7 @@ CREATE INDEX `i_guest_os__category_id`
   ON `guest_os` (`category_id`);
 
 CREATE TABLE `guest_os_category` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
@@ -1478,11 +1478,11 @@ FOREIGN KEY (`category_id`) REFERENCES `cloud`.`guest_os_category` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `guest_os_hypervisor` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `hypervisor_type` VARCHAR(32) NOT NULL,
   `guest_os_name` VARCHAR(255) NOT NULL,
-  `guest_os_id` BIGINT NOT NULL,
+  `guest_os_id` BIGINT UNSIGNED NOT NULL,
   `hypervisor_version` VARCHAR(32) DEFAULT 'default' NOT NULL
   COMMENT 'Hypervisor version for this mapping',
   `uuid` VARCHAR(40) NULL
@@ -1503,7 +1503,7 @@ CREATE INDEX `guest_os_id`
   ON `guest_os_hypervisor` (`guest_os_id`);
 
 CREATE TABLE `host` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL
@@ -1519,14 +1519,14 @@ CREATE TABLE `host` (
   `storage_ip_address_2` CHAR(40) NULL,
   `storage_mac_address_2` VARCHAR(17) NULL,
   `storage_netmask_2` VARCHAR(15) NULL,
-  `cluster_id` BIGINT NULL
+  `cluster_id` BIGINT UNSIGNED NULL
   COMMENT 'foreign key to cluster',
   `public_ip_address` CHAR(40) NULL,
   `public_netmask` VARCHAR(15) NULL,
   `public_mac_address` VARCHAR(17) NULL,
   `proxy_port` INT(10) UNSIGNED NULL,
-  `data_center_id` BIGINT NOT NULL,
-  `pod_id` BIGINT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `pod_id` BIGINT UNSIGNED NULL,
   `cpu_sockets` INT(10) UNSIGNED NULL
   COMMENT 'the number of CPU sockets on the host',
   `cpus` INT(10) UNSIGNED NULL,
@@ -1538,13 +1538,13 @@ CREATE TABLE `host` (
   COMMENT 'hypervisor type, can be NONE for storage',
   `hypervisor_version` VARCHAR(32) NULL
   COMMENT 'hypervisor version',
-  `ram` BIGINT NULL,
+  `ram` BIGINT UNSIGNED NULL,
   `resource` VARCHAR(255) NULL
   COMMENT 'If it is a local resource, this is the class name',
   `version` VARCHAR(40) NOT NULL,
   `parent` VARCHAR(255) NULL
   COMMENT 'parent path for the storage server',
-  `total_size` BIGINT NULL
+  `total_size` BIGINT UNSIGNED NULL
   COMMENT 'TotalSize',
   `capabilities` VARCHAR(255) NULL
   COMMENT 'host capabilities in comma separated list',
@@ -1553,11 +1553,11 @@ CREATE TABLE `host` (
   COMMENT 'Is this host ready for more resources?',
   `setup` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Is this host already setup?',
-  `dom0_memory` BIGINT NOT NULL
+  `dom0_memory` BIGINT UNSIGNED NOT NULL
   COMMENT 'memory used by dom0 for computing and routing servers',
   `last_ping` INT(10) UNSIGNED NOT NULL
   COMMENT 'time in seconds from the start of machine of the last ping',
-  `mgmt_server_id` BIGINT NULL
+  `mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'ManagementServer this host is connected to.',
   `disconnected` DATETIME NULL
   COMMENT 'Time this was disconnected',
@@ -1565,7 +1565,7 @@ CREATE TABLE `host` (
   COMMENT 'date the host first signed on',
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
-  `update_count` BIGINT DEFAULT '0' NOT NULL
+  `update_count` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'atomic increase count making status update operation atomical',
   `resource_state` VARCHAR(32) DEFAULT 'Enabled' NOT NULL
   COMMENT 'Is this host enabled for allocation for new resources',
@@ -1625,9 +1625,9 @@ FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `host_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NOT NULL,
@@ -1642,10 +1642,10 @@ CREATE INDEX `i_host_details__host_id`
   ON `host_details` (`host_id`);
 
 CREATE TABLE `host_gpu_groups` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `group_name` VARCHAR(255) NOT NULL,
-  `host_id` BIGINT NOT NULL,
+  `host_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_host_gpu_groups__host_id`
   FOREIGN KEY (`host_id`) REFERENCES `cloud`.`host` (`id`)
     ON DELETE CASCADE
@@ -1655,16 +1655,16 @@ CREATE INDEX `i_host_gpu_groups__host_id`
   ON `host_gpu_groups` (`host_id`);
 
 CREATE TABLE `host_pod_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NULL,
   `uuid` VARCHAR(40) NULL,
-  `data_center_id` BIGINT NOT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
   `gateway` VARCHAR(255) NOT NULL
   COMMENT 'gateway for the pod',
   `cidr_address` VARCHAR(15) NOT NULL
   COMMENT 'CIDR address for the pod',
-  `cidr_size` BIGINT NOT NULL
+  `cidr_size` BIGINT UNSIGNED NOT NULL
   COMMENT 'CIDR size for the pod',
   `description` VARCHAR(255) NULL
   COMMENT 'store private ip range in startIP-endIP format',
@@ -1714,9 +1714,9 @@ FOREIGN KEY (`pod_id`) REFERENCES `cloud`.`host_pod_ref` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `host_tags` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id',
   `tag` VARCHAR(255) NOT NULL,
   CONSTRAINT `fk_host_tags__host_id`
@@ -1728,12 +1728,12 @@ CREATE INDEX `i_host_tags__host_id`
   ON `host_tags` (`host_id`);
 
 CREATE TABLE `hypervisor_capabilities` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `hypervisor_type` VARCHAR(32) NOT NULL,
   `hypervisor_version` VARCHAR(32) NULL,
-  `max_guests_limit` BIGINT DEFAULT '50' NULL,
+  `max_guests_limit` BIGINT UNSIGNED DEFAULT '50' NULL,
   `security_group_enabled` INT(1) UNSIGNED DEFAULT '1' NULL
   COMMENT 'Is security group supported',
   `max_data_volumes_limit` INT(10) UNSIGNED DEFAULT '6' NULL
@@ -1751,7 +1751,7 @@ CREATE TABLE `hypervisor_capabilities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `image_store` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL
@@ -1761,7 +1761,7 @@ CREATE TABLE `image_store` (
   `protocol` VARCHAR(255) NOT NULL
   COMMENT 'protocol of data store',
   `url` VARCHAR(2048) NULL,
-  `data_center_id` BIGINT NULL
+  `data_center_id` BIGINT UNSIGNED NULL
   COMMENT 'datacenter id of data store',
   `scope` VARCHAR(255) NULL
   COMMENT 'scope of data store',
@@ -1775,17 +1775,17 @@ CREATE TABLE `image_store` (
   COMMENT 'date the image store first signed on',
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
-  `total_size` BIGINT NULL
+  `total_size` BIGINT UNSIGNED NULL
   COMMENT 'storage total size statistics',
-  `used_bytes` BIGINT NULL
+  `used_bytes` BIGINT UNSIGNED NULL
   COMMENT 'storage available bytes statistics'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `image_store_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `store_id` BIGINT NOT NULL
+  `store_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'store the detail is related to',
   `name` VARCHAR(255) NOT NULL
   COMMENT 'name of the detail',
@@ -1803,19 +1803,19 @@ CREATE INDEX `i_image_store__name__value`
   ON `image_store_details` (`name`, `value`);
 
 CREATE TABLE `inline_load_balancer_nic_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `public_ip_address` CHAR(40) NOT NULL,
-  `nic_id` BIGINT NULL
+  `nic_id` BIGINT UNSIGNED NULL
   COMMENT 'nic id',
   CONSTRAINT `nic_id`
   UNIQUE (`nic_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `instance_group` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner.  foreign key to account table',
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
@@ -1839,10 +1839,10 @@ CREATE INDEX `i_name`
   ON `instance_group` (`name`);
 
 CREATE TABLE `instance_group_vm_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `group_id` BIGINT NOT NULL,
-  `instance_id` BIGINT NOT NULL,
+  `group_id` BIGINT UNSIGNED NOT NULL,
+  `instance_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_instance_group_vm_map___group_id`
   FOREIGN KEY (`group_id`) REFERENCES `cloud`.`instance_group` (`id`)
     ON DELETE CASCADE
@@ -1855,7 +1855,7 @@ CREATE INDEX `i_instance_group_vm_map___instance_id`
   ON `instance_group_vm_map` (`instance_id`);
 
 CREATE TABLE `keystore` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(64) NOT NULL
@@ -1872,17 +1872,17 @@ CREATE TABLE `keystore` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `launch_permission` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `template_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL
+  `template_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_launch_permission_template_id`
   ON `launch_permission` (`template_id`);
 
 CREATE TABLE `ldap_configuration` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `hostname` VARCHAR(255) NOT NULL
@@ -1894,7 +1894,7 @@ CREATE TABLE `ldap_configuration` (
 CREATE TABLE `ldap_trust_map` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `domain_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `type` VARCHAR(10) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `account_type` INT(1) UNSIGNED NOT NULL,
@@ -1905,10 +1905,10 @@ CREATE TABLE `ldap_trust_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `legacy_zones` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `zone_id` BIGINT NOT NULL
+  `zone_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of CloudStack zone',
   CONSTRAINT `zone_id`
   UNIQUE (`zone_id`),
@@ -1918,11 +1918,11 @@ CREATE TABLE `legacy_zones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `load_balancer_cert_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `load_balancer_id` BIGINT NOT NULL,
-  `certificate_id` BIGINT NOT NULL,
+  `load_balancer_id` BIGINT UNSIGNED NOT NULL,
+  `certificate_id` BIGINT UNSIGNED NOT NULL,
   `revoke` TINYINT(1) DEFAULT '0' NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1936,7 +1936,7 @@ CREATE TABLE `load_balancer_healthcheck_policies` (
   `id` BIGINT AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `load_balancer_id` BIGINT NOT NULL,
+  `load_balancer_id` BIGINT UNSIGNED NOT NULL,
   `pingpath` VARCHAR(225) DEFAULT '/' NULL,
   `description` VARCHAR(4096) NULL,
   `response_time` INT DEFAULT '5' NULL,
@@ -1955,7 +1955,7 @@ CREATE INDEX `i_load_balancer_healthcheck_policies_loadbalancer_id`
   ON `load_balancer_healthcheck_policies` (`load_balancer_id`);
 
 CREATE TABLE `load_balancer_healthcheck_policy_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `lb_policy_id` BIGINT NOT NULL
   COMMENT 'resource id',
@@ -1972,10 +1972,10 @@ CREATE INDEX `i_lb_healthcheck_policy_details__lb_healthcheck_policy_id`
   ON `load_balancer_healthcheck_policy_details` (`lb_policy_id`);
 
 CREATE TABLE `load_balancer_stickiness_policies` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `load_balancer_id` BIGINT NOT NULL,
+  `load_balancer_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `description` VARCHAR(4096) NULL
   COMMENT 'description',
@@ -1991,9 +1991,9 @@ CREATE INDEX `i_load_balancer_stickiness_policies__load_balancer_id`
   ON `load_balancer_stickiness_policies` (`load_balancer_id`);
 
 CREATE TABLE `load_balancer_stickiness_policy_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `lb_policy_id` BIGINT NOT NULL
+  `lb_policy_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'resource id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -2008,10 +2008,10 @@ CREATE INDEX `i_lb_stickiness_policy_details__lb_stickiness_policy_id`
   ON `load_balancer_stickiness_policy_details` (`lb_policy_id`);
 
 CREATE TABLE `load_balancer_vm_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `load_balancer_id` BIGINT NOT NULL,
-  `instance_id` BIGINT NOT NULL,
+  `load_balancer_id` BIGINT UNSIGNED NOT NULL,
+  `instance_id` BIGINT UNSIGNED NOT NULL,
   `revoke` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '1 is when rule is set for Revoke',
   `state` VARCHAR(40) NULL
@@ -2025,7 +2025,7 @@ CREATE INDEX `i_load_balancer_vm_map__instance_id`
   ON `load_balancer_vm_map` (`instance_id`);
 
 CREATE TABLE `load_balancing_rules` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `description` VARCHAR(4096) NULL
@@ -2037,7 +2037,7 @@ CREATE TABLE `load_balancing_rules` (
   `algorithm` VARCHAR(255) NOT NULL,
   `source_ip_address` VARCHAR(40) NULL
   COMMENT 'source ip address for the load balancer rule',
-  `source_ip_address_network_id` BIGINT NULL
+  `source_ip_address_network_id` BIGINT UNSIGNED NULL
   COMMENT 'the id of the network where source ip belongs to',
   `scheme` VARCHAR(40) NOT NULL
   COMMENT 'load balancer scheme; can be Internal or Public',
@@ -2082,7 +2082,7 @@ FOREIGN KEY (`load_balancer_id`) REFERENCES `cloud`.`load_balancing_rules` (`id`
   ON DELETE CASCADE;
 
 CREATE TABLE `monitoring_services` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -2101,9 +2101,9 @@ CREATE TABLE `monitoring_services` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `mshost` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `msid` BIGINT NOT NULL
+  `msid` BIGINT UNSIGNED NOT NULL
   COMMENT 'management server id derived from MAC address',
   `runid` BIGINT DEFAULT '0' NOT NULL
   COMMENT 'run id, combined with msid to form a cluster session',
@@ -2128,10 +2128,10 @@ CREATE INDEX `i_mshost__removed`
   ON `mshost` (`removed`);
 
 CREATE TABLE `mshost_peer` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `owner_mshost` BIGINT NOT NULL,
-  `peer_mshost` BIGINT NOT NULL,
+  `owner_mshost` BIGINT UNSIGNED NOT NULL,
+  `peer_mshost` BIGINT UNSIGNED NOT NULL,
   `peer_runid` BIGINT NOT NULL,
   `peer_state` VARCHAR(10) DEFAULT 'Down' NOT NULL,
   `last_update` DATETIME NULL
@@ -2149,13 +2149,13 @@ CREATE INDEX `i_mshost_peer__peer_mshost`
   ON `mshost_peer` (`peer_mshost`);
 
 CREATE TABLE `network_acl` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL
   COMMENT 'name of the network acl',
   `uuid` VARCHAR(40) NULL,
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc this network acl belongs to',
   `description` VARCHAR(1024) NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
@@ -2163,9 +2163,9 @@ CREATE TABLE `network_acl` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `network_acl_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_acl_id` BIGINT NOT NULL
+  `network_acl_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -2180,11 +2180,11 @@ CREATE INDEX `i_network_acl_details__network_acl_id`
   ON `network_acl_details` (`network_acl_id`);
 
 CREATE TABLE `network_acl_item` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `acl_id` BIGINT NOT NULL
+  `acl_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network acl id',
   `start_port` INT(10) NULL
   COMMENT 'starting port of a port range',
@@ -2218,9 +2218,9 @@ CREATE TABLE `network_acl_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `network_acl_item_cidrs` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_acl_item_id` BIGINT NOT NULL
+  `network_acl_item_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Network ACL Item id',
   `cidr` VARCHAR(255) NOT NULL,
   CONSTRAINT `fk_network_acl_item_id`
@@ -2232,9 +2232,9 @@ CREATE INDEX `i_network_acl_item_id`
   ON `network_acl_item_cidrs` (`network_acl_item_id`);
 
 CREATE TABLE `network_acl_item_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_acl_item_id` BIGINT NOT NULL
+  `network_acl_item_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -2249,9 +2249,9 @@ CREATE INDEX `i_network_acl_item_details__network_acl_item_id`
   ON `network_acl_item_details` (`network_acl_item_id`);
 
 CREATE TABLE `network_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -2263,13 +2263,13 @@ CREATE INDEX `i_network_details__network_id`
   ON `network_details` (`network_id`);
 
 CREATE TABLE `network_external_lb_device_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT ' guest network id',
-  `external_load_balancer_device_id` BIGINT NOT NULL
+  `external_load_balancer_device_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of external load balancer device assigned for this network',
   `created` DATETIME NULL
   COMMENT 'Date from when network started using the device',
@@ -2289,9 +2289,9 @@ CREATE INDEX `i_network_external_lb_devices_network_id`
   ON `network_external_lb_device_map` (`network_id`);
 
 CREATE TABLE `network_offering_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_offering_id` BIGINT NOT NULL
+  `network_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network offering id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL
@@ -2301,7 +2301,7 @@ CREATE INDEX `i_network_offering_details__network_offering_id`
   ON `network_offering_details` (`network_offering_id`);
 
 CREATE TABLE `network_offerings` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(64) NULL
@@ -2311,9 +2311,9 @@ CREATE TABLE `network_offerings` (
   COMMENT 'unique name of the network offering',
   `display_text` VARCHAR(255) NOT NULL
   COMMENT 'text to display to users',
-  `nw_rate` SMALLINT NULL
+  `nw_rate` SMALLINT UNSIGNED NULL
   COMMENT 'network rate throttle mbits/s',
-  `mc_rate` SMALLINT NULL
+  `mc_rate` SMALLINT UNSIGNED NULL
   COMMENT 'mcast rate throttle mbits/s',
   `traffic_type` VARCHAR(32) NOT NULL
   COMMENT 'traffic type carried on this network',
@@ -2323,7 +2323,7 @@ CREATE TABLE `network_offerings` (
   COMMENT 'Is this network offering for system use only',
   `specify_vlan` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Should the user specify vlan',
-  `service_offering_id` BIGINT NULL
+  `service_offering_id` BIGINT UNSIGNED NULL
   COMMENT 'service offering id that virtual router is tied to',
   `conserve_mode` INT(1) UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'Is this network offering is IP conserve mode enabled',
@@ -2369,7 +2369,7 @@ CREATE TABLE `network_offerings` (
   `keep_alive_enabled` INT(1) UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'true if connection should be reset after requests.',
   `supports_streched_l2` TINYINT(1) DEFAULT '0' NULL,
-  `secondary_service_offering_id` BIGINT NULL
+  `secondary_service_offering_id` BIGINT UNSIGNED NULL
   COMMENT 'service offering id that a secondary virtual router is tied to',
   CONSTRAINT `uc_network_offerings__uuid`
   UNIQUE (`uuid`),
@@ -2389,9 +2389,9 @@ FOREIGN KEY (`network_offering_id`) REFERENCES `cloud`.`network_offerings` (`id`
   ON DELETE CASCADE;
 
 CREATE TABLE `network_rule_config` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `security_group_id` BIGINT NOT NULL,
+  `security_group_id` BIGINT UNSIGNED NOT NULL,
   `public_port` VARCHAR(10) NULL,
   `private_port` VARCHAR(10) NULL,
   `protocol` VARCHAR(16) DEFAULT 'TCP' NOT NULL,
@@ -2400,7 +2400,7 @@ CREATE TABLE `network_rule_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `networks` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(255) NULL
@@ -2420,21 +2420,21 @@ CREATE TABLE `networks` (
   COMMENT 'CloudStack managed vms get IP address from cidr.In general this cidr also serves as the network CIDR. But in case IP reservation feature is being used by a Guest network, networkcidr is the Effective network CIDR for that network',
   `mode` VARCHAR(32) NULL
   COMMENT 'How to retrieve ip address in this network',
-  `network_offering_id` BIGINT NOT NULL
+  `network_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network offering id that this configuration is created from',
-  `physical_network_id` BIGINT NULL
+  `physical_network_id` BIGINT UNSIGNED NULL
   COMMENT 'physical network id that this configuration is based on',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center id that this configuration is used in',
   `guru_name` VARCHAR(255) NOT NULL
   COMMENT 'who is responsible for this type of network configuration',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'what state is this configuration in',
-  `related` BIGINT NOT NULL
+  `related` BIGINT UNSIGNED NOT NULL
   COMMENT 'related to what other network configuration',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'foreign key to domain id',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner of this network',
   `dns1` VARCHAR(255) NULL
   COMMENT 'comma separated DNS list',
@@ -2442,7 +2442,7 @@ CREATE TABLE `networks` (
   COMMENT 'comma separated DNS list',
   `guru_data` VARCHAR(1024) NULL
   COMMENT 'data stored by the network guru that setup this network',
-  `set_fields` BIGINT DEFAULT '0' NOT NULL
+  `set_fields` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'which fields are set already',
   `acl_type` VARCHAR(15) NULL
   COMMENT 'ACL access type. Null for system networks, can be Account/Domain for Guest networks',
@@ -2460,7 +2460,7 @@ CREATE TABLE `networks` (
   COMMENT 'date removed if not null',
   `specify_ip_ranges` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'true if the network provides an ability to define ip ranges',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc this network belongs to',
   `ip6_gateway` VARCHAR(50) NULL
   COMMENT 'IPv6 gateway for this network',
@@ -2470,7 +2470,7 @@ CREATE TABLE `networks` (
   COMMENT 'The network cidr for the isolated guest network which uses IP Reservation facility.For networks not using IP reservation, network_cidr is always null.',
   `display_network` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'Should network be displayed to the end user',
-  `network_acl_id` BIGINT NULL
+  `network_acl_id` BIGINT UNSIGNED NULL
   COMMENT 'network acl id',
   `streched_l2` TINYINT(1) DEFAULT '0' NULL,
   `redundant` TINYINT(1) DEFAULT '0' NULL,
@@ -2543,7 +2543,7 @@ FOREIGN KEY (`network_id`) REFERENCES `cloud`.`networks` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `networks_pre520` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `name` VARCHAR(255) NULL
@@ -2563,21 +2563,21 @@ CREATE TABLE `networks_pre520` (
   COMMENT 'CloudStack managed vms get IP address from cidr.In general this cidr also serves as the network CIDR. But in case IP reservation feature is being used by a Guest network, networkcidr is the Effective network CIDR for that network',
   `mode` VARCHAR(32) NULL
   COMMENT 'How to retrieve ip address in this network',
-  `network_offering_id` BIGINT NOT NULL
+  `network_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network offering id that this configuration is created from',
-  `physical_network_id` BIGINT NULL
+  `physical_network_id` BIGINT UNSIGNED NULL
   COMMENT 'physical network id that this configuration is based on',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center id that this configuration is used in',
   `guru_name` VARCHAR(255) NOT NULL
   COMMENT 'who is responsible for this type of network configuration',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'what state is this configuration in',
-  `related` BIGINT NOT NULL
+  `related` BIGINT UNSIGNED NOT NULL
   COMMENT 'related to what other network configuration',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'foreign key to domain id',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner of this network',
   `dns1` VARCHAR(255) NULL
   COMMENT 'comma separated DNS list',
@@ -2585,7 +2585,7 @@ CREATE TABLE `networks_pre520` (
   COMMENT 'comma separated DNS list',
   `guru_data` VARCHAR(1024) NULL
   COMMENT 'data stored by the network guru that setup this network',
-  `set_fields` BIGINT DEFAULT '0' NOT NULL
+  `set_fields` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'which fields are set already',
   `acl_type` VARCHAR(15) NULL
   COMMENT 'ACL access type. Null for system networks, can be Account/Domain for Guest networks',
@@ -2603,7 +2603,7 @@ CREATE TABLE `networks_pre520` (
   COMMENT 'date removed if not null',
   `specify_ip_ranges` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'true if the network provides an ability to define ip ranges',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc this network belongs to',
   `ip6_gateway` VARCHAR(50) NULL
   COMMENT 'IPv6 gateway for this network',
@@ -2613,7 +2613,7 @@ CREATE TABLE `networks_pre520` (
   COMMENT 'The network cidr for the isolated guest network which uses IP Reservation facility.For networks not using IP reservation, network_cidr is always null.',
   `display_network` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'Should network be displayed to the end user',
-  `network_acl_id` BIGINT NULL
+  `network_acl_id` BIGINT UNSIGNED NULL
   COMMENT 'network acl id',
   `streched_l2` TINYINT(1) DEFAULT '0' NULL,
   `redundant` TINYINT(1) DEFAULT '0' NULL,
@@ -2643,9 +2643,9 @@ CREATE INDEX `i_networks__removed`
   ON `networks_pre520` (`removed`);
 
 CREATE TABLE `nic_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `nic_id` BIGINT NOT NULL
+  `nic_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'nic id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -2657,44 +2657,44 @@ CREATE INDEX `i_nic_details__nic_id`
   ON `nic_details` (`nic_id`);
 
 CREATE TABLE `nic_ip_alias` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NOT NULL,
-  `nic_id` BIGINT NULL,
+  `nic_id` BIGINT UNSIGNED NULL,
   `ip4_address` CHAR(40) NULL,
   `ip6_address` CHAR(40) NULL,
   `netmask` CHAR(40) NULL,
   `gateway` CHAR(40) NULL,
   `start_ip_of_subnet` CHAR(40) NULL,
-  `network_id` BIGINT NULL,
-  `vmId` BIGINT NULL,
-  `alias_count` BIGINT NULL,
+  `network_id` BIGINT UNSIGNED NULL,
+  `vmid` BIGINT UNSIGNED NULL,
+  `alias_count` BIGINT UNSIGNED NULL,
   `created` DATETIME NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `state` CHAR(32) NOT NULL,
   CONSTRAINT `id_UNIQUE`
   UNIQUE (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nic_secondary_ips` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `vmId` BIGINT NULL
+  `vmid` BIGINT UNSIGNED NULL
   COMMENT 'vm instance id',
-  `nicId` BIGINT NOT NULL,
+  `nicid` BIGINT UNSIGNED NOT NULL,
   `ip4_address` CHAR(40) NULL
   COMMENT 'ip4 address',
   `ip6_address` CHAR(40) NULL
   COMMENT 'ip6 address',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network configuration id',
   `created` DATETIME NOT NULL
   COMMENT 'date created',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner.  foreign key to   account table',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'the domain that the owner belongs to',
   CONSTRAINT `uc_nic_secondary_ip__uuid`
   UNIQUE (`uuid`),
@@ -2709,7 +2709,7 @@ CREATE INDEX `i_nic_secondary_ip__vmId`
   ON `nic_secondary_ips` (`vmId`);
 
 CREATE TABLE `nicira_nvp_nic_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `logicalswitch` VARCHAR(255) NOT NULL
@@ -2725,12 +2725,12 @@ CREATE TABLE `nicira_nvp_nic_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nicira_nvp_router_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `logicalrouter_uuid` VARCHAR(255) NOT NULL
   COMMENT 'nicira uuid of logical router',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'cloudstack id of the network',
   CONSTRAINT `logicalrouter_uuid`
   UNIQUE (`logicalrouter_uuid`),
@@ -2742,11 +2742,11 @@ CREATE TABLE `nicira_nvp_router_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `nics` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `instance_id` BIGINT NULL
+  `instance_id` BIGINT UNSIGNED NULL
   COMMENT 'vm instance id',
   `mac_address` VARCHAR(17) NULL
   COMMENT 'mac address',
@@ -2760,7 +2760,7 @@ CREATE TABLE `nics` (
   COMMENT 'type of ip',
   `broadcast_uri` VARCHAR(255) NULL
   COMMENT 'broadcast uri',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network configuration id',
   `mode` VARCHAR(32) NULL
   COMMENT 'mode of getting ip address',
@@ -2827,9 +2827,9 @@ FOREIGN KEY (`nic`) REFERENCES `cloud`.`nics` (`uuid`)
   ON DELETE CASCADE;
 
 CREATE TABLE `ntwk_offering_service_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_offering_id` BIGINT NOT NULL
+  `network_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network_offering_id',
   `service` VARCHAR(255) NOT NULL
   COMMENT 'service',
@@ -2845,9 +2845,9 @@ CREATE TABLE `ntwk_offering_service_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ntwk_service_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network_id',
   `service` VARCHAR(255) NOT NULL
   COMMENT 'service',
@@ -2863,7 +2863,7 @@ CREATE TABLE `ntwk_service_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `object_datastore_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `datastore_uuid` VARCHAR(255) NOT NULL,
   `datastore_role` VARCHAR(255) NOT NULL,
@@ -2880,30 +2880,30 @@ CREATE TABLE `object_datastore_ref` (
   `error_str` VARCHAR(255) NULL,
   `local_path` VARCHAR(255) NULL,
   `install_path` VARCHAR(255) NULL,
-  `size` BIGINT NULL
+  `size` BIGINT UNSIGNED NULL
   COMMENT 'the size of the template on the pool',
   `state` VARCHAR(255) NOT NULL,
-  `update_count` BIGINT NOT NULL,
+  `update_count` BIGINT UNSIGNED NOT NULL,
   `updated` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_dc_ip_address_alloc` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary key'
     PRIMARY KEY,
   `ip_address` CHAR(40) NOT NULL
   COMMENT 'ip address',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center it belongs to',
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod it belongs to',
-  `nic_id` BIGINT NULL
+  `nic_id` BIGINT UNSIGNED NULL
   COMMENT 'nic id',
   `reservation_id` CHAR(40) NULL
   COMMENT 'reservation id',
   `taken` DATETIME NULL
   COMMENT 'Date taken',
-  `mac_address` BIGINT NOT NULL
+  `mac_address` BIGINT UNSIGNED NOT NULL
   COMMENT 'mac address for management ips',
   CONSTRAINT `i_op_dc_ip_address_alloc__ip_address__data_center_id`
   UNIQUE (`ip_address`, `data_center_id`),
@@ -2925,16 +2925,16 @@ CREATE INDEX `i_op_dc_ip_address_alloc__pod_id__data_center_id__taken`
   ON `op_dc_ip_address_alloc` (`pod_id`, `data_center_id`, `taken`, `nic_id`);
 
 CREATE TABLE `op_dc_link_local_ip_address_alloc` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary key'
     PRIMARY KEY,
   `ip_address` CHAR(40) NOT NULL
   COMMENT 'ip address',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center it belongs to',
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod it belongs to',
-  `nic_id` BIGINT NULL
+  `nic_id` BIGINT UNSIGNED NULL
   COMMENT 'instance id',
   `reservation_id` CHAR(40) NULL
   COMMENT 'reservation id used to reserve this network',
@@ -2952,14 +2952,14 @@ CREATE INDEX `i_op_dc_link_local_ip_address_alloc__pod_id`
   ON `op_dc_link_local_ip_address_alloc` (`pod_id`);
 
 CREATE TABLE `op_dc_storage_network_ip_address` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary key'
     PRIMARY KEY,
-  `range_id` BIGINT NOT NULL
+  `range_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of ip range in dc_storage_network_ip_range',
   `ip_address` CHAR(40) NOT NULL
   COMMENT 'ip address',
-  `mac_address` BIGINT NOT NULL
+  `mac_address` BIGINT UNSIGNED NOT NULL
   COMMENT 'mac address for storage ips',
   `taken` DATETIME NULL
   COMMENT 'Date taken',
@@ -2972,22 +2972,22 @@ CREATE INDEX `i_storage_ip_address__range_id`
   ON `op_dc_storage_network_ip_address` (`range_id`);
 
 CREATE TABLE `op_dc_vnet_alloc` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary id'
     PRIMARY KEY,
   `vnet` VARCHAR(18) NOT NULL
   COMMENT 'vnet',
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'physical network the vnet belongs to',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center the vnet belongs to',
   `reservation_id` CHAR(40) NULL
   COMMENT 'reservation id',
-  `account_id` BIGINT NULL
+  `account_id` BIGINT UNSIGNED NULL
   COMMENT 'account the vnet belongs to right now',
   `taken` DATETIME NULL
   COMMENT 'Date taken',
-  `account_vnet_map_id` BIGINT NULL,
+  `account_vnet_map_id` BIGINT UNSIGNED NULL,
   CONSTRAINT `i_op_dc_vnet_alloc__vnet__data_center_id`
   UNIQUE (`vnet`, `physical_network_id`, `data_center_id`),
   CONSTRAINT `fk_op_dc_vnet_alloc__data_center_id`
@@ -3007,10 +3007,10 @@ CREATE INDEX `i_op_dc_vnet_alloc__dc_taken`
   ON `op_dc_vnet_alloc` (`data_center_id`, `taken`);
 
 CREATE TABLE `op_ha_work` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `instance_id` BIGINT NOT NULL
+  `instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance that needs to be ha.',
   `type` VARCHAR(32) NOT NULL
   COMMENT 'type of work',
@@ -3018,9 +3018,9 @@ CREATE TABLE `op_ha_work` (
   COMMENT 'VM type',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'state of the vm instance when this happened.',
-  `mgmt_server_id` BIGINT NULL
+  `mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'management server that has taken up the work of doing ha',
-  `host_id` BIGINT NULL
+  `host_id` BIGINT UNSIGNED NULL
   COMMENT 'host that the vm is suppose to be on',
   `created` DATETIME NOT NULL
   COMMENT 'time the entry was requested',
@@ -3032,7 +3032,7 @@ CREATE TABLE `op_ha_work` (
   COMMENT 'Step in the work',
   `time_to_try` BIGINT NULL
   COMMENT 'time to try do this work',
-  `updated` BIGINT NOT NULL
+  `updated` BIGINT UNSIGNED NOT NULL
   COMMENT 'time the VM state was updated when it was stored into work queue',
   CONSTRAINT `fk_op_ha_work__mgmt_server_id`
   FOREIGN KEY (`mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`),
@@ -3056,10 +3056,10 @@ CREATE INDEX `i_op_ha_work__type`
   ON `op_ha_work` (`type`);
 
 CREATE TABLE `op_host` (
-  `id` BIGINT NOT NULL
+  `id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id'
     PRIMARY KEY,
-  `sequence` BIGINT DEFAULT '1' NOT NULL
+  `sequence` BIGINT UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'sequence for the host communication',
   CONSTRAINT `fk_op_host__id`
   FOREIGN KEY (`id`) REFERENCES `cloud`.`host` (`id`)
@@ -3067,12 +3067,12 @@ CREATE TABLE `op_host` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_host_capacity` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NULL,
-  `data_center_id` BIGINT NOT NULL,
-  `pod_id` BIGINT NULL,
-  `cluster_id` BIGINT NULL
+  `host_id` BIGINT UNSIGNED NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `pod_id` BIGINT UNSIGNED NULL,
+  `cluster_id` BIGINT UNSIGNED NULL
   COMMENT 'foreign key to cluster',
   `used_capacity` BIGINT NOT NULL,
   `reserved_capacity` BIGINT NOT NULL,
@@ -3099,12 +3099,12 @@ CREATE INDEX `i_op_host_capacity__pod_id`
   ON `op_host_capacity` (`pod_id`);
 
 CREATE TABLE `op_host_planner_reservation` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `data_center_id` BIGINT NOT NULL,
-  `pod_id` BIGINT NULL,
-  `cluster_id` BIGINT NULL,
-  `host_id` BIGINT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `pod_id` BIGINT UNSIGNED NULL,
+  `cluster_id` BIGINT UNSIGNED NULL,
+  `host_id` BIGINT UNSIGNED NULL,
   `resource_usage` VARCHAR(255) NULL
   COMMENT 'Shared(between planners) Vs Dedicated (exclusive usage to a planner)',
   CONSTRAINT `fk_planner_reservation__data_center_id`
@@ -3134,12 +3134,12 @@ CREATE INDEX `i_op_host_planner_reservation__host_resource_usage`
   ON `op_host_planner_reservation` (`host_id`, `resource_usage`);
 
 CREATE TABLE `op_host_transfer` (
-  `id` BIGINT NOT NULL
+  `id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Id of the host'
     PRIMARY KEY,
-  `initial_mgmt_server_id` BIGINT NULL
+  `initial_mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'management server the host is transfered from',
-  `future_mgmt_server_id` BIGINT NULL
+  `future_mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'management server the host is transfered to',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'the transfer state of the host',
@@ -3161,7 +3161,7 @@ CREATE INDEX `i_op_host_transfer__initial_mgmt_server_id`
   ON `op_host_transfer` (`initial_mgmt_server_id`);
 
 CREATE TABLE `op_host_upgrade` (
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id'
     PRIMARY KEY,
   `version` VARCHAR(20) NOT NULL
@@ -3176,9 +3176,9 @@ CREATE TABLE `op_it_work` (
   `id` CHAR(40) DEFAULT '' NOT NULL
   COMMENT 'reservation id'
     PRIMARY KEY,
-  `mgmt_server_id` BIGINT NULL
+  `mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'management server id',
-  `created_at` BIGINT NOT NULL
+  `created_at` BIGINT UNSIGNED NOT NULL
   COMMENT 'when was this work detail created',
   `thread` VARCHAR(255) NOT NULL
   COMMENT 'thread name',
@@ -3188,13 +3188,13 @@ CREATE TABLE `op_it_work` (
   COMMENT 'type of vm',
   `step` CHAR(32) NOT NULL
   COMMENT 'state',
-  `updated_at` BIGINT NOT NULL
+  `updated_at` BIGINT UNSIGNED NOT NULL
   COMMENT 'time it was taken over',
-  `instance_id` BIGINT NOT NULL
+  `instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance',
   `resource_type` CHAR(32) NULL
   COMMENT 'type of resource being worked on',
-  `resource_id` BIGINT NULL
+  `resource_id` BIGINT UNSIGNED NULL
   COMMENT 'resource id being worked on',
   CONSTRAINT `fk_op_it_work__mgmt_server_id`
   FOREIGN KEY (`mgmt_server_id`) REFERENCES `cloud`.`mshost` (`msid`)
@@ -3234,9 +3234,9 @@ CREATE INDEX `i_op_lock__mac_ip_thread`
   ON `op_lock` (`mac`, `ip`, `thread`);
 
 CREATE TABLE `op_networks` (
-  `id` BIGINT NOT NULL
+  `id` BIGINT UNSIGNED NOT NULL
     PRIMARY KEY,
-  `mac_address_seq` BIGINT DEFAULT '1' NOT NULL
+  `mac_address_seq` BIGINT UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'mac address',
   `nics_count` INT(10) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT '# of nics',
@@ -3250,12 +3250,12 @@ CREATE TABLE `op_networks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_nwgrp_work` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `instance_id` BIGINT NOT NULL
+  `instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance that needs rules to be synced.',
-  `mgmt_server_id` BIGINT NULL
+  `mgmt_server_id` BIGINT UNSIGNED NULL
   COMMENT 'management server that has taken up the work of doing rule sync',
   `created` DATETIME NOT NULL
   COMMENT 'time the entry was requested',
@@ -3263,7 +3263,7 @@ CREATE TABLE `op_nwgrp_work` (
   COMMENT 'time it was taken by the management server',
   `step` VARCHAR(32) NOT NULL
   COMMENT 'Step in the work',
-  `seq_no` BIGINT NULL
+  `seq_no` BIGINT UNSIGNED NULL
   COMMENT 'seq number to be sent to agent, uniquely identifies ruleset update'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -3283,23 +3283,23 @@ CREATE INDEX `i_op_nwgrp_work__taken`
   ON `op_nwgrp_work` (`taken`);
 
 CREATE TABLE `op_pod_vlan_alloc` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary id'
     PRIMARY KEY,
   `vlan` VARCHAR(18) NOT NULL
   COMMENT 'vlan id',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center the pod belongs to',
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod the vlan belongs to',
-  `account_id` BIGINT NULL
+  `account_id` BIGINT UNSIGNED NULL
   COMMENT 'account the vlan belongs to right now',
   `taken` DATETIME NULL
   COMMENT 'Date taken'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_router_monitoring_services` (
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Primary Key'
     PRIMARY KEY,
   `router_name` VARCHAR(255) NOT NULL
@@ -3311,13 +3311,13 @@ CREATE TABLE `op_router_monitoring_services` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_user_stats_log` (
-  `user_stats_id` BIGINT NOT NULL,
-  `net_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `net_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
+  `user_stats_id` BIGINT UNSIGNED NOT NULL,
+  `net_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
   `updated` DATETIME NULL
   COMMENT 'stats update timestamp',
   CONSTRAINT `user_stats_id`
@@ -3325,38 +3325,38 @@ CREATE TABLE `op_user_stats_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_vm_ruleset_log` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `instance_id` BIGINT NOT NULL
+  `instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance that needs rules to be synced.',
   `created` DATETIME NOT NULL
   COMMENT 'time the entry was requested',
-  `logsequence` BIGINT NULL
+  `logsequence` BIGINT UNSIGNED NULL
   COMMENT 'seq number to be sent to agent, uniquely identifies ruleset update',
   CONSTRAINT `u_op_vm_ruleset_log__instance_id`
   UNIQUE (`instance_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `op_vpc_distributed_router_sequence_no` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `vpc_id` BIGINT NOT NULL
+  `vpc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vpc id.',
-  `topology_update_sequence_no` BIGINT NULL
+  `topology_update_sequence_no` BIGINT UNSIGNED NULL
   COMMENT 'sequence number to be sent to hypervisor, uniquely identifies a VPC topology update',
-  `routing_policy__update_sequence_no` BIGINT NULL
+  `routing_policy__update_sequence_no` BIGINT UNSIGNED NULL
   COMMENT 'sequence number to be sent to hypervisor, uniquely identifies a routing policy update',
   CONSTRAINT `u_op_vpc_distributed_router_sequence_no_vpc_id`
   UNIQUE (`vpc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ovs_providers` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `nsp_id` BIGINT NOT NULL
+  `nsp_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Network Service Provider ID',
   `uuid` VARCHAR(40) NULL,
   `enabled` INT(1) NOT NULL
@@ -3381,12 +3381,12 @@ CREATE TABLE `ovs_tunnel_interface` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ovs_tunnel_network` (
-  `id` BIGINT AUTO_INCREMENT,
-  `from` BIGINT DEFAULT '0' NOT NULL
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `from` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'from host id',
-  `to` BIGINT DEFAULT '0' NOT NULL
+  `to` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'to host id',
-  `network_id` BIGINT DEFAULT '0' NOT NULL
+  `network_id` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'network identifier',
   `key` INT(10) UNSIGNED NULL
   COMMENT 'gre key',
@@ -3400,16 +3400,16 @@ CREATE TABLE `ovs_tunnel_network` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `name` VARCHAR(255) NOT NULL,
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center id that this physical network belongs to',
   `vnet` VARCHAR(255) NULL,
   `speed` VARCHAR(32) NULL,
-  `domain_id` BIGINT NULL
+  `domain_id` BIGINT UNSIGNED NULL
   COMMENT 'foreign key to domain id',
   `broadcast_domain_range` VARCHAR(32) DEFAULT 'POD' NOT NULL
   COMMENT 'range of broadcast domain : POD/ZONE',
@@ -3463,10 +3463,10 @@ FOREIGN KEY (`physical_network_id`) REFERENCES `cloud`.`physical_network` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `physical_network_isolation_methods` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network',
   `isolation_method` VARCHAR(255) NOT NULL
   COMMENT 'isolation method(VLAN, L3 or GRE)',
@@ -3478,17 +3478,17 @@ CREATE TABLE `physical_network_isolation_methods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network_service_providers` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network',
   `provider_name` VARCHAR(255) NOT NULL
   COMMENT 'Service Provider name',
   `state` VARCHAR(32) DEFAULT 'Disabled' NOT NULL
   COMMENT 'provider state',
-  `destination_physical_network_id` BIGINT NULL
+  `destination_physical_network_id` BIGINT UNSIGNED NULL
   COMMENT 'id of the physical network to bridge to',
   `vpn_service_provided` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Is VPN service provided',
@@ -3532,10 +3532,10 @@ FOREIGN KEY (`nsp_id`) REFERENCES `cloud`.`physical_network_service_providers` (
   ON DELETE CASCADE;
 
 CREATE TABLE `physical_network_tags` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network',
   `tag` VARCHAR(255) NOT NULL
   COMMENT 'tag',
@@ -3547,11 +3547,11 @@ CREATE TABLE `physical_network_tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `physical_network_traffic_types` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the physical network',
   `traffic_type` VARCHAR(32) NOT NULL
   COMMENT 'type of traffic going through this network',
@@ -3573,11 +3573,11 @@ CREATE TABLE `physical_network_traffic_types` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `pod_vlan_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod id. foreign key to pod table',
-  `vlan_db_id` BIGINT NOT NULL
+  `vlan_db_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'database id of vlan. foreign key to vlan table',
   CONSTRAINT `fk_pod_vlan_map__pod_id`
   FOREIGN KEY (`pod_id`) REFERENCES `cloud`.`host_pod_ref` (`id`)
@@ -3591,9 +3591,9 @@ CREATE INDEX `i_pod_vlan_map__vlan_id`
   ON `pod_vlan_map` (`vlan_db_id`);
 
 CREATE TABLE `port_forwarding_rules` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `instance_id` BIGINT NOT NULL
+  `instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance id',
   `dest_ip_address` CHAR(40) NOT NULL
   COMMENT 'id_address',
@@ -3610,10 +3610,10 @@ CREATE INDEX `i_port_forwarding_rules__instance_id`
   ON `port_forwarding_rules` (`instance_id`);
 
 CREATE TABLE `portable_ip_address` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NULL,
-  `domain_id` BIGINT NULL,
+  `account_id` BIGINT UNSIGNED NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `allocated` DATETIME NULL
   COMMENT 'Date portable ip was allocated',
   `state` CHAR(32) DEFAULT 'Free' NOT NULL
@@ -3623,14 +3623,14 @@ CREATE TABLE `portable_ip_address` (
   `gateway` VARCHAR(255) NULL,
   `netmask` VARCHAR(255) NULL,
   `portable_ip_address` VARCHAR(255) NULL,
-  `portable_ip_range_id` BIGINT NOT NULL,
-  `data_center_id` BIGINT NULL
+  `portable_ip_range_id` BIGINT UNSIGNED NOT NULL,
+  `data_center_id` BIGINT UNSIGNED NULL
   COMMENT 'zone to which portable IP is associated',
-  `physical_network_id` BIGINT NULL
+  `physical_network_id` BIGINT UNSIGNED NULL
   COMMENT 'physical network id in the zone to which portable IP is associated',
-  `network_id` BIGINT NULL
+  `network_id` BIGINT UNSIGNED NULL
   COMMENT 'guest network to which portable ip address is associated with',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc to which portable ip address is associated with'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -3641,7 +3641,7 @@ CREATE INDEX `i_portable_ip_address__region_id`
   ON `portable_ip_address` (`region_id`);
 
 CREATE TABLE `portable_ip_range` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `region_id` INT(10) UNSIGNED NOT NULL,
@@ -3661,18 +3661,18 @@ FOREIGN KEY (`portable_ip_range_id`) REFERENCES `cloud`.`portable_ip_range` (`id
   ON DELETE CASCADE;
 
 CREATE TABLE `private_ip_address` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'primary key'
     PRIMARY KEY,
   `ip_address` CHAR(40) NOT NULL
   COMMENT 'ip address',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the network ip belongs to',
   `reservation_id` CHAR(40) NULL
   COMMENT 'reservation id',
   `mac_address` VARCHAR(17) NULL
   COMMENT 'mac address',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc this ip belongs to',
   `taken` DATETIME NULL
   COMMENT 'Date taken',
@@ -3689,15 +3689,15 @@ CREATE INDEX `i_private_ip_address__vpc_id`
   ON `private_ip_address` (`vpc_id`);
 
 CREATE TABLE `project_account` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'account id',
   `account_role` VARCHAR(255) DEFAULT 'Regular' NOT NULL
   COMMENT 'Account role in the project (Owner or Regular)',
-  `project_id` BIGINT NOT NULL
+  `project_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'project id',
-  `project_account_id` BIGINT NOT NULL,
+  `project_account_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NULL
   COMMENT 'date created',
   CONSTRAINT `account_id`
@@ -3717,14 +3717,14 @@ CREATE INDEX `i_project_account__project_id`
   ON `project_account` (`project_id`);
 
 CREATE TABLE `project_invitations` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `project_id` BIGINT NOT NULL
+  `project_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'project id',
-  `account_id` BIGINT NULL
+  `account_id` BIGINT UNSIGNED NULL
   COMMENT 'account id',
-  `domain_id` BIGINT NULL
+  `domain_id` BIGINT UNSIGNED NULL
   COMMENT 'domain id',
   `email` VARCHAR(255) NULL
   COMMENT 'email',
@@ -3757,15 +3757,15 @@ CREATE INDEX `i_project_invitations__domain_id`
   ON `project_invitations` (`domain_id`);
 
 CREATE TABLE `projects` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NULL
   COMMENT 'project name',
   `uuid` VARCHAR(40) NULL,
   `display_text` VARCHAR(255) NULL
   COMMENT 'project name',
-  `project_account_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `project_account_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NULL
   COMMENT 'date created',
   `removed` DATETIME NULL
@@ -3833,19 +3833,19 @@ ALTER TABLE `portable_ip_range`
 FOREIGN KEY (`region_id`) REFERENCES `cloud`.`region` (`id`);
 
 CREATE TABLE `remote_access_vpn` (
-  `vpn_server_addr_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `network_id` BIGINT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `vpn_server_addr_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `network_id` BIGINT UNSIGNED NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `local_ip` CHAR(40) NOT NULL,
   `ip_range` VARCHAR(32) NOT NULL,
   `ipsec_psk` VARCHAR(256) NOT NULL,
   `state` CHAR(32) NOT NULL,
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `vpc_id` BIGINT NULL,
+  `vpc_id` BIGINT UNSIGNED NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'True if the entry can be displayed to the end user',
   CONSTRAINT `vpn_server_addr_id`
@@ -3873,9 +3873,9 @@ CREATE INDEX `i_remote_access_vpn__network_id`
   ON `remote_access_vpn` (`network_id`);
 
 CREATE TABLE `remote_access_vpn_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `remote_access_vpn_id` BIGINT NOT NULL
+  `remote_access_vpn_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Remote access vpn id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -3890,10 +3890,10 @@ CREATE INDEX `i_remote_access_vpn_details__remote_access_vpn_id`
   ON `remote_access_vpn_details` (`remote_access_vpn_id`);
 
 CREATE TABLE `resource_count` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `account_id` BIGINT NULL,
-  `domain_id` BIGINT NULL,
+  `account_id` BIGINT UNSIGNED NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `type` VARCHAR(255) NULL,
   `count` BIGINT DEFAULT '0' NOT NULL,
   CONSTRAINT `i_resource_count__type_accountId`
@@ -3918,10 +3918,10 @@ CREATE INDEX `i_resource_count__type`
   ON `resource_count` (`type`);
 
 CREATE TABLE `resource_limit` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `domain_id` BIGINT NULL,
-  `account_id` BIGINT NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
+  `account_id` BIGINT UNSIGNED NULL,
   `type` VARCHAR(255) NULL,
   `max` BIGINT DEFAULT '-1' NOT NULL,
   CONSTRAINT `fk_resource_limit__domain_id`
@@ -3939,19 +3939,19 @@ CREATE INDEX `i_resource_limit__domain_id`
   ON `resource_limit` (`domain_id`);
 
 CREATE TABLE `resource_tags` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `key` VARCHAR(255) NULL,
   `value` VARCHAR(255) NULL,
-  `resource_id` BIGINT NOT NULL,
+  `resource_id` BIGINT UNSIGNED NOT NULL,
   `resource_uuid` VARCHAR(40) NULL,
   `resource_type` VARCHAR(255) NULL,
   `customer` VARCHAR(255) NULL,
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'foreign key to domain id',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner of this network',
   CONSTRAINT `uc_resource_tags__uuid`
   UNIQUE (`uuid`),
@@ -3970,12 +3970,12 @@ CREATE INDEX `i_tags__domain_id`
   ON `resource_tags` (`domain_id`);
 
 CREATE TABLE `router_network_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `router_id` BIGINT NOT NULL
+  `router_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'router id',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id',
   `guest_type` CHAR(32) NULL
   COMMENT 'type of guest network that can be shared or isolated',
@@ -3993,7 +3993,7 @@ CREATE INDEX `i_router_network_ref__networks_id`
   ON `router_network_ref` (`network_id`);
 
 CREATE TABLE `s2s_customer_gateway` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -4007,8 +4007,8 @@ CREATE TABLE `s2s_customer_gateway` (
   `esp_lifetime` INT DEFAULT '3600' NOT NULL,
   `dpd` INT(1) DEFAULT '0' NOT NULL,
   `force_encap` INT(1) DEFAULT '0' NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
   CONSTRAINT `uc_s2s_customer_gateway__uuid`
@@ -4028,9 +4028,9 @@ CREATE INDEX `i_s2s_customer_gateway__domain_id`
   ON `s2s_customer_gateway` (`domain_id`);
 
 CREATE TABLE `s2s_customer_gateway_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `s2s_customer_gateway_id` BIGINT NOT NULL
+  `s2s_customer_gateway_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -4045,15 +4045,15 @@ CREATE INDEX `i_s2s_customer_gateway_details__s2s_customer_gateway_id`
   ON `s2s_customer_gateway_details` (`s2s_customer_gateway_id`);
 
 CREATE TABLE `s2s_vpn_connection` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `vpn_gateway_id` BIGINT NULL,
-  `customer_gateway_id` BIGINT NULL,
+  `vpn_gateway_id` BIGINT UNSIGNED NULL,
+  `customer_gateway_id` BIGINT UNSIGNED NULL,
   `state` VARCHAR(32) NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL
   COMMENT 'date created',
   `removed` DATETIME NULL
@@ -4087,9 +4087,9 @@ CREATE INDEX `i_s2s_vpn_connection__vpn_gateway_id`
   ON `s2s_vpn_connection` (`vpn_gateway_id`);
 
 CREATE TABLE `s2s_vpn_connection_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `s2s_vpn_connection_id` BIGINT NOT NULL
+  `s2s_vpn_connection_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -4104,14 +4104,14 @@ CREATE INDEX `i_s2s_vpn_connection_details__s2s_vpn_connection_id`
   ON `s2s_vpn_connection_details` (`s2s_vpn_connection_id`);
 
 CREATE TABLE `s2s_vpn_gateway` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `addr_id` BIGINT NOT NULL,
-  `vpc_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `addr_id` BIGINT UNSIGNED NOT NULL,
+  `vpc_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
   `display` TINYINT(1) DEFAULT '1' NOT NULL
@@ -4144,9 +4144,9 @@ FOREIGN KEY (`vpn_gateway_id`) REFERENCES `cloud`.`s2s_vpn_gateway` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `s2s_vpn_gateway_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `s2s_vpn_gateway_id` BIGINT NOT NULL
+  `s2s_vpn_gateway_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -4161,11 +4161,11 @@ CREATE INDEX `i_s2s_vpn_gateway_details__s2s_vpn_gateway_id`
   ON `s2s_vpn_gateway_details` (`s2s_vpn_gateway_id`);
 
 CREATE TABLE `saml_token` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(255) NOT NULL
   COMMENT 'The Authn Unique Id',
-  `domain_id` BIGINT NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `entity` TEXT NOT NULL
   COMMENT 'Identity Provider Entity Id',
   `created` DATETIME NOT NULL,
@@ -4180,7 +4180,7 @@ CREATE INDEX `i_saml_token__domain_id`
   ON `saml_token` (`domain_id`);
 
 CREATE TABLE `secondary_storage_vm` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `public_mac_address` VARCHAR(17) NULL
   COMMENT 'mac address of the public facing network card',
@@ -4201,13 +4201,13 @@ CREATE TABLE `secondary_storage_vm` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `security_group` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
   `description` VARCHAR(4096) NULL,
-  `domain_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `name`
   UNIQUE (`name`, `account_id`),
   CONSTRAINT `uc_security_group__uuid`
@@ -4229,15 +4229,15 @@ CREATE INDEX `i_security_group_name`
   ON `security_group` (`name`);
 
 CREATE TABLE `security_group_rule` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `security_group_id` BIGINT NOT NULL,
+  `security_group_id` BIGINT UNSIGNED NOT NULL,
   `type` VARCHAR(10) DEFAULT 'ingress' NULL,
   `start_port` VARCHAR(10) NULL,
   `end_port` VARCHAR(10) NULL,
   `protocol` VARCHAR(16) DEFAULT 'TCP' NOT NULL,
-  `allowed_network_id` BIGINT NULL,
+  `allowed_network_id` BIGINT UNSIGNED NULL,
   `allowed_ip_cidr` VARCHAR(44) NULL,
   `create_status` VARCHAR(32) NULL
   COMMENT 'rule creation status',
@@ -4258,10 +4258,10 @@ CREATE INDEX `i_security_group_rule_network_id`
   ON `security_group_rule` (`security_group_id`);
 
 CREATE TABLE `security_group_vm_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `security_group_id` BIGINT NOT NULL,
-  `instance_id` BIGINT NOT NULL,
+  `security_group_id` BIGINT UNSIGNED NOT NULL,
+  `instance_id` BIGINT UNSIGNED NOT NULL,
   CONSTRAINT `fk_security_group_vm_map___security_group_id`
   FOREIGN KEY (`security_group_id`) REFERENCES `cloud`.`security_group` (`id`)
     ON DELETE CASCADE
@@ -4277,23 +4277,23 @@ CREATE TABLE `sequence` (
   `name` VARCHAR(64) NOT NULL
   COMMENT 'name of the sequence'
     PRIMARY KEY,
-  `value` BIGINT NOT NULL
+  `value` BIGINT UNSIGNED NOT NULL
   COMMENT 'sequence value',
   CONSTRAINT `name`
   UNIQUE (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `service_offering` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `cpu` INT(10) UNSIGNED NULL
   COMMENT '# of cores',
   `speed` INT(10) UNSIGNED NULL
   COMMENT 'speed per core in mhz',
-  `ram_size` BIGINT NULL,
-  `nw_rate` SMALLINT DEFAULT '200' NULL
+  `ram_size` BIGINT UNSIGNED NULL,
+  `nw_rate` SMALLINT UNSIGNED DEFAULT '200' NULL
   COMMENT 'network rate throttle mbits/s',
-  `mc_rate` SMALLINT DEFAULT '10' NULL
+  `mc_rate` SMALLINT UNSIGNED DEFAULT '10' NULL
   COMMENT 'mcast rate throttle mbits/s',
   `ha_enabled` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Enable HA',
@@ -4317,9 +4317,9 @@ CREATE TABLE `service_offering` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `service_offering_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `service_offering_id` BIGINT NOT NULL
+  `service_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'service offering id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NOT NULL,
@@ -4333,9 +4333,9 @@ CREATE TABLE `service_offering_details` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `snapshot_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `snapshot_id` BIGINT NOT NULL,
+  `snapshot_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
@@ -4343,10 +4343,10 @@ CREATE TABLE `snapshot_details` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `snapshot_policy` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `volume_id` BIGINT NOT NULL,
+  `volume_id` BIGINT UNSIGNED NOT NULL,
   `schedule` VARCHAR(100) NOT NULL
   COMMENT 'schedule time of execution',
   `timezone` VARCHAR(100) NOT NULL
@@ -4367,9 +4367,9 @@ CREATE INDEX `i_snapshot_policy__volume_id`
   ON `snapshot_policy` (`volume_id`);
 
 CREATE TABLE `snapshot_policy_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `policy_id` BIGINT NOT NULL
+  `policy_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'snapshot policy id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -4384,18 +4384,18 @@ CREATE INDEX `i_snapshot_policy_details__snapshot_policy_id`
   ON `snapshot_policy_details` (`policy_id`);
 
 CREATE TABLE `snapshot_schedule` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `volume_id` BIGINT NOT NULL
+  `volume_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'The volume for which this snapshot is being taken',
-  `policy_id` BIGINT NOT NULL
+  `policy_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'One of the policyIds for which this snapshot was taken',
   `scheduled_timestamp` DATETIME NOT NULL
   COMMENT 'Time at which the snapshot was scheduled for execution',
-  `async_job_id` BIGINT NULL
+  `async_job_id` BIGINT UNSIGNED NULL
   COMMENT 'If this schedule is being executed, it is the id of the create aysnc_job. Before that it is null',
-  `snapshot_id` BIGINT NULL
+  `snapshot_id` BIGINT UNSIGNED NULL
   COMMENT 'If this schedule is being executed, then the corresponding snapshot has this id. Before that it is null',
   CONSTRAINT `uc_snapshot_schedule__uuid`
   UNIQUE (`uuid`),
@@ -4425,23 +4425,23 @@ CREATE INDEX `i_snapshot_schedule__volume_id`
   ON `snapshot_schedule` (`volume_id`);
 
 CREATE TABLE `snapshot_store_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `store_id` BIGINT NOT NULL,
-  `snapshot_id` BIGINT NOT NULL,
+  `store_id` BIGINT UNSIGNED NOT NULL,
+  `snapshot_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `store_role` VARCHAR(255) NULL,
   `size` BIGINT NULL,
   `physical_size` BIGINT DEFAULT '0' NULL,
-  `parent_snapshot_id` BIGINT DEFAULT '0' NULL,
+  `parent_snapshot_id` BIGINT UNSIGNED DEFAULT '0' NULL,
   `install_path` VARCHAR(255) NULL,
   `state` VARCHAR(255) NOT NULL,
   `update_count` BIGINT NULL,
   `ref_cnt` BIGINT NULL,
   `updated` DATETIME NULL,
-  `volume_id` BIGINT NULL
+  `volume_id` BIGINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_snapshot_store_ref__snapshot_id`
@@ -4451,17 +4451,17 @@ CREATE INDEX `i_snapshot_store_ref__store_id`
   ON `snapshot_store_ref` (`store_id`);
 
 CREATE TABLE `snapshots` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'Primary Key'
     PRIMARY KEY,
-  `data_center_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner.  foreign key to account table',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'the domain that the owner belongs to',
-  `volume_id` BIGINT NOT NULL
+  `volume_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'volume it belongs to. foreign key to volume table',
-  `disk_offering_id` BIGINT NOT NULL
+  `disk_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'from original volume',
   `status` VARCHAR(32) NULL
   COMMENT 'snapshot creation status',
@@ -4474,7 +4474,7 @@ CREATE TABLE `snapshots` (
   COMMENT 'type of snapshot, e.g. manual, recurring',
   `type_description` VARCHAR(25) NULL
   COMMENT 'description of the type of snapshot, e.g. manual, recurring',
-  `size` BIGINT NOT NULL
+  `size` BIGINT UNSIGNED NOT NULL
   COMMENT 'original disk size of snapshot',
   `created` DATETIME NULL
   COMMENT 'Date Created',
@@ -4482,17 +4482,17 @@ CREATE TABLE `snapshots` (
   COMMENT 'Date removed.  not null if removed',
   `backup_snap_id` VARCHAR(255) NULL
   COMMENT 'Back up uuid of the snapshot',
-  `sechost_id` BIGINT NULL
+  `sechost_id` BIGINT UNSIGNED NULL
   COMMENT 'secondary storage host id',
-  `prev_snap_id` BIGINT NULL
+  `prev_snap_id` BIGINT UNSIGNED NULL
   COMMENT 'Id of the most recent snapshot',
   `hypervisor_type` VARCHAR(32) NOT NULL
   COMMENT 'hypervisor that the snapshot was taken under',
   `version` VARCHAR(32) NULL
   COMMENT 'snapshot version',
-  `min_iops` BIGINT NULL
+  `min_iops` BIGINT UNSIGNED NULL
   COMMENT 'Minimum IOPS',
-  `max_iops` BIGINT NULL
+  `max_iops` BIGINT UNSIGNED NULL
   COMMENT 'Maximum IOPS',
   CONSTRAINT `uc_snapshots__uuid`
   UNIQUE (`uuid`),
@@ -4528,12 +4528,12 @@ ALTER TABLE `snapshot_store_ref`
 FOREIGN KEY (`snapshot_id`) REFERENCES `cloud`.`snapshots` (`id`);
 
 CREATE TABLE `ssh_keypairs` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner, foreign key to account table',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain, foreign key to domain table',
   `keypair_name` VARCHAR(256) NOT NULL
   COMMENT 'name of the key pair',
@@ -4561,15 +4561,15 @@ CREATE INDEX `i_public_key`
   ON `ssh_keypairs` (`public_key`);
 
 CREATE TABLE `sslcerts` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `account_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
-  `certificate` TEXT NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `certificate` MEDIUMTEXT NOT NULL,
   `fingerprint` VARCHAR(62) NOT NULL,
-  `key` TEXT NOT NULL,
-  `chain` TEXT NULL,
+  `key` MEDIUMTEXT NOT NULL,
+  `chain` MEDIUMTEXT NULL,
   `password` VARCHAR(255) NULL,
   CONSTRAINT `fk_sslcert__account_id`
   FOREIGN KEY (`account_id`) REFERENCES `cloud`.`account` (`id`)
@@ -4591,10 +4591,10 @@ FOREIGN KEY (`certificate_id`) REFERENCES `cloud`.`sslcerts` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `stack_maid` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `msid` BIGINT NOT NULL,
-  `thread_id` BIGINT NOT NULL,
+  `msid` BIGINT UNSIGNED NOT NULL,
+  `thread_id` BIGINT UNSIGNED NOT NULL,
   `seq` INT(10) UNSIGNED NOT NULL,
   `cleanup_delegate` VARCHAR(128) NULL,
   `cleanup_context` TEXT NULL,
@@ -4611,7 +4611,7 @@ CREATE INDEX `i_stack_maid_seq`
   ON `stack_maid` (`msid`, `seq`);
 
 CREATE TABLE `static_routes` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -4623,11 +4623,11 @@ CREATE TABLE `static_routes` (
   COMMENT 'metric value for the route',
   `state` CHAR(32) NOT NULL
   COMMENT 'current state of this rule',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc the firewall rule is associated with',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
   `created` DATETIME NULL
   COMMENT 'Date created',
@@ -4651,21 +4651,21 @@ CREATE INDEX `i_static_routes__vpc_id`
   ON `static_routes` (`vpc_id`);
 
 CREATE TABLE `static_routes_pre510` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `vpc_gateway_id` BIGINT NULL
+  `vpc_gateway_id` BIGINT UNSIGNED NULL
   COMMENT 'id of the corresponding ip address',
   `cidr` VARCHAR(18) NULL
   COMMENT 'cidr for the static route',
   `state` CHAR(32) NOT NULL
   COMMENT 'current state of this rule',
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc the firewall rule is associated with',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
   `created` DATETIME NULL
   COMMENT 'Date created',
@@ -4686,19 +4686,19 @@ CREATE INDEX `i_static_routes__vpc_id`
   ON `static_routes_pre510` (`vpc_id`);
 
 CREATE TABLE `storage_pool` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NULL
   COMMENT 'should be NOT NULL',
   `uuid` VARCHAR(255) NULL,
   `pool_type` VARCHAR(32) NOT NULL,
   `port` INT(10) UNSIGNED NOT NULL,
-  `data_center_id` BIGINT NOT NULL,
-  `pod_id` BIGINT NULL,
-  `cluster_id` BIGINT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `pod_id` BIGINT UNSIGNED NULL,
+  `cluster_id` BIGINT UNSIGNED NULL
   COMMENT 'foreign key to cluster',
-  `used_bytes` BIGINT NULL,
-  `capacity_bytes` BIGINT NULL,
+  `used_bytes` BIGINT UNSIGNED NULL,
+  `capacity_bytes` BIGINT UNSIGNED NULL,
   `host_address` VARCHAR(255) NOT NULL
   COMMENT 'FQDN or IP of storage server',
   `user_info` VARCHAR(255) NULL
@@ -4716,7 +4716,7 @@ CREATE TABLE `storage_pool` (
   `hypervisor` VARCHAR(32) NULL,
   `managed` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Should CloudStack manage this storage',
-  `capacity_iops` BIGINT NULL
+  `capacity_iops` BIGINT UNSIGNED NULL
   COMMENT 'IOPS CloudStack can provision from this storage pool',
   CONSTRAINT `uuid`
   UNIQUE (`uuid`),
@@ -4737,10 +4737,10 @@ CREATE INDEX `i_storage_pool__removed`
   ON `storage_pool` (`removed`);
 
 CREATE TABLE `storage_pool_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `pool_id` BIGINT NOT NULL
+  `pool_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pool the detail is related to',
   `name` VARCHAR(255) NOT NULL
   COMMENT 'name of the detail',
@@ -4759,10 +4759,10 @@ CREATE INDEX `i_storage_pool_details__name__value`
   ON `storage_pool_details` (`name`, `value`);
 
 CREATE TABLE `storage_pool_host_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL,
-  `pool_id` BIGINT NOT NULL,
+  `host_id` BIGINT UNSIGNED NOT NULL,
+  `pool_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `local_path` VARCHAR(255) NULL,
@@ -4781,28 +4781,28 @@ CREATE INDEX `i_storage_pool_host_ref__pool_id`
   ON `storage_pool_host_ref` (`pool_id`);
 
 CREATE TABLE `storage_pool_work` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `pool_id` BIGINT NOT NULL
+  `pool_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'storage pool associated with the vm',
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm identifier',
   `stopped_for_maintenance` TINYINT(3) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'this flag denoted whether the vm was stopped during maintenance',
   `started_after_maintenance` TINYINT(3) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'this flag denoted whether the vm was started after maintenance',
-  `mgmt_server_id` BIGINT NOT NULL
+  `mgmt_server_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'management server id',
   CONSTRAINT `pool_id`
   UNIQUE (`pool_id`, `vm_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `sync_queue` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `sync_objtype` VARCHAR(64) NOT NULL,
-  `sync_objid` BIGINT NOT NULL,
+  `sync_objid` BIGINT UNSIGNED NOT NULL,
   `queue_proc_number` BIGINT NULL
   COMMENT 'process number, increase 1 for each iteration',
   `created` DATETIME NULL
@@ -4824,9 +4824,9 @@ CREATE INDEX `i_sync_queue__last_updated`
   ON `sync_queue` (`last_updated`);
 
 CREATE TABLE `sync_queue_item` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `queue_id` BIGINT NOT NULL,
+  `queue_id` BIGINT UNSIGNED NOT NULL,
   `content_type` VARCHAR(64) NULL,
   `content_id` BIGINT NULL,
   `queue_proc_msid` BIGINT NULL
@@ -4858,16 +4858,16 @@ CREATE INDEX `i_sync_queue__queue_proc_time`
   ON `sync_queue_item` (`queue_proc_time`);
 
 CREATE TABLE `template_host_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL,
-  `template_id` BIGINT NOT NULL,
+  `host_id` BIGINT UNSIGNED NOT NULL,
+  `template_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `download_pct` INT(10) UNSIGNED NULL,
-  `size` BIGINT NULL,
-  `physical_size` BIGINT DEFAULT '0' NULL,
+  `size` BIGINT UNSIGNED NULL,
+  `physical_size` BIGINT UNSIGNED DEFAULT '0' NULL,
   `download_state` VARCHAR(255) NULL,
   `error_str` VARCHAR(255) NULL,
   `local_path` VARCHAR(255) NULL,
@@ -4889,10 +4889,10 @@ CREATE INDEX `i_template_host_ref__template_id`
   ON `template_host_ref` (`template_id`);
 
 CREATE TABLE `template_spool_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `pool_id` BIGINT NOT NULL,
-  `template_id` BIGINT NOT NULL,
+  `pool_id` BIGINT UNSIGNED NOT NULL,
+  `template_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
@@ -4901,12 +4901,12 @@ CREATE TABLE `template_spool_ref` (
   `error_str` VARCHAR(255) NULL,
   `local_path` VARCHAR(255) NULL,
   `install_path` VARCHAR(255) NULL,
-  `template_size` BIGINT NOT NULL
+  `template_size` BIGINT UNSIGNED NOT NULL
   COMMENT 'the size of the template on the pool',
   `marked_for_gc` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'if true, the garbage collector will evict the template from this pool.',
   `state` VARCHAR(255) NULL,
-  `update_count` BIGINT NULL,
+  `update_count` BIGINT UNSIGNED NULL,
   `updated` DATETIME NULL,
   CONSTRAINT `i_template_spool_ref__template_id__pool_id`
   UNIQUE (`template_id`, `pool_id`),
@@ -4919,17 +4919,17 @@ CREATE INDEX `i_template_spool_ref__pool_id`
   ON `template_spool_ref` (`pool_id`);
 
 CREATE TABLE `template_store_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `store_id` BIGINT NOT NULL,
-  `template_id` BIGINT NOT NULL,
+  `store_id` BIGINT UNSIGNED NOT NULL,
+  `template_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `download_pct` INT(10) UNSIGNED NULL,
-  `size` BIGINT NULL,
+  `size` BIGINT UNSIGNED NULL,
   `store_role` VARCHAR(255) NULL,
-  `physical_size` BIGINT DEFAULT '0' NULL,
+  `physical_size` BIGINT UNSIGNED DEFAULT '0' NULL,
   `download_state` VARCHAR(255) NULL,
   `error_str` VARCHAR(255) NULL,
   `local_path` VARCHAR(255) NULL,
@@ -4940,8 +4940,8 @@ CREATE TABLE `template_store_ref` (
   COMMENT 'indicates whether the template_store entry was destroyed by the user or not',
   `is_copy` TINYINT(1) DEFAULT '0' NOT NULL
   COMMENT 'indicates whether this was copied',
-  `update_count` BIGINT NULL,
-  `ref_cnt` BIGINT DEFAULT '0' NULL,
+  `update_count` BIGINT UNSIGNED NULL,
+  `ref_cnt` BIGINT UNSIGNED DEFAULT '0' NULL,
   `updated` DATETIME NULL,
   `download_url_created` DATETIME NULL,
   `download_url` VARCHAR(2048) NULL
@@ -4954,10 +4954,10 @@ CREATE INDEX `i_template_store_ref__template_id`
   ON `template_store_ref` (`template_id`);
 
 CREATE TABLE `template_zone_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `zone_id` BIGINT NOT NULL,
-  `template_id` BIGINT NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
+  `template_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `removed` DATETIME NULL
@@ -4977,12 +4977,12 @@ CREATE INDEX `i_template_zone_ref__zone_id`
   ON `template_zone_ref` (`zone_id`);
 
 CREATE TABLE `ucs_blade` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `ucs_manager_id` BIGINT NOT NULL,
-  `host_id` BIGINT NULL,
+  `ucs_manager_id` BIGINT UNSIGNED NOT NULL,
+  `host_id` BIGINT UNSIGNED NULL,
   `dn` VARCHAR(512) NOT NULL,
   `profile_dn` VARCHAR(512) NULL,
   CONSTRAINT `uuid`
@@ -4990,11 +4990,11 @@ CREATE TABLE `ucs_blade` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `ucs_manager` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `zone_id` BIGINT NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(128) NULL,
   `url` VARCHAR(255) NOT NULL,
   `username` VARCHAR(255) NOT NULL,
@@ -5004,10 +5004,10 @@ CREATE TABLE `ucs_manager` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `upload` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL,
-  `type_id` BIGINT NOT NULL,
+  `host_id` BIGINT UNSIGNED NOT NULL,
+  `type_id` BIGINT UNSIGNED NOT NULL,
   `type` VARCHAR(255) NULL,
   `mode` VARCHAR(255) NULL,
   `created` DATETIME NOT NULL,
@@ -5031,29 +5031,29 @@ CREATE INDEX `i_upload__type_id`
   ON `upload` (`type_id`);
 
 CREATE TABLE `usage_event` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `type` VARCHAR(32) NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
-  `zone_id` BIGINT NOT NULL,
-  `resource_id` BIGINT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
+  `resource_id` BIGINT UNSIGNED NULL,
   `resource_name` VARCHAR(255) NULL,
-  `offering_id` BIGINT NULL,
-  `template_id` BIGINT NULL,
-  `size` BIGINT NULL,
+  `offering_id` BIGINT UNSIGNED NULL,
+  `template_id` BIGINT UNSIGNED NULL,
+  `size` BIGINT UNSIGNED NULL,
   `resource_type` VARCHAR(32) NULL,
   `processed` TINYINT DEFAULT '0' NOT NULL,
-  `virtual_size` BIGINT NULL
+  `virtual_size` BIGINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX `i_usage_event__created`
   ON `usage_event` (`created`);
 
 CREATE TABLE `usage_event_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `usage_event_id` BIGINT NOT NULL
+  `usage_event_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'usage event id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -5066,12 +5066,12 @@ CREATE INDEX `i_usage_event_details__usage_event_id`
   ON `usage_event_details` (`usage_event_id`);
 
 CREATE TABLE `user` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `username` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `firstname` VARCHAR(255) NULL,
   `lastname` VARCHAR(255) NULL,
   `email` VARCHAR(255) NULL,
@@ -5116,9 +5116,9 @@ FOREIGN KEY (`autoscale_user_id`) REFERENCES `cloud`.`user` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `user_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `user_id` BIGINT NOT NULL
+  `user_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -5133,34 +5133,34 @@ CREATE INDEX `i_user_details__user_id`
   ON `user_details` (`user_id`);
 
 CREATE TABLE `user_ip_address` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `account_id` BIGINT NULL,
-  `domain_id` BIGINT NULL,
+  `account_id` BIGINT UNSIGNED NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `public_ip_address` CHAR(40) NOT NULL,
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'zone that it belongs to',
   `source_nat` INT(1) UNSIGNED DEFAULT '0' NOT NULL,
   `allocated` DATETIME NULL
   COMMENT 'Date this ip was allocated to someone',
-  `vlan_db_id` BIGINT NOT NULL,
+  `vlan_db_id` BIGINT UNSIGNED NOT NULL,
   `one_to_one_nat` INT(1) UNSIGNED DEFAULT '0' NOT NULL,
-  `vm_id` BIGINT NULL
+  `vm_id` BIGINT UNSIGNED NULL
   COMMENT 'vm id the one_to_one nat ip is assigned to',
   `state` CHAR(32) DEFAULT 'Free' NOT NULL
   COMMENT 'state of the ip address',
-  `mac_address` BIGINT NOT NULL
+  `mac_address` BIGINT UNSIGNED NOT NULL
   COMMENT 'mac address of this ip',
-  `source_network_id` BIGINT NOT NULL
+  `source_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id ip belongs to',
-  `network_id` BIGINT NULL
+  `network_id` BIGINT UNSIGNED NULL
   COMMENT 'network this public ip address is associated with',
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'physical network id that this configuration is based on',
-  `ip_acl_id` BIGINT NOT NULL,
+  `ip_acl_id` BIGINT UNSIGNED NOT NULL,
   `is_system` INT(1) UNSIGNED DEFAULT '0' NOT NULL,
-  `vpc_id` BIGINT NULL
+  `vpc_id` BIGINT UNSIGNED NULL
   COMMENT 'vpc the ip address is associated with',
   `dnat_vmip` VARCHAR(40) NULL,
   `is_portable` INT(1) UNSIGNED DEFAULT '0' NOT NULL,
@@ -5232,9 +5232,9 @@ FOREIGN KEY (`addr_id`) REFERENCES `cloud`.`user_ip_address` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `user_ip_address_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `user_ip_address_id` BIGINT NOT NULL
+  `user_ip_address_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'User ip address id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -5249,24 +5249,24 @@ CREATE INDEX `i_user_ip_address_details__user_ip_address_id`
   ON `user_ip_address_details` (`user_ip_address_id`);
 
 CREATE TABLE `user_ipv6_address` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `account_id` BIGINT NULL,
-  `domain_id` BIGINT NULL,
+  `account_id` BIGINT UNSIGNED NULL,
+  `domain_id` BIGINT UNSIGNED NULL,
   `ip_address` CHAR(50) NOT NULL,
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'zone that it belongs to',
-  `vlan_id` BIGINT NOT NULL,
+  `vlan_id` BIGINT UNSIGNED NOT NULL,
   `state` CHAR(32) DEFAULT 'Free' NOT NULL
   COMMENT 'state of the ip address',
   `mac_address` VARCHAR(40) NOT NULL
   COMMENT 'mac address of this ip',
-  `source_network_id` BIGINT NOT NULL
+  `source_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id ip belongs to',
-  `network_id` BIGINT NULL
+  `network_id` BIGINT UNSIGNED NULL
   COMMENT 'network this public ip address is associated with',
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'physical network id that this configuration is based on',
   `created` DATETIME NULL
   COMMENT 'Date this ip was allocated to someone',
@@ -5307,20 +5307,20 @@ CREATE INDEX `i_user_ipv6_address__vlan_id`
   ON `user_ipv6_address` (`vlan_id`);
 
 CREATE TABLE `user_statistics` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `data_center_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
   `public_ip_address` CHAR(40) NULL,
-  `device_id` BIGINT NOT NULL,
+  `device_id` BIGINT UNSIGNED NOT NULL,
   `device_type` VARCHAR(32) NOT NULL,
-  `network_id` BIGINT NULL,
-  `net_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `net_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_received` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_sent` BIGINT DEFAULT '0' NOT NULL,
+  `network_id` BIGINT UNSIGNED NULL,
+  `net_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_received` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_sent` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
   CONSTRAINT `account_id`
   UNIQUE (`account_id`, `data_center_id`, `public_ip_address`, `device_id`, `device_type`),
   CONSTRAINT `fk_user_statistics__account_id`
@@ -5335,9 +5335,9 @@ CREATE INDEX `i_user_statistics__account_id_data_center_id`
   ON `user_statistics` (`account_id`, `data_center_id`);
 
 CREATE TABLE `user_vm` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `iso_id` BIGINT NULL,
+  `iso_id` BIGINT UNSIGNED NULL,
   `display_name` VARCHAR(255) NULL,
   `user_data` MEDIUMTEXT NULL,
   `update_parameters` TINYINT(1) DEFAULT '1' NOT NULL
@@ -5360,7 +5360,7 @@ FOREIGN KEY (`instance_id`) REFERENCES `cloud`.`user_vm` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `user_vm_clone_setting` (
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'guest VM id'
     PRIMARY KEY,
   `clone_type` VARCHAR(10) NOT NULL
@@ -5368,9 +5368,9 @@ CREATE TABLE `user_vm_clone_setting` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user_vm_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(5120) NULL,
@@ -5385,7 +5385,7 @@ CREATE INDEX `i_name_vm_id`
   ON `user_vm_details` (`vm_id`, `name`);
 
 CREATE TABLE `version` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `version` CHAR(40) NOT NULL
@@ -5402,24 +5402,24 @@ CREATE INDEX `i_version__version`
   ON `version` (`version`);
 
 CREATE TABLE `vgpu_types` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `gpu_group_id` BIGINT NOT NULL,
+  `gpu_group_id` BIGINT UNSIGNED NOT NULL,
   `vgpu_type` VARCHAR(40) NOT NULL
   COMMENT 'vgpu type supported by this gpu group',
-  `video_ram` BIGINT NULL
+  `video_ram` BIGINT UNSIGNED NULL
   COMMENT 'video RAM for this vgpu type',
-  `max_heads` BIGINT NULL
+  `max_heads` BIGINT UNSIGNED NULL
   COMMENT 'maximum displays per user',
-  `max_resolution_x` BIGINT NULL
+  `max_resolution_x` BIGINT UNSIGNED NULL
   COMMENT 'maximum X resolution per display',
-  `max_resolution_y` BIGINT NULL
+  `max_resolution_y` BIGINT UNSIGNED NULL
   COMMENT 'maximum Y resolution per display',
-  `max_vgpu_per_pgpu` BIGINT NULL
+  `max_vgpu_per_pgpu` BIGINT UNSIGNED NULL
   COMMENT 'max number of vgpus per physical gpu (pgpu)',
-  `remaining_capacity` BIGINT NULL
+  `remaining_capacity` BIGINT UNSIGNED NULL
   COMMENT 'remaining vgpu can be created with this vgpu_type on the given gpu group',
-  `max_capacity` BIGINT NULL
+  `max_capacity` BIGINT UNSIGNED NULL
   COMMENT 'maximum vgpu can be created with this vgpu_type on the given gpu group',
   CONSTRAINT `fk_vgpu_types__gpu_group_id`
   FOREIGN KEY (`gpu_group_id`) REFERENCES `cloud`.`host_gpu_groups` (`id`)
@@ -5430,10 +5430,10 @@ CREATE INDEX `i_vgpu_types__gpu_group_id`
   ON `vgpu_types` (`gpu_group_id`);
 
 CREATE TABLE `virtual_router_providers` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `nsp_id` BIGINT NOT NULL
+  `nsp_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Network Service Provider ID',
   `uuid` VARCHAR(40) NULL,
   `type` VARCHAR(255) NOT NULL
@@ -5457,7 +5457,7 @@ ALTER TABLE `domain_router`
 FOREIGN KEY (`element_id`) REFERENCES `cloud`.`virtual_router_providers` (`id`);
 
 CREATE TABLE `virtual_supervisor_module` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -5470,14 +5470,14 @@ CREATE TABLE `virtual_supervisor_module` (
   `control_vlan` INT(32) NULL,
   `packet_vlan` INT(32) NULL,
   `storage_vlan` INT(32) NULL,
-  `vsm_domain_id` BIGINT NULL,
+  `vsm_domain_id` BIGINT UNSIGNED NULL,
   `config_mode` VARCHAR(20) NULL,
   `config_state` VARCHAR(20) NULL,
   `vsm_device_state` VARCHAR(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vlan` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
   `vlan_id` VARCHAR(255) NULL,
@@ -5485,10 +5485,10 @@ CREATE TABLE `vlan` (
   `vlan_netmask` VARCHAR(255) NULL,
   `description` VARCHAR(255) NULL,
   `vlan_type` VARCHAR(255) NULL,
-  `data_center_id` BIGINT NOT NULL,
-  `network_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of corresponding network offering',
-  `physical_network_id` BIGINT NOT NULL
+  `physical_network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'physical network id that this configuration is based on',
   `ip6_gateway` VARCHAR(255) NULL,
   `ip6_cidr` VARCHAR(255) NULL,
@@ -5537,10 +5537,10 @@ FOREIGN KEY (`vlan_id`) REFERENCES `cloud`.`vlan` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `vm_compute_tags` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
   `compute_tag` VARCHAR(255) NOT NULL
   COMMENT 'name of tag'
@@ -5550,24 +5550,24 @@ CREATE INDEX `i_vm_id`
   ON `vm_compute_tags` (`vm_id`);
 
 CREATE TABLE `vm_disk_statistics` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `data_center_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `vm_id` BIGINT NOT NULL,
-  `volume_id` BIGINT DEFAULT '0' NOT NULL,
-  `net_io_read` BIGINT DEFAULT '0' NOT NULL,
-  `net_io_write` BIGINT DEFAULT '0' NOT NULL,
-  `current_io_read` BIGINT DEFAULT '0' NOT NULL,
-  `current_io_write` BIGINT DEFAULT '0' NOT NULL,
-  `agg_io_read` BIGINT DEFAULT '0' NOT NULL,
-  `agg_io_write` BIGINT DEFAULT '0' NOT NULL,
-  `net_bytes_read` BIGINT DEFAULT '0' NOT NULL,
-  `net_bytes_write` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_read` BIGINT DEFAULT '0' NOT NULL,
-  `current_bytes_write` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_read` BIGINT DEFAULT '0' NOT NULL,
-  `agg_bytes_write` BIGINT DEFAULT '0' NOT NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `vm_id` BIGINT UNSIGNED NOT NULL,
+  `volume_id` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_io_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_io_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_io_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_io_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_io_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_io_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_bytes_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `net_bytes_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `current_bytes_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_read` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
+  `agg_bytes_write` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
   CONSTRAINT `account_id`
   UNIQUE (`account_id`, `data_center_id`, `vm_id`, `volume_id`),
   CONSTRAINT `fk_vm_disk_statistics__account_id`
@@ -5582,24 +5582,24 @@ CREATE INDEX `i_vm_disk_statistics__account_id_data_center_id`
   ON `vm_disk_statistics` (`account_id`, `data_center_id`);
 
 CREATE TABLE `vm_instance` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `uuid` VARCHAR(40) NULL,
   `instance_name` VARCHAR(255) NOT NULL
   COMMENT 'name of the vm instance running on the hosts',
   `state` VARCHAR(32) NOT NULL,
-  `vm_template_id` BIGINT NULL,
-  `guest_os_id` BIGINT NOT NULL,
+  `vm_template_id` BIGINT UNSIGNED NULL,
+  `guest_os_id` BIGINT UNSIGNED NOT NULL,
   `private_mac_address` VARCHAR(17) NULL,
   `private_ip_address` CHAR(40) NULL,
-  `pod_id` BIGINT NULL,
-  `data_center_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NULL,
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'Data Center the instance belongs to',
-  `host_id` BIGINT NULL,
-  `last_host_id` BIGINT NULL
+  `host_id` BIGINT UNSIGNED NULL,
+  `last_host_id` BIGINT UNSIGNED NULL
   COMMENT 'tentative host for first run or last host that it has been running on',
-  `proxy_id` BIGINT NULL
+  `proxy_id` BIGINT UNSIGNED NULL
   COMMENT 'console proxy allocated in previous session',
   `proxy_assign_time` DATETIME NULL
   COMMENT 'time when console proxy was assigned',
@@ -5609,7 +5609,7 @@ CREATE TABLE `vm_instance` (
   COMMENT 'Should HA be enabled for this VM',
   `limit_cpu_use` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'Limit the cpu usage to service offering',
-  `update_count` BIGINT DEFAULT '0' NOT NULL
+  `update_count` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'date state was updated',
   `update_time` DATETIME NULL
   COMMENT 'date the destroy was requested',
@@ -5621,16 +5621,16 @@ CREATE TABLE `vm_instance` (
   COMMENT 'type of vm it is',
   `vm_type` VARCHAR(32) NOT NULL
   COMMENT 'vm type',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'user id of owner',
-  `domain_id` BIGINT NOT NULL,
-  `service_offering_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL,
+  `service_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'service offering id',
   `reservation_id` CHAR(40) NULL
   COMMENT 'reservation id',
   `hypervisor_type` CHAR(32) NULL
   COMMENT 'hypervisor type',
-  `disk_offering_id` BIGINT NULL,
+  `disk_offering_id` BIGINT UNSIGNED NULL,
   `owner` VARCHAR(255) NULL,
   `host_name` VARCHAR(255) NULL,
   `display_name` VARCHAR(255) NULL,
@@ -5642,8 +5642,8 @@ CREATE TABLE `vm_instance` (
   `power_state` VARCHAR(74) DEFAULT 'PowerUnknown' NULL,
   `power_state_update_time` DATETIME NULL,
   `power_state_update_count` INT DEFAULT '0' NULL,
-  `power_host` BIGINT NULL,
-  `user_id` BIGINT DEFAULT '1' NOT NULL
+  `power_host` BIGINT UNSIGNED NULL,
+  `user_id` BIGINT UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'user id of VM deployer',
   CONSTRAINT `uc_vm_instance_uuid`
   UNIQUE (`uuid`),
@@ -5770,12 +5770,12 @@ FOREIGN KEY (`vm_id`) REFERENCES `cloud`.`vm_instance` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `vm_network_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -5783,20 +5783,20 @@ CREATE INDEX `i_vm_id`
   ON `vm_network_map` (`vm_id`);
 
 CREATE TABLE `vm_reservation` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NOT NULL
   COMMENT 'reservation id',
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'zone id',
-  `pod_id` BIGINT NOT NULL
+  `pod_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pod id',
-  `cluster_id` BIGINT NOT NULL
+  `cluster_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'cluster id',
-  `host_id` BIGINT NOT NULL
+  `host_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'host id',
   `created` DATETIME NULL
   COMMENT 'date created',
@@ -5809,10 +5809,10 @@ CREATE TABLE `vm_reservation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vm_root_disk_tags` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
   `root_disk_tag` VARCHAR(255) NOT NULL
   COMMENT 'name of tag'
@@ -5822,9 +5822,9 @@ CREATE INDEX `i_vm_id`
   ON `vm_root_disk_tags` (`vm_id`);
 
 CREATE TABLE `vm_snapshot_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vm_snapshot_id` BIGINT NOT NULL,
+  `vm_snapshot_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(255) NOT NULL,
   `display` TINYINT(1) DEFAULT '1' NOT NULL
@@ -5832,21 +5832,21 @@ CREATE TABLE `vm_snapshot_details` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vm_snapshots` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'Primary Key'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `display_name` VARCHAR(255) NULL,
   `description` VARCHAR(255) NULL,
-  `vm_id` BIGINT NOT NULL,
-  `account_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `vm_id` BIGINT UNSIGNED NOT NULL,
+  `account_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `vm_snapshot_type` VARCHAR(32) NULL,
   `state` VARCHAR(32) NOT NULL,
-  `parent` BIGINT NULL,
+  `parent` BIGINT UNSIGNED NULL,
   `current` INT(1) UNSIGNED NULL,
-  `update_count` BIGINT DEFAULT '0' NOT NULL,
+  `update_count` BIGINT UNSIGNED DEFAULT '0' NOT NULL,
   `updated` DATETIME NULL,
   `created` DATETIME NULL,
   `removed` DATETIME NULL,
@@ -5882,7 +5882,7 @@ CREATE INDEX `vm_snapshots_vm_id`
   ON `vm_snapshots` (`vm_id`);
 
 CREATE TABLE `vm_template` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `unique_name` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
@@ -5902,7 +5902,7 @@ CREATE TABLE `vm_template` (
   COMMENT 'Date created',
   `removed` DATETIME NULL
   COMMENT 'Date removed if not null',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the account that created this template',
   `checksum` VARCHAR(255) NULL
   COMMENT 'checksum for the template root disk',
@@ -5912,7 +5912,7 @@ CREATE TABLE `vm_template` (
   COMMENT 'true if this template supports password reset',
   `enable_sshkey` INT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'true if this template supports sshkey reset',
-  `guest_os_id` BIGINT NOT NULL
+  `guest_os_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'the OS of the template',
   `bootable` INT(1) UNSIGNED DEFAULT '1' NOT NULL
   COMMENT 'true if this template represents a bootable ISO',
@@ -5924,15 +5924,15 @@ CREATE TABLE `vm_template` (
   COMMENT 'Is this template extractable',
   `hypervisor_type` VARCHAR(32) NULL
   COMMENT 'hypervisor that the template belongs to',
-  `source_template_id` BIGINT NULL
+  `source_template_id` BIGINT UNSIGNED NULL
   COMMENT 'Id of the original template, if this template is created from snapshot',
   `template_tag` VARCHAR(255) NULL
   COMMENT 'template tag',
   `sort_key` INT(32) DEFAULT '0' NOT NULL
   COMMENT 'sort key used for customising sort method',
-  `size` BIGINT NULL,
+  `size` BIGINT UNSIGNED NULL,
   `state` VARCHAR(255) NULL,
-  `update_count` BIGINT NULL,
+  `update_count` BIGINT UNSIGNED NULL,
   `updated` DATETIME NULL,
   `dynamically_scalable` TINYINT(1) UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'true if template contains XS/VMWare tools inorder to support dynamic scaling of VM cpu/memory',
@@ -5968,9 +5968,9 @@ ALTER TABLE `vm_instance`
 FOREIGN KEY (`vm_template_id`) REFERENCES `cloud`.`vm_template` (`id`);
 
 CREATE TABLE `vm_template_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `template_id` BIGINT NOT NULL
+  `template_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'template id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -5985,13 +5985,13 @@ CREATE INDEX `i_vm_template_details__template_id`
   ON `vm_template_details` (`template_id`);
 
 CREATE TABLE `vm_work_job` (
-  `id` BIGINT NOT NULL
+  `id` BIGINT UNSIGNED NOT NULL
     PRIMARY KEY,
   `step` CHAR(32) NOT NULL
   COMMENT 'state',
   `vm_type` CHAR(32) NOT NULL
   COMMENT 'type of vm',
-  `vm_instance_id` BIGINT NOT NULL
+  `vm_instance_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm instance',
   CONSTRAINT `fk_vm_work_job__instance_id`
   FOREIGN KEY (`vm_instance_id`) REFERENCES `cloud`.`vm_instance` (`id`)
@@ -6008,7 +6008,7 @@ CREATE INDEX `i_vm_work_job__vm`
   ON `vm_work_job` (`vm_type`, `vm_instance_id`);
 
 CREATE TABLE `vmware_data_center` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(255) NULL,
@@ -6029,12 +6029,12 @@ CREATE TABLE `vmware_data_center` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vmware_data_center_zone_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `zone_id` BIGINT NOT NULL
+  `zone_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of CloudStack zone',
-  `vmware_data_center_id` BIGINT NOT NULL
+  `vmware_data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of VMware datacenter',
   CONSTRAINT `zone_id`
   UNIQUE (`zone_id`),
@@ -6046,9 +6046,9 @@ CREATE TABLE `vmware_data_center_zone_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `volume_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `volume_id` BIGINT NOT NULL
+  `volume_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'volume id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -6060,17 +6060,17 @@ CREATE INDEX `i_volume_details__volume_id`
   ON `volume_details` (`volume_id`);
 
 CREATE TABLE `volume_host_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `host_id` BIGINT NOT NULL,
-  `volume_id` BIGINT NOT NULL,
-  `zone_id` BIGINT NOT NULL,
+  `host_id` BIGINT UNSIGNED NOT NULL,
+  `volume_id` BIGINT UNSIGNED NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `download_pct` INT(10) UNSIGNED NULL,
-  `size` BIGINT NULL,
-  `physical_size` BIGINT DEFAULT '0' NULL,
+  `size` BIGINT UNSIGNED NULL,
+  `physical_size` BIGINT UNSIGNED DEFAULT '0' NULL,
   `download_state` VARCHAR(255) NULL,
   `checksum` VARCHAR(255) NULL
   COMMENT 'checksum for the data disk',
@@ -6094,16 +6094,16 @@ CREATE INDEX `i_volume_host_ref__volume_id`
   ON `volume_host_ref` (`volume_id`);
 
 CREATE TABLE `volume_reservation` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
-  `vm_reservation_id` BIGINT NOT NULL
+  `vm_reservation_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the vm reservation',
-  `vm_id` BIGINT NOT NULL
+  `vm_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vm id',
-  `volume_id` BIGINT NOT NULL
+  `volume_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'volume id',
-  `pool_id` BIGINT NOT NULL
+  `pool_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'pool assigned to the volume',
   CONSTRAINT `fk_vm_pool_reservation__vm_reservation_id`
   FOREIGN KEY (`vm_reservation_id`) REFERENCES `cloud`.`vm_reservation` (`id`)
@@ -6114,17 +6114,17 @@ CREATE INDEX `i_vm_pool_reservation__vm_reservation_id`
   ON `volume_reservation` (`vm_reservation_id`);
 
 CREATE TABLE `volume_store_ref` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `store_id` BIGINT NOT NULL,
-  `volume_id` BIGINT NOT NULL,
-  `zone_id` BIGINT NOT NULL,
+  `store_id` BIGINT UNSIGNED NOT NULL,
+  `volume_id` BIGINT UNSIGNED NOT NULL,
+  `zone_id` BIGINT UNSIGNED NOT NULL,
   `created` DATETIME NOT NULL,
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `download_pct` INT(10) UNSIGNED NULL,
-  `size` BIGINT NULL,
-  `physical_size` BIGINT DEFAULT '0' NULL,
+  `size` BIGINT UNSIGNED NULL,
+  `physical_size` BIGINT UNSIGNED DEFAULT '0' NULL,
   `download_state` VARCHAR(255) NULL,
   `checksum` VARCHAR(255) NULL
   COMMENT 'checksum for the data disk',
@@ -6136,8 +6136,8 @@ CREATE TABLE `volume_store_ref` (
   `state` VARCHAR(255) NOT NULL,
   `destroyed` TINYINT(1) NULL
   COMMENT 'indicates whether the volume_host entry was destroyed by the user or not',
-  `update_count` BIGINT NULL,
-  `ref_cnt` BIGINT NULL,
+  `update_count` BIGINT UNSIGNED NULL,
+  `ref_cnt` BIGINT UNSIGNED NULL,
   `updated` DATETIME NULL,
   `download_url_created` DATETIME NULL,
   CONSTRAINT `fk_volume_store_ref__store_id`
@@ -6152,33 +6152,33 @@ CREATE INDEX `i_volume_store_ref__volume_id`
   ON `volume_store_ref` (`volume_id`);
 
 CREATE TABLE `volumes` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'Primary Key'
     PRIMARY KEY,
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner.  foreign key to account table',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'the domain that the owner belongs to',
-  `pool_id` BIGINT NULL
+  `pool_id` BIGINT UNSIGNED NULL
   COMMENT 'pool it belongs to. foreign key to storage_pool table',
-  `last_pool_id` BIGINT NULL
+  `last_pool_id` BIGINT UNSIGNED NULL
   COMMENT 'last pool it belongs to.',
-  `instance_id` BIGINT NULL
+  `instance_id` BIGINT UNSIGNED NULL
   COMMENT 'vm instance it belongs to. foreign key to vm_instance table',
-  `device_id` BIGINT NULL
+  `device_id` BIGINT UNSIGNED NULL
   COMMENT 'which device inside vm instance it is',
   `name` VARCHAR(255) NULL
   COMMENT 'A user specified name for the volume',
   `uuid` VARCHAR(40) NULL,
-  `size` BIGINT NOT NULL
+  `size` BIGINT UNSIGNED NOT NULL
   COMMENT 'total size',
   `folder` VARCHAR(255) NULL
   COMMENT 'The folder where the volume is saved',
   `path` VARCHAR(255) NULL
   COMMENT 'Path',
-  `pod_id` BIGINT NULL
+  `pod_id` BIGINT UNSIGNED NULL
   COMMENT 'pod this volume belongs to',
-  `data_center_id` BIGINT NOT NULL
+  `data_center_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'data center this volume belongs to',
   `iscsi_name` VARCHAR(255) NULL
   COMMENT 'iscsi target name',
@@ -6188,9 +6188,9 @@ CREATE TABLE `volumes` (
   COMMENT 'root, swap or data',
   `pool_type` VARCHAR(64) NULL
   COMMENT 'type of the pool',
-  `disk_offering_id` BIGINT NOT NULL
+  `disk_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'can be null for system VMs',
-  `template_id` BIGINT NULL
+  `template_id` BIGINT UNSIGNED NULL
   COMMENT 'fk to vm_template.id',
   `first_snapshot_backup_uuid` VARCHAR(255) NULL
   COMMENT 'The first snapshot that was ever taken for this volume',
@@ -6208,19 +6208,19 @@ CREATE TABLE `volumes` (
   COMMENT 'State machine',
   `chain_info` TEXT NULL
   COMMENT 'save possible disk chain info in primary storage',
-  `update_count` BIGINT DEFAULT '0' NOT NULL
+  `update_count` BIGINT UNSIGNED DEFAULT '0' NOT NULL
   COMMENT 'date state was updated',
   `disk_type` VARCHAR(255) NULL,
-  `vm_snapshot_chain_size` BIGINT NULL,
-  `iso_id` BIGINT NULL
+  `vm_snapshot_chain_size` BIGINT UNSIGNED NULL,
+  `iso_id` BIGINT UNSIGNED NULL
   COMMENT 'The id of the iso from which the volume was created',
   `display_volume` TINYINT(1) DEFAULT '1' NOT NULL
   COMMENT 'Should volume be displayed to the end user',
   `format` VARCHAR(255) NULL
   COMMENT 'volume format',
-  `min_iops` BIGINT NULL
+  `min_iops` BIGINT UNSIGNED NULL
   COMMENT 'Minimum IOPS',
-  `max_iops` BIGINT NULL
+  `max_iops` BIGINT UNSIGNED NULL
   COMMENT 'Maximum IOPS',
   `hv_ss_reserve` INT(32) UNSIGNED NULL
   COMMENT 'Hypervisor snapshot reserve space as a percent of a volume (for managed storage using Xen or VMware)',
@@ -6281,7 +6281,7 @@ ALTER TABLE `volume_store_ref`
 FOREIGN KEY (`volume_id`) REFERENCES `cloud`.`volumes` (`id`);
 
 CREATE TABLE `vpc` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NOT NULL,
@@ -6291,15 +6291,15 @@ CREATE TABLE `vpc` (
   COMMENT 'vpc display text',
   `cidr` VARCHAR(18) NULL
   COMMENT 'vpc cidr',
-  `vpc_offering_id` BIGINT NOT NULL
+  `vpc_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vpc offering id that this vpc is created from',
-  `zone_id` BIGINT NOT NULL
+  `zone_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'the id of the zone this Vpc belongs to',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'state of the VP (can be Enabled and Disabled)',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain the vpc belongs to',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner of this vpc',
   `network_domain` VARCHAR(255) NULL
   COMMENT 'network domain',
@@ -6377,9 +6377,9 @@ FOREIGN KEY (`vpc_id`) REFERENCES `cloud`.`vpc` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `vpc_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vpc_id` BIGINT NOT NULL
+  `vpc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -6394,9 +6394,9 @@ CREATE INDEX `i_vpc_details__vpc_id`
   ON `vpc_details` (`vpc_id`);
 
 CREATE TABLE `vpc_gateway_details` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vpc_gateway_id` BIGINT NOT NULL
+  `vpc_gateway_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'VPC gateway id',
   `name` VARCHAR(255) NOT NULL,
   `value` VARCHAR(1024) NOT NULL,
@@ -6408,7 +6408,7 @@ CREATE INDEX `i_vpc_gateway_details__vpc_gateway_id`
   ON `vpc_gateway_details` (`vpc_gateway_id`);
 
 CREATE TABLE `vpc_gateways` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -6416,24 +6416,24 @@ CREATE TABLE `vpc_gateways` (
   COMMENT 'ip4 address of the gateway',
   `type` VARCHAR(32) NULL
   COMMENT 'type of gateway; can be Public/Private/Vpn',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id vpc gateway belongs to',
-  `vpc_id` BIGINT NOT NULL
+  `vpc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the vpc the gateway belongs to',
-  `zone_id` BIGINT NOT NULL
+  `zone_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the zone the gateway belongs to',
   `created` DATETIME NULL
   COMMENT 'date created',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'what state the vpc gateway in',
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
   `source_nat` TINYINT(1) DEFAULT '0' NULL,
-  `network_acl_id` BIGINT DEFAULT '1' NOT NULL,
+  `network_acl_id` BIGINT UNSIGNED DEFAULT '1' NOT NULL,
   CONSTRAINT `uc_vpc_gateways__uuid`
   UNIQUE (`uuid`),
   CONSTRAINT `fk_vpc_gateways__network_id`
@@ -6474,7 +6474,7 @@ FOREIGN KEY (`vpc_gateway_id`) REFERENCES `cloud`.`vpc_gateways` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `vpc_gateways_pre530` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
@@ -6487,24 +6487,24 @@ CREATE TABLE `vpc_gateways_pre530` (
   `vlan_tag` VARCHAR(255) NULL,
   `type` VARCHAR(32) NULL
   COMMENT 'type of gateway; can be Public/Private/Vpn',
-  `network_id` BIGINT NOT NULL
+  `network_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'network id vpc gateway belongs to',
-  `vpc_id` BIGINT NOT NULL
+  `vpc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the vpc the gateway belongs to',
-  `zone_id` BIGINT NOT NULL
+  `zone_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'id of the zone the gateway belongs to',
   `created` DATETIME NULL
   COMMENT 'date created',
-  `account_id` BIGINT NOT NULL
+  `account_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'owner id',
-  `domain_id` BIGINT NOT NULL
+  `domain_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'domain id',
   `state` VARCHAR(32) NOT NULL
   COMMENT 'what state the vpc gateway in',
   `removed` DATETIME NULL
   COMMENT 'date removed if not null',
   `source_nat` TINYINT(1) DEFAULT '0' NULL,
-  `network_acl_id` BIGINT DEFAULT '1' NOT NULL,
+  `network_acl_id` BIGINT UNSIGNED DEFAULT '1' NOT NULL,
   CONSTRAINT `uc_vpc_gateways__uuid`
   UNIQUE (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -6528,9 +6528,9 @@ CREATE INDEX `i_vpc_gateways__removed`
   ON `vpc_gateways_pre530` (`removed`);
 
 CREATE TABLE `vpc_offering_service_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vpc_offering_id` BIGINT NOT NULL
+  `vpc_offering_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vpc_offering_id',
   `service` VARCHAR(255) NOT NULL
   COMMENT 'service',
@@ -6543,7 +6543,7 @@ CREATE TABLE `vpc_offering_service_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vpc_offerings` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
   COMMENT 'id'
     PRIMARY KEY,
   `uuid` VARCHAR(40) NOT NULL,
@@ -6561,12 +6561,12 @@ CREATE TABLE `vpc_offerings` (
   COMMENT 'date removed if not null',
   `created` DATETIME NOT NULL
   COMMENT 'date created',
-  `service_offering_id` BIGINT NULL
+  `service_offering_id` BIGINT UNSIGNED NULL
   COMMENT 'service offering id that virtual router is tied to',
   `supports_distributed_router` TINYINT(1) DEFAULT '0' NULL,
   `supports_region_level_vpc` TINYINT(1) DEFAULT '0' NULL,
   `redundant_router_service` TINYINT(1) DEFAULT '0' NULL,
-  `secondary_service_offering_id` BIGINT NULL
+  `secondary_service_offering_id` BIGINT UNSIGNED NULL
   COMMENT 'service offering id that a secondary virtual router is tied to',
   CONSTRAINT `unique_name`
   UNIQUE (`unique_name`),
@@ -6591,9 +6591,9 @@ FOREIGN KEY (`vpc_offering_id`) REFERENCES `cloud`.`vpc_offerings` (`id`)
   ON DELETE CASCADE;
 
 CREATE TABLE `vpc_service_map` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
-  `vpc_id` BIGINT NOT NULL
+  `vpc_id` BIGINT UNSIGNED NOT NULL
   COMMENT 'vpc_id',
   `service` VARCHAR(255) NOT NULL
   COMMENT 'service',
@@ -6609,11 +6609,11 @@ CREATE TABLE `vpc_service_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `vpn_users` (
-  `id` BIGINT AUTO_INCREMENT
+  `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
   `uuid` VARCHAR(40) NULL,
-  `owner_id` BIGINT NOT NULL,
-  `domain_id` BIGINT NOT NULL,
+  `owner_id` BIGINT UNSIGNED NOT NULL,
+  `domain_id` BIGINT UNSIGNED NOT NULL,
   `username` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
   `state` CHAR(32) NOT NULL
