@@ -31,6 +31,7 @@ public class FlywayDB {
 
         final Flyway flyway = new Flyway();
         flyway.setDataSource(dataSource);
+        flyway.setEncoding("UTF-8");
 
         try {
             flyway.migrate();
