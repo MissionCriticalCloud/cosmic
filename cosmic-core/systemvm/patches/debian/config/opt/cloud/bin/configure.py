@@ -10,13 +10,13 @@ from fcntl import flock, LOCK_EX, LOCK_UN
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsDataBag
 from cs.CsDhcp import CsDhcp
+from cs.CsHelper import get_systemvm_version
 from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
+from cs.CsPrivateGateway import CsPrivateGateway
 from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
-from cs.CsPrivateGateway import CsPrivateGateway
-from cs.CsHelper import get_systemvm_version
 from cs.CsVrConfig import CsVrConfig
 
 OCCURRENCES = 1
@@ -69,7 +69,7 @@ class CsAcl(CsDataBag):
             rnge = ''
             if "first_port" in self.rule.keys() and \
                             self.rule['first_port'] == self.rule['last_port']:
-                rnge = " --dport %s " %self.rule['first_port']
+                rnge = " --dport %s " % self.rule['first_port']
             if "first_port" in self.rule.keys() and \
                             self.rule['first_port'] != self.rule['last_port']:
                 rnge = " --dport %s:%s" % (rule['first_port'], rule['last_port'])
@@ -159,7 +159,8 @@ class CsAcl(CsDataBag):
 
             # to drop traffic destined to public ips
             if hasattr(self, 'public_ip'):
-                self.fw.append(["mangle", "", "-A ACL_PUBLIC_IP_%s -d %s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [public ip] \" --log-level 4" % (self.device, self.public_ip)])
+                self.fw.append(["mangle", "", "-A ACL_PUBLIC_IP_%s -d %s -m limit --limit 2/second -j LOG  --log-prefix \"iptables denied: [public ip] \" --log-level 4" % (
+                    self.device, self.public_ip)])
                 self.fw.append(["mangle", "", "-A ACL_PUBLIC_IP_%s -d %s -j DROP" % (self.device, self.public_ip)])
             # rule below moved from CsAddress to replicate default behaviour
             # default behaviour is that only if one or more egress rules exist
@@ -442,13 +443,27 @@ class CsSite2SiteVpn(CsDataBag):
                 logging.error("Request for ipsec to %s not possible because ip is not configured", local_ip)
                 continue
 
-            CsHelper.start_if_stopped("ipsec")
             self.configure_iptables(dev, self.dbag[vpn])
             self.configure_ipsec(self.dbag[vpn])
 
         # Delete vpns that are no longer in the configuration
         for ip in self.confips:
             self.deletevpn(ip)
+
+        self.check_ipsec()
+
+    def check_ipsec(self):
+        CsHelper.start_if_stopped("ipsec")
+
+        logging.info("Checking if ipsec is running correctly: service ipsec status")
+        p = CsHelper.execute2("service ipsec status", log=False)
+
+        out, _ = p.communicate()
+
+        if "Security Associations" not in out:
+            logging.error("Security Associations not found in: %s" % out)
+            CsHelper.execute2("service ipsec stop")
+            CsHelper.execute2("service ipsec start")
 
     def deletevpn(self, ip):
         logging.info("Removing VPN configuration for %s", ip)
@@ -480,19 +495,15 @@ class CsSite2SiteVpn(CsDataBag):
         peerlist = obj['peer_guest_cidr_list'].split(',')
         vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, rightpeer)
         vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, rightpeer)
-        ikepolicy=obj['ike_policy'].replace(';','-')
-        esppolicy=obj['esp_policy'].replace(';','-')
+        ikepolicy = obj['ike_policy'].replace(';', '-')
+        esppolicy = obj['esp_policy'].replace(';', '-')
 
-        strokefile='/etc/strongswan.d/charon/stroke.conf'
+        strokefile = '/etc/strongswan.d/charon/stroke.conf'
 
         # Set timeout to 30s
         file = CsFile(strokefile)
         file.greplace("# timeout = 0", "timeout = 30000")
         file.commit()
-
-        pfs='no'
-        if 'modp' in esppolicy:
-            pfs='yes'
 
         if rightpeer in self.confips:
             self.confips.remove(rightpeer)
@@ -503,8 +514,8 @@ class CsSite2SiteVpn(CsDataBag):
                 file.add("#conn for vpn-%s" % rightpeer, -1)
                 file.add("conn vpn-%s" % rightpeer, -1)
             else:
-                file.add("#conn for vpn-%s-%i" % (rightpeer,idx), -1)
-                file.add("conn vpn-%s-%i" % (rightpeer,idx), -1)
+                file.add("#conn for vpn-%s-%i" % (rightpeer, idx), -1)
+                file.add("conn vpn-%s-%i" % (rightpeer, idx), -1)
             file.add(" left=%s" % leftpeer, -1)
             file.add(" leftsubnet=%s" % obj['local_guest_cidr'], -1)
             file.add(" right=%s" % rightpeer, -1)
@@ -521,7 +532,7 @@ class CsSite2SiteVpn(CsDataBag):
             file.add(" closeaction=restart", -1)
             file.add(" inactivity=0", -1)
             if 'encap' not in obj:
-                obj['encap']=False
+                obj['encap'] = False
             file.add(" forceencaps=%s" % CsHelper.bool_to_yn(obj['encap']), -1)
             if obj['dpd']:
                 file.add(" dpddelay=30", -1)
@@ -537,12 +548,13 @@ class CsSite2SiteVpn(CsDataBag):
             CsHelper.execute("ipsec rereadsecrets")
 
         # This will load the new config and start the connection when needed since auto=start in the config
-        CsHelper.execute("ipsec reload")
         os.chmod(vpnsecretsfile, 0400)
+        CsHelper.execute("ipsec reload")
 
     def convert_sec_to_h(self, val):
         hrs = int(val) / 3600
         return "%sh" % hrs
+
 
 class CsSite2SiteVpnOpenSwan(CsDataBag):
     """
@@ -725,14 +737,14 @@ class CsRemoteAccessVpn(CsDataBag):
         for public_ip in self.dbag:
             if public_ip == "id":
                 continue
-            vpnconfig=self.dbag[public_ip]
+            vpnconfig = self.dbag[public_ip]
 
             # Enable remote access vpn
             if vpnconfig['create']:
-                logging.debug("Enabling  remote access vpn  on "+ public_ip)
+                logging.debug("Enabling  remote access vpn  on " + public_ip)
                 CsHelper.start_if_stopped("ipsec")
                 self.configure_l2tpIpsec(public_ip, self.dbag[public_ip])
-                logging.debug("Remote accessvpn  data bag %s",  self.dbag)
+                logging.debug("Remote accessvpn  data bag %s", self.dbag)
                 self.remoteaccessvpn_iptables(public_ip, self.dbag[public_ip])
 
                 CsHelper.execute("ipsec update")
@@ -744,21 +756,20 @@ class CsRemoteAccessVpn(CsDataBag):
                 CsHelper.execute("ipsec down L2TP-PSK")
                 CsHelper.execute("service xl2tpd stop")
 
-    def configure_l2tpIpsec(self, left,  obj):
-        l2tpconffile="%s/l2tp.conf" % (self.VPNCONFDIR)
-        vpnsecretfilte="%s/ipsec.any.secrets" % (self.VPNCONFDIR)
-        xl2tpdconffile="/etc/xl2tpd/xl2tpd.conf"
-        xl2tpoptionsfile='/etc/ppp/options.xl2tpd'
-        strokefile='/etc/strongswan.d/charon/stroke.conf'
-        ipsecconf='/etc/ipsec.conf'
+    def configure_l2tpIpsec(self, left, obj):
+        l2tpconffile = "%s/l2tp.conf" % (self.VPNCONFDIR)
+        vpnsecretfilte = "%s/ipsec.any.secrets" % (self.VPNCONFDIR)
+        xl2tpdconffile = "/etc/xl2tpd/xl2tpd.conf"
+        xl2tpoptionsfile = '/etc/ppp/options.xl2tpd'
+        strokefile = '/etc/strongswan.d/charon/stroke.conf'
+        ipsecconf = '/etc/ipsec.conf'
 
         file = CsFile(l2tpconffile)
-        localip=obj['local_ip']
-        iprange=obj['ip_range']
-        psk=obj['preshared_key']
+        localip = obj['local_ip']
+        iprange = obj['ip_range']
+        psk = obj['preshared_key']
 
         # l2tp config options
-        file.search("pfs=", "        pfs=no")
         file.search("rekey=", "        rekey=no")
         file.search("keyingtries=", "        keyingtries=3")
         file.search("keyexchange=", "        keyexchange=ikev1")
@@ -789,22 +800,22 @@ class CsRemoteAccessVpn(CsDataBag):
 
         # Secrets
         secret = CsFile(vpnsecretfilte)
-        secret.addeq(": PSK \"%s\"" %psk)
+        secret.addeq(": PSK \"%s\"" % psk)
         secret.commit()
 
         xl2tpdconf = CsFile(xl2tpdconffile)
-        xl2tpdconf.addeq("ip range = %s" %iprange)
-        xl2tpdconf.addeq("local ip = %s" %localip)
+        xl2tpdconf.addeq("ip range = %s" % iprange)
+        xl2tpdconf.addeq("local ip = %s" % localip)
         xl2tpdconf.commit()
 
-        xl2tpoptions=CsFile(xl2tpoptionsfile)
-        xl2tpoptions.search("ms-dns ", "ms-dns %s" %localip)
+        xl2tpoptions = CsFile(xl2tpoptionsfile)
+        xl2tpoptions.search("ms-dns ", "ms-dns %s" % localip)
         xl2tpoptions.commit()
 
     def remoteaccessvpn_iptables(self, publicip, obj):
-        publicdev=obj['public_interface']
-        localcidr=obj['local_cidr']
-        local_ip=obj['local_ip']
+        publicdev = obj['public_interface']
+        localcidr = obj['local_cidr']
+        local_ip = obj['local_ip']
 
         self.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (publicdev, publicip)])
         self.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (publicdev, publicip)])
@@ -813,30 +824,30 @@ class CsRemoteAccessVpn(CsDataBag):
         self.fw.append(["", "", "-A INPUT -i %s -p esp -j ACCEPT" % publicdev])
 
         if self.config.is_vpc():
-            self.fw.append(["", ""," -N VPN_FORWARD"])
-            self.fw.append(["", "","-I FORWARD -i ppp+ -j VPN_FORWARD"])
-            self.fw.append(["", "","-I FORWARD -o ppp+ -j VPN_FORWARD"])
-            self.fw.append(["", "","-I FORWARD -o ppp+ -j VPN_FORWARD"])
-            self.fw.append(["", "","-A VPN_FORWARD -s  %s -j RETURN" %localcidr])
-            self.fw.append(["", "","-A VPN_FORWARD -i ppp+ -d %s -j RETURN" %localcidr])
-            self.fw.append(["", "","-A VPN_FORWARD -i ppp+  -o ppp+ -j RETURN"])
+            self.fw.append(["", "", " -N VPN_FORWARD"])
+            self.fw.append(["", "", "-I FORWARD -i ppp+ -j VPN_FORWARD"])
+            self.fw.append(["", "", "-I FORWARD -o ppp+ -j VPN_FORWARD"])
+            self.fw.append(["", "", "-I FORWARD -o ppp+ -j VPN_FORWARD"])
+            self.fw.append(["", "", "-A VPN_FORWARD -s  %s -j RETURN" % localcidr])
+            self.fw.append(["", "", "-A VPN_FORWARD -i ppp+ -d %s -j RETURN" % localcidr])
+            self.fw.append(["", "", "-A VPN_FORWARD -i ppp+  -o ppp+ -j RETURN"])
         else:
-            self.fw.append(["", "","-A FORWARD -i ppp+ -o  ppp+ -j ACCEPT"])
-            self.fw.append(["", "","-A FORWARD -s %s -o  ppp+ -j ACCEPT" % localcidr])
-            self.fw.append(["", "","-A FORWARD -i ppp+ -d %s  -j ACCEPT" % localcidr])
+            self.fw.append(["", "", "-A FORWARD -i ppp+ -o  ppp+ -j ACCEPT"])
+            self.fw.append(["", "", "-A FORWARD -s %s -o  ppp+ -j ACCEPT" % localcidr])
+            self.fw.append(["", "", "-A FORWARD -i ppp+ -d %s  -j ACCEPT" % localcidr])
 
-        self.fw.append(["", "","-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
-        self.fw.append(["", "","-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
-        self.fw.append(["nat", "front","-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
+        self.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
+        self.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
+        self.fw.append(["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
 
         if self.config.is_vpc():
             return
 
-        self.fw.append(["mangle", "","-N  VPN_%s " %publicip])
-        self.fw.append(["mangle", "","-A VPN_%s -j RETURN " % publicip])
-        self.fw.append(["mangle", "","-I VPN_%s -p ah  -j ACCEPT " % publicip])
-        self.fw.append(["mangle", "","-I VPN_%s -p esp  -j ACCEPT " % publicip])
-        self.fw.append(["mangle", "","-I PREROUTING  -d %s -j VPN_%s " % (publicip, publicip)])
+        self.fw.append(["mangle", "", "-N  VPN_%s " % publicip])
+        self.fw.append(["mangle", "", "-A VPN_%s -j RETURN " % publicip])
+        self.fw.append(["mangle", "", "-I VPN_%s -p ah  -j ACCEPT " % publicip])
+        self.fw.append(["mangle", "", "-I VPN_%s -p esp  -j ACCEPT " % publicip])
+        self.fw.append(["mangle", "", "-I PREROUTING  -d %s -j VPN_%s " % (publicip, publicip)])
 
 
 class CsRemoteAccessVpnOpenSwan(CsDataBag):

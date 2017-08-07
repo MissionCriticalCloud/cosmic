@@ -1,8 +1,5 @@
 import socket
 import time
-
-from nose.plugins.attrib import attr
-
 from marvin.cloudstackAPI import (
     stopRouter,
     destroyRouter
@@ -33,6 +30,7 @@ from marvin.lib.utils import (
     cleanup_resources
 )
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestVPCIpTablesPolicies(cloudstackTestCase):
@@ -157,7 +155,7 @@ class TestVPCIpTablesPolicies(cloudstackTestCase):
                     res = str(result)
 
                     self.assertEqual(
-                        res.count("DROP"),
+                        res.count("policy DROP"),
                         1,
                         "%s Default Policy should be DROP" % table)
 

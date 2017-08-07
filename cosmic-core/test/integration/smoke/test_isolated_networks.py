@@ -1,6 +1,4 @@
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-
 from marvin.lib.base import (
     EgressFireWallRule,
     NATRule,
@@ -17,21 +15,20 @@ from marvin.lib.common import (
     get_template,
     get_zone,
     get_domain,
-    list_vlan_ipranges,
-    list_networks,
     get_default_isolated_network_offering_with_egress,
     get_default_isolated_network_offering
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestIsolatedNetworks(cloudstackTestCase):
     # TODO: refactor these and others in the same file to super class
-    HTTP_COMMAND = "wget -t 1 -T 5 %s:8080"
+    HTTP_COMMAND = "wget -t 1 -T 5 --no-check-certificate https://www.google.com"
     HTTP_CHECK_STRING = 'HTTP request sent, awaiting response... 200 OK'
-    HTTP_ASSERT_SUCCESS_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should be successful!'
-    HTTP_ASSERT_FAILURE_MESSAGE = 'Attempt to retrieve index page from cloud-init on gateway should NOT be successful!'
+    HTTP_ASSERT_SUCCESS_MESSAGE = 'Attempt to retrieve index page from google.com on gateway should be successful!'
+    HTTP_ASSERT_FAILURE_MESSAGE = 'Attempt to retrieve index page from google.com on gateway should NOT be successful!'
 
     @classmethod
     def setUpClass(cls):
@@ -61,9 +58,9 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
         cls.service_offering = get_default_virtual_machine_offering(cls.api_client)
 
-        cls.services["egress_8080"] = {
-            "startport": 8080,
-            "endport": 8080,
+        cls.services["egress_443"] = {
+            "startport": 443,
+            "endport": 443,
             "protocol": "TCP",
             "cidrlist": ["0.0.0.0/0"]
         }
@@ -199,8 +196,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         # Test SSH after closing port 22
         expected = 1
-        gateway = find_public_gateway(self)
-        ssh_command = "ping -c 3 %s" % gateway
+        ssh_command = "ping -c 3 8.8.8.8"
         check_string = "3 packets received"
         result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
@@ -211,7 +207,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 1
-        ssh_command = self.HTTP_COMMAND % gateway
+        ssh_command = self.HTTP_COMMAND
         check_string = self.HTTP_CHECK_STRING
         result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
@@ -224,10 +220,10 @@ class TestIsolatedNetworks(cloudstackTestCase):
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_8080"]["protocol"],
-            startport=self.services["egress_8080"]["startport"],
-            endport=self.services["egress_8080"]["endport"],
-            cidrlist=self.services["egress_8080"]["cidrlist"]
+            protocol=self.services["egress_443"]["protocol"],
+            startport=self.services["egress_443"]["startport"],
+            endport=self.services["egress_443"]["endport"],
+            cidrlist=self.services["egress_443"]["cidrlist"]
         )
 
         expected = 0
@@ -347,8 +343,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        gateway = find_public_gateway(self)
-        ssh_command = "ping -c 3 %s" % gateway
+        ssh_command = "ping -c 3 8.8.8.8"
         check_string = "3 packets received"
         result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
@@ -359,7 +354,7 @@ class TestIsolatedNetworks(cloudstackTestCase):
         )
 
         expected = 0
-        ssh_command = self.HTTP_COMMAND % gateway
+        ssh_command = self.HTTP_COMMAND
         check_string = self.HTTP_CHECK_STRING
         result = self.check_router_command(virtual_machine, nat_rule.ipaddress, ssh_command, check_string, self)
 
@@ -372,10 +367,10 @@ class TestIsolatedNetworks(cloudstackTestCase):
         EgressFireWallRule.create(
             self.apiclient,
             networkid=network.id,
-            protocol=self.services["egress_8080"]["protocol"],
-            startport=self.services["egress_8080"]["startport"],
-            endport=self.services["egress_8080"]["endport"],
-            cidrlist=self.services["egress_8080"]["cidrlist"]
+            protocol=self.services["egress_443"]["protocol"],
+            startport=self.services["egress_443"]["startport"],
+            endport=self.services["egress_443"]["endport"],
+            cidrlist=self.services["egress_443"]["cidrlist"]
         )
 
         expected = 1
@@ -399,27 +394,3 @@ class TestIsolatedNetworks(cloudstackTestCase):
 
         self.logger.debug("Result from SSH into the Virtual Machine: %s" % result)
         return result.count(check_string)
-
-
-def find_public_gateway(test_case):
-    networks = list_networks(test_case.apiclient,
-                             zoneid=test_case.zone.id,
-                             listall=True,
-                             issystem=True,
-                             traffictype="Public")
-    test_case.logger.debug('::: Public Networks ::: ==> %s' % networks)
-
-    test_case.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-
-    ip_ranges = list_vlan_ipranges(test_case.apiclient,
-                                   zoneid=test_case.zone.id,
-                                   networkid=networks[0].id)
-    test_case.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-    test_case.assertTrue(len(ip_ranges) == 1,
-                         "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-    test_case.assertIsNotNone(ip_ranges[0].gateway,
-                              "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." %
-                              networks[0].id)
-
-    return ip_ranges[0].gateway

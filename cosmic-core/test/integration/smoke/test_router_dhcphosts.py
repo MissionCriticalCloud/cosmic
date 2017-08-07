@@ -1,6 +1,4 @@
-from nose.plugins.attrib import attr
 from marvin.cloudstackTestCase import cloudstackTestCase
-
 from marvin.lib.base import (
     VirtualMachine,
     Account,
@@ -12,12 +10,10 @@ from marvin.lib.common import (
     get_zone,
     get_template,
     get_domain,
-    list_networks,
     list_routers,
     list_nat_rules,
     list_public_ip,
     list_hosts,
-    list_vlan_ipranges,
     get_default_virtual_machine_offering,
     get_default_isolated_network_offering_with_egress
 )
@@ -26,6 +22,7 @@ from marvin.lib.utils import (
     get_process_status
 )
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestRouterDHCPHosts(cloudstackTestCase):
@@ -281,31 +278,10 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
         return
 
-    def find_public_gateway(self):
-        networks = list_networks(self.apiclient,
-                                 zoneid=self.zone.id,
-                                 listall=True,
-                                 issystem=True,
-                                 traffictype="Public")
-        self.logger.debug('::: Public Networks ::: ==> %s' % networks)
-
-        self.assertTrue(len(networks) == 1, "Test expects only 1 Public network but found -> '%s'" % len(networks))
-
-        ip_ranges = list_vlan_ipranges(self.apiclient,
-                                       zoneid=self.zone.id,
-                                       networkid=networks[0].id)
-        self.logger.debug('::: IP Ranges ::: ==> %s' % ip_ranges)
-
-        self.assertTrue(len(ip_ranges) == 1, "Test expects only 1 VLAN IP Range network but found -> '%s'" % len(ip_ranges))
-        self.assertIsNotNone(ip_ranges[0].gateway, "The network with id -> '%s' returned an IP Range with a None gateway. Please check your Datacenter settings." % networks[0].id)
-
-        return ip_ranges[0].gateway
-
     def test_ssh_command(self, vm, nat_rule, rule_label):
         result = 'failed'
         try:
-            gateway = self.find_public_gateway()
-            ssh_command = "ping -c 3 %s" % gateway
+            ssh_command = "ping -c 3 8.8.8.8"
             self.logger.debug("SSH into VM with IP: %s" % nat_rule.ipaddress)
 
             ssh = vm.get_ssh_client(ipaddress=nat_rule.ipaddress, port=self.services[rule_label]["publicport"], retries=5)
