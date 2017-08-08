@@ -6,6 +6,7 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.UserResponse;
 import com.cloud.user.UserAccount;
+import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
@@ -34,7 +35,9 @@ public class GetUserCmd extends BaseCmd {
         final UserAccount result = _accountService.getUserByApiKey(getApiKey());
         if (result != null) {
             final UserResponse response = _responseGenerator.createUserResponse(result);
-            response.setResponseName(getCommandName());
+            if (StringUtils.isNotBlank(response.getSecretKey())) {
+                response.setSecretKey("SecretKey only visible when generating a new key");
+            }
             response.setResponseName(getCommandName());
             this.setResponseObject(response);
         } else {

@@ -1225,6 +1225,12 @@
                                         url: createURL('registerUserKeys'),
                                         data: data,
                                         success: function (json) {
+                                            var secretKey = json.registeruserkeysresponse.userkeys.secretkey
+                                            cloudStack.dialog.notice({
+                                                message: 'Secret key (non-retrievable after this): </br></br>' + _s(secretKey),
+                                                width: 800
+                                            });
+
                                             args.response.success({
                                                 data: json.registeruserkeysresponse.userkeys
                                             });
