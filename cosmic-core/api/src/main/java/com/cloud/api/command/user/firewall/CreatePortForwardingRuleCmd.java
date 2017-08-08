@@ -13,7 +13,6 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
-import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
@@ -99,12 +98,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
             + " rule is being created for VPC guest network 2) in all other cases defaulted to true")
     private Boolean openFirewall;
 
-    @Parameter(name = ApiConstants.NETWORK_ID,
-            type = CommandType.UUID,
-            entityType = NetworkResponse.class,
-            description = "the network of the virtual machine the port forwarding rule will be created for. "
-                    + "Required when public IP address is not associated with any guest network yet (VPC case).")
-    private Long networkId;
     @Parameter(name = ApiConstants.VM_GUEST_IP,
             type = CommandType.STRING,
             required = false,
@@ -254,19 +247,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
 
     @Override
     public long getNetworkId() {
-        final IpAddress ip = _entityMgr.findById(IpAddress.class, getIpAddressId());
-        Long ntwkId = null;
-
-        if (ip.getAssociatedWithNetworkId() != null) {
-            ntwkId = ip.getAssociatedWithNetworkId();
-        } else {
-            ntwkId = networkId;
-        }
-        if (ntwkId == null) {
-            throw new InvalidParameterValueException("Unable to create port forwarding rule for ip address with ID = " + getIpAddressUuid() +
-                    " as this ip address is not associated with any network. Please add networkId parameter.");
-        }
-        return ntwkId;
+        return 0;
     }
 
     public Long getIpAddressId() {
@@ -370,7 +351,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
         }
 
         try {
-            final PortForwardingRule result = _rulesService.createPortForwardingRule(this, virtualMachineId, privateIp, getOpenFirewall(), isDisplay());
+            final PortForwardingRule result = _rulesService.createPortForwardingRule(this, privateIp, getOpenFirewall(), isDisplay());
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
         } catch (final NetworkRuleConflictException ex) {
@@ -381,7 +362,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     }
 
     public Ip getVmSecondaryIp() {
-        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty() ) {
+        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty()) {
             return null;
         }
         return new Ip(vmSecondaryIp);

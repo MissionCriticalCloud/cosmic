@@ -570,19 +570,19 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final Integer portEnd, final String proto, final Purpose
-            purpose, final FirewallRuleType type,
-                                     Long networkId, final FirewallRule.TrafficType trafficType) {
+    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final Integer portEnd, final String proto, final Purpose purpose,
+                                     final FirewallRuleType type, Long networkId, final FirewallRule.TrafficType trafficType) {
+
         if (portStart != null && !NetUtils.isValidPort(portStart)) {
-            throw new InvalidParameterValueException("publicPort is an invalid value: " + portStart);
+            throw new InvalidParameterValueException("Public start port is an invalid value: " + portStart);
         }
         if (portEnd != null && !NetUtils.isValidPort(portEnd)) {
-            throw new InvalidParameterValueException("Public port range is an invalid value: " + portEnd);
+            throw new InvalidParameterValueException("Public end port is an invalid value: " + portEnd);
         }
 
         // start port can't be bigger than end port
         if (portStart != null && portEnd != null && portStart > portEnd) {
-            throw new InvalidParameterValueException("Start port can't be bigger than end port");
+            throw new InvalidParameterValueException("Public start port can't be bigger than end port");
         }
 
         if (ipAddress == null && type == FirewallRuleType.System) {
@@ -590,61 +590,55 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         }
 
         if (ipAddress != null) {
-            if (ipAddress.getAssociatedWithNetworkId() == null) {
-                throw new InvalidParameterValueException("Unable to create firewall rule ; ip with specified id is not associated with any network");
-            } else {
+            if (purpose != Purpose.PortForwarding) {
                 networkId = ipAddress.getAssociatedWithNetworkId();
+
+                final Network network = _networkModel.getNetwork(networkId);
+
+                if (network == null) {
+                    throw new InvalidParameterValueException("Unable to retrieve network id to validate the rule");
+                }
+
+                if (trafficType == FirewallRule.TrafficType.Egress) {
+                    _accountMgr.checkAccess(caller, null, true, network);
+                }
+
+                // Verify that the network guru supports the protocol specified
+                Map<Network.Capability, String> caps = null;
+
+                if (purpose == Purpose.LoadBalancing) {
+                    if (!_elbEnabled) {
+                        caps = _networkModel.getNetworkServiceCapabilities(network.getId(), Service.Lb);
+                    }
+                } else if (purpose == Purpose.Firewall) {
+                    caps = _networkModel.getNetworkServiceCapabilities(network.getId(), Service.Firewall);
+                }
+
+                if (caps != null) {
+                    final String supportedProtocols;
+                    String supportedTrafficTypes = null;
+                    if (purpose == FirewallRule.Purpose.Firewall) {
+                        supportedTrafficTypes = caps.get(Capability.SupportedTrafficDirection).toLowerCase();
+                    }
+
+                    if (purpose == FirewallRule.Purpose.Firewall && trafficType == FirewallRule.TrafficType.Egress) {
+                        supportedProtocols = caps.get(Capability.SupportedEgressProtocols).toLowerCase();
+                    } else {
+                        supportedProtocols = caps.get(Capability.SupportedProtocols).toLowerCase();
+                    }
+
+                    if (!supportedProtocols.contains(proto.toLowerCase())) {
+                        throw new InvalidParameterValueException("Protocol " + proto + " is not supported in zone " + network.getDataCenterId());
+                    } else if (proto.equalsIgnoreCase(NetUtils.ICMP_PROTO) && purpose != Purpose.Firewall) {
+                        throw new InvalidParameterValueException("Protocol " + proto + " is currently supported only for rules with purpose " + Purpose.Firewall);
+                    } else if (purpose == Purpose.Firewall && !supportedTrafficTypes.contains(trafficType.toString().toLowerCase())) {
+                        throw new InvalidParameterValueException("Traffic Type " + trafficType + " is currently supported by Firewall in network " + networkId);
+                    }
+                }
             }
 
             // Validate ip address
             _accountMgr.checkAccess(caller, null, true, ipAddress);
-        }
-
-        //network id either has to be passed explicitly, or implicitly as a part of ipAddress object
-        if (networkId == null) {
-            throw new InvalidParameterValueException("Unable to retrieve network id to validate the rule");
-        }
-
-        final Network network = _networkModel.getNetwork(networkId);
-        assert network != null : "Can't create rule as network associated with public ip address is null?";
-
-        if (trafficType == FirewallRule.TrafficType.Egress) {
-            _accountMgr.checkAccess(caller, null, true, network);
-        }
-
-        // Verify that the network guru supports the protocol specified
-        Map<Network.Capability, String> caps = null;
-
-        if (purpose == Purpose.LoadBalancing) {
-            if (!_elbEnabled) {
-                caps = _networkModel.getNetworkServiceCapabilities(network.getId(), Service.Lb);
-            }
-        } else if (purpose == Purpose.PortForwarding) {
-            caps = _networkModel.getNetworkServiceCapabilities(network.getId(), Service.PortForwarding);
-        } else if (purpose == Purpose.Firewall) {
-            caps = _networkModel.getNetworkServiceCapabilities(network.getId(), Service.Firewall);
-        }
-
-        if (caps != null) {
-            final String supportedProtocols;
-            String supportedTrafficTypes = null;
-            if (purpose == FirewallRule.Purpose.Firewall) {
-                supportedTrafficTypes = caps.get(Capability.SupportedTrafficDirection).toLowerCase();
-            }
-
-            if (purpose == FirewallRule.Purpose.Firewall && trafficType == FirewallRule.TrafficType.Egress) {
-                supportedProtocols = caps.get(Capability.SupportedEgressProtocols).toLowerCase();
-            } else {
-                supportedProtocols = caps.get(Capability.SupportedProtocols).toLowerCase();
-            }
-
-            if (!supportedProtocols.contains(proto.toLowerCase())) {
-                throw new InvalidParameterValueException("Protocol " + proto + " is not supported in zone " + network.getDataCenterId());
-            } else if (proto.equalsIgnoreCase(NetUtils.ICMP_PROTO) && purpose != Purpose.Firewall) {
-                throw new InvalidParameterValueException("Protocol " + proto + " is currently supported only for rules with purpose " + Purpose.Firewall);
-            } else if (purpose == Purpose.Firewall && !supportedTrafficTypes.contains(trafficType.toString().toLowerCase())) {
-                throw new InvalidParameterValueException("Traffic Type " + trafficType + " is currently supported by Firewall in network " + networkId);
-            }
         }
     }
 
@@ -782,8 +776,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_OPEN, eventDescription = "creating firewall rule", create = true)
     public FirewallRule createRuleForAllCidrs(final long ipAddrId, final Account caller, final Integer startPort, final Integer endPort, final String protocol, final Integer
-            icmpCode, final Integer icmpType,
-                                              final Long relatedRuleId, final long networkId) throws NetworkRuleConflictException {
+            icmpCode, final Integer icmpType, final Long relatedRuleId, final long networkId) throws NetworkRuleConflictException {
 
         // If firwallRule for this port range already exists, return it
         final List<FirewallRuleVO> rules = _firewallDao.listByIpPurposeAndProtocolAndNotRevoked(ipAddrId, startPort, endPort, protocol, Purpose.Firewall);
