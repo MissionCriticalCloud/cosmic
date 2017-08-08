@@ -4557,9 +4557,6 @@ CREATE INDEX `i_ssh_keypairs__account_id`
 CREATE INDEX `i_ssh_keypairs__domain_id`
   ON `ssh_keypairs` (`domain_id`);
 
-CREATE INDEX `i_public_key`
-  ON `ssh_keypairs` (`public_key`);
-
 CREATE TABLE `sslcerts` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT
     PRIMARY KEY,
