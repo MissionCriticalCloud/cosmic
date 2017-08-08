@@ -229,14 +229,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         if (services == null || services.isEmpty()) {
             return true;
         }
-        // Since it's non-conserve mode, only one service should used for IP
-        if (services.size() != 1) {
-            throw new InvalidParameterException("There are multiple services used ip " + ip.getAddress() + ".");
-        }
-        if (service != null && !((Service) services.toArray()[0] == service || service.equals(Service.Firewall))) {
-            throw new InvalidParameterException("The IP " + ip.getAddress() + " is already used as " + ((Service) services.toArray()[0]).getName() + " rather than " +
-                    service.getName());
-        }
         return true;
     }
 
@@ -521,9 +513,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                 services.addAll(ipToServices.get(ip));
                 if (services != null && services.contains(Service.Firewall)) {
                     services.remove(Service.Firewall);
-                }
-                if (services != null && services.size() > 1) {
-                    throw new CloudRuntimeException("Ip " + ip.getAddress() + " is used by multiple services!");
                 }
             }
         }

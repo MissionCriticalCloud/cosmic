@@ -3417,10 +3417,6 @@
                                 }
                             }
 
-                            if (ipAddress.vpcid != null && ipAddress.issourcenat) { //don't show Configuration(ipRules) tab on VPC sourceNAT IP
-                                disableIpRules = true;
-                            }
-
                             if (('vpc' in args.context) == false && ipAddress.vpcid != null) { //from Guest Network section, don't show Configuration(ipRules) tab on VPC IP
                                 disableIpRules = true;
                             }
@@ -4104,9 +4100,6 @@
                                                                 if (havingFirewallService == false) { //firewall is not supported in IP from VPC section (because ACL has already supported in tier from VPC section)
                                                                     disallowedActions.push("firewall");
                                                                 }
-
-                                                                disallowedActions.push("portForwarding");
-                                                                disallowedActions.push("loadBalancing");
                                                             }
 
                                                             /*
