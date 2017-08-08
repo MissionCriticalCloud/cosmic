@@ -68,7 +68,6 @@ import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
 import com.cloud.api.response.InternalLoadBalancerElementResponse;
-import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckPolicyResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
@@ -200,7 +199,6 @@ import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PortForwardingRuleVO;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupVO;
@@ -1291,44 +1289,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setState(stateToSet);
         response.setForDisplay(fwRule.isDisplay());
         response.setObjectName("portforwardingrule");
-        return response;
-    }
-
-    @Override
-    public IpForwardingRuleResponse createIpForwardingRuleResponse(final StaticNatRule fwRule) {
-        final IpForwardingRuleResponse response = new IpForwardingRuleResponse();
-        response.setId(fwRule.getUuid());
-        response.setProtocol(fwRule.getProtocol());
-
-        final IpAddress ip = ApiDBUtils.findIpAddressById(fwRule.getSourceIpAddressId());
-
-        if (ip != null) {
-            response.setPublicIpAddressId(ip.getId());
-            response.setPublicIpAddress(ip.getAddress().addr());
-            if (fwRule.getDestIpAddress() != null) {
-                final UserVm vm = ApiDBUtils.findUserVmById(ip.getAssociatedWithVmId());
-                if (vm != null) {// vm might be destroyed
-                    response.setVirtualMachineId(vm.getUuid());
-                    response.setVirtualMachineName(vm.getHostName());
-                    if (vm.getDisplayName() != null) {
-                        response.setVirtualMachineDisplayName(vm.getDisplayName());
-                    } else {
-                        response.setVirtualMachineDisplayName(vm.getHostName());
-                    }
-                }
-            }
-        }
-        final FirewallRule.State state = fwRule.getState();
-        String stateToSet = state.toString();
-        if (state.equals(FirewallRule.State.Revoke)) {
-            stateToSet = "Deleting";
-        }
-
-        response.setStartPort(fwRule.getSourcePortStart());
-        response.setEndPort(fwRule.getSourcePortEnd());
-        response.setProtocol(fwRule.getProtocol());
-        response.setState(stateToSet);
-        response.setObjectName("ipforwardingrule");
         return response;
     }
 

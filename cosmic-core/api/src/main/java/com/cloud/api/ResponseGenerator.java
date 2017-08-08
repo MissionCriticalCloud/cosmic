@@ -36,7 +36,6 @@ import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
 import com.cloud.api.response.InternalLoadBalancerElementResponse;
-import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.api.response.LBStickinessResponse;
@@ -128,7 +127,6 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityRule;
@@ -243,8 +241,6 @@ public interface ResponseGenerator {
     ClusterResponse createClusterResponse(Cluster cluster, Boolean showCapacities);
 
     FirewallRuleResponse createPortForwardingRuleResponse(PortForwardingRule fwRule);
-
-    IpForwardingRuleResponse createIpForwardingRuleResponse(StaticNatRule fwRule);
 
     User findUserById(Long userId);
 
