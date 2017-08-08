@@ -408,14 +408,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (services == null || services.isEmpty()) {
             return true;
         }
-        // Since it's non-conserve mode, only one service should used for IP
-        if (services.size() != 1) {
-            throw new InvalidParameterException("There are multiple services used ip " + ip.getAddress() + ".");
-        }
-        if (service != null && !((Service) services.toArray()[0] == service || service.equals(Service.Firewall))) {
-            throw new InvalidParameterException("The IP " + ip.getAddress() + " is already used as " + ((Service) services.toArray()[0]).getName() + " rather than "
-                    + service.getName());
-        }
         return true;
     }
 

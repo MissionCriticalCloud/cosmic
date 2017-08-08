@@ -1258,23 +1258,11 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
             }
         }
 
-        final NetworkOffering offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-        final boolean sharedSourceNat = offering.getSharedSourceNat();
-        boolean isSourceNat = false;
-        if (!sharedSourceNat) {
-            if (getExistingSourceNatInNetwork(owner.getId(), networkId) == null) {
-                if (network.getGuestType() == GuestType.Isolated && network.getVpcId() == null && !ipToAssoc.isPortable()) {
-                    isSourceNat = true;
-                }
-            }
-        }
-
         s_logger.debug("Associating ip " + ipToAssoc + " to network " + network);
 
         final IPAddressVO ip = _ipAddressDao.findById(ipId);
         //update ip address with networkId
         ip.setAssociatedWithNetworkId(networkId);
-        ip.setSourceNat(isSourceNat);
         _ipAddressDao.update(ipId, ip);
 
         boolean success = false;
