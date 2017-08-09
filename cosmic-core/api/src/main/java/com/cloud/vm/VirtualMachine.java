@@ -119,6 +119,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         PowerUnknown,
         PowerOn,
         PowerOff,
+        PowerPaused,
         PowerReportMissing
     }
 
@@ -131,6 +132,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         Expunging(true, "VM is being   expunged."),
         Migrating(true, "VM is being migrated.  host id holds to from host"),
         Error(false, "VM is in error"),
+        Paused(true, "VM is paused. host id has the host that it is running on."),
         Unknown(false, "VM state is unknown."),
         Shutdowned(false, "VM is shutdowned from inside");
 
@@ -182,6 +184,15 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
             s_fsm.addTransition(new Transition<>(State.Expunging, VirtualMachine.Event.ExpungeOperation, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Error, VirtualMachine.Event.DestroyRequested, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Error, VirtualMachine.Event.ExpungeOperation, State.Expunging, null));
+            s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.AgentReportRunning, State.Running, null));
+            s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.StopRequested, State.Stopping, null));
+            s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+
+            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
+            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
+            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
+            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
+            s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
 
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, Arrays.asList(new Impact[]{Impact.USAGE})));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, null));
@@ -287,6 +298,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         // added for new VMSync logic
         FollowAgentPowerOnReport,
         FollowAgentPowerOffReport,
+        FollowAgentPowerPausedReport,
     }
 
     public enum Type {

@@ -2801,7 +2801,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         try {
             final VirtualMachineEntity vmEntity = _orchSrvc.getVirtualMachine(vm.getUuid());
 
-            if (forced) {
+            if (forced || vm.getState() == State.Paused) {
                 status = vmEntity.stopForced(Long.toString(userId));
             } else {
                 status = vmEntity.stop(Long.toString(userId));
