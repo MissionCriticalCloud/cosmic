@@ -4433,13 +4433,13 @@ CREATE TABLE `snapshot_store_ref` (
   `last_updated` DATETIME NULL,
   `job_id` VARCHAR(255) NULL,
   `store_role` VARCHAR(255) NULL,
-  `size` BIGINT NULL,
-  `physical_size` BIGINT DEFAULT '0' NULL,
+  `size` BIGINT UNSIGNED NULL,
+  `physical_size` BIGINT UNSIGNED DEFAULT '0' NULL,
   `parent_snapshot_id` BIGINT UNSIGNED DEFAULT '0' NULL,
   `install_path` VARCHAR(255) NULL,
   `state` VARCHAR(255) NOT NULL,
-  `update_count` BIGINT NULL,
-  `ref_cnt` BIGINT NULL,
+  `update_count` BIGINT UNSIGNED NULL,
+  `ref_cnt` BIGINT UNSIGNED NULL,
   `updated` DATETIME NULL,
   `volume_id` BIGINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
