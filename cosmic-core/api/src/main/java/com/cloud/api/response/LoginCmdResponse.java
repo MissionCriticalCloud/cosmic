@@ -19,6 +19,10 @@ public class LoginCmdResponse extends AuthenticationCmdResponse {
     @Param(description = "Domain ID that the user belongs to")
     private String domainId;
 
+    @SerializedName(value = ApiConstants.DOMAIN_NAME)
+    @Param(description = "Domain name that the user belongs to")
+    private String domainName;
+
     @SerializedName(value = ApiConstants.TIMEOUT)
     @Param(description = "the time period before the session has expired")
     private Integer timeout;
@@ -137,5 +141,13 @@ public class LoginCmdResponse extends AuthenticationCmdResponse {
 
     public void setSessionKey(final String sessionKey) {
         this.sessionKey = sessionKey;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(final String domainName) {
+        this.domainName = domainName;
     }
 }

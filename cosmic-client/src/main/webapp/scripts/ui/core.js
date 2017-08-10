@@ -205,16 +205,16 @@
                 id: 'user'
             }).addClass('button')
                 .append(
-                    $('<div>').addClass('name').text(
-                        args.context && args.context.users ?
-                            cloudStack.concat(userLabel, 21) : 'Invalid User'
-                    )
-                )
-                .append(
                     $('<div>').addClass('icon options')
                         .append(
                             $('<div>').addClass('icon arrow')
                         )
+                )
+                .append(
+                    $('<div>').addClass('name').text(
+                        args.context && args.context.users ?
+                            cloudStack.concat(userLabel, 60) : 'Invalid User'
+                    )
                 );
             $userInfo.attr('title', userLabel);
 

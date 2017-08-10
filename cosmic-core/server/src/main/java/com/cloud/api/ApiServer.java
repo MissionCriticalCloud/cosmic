@@ -906,7 +906,9 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             if (domain.getUuid() != null) {
                 session.setAttribute("domain_UUID", domain.getUuid());
             }
-
+            if (domain.getName() != null) {
+                session.setAttribute(ApiConstants.DOMAIN_NAME, domain.getName());
+            }
             session.setAttribute("type", Short.valueOf(account.getType()).toString());
             session.setAttribute("registrationtoken", userAcct.getRegistrationToken());
             session.setAttribute("registered", Boolean.toString(userAcct.isRegistered()));
@@ -972,6 +974,9 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 }
                 if (ApiConstants.SESSIONKEY.equalsIgnoreCase(attrName)) {
                     response.setSessionKey(attrObj.toString());
+                }
+                if(ApiConstants.DOMAIN_NAME.equalsIgnoreCase(attrName)) {
+                    response.setDomainName(attrObj.toString());
                 }
             }
         }
