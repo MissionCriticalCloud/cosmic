@@ -51,7 +51,7 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
      */
     public ConsoleProxyVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
                           final long dataCenterId, final long domainId, final long accountId, final long userId, final int activeSession, final boolean haEnabled) {
-        super(id, serviceOfferingId, name, name, Type.ConsoleProxy, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+        super(id, serviceOfferingId, name, name, Type.ConsoleProxy, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled, null, null);
         this.activeSession = activeSession;
         this.dataCenterId = dataCenterId;
     }

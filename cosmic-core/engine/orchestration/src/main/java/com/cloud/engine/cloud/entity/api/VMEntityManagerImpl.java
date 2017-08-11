@@ -24,6 +24,7 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.org.Cluster;
+import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.VolumeVO;
@@ -124,6 +125,7 @@ public class VMEntityManagerImpl implements VMEntityManager {
         final VMInstanceVO vm = _vmDao.findByUuid(vmEntityVO.getUuid());
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vm);
         vmProfile.setServiceOffering(_serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()));
+
         DataCenterDeployment plan = new DataCenterDeployment(vm.getDataCenterId(), vm.getPodIdToDeployIn(), null, null, null, null);
         if (planToDeploy != null && planToDeploy.getDataCenterId() != 0) {
             plan =
