@@ -17,6 +17,7 @@ public class NicSecondaryIpDaoImpl extends GenericDaoBase<NicSecondaryIpVO, Long
     private final SearchBuilder<NicSecondaryIpVO> AllFieldsSearch;
     private final GenericSearchBuilder<NicSecondaryIpVO, String> IpSearch;
     protected GenericSearchBuilder<NicSecondaryIpVO, Long> CountByNicId;
+    private SearchBuilder<NicSecondaryIpVO> IpFuzzySearch;
 
     protected NicSecondaryIpDaoImpl() {
         super();
@@ -37,6 +38,10 @@ public class NicSecondaryIpDaoImpl extends GenericDaoBase<NicSecondaryIpVO, Long
         CountByNicId.select(null, Func.COUNT, null);
         CountByNicId.and("nic", CountByNicId.entity().getNicId(), SearchCriteria.Op.EQ);
         CountByNicId.done();
+
+        IpFuzzySearch = createSearchBuilder();
+        IpFuzzySearch.and("address", IpFuzzySearch.entity().getIp4Address(), Op.LIKE);
+        IpFuzzySearch.done();
     }
 
     @Override
@@ -57,6 +62,13 @@ public class NicSecondaryIpDaoImpl extends GenericDaoBase<NicSecondaryIpVO, Long
     public List<NicSecondaryIpVO> listByNetworkId(final long networkId) {
         final SearchCriteria<NicSecondaryIpVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<NicSecondaryIpVO> listByIpAddress(final String ipAddress) {
+        final SearchCriteria<NicSecondaryIpVO> sc = IpFuzzySearch.create();
+        sc.setParameters("address", "%" + ipAddress + "%");
         return listBy(sc);
     }
 
