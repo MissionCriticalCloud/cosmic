@@ -381,7 +381,7 @@ class CsIP:
         if self.config.is_vpc():
             return
 
-        self.fw.append(["filter", "", "-A INPUT -i eth1 -p tcp -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
+        self.fw.append(["filter", "", "-A INPUT -i eth1 -p tcp -s 169.254.0.1/32 -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
 
         self.fw.append(["filter", "", "-P INPUT DROP"])
         self.fw.append(["filter", "", "-P FORWARD DROP"])
@@ -525,7 +525,7 @@ class CsIP:
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % self.dev])
         self.fw.append(["filter", "", "-A INPUT -i lo -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -p icmp -j ACCEPT"])
-        self.fw.append(["filter", "", "-A INPUT -i eth0 -p tcp -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
+        self.fw.append(["filter", "", "-A INPUT -i eth0 -p tcp -m tcp -s 169.254.0.1/32 --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"])
 
         self.fw.append(["filter", "", "-P INPUT DROP"])
