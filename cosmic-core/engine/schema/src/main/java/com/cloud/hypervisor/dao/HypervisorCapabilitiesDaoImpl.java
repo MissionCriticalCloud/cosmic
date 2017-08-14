@@ -42,7 +42,11 @@ public class HypervisorCapabilitiesDaoImpl extends GenericDaoBase<HypervisorCapa
     public HypervisorCapabilitiesVO findByHypervisorTypeAndVersion(final HypervisorType hypervisorType, final String hypervisorVersion) {
         final SearchCriteria<HypervisorCapabilitiesVO> sc = HypervisorTypeAndVersionSearch.create();
         sc.setParameters("hypervisorType", hypervisorType);
-        sc.setParameters("hypervisorVersion", hypervisorVersion);
+
+        if (hypervisorVersion != null) {
+            sc.setParameters("hypervisorVersion", hypervisorVersion);
+        }
+
         return findOneBy(sc);
     }
 
