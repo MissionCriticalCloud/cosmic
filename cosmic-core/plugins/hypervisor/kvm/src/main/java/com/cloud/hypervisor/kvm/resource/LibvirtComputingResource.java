@@ -196,7 +196,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     static {
         s_powerStatesTable = new HashMap<>();
         s_powerStatesTable.put(DomainState.VIR_DOMAIN_SHUTOFF, PowerState.PowerOff);
-        s_powerStatesTable.put(DomainState.VIR_DOMAIN_PAUSED, PowerState.PowerOn);
+        s_powerStatesTable.put(DomainState.VIR_DOMAIN_PAUSED, PowerState.PowerPaused);
         s_powerStatesTable.put(DomainState.VIR_DOMAIN_RUNNING, PowerState.PowerOn);
         s_powerStatesTable.put(DomainState.VIR_DOMAIN_BLOCKED, PowerState.PowerOn);
         s_powerStatesTable.put(DomainState.VIR_DOMAIN_NOSTATE, PowerState.PowerUnknown);
@@ -2248,14 +2248,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
                 logger.trace("VM " + dm.getName() + ": powerstate = " + ps + "; vm state=" + state.toString());
                 final String vmName = dm.getName();
-
-                // TODO : for XS/KVM (host-based resource), we require to remove
-                // VM completely from host, for some reason, KVM seems to still keep
-                // Stopped VM around, to work-around that, reporting only powered-on VM
-                //
-                if (state == PowerState.PowerOn) {
-                    vmStates.put(vmName, new HostVmStateReportEntry(state, conn.getHostName()));
-                }
+                vmStates.put(vmName, new HostVmStateReportEntry(state, conn.getHostName()));
             } catch (final LibvirtException e) {
                 logger.warn("Unable to get vms", e);
             } finally {
@@ -2278,14 +2271,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 final PowerState state = convertToPowerState(ps);
                 final String vmName = dm.getName();
                 logger.trace("VM " + vmName + ": powerstate = " + ps + "; vm state=" + state.toString());
-
-                // TODO : for XS/KVM (host-based resource), we require to remove
-                // VM completely from host, for some reason, KVM seems to still keep
-                // Stopped VM around, to work-around that, reporting only powered-on VM
-                //
-                if (state == PowerState.PowerOn) {
-                    vmStates.put(vmName, new HostVmStateReportEntry(state, conn.getHostName()));
-                }
+                vmStates.put(vmName, new HostVmStateReportEntry(state, conn.getHostName()));
             } catch (final LibvirtException e) {
                 logger.warn("Unable to get vms", e);
             } finally {

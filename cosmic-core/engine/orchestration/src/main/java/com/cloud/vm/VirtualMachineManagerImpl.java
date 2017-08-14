@@ -1084,6 +1084,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             assert vm != null;
             if (vm.getPowerState() == PowerState.PowerOn) {
                 handlePowerOnReportWithNoPendingJobsOnVM(vm);
+            } else if (vm.getPowerState() == PowerState.PowerPaused) {
+                handlePowerPausedReportWithNoPendingJobsOnVM(vm);
             } else {
                 handlePowerOffReportWithNoPendingJobsOnVM(vm);
             }
@@ -1259,6 +1261,23 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 throw new ConcurrentOperationException("Waiting for " + vm + " but is interrupted");
             }
             s_logger.debug("Waiting some more to make sure there's no activity on " + vm);
+        }
+    }
+
+    private void handlePowerPausedReportWithNoPendingJobsOnVM(final VMInstanceVO vm) {
+        switch (vm.getState()) {
+            case Running:
+                try {
+                    stateTransitTo(vm, Event.FollowAgentPowerPausedReport, vm.getPowerHostId());
+                } catch (final NoTransitionException e) {
+                    s_logger.warn("Unexpected VM state transition exception, race-condition?", e);
+                }
+                break;
+            case Error:
+            default:
+                s_logger.info("Receive power on report when VM is in error or unexpected state. vm: "
+                        + vm.getId() + ", state: " + vm.getState());
+                break;
         }
     }
 
@@ -1458,6 +1477,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 switch (vm.getPowerState()) {
                     case PowerOn:
                         handlePowerOnReportWithNoPendingJobsOnVM(vm);
+                        break;
+
+                    case PowerPaused:
+                        handlePowerPausedReportWithNoPendingJobsOnVM(vm);
                         break;
 
                     case PowerOff:
