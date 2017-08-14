@@ -207,6 +207,8 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
+import com.cloud.vm.dao.NicSecondaryIpDao;
+import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -345,6 +347,8 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     private NetworkDao _networkDao;
     @Inject
     private NicDao _nicDao;
+    @Inject
+    private NicSecondaryIpDao _nicSecondaryIpDao;
 
     /*
      * (non-Javadoc)
@@ -3581,6 +3585,43 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
             queryNicsTableResponse(responsesList, nic, response);
         });
+
+        final List<NicSecondaryIpVO> nicSecondaryIps = _nicSecondaryIpDao.listByIpAddress(cmd.getIpAddress());
+        nicSecondaryIps.forEach(nicSecondaryIp -> {
+                    final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
+                    response.setObjectName("whohasthisip");
+
+                    response.setIpAddress(nicSecondaryIp.getIp4Address());
+                    response.setUuid(nicSecondaryIp.getUuid());
+
+                    response.setCreated(nicSecondaryIp.getCreated());
+
+                    final NicVO nicVO = _nicDao.findById(nicSecondaryIp.getNicId());
+                    response.setMode(nicVO.getMode());
+                    response.setBroadcastUri(nicVO.getBroadcastUri());
+                    response.setNetmask(nicVO.getIPv4Netmask());
+                    response.setMacAddress(nicVO.getMacAddress());
+                    response.setState(nicVO.getState().toString());
+
+                    final Network network = _networkDao.findById(nicSecondaryIp.getNetworkId());
+                    response.setNetworkUuid(network.getUuid());
+                    if (!StringUtils.isEmpty(network.getName())) {
+                        response.setNetworkName(network.getName());
+                    }
+
+                    final VMInstanceVO vm = _vmInstanceDao.findById(nicSecondaryIp.getVmId());
+                    response.setVmName(vm.getHostName());
+                    response.setVmUuid(vm.getUuid());
+
+                    response.setVmType(nicVO.getVmType());
+
+                    final Domain domain = _domainDao.findById(vm.getDomainId());
+                    response.setDomainName(domain.getName());
+                    response.setDomainUuid(domain.getUuid());
+
+                    responsesList.add(response);
+                }
+        );
 
         final Account account = CallContext.current().getCallingAccount();
         final Domain domain = _domainDao.findById(account.getDomainId());
