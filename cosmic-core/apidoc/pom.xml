@@ -6,7 +6,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.3.9</version>
+        <version>5.3.10-SNAPSHOT</version>
     </parent>
     <properties>
         <client.config.base>${project.build.directory}/dependency</client.config.base>
@@ -16,17 +16,17 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>5.3.9</version>
+            <version>5.3.10-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-network-nvp</artifactId>
-            <version>5.3.9</version>
+            <version>5.3.10-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-client-ui</artifactId>
-            <version>5.3.9</version>
+            <version>5.3.10-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>
