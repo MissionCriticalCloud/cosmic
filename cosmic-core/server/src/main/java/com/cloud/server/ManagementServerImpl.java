@@ -657,6 +657,11 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
     static final ConfigKey<Integer> vmPasswordLength = new ConfigKey<>("Advanced", Integer.class, "vm.password.length", "10",
             "Specifies the length of a randomly generated password", false);
+    static final ConfigKey<Boolean> xenserverDeploymentsEnabled = new ConfigKey<>("Advanced", Boolean.class, "xenserver.deployments.enabled", "true",
+            "Are deployments to XenServer enabled or not", false);
+    static final ConfigKey<Boolean> kvmDeploymentsEnabled = new ConfigKey<>("Advanced", Boolean.class, "kvm.deployments.enabled", "true",
+            "Are deployments to KVM are enabled or not", false);
+
     private final ScheduledExecutorService _eventExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("EventChecker"));
     private final ScheduledExecutorService _alertExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("AlertChecker"));
     private final List<HypervisorType> supportedHypervisors = new ArrayList<>();
@@ -807,6 +812,16 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
     public void setHostAllocators(final List<HostAllocator> hostAllocators) {
         this.hostAllocators = hostAllocators;
+    }
+
+    @Override
+    public boolean getXenserverDeploymentsEnabled() {
+        return xenserverDeploymentsEnabled.value();
+    }
+
+    @Override
+    public boolean getKvmDeploymentsEnabled() {
+        return kvmDeploymentsEnabled.value();
     }
 
     @Override
@@ -2391,6 +2406,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final boolean allowUserViewDestroyedVM = QueryService.AllowUserViewDestroyedVM.valueIn(caller.getId()) | _accountService.isAdmin(caller.getId());
         final boolean allowUserExpungeRecoverVM = UserVmManager.AllowUserExpungeRecoverVm.valueIn(caller.getId()) | _accountService.isAdmin(caller.getId());
 
+        final boolean XenServerDeploymentsEnabled = xenserverDeploymentsEnabled.value();
+        final boolean KvmDeploymentsEnabled = kvmDeploymentsEnabled.value();
+
         // check if region-wide secondary storage is used
         boolean regionSecondaryEnabled = false;
         final List<ImageStoreVO> imgStores = _imgStoreDao.findRegionImageStores();
@@ -2410,6 +2428,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         capabilities.put("KVMSnapshotEnabled", KVMSnapshotEnabled);
         capabilities.put("allowUserViewDestroyedVM", allowUserViewDestroyedVM);
         capabilities.put("allowUserExpungeRecoverVM", allowUserExpungeRecoverVM);
+        capabilities.put("xenserverDeploymentsEnabled", XenServerDeploymentsEnabled);
+        capabilities.put("KVMDeploymentsEnabled", KvmDeploymentsEnabled);
         if (apiLimitEnabled) {
             capabilities.put("apiLimitInterval", apiLimitInterval);
             capabilities.put("apiLimitMax", apiLimitMax);
@@ -3892,7 +3912,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[]{vmPasswordLength};
+        return new ConfigKey<?>[]{vmPasswordLength, xenserverDeploymentsEnabled, kvmDeploymentsEnabled};
     }
 
     @Inject

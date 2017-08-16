@@ -110,6 +110,7 @@ import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
@@ -158,6 +159,7 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
 import com.cloud.server.ConfigurationServer;
+import com.cloud.server.ManagementServer;
 import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -476,6 +478,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     VolumeOrchestrationService volumeMgr;
     @Inject
     ManagementService _mgr;
+    @Inject
+    ManagementServer _mgtserver;
     @Inject
     private ServiceOfferingDetailsDao serviceOfferingDetailsDao;
     @Inject
@@ -2401,6 +2405,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(owner, serviceOffering);
         _accountMgr.checkAccess(owner, _diskOfferingDao.findById(diskOfferingId));
 
+        checkHypervisorEnabled(zone, template);
+
         // Get default guest network in Basic zone
         final Network defaultNetwork = _networkModel.getExclusiveGuestNetwork(zone.getId());
 
@@ -2457,6 +2463,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         // Verify that owner can use the service offering
         _accountMgr.checkAccess(owner, serviceOffering);
         _accountMgr.checkAccess(owner, _diskOfferingDao.findById(diskOfferingId));
+
+        checkHypervisorEnabled(zone, template);
 
         // If no network is specified, find system security group enabled network
         if (networkIdList == null || networkIdList.isEmpty()) {
@@ -2565,6 +2573,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(owner, serviceOffering);
         _accountMgr.checkAccess(owner, _diskOfferingDao.findById(diskOfferingId));
 
+        checkHypervisorEnabled(zone, template);
+
         final List<HypervisorType> vpcSupportedHTypes = _vpcMgr.getSupportedVpcHypervisors();
         if (networkIdList == null || networkIdList.isEmpty()) {
             NetworkVO defaultNetwork = null;
@@ -2651,6 +2661,19 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, null, group, httpmethod, userData,
                 sshKeyPair, hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId);
+    }
+
+    private void checkHypervisorEnabled(final Zone zone, final VirtualMachineTemplate template) {
+        final boolean xenServerDeploymentsEnabled = _mgtserver.getXenserverDeploymentsEnabled();
+        final boolean kvmDeploymentsEnabled = _mgtserver.getKvmDeploymentsEnabled();
+
+        if (template.getHypervisorType() != null && template.getHypervisorType().equals(HypervisorType.XenServer) && !xenServerDeploymentsEnabled) {
+            throw new CloudRuntimeException("Deploying to hypervisor " + HypervisorType.XenServer + " is disabled in zone " + zone.getName());
+        }
+
+        if (template.getHypervisorType() != null && template.getHypervisorType().equals(HypervisorType.KVM) && !kvmDeploymentsEnabled) {
+            throw new CloudRuntimeException("Deploying to hypervisor " + HypervisorType.KVM + " is disabled in zone " + zone.getName());
+        }
     }
 
     @Override

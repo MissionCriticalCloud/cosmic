@@ -50,4 +50,8 @@ public interface ManagementServer extends ManagementService, PluggableService {
     Pair<String, Integer> getVncPort(VirtualMachine vm);
 
     public long getMemoryOrCpuCapacityByHost(Long hostId, short capacityType);
+
+    public boolean getXenserverDeploymentsEnabled();
+
+    public boolean getKvmDeploymentsEnabled();
 }
