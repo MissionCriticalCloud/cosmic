@@ -13,6 +13,7 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
 import com.cloud.network.NetworkUsageService;
@@ -160,6 +161,8 @@ public abstract class BaseCmd {
     public UUIDManager _uuidMgr;
     @Inject
     public ZoneRepository zoneRepository;
+    @Inject
+    public ConfigurationDao _configDao;
 
     private Object _responseObject;
     private Map<String, String> fullUrlParams;

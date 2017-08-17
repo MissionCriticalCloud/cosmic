@@ -34,6 +34,8 @@ public class ListCapabilitiesCmd extends BaseCmd {
         response.setKVMSnapshotEnabled((Boolean) capabilities.get("KVMSnapshotEnabled"));
         response.setAllowUserViewDestroyedVM((Boolean) capabilities.get("allowUserViewDestroyedVM"));
         response.setAllowUserExpungeRecoverVM((Boolean) capabilities.get("allowUserExpungeRecoverVM"));
+        response.setXenServerDeploymentsEnabled((Boolean) capabilities.get("xenserverDeploymentsEnabled"));
+        response.setKvmDeploymentsEnabled((Boolean) capabilities.get("KVMDeploymentsEnabled"));
         if (capabilities.containsKey("apiLimitInterval")) {
             response.setApiLimitInterval((Integer) capabilities.get("apiLimitInterval"));
         }

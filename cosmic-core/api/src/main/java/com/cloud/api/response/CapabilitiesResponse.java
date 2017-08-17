@@ -67,6 +67,22 @@ public class CapabilitiesResponse extends BaseResponse {
     @Param(description = "true if the user can recover and expunge virtualmachines, false otherwise", since = "4.6.0")
     private boolean allowUserExpungeRecoverVM;
 
+    @SerializedName("xenserverdeploymentsenabled")
+    @Param(description = "true if the user can deploy VMs on XenServer, false otherwise")
+    private boolean xenServerDeploymentsEnabled;
+
+    @SerializedName("kvmdeploymentsenabled")
+    @Param(description = "true if the user can deploy VMs on KVM, false otherwise")
+    private boolean kvmDeploymentsEnabled;
+
+    public void setXenServerDeploymentsEnabled(final boolean xenServerDeploymentsEnabled) {
+        this.xenServerDeploymentsEnabled = xenServerDeploymentsEnabled;
+    }
+
+    public void setKvmDeploymentsEnabled(final boolean kvmDeploymentsEnabled) {
+        this.kvmDeploymentsEnabled = kvmDeploymentsEnabled;
+    }
+
     public void setSecurityGroupsEnabled(final boolean securityGroupsEnabled) {
         this.securityGroupsEnabled = securityGroupsEnabled;
     }
