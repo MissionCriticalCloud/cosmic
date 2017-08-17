@@ -34,6 +34,9 @@
                         hypervisor: {
                             label: 'label.hypervisor'
                         },
+                        state: {
+                            label: 'label.state'
+                        },
                         vmdisplayname: {
                             label: 'label.vm.display.name'
                         }
@@ -734,6 +737,13 @@
                                                     async: true,
                                                     success: function (json) {
                                                         var pools = json.liststoragepoolsresponse.storagepool;
+                                                        pools.sort(function(a,b) {
+                                                            if (a.name < b.name)
+                                                                return -1;
+                                                            if (a.name > b.name)
+                                                                return 1;
+                                                            return 0;
+                                                        });
                                                         var items = [];
                                                         $(pools).each(function () {
                                                             items.push({
