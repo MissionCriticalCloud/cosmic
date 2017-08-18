@@ -4330,6 +4330,7 @@ textarea {
     background: #FFFFFF;
     z-index: 10000;
     width: 150px;
+    left: -150px;
     position: absolute;
     padding: 10px;
     top: 20px;
