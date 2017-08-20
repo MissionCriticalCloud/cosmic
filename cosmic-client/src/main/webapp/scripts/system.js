@@ -5888,6 +5888,9 @@
                                 name: {
                                     label: 'label.name'
                                 },
+                                redundantstate: {
+                                    label: 'label.redundant.state'
+                                },
                                 publicip: {
                                     label: 'label.public.ip'
                                 },
@@ -5973,7 +5976,7 @@
                                         });
 
                                         /*
-                                         * In project view, the first listRotuers API(without projectid=-1) will return the same objects as the second listRouters API(with projectid=-1),
+                                         * In project view, the first listRouters API(without projectid=-1) will return the same objects as the second listRouters API(with projectid=-1),
                                          * because in project view, all API calls are appended with projectid=[projectID].
                                          * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                          */
