@@ -205,16 +205,17 @@
                 id: 'user'
             }).addClass('button')
                 .append(
-                    $('<div>').addClass('icon options')
-                        .append(
-                            $('<div>').addClass('icon arrow')
-                        )
-                )
-                .append(
                     $('<div>').addClass('name').text(
                         args.context && args.context.users ?
                             cloudStack.concat(userLabel, 60) : 'Invalid User'
                     )
+                )
+                .append(
+                    $('<div>').addClass('icon options')
+                        .append($('<div>').attr({
+                                id: 'userarrow'
+                            }).addClass('icon arrow')
+                        )
                 );
             $userInfo.attr('title', userLabel);
 
@@ -286,8 +287,7 @@
         // User options
         var $options = $('<div>').attr({
             id: 'user-options'
-        })
-            .appendTo($('#user'));
+        }).appendTo($('#userarrow'));
 
         $(['label.logout', 'label.issue', 'label.changelog', 'label.about.app']).each(function () {
             var $link = $('<a>')
