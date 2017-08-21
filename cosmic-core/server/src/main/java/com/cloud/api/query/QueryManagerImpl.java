@@ -3543,7 +3543,9 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
         final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
-        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
+        final String cleanedIpAddress = StringUtils.deleteWhitespace(cmd.getIpAddress());
+
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cleanedIpAddress);
         ipAddresses.forEach(ipAddress -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
@@ -3581,7 +3583,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             responsesList.add(response);
         });
 
-        final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
+        final List<NicVO> nics = _nicDao.listByIpAddress(cleanedIpAddress);
         nics.forEach(nic -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
@@ -3589,7 +3591,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             queryNicsTableResponse(responsesList, nic, response);
         });
 
-        final List<NicSecondaryIpVO> nicSecondaryIps = _nicSecondaryIpDao.listByIpAddress(cmd.getIpAddress());
+        final List<NicSecondaryIpVO> nicSecondaryIps = _nicSecondaryIpDao.listByIpAddress(cleanedIpAddress);
         nicSecondaryIps.forEach(nicSecondaryIp -> {
                     final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
                     response.setObjectName("whohasthisip");
@@ -3659,7 +3661,9 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
         final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
-        final List<NicVO> nics = _nicDao.listByMacAddress(cmd.getMacAddress());
+        final String cleanedMacAddress = StringUtils.deleteWhitespace(cmd.getMacAddress());
+
+        final List<NicVO> nics = _nicDao.listByMacAddress(cleanedMacAddress);
         nics.forEach(nic -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthismac");
