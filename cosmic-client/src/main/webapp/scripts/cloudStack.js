@@ -420,6 +420,10 @@
 
         cloudStack.uiCustom.login(loginArgs);
 
-        document.title = _l('label.app.name');
+        var host = document.location.hostname.split('.');
+        if (host.length > 2) 
+            document.title = host[0].toUpperCase()+" "+_l('label.app.name');
+        else 
+            document.title = _l('label.app.name');
     });
 })(cloudStack, jQuery);
