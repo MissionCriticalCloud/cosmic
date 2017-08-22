@@ -3543,7 +3543,9 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
         final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
-        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cmd.getIpAddress());
+        final String cleanedIpAddress = StringUtils.deleteWhitespace(cmd.getIpAddress());
+
+        final List<IPAddressVO> ipAddresses = _ipAddressDao.listByIpAddress(cleanedIpAddress);
         ipAddresses.forEach(ipAddress -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
@@ -3552,11 +3554,13 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             response.setState(ipAddress.getState().toString());
 
             final Domain domain = _domainDao.findById(ipAddress.getDomainId());
+
             if (domain != null) {
                 response.setDomainName(domain.getName());
                 response.setDomainUuid(domain.getUuid());
             }
             final Network network = _networkDao.findById(ipAddress.getNetworkId());
+
             if (ipAddress.getVpcId() != null) {
                 final Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
                 response.setNetworkName(vpc.getName());
@@ -3571,6 +3575,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             response.setMode(network.getMode());
 
             final Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
+
             if (associatedNetwork != null) {
                 response.setAssociatedNetworkName(associatedNetwork.getName());
                 response.setAssociatedNetworkUuid(associatedNetwork.getUuid());
@@ -3578,7 +3583,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             responsesList.add(response);
         });
 
-        final List<NicVO> nics = _nicDao.listByIpAddress(cmd.getIpAddress());
+        final List<NicVO> nics = _nicDao.listByIpAddress(cleanedIpAddress);
         nics.forEach(nic -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthisip");
@@ -3586,7 +3591,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             queryNicsTableResponse(responsesList, nic, response);
         });
 
-        final List<NicSecondaryIpVO> nicSecondaryIps = _nicSecondaryIpDao.listByIpAddress(cmd.getIpAddress());
+        final List<NicSecondaryIpVO> nicSecondaryIps = _nicSecondaryIpDao.listByIpAddress(cleanedIpAddress);
         nicSecondaryIps.forEach(nicSecondaryIp -> {
                     final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
                     response.setObjectName("whohasthisip");
@@ -3597,27 +3602,27 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                     response.setCreated(nicSecondaryIp.getCreated());
 
                     final NicVO nicVO = _nicDao.findById(nicSecondaryIp.getNicId());
-                    response.setMode(nicVO.getMode());
-                    response.setBroadcastUri(nicVO.getBroadcastUri());
-                    response.setNetmask(nicVO.getIPv4Netmask());
-                    response.setMacAddress(nicVO.getMacAddress());
-                    response.setState(nicVO.getState().toString());
+
+                    if (nicVO != null) {
+                        response.setMode(nicVO.getMode());
+                        response.setBroadcastUri(nicVO.getBroadcastUri());
+                        response.setNetmask(nicVO.getIPv4Netmask());
+                        response.setMacAddress(nicVO.getMacAddress());
+                        response.setState(nicVO.getState().toString());
+                    }
 
                     final Network network = _networkDao.findById(nicSecondaryIp.getNetworkId());
-                    response.setNetworkUuid(network.getUuid());
-                    if (!StringUtils.isEmpty(network.getName())) {
-                        response.setNetworkName(network.getName());
+
+                    if (network != null) {
+                        response.setNetworkUuid(network.getUuid());
+                        if (!StringUtils.isEmpty(network.getName())) {
+                            response.setNetworkName(network.getName());
+                        }
                     }
 
                     final VMInstanceVO vm = _vmInstanceDao.findById(nicSecondaryIp.getVmId());
-                    response.setVmName(vm.getHostName());
-                    response.setVmUuid(vm.getUuid());
 
-                    response.setVmType(nicVO.getVmType());
-
-                    final Domain domain = _domainDao.findById(vm.getDomainId());
-                    response.setDomainName(domain.getName());
-                    response.setDomainUuid(domain.getUuid());
+                    getVMInfo(response, nicVO, vm);
 
                     responsesList.add(response);
                 }
@@ -3637,11 +3642,28 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         return whoHasThisIpList;
     }
 
+    private void getVMInfo(final WhoHasThisAddressResponse response, final NicVO nicVO, final VMInstanceVO vm) {
+        if (vm != null) {
+            response.setVmName(vm.getHostName());
+            response.setVmUuid(vm.getUuid());
+            response.setVmType(nicVO.getVmType());
+
+            final Domain domain = _domainDao.findById(vm.getDomainId());
+
+            if (domain != null) {
+                response.setDomainName(domain.getName());
+                response.setDomainUuid(domain.getUuid());
+            }
+        }
+    }
+
     public ListResponse<WhoHasThisAddressResponse> listWhoHasThisMac(final ListWhoHasThisMacCmd cmd) {
         final ListResponse<WhoHasThisAddressResponse> whoHasThisIpList = new ListResponse<>();
         final List<WhoHasThisAddressResponse> responsesList = new ArrayList<>();
 
-        final List<NicVO> nics = _nicDao.listByMacAddress(cmd.getMacAddress());
+        final String cleanedMacAddress = StringUtils.deleteWhitespace(cmd.getMacAddress());
+
+        final List<NicVO> nics = _nicDao.listByMacAddress(cleanedMacAddress);
         nics.forEach(nic -> {
             final WhoHasThisAddressResponse response = new WhoHasThisAddressResponse();
             response.setObjectName("whohasthismac");
@@ -3675,19 +3697,17 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         response.setState(nic.getState().toString());
 
         final Network network = _networkDao.findById(nic.getNetworkId());
-        response.setNetworkUuid(network.getUuid());
-        if (!StringUtils.isEmpty(network.getName())) {
-            response.setNetworkName(network.getName());
+
+        if (network != null) {
+            response.setNetworkUuid(network.getUuid());
+            if (!StringUtils.isEmpty(network.getName())) {
+                response.setNetworkName(network.getName());
+            }
         }
 
         final VMInstanceVO vm = _vmInstanceDao.findById(nic.getInstanceId());
-        response.setVmName(vm.getHostName());
-        response.setVmUuid(vm.getUuid());
-        response.setVmType(nic.getVmType());
 
-        final Domain domain = _domainDao.findById(vm.getDomainId());
-        response.setDomainName(domain.getName());
-        response.setDomainUuid(domain.getUuid());
+        getVMInfo(response, nic, vm);
 
         responsesList.add(response);
     }
