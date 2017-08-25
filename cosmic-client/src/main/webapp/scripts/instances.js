@@ -1480,6 +1480,7 @@
                         action: {
                             custom: cloudStack.uiCustom.migrate({
                                 listView: {
+                                    label: 'label.migrate.instance.to.host',
                                     listView: {
                                         id: 'availableHosts',
                                         fields: {

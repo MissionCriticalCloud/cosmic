@@ -16,7 +16,7 @@
 
                 hosts.listView.actions = {
                     select: {
-                        label: _l('label.select.host'),
+                        label: _l(args.listView.label),
                         type: 'radio',
                         action: {
                             uiCustom: function(args) {
@@ -51,7 +51,7 @@
                 dialogClass: 'multi-edit-add-list panel migrate-vm-available-host-list',
                 width: 825,
                 draggable: false,
-                title: _l('label.migrate.instance.to.host'),
+                title: _l(listView.label),
                 buttons: [{
                     text: _l('label.ok'),
                     'class': 'ok migrateok',

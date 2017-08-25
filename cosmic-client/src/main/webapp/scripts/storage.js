@@ -713,75 +713,89 @@
                             migrateVolume: {
                                 label: 'label.migrate.volume',
                                 messages: {
-                                    confirm: function (args) {
-                                        return 'message.confirm.migrate.volume';
-                                    },
                                     notification: function (args) {
                                         return 'label.volume.migrated';
                                     }
                                 },
 
-                                createForm: {
-                                    title: 'label.migrate.volume',
-                                    desc: '',
-                                    fields: {
-                                        storagePool: {
-                                            label: 'label.storage.pool',
-                                            validation: {
-                                                required: true
-                                            },
-                                            select: function (args) {
-                                                $.ajax({
-                                                    url: createURL("listStoragePools"),
-                                                    dataType: "json",
-                                                    async: true,
-                                                    success: function (json) {
-                                                        var pools = json.liststoragepoolsresponse.storagepool;
-                                                        pools.sort(function(a,b) {
-                                                            if (a.name < b.name)
-                                                                return -1;
-                                                            if (a.name > b.name)
-                                                                return 1;
-                                                            return 0;
-                                                        });
-                                                        var items = [];
-                                                        $(pools).each(function () {
-                                                            items.push({
-                                                                id: this.id,
-                                                                description: this.name + " (" + (this.suitableformigration ? "Suitable" : "Not Suitable") + ")"
-                                                            });
-                                                        });
-                                                        args.response.success({
-                                                            data: items
-                                                        });
-
+                                action: {
+                                    custom: cloudStack.uiCustom.migrate({
+                                        listView: {
+                                            label: 'label.migrate.volume',
+                                            listView: {
+                                                id: 'availableStorage',
+                                                fields: {
+                                                    availableStorageName: {
+                                                        label: 'label.name'
+                                                    },
+                                                    availableStorageSuitable: {
+                                                        label: 'label.suitability',
+                                                        indicator: {
+                                                            'Suitable': 'suitable',
+                                                            'Not Suitable': 'notsuitable'
+                                                        }
                                                     }
-                                                });
+                                                },
+                                                dataProvider: function(args) {
+                                                    var data = {
+                                                        page: args.page,
+                                                        pagesize: pageSize
+                                                    };
+                                                    if (args.filterBy.search.value) {
+                                                        data.keyword = args.filterBy.search.value;
+                                                    }
+                                                    $.ajax({
+                                                        url: createURL("listStoragePools"),
+                                                        dataType: "json",
+                                                        async: true,
+                                                        data: data,
+                                                        success: function (json) {
+                                                            var pools = json.liststoragepoolsresponse.storagepool;
+                                                            pools.sort(function(a,b) {
+                                                                if (a.name < b.name)
+                                                                    return -1;
+                                                                if (a.name > b.name)
+                                                                    return 1;
+                                                                return 0;
+                                                            });
+                                                            var items = [];
+                                                            $(pools).each(function () {
+                                                                var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
+                                                                items.push({
+                                                                    id: this.id,
+                                                                    availableStorageName: this.name,
+                                                                    availableStorageSuitable: suitability
+                                                                });
+                                                            });
+                                                            args.response.success({
+                                                                data: items
+                                                            });
+
+                                                        }
+                                                    });
+                                                }
                                             }
-                                        }
-                                    }
-
-                                },
-
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("migrateVolume&livemigrate=true&storageid=" + args.data.storagePool + "&volumeid=" + args.context.volumes[0].id),
-                                        dataType: "json",
-                                        async: true,
-                                        success: function (json) {
-                                            var jid = json.migratevolumeresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid
+                                        },
+                                        action: function (args) {
+                                            $.ajax({
+                                                url: createURL("migrateVolume&livemigrate=true&storageid=" + args.data.storagePool + "&volumeid=" + args.context.volumes[0].id),
+                                                dataType: "json",
+                                                async: true,
+                                                success: function (json) {
+                                                    var jid = json.migratevolumeresponse.jobid;
+                                                    args.response.success({
+                                                        _custom: {
+                                                            jobId: jid
+                                                        }
+                                                    });
                                                 }
                                             });
+                                        },
+                                        notification: {
+                                            poll: pollAsyncJobResult
                                         }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
+                                    })
                                 }
-
                             },
 
                             takeSnapshot: {
