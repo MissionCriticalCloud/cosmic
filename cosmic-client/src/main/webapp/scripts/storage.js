@@ -35,7 +35,14 @@
                             label: 'label.hypervisor'
                         },
                         state: {
-                            label: 'label.state'
+                            label: 'label.state',
+                            indicator: {
+                                'Ready': 'on',
+                                'Migrating': 'transition',
+                                'Creating' : 'off',
+                                'Expunging': 'off',
+                                'Allocated': 'warning'
+                            }
                         },
                         vmdisplayname: {
                             label: 'label.vm.display.name'
@@ -726,7 +733,7 @@
                                                 id: 'availableStorage',
                                                 fields: {
                                                     availableStorageName: {
-                                                        label: 'label.name'
+                                                        label: 'label.storage.pool'
                                                     },
                                                     availableStorageSuitable: {
                                                         label: 'label.suitability',
@@ -745,28 +752,30 @@
                                                         data.keyword = args.filterBy.search.value;
                                                     }
                                                     $.ajax({
-                                                        url: createURL("listStoragePools"),
+                                                        url: createURL("findStoragePoolsForMigration&id="+args.context.volumes[0].id),
                                                         dataType: "json",
                                                         async: true,
                                                         data: data,
                                                         success: function (json) {
-                                                            var pools = json.liststoragepoolsresponse.storagepool;
-                                                            pools.sort(function(a,b) {
-                                                                if (a.name < b.name)
-                                                                    return -1;
-                                                                if (a.name > b.name)
-                                                                    return 1;
-                                                                return 0;
-                                                            });
                                                             var items = [];
-                                                            $(pools).each(function () {
-                                                                var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
-                                                                items.push({
-                                                                    id: this.id,
-                                                                    availableStorageName: this.name,
-                                                                    availableStorageSuitable: suitability
+                                                            if ('storagepool' in json.findstoragepoolsformigrationresponse) {
+                                                                var pools = json.findstoragepoolsformigrationresponse.storagepool;
+                                                                pools.sort(function (a, b) {
+                                                                    if (a.name < b.name)
+                                                                        return -1;
+                                                                    if (a.name > b.name)
+                                                                        return 1;
+                                                                    return 0;
                                                                 });
-                                                            });
+                                                                $(pools).each(function () {
+                                                                    var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
+                                                                    items.push({
+                                                                        id: this.id,
+                                                                        availableStorageName: this.name,
+                                                                        availableStorageSuitable: suitability
+                                                                    });
+                                                                });
+                                                            }
                                                             args.response.success({
                                                                 data: items
                                                             });
@@ -1218,68 +1227,86 @@
                             migrateToAnotherStorage: {
                                 label: 'label.migrate.volume.to.primary.storage',
                                 messages: {
-                                    confirm: function (args) {
-                                        return 'message.migrate.volume';
-                                    },
                                     notification: function (args) {
-                                        return 'label.migrate.volume.to.primary.storage';
+                                        return 'label.volume.migrated';
                                     }
                                 },
-                                createForm: {
-                                    title: 'label.migrate.volume.to.primary.storage',
-                                    desc: '',
-                                    fields: {
-                                        storageId: {
-                                            label: 'label.primary.storage',
-                                            validation: {
-                                                required: true
-                                            },
-                                            select: function (args) {
-                                                $.ajax({
-                                                    url: createURL("listStoragePools&zoneid=" + args.context.volumes[0].zoneid),
-                                                    dataType: "json",
-                                                    async: true,
-                                                    success: function (json) {
-                                                        var pools = json.liststoragepoolsresponse.storagepool;
-                                                        var items = [];
-                                                        $(pools).each(function () {
-                                                            items.push({
-                                                                id: this.id,
-                                                                description: this.name
+
+                                action: {
+                                    custom: cloudStack.uiCustom.migrate({
+                                        listView: {
+                                            label: 'label.migrate.volume.to.primary.storage',
+                                            listView: {
+                                                id: 'availableStorage',
+                                                fields: {
+                                                    availableStorageName: {
+                                                        label: 'label.storage.pool'
+                                                    }
+                                                },
+                                                dataProvider: function(args) {
+                                                    var data = {
+                                                        page: args.page,
+                                                        pagesize: pageSize
+                                                    };
+                                                    if (args.filterBy.search.value) {
+                                                        data.keyword = args.filterBy.search.value;
+                                                    }
+                                                    $.ajax({
+                                                        url: createURL("listStoragePools&zoneid=" + args.context.volumes[0].zoneid),
+                                                        dataType: "json",
+                                                        async: true,
+                                                        data: data,
+                                                        success: function (json) {
+                                                            var items = [];
+                                                            if ('storagepool' in json.liststoragepoolsresponse) {
+                                                                var pools = json.liststoragepoolsresponse.storagepool;
+                                                                pools.sort(function (a, b) {
+                                                                    if (a.name < b.name)
+                                                                        return -1;
+                                                                    if (a.name > b.name)
+                                                                        return 1;
+                                                                    return 0;
+                                                                });
+                                                                $(pools).each(function () {
+                                                                    items.push({
+                                                                        id: this.id,
+                                                                        availableStorageName: this.name
+                                                                    });
+                                                                });
+                                                            }
+                                                            args.response.success({
+                                                                data: items
                                                             });
-                                                        });
-                                                        args.response.success({
-                                                            data: items
-                                                        });
-                                                    }
-                                                });
+                                                        }
+                                                    });
+                                                }
                                             }
-                                        }
-                                    }
-                                },
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("migrateVolume&storageid=" + args.data.storageId + "&volumeid=" + args.context.volumes[0].id),
-                                        dataType: "json",
-                                        async: true,
-                                        success: function (json) {
-                                            var jid = json.migratevolumeresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        return json.queryasyncjobresultresponse.jobresult.volume;
-                                                    },
-                                                    getActionFilter: function () {
-                                                        return volumeActionfilter;
-                                                    }
+                                        },
+                                        action: function (args) {
+                                            $.ajax({
+                                                url: createURL("migrateVolume&storageid=" + args.data.storageId + "&volumeid=" + args.context.volumes[0].id),
+                                                dataType: "json",
+                                                async: true,
+                                                success: function (json) {
+                                                    var jid = json.migratevolumeresponse.jobid;
+                                                    args.response.success({
+                                                        _custom: {
+                                                            jobId: jid,
+                                                            getUpdatedItem: function (json) {
+                                                                return json.queryasyncjobresultresponse.jobresult.volume;
+                                                            },
+                                                            getActionFilter: function () {
+                                                                return volumeActionfilter;
+                                                            }
+                                                        }
+                                                    });
                                                 }
                                             });
+                                        },
+                                        notification: {
+                                            poll: pollAsyncJobResult
                                         }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
+                                    })
                                 }
                             },
 
