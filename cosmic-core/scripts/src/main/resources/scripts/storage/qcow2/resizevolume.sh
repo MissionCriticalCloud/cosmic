@@ -53,7 +53,7 @@ log() {
 
   if [ $shouldwelog -eq 1 ]
   then
-    echo "$d - $1" >> /var/log/cloudstack/agent/resizevolume.log
+    echo "$d - $1" >> /var/log/cosmic/agent/resizevolume.log
   fi
 }
 
