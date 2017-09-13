@@ -42,11 +42,9 @@ public class LibvirtRequestWrapper extends RequestWrapper {
     public Answer execute(final Command command, final ServerResource serverResource) {
         final Class<? extends ServerResource> resourceClass = serverResource.getClass();
 
-        final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands = retrieveResource(command,
-                resourceClass);
+        final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands = retrieveResource(command, resourceClass);
 
-        CommandWrapper<Command, Answer, ServerResource> commandWrapper = retrieveCommands(command.getClass(),
-                resourceCommands);
+        CommandWrapper<Command, Answer, ServerResource> commandWrapper = retrieveCommands(command.getClass(), resourceCommands);
 
         while (commandWrapper == null) {
             // Could not find the command in the given resource, will traverse the family tree.
