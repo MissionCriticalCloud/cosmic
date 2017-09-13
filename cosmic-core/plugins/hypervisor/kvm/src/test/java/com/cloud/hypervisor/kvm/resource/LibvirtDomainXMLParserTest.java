@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ public class LibvirtDomainXMLParserTest extends TestCase {
     public void testDomainXMLParser() {
         final int vncPort = 5900;
 
-        final DiskDef.DiskBus diskBus = DiskDef.DiskBus.VIRTIO;
-        final DiskDef.DiskType diskType = DiskDef.DiskType.FILE;
-        final DiskDef.DeviceType deviceType = DiskDef.DeviceType.DISK;
-        final DiskDef.DiskFmtType diskFormat = DiskDef.DiskFmtType.QCOW2;
-        final DiskDef.DiskCacheMode diskCache = DiskDef.DiskCacheMode.NONE;
+        final LibvirtDiskDef.DiskBus diskBus = LibvirtDiskDef.DiskBus.VIRTIO;
+        final LibvirtDiskDef.DiskType diskType = LibvirtDiskDef.DiskType.FILE;
+        final LibvirtDiskDef.DeviceType deviceType = LibvirtDiskDef.DeviceType.DISK;
+        final LibvirtDiskDef.DiskFmtType diskFormat = LibvirtDiskDef.DiskFmtType.QCOW2;
+        final LibvirtDiskDef.DiskCacheMode diskCache = LibvirtDiskDef.DiskCacheMode.NONE;
 
         final InterfaceDef.NicModel ifModel = InterfaceDef.NicModel.VIRTIO;
         final InterfaceDef.GuestNetType ifType = InterfaceDef.GuestNetType.BRIDGE;
@@ -163,7 +163,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
 
         assertEquals(vncPort - 5900, (int) parser.getVncPort());
 
-        final List<DiskDef> disks = parser.getDisks();
+        final List<LibvirtDiskDef> disks = parser.getDisks();
     /* Disk 0 is the first disk, the QCOW2 file backed virto disk */
         final int diskId = 0;
 

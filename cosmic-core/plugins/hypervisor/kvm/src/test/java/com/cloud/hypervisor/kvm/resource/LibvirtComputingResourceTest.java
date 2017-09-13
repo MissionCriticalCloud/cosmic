@@ -71,10 +71,10 @@ import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.NfsStoragePool;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.wrapper.LibvirtRequestWrapper;
 import com.cloud.hypervisor.kvm.resource.wrapper.LibvirtUtilitiesHelper;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
@@ -428,8 +428,8 @@ public class LibvirtComputingResourceTest {
             }
 
             @Override
-            public List<DiskDef> getDisks(final Connect conn, final String vmName) {
-                final DiskDef diskDef = new DiskDef();
+            public List<LibvirtDiskDef> getDisks(final Connect conn, final String vmName) {
+                final LibvirtDiskDef diskDef = new LibvirtDiskDef();
                 return Arrays.asList(diskDef);
             }
         };
@@ -1188,8 +1188,8 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getInterfaces(conn, vmName)).thenReturn(ifaces);
 
-        final DiskDef diskDef = Mockito.mock(DiskDef.class);
-        final List<DiskDef> disks = new ArrayList<>();
+        final LibvirtDiskDef diskDef = Mockito.mock(LibvirtDiskDef.class);
+        final List<LibvirtDiskDef> disks = new ArrayList<>();
         disks.add(diskDef);
 
         when(libvirtComputingResource.getDisks(conn, vmName)).thenReturn(disks);

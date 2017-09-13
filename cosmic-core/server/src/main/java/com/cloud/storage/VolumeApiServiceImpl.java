@@ -1569,6 +1569,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (_serviceOfferingDetailsDao.findDetail(vm.getServiceOfferingId(), GPU.Keys.pciDevice.toString()) != null) {
                 throw new InvalidParameterValueException("Live Migration of GPU enabled VM is not supported");
             }
+
             // Check if the underlying hypervisor supports storage motion.
             final Long hostId = vm.getHostId();
             if (hostId != null) {
@@ -2242,7 +2243,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return snapshotMgr.allocSnapshot(volumeId, policyId, snapshotName, false);
     }
 
-     @Override
+    @Override
     public Snapshot allocSnapshotForVm(final Long vmId, Long volumeId, final String snapshotName) throws ResourceAllocationException {
         final Account caller = CallContext.current().getCallingAccount();
         final VMInstanceVO vm = _vmInstanceDao.findById(vmId);

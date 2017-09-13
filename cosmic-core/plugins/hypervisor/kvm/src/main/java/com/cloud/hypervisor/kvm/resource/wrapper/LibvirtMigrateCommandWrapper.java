@@ -4,10 +4,10 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateAnswer;
 import com.cloud.agent.api.MigrateCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.MigrateKvmAsync;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.Ternary;
@@ -40,7 +40,7 @@ public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCo
         String result = null;
 
         List<InterfaceDef> ifaces = null;
-        List<DiskDef> disks;
+        List<LibvirtDiskDef> disks;
 
         Domain dm = null;
         Connect dconn = null;
@@ -124,7 +124,7 @@ public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCo
             destDomain = migrateThread.get(10, TimeUnit.SECONDS);
 
             if (destDomain != null) {
-                for (final DiskDef disk : disks) {
+                for (final LibvirtDiskDef disk : disks) {
                     libvirtComputingResource.cleanupDisk(disk);
                 }
             }

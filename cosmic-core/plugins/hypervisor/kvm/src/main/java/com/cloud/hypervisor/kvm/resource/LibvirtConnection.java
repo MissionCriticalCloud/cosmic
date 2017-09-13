@@ -15,7 +15,6 @@ public class LibvirtConnection {
 
     private static final Map<String, Connect> connections = new HashMap<>();
 
-    private static Connect connection;
     private static String hypervisorUri;
 
     public static Connect getConnectionByVmName(final String vmName) throws LibvirtException {

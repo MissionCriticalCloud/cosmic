@@ -4,9 +4,9 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.StopAnswer;
 import com.cloud.agent.api.StopCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 
@@ -45,13 +45,13 @@ public final class LibvirtStopCommandWrapper extends CommandWrapper<StopCommand,
         try {
             final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(vmName);
 
-            final List<DiskDef> disks = libvirtComputingResource.getDisks(conn, vmName);
+            final List<LibvirtDiskDef> disks = libvirtComputingResource.getDisks(conn, vmName);
             final List<InterfaceDef> ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
 
             libvirtComputingResource.destroyNetworkRulesForVm(conn, vmName);
             final String result = libvirtComputingResource.stopVm(conn, vmName, command.isForceStop());
             if (result == null) {
-                for (final DiskDef disk : disks) {
+                for (final LibvirtDiskDef disk : disks) {
                     libvirtComputingResource.cleanupDisk(disk);
                 }
                 for (final InterfaceDef iface : ifaces) {
