@@ -787,7 +787,7 @@
                                         },
                                         action: function (args) {
                                             $.ajax({
-                                                url: createURL("migrateVolume&livemigrate=true&storageid=" + args.data.storagePool + "&volumeid=" + args.context.volumes[0].id),
+                                                url: createURL("migrateVolume&livemigrate=true&storageid=" + args.context.selectedHost[0].id + "&volumeid=" + args.context.volumes[0].id),
                                                 dataType: "json",
                                                 async: true,
                                                 success: function (json) {
@@ -1284,7 +1284,7 @@
                                         },
                                         action: function (args) {
                                             $.ajax({
-                                                url: createURL("migrateVolume&storageid=" + args.data.storageId + "&volumeid=" + args.context.volumes[0].id),
+                                                url: createURL("migrateVolume&storageid=" + args.context.selectedHost[0].id + "&volumeid=" + args.context.volumes[0].id),
                                                 dataType: "json",
                                                 async: true,
                                                 success: function (json) {
