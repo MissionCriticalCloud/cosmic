@@ -1127,11 +1127,13 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 ipv4 = true;
                 buf.append(" eth").append(deviceId).append("ip=").append(nic.getIPv4Address());
                 buf.append(" eth").append(deviceId).append("mask=").append(nic.getIPv4Netmask());
+                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
             }
             if (nic.getIPv6Address() != null) {
                 ipv6 = true;
                 buf.append(" eth").append(deviceId).append("ip6=").append(nic.getIPv6Address());
                 buf.append(" eth").append(deviceId).append("ip6prelen=").append(NetUtils.getIp6CidrSize(nic.getIPv6Cidr()));
+                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
             }
 
             if (nic.isDefaultNic()) {
