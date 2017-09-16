@@ -66,16 +66,6 @@ class bash:
             return self.getStderr()
 
 
-def initLoging(logFile=None):
-    try:
-        if logFile is None:
-            logging.basicConfig(level=logging.DEBUG)
-        else:
-            logging.basicConfig(filename=logFile, level=logging.DEBUG)
-    except:
-        logging.basicConfig(level=logging.DEBUG)
-
-
 def writeProgressBar(msg, result):
     output = "[%-6s]\n" % "Failed"
     if msg is not None:

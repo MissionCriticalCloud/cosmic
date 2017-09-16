@@ -459,7 +459,7 @@ class TestPasswordService(cloudstackTestCase):
                     host.user,
                     host.passwd,
                     router.linklocalip,
-                    "/opt/cloud/bin/checkrouter.sh | cut -d\" \" -f2"
+                    "/opt/cosmic/router/scripts/checkrouter.sh | cut -d\" \" -f2"
                 )
             except:
                 self.logger.debug("Oops, unable to determine redundant state for router with link local address %s" % (router.linklocalip))

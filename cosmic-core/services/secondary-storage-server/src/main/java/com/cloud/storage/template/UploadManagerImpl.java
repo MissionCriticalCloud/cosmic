@@ -165,12 +165,6 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
     @Override
     public CreateEntityDownloadURLAnswer handleCreateEntityURLCommand(final CreateEntityDownloadURLCommand cmd) {
 
-        final boolean isApacheUp = checkAndStartApache();
-        if (!isApacheUp) {
-            final String errorString = "Error in starting Apache server ";
-            s_logger.error(errorString);
-            return new CreateEntityDownloadURLAnswer(errorString, CreateEntityDownloadURLAnswer.RESULT_FAILURE);
-        }
         // Create the directory structure so that its visible under apache server root
         final String extractDir = "/var/www/html/userdata/";
         Script command = new Script("mkdir", s_logger);
@@ -242,54 +236,6 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         }
 
         return new Answer(cmd, true, "");
-    }
-
-    private boolean checkAndStartApache() {
-
-        //Check whether the Apache server is running
-        Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("if [ -d /etc/apache2 ] ; then service apache2 status | grep pid; else service httpd status | grep pid; fi ");
-        String result = command.execute();
-
-        //Apache Server is not running. Try to start it.
-        if (result != null) {
-
-            /*s_logger.warn("Apache server not running, trying to start it");
-            String port = Integer.toString(TemplateConstants.DEFAULT_TMPLT_COPY_PORT);
-            String intf = TemplateConstants.DEFAULT_TMPLT_COPY_INTF;
-
-            command = new Script("/bin/bash", s_logger);
-            command.add("-c");
-            command.add("iptables -D INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + port + " -j DROP;" +
-                        "iptables -D INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + port + " -j HTTP;" +
-                        "iptables -D INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j DROP;" +
-                        "iptables -D INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j HTTP;" +
-                        "iptables -F HTTP;" +
-                        "iptables -X HTTP;" +
-                        "iptables -N HTTP;" +
-                        "iptables -I INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + port + " -j DROP;" +
-                        "iptables -I INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j DROP;" +
-                        "iptables -I INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + port + " -j HTTP;" +
-                        "iptables -I INPUT -i " + intf + " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j HTTP;");
-
-            result = command.execute();
-            if (result != null) {
-                s_logger.warn("Error in opening up httpd port err=" + result );
-                return false;
-            }*/
-
-            command = new Script("/bin/bash", s_logger);
-            command.add("-c");
-            command.add("if [ -d /etc/apache2 ] ; then service apache2 start; else service httpd start; fi ");
-            result = command.execute();
-            if (result != null) {
-                s_logger.warn("Error in starting httpd service err=" + result);
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private UploadAnswer handleUploadProgressCmd(final UploadProgressCommand cmd) {

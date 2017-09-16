@@ -434,3 +434,7 @@ fabric.properties
 
 # Checkstyle settings
 .checkstyle
+
+# Python virtualenv
+virtualenv/
+env/

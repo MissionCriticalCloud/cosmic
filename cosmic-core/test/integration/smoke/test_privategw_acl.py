@@ -377,7 +377,7 @@ class TestPrivateGateway(cloudstackTestCase):
 
                 try:
                     host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
-                    get_process_status(host.ipaddress, 22, host.user, host.passwd, router.linklocalip, "sh /opt/cloud/bin/checkrouter.sh ")
+                    get_process_status(host.ipaddress, 22, host.user, host.passwd, router.linklocalip, "sh /opt/cosmic/router/scripts/checkrouter.sh ")
 
                 except KeyError as e:
                     raise Exception("Exception: %s" % e)

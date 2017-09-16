@@ -290,7 +290,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                             host.user,
                             host.passwd,
                             router.linklocalip,
-                            "sh /opt/cloud/bin/checkrouter.sh "
+                            "sh /opt/cosmic/router/scripts/checkrouter.sh "
                         ))
 
                         self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))

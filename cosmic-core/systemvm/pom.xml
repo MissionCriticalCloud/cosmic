@@ -39,17 +39,8 @@
                                 <mkdir dir="${basedir}/target/build-patch/usr/sbin" />
 
                                 <copy overwrite="true" todir="${basedir}/target/build-patch">
-                                    <fileset dir="${basedir}/patches/debian/config/">
+                                    <fileset dir="${basedir}/patches/centos7/">
                                         <include name="**/*" />
-                                    </fileset>
-                                    <fileset dir="${basedir}/patches/debian/vpn/">
-                                        <include name="**/*" />
-                                    </fileset>
-                                </copy>
-
-                                <copy overwrite="true" todir="${basedir}/target/build-patch/usr/sbin/">
-                                    <fileset dir="${basedir}/patches/debian/xe/">
-                                        <include name="**/xe-*" />
                                     </fileset>
                                 </copy>
 
@@ -115,12 +106,6 @@
                                         <include>systemvm.zip</include>
                                     </includes>
                                 </resource>
-                                <resource>
-                                    <directory>patches/debian/config/root/.ssh</directory>
-                                    <includes>
-                                        <include>authorized_keys</include>
-                                    </includes>
-                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -148,7 +133,6 @@
                         <argument>systemvm.iso</argument>
                         <argument>systemvm.zip</argument>
                         <argument>cloud-scripts.tgz</argument>
-                        <argument>authorized_keys</argument>
                     </arguments>
                 </configuration>
             </plugin>
