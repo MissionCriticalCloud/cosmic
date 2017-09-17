@@ -115,12 +115,6 @@
                                         <include>systemvm.zip</include>
                                     </includes>
                                 </resource>
-                                <resource>
-                                    <directory>patches/debian/config/root/.ssh</directory>
-                                    <includes>
-                                        <include>authorized_keys</include>
-                                    </includes>
-                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -148,7 +142,6 @@
                         <argument>systemvm.iso</argument>
                         <argument>systemvm.zip</argument>
                         <argument>cloud-scripts.tgz</argument>
-                        <argument>authorized_keys</argument>
                     </arguments>
                 </configuration>
             </plugin>
