@@ -39,17 +39,8 @@
                                 <mkdir dir="${basedir}/target/build-patch/usr/sbin" />
 
                                 <copy overwrite="true" todir="${basedir}/target/build-patch">
-                                    <fileset dir="${basedir}/patches/debian/config/">
+                                    <fileset dir="${basedir}/patches/centos7/">
                                         <include name="**/*" />
-                                    </fileset>
-                                    <fileset dir="${basedir}/patches/debian/vpn/">
-                                        <include name="**/*" />
-                                    </fileset>
-                                </copy>
-
-                                <copy overwrite="true" todir="${basedir}/target/build-patch/usr/sbin/">
-                                    <fileset dir="${basedir}/patches/debian/xe/">
-                                        <include name="**/xe-*" />
                                     </fileset>
                                 </copy>
 
