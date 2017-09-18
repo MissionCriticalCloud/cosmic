@@ -22,7 +22,6 @@ import com.cloud.vm.VirtualMachine;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -118,13 +117,7 @@ public class MigrateVirtualMachineWithVolumeCmd extends BaseAsyncCmd {
         } catch (final ResourceUnavailableException ex) {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
-        } catch (final ConcurrentOperationException e) {
-            s_logger.warn("Exception: ", e);
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
-        } catch (final ManagementServerException e) {
-            s_logger.warn("Exception: ", e);
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
-        } catch (final VirtualMachineMigrationException e) {
+        } catch (final ConcurrentOperationException | ManagementServerException | VirtualMachineMigrationException e) {
             s_logger.warn("Exception: ", e);
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, e.getMessage());
         }
@@ -134,9 +127,8 @@ public class MigrateVirtualMachineWithVolumeCmd extends BaseAsyncCmd {
         final Map<String, String> volumeToPoolMap = new HashMap<>();
         if (migrateVolumeTo != null && !migrateVolumeTo.isEmpty()) {
             final Collection<?> allValues = migrateVolumeTo.values();
-            final Iterator<?> iter = allValues.iterator();
-            while (iter.hasNext()) {
-                final HashMap<String, String> volumeToPool = (HashMap<String, String>) iter.next();
+            for (final Object allValue : allValues) {
+                final HashMap<String, String> volumeToPool = (HashMap<String, String>) allValue;
                 final String volume = volumeToPool.get("volume");
                 final String pool = volumeToPool.get("pool");
                 volumeToPoolMap.put(volume, pool);

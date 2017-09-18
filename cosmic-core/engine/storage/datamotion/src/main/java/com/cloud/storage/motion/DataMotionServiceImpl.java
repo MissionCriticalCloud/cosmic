@@ -54,8 +54,8 @@ public class DataMotionServiceImpl implements DataMotionService {
     }
 
     @Override
-    public void copyAsync(final Map<VolumeInfo, DataStore> volumeMap, final VirtualMachineTO vmTo, final Host srcHost, final Host destHost, final
-    AsyncCompletionCallback<CopyCommandResult> callback) {
+    public void copyAsync(final Map<VolumeInfo, DataStore> volumeMap, final VirtualMachineTO vmTo, final Host srcHost, final Host destHost,
+                          final AsyncCompletionCallback<CopyCommandResult> callback) {
 
         final DataMotionStrategy strategy = storageStrategyFactory.getDataMotionStrategy(volumeMap, srcHost, destHost);
         if (strategy == null) {
