@@ -1540,7 +1540,8 @@
                                                                 availableHostSuitability: suitability,
                                                                 cpuallocated: this.cpuallocated,
                                                                 memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB',
-                                                                dedicated: dedicated
+                                                                dedicated: dedicated,
+                                                                requiresStorageMotion: this.requiresStorageMotion
                                                             });
                                                         });
                                                         args.response.success({
