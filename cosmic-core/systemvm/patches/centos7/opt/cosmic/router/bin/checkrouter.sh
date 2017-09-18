@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 STATUS=UNKNOWN
-ROUTER_TYPE=$(cat /etc/cloudstack/cmdline.json | grep type | awk '{print $2;}' | sed -e 's/[,\"]//g')
+ROUTER_TYPE=$(cat /etc/cosmic/router/cmdline.json | grep type | awk '{print $2;}' | sed -e 's/[,\"]//g')
 if [ "$ROUTER_TYPE" = "router" ]
 then
     ROUTER_STATE=$(ip addr | grep eth2 | grep state | awk '{print $9;}')

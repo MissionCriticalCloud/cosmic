@@ -2,9 +2,7 @@
 
 
 import glob
-import json
 import logging
-import os
 import os.path
 import sys
 
@@ -25,7 +23,7 @@ if len(sys.argv) != 2:
 # FIXME we should get this location from a configuration class
 jsonPath = "/var/cache/cloud/%s"
 jsonCmdConfigPath = jsonPath % sys.argv[1]
-currentGuestNetConfig = "/etc/cloudstack/guestnetwork.json"
+currentGuestNetConfig = "/etc/cosmic/router/guestnetwork.json"
 
 
 def finish_config():
@@ -55,6 +53,7 @@ def process_vmpasswd():
     qf = process(False)
     print("[INFO] Sending password to password server")
     CsPassword(qf.getData())
+
 
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
 if not (os.path.isfile(filename) and os.access(filename, os.R_OK)):

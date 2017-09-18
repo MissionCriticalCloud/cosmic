@@ -7,8 +7,8 @@ import logging
 import os
 import shutil
 import uuid
-import sys
 
+import cs.CsHelper as csHelper
 import cs_cmdline
 import cs_dhcp
 import cs_firewallrules
@@ -18,19 +18,18 @@ import cs_ip
 import cs_loadbalancer
 import cs_monitorservice
 import cs_network_acl
+import cs_privategateway
 import cs_public_ip_acl
 import cs_remoteaccessvpn
 import cs_site2sitevpn
 import cs_staticroutes
+import cs_virtualrouter
 import cs_vmdata
 import cs_vpnusers
-import cs_privategateway
-import cs_virtualrouter
-import cs.CsHelper as csHelper
 
 
 class DataBag:
-    DPATH = "/etc/cloudstack"
+    DPATH = "/etc/cosmic/router"
 
     def __init__(self):
         self.bdata = { }
@@ -70,12 +69,12 @@ class DataBag:
 
 
 class updateDataBag:
-    DPATH = "/etc/cloudstack"
+    DPATH = "/etc/cosmic/router"
 
     def __init__(self, qFile):
         self.qFile = qFile
         self.fpath = ''
-        self.bdata = {}
+        self.bdata = { }
         self.process()
 
     def process(self):
@@ -145,9 +144,10 @@ class updateDataBag:
 
         # Networks of type Guest and Private are stored in their own json but in order for interfaces to work properly these need to be
         # stored in ips.json as well.
+
     def save_ip_dbag(self, dbag):
         qf = QueueFile()
-        qf.load({'ip_address': [dbag], 'type': 'ips'})
+        qf.load({ 'ip_address': [dbag], 'type': 'ips' })
 
     # Based on mac address, find the device we should use
     def validate_device_based_on_mac_address(self):
@@ -191,7 +191,7 @@ class updateDataBag:
 
     def update_dbag_contents(self):
         d_to_merge = self.validate_device_based_on_mac_address()
-        d_ip_to_save = {}
+        d_ip_to_save = { }
 
         # Find mac address
         if 'mac_address' in d_to_merge:
@@ -258,7 +258,7 @@ class updateDataBag:
         # Pass the add boolean
         d_ip_to_save['add'] = d_to_merge['add']
 
-        return {'d_ip_to_save': d_ip_to_save, 'd_to_merge': d_to_merge}
+        return { 'd_ip_to_save': d_ip_to_save, 'd_to_merge': d_to_merge }
 
     def process_dhcp_entry(self, dbag):
         return cs_dhcp.merge(dbag, self.qFile.data)
@@ -327,7 +327,7 @@ class updateDataBag:
                     print("[INFO] " + log_message)
                     ip['vif_mac_address'] = ip['device_mac_address']
                     ip['device'] = device_name
-                    ip['nic_dev_id'] = device_name.replace("eth","")
+                    ip['nic_dev_id'] = device_name.replace("eth", "")
             dbag = cs_ip.merge(dbag, ip)
         return dbag
 
@@ -359,7 +359,7 @@ class updateDataBag:
             if nw_type == "public":
                 dp['gateway'] = self.qFile.data['cmd_line']['gateway']
             else:
-                if('localgw' in self.qFile.data['cmd_line']):
+                if ('localgw' in self.qFile.data['cmd_line']):
                     dp['gateway'] = self.qFile.data['cmd_line']['localgw']
                 else:
                     dp['gateway'] = 'None'

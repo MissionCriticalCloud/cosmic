@@ -6,9 +6,9 @@ then
     exit 1
 fi
 
-if [ -f /etc/cloudstack-release ]
+if [ -f /etc/cosmic-release ]
   then
-    VERSION_DATA=$(cat /etc/cloudstack-release | cut -d" " -f3)
+    VERSION_DATA=$(cat /etc/cosmci-release | cut -d" " -f3)
     export IFS="."
     for part in ${VERSION_DATA}; do
         SYSTEMVM_VERSION=${SYSTEMVM_VERSION}$(printf "%02d" ${part})

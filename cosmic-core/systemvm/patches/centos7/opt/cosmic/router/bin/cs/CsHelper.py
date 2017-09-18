@@ -50,7 +50,7 @@ def get_device_from_mac_address(macaddress):
 
 def get_systemvm_version():
     try:
-        with open("/etc/cloudstack-release") as file:
+        with open("/etc/cosmic-release") as file:
             content = file.readlines()
         version_data = content[0].split(" ")[2]
         version = ""
