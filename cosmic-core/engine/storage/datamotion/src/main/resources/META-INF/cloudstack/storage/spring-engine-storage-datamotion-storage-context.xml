@@ -23,5 +23,6 @@
 >
     <bean id="ancientDataMotionStrategy" class="com.cloud.storage.motion.AncientDataMotionStrategy" />
     <bean id="xenserverStorageMotionStrategy" class="com.cloud.storage.motion.XenServerStorageMotionStrategy" />
+    <bean id="kvmStorageMotionStrategy" class="com.cloud.storage.motion.KVMStorageMotionStrategy" />
     <bean id="storageSystemDataMotionStrategy" class="com.cloud.storage.motion.StorageSystemDataMotionStrategy" />
 </beans>
