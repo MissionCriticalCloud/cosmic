@@ -17,7 +17,7 @@ public class VRScripts {
 
     // Present inside the router
     public static final String UPDATE_CONFIG = "bin/update_config.py";
-    public static final String S2SVPN_CHECK = "scripts/checkbatchs2svpn.sh";
+    public static final String S2SVPN_CHECK = "scripts/checks2svpn.py";
     public static final String RVR_CHECK = "scripts/checkrouter.sh";
     public static final String VERSION = "scripts/get_template_version.sh";
     public static final String VPC_NETUSAGE = "scripts/vpc_netusage.sh";
