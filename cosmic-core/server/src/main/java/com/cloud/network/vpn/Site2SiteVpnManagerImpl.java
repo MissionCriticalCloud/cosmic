@@ -185,9 +185,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
 
         final long accountId = owner.getAccountId();
-        if (_customerGatewayDao.findByGatewayIpAndAccountId(gatewayIp, accountId) != null) {
-            throw new InvalidParameterValueException("The customer gateway with ip " + gatewayIp + " already existed in the system!");
-        }
         if (_customerGatewayDao.findByNameAndAccountId(name, accountId) != null) {
             throw new InvalidParameterValueException("The customer gateway with name " + name + " already existed!");
         }
@@ -682,11 +679,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         checkCustomerGatewayCidrList(guestCidrList);
 
         final long accountId = gw.getAccountId();
-        Site2SiteCustomerGatewayVO existedGw = _customerGatewayDao.findByGatewayIpAndAccountId(gatewayIp, accountId);
-        if (existedGw != null && existedGw.getId() != gw.getId()) {
-            throw new InvalidParameterValueException("The customer gateway with ip " + gatewayIp + " already existed in the system!");
-        }
-        existedGw = _customerGatewayDao.findByNameAndAccountId(name, accountId);
+        Site2SiteCustomerGatewayVO existedGw = _customerGatewayDao.findByNameAndAccountId(name, accountId);
         if (existedGw != null && existedGw.getId() != gw.getId()) {
             throw new InvalidParameterValueException("The customer gateway with name " + name + " already existed!");
         }
