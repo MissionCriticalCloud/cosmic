@@ -1,4 +1,15 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
 
 cosmiccat() {
   if [ $# -ne 1 ];
@@ -68,7 +79,7 @@ replay() {
   # replay the config file
   if [ -f ${f:0:(-3)} ]
   then
-    update_config.py ${f:0:(-3)}
+    /opt/cosmic/router/bin/update_config.py ${f:0:(-3)}
     echo "Exit code $?"
     cd - > /dev/null
   else
