@@ -739,7 +739,8 @@
                                                         label: 'label.suitability',
                                                         indicator: {
                                                             'Suitable': 'suitable',
-                                                            'Not Suitable': 'notsuitable'
+                                                            'Not Suitable': 'notsuitable',
+                                                            '': 'off'
                                                         }
                                                     }
                                                 },
@@ -752,14 +753,14 @@
                                                         data.keyword = args.filterBy.search.value;
                                                     }
                                                     $.ajax({
-                                                        url: createURL("findStoragePoolsForMigration&id="+args.context.volumes[0].id),
+                                                        url: createURL("listStoragePools&zoneid="+args.context.volumes[0].zoneid),
                                                         dataType: "json",
                                                         async: true,
                                                         data: data,
                                                         success: function (json) {
                                                             var items = [];
-                                                            if ('storagepool' in json.findstoragepoolsformigrationresponse) {
-                                                                var pools = json.findstoragepoolsformigrationresponse.storagepool;
+                                                            if (json.liststoragepoolsresponse.storagepool != undefined) {
+                                                                var pools = json.liststoragepoolsresponse.storagepool;
                                                                 pools.sort(function (a, b) {
                                                                     if (a.name < b.name)
                                                                         return -1;
@@ -768,7 +769,11 @@
                                                                     return 0;
                                                                 });
                                                                 $(pools).each(function () {
-                                                                    var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
+                                                                    if (this.suitableformigration != undefined) {
+                                                                        var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
+                                                                    } else {
+                                                                        var suitability = "";
+                                                                    }
                                                                     items.push({
                                                                         id: this.id,
                                                                         availableStorageName: this.name,
