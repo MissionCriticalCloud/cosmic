@@ -739,8 +739,12 @@
                                                         label: 'label.suitability',
                                                         indicator: {
                                                             'Suitable': 'suitable',
+<<<<<<< HEAD
                                                             'Not Suitable': 'notsuitable',
                                                             '': 'off'
+=======
+                                                            'Not Suitable': 'notsuitable'
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                         }
                                                     }
                                                 },
@@ -753,14 +757,23 @@
                                                         data.keyword = args.filterBy.search.value;
                                                     }
                                                     $.ajax({
+<<<<<<< HEAD
                                                         url: createURL("listStoragePools&zoneid="+args.context.volumes[0].zoneid),
+=======
+                                                        url: createURL("findStoragePoolsForMigration&id="+args.context.volumes[0].id),
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                         dataType: "json",
                                                         async: true,
                                                         data: data,
                                                         success: function (json) {
                                                             var items = [];
+<<<<<<< HEAD
                                                             if (json.liststoragepoolsresponse.storagepool != undefined) {
                                                                 var pools = json.liststoragepoolsresponse.storagepool;
+=======
+                                                            if ('storagepool' in json.findstoragepoolsformigrationresponse) {
+                                                                var pools = json.findstoragepoolsformigrationresponse.storagepool;
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                                 pools.sort(function (a, b) {
                                                                     if (a.name < b.name)
                                                                         return -1;
@@ -769,11 +782,15 @@
                                                                     return 0;
                                                                 });
                                                                 $(pools).each(function () {
+<<<<<<< HEAD
                                                                     if (this.suitableformigration != undefined) {
                                                                         var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
                                                                     } else {
                                                                         var suitability = "";
                                                                     }
+=======
+                                                                    var suitability = this.suitableformigration ? "Suitable" : "Not Suitable";
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                                     items.push({
                                                                         id: this.id,
                                                                         availableStorageName: this.name,
@@ -792,7 +809,11 @@
                                         },
                                         action: function (args) {
                                             $.ajax({
+<<<<<<< HEAD
                                                 url: createURL("migrateVolume&livemigrate=true&storageid=" + args.context.selectedHost[0].id + "&volumeid=" + args.context.volumes[0].id),
+=======
+                                                url: createURL("migrateVolume&livemigrate=true&storageid=" + args.data.storagePool + "&volumeid=" + args.context.volumes[0].id),
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                 dataType: "json",
                                                 async: true,
                                                 success: function (json) {
@@ -1289,7 +1310,11 @@
                                         },
                                         action: function (args) {
                                             $.ajax({
+<<<<<<< HEAD
                                                 url: createURL("migrateVolume&storageid=" + args.context.selectedHost[0].id + "&volumeid=" + args.context.volumes[0].id),
+=======
+                                                url: createURL("migrateVolume&storageid=" + args.data.storageId + "&volumeid=" + args.context.volumes[0].id),
+>>>>>>> 094d9c6b8b29d40569d0450db77d6eb1d2e7fb39
                                                 dataType: "json",
                                                 async: true,
                                                 success: function (json) {
