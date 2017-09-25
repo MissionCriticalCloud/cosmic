@@ -6,7 +6,7 @@ import os.path
 import sys
 
 import configure
-from CsMetadataService import CsMetadataServiceVMConfig
+from cs.CsMetadataService import CsMetadataServiceVMConfig
 from databag.merge import QueueFile
 
 OCCURRENCES = 1
