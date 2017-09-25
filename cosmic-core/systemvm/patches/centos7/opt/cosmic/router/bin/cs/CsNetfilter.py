@@ -1,5 +1,3 @@
-# -- coding: utf-8 --
-
 from __future__ import print_function
 
 import logging
@@ -7,7 +5,7 @@ from subprocess import Popen, PIPE
 
 import CsHelper
 from CsDatabag import CsCmdLine
-from cs_iptables_save import Tables
+from databag.cs_iptables_save import Tables
 
 
 class CsChain(object):
