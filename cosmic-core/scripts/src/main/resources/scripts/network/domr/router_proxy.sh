@@ -13,7 +13,7 @@ domRIp=$1
 shift
 
 tries=0
-until ssh -p 3922 -q -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 -i ${cert} root@${domRIp} "/opt/cosmic/router/bin/$script $*"
+until ssh -p 3922 -q -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 -i ${cert} root@${domRIp} "/opt/cosmic/router/$script $*"
 do
   exit_status=$?
   if [ "${exit_status}" -lt 255 ]; then
