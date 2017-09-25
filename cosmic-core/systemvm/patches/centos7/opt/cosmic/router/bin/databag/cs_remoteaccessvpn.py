@@ -1,7 +1,3 @@
-# -- coding: utf-8 --
-
-
-
 def merge(dbag, vpn):
     key = vpn['vpn_server_ip']
     op = vpn['create']

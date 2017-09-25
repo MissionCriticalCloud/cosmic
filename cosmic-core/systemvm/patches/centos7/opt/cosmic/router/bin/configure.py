@@ -5,11 +5,11 @@ import re
 import sys
 from collections import OrderedDict
 
-from CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsDataBag
 from cs.CsDhcp import CsDhcp
 from cs.CsLoadBalancer import CsLoadBalancer
+from cs.CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
 from cs.CsPrivateGateway import CsPrivateGateway

@@ -1,4 +1,4 @@
-from merge import DataBag
+from databag.merge import DataBag
 
 
 class CsGuestNetwork:

@@ -67,7 +67,7 @@ def savePasswordFile():
                 for ip in passMap:
                     f.write('%s=%s\n' % (ip, passMap[ip]))
             f.close()
-        except IOError, e:
+        except IOError as e:
             syslog.syslog('serve_password[%s]: Unable to save to password file %s' % (listeningAddress, e))
 
 
@@ -177,7 +177,7 @@ def serve(HandlerClass=PasswordRequestHandler,
     except KeyboardInterrupt:
         syslog.syslog('serve_password[%s] shutting down' % listeningAddress)
         passwordServer.socket.close()
-    except Exception, e:
+    except Exception as e:
         syslog.syslog('serve_password[%s] hit exception %s -- died' % (listeningAddress, e))
         passwordServer.socket.close()
 

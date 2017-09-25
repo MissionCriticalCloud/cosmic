@@ -9,8 +9,10 @@ import os.path
 import re
 import shutil
 import subprocess
-from netaddr import *
+import sys
 from subprocess import check_output
+
+from netaddr import *
 
 # @TODO fix hardcoded eth1 public interface -- is OK for now since it's for redundant VPCs and these have always a public interface. Although that is still an assumption and may not be true anymore some day
 STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
@@ -95,8 +97,8 @@ def mkdir(name, mode, fatal):
         os.makedirs(name, mode)
     except OSError as e:
         if e.errno != 17:
-            print "failed to make directories " + name + " due to :" + e.strerror
-            if (fatal):
+            print("failed to make directories " + name + " due to :" + e.strerror)
+            if fatal:
                 sys.exit(1)
 
 

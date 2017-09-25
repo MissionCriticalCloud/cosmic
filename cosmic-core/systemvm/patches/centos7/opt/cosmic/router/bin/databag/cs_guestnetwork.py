@@ -1,4 +1,3 @@
-
 def merge(dbag, ip):
     for dev in dbag:
         if dev == "id":

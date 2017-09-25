@@ -1,14 +1,11 @@
-# -- coding: utf-8 --
-
-
 import copy
 
 
 def merge(dbag, data):
     dbagc = copy.deepcopy(dbag)
 
-    print dbag
-    print data
+    print(dbag)
+    print(data)
     if "vpn_users" not in data:
         return dbagc
 

@@ -41,7 +41,7 @@ def merge(dbag, rules):
                     for forward in dbag[source_ip]:
                         if ruleCompare(forward, newrule):
                             index = dbag[source_ip].index(forward)
-                            print "removing index %s" % str(index)
+                            print("removing index %s" % str(index))
                     if not index == -1:
                         del dbag[source_ip][index]
 

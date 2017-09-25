@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 import gzip
 import json
 import logging

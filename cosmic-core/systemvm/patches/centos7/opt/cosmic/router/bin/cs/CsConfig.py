@@ -1,6 +1,3 @@
-# -- coding: utf-8 --
-
-
 from CsAddress import CsAddress
 from CsDatabag import CsCmdLine
 

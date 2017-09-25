@@ -7,7 +7,7 @@ import sys
 
 import configure
 from cs.CsVmPassword import *
-from merge import QueueFile
+from databag.merge import QueueFile
 
 OCCURRENCES = 1
 

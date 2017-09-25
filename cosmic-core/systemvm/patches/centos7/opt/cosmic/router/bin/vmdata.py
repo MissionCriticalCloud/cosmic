@@ -16,7 +16,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "f:d:")
     except getopt.GetoptError:
-        print 'params: -f <filename> -d <b64jsondata>'
+        print('params: -f <filename> -d <b64jsondata>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-f':
@@ -31,7 +31,7 @@ def main(argv):
     elif b64data != '':
         json_data = json.loads(base64.b64decode(b64data))
     else:
-        print '-f <filename> or -d <b64jsondata> required'
+        print('-f <filename> or -d <b64jsondata> required')
         sys.exit(2)
 
     for ip in json_data:
@@ -84,15 +84,15 @@ def createfile(ip, folder, file, data):
         fh.write("")
     unflock(fh)
     fh.close()
-    os.chmod(dest, 0644)
+    os.chmod(dest, 0o644)
 
     if folder == "metadata" or folder == "meta-data":
         try:
-            os.makedirs(metamanifestdir, 0755)
+            os.makedirs(metamanifestdir, 0o755)
         except OSError as e:
             # error 17 is already exists, we do it this way for concurrency
             if e.errno != 17:
-                print "failed to make directories " + metamanifestdir + " due to :" + e.strerror
+                print("failed to make directories " + metamanifestdir + " due to :" + e.strerror)
                 sys.exit(1)
         if os.path.exists(metamanifest):
             fh = open(metamanifest, "r+a")
@@ -109,7 +109,7 @@ def createfile(ip, folder, file, data):
             fh.close()
 
     if os.path.exists(metamanifest):
-        os.chmod(metamanifest, 0644)
+        os.chmod(metamanifest, 0o644)
 
 
 def htaccess(ip, folder, file):
@@ -118,11 +118,11 @@ def htaccess(ip, folder, file):
     htaccessFile = htaccessFolder + "/.htaccess"
 
     try:
-        os.makedirs(htaccessFolder, 0755)
+        os.makedirs(htaccessFolder, 0o755)
     except OSError as e:
         # error 17 is already exists, we do it this way for sake of concurrency
         if e.errno != 17:
-            print "failed to make directories " + htaccessFolder + " due to :" + e.strerror
+            print("failed to make directories " + htaccessFolder + " due to :" + e.strerror)
             sys.exit(1)
 
     fh = open(htaccessFile, "w")
@@ -136,7 +136,7 @@ def exflock(file):
     try:
         flock(file, LOCK_EX)
     except IOError as e:
-        print "failed to lock file" + file.name + " due to : " + e.strerror
+        print("failed to lock file" + file.name + " due to : " + e.strerror)
         sys.exit(1)
     return True
 
@@ -144,8 +144,8 @@ def exflock(file):
 def unflock(file):
     try:
         flock(file, LOCK_UN)
-    except IOError:
-        print "failed to unlock file" + file.name + " due to : " + e.strerror
+    except IOError as e:
+        print("failed to unlock file" + file.name + " due to : " + e.strerror)
         sys.exit(1)
     return True
 
