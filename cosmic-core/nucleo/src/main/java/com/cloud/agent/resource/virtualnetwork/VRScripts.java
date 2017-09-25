@@ -42,7 +42,7 @@ public class VRScripts {
     public static final String RVR_CHECK = "checkrouter.sh";
     public static final String VMDATA = "vmdata.py";
     public static final String RVR_BUMPUP_PRI = "bumpup_priority.sh";
-    public static final String VERSION = "get_template_version.sh";
+    public static final String VERSION = "scripts/get_template_version.sh";
     public static final String VPC_SOURCE_NAT = "vpc_snat.sh";
     public static final String VPC_STATIC_ROUTE = "vpc_staticroute.sh";
     public static final String VPN_L2TP = "vpn_l2tp.sh";
