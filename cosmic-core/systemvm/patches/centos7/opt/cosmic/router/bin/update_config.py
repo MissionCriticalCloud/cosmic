@@ -6,10 +6,16 @@ import os.path
 import sys
 
 import configure
+from cs.CsHelper import mkdir
 from cs.CsMetadataService import CsMetadataServiceVMConfig
 from databag.merge import QueueFile
 
 OCCURRENCES = 1
+
+LOG_DIR="/var/log/cosmic/router"
+
+if not os.path.isdir(LOG_DIR):
+    mkdir(LOG_DIR, 0o755, False)
 
 logging.basicConfig(filename='/var/log/cosmic/router/router.log', level=logging.DEBUG,
                     format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
