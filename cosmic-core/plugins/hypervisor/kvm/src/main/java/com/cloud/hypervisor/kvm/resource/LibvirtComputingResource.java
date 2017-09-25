@@ -1551,7 +1551,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     public String configureVpcNetworkUsage(final String privateIpAddress, final String publicIp, final String option,
                                            final String vpcCidr) {
         final Script getUsage = new Script(routerProxyPath, logger);
-        getUsage.add("vpc_netusage.sh");
+        getUsage.add(VRScripts.VPC_NETUSAGE);
         getUsage.add(privateIpAddress);
         getUsage.add("-l", publicIp);
 

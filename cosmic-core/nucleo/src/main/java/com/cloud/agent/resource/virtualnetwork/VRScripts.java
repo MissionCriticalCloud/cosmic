@@ -30,6 +30,7 @@ public class VRScripts {
     public static final String UPDATE_CONFIG = "bin/update_config.py";
 
     // TODO Remove scripts
+    // Present inside the router
     public static final String S2SVPN_CHECK = "scripts/checkbatchs2svpn.sh";
     public static final String S2SVPN_IPSEC = "scripts/ipsectunnel.sh";
     public static final String DHCP = "scripts/edithosts.sh";
@@ -43,9 +44,12 @@ public class VRScripts {
     public static final String VMDATA = "bin/vmdata.py";
     public static final String RVR_BUMPUP_PRI = "scripts/bumpup_priority.sh";
     public static final String VERSION = "scripts/get_template_version.sh";
+    public static final String VPC_NETUSAGE = "scripts/vpc_netusage.sh";
     public static final String VPC_SOURCE_NAT = "scripts/vpc_snat.sh";
     public static final String VPC_STATIC_ROUTE = "scripts/vpc_staticroute.sh";
     public static final String VPN_L2TP = "scripts/vpn_l2tp.sh";
+
+    // Present on the KVM hypervisor
     public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";
 
     public static final String VR_CFG = "scripts/vr_cfg.sh";
