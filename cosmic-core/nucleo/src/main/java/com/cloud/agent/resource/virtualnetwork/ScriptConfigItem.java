@@ -29,7 +29,7 @@ public class ScriptConfigItem extends ConfigItem {
     public String getAggregateCommand() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<script>\n");
-        sb.append("/opt/cloud/bin/");
+        sb.append("/opt/cosmic/router/");
         sb.append(script);
         sb.append(' ');
         sb.append(args);
