@@ -1,14 +1,12 @@
 #!/usr/bin/python
 # -- coding: utf-8 --
 
-
-import sys
 import logging
 
-from CsDatabag import CsDataBag
 import CsHelper
-from cs.CsFile import CsFile
+from CsDatabag import CsDataBag
 
+from cs.CsFile import CsFile
 
 RSYSLOG_IPTABLES_CONF = "/etc/rsyslog.d/00-iptables.conf"
 
@@ -65,4 +63,4 @@ class CsVrConfig(CsDataBag):
         changed = self.syslogconf.is_changed()
         self.syslogconf.commit()
         if changed:
-            CsHelper.execute2("service rsyslog restart")
+            CsHelper.execute2("systemctl restart rsyslog")
