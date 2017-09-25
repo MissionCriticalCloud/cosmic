@@ -22,71 +22,76 @@ class CsMetadataService(CsApp):
     def setup(self):
         vhost = """
 server {
-    listen       80 %s;
-    listen       443 %s ssl;
+    listen       %s:80;
+    listen       %s:443 ssl;
     server_name  _;
     root         /var/www/html;
     
     autoindex off;
     
-    location /latest {
-        location /latest/user {
-            rewrite ^/user-data/?$ /../userdata/$remote_addr/user-data break;
-            rewrite ^/user-data$ /../userdata/$remote_addr/user-data break;
-        }
-        
-        location /latest/meta {
-            rewrite ^/meta-data/?$ /../metadata/$remote_addr/meta-data break;
-            rewrite ^/meta-data/(.+[^/])/?$ /../metadata/$remote_addr/$1 break;
-            rewrite ^/meta-data/(.+)$ /../metadata/$remote_addr/$1 break;
-            rewrite ^/meta-data/$ /../metadata/$remote_addr/meta-data break;
-        }
-        
-        location /latest/availability {
-            rewrite ^/availability-zone/?$ /../metadata/$remote_addr/availability-zone break;
-            rewrite ^/availability-zone$ /../metadata/$remote_addr/availability-zone break;
-        }
-        
-        location /latest/cloud {
-            rewrite ^/cloud-identifier/?$ /../metadata/$remote_addr/cloud-identifier break;
-            rewrite ^/cloud-identifier$ /../metadata/$remote_addr/cloud-identifier break;
-        }
-        
-        location /latest/instance {
-            rewrite ^/instance-id/?$ /../metadata/$remote_addr/instance-id break;
-            rewrite ^/instance-id$ /../metadata/$remote_addr/instance-id break;
-        }
-        
-        location /latest/local {
-            rewrite ^/local-hostname/?$ /../metadata/$remote_addr/local-hostname break;
-            rewrite ^/local-ipv4/?$ /../metadata/$remote_addr/local-ipv4 break;
-            rewrite ^/local-ipv4$ /../metadata/$remote_addr/local-ipv4 break;
-            rewrite ^/local-hostname$ /../metadata/$remote_addr/local-hostname break;
-        }
-        
-        location /latest/public {
-            rewrite ^/public-hostname/?$ /../metadata/$remote_addr/public-hostname break;
-            rewrite ^/public-ipv4/?$ /../metadata/$remote_addr/public-ipv4 break;
-            rewrite ^/public-keys/?$ /../metadata/$remote_addr/public-keys break;
-            rewrite ^/public-ipv4$ /../metadata/$remote_addr/public-ipv4 break;
-            rewrite ^/public-hostname$ /../metadata/$remote_addr/public-hostname break;
-            rewrite ^/public-keys$ /../metadata/$remote_addr/public-keys break;
-        }
-        
-        location /latest/service {
-            rewrite ^/service-offering/?$ /../metadata/$remote_addr/service-offering break;
-            rewrite ^/service-offering$ /../metadata/$remote_addr/service-offering break;
-        }
-        
-        location /latest/vm {
-            rewrite ^/vm-id/?$ /../metadata/$remote_addr/vm-id break;
-            rewrite ^/vm-id$ /../metadata/$remote_addr/vm-id break;
-        }
+    location /latest/user-data {
+        rewrite ^/latest/user-data/?$ /userdata/$remote_addr/user-data break;
+        rewrite ^/latest/user-data$ /userdata/$remote_addr/user-data break;
+    }
+    
+    location /latest/meta-data {
+        rewrite ^/latest/meta-data/?$ /metadata/$remote_addr/meta-data break;
+        rewrite ^/latest/meta-data/(.+[^/])/?$ /metadata/$remote_addr/$1 break;
+        rewrite ^/latest/meta-data/(.+)$ /metadata/$remote_addr/$1 break;
+        rewrite ^/latest/meta-data/$ /metadata/$remote_addr/meta-data break;
+    }
+    
+    location /latest/availability-zone {
+        rewrite ^/latest/availability-zone/?$ /metadata/$remote_addr/availability-zone break;
+        rewrite ^/latest/availability-zone$ /metadata/$remote_addr/availability-zone break;
+    }
+    
+    location /latest/cloud-identifier {
+        rewrite ^/latest/cloud-identifier/?$ /metadata/$remote_addr/cloud-identifier break;
+        rewrite ^/latest/cloud-identifier$ /metadata/$remote_addr/cloud-identifier break;
+    }
+    
+    location /latest/instance-id {
+        rewrite ^/latest/instance-id/?$ /metadata/$remote_addr/instance-id break;
+        rewrite ^/latest/instance-id$ /metadata/$remote_addr/instance-id break;
+    }
+    
+    location /latest/local-hostname {
+        rewrite ^/latest/local-hostname/?$ /metadata/$remote_addr/local-hostname break;
+        rewrite ^/latest/local-hostname$ /metadata/$remote_addr/local-hostname break;
+    }
+    
+    location /latest/local-ipv4 {
+        rewrite ^/latest/local-ipv4/?$ /metadata/$remote_addr/local-ipv4 break;
+        rewrite ^/latest/local-ipv4$ /metadata/$remote_addr/local-ipv4 break;
+    }
+    
+    location /latest/public-hostname {
+        rewrite ^/latest/public-hostname/?$ /metadata/$remote_addr/public-hostname break;
+        rewrite ^/latest/public-hostname$ /metadata/$remote_addr/public-hostname break;
+    }
+    
+    location /latest/public-ipv4 {
+        rewrite ^/latest/public-ipv4/?$ /metadata/$remote_addr/public-ipv4 break;
+        rewrite ^/latest/public-ipv4$ /metadata/$remote_addr/public-ipv4 break;
+    }
+    
+    location /latest/public-keys {
+        rewrite ^/latest/public-keys/?$ /metadata/$remote_addr/public-keys break;
+        rewrite ^/latest/public-keys$ /metadata/$remote_addr/public-keys break;
+    }
+    
+    location /latest/service-offering {
+        rewrite ^/latest/service-offering/?$ /metadata/$remote_addr/service-offering break;
+        rewrite ^/latest/service-offering$ /metadata/$remote_addr/service-offering break;
+    }
+    
+    location /latest/vm-id {
+        rewrite ^/latest/vm-id/?$ /metadata/$remote_addr/vm-id break;
+        rewrite ^/latest/vm-id$ /metadata/$remote_addr/vm-id break;
     }
     
     location /(userdata|metadata)/$remote_addr {
-        deny all;
-        allow $remote_addr;
         autoindex off;
     }
 }
