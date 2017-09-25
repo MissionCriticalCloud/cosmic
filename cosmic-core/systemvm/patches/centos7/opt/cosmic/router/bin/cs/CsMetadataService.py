@@ -144,6 +144,9 @@ class CsMetadataServiceVMConfig(CsDataBag):
         metamanifestdir = "/var/www/html/" + folder + "/" + ip
         metamanifest = metamanifestdir + "/meta-data"
 
+        if not os.path.isdir(metamanifestdir):
+            CsHelper.mkdir(metamanifestdir, 0o755, False)
+
         # base64 decode userdata
         if folder == "userdata" or folder == "user-data":
             if data is not None:
