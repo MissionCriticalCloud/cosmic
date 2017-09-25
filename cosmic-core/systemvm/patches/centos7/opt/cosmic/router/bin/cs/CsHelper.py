@@ -239,9 +239,9 @@ def service(name, op):
 def start_if_stopped(name):
     logging.info("Start if stopped: %s" % name)
 
-    ret = execute2("service %s status" % name)
+    ret = execute2("systemctl status %s" % name)
     if ret.returncode:
-        execute2("service %s start" % name)
+        execute2("systemctl start %s" % name)
 
 
 def hup_dnsmasq(name, user):
