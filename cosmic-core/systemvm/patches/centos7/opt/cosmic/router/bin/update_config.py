@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import glob
 import logging
 import os.path
