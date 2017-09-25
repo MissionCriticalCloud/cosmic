@@ -417,7 +417,7 @@ class CsVmMetadata(CsDataBag):
 
 class CsSite2SiteVpn(CsDataBag):
     """
-    Setup any configured vpns (using swan)
+    Setup any configured vpns (using strongswan)
     left is the local machine
     right is where the clients connect from
     """
@@ -453,26 +453,26 @@ class CsSite2SiteVpn(CsDataBag):
         self.check_ipsec()
 
     def check_ipsec(self):
-        CsHelper.start_if_stopped("ipsec")
+        CsHelper.start_if_stopped("strongswan")
 
-        logging.info("Checking if ipsec is running correctly: service ipsec status")
-        p = CsHelper.execute2("service ipsec status", log=False)
+        logging.info("Checking if strongswan is running correctly: systemctl status strongswan")
+        p = CsHelper.execute2("systemctl status strongswan", log=False)
 
         out, _ = p.communicate()
 
         if "Security Associations" not in out:
             logging.error("Security Associations not found in: %s" % out)
-            CsHelper.execute2("service ipsec stop")
-            CsHelper.execute2("service ipsec start")
+            CsHelper.execute2("systemctl stop strongswan")
+            CsHelper.execute2("systemctl start strongswan")
 
     def deletevpn(self, ip):
         logging.info("Removing VPN configuration for %s", ip)
-        CsHelper.execute("ipsec down vpn-%s" % ip, wait=False)
+        CsHelper.execute("strongswan down vpn-%s" % ip, wait=False)
         vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, ip)
         vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, ip)
         os.remove(vpnconffile)
         os.remove(vpnsecretsfile)
-        CsHelper.execute("ipsec reload")
+        CsHelper.execute("strongswan reload")
 
     def configure_iptables(self, dev, obj):
         self.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 500 -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
@@ -545,121 +545,11 @@ class CsSite2SiteVpn(CsDataBag):
             secret.commit()
             file.commit()
             logging.info("Configured vpn %s %s", leftpeer, rightpeer)
-            CsHelper.execute("ipsec rereadsecrets")
+            CsHelper.execute("strongswan rereadsecrets")
 
         # This will load the new config and start the connection when needed since auto=start in the config
         os.chmod(vpnsecretsfile, 0400)
-        CsHelper.execute("ipsec reload")
-
-    def convert_sec_to_h(self, val):
-        hrs = int(val) / 3600
-        return "%sh" % hrs
-
-
-class CsSite2SiteVpnOpenSwan(CsDataBag):
-    """
-    Setup any configured vpns (using swan)
-    left is the local machine
-    right is where the clients connect from
-    """
-
-    VPNCONFDIR = "/etc/ipsec.d"
-
-    def process(self):
-        self.confips = []
-        # collect a list of configured vpns
-        for file in os.listdir(self.VPNCONFDIR):
-            m = re.search("^ipsec.vpn-(.*).conf", file)
-            if m:
-                self.confips.append(m.group(1))
-
-        for vpn in self.dbag:
-            if vpn == "id":
-                continue
-
-            local_ip = self.dbag[vpn]['local_public_ip']
-            dev = CsHelper.get_device(local_ip)
-
-            if dev == "":
-                logging.error("Request for ipsec to %s not possible because ip is not configured", local_ip)
-                continue
-
-            CsHelper.start_if_stopped("ipsec")
-            self.configure_iptables(dev, self.dbag[vpn])
-            self.configure_ipsec(self.dbag[vpn])
-
-        # Delete vpns that are no longer in the configuration
-        for ip in self.confips:
-            self.deletevpn(ip)
-
-    def deletevpn(self, ip):
-        logging.info("Removing VPN configuration for %s", ip)
-        CsHelper.execute("ipsec auto --down vpn-%s" % ip)
-        CsHelper.execute("ipsec auto --delete vpn-%s" % ip)
-        vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, ip)
-        vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, ip)
-        os.remove(vpnconffile)
-        os.remove(vpnsecretsfile)
-        CsHelper.execute("ipsec auto --rereadall")
-
-    def configure_iptables(self, dev, obj):
-        self.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 500 -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
-        self.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 4500 -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
-        self.fw.append(["", "front", "-A INPUT -i %s -p esp -s %s -d %s -j ACCEPT" % (dev, obj['peer_gateway_ip'], obj['local_public_ip'])])
-        self.fw.append(["nat", "front", "-A POSTROUTING -o %s -m mark --mark 0x525 -j ACCEPT" % dev])
-        for net in obj['peer_guest_cidr_list'].lstrip().rstrip().split(','):
-            self.fw.append(["mangle", "front",
-                            "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (obj['local_guest_cidr'], net)])
-            self.fw.append(["mangle", "",
-                            "-A OUTPUT -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (obj['local_guest_cidr'], net)])
-            self.fw.append(["mangle", "front",
-                            "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (net, obj['local_guest_cidr'])])
-            self.fw.append(["mangle", "",
-                            "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (net, obj['local_guest_cidr'])])
-
-    def configure_ipsec(self, obj):
-        leftpeer = obj['local_public_ip']
-        rightpeer = obj['peer_gateway_ip']
-        peerlist = obj['peer_guest_cidr_list'].lstrip().rstrip().replace(',', ' ')
-        vpnconffile = "%s/ipsec.vpn-%s.conf" % (self.VPNCONFDIR, rightpeer)
-        vpnsecretsfile = "%s/ipsec.vpn-%s.secrets" % (self.VPNCONFDIR, rightpeer)
-        if rightpeer in self.confips:
-            self.confips.remove(rightpeer)
-        file = CsFile(vpnconffile)
-        file.search("conn ", "conn vpn-%s" % rightpeer)
-        file.addeq(" left=%s" % leftpeer)
-        file.addeq(" leftsubnet=%s" % obj['local_guest_cidr'])
-        file.addeq(" leftnexthop=%s" % obj['local_public_gateway'])
-        file.addeq(" right=%s" % rightpeer)
-        file.addeq(" rightsubnets={%s}" % peerlist)
-        file.addeq(" type=tunnel")
-        file.addeq(" authby=secret")
-        file.addeq(" keyexchange=ike")
-        file.addeq(" ike=%s" % obj['ike_policy'])
-        file.addeq(" ikelifetime=%s" % self.convert_sec_to_h(obj['ike_lifetime']))
-        file.addeq(" esp=%s" % obj['esp_policy'])
-        file.addeq(" salifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']))
-        file.addeq(" pfs=%s" % CsHelper.bool_to_yn(obj['dpd']))
-        file.addeq(" keyingtries=%forever")
-        file.addeq(" auto=start")
-        if not obj.has_key('encap'):
-            obj['encap'] = False
-        file.addeq(" forceencaps=%s" % CsHelper.bool_to_yn(obj['encap']))
-        if obj['dpd']:
-            file.addeq("  dpddelay=30")
-            file.addeq("  dpdtimeout=120")
-            file.addeq("  dpdaction=restart")
-        secret = CsFile(vpnsecretsfile)
-        secret.search("%s " % leftpeer, "%s %s: PSK \"%s\"" % (leftpeer, rightpeer, obj['ipsec_psk']))
-        if secret.is_changed() or file.is_changed():
-            secret.commit()
-            file.commit()
-            logging.info("Configured vpn %s %s", leftpeer, rightpeer)
-            CsHelper.execute("ipsec auto --rereadall")
-            CsHelper.execute("ipsec auto --add vpn-%s" % rightpeer)
-            if not obj['passive']:
-                CsHelper.execute("ipsec auto --up vpn-%s" % rightpeer)
-        os.chmod(vpnsecretsfile, 0o400)
+        CsHelper.execute("strongswan reload")
 
     def convert_sec_to_h(self, val):
         hrs = int(val) / 3600
@@ -742,19 +632,19 @@ class CsRemoteAccessVpn(CsDataBag):
             # Enable remote access vpn
             if vpnconfig['create']:
                 logging.debug("Enabling  remote access vpn  on " + public_ip)
-                CsHelper.start_if_stopped("ipsec")
+                CsHelper.start_if_stopped("strongswan")
                 self.configure_l2tpIpsec(public_ip, self.dbag[public_ip])
                 logging.debug("Remote accessvpn  data bag %s", self.dbag)
                 self.remoteaccessvpn_iptables(public_ip, self.dbag[public_ip])
 
-                CsHelper.execute("ipsec update")
-                CsHelper.execute("service xl2tpd start")
-                CsHelper.execute("ipsec rereadsecrets")
+                CsHelper.execute("strongswan update")
+                CsHelper.execute("systemctl start xl2tpd")
+                CsHelper.execute("strongswan rereadsecrets")
             else:
                 logging.debug("Disabling remote access vpn .....")
                 # disable remote access vpn
-                CsHelper.execute("ipsec down L2TP-PSK")
-                CsHelper.execute("service xl2tpd stop")
+                CsHelper.execute("strongswan down L2TP-PSK")
+                CsHelper.execute("systemctl stop xl2tpd")
 
     def configure_l2tpIpsec(self, left, obj):
         l2tpconffile = "%s/l2tp.conf" % (self.VPNCONFDIR)
@@ -866,20 +756,20 @@ class CsRemoteAccessVpnOpenSwan(CsDataBag):
             if vpnconfig['create']:
                 logging.debug("Enabling  remote access vpn  on " + public_ip)
                 self.configure_l2tpIpsec(public_ip, self.dbag[public_ip])
-                CsHelper.start_if_stopped("ipsec")
+                CsHelper.start_if_stopped("strongswan")
                 logging.debug("Remote accessvpn  data bag %s", self.dbag)
                 self.remoteaccessvpn_iptables(public_ip, self.dbag[public_ip])
 
-                CsHelper.execute("ipsec auto --rereadall")
-                CsHelper.execute("service xl2tpd stop")
-                CsHelper.execute("service xl2tpd start")
-                CsHelper.execute("ipsec auto --rereadsecrets")
-                CsHelper.execute("ipsec auto --replace L2TP-PSK")
+                CsHelper.execute("strongswan auto --rereadall")
+                CsHelper.execute("systemctl stop xl2tpd")
+                CsHelper.execute("systemctl start xl2tpd")
+                CsHelper.execute("strongswan auto --rereadsecrets")
+                CsHelper.execute("strongswan auto --replace L2TP-PSK")
             else:
                 logging.debug("Disabling remote access vpn .....")
                 # disable remote access vpn
-                CsHelper.execute("ipsec auto --down L2TP-PSK")
-                CsHelper.execute("service xl2tpd stop")
+                CsHelper.execute("strongswan auto --down L2TP-PSK")
+                CsHelper.execute("systemctl stop xl2tpd")
 
     def configure_l2tpIpsec(self, left, obj):
         vpnconffile = "%s/l2tp.conf" % (self.VPNCONFDIR)
@@ -1159,19 +1049,11 @@ class IpTablesExecutor:
         acls = CsVrConfig('virtualrouter', self.config)
         acls.process()
 
-        # Strongswan is included in the systemvm template 17.3.13 and newer
-        if get_systemvm_version() > 170312:
-            logging.debug("Found StrongSwan compatible systemvm template so let's configure VPN with it")
-            vpns = CsSite2SiteVpn("site2sitevpn", self.config)
-            vpns.process()
-            rvpn = CsRemoteAccessVpn("remoteaccessvpn", self.config)
-            rvpn.process()
-        else:
-            logging.debug("Found OpenSwan compatible systemvm template so let's configure VPN with it")
-            vpns = CsSite2SiteVpnOpenSwan("site2sitevpn", self.config)
-            vpns.process()
-            rvpn = CsRemoteAccessVpnOpenSwan("remoteaccessvpn", self.config)
-            rvpn.process()
+        logging.debug("Found StrongSwan compatible systemvm template so let's configure VPN with it")
+        vpns = CsSite2SiteVpn("site2sitevpn", self.config)
+        vpns.process()
+        rvpn = CsRemoteAccessVpn("remoteaccessvpn", self.config)
+        rvpn.process()
 
         lb = CsLoadBalancer("loadbalancer", self.config)
         lb.process()
