@@ -46,7 +46,7 @@ public class VRScripts {
     public static final String VPC_SOURCE_NAT = "scripts/vpc_snat.sh";
     public static final String VPC_STATIC_ROUTE = "scripts/vpc_staticroute.sh";
     public static final String VPN_L2TP = "scripts/vpn_l2tp.sh";
-    public static final String UPDATE_HOST_PASSWD = "scripts/update_host_passwd.sh";
+    public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";
 
     public static final String VR_CFG = "scripts/vr_cfg.sh";
 }
