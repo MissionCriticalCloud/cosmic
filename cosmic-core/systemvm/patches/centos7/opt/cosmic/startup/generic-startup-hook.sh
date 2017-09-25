@@ -182,3 +182,31 @@ chmod 644 /root/.ssh/authorized_keys
 
 # Restart the SSH daemon
 systemctl restart sshd
+
+cat >/etc/issue <<EOL
+
+Cosmic sytemvm powered by $(cat /etc/redhat-release) \n \l
+  ____________________________________________
+ ( Void 100% of your warranty @ ${PRIVATE_NIC_IPV4} )
+  --------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+           (__)\       )\/
+             ||----w |
+             ||     ||
+
+EOL
+
+cat >/etc/motd <<EOL
+
+Cosmic sytemvm powered by $(cat /etc/redhat-release) \n \l
+  ______________________________________
+ ( Booo! 0% of your warranty remaining! )
+  --------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/
+               ||----w |
+               ||     ||
+
+EOL
