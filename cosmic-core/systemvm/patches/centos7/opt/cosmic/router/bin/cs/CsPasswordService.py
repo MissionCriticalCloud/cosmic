@@ -18,7 +18,7 @@ class CsPasswordService:
         CsHelper.service("cosmic-password-server@%s" % self.ip, "restart")
 
 
-class CsMetadataServiceVMConfig:
+class CsPasswordServiceVMConfig:
     TOKEN_FILE = "/tmp/passwdsrvrtoken"
 
     def __init__(self, dbag):

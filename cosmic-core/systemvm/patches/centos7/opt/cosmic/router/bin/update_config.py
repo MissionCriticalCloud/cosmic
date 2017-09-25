@@ -7,7 +7,7 @@ import sys
 
 import configure
 from cs.CsHelper import mkdir
-from cs.CsMetadataService import CsMetadataServiceVMConfig
+from cs.CsPasswordService import CsPasswordServiceVMConfig
 from databag.merge import QueueFile
 
 OCCURRENCES = 1
@@ -57,7 +57,7 @@ def process_vmpasswd():
     print("[INFO] process_vmpassword")
     qf = process(False)
     print("[INFO] Sending password to password server")
-    CsMetadataServiceVMConfig(qf.getData())
+    CsPasswordServiceVMConfig(qf.getData())
 
 
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
