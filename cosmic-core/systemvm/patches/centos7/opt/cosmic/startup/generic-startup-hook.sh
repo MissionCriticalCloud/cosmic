@@ -196,10 +196,11 @@ Cosmic sytemvm powered by $(cat /etc/redhat-release) \n \l
              ||     ||
 
 EOL
+cat /etc/issue > /etc/issue.net
 
 cat >/etc/motd <<EOL
 
-Cosmic sytemvm powered by $(cat /etc/redhat-release) \n \l
+Cosmic sytemvm powered by $(cat /etc/redhat-release)
   ______________________________________
  ( Booo! 0% of your warranty remaining! )
   --------------------------------------
