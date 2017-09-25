@@ -52,6 +52,7 @@ class CsApache(CsApp):
             apache_config.commit()
 
     def remove(self):
+        return  # TODO Fix metadata service
         self.remove_legacy_apache_config_files()
         file = "/etc/apache2/sites-enabled/vhost-%s.conf" % self.dev
         if os.path.isfile(file):
@@ -59,6 +60,7 @@ class CsApache(CsApp):
             CsHelper.service("apache2", "restart")
 
     def setup(self):
+        return # TODO Fix metadata service
         self.remove_legacy_apache_config_files()
         CsHelper.copy_if_needed("/etc/apache2/vhost.template",
                                 "/etc/apache2/sites-enabled/vhost-%s.conf" % self.ip)
