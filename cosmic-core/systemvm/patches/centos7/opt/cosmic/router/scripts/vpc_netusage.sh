@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source /opt/cosmic/router/bin/func.sh
-source /opt/cosmic/router/bin/vpc_func.sh
+source /opt/cosmic/router/scripts/func.sh
+source /opt/cosmic/router/scripts/vpc_func.sh
 
 vpnoutmark="0x525"
 vpninmark="0x524"
