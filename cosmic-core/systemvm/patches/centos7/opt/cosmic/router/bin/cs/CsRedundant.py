@@ -22,8 +22,8 @@ from time import sleep
 
 import CsHelper
 from CsAddress import CsDevice
-from CsApp import CsPasswdSvc
 from CsFile import CsFile
+from CsPasswordService import CsPasswordService
 from CsProcess import CsProcess
 from CsRoute import CsRoute
 from CsStaticRoutes import CsStaticRoutes
@@ -228,7 +228,7 @@ class CsRedundant(object):
 
         interfaces = [interface for interface in self.address.get_interfaces() if interface.needs_vrrp()]
         for interface in interfaces:
-            CsPasswdSvc(interface.get_ip()).stop()
+            CsPasswordService(interface.get_ip()).stop()
 
         self.cl.set_fault_state()
         self.cl.save()
@@ -265,7 +265,7 @@ class CsRedundant(object):
 
         interfaces = [interface for interface in self.address.get_interfaces() if interface.needs_vrrp()]
         for interface in interfaces:
-            CsPasswdSvc(interface.get_ip()).stop()
+            CsPasswordService(interface.get_ip()).stop()
         CsHelper.service("dnsmasq", "stop")
 
         self.cl.set_master_state(False)
@@ -323,7 +323,7 @@ class CsRedundant(object):
         for interface in interfaces:
             # Listen on local ip address, as cloud-init uses the 'dhcp-server-identifier' address,
             #  which unfortunately is not the gateway address.
-            CsPasswdSvc(interface.get_ip()).start()
+            CsPasswordService(interface.get_ip()).start()
 
         CsHelper.service("dnsmasq", "restart")
 
