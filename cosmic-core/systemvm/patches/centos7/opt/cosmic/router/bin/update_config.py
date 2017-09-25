@@ -1,17 +1,15 @@
-#!/usr/bin/python
-
-
 import glob
+import logging
 import os.path
 import sys
 
 import configure
-from cs.CsVmPassword import *
+from CsMetadataService import CsMetadataServiceVMConfig
 from databag.merge import QueueFile
 
 OCCURRENCES = 1
 
-logging.basicConfig(filename='/var/log/cloud.log', level=logging.DEBUG,
+logging.basicConfig(filename='/var/log/cosmic/router/router.log', level=logging.DEBUG,
                     format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
 # first commandline argument should be the file to process
@@ -51,7 +49,7 @@ def process_vmpasswd():
     print("[INFO] process_vmpassword")
     qf = process(False)
     print("[INFO] Sending password to password server")
-    CsPassword(qf.getData())
+    CsMetadataServiceVMConfig(qf.getData())
 
 
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)

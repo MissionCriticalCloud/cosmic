@@ -3,12 +3,14 @@
 import logging
 import subprocess
 import time
+
 from netaddr import IPAddress, IPNetwork
 
 import CsHelper
-from CsApp import CsDnsmasq, CsPasswdSvc
-from CsMetadataService import CsMetadataService
+from CsApp import CsDnsmasq
 from CsDatabag import CsDataBag
+from CsMetadataService import CsMetadataService
+from CsPasswordService import CsPasswordService
 from CsRoute import CsRoute
 from CsRule import CsRule
 
@@ -599,10 +601,10 @@ class CsIP:
         # Start passwd server on non-redundant routers and on the master router of redundant pairs
         # CsRedundant will handle fail-over.
         if self.get_type() in ["guest"] and (not self.cl.is_redundant() or self.cl.is_master()):
-            CsPasswdSvc(self.address['public_ip']).start()
+            CsPasswordService(self.address['public_ip']).start()
         elif self.get_type() in ["guest"]:
             # Or else make sure it's stopped
-            CsPasswdSvc(self.address['public_ip']).stop()
+            CsPasswordService(self.address['public_ip']).stop()
 
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:

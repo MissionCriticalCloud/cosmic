@@ -102,6 +102,7 @@ server {
         with open(filename, 'w') as f:
             f.write(vhost)
 
+        CsHelper.service("nginx", "start")
         CsHelper.service("nginx", "reload")
 
         self.fw.append(["", "front",
