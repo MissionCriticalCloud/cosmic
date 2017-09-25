@@ -49,7 +49,7 @@ class CsDhcp(CsDataBag):
         # But only do that on the master or else VMs will get leases from the backup resulting in
         # Cloud-init to get the passwd and other meta-data from the backup as well.
         if not self.cl.is_redundant() or self.cl.is_master():
-            CsHelper.execute2("service dnsmasq restart")
+            CsHelper.execute2("systemctl restart dnsmasq")
 
     def configure_server(self):
         # self.conf.addeq("dhcp-hostsfile=%s" % DHCP_HOSTS)

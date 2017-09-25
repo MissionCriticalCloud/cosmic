@@ -232,8 +232,8 @@ def get_output_of_command(command):
 
 
 def service(name, op):
-    execute("service %s %s" % (name, op))
-    logging.info("Service %s %s" % (name, op))
+    execute("systemctl %s %s" % (op, name))
+    logging.info("systemctl %s %s" % (op, name))
 
 
 def start_if_stopped(name):

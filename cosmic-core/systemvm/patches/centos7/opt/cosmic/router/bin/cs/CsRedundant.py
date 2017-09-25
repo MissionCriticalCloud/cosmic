@@ -222,7 +222,7 @@ class CsRedundant(object):
 
         cmd = "%s -C %s" % (self.CONNTRACKD_BIN, self.CONNTRACKD_CONF)
         CsHelper.execute("%s -s" % cmd)
-        CsHelper.service("ipsec", "stop")
+        CsHelper.service("strongswan", "stop")
         CsHelper.service("xl2tpd", "stop")
         CsHelper.service("dnsmasq", "stop")
 
@@ -260,7 +260,7 @@ class CsRedundant(object):
 
         cmd = "%s -C %s" % (self.CONNTRACKD_BIN, self.CONNTRACKD_CONF)
         CsHelper.execute("%s -d" % cmd)
-        CsHelper.service("ipsec", "stop")
+        CsHelper.service("strongswan", "stop")
         CsHelper.service("xl2tpd", "stop")
 
         interfaces = [interface for interface in self.address.get_interfaces() if interface.needs_vrrp()]
@@ -317,7 +317,7 @@ class CsRedundant(object):
         CsHelper.execute("%s -f" % cmd)
         CsHelper.execute("%s -R" % cmd)
         CsHelper.execute("%s -B" % cmd)
-        CsHelper.service("ipsec", "restart")
+        CsHelper.service("strongswan", "restart")
         CsHelper.service("xl2tpd", "restart")
         interfaces = [interface for interface in self.address.get_interfaces() if interface.needs_vrrp()]
         for interface in interfaces:
