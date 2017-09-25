@@ -1,16 +1,14 @@
 #!/usr/bin/python
 # -- coding: utf-8 --
 
-import base64
 import re
 import sys
 from collections import OrderedDict
-from fcntl import flock, LOCK_EX, LOCK_UN
 
+from CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsDataBag
 from cs.CsDhcp import CsDhcp
-from cs.CsHelper import get_systemvm_version
 from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
@@ -264,157 +262,6 @@ class CsAcl(CsDataBag):
                 self.AclIP(self.dbag[item], self.config).create()
 
 
-class CsVmMetadata(CsDataBag):
-    def process(self):
-        for ip in self.dbag:
-            if ("id" == ip):
-                continue
-            logging.info("Processing metadata for %s" % ip)
-            for item in self.dbag[ip]:
-                folder = item[0]
-                file = item[1]
-                data = item[2]
-
-                # process only valid data
-                if folder != "userdata" and folder != "metadata":
-                    continue
-
-                if file == "":
-                    continue
-
-                self.__htaccess(ip, folder, file)
-
-                if data == "":
-                    self.__deletefile(ip, folder, file)
-                else:
-                    self.__createfile(ip, folder, file, data)
-
-    def __deletefile(self, ip, folder, file):
-        datafile = "/var/www/html/" + folder + "/" + ip + "/" + file
-
-        if os.path.exists(datafile):
-            os.remove(datafile)
-
-    def __createfile(self, ip, folder, file, data):
-        dest = "/var/www/html/" + folder + "/" + ip + "/" + file
-        metamanifestdir = "/var/www/html/" + folder + "/" + ip
-        metamanifest = metamanifestdir + "/meta-data"
-
-        # base64 decode userdata
-        if folder == "userdata" or folder == "user-data":
-            if data is not None:
-                data = base64.b64decode(data)
-
-        fh = open(dest, "w")
-        self.__exflock(fh)
-        if data is not None:
-            fh.write(data)
-        else:
-            fh.write("")
-        self.__unflock(fh)
-        fh.close()
-        os.chmod(dest, 0644)
-
-        if folder == "metadata" or folder == "meta-data":
-            try:
-                os.makedirs(metamanifestdir, 0755)
-            except OSError as e:
-                # error 17 is already exists, we do it this way for concurrency
-                if e.errno != 17:
-                    print "failed to make directories " + metamanifestdir + " due to :" + e.strerror
-                    sys.exit(1)
-            if os.path.exists(metamanifest):
-                fh = open(metamanifest, "r+a")
-                self.__exflock(fh)
-                if file not in fh.read():
-                    fh.write(file + '\n')
-                self.__unflock(fh)
-                fh.close()
-            else:
-                fh = open(metamanifest, "w")
-                self.__exflock(fh)
-                fh.write(file + '\n')
-                self.__unflock(fh)
-                fh.close()
-
-        if os.path.exists(metamanifest):
-            os.chmod(metamanifest, 0644)
-
-    def __htaccess(self, ip, folder, file):
-        entry = "RewriteRule ^" + file + "$  ../" + folder + "/%{REMOTE_ADDR}/" + file + " [L,NC,QSA]"
-        htaccessFolder = "/var/www/html/latest"
-        htaccessFile = htaccessFolder + "/.htaccess"
-
-        CsHelper.mkdir(htaccessFolder, 0755, True)
-
-        if os.path.exists(htaccessFile):
-            fh = open(htaccessFile, "r+a")
-            self.__exflock(fh)
-            if entry not in fh.read():
-                fh.write(entry + '\n')
-            self.__unflock(fh)
-            fh.close()
-        else:
-            fh = open(htaccessFile, "w")
-            self.__exflock(fh)
-            fh.write("Options +FollowSymLinks\nRewriteEngine On\n\n")
-            fh.write(entry + '\n')
-            self.__unflock(fh)
-            fh.close()
-
-        entry = "Options -Indexes\nOrder Deny,Allow\nDeny from all\nAllow from " + ip
-        htaccessFolder = "/var/www/html/" + folder + "/" + ip
-        htaccessFile = htaccessFolder + "/.htaccess"
-
-        try:
-            os.makedirs(htaccessFolder, 0755)
-        except OSError as e:
-            # error 17 is already exists, we do it this way for sake of concurrency
-            if e.errno != 17:
-                print "failed to make directories " + htaccessFolder + " due to :" + e.strerror
-                sys.exit(1)
-
-        fh = open(htaccessFile, "w")
-        self.__exflock(fh)
-        fh.write(entry + '\n')
-        self.__unflock(fh)
-        fh.close()
-
-        if folder == "metadata" or folder == "meta-data":
-            entry = "RewriteRule ^meta-data/(.+)$  ../" + folder + "/%{REMOTE_ADDR}/$1 [L,NC,QSA]"
-            htaccessFolder = "/var/www/html/latest"
-            htaccessFile = htaccessFolder + "/.htaccess"
-
-            fh = open(htaccessFile, "r+a")
-            self.__exflock(fh)
-            if entry not in fh.read():
-                fh.write(entry + '\n')
-
-            entry = "RewriteRule ^meta-data/$  ../" + folder + "/%{REMOTE_ADDR}/meta-data [L,NC,QSA]"
-
-            fh.seek(0)
-            if entry not in fh.read():
-                fh.write(entry + '\n')
-            self.__unflock(fh)
-            fh.close()
-
-    def __exflock(self, file):
-        try:
-            flock(file, LOCK_EX)
-        except IOError as e:
-            print "failed to lock file" + file.name + " due to : " + e.strerror
-            sys.exit(1)  # FIXME
-        return True
-
-    def __unflock(self, file):
-        try:
-            flock(file, LOCK_UN)
-        except IOError:
-            print "failed to unlock file" + file.name + " due to : " + e.strerror
-            sys.exit(1)  # FIXME
-        return True
-
-
 class CsSite2SiteVpn(CsDataBag):
     """
     Setup any configured vpns (using strongswan)
@@ -548,7 +395,7 @@ class CsSite2SiteVpn(CsDataBag):
             CsHelper.execute("strongswan rereadsecrets")
 
         # This will load the new config and start the connection when needed since auto=start in the config
-        os.chmod(vpnsecretsfile, 0400)
+        os.chmod(vpnsecretsfile, 0o400)
         CsHelper.execute("strongswan reload")
 
     def convert_sec_to_h(self, val):
@@ -602,13 +449,13 @@ class CsVpnUser(CsDataBag):
         logging.debug("kiing the PPPD process for the user %s " % user)
 
         fileContents = CsHelper.execute("tdbdump /var/run/pppd2.tdb")
-        print fileContents
+        print(fileContents)
 
         for line in fileContents:
             if user in line:
                 contentlist = line.split(';')
                 for str in contentlist:
-                    print 'in del_l2tp str = ' + str
+                    print('in del_l2tp str = ' + str)
                     pppd = str.split('=')[0]
                     if pppd == 'PPPD_PID':
                         pid = str.split('=')[1]
@@ -1092,7 +939,7 @@ def main(argv):
     config.address().process()
 
     databag_map = OrderedDict([("guest_network.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("vm_metadata.json", { "process_iptables": False, "executor": CsVmMetadata('vmdata', config) }),
+                               ("vm_metadata.json", { "process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config) }),
                                ("network_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("public_ip_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
                                ("firewall_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),

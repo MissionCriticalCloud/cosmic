@@ -1,7 +1,8 @@
 # -- coding: utf-8 --
 
 import hashlib
-from merge import DataBag
+
+from databag.merge import DataBag
 
 
 class CsDataBag(object):

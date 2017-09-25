@@ -113,7 +113,7 @@ def createfile(ip, folder, file, data):
 
 
 def htaccess(ip, folder, file):
-    entry = "Options -Indexes\nOrder Deny,Allow\nDeny from all\nAllow from " + ip
+    entry = "deny all;\nallow %s;\nautoindex off;" % ip
     htaccessFolder = "/var/www/html/" + folder + "/" + ip
     htaccessFile = htaccessFolder + "/.htaccess"
 

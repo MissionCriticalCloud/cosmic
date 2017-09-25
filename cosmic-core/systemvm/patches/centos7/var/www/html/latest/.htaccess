@@ -1,24 +1,52 @@
-Options +FollowSymLinks
-RewriteEngine On
+location /user {
+  rewrite ^/user-data/?$ /../userdata/$remote_addr/user-data break;
+  rewrite ^/user-data$ /../userdata/$remote_addr/user-data break;
+}
 
-#http://<routerIP>/latest/user-data  and .../user-data/  (both yield user-data file)
-#http://<routerIP>/latest/meta-data and .../meta-data/   (dir listing of meta-data)
-RewriteRule ^user-data/?$  ../userdata/%{REMOTE_ADDR}/user-data [L,NC,QSA]
-RewriteRule ^meta-data/?$  ../metadata/%{REMOTE_ADDR}/meta-data [L,NC,QSA]
+location /meta {
+  rewrite ^/meta-data/?$ /../metadata/$remote_addr/meta-data break;
+  rewrite ^/meta-data/(.+[^/])/?$ /../metadata/$remote_addr/$1 break;
+  rewrite ^/meta-data/(.+)$ /../metadata/$remote_addr/$1 break;
+  rewrite ^/meta-data/$ /../metadata/$remote_addr/meta-data break;
+}
 
-#http://<routerIP/latest/meta-data/foo and .../foo/  (yield metadata/$IP/foo)
-RewriteRule ^meta-data/(.+[^/])/?$  ../metadata/%{REMOTE_ADDR}/$1 [L,NC,QSA]
+location /availability {
+  rewrite ^/availability-zone/?$ /../metadata/$remote_addr/availability-zone break;
+  rewrite ^/availability-zone$ /../metadata/$remote_addr/availability-zone break;
+}
 
-#http://<routerIP>/latest/foo and .../foo/ (yield metadata/$IP/foo)
-#are these used?
-RewriteRule ^availability-zone/?$  ../metadata/%{REMOTE_ADDR}/availability-zone [L,NC,QSA]
-RewriteRule ^cloud-identifier/?$  ../metadata/%{REMOTE_ADDR}/cloud-identifier [L,NC,QSA]
-RewriteRule ^instance-id/?$  ../metadata/%{REMOTE_ADDR}/instance-id [L,NC,QSA]
-RewriteRule ^local-hostname/?$  ../metadata/%{REMOTE_ADDR}/local-hostname [L,NC,QSA]
-RewriteRule ^local-ipv4/?$  ../metadata/%{REMOTE_ADDR}/local-ipv4 [L,NC,QSA]
-RewriteRule ^public-hostname/?$  ../metadata/%{REMOTE_ADDR}/public-hostname [L,NC,QSA]
-RewriteRule ^public-ipv4/?$  ../metadata/%{REMOTE_ADDR}/public-ipv4 [L,NC,QSA]
-RewriteRule ^public-keys/?$  ../metadata/%{REMOTE_ADDR}/public-keys [L,NC,QSA]
-RewriteRule ^service-offering/?$  ../metadata/%{REMOTE_ADDR}/service-offering [L,NC,QSA]
-RewriteRule ^vm-id/?$  ../metadata/%{REMOTE_ADDR}/vm-id [L,NC,QSA]
+location /cloud {
+  rewrite ^/cloud-identifier/?$ /../metadata/$remote_addr/cloud-identifier break;
+  rewrite ^/cloud-identifier$ /../metadata/$remote_addr/cloud-identifier break;
+}
 
+location /instance {
+  rewrite ^/instance-id/?$ /../metadata/$remote_addr/instance-id break;
+  rewrite ^/instance-id$ /../metadata/$remote_addr/instance-id break;
+}
+
+location /local {
+  rewrite ^/local-hostname/?$ /../metadata/$remote_addr/local-hostname break;
+  rewrite ^/local-ipv4/?$ /../metadata/$remote_addr/local-ipv4 break;
+  rewrite ^/local-ipv4$ /../metadata/$remote_addr/local-ipv4 break;
+  rewrite ^/local-hostname$ /../metadata/$remote_addr/local-hostname break;
+}
+
+location /public {
+  rewrite ^/public-hostname/?$ /../metadata/$remote_addr/public-hostname break;
+  rewrite ^/public-ipv4/?$ /../metadata/$remote_addr/public-ipv4 break;
+  rewrite ^/public-keys/?$ /../metadata/$remote_addr/public-keys break;
+  rewrite ^/public-ipv4$ /../metadata/$remote_addr/public-ipv4 break;
+  rewrite ^/public-hostname$ /../metadata/$remote_addr/public-hostname break;
+  rewrite ^/public-keys$ /../metadata/$remote_addr/public-keys break;
+}
+
+location /service {
+  rewrite ^/service-offering/?$ /../metadata/$remote_addr/service-offering break;
+  rewrite ^/service-offering$ /../metadata/$remote_addr/service-offering break;
+}
+
+location /vm {
+  rewrite ^/vm-id/?$ /../metadata/$remote_addr/vm-id break;
+  rewrite ^/vm-id$ /../metadata/$remote_addr/vm-id break;
+}
