@@ -19,6 +19,8 @@ cat ${CMDLINE}
 DOMAIN=
 DNS1=
 DNS2=
+INTERNAL_DNS1=
+INTERNAL_DNS2=
 NEW_HOSTNAME=
 PRIVATE_NIC_IPV4=
 PRIVATE_NIC_IPv4_NETMASK=
@@ -28,6 +30,8 @@ TEMPLATE=
 VMPASSWORD=
 TYPE=
 DISABLE_RP_FILTER=
+ADVERT_INT=
+USE_EXT_DNS=
 
 for i in $(cat ${CMDLINE})
   do
@@ -42,6 +46,12 @@ for i in $(cat ${CMDLINE})
         ;;
       dns2)
         DNS2=${VALUE}
+        ;;
+      internaldns1)
+        INTERNAL_DNS1=${VALUE}
+        ;;
+      internaldns2)
+        INTERNAL_DNS2=${VALUE}
         ;;
       name)
         NEW_HOSTNAME=${VALUE}
@@ -70,6 +80,12 @@ for i in $(cat ${CMDLINE})
       disable_rp_filter)
         DISABLE_RP_FILTER=${VALUE}
         ;;
+      advert_int)
+        ADVERT_INT=${VALUE}
+        ;;
+      useextdns)
+        USE_EXT_DNS=${VALUE}
+        ;;
       *)
         ;;
     esac
@@ -96,6 +112,14 @@ search ${DOMAIN}
 `if [ ! -z "${DNS2}" ]; then echo "nameserver ${DNS2}"; fi`
 EOF
 
+# Setup dns for dnsmasq
+cat > /etc/dnsmasq-resolv.conf << EOF
+`if [ ! -z "${INTERNAL_DNS1}" ]; then echo "nameserver ${INTERNAL_DNS1}"; fi`
+`if [ ! -z "${INTERNAL_DNS2}" ]; then echo "nameserver ${INTERNAL_DNS2}"; fi`
+`if [ ! -z "${DNS1}" ]; then echo "nameserver ${DNS1}"; fi`
+`if [ ! -z "${DNS2}" ]; then echo "nameserver ${DNS2}"; fi`
+EOF
+
 # Reload the private nic
 ifdown eth0; ifup eth0
 
@@ -107,6 +131,8 @@ cat > /var/cache/cloud/cmd_line.json << EOF
     "disable_rp_filter": "${DISABLE_RP_FILTER}",
     "dns1": "${DNS1}",
     "dns2": "${DNS2}",
+    "internaldns1": "${INTERNAL_DNS1}",
+    "internaldns2": "${INTERNAL_DNS2}",
     "domain": "${DOMAIN}",
     "eth0ip": "${PRIVATE_NIC_IPV4}",
     "eth0mask": "${PRIVATE_NIC_IPv4_NETMASK}",
@@ -115,7 +141,9 @@ cat > /var/cache/cloud/cmd_line.json << EOF
     "template": "${TEMPLATE}",
     "type": "${TYPE}",
     "vmpassword": "${VMPASSWORD}",
-    "vpccidr": "${VPCCIDR}"
+    "vpccidr": "${VPCCIDR}",
+    "advert_int": "${ADVERT_INT}",
+    "useextdns": "${USE_EXT_DNS}"
   }
 }
 EOF
