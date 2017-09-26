@@ -123,7 +123,7 @@ Cosmic sytemvm powered by %s \\n \\l
             f.write(prelogin_banner)
 
         motd = """
-Cosmic sytemvm powered by %s \n \l
+Cosmic sytemvm powered by %s \\n \\l
   ______________________________________
  ( Booo! 0%% of your warranty remaining! )
   --------------------------------------
