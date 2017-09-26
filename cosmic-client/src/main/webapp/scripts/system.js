@@ -5541,7 +5541,7 @@
                                                             var hostObjs = json.listhostsresponse.host;
                                                             for (var i = 0; i < systemvmObjs.length; i++) {
                                                                 for (var k = 0; k < hostObjs.length; k++) {
-                                                                    if (hostObjs[k].name == systemvmObjs[i].name) {
+                                                                    if (hostObjs[k].name.toUpperCase() == systemvmObjs[i].name.toUpperCase()) {
                                                                         systemvmObjs[i].agentstate = hostObjs[k].state;
                                                                         break;
                                                                     }
