@@ -16,20 +16,24 @@ class Utils:
         self.setup_ssh()
 
     def setup_private_nic(self):
-        ifcfg = """
-DEVICE="eth0"
+
+        for interface in [0, 1, 2]:
+            if "eth%sip" % interface in self.cmdline:
+                ifcfg = """
+DEVICE="eth%s"
 IPV6INIT="no"
 BOOTPROTO="none"
 ONBOOT="yes"
 HWADDR="%s"
 IPADDR="%s"
 NETMASK="%s"
-""" % (self.cmdline["eth0mac"], self.cmdline["eth0ip"], self.cmdline["eth0mask"])
+""" % (interface, self.cmdline["eth%smac" % interface], self.cmdline["eth%sip" % interface], self.cmdline["eth%smask" %
+                                                                                                          interface])
 
-        with open("/etc/sysconfig/network-scripts/ifcfg-eth0", "w") as f:
-            f.write(ifcfg)
+                with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
+                    f.write(ifcfg)
 
-        os.system("ifdown eth0; ifup eth0")
+                os.system("ifdown eth%s; ifup eth%s" % (interface, interface))
 
     def setup_dns(self):
         resolv_conf = []
