@@ -32,3 +32,30 @@ class SecondaryStorageVM:
 
     def setup_agent_config(self):
         Utils(self.cmdline).setup_agent_properties()
+
+    def setup(self):
+        if not os.path.isdir("/var/www/html/userdata"):
+            os.makedirs("/var/www/html/userdata", 0o755, True)
+
+        vhost = """
+server {
+    listen       %s:80;
+    listen       %s:443 ssl;
+    server_name  _;
+    root         /var/www/html;
+
+    autoindex off;
+
+    location /userdata {
+        autoindex off;
+    }
+}
+""" % (self.cmdline["eth2"], self.cmdline["eth2"])
+
+        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["eth2"])
+
+        with open(filename, 'w') as f:
+            f.write(vhost)
+
+        os.system("systemctl start nginx")
+        os.system("systemctl reload nginx")
