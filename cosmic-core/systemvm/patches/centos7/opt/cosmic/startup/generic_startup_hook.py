@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.6
 import json
 import logging
 import os
@@ -75,10 +75,10 @@ class App:
 
 if __name__ == "__main__":
     if not os.path.isdir(LOG_DIR):
-        os.mkdir(LOG_DIR, 0o755)
+        os.makedirs(LOG_DIR, 0o755, True)
 
     if not os.path.isdir(CMDLINE_DIR):
-        os.mkdir(CMDLINE_DIR, 0o755)
+        os.makedirs(CMDLINE_DIR, 0o755, True)
 
     logging.basicConfig(filename=LOG_DIR + "startup.log", level=logging.DEBUG)
 

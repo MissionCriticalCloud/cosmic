@@ -24,7 +24,6 @@ ONBOOT="yes"
 HWADDR="%s"
 IPADDR="%s"
 NETMASK="%s"
-EOF
 """ % (self.cmdline["eth0mac"], self.cmdline["eth0ip"], self.cmdline["eth0mask"])
 
         with open("/etc/sysconfig/network-scripts/ifcfg-eth0", "w") as f:
@@ -35,15 +34,15 @@ EOF
     def setup_dns(self):
         resolv_conf = []
 
-        if self.cmdline["domain"]:
+        if "domain" in self.cmdline:
             resolv_conf.append("search %s" % self.cmdline["domain"])
-        if self.cmdline["internaldns1"]:
+        if "internaldns1" in self.cmdline:
             resolv_conf.append("nameserver %s" % self.cmdline["internaldns1"])
-        if self.cmdline["internaldns2"]:
+        if "internaldns2" in self.cmdline:
             resolv_conf.append("nameserver %s" % self.cmdline["internaldns2"])
-        if self.cmdline["dns1"]:
+        if "dns1" in self.cmdline:
             resolv_conf.append("nameserver %s" % self.cmdline["dns1"])
-        if self.cmdline["dns2"]:
+        if "dns2" in self.cmdline:
             resolv_conf.append("nameserver %s" % self.cmdline["dns2"])
 
         with open("/etc/resolv.conf", "w") as f:
@@ -87,7 +86,7 @@ AcceptEnv XMODIFIERS
 
     def setup_agent_properties(self):
         if not os.path.isdir(self.config_dir):
-            os.mkdir(self.config_dir, 0o644)
+            os.makedirs(self.config_dir, 0o644, True)
 
         agent_properties = []
         for key, value in self.cmdline.items():

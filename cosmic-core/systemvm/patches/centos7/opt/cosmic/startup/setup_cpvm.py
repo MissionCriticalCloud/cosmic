@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import logging
 import os
 
@@ -21,7 +20,7 @@ class ConsoleProxyVM:
 
     def setup_agent_config(self):
         if not os.path.isdir(self.config_dir):
-            os.mkdir(self.config_dir, 0o644)
+            os.makedirs(self.config_dir, 0o644, True)
 
         consoleproxy_properties = """
 consoleproxy.tcpListenPort=0
