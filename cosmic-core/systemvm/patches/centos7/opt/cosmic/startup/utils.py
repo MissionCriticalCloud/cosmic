@@ -105,7 +105,7 @@ AcceptEnv XMODIFIERS
             release = f.readline()
 
         prelogin_banner = """
-Cosmic sytemvm powered by %s \\n \\l
+Cosmic sytemvm powered by %s
   ____________________________________________
  ( Void 100%% of your warranty @ %s )
   --------------------------------------------
@@ -123,7 +123,7 @@ Cosmic sytemvm powered by %s \\n \\l
             f.write(prelogin_banner)
 
         motd = """
-Cosmic sytemvm powered by %s \\n \\l
+Cosmic sytemvm powered by %s
   ______________________________________
  ( Booo! 0%% of your warranty remaining! )
   --------------------------------------
