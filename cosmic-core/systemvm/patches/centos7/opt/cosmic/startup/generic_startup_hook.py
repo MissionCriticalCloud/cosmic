@@ -80,7 +80,7 @@ if __name__ == "__main__":
     if not os.path.isdir(CMDLINE_DIR):
         os.makedirs(CMDLINE_DIR, 0o755, True)
 
-    logging.basicConfig(filename=LOG_DIR + "startup.log", level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
     app = App()
 

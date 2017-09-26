@@ -6,14 +6,13 @@ class CsConfig(object):
     """
     A class to cache all the stuff that the other classes need
     """
-    __LOG_FILE = "/var/log/cloud.log"
     __LOG_LEVEL = "DEBUG"
     __LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
     cl = None
 
     def __init__(self):
         self.fw = []
-        self.ingress_rules = {}
+        self.ingress_rules = { }
         self.ips = None
 
     def set_address(self):
@@ -41,9 +40,6 @@ class CsConfig(object):
 
     def set_ingress_rules(self, key, ingress_rules):
         self.ingress_rules[key] = ingress_rules
-
-    def get_logger(self):
-        return self.__LOG_FILE
 
     def get_level(self):
         return self.__LOG_LEVEL

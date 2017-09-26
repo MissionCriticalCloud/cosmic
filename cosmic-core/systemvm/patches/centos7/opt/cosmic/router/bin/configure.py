@@ -927,9 +927,7 @@ def main(argv):
     # The "GLOBAL" Configuration object
     config = CsConfig()
 
-    logging.basicConfig(filename=config.get_logger(),
-                        level=config.get_level(),
-                        format=config.get_format())
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
     # Load stored ip addresses from disk to CsConfig()
     config.set_address()

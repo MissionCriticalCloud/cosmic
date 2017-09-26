@@ -22,9 +22,8 @@ parser.add_option("-f", "--fault",
 (options, args) = parser.parse_args()
 
 config = CsConfig()
-logging.basicConfig(filename=config.get_logger(),
-                    level=config.get_level(),
-                    format=config.get_format())
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
+
 config.cmdline()
 cl = CsCmdLine("cmdline", config)
 # Update the configuration to set state as backup and let keepalived decide who the real Master is!

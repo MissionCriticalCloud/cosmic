@@ -20,9 +20,8 @@ parser.add_option("-d", "--disable",
 (options, args) = parser.parse_args()
 
 config = CsConfig()
-logging.basicConfig(filename=config.get_logger(),
-                    level=config.get_level(),
-                    format=config.get_format())
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
+
 config.set_cl()
 
 if options.enable:
