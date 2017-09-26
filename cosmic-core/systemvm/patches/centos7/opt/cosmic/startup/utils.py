@@ -15,6 +15,7 @@ class Utils:
         self.setup_private_nic()
         self.setup_ssh()
         self.setup_banner()
+        self.setup_default_gw()
 
     def setup_private_nic(self):
 
@@ -137,3 +138,10 @@ Cosmic sytemvm powered by %s
 
         with open("/etc/motd", "w") as f:
             f.write(motd)
+
+    def setup_default_gw(self):
+        if "gateway" in  self.cmdline:
+            with open("/etc/sysconfig/network", "w") as f:
+                f.write("GATEWAY=%s" % self.cmdline["gateway"])
+
+            os.system("ip route add default via %s" % self.cmdline["gateway"])
