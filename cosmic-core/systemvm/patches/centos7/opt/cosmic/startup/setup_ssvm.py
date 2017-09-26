@@ -27,13 +27,14 @@ class SecondaryStorageVM:
         self.setup_agent_config()
         setup_html()
         setup_iptable_rules()
+        self.setup_nginx()
 
         os.system("systemctl start cosmic-agent")
 
     def setup_agent_config(self):
         Utils(self.cmdline).setup_agent_properties()
 
-    def setup(self):
+    def setup_nginx(self):
         if not os.path.isdir("/var/www/html/userdata"):
             os.makedirs("/var/www/html/userdata", 0o755, True)
 
