@@ -4,6 +4,10 @@ import os
 from utils import Utils
 
 
+def setup_iptable_rules():
+    os.system("iptables-restore < /etc/iptables/iptables-consoleproxy")
+
+
 class ConsoleProxyVM:
     def __init__(self, cmdline) -> None:
         super().__init__()
@@ -15,6 +19,7 @@ class ConsoleProxyVM:
     def start(self):
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
+        setup_iptable_rules()
 
         os.system("systemctl start cosmic-agent")
 

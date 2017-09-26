@@ -10,6 +10,10 @@ def setup_html():
         os.makedirs(html_dir, 0o755, True)
 
 
+def setup_iptable_rules():
+    os.system("iptables-restore < /etc/iptables/iptables-secstorage")
+
+
 class SecondaryStorageVM:
     def __init__(self, cmdline) -> None:
         super().__init__()
@@ -22,6 +26,7 @@ class SecondaryStorageVM:
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
         setup_html()
+        setup_iptable_rules()
 
         os.system("systemctl start cosmic-agent")
 
