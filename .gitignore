@@ -437,3 +437,4 @@ fabric.properties
 
 # Python virtualenv
 virtualenv/
+env/
