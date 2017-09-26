@@ -14,6 +14,7 @@ class Utils:
         self.setup_dns()
         self.setup_private_nic()
         self.setup_ssh()
+        self.setup_banner()
 
     def setup_private_nic(self):
 
