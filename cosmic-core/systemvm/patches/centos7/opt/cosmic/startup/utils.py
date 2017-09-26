@@ -98,3 +98,41 @@ AcceptEnv XMODIFIERS
 
         with open(self.config_dir + "agent.properties", "w") as f:
             f.write("\n".join(agent_properties))
+
+    def setup_banner(self):
+        with open("/etc/redhat-release", "r") as f:
+            release = f.readline()
+
+        prelogin_banner = """
+Cosmic sytemvm powered by %s \\n \\l
+  ____________________________________________
+ ( Void 100%% of your warranty @ %s )
+  --------------------------------------------
+        \   ^__^
+         \  (oo)\_______
+           (__)\       )\/
+             ||----w |
+             ||     ||
+
+""" % (release, self.cmdline["eth0ip"])
+
+        with open("/etc/issue", "w") as f:
+            f.write(prelogin_banner)
+        with open("/etc/issue.net", "w") as f:
+            f.write(prelogin_banner)
+
+        motd = """
+Cosmic sytemvm powered by %s \n \l
+  ______________________________________
+ ( Booo! 0%% of your warranty remaining! )
+  --------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/
+               ||----w |
+               ||     ||
+
+""" % release
+
+        with open("/etc/motd", "w") as f:
+            f.write(motd)
