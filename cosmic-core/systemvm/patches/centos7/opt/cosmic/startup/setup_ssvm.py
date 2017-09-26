@@ -14,8 +14,10 @@ class SecondaryStorageVM:
         self.config_dir = "/etc/cosmic/agent/"
 
     def start(self):
-        logging.info("Running update_config.py on %s" % self.cmdline["name"])
-        os.system("/opt/cosmic/router/bin/update_config.py cmd_line.json")
+        logging.info("Setting up configuration for %s" % self.cmdline["type"])
+        self.setup_agent_config()
+
+        os.system("systemctl start cosmic-agent")
 
     def setup_agent_config(self):
         Utils(self.cmdline).setup_agent_properties()

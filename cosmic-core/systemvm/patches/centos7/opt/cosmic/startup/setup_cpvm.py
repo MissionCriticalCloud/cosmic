@@ -17,6 +17,8 @@ class ConsoleProxyVM:
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
 
+        os.system("systemctl start cosmic-agent")
+
     def setup_agent_config(self):
         if not os.path.isdir(self.config_dir):
             os.mkdir(self.config_dir, 0o644)
