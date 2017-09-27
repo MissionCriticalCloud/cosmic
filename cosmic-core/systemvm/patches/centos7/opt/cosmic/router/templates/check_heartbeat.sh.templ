@@ -36,7 +36,7 @@ then
         service conntrackd stop >> $ROUTER_LOG 2>&1
 
         #Set fault so we have the same effect as a KeepaliveD fault.
-        python /opt/cloud/bin/master.py --fault
+        python /opt/cosmic/router/bin/master.py --fault
 
         pkill -9 keepalived >> $ROUTER_LOG 2>&1
         pkill -9 conntrackd >> $ROUTER_LOG 2>&1

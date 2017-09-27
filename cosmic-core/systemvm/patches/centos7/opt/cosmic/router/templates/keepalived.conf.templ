@@ -28,7 +28,7 @@ vrrp_instance inside_network {
     }
 
     !That's the correct path of the master.py file.
-    notify_backup "/opt/cloud/bin/master.py --backup"
-    notify_master "/opt/cloud/bin/master.py --master"
-    notify_fault "/opt/cloud/bin/master.py --fault"
+    notify_backup "/opt/cosmic/router/bin/master.py --backup"
+    notify_master "/opt/cosmic/router/bin/master.py --master"
+    notify_fault "/opt/cosmic/router/bin/master.py --fault"
 }
