@@ -7,7 +7,7 @@ from cloudutils.configFileOps import configFileOps
 from cloudutils.globalEnv import globalEnv
 from cloudutils.networkConfig import networkConfig
 from cloudutils.syscfg import sysConfigFactory
-from cloudutils.utilities import initLoging, bash
+from cloudutils.utilities import bash
 from optparse import OptionParser
 
 
