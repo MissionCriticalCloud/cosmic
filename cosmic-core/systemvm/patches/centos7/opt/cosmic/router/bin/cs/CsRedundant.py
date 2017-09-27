@@ -35,15 +35,16 @@ class CsRedundant(object):
     CS_PRIO_DOWN = -1
     CS_ROUTER_DIR = "%s/rrouter" % CS_RAMDISK_DIR
     CS_TEMPLATES = [
-        "heartbeat.sh.templ", "check_heartbeat.sh.templ",
+        "heartbeat.sh.templ",
+        "check_heartbeat.sh.templ",
         "arping_gateways.sh.templ"
     ]
-    CS_TEMPLATES_DIR = "/opt/cloud/templates"
+    CS_TEMPLATES_DIR = "/opt/cosmic/router/templates"
     CONNTRACKD_BIN = "/usr/sbin/conntrackd"
     CONNTRACKD_KEEPALIVED_CONFLOCK = "/var/lock/conntrack.lock"
     CONNTRACKD_CONF = "/etc/conntrackd/conntrackd.conf"
-    RROUTER_LOG = "/var/log/cloud.log"
     KEEPALIVED_CONF = "/etc/keepalived/keepalived.conf"
+    RROUTER_LOG = "/var/log/cosmic/router/redundantrouter.log"
 
     def __init__(self, config):
         self.cl = config.cmdline()
@@ -112,7 +113,7 @@ class CsRedundant(object):
         CsHelper.execute(
             'sed -i "s/--exec\ \$DAEMON;/--exec\ \$DAEMON\ --\ --vrrp;/g" /etc/init.d/keepalived')
         # checkrouter.sh configuration
-        check_router = CsFile("/opt/cloud/bin/checkrouter.sh")
+        check_router = CsFile("/opt/cosmic/router/scripts/checkrouter.sh")
         check_router.greplace("[RROUTER_LOG]", self.RROUTER_LOG)
         check_router.commit()
 
