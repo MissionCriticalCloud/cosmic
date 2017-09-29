@@ -2749,7 +2749,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     @DB
     protected Volume liveMigrateVolume(final Volume volume, final StoragePool destPool) throws StorageUnavailableException {
-        final VolumeInfo vol = volFactory.getVolume(volume.getId());
+        final VolumeInfo vol = volFactory.getVolume(volume.getId(), true);
         final AsyncCallFuture<VolumeApiResult> future = volService.migrateVolume(vol, (DataStore) destPool);
         try {
             final VolumeApiResult result = future.get();

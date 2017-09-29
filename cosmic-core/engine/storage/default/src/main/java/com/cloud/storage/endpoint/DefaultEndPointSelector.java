@@ -292,12 +292,21 @@ public class DefaultEndPointSelector implements EndPointSelector {
 
     @Override
     public EndPoint select(final DataObject object, final StorageAction action) {
-        if (action == StorageAction.TAKESNAPSHOT) {
+        if (StorageAction.TAKESNAPSHOT.equals(action)) {
             final SnapshotInfo snapshotInfo = (SnapshotInfo) object;
-            if (snapshotInfo.getHypervisorType() == Hypervisor.HypervisorType.KVM) {
+            if (Hypervisor.HypervisorType.KVM.equals(snapshotInfo.getHypervisorType())) {
                 final VolumeInfo volumeInfo = snapshotInfo.getBaseVolume();
                 final VirtualMachine vm = volumeInfo.getAttachedVM();
-                if (vm != null && vm.getState() == VirtualMachine.State.Running) {
+                if (vm != null && VirtualMachine.State.Running.equals(vm.getState())) {
+                    final Long hostId = vm.getHostId();
+                    return getEndPointFromHostId(hostId);
+                }
+            }
+        } else if (StorageAction.MIGRATEVOLUME.equals(action)) {
+            final VolumeInfo volumeInfo = (VolumeInfo) object;
+            if (Hypervisor.HypervisorType.KVM.equals(volumeInfo.getHypervisorType())) {
+                final VirtualMachine vm = volumeInfo.getAttachedVM();
+                if (vm != null && VirtualMachine.State.Running.equals(vm.getState()) && volumeInfo.isToBeLiveMigrated()) {
                     final Long hostId = vm.getHostId();
                     return getEndPointFromHostId(hostId);
                 }
