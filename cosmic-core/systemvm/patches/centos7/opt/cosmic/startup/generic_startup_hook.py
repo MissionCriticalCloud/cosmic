@@ -58,7 +58,7 @@ class App:
 
             SecondaryStorageVM(self.cmdline).start()
 
-        elif self.cmdline["type"] == "vpcrouter":
+        elif self.cmdline["type"] in ("vpcrouter", "router"):
             logging.info("Starting app %s" % self.cmdline["type"])
 
             RouterVM(self.cmdline).start()
