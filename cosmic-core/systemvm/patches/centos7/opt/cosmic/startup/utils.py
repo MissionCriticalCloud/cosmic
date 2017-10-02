@@ -8,6 +8,10 @@ class Utils:
         self.cmdline = cmdline
         self.config_dir = "/etc/cosmic/agent/"
         self.ssh_port = 3922
+        self.is_legacy_router_vm = False
+
+        if "type" in self.cmdline and self.cmdline['type'] == "router":
+            self.is_legacy_router_vm = True
 
     def bootstrap(self):
         self.setup_hostname()
@@ -59,6 +63,11 @@ NETMASK="%s"
         os.system("hostnamectl set-hostname %s" % self.cmdline["name"])
 
     def setup_ssh(self):
+
+        link_local_ip = self.cmdline["eth0ip"]
+        if self.is_legacy_router_vm:
+            link_local_ip = self.cmdline["eth1ip"]
+
         sshd_config = """
 Port %s
 AddressFamily inet
@@ -82,7 +91,7 @@ AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
 AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
 AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
 AcceptEnv XMODIFIERS
-""" % (self.ssh_port, self.cmdline["eth0ip"])
+""" % (self.ssh_port, link_local_ip)
 
         with open("/etc/ssh/sshd_config", "w") as f:
             f.write(sshd_config)
