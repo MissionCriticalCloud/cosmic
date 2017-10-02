@@ -9,11 +9,11 @@ vrrp_script heartbeat {
 
 vrrp_instance inside_network {
     state BACKUP
-    interface eth2
-    virtual_router_id 51
+    interface [INTERFACE]
+    virtual_router_id [ROUTER_ID]
     nopreempt
 
-    advert_int 1
+    advert_int [ADVERT_INT]
     authentication {
         auth_type AH
         auth_pass PASS
