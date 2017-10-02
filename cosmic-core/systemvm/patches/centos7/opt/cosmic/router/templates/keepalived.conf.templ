@@ -10,7 +10,7 @@ vrrp_script heartbeat {
 vrrp_instance inside_network {
     state BACKUP
     interface [INTERFACE]
-    virtual_router_id [ROUTER_ID]
+    virtual_router_id 51
     nopreempt
 
     advert_int [ADVERT_INT]
