@@ -7,5 +7,5 @@ ipInfo=$(ip addr show dev eth0 | grep inet | grep eth0 )
 ips=$(echo "$ipInfo" | awk '{print $2}' ); echo $ips
 for ip in $ips; do
 	addr=$(echo $ip | awk -F'/' '{print $1}')
-	/opt/cloud/bin/passwd_server_ip $addr >> /var/log/cloud.log 2>&1 &
+	/opt/cosmic/router/scripts/passwd_server_ip $addr >> /var/log/cloud.log 2>&1 &
 done;

@@ -351,7 +351,7 @@ grep "redundant_router=1" /var/cache/cloud/cmdline > /dev/null
 if [ $? -eq 0 ]
 then
     is_redundant=1
-    sudo /opt/cloud/bin/checkrouter.sh --no-lock|grep "Status: MASTER" > /dev/null 2>&1
+    sudo /opt/cosmic/router/scripts/checkrouter.sh --no-lock|grep "Status: MASTER" > /dev/null 2>&1
     if [ $? -eq 0 ]
     then
         is_master=1

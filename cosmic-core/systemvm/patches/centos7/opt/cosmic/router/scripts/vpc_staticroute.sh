@@ -2,8 +2,8 @@
 
 # @VERSION@
 
-source /root/func.sh
-source /opt/cloud/bin/vpc_func.sh
+source /opt/cosmic/router/scripts/func.sh
+source /opt/cosmic/router/scripts/vpc_func.sh
 lock="biglock"
 locked=$(getLockFile $lock)
 if [ "$locked" != "1" ]

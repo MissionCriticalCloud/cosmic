@@ -7,7 +7,7 @@
 # Send ack:
 #   wget -t 3 -T 20 -O - --header 'DomU_Request: saved_password' localhost:8080
 # Save password only from within router:
-#   /opt/cloud/bin/savepassword.sh -v <IP> -p <password>
+#   /opt/cosmic/router/scripts/savepassword.sh -v <IP> -p <password>
 #   curl --header 'DomU_Request: save_password' http://localhost:8080/ -F ip=<IP> -F password=<passwd>
 
 import binascii
