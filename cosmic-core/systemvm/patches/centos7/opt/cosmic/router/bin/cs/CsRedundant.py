@@ -107,8 +107,7 @@ class CsRedundant(object):
             CsHelper.copy_if_needed(
                 "%s/%s" % (self.CS_TEMPLATES_DIR, s), "%s/%s" % (self.CS_ROUTER_DIR, d))
 
-        CsHelper.copy_if_needed(
-            "%s/%s" % (self.CS_TEMPLATES_DIR, "keepalived.conf.templ"), self.KEEPALIVED_CONF)
+        CsHelper.copy_if_needed("%s/%s" % (self.CS_TEMPLATES_DIR, "keepalived.conf.templ"), self.KEEPALIVED_CONF)
 
         with open("/etc/sysconfig/keepalived", "w") as f:
             f.write("KEEPALIVED_OPTIONS=\"-D --vrrp\"")
@@ -181,6 +180,7 @@ class CsRedundant(object):
         proc = CsProcess(['/usr/sbin/keepalived'])
         if not proc.find() or keepalived_conf.is_changed() or force_keepalived_restart:
             keepalived_conf.commit()
+            os.chmod(self.KEEPALIVED_CONF, 0o644)
             CsHelper.service("keepalived", "restart")
 
     def release_lock(self):
