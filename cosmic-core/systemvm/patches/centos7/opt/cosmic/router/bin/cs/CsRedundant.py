@@ -110,8 +110,9 @@ class CsRedundant(object):
         CsHelper.copy_if_needed(
             "%s/%s" % (self.CS_TEMPLATES_DIR, "keepalived.conf.templ"), self.KEEPALIVED_CONF)
 
-        CsHelper.execute(
-            'sed -i "s/--exec\ \$DAEMON;/--exec\ \$DAEMON\ --\ --vrrp;/g" /etc/init.d/keepalived')
+        with open("/etc/sysconfig/keepalived", "w") as f:
+            f.write("KEEPALIVED_OPTIONS=\"-D --vrrp\"")
+
         # checkrouter.sh configuration
         check_router = CsFile("/opt/cosmic/router/scripts/checkrouter.sh")
         check_router.greplace("[RROUTER_LOG]", self.RROUTER_LOG)
