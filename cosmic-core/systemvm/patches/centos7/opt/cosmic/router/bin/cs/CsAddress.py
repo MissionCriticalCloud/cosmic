@@ -150,6 +150,8 @@ class CsAddress(CsDataBag):
             vpccidr = cmdline.get_vpccidr()
             self.fw.append(["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (vpccidr, vpccidr)])
             if has_sourcenat:
+                # create source nat list chain
+                self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
                 self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
             # adding logging here for all ingress traffic at once
             self.fw.append(["filter", "",
