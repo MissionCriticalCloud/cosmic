@@ -48,6 +48,9 @@ class App:
 
         json.dump(cmdline_json, open(CMDLINE_DIR + CMDLINE_JSON, "w"))
 
+        os.remove(CMDLINE_DIR + CMDLINE_FILE)
+        os.remove(CMDLINE_DIR + CMDLINE_DONE)
+
         self.cmdline = cmdline_json["cmd_line"]
 
     def start_app(self):
