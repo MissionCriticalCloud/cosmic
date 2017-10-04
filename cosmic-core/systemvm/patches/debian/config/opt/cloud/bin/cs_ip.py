@@ -1,7 +1,7 @@
 # -- coding: utf-8 --
 
 from netaddr import *
-
+from cs.CsHelper import *
 
 def merge(dbag, ip):
 
@@ -9,15 +9,14 @@ def merge(dbag, ip):
     if 'public_ip' not in ip:
         ip['public_ip'] = ip['ip_address']
 
-    for dev in dbag:
-        if dev == "id":
+    for identifier in dbag:
+        if identifier == "id":
             continue
-        for address in dbag[dev]:
+        for address in dbag[identifier]:
             if address['public_ip'] == ip['public_ip']:
-                dbag[dev].remove(address)
+                dbag[identifier].remove(address)
 
     ipo = IPNetwork(ip['public_ip'] + '/' + ip['netmask'])
-    ip['device'] = 'eth' + str(ip['nic_dev_id'])
     ip['broadcast'] = str(ipo.broadcast)
     ip['cidr'] = str(ipo.ip) + '/' + str(ipo.prefixlen)
     ip['size'] = str(ipo.prefixlen)
@@ -26,9 +25,14 @@ def merge(dbag, ip):
         ip['nw_type'] = 'public'
     else:
         ip['nw_type'] = ip['nw_type'].lower()
-    if ip['nw_type'] == 'control':
-        dbag['eth' + str(ip['nic_dev_id'])] = [ip]
-    else:
-        dbag.setdefault('eth' + str(ip['nic_dev_id']), []).append(ip)
+
+    # Get device from mac address
+    device = get_device_from_mac_address(ip['mac_address'])
+    if device == "false":
+        device = ""
+    ip['device'] = device
+
+    # Merge
+    dbag.setdefault(ip['mac_address'], []).append(ip)
 
     return dbag

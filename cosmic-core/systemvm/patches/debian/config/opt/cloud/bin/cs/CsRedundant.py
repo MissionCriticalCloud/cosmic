@@ -74,28 +74,6 @@ class CsRedundant(object):
             self._redundant_off()
             return
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_guest()]
-        isDeviceReady = False
-        dev = ''
-        for interface in interfaces:
-            if dev == interface.get_device():
-                continue
-            dev = interface.get_device()
-            logging.info("Wait for devices to be configured so we can start keepalived")
-            devConfigured = CsDevice(dev, self.config).waitfordevice()
-            if devConfigured:
-                command = "ip link show %s | grep 'state UP'" % dev
-                devUp = CsHelper.execute(command)
-                if devUp:
-                    logging.info("Device %s is present, let's start keepalive now." % dev)
-                    isDeviceReady = True
-
-        if not isDeviceReady:
-            logging.info("Guest network not configured yet, let's stop router redundancy for now.")
-            CsHelper.service("conntrackd", "stop")
-            CsHelper.service("keepalived", "stop")
-            return
-
         CsHelper.mkdir(self.CS_RAMDISK_DIR, 0755, False)
         CsHelper.mount_tmpfs(self.CS_RAMDISK_DIR)
         CsHelper.mkdir(self.CS_ROUTER_DIR, 0755, False)

@@ -358,13 +358,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
                 if (!broadcastUriAllocatedToVm.containsKey(ip.getBroadcastUri())) {
           /* plug a vif into router */
-                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getVifMacAddress());
+                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getMacAddress());
                     broadcastUriAllocatedToVm.put(ip.getBroadcastUri(), nicPos++);
                 }
                 nicNum = broadcastUriAllocatedToVm.get(ip.getBroadcastUri());
 
                 if (numOfIps == 1 && !ip.isAdd()) {
-                    vifHotUnPlug(conn, routerName, ip.getVifMacAddress());
+                    vifHotUnPlug(conn, routerName, ip.getMacAddress());
                     networkUsage(routerIp, "deleteVif", "eth" + nicNum);
                 }
             }
@@ -425,15 +425,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(routerName);
-            final IpAddressTO[] ips = cmd.getIpAddresses();
             final Map<String, Integer> bridgeToNicNum = new HashMap<>();
             final List<InterfaceDef> pluggedNics = getInterfaces(conn, routerName);
 
             buildBridgeToNicNumHashMap(bridgeToNicNum, pluggedNics);
-
-            for (final IpAddressTO ip : ips) {
-                setIpNicDevId(bridgeToNicNum, ip);
-            }
 
             return new ExecutionResult(true, null);
         } catch (final LibvirtException e) {
@@ -454,17 +449,16 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
             Integer devNum = buildBridgeToNicNumHashMap(bridgeToNicNum, pluggedNics);
 
-            int nicNum;
             for (final IpAddressTO ip : ips) {
                 boolean newNic = false;
                 if (!bridgeToNicNum.containsKey(getBridgeNameFromTrafficType(ip.getTrafficType()))) {
-          /* plug a vif into router */
-                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getVifMacAddress());
+                    /* plug a vif into router */
+                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getMacAddress());
                     bridgeToNicNum.put(getBridgeNameFromTrafficType(ip.getTrafficType()), devNum++);
                     newNic = true;
                 }
-                nicNum = setIpNicDevId(bridgeToNicNum, ip);
-                networkUsage(routerIp, "addVif", "eth" + nicNum);
+                // rewrite to mac address
+                //networkUsage(routerIp, "addVif", "eth" + nicNum);
 
                 ip.setNewNic(newNic);
             }
@@ -536,9 +530,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
                 devNum++;
             }
-
-            pubIp.setNicDevId(devNum);
-
             return new ExecutionResult(true, "success");
         } catch (final LibvirtException e) {
             final String msg = "Ip SNAT failure due to " + e.toString();
@@ -588,19 +579,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     private String getLinkLocalBridgeName() {
         return libvirtComputingResourceProperties.getPrivateBridgeName();
-    }
-
-    private Integer setIpNicDevId(final Map<String, Integer> bridgeToNicNum, final IpAddressTO ip) {
-        if (ip.getTrafficType().equals(TrafficType.Public) && bridgeToNicNum.containsKey(getPublicBridgeName())) {
-            ip.setNicDevId(bridgeToNicNum.get(getPublicBridgeName()));
-        } else if (ip.getTrafficType().equals(TrafficType.Management) && bridgeToNicNum.containsKey(getPrivBridgeName())) {
-            ip.setNicDevId(bridgeToNicNum.get(getPrivBridgeName()));
-        } else if (ip.getTrafficType().equals(TrafficType.Guest) && bridgeToNicNum.containsKey(getGuestBridgeName())) {
-            ip.setNicDevId(bridgeToNicNum.get(getGuestBridgeName()));
-        } else if (ip.getTrafficType().equals(TrafficType.Control) && bridgeToNicNum.containsKey(getLinkLocalBridgeName())) {
-            ip.setNicDevId(bridgeToNicNum.get(getLinkLocalBridgeName()));
-        }
-        return ip.getNicDevId();
     }
 
     private String getBridgeNameFromTrafficType(final TrafficType trafficType) {

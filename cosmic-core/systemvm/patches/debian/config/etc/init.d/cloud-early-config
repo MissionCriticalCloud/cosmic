@@ -530,28 +530,6 @@ setup_common() {
     ip route add default via $GW dev $gwdev
 
   fi
-
-  # a hacking way to activate vSwitch under VMware
-  ping -n -c 3 $GW &
-  sleep 3
-  pkill ping
-  if [ -n "$MGMTNET"  -a -n "$LOCAL_GW" ]
-  then
-      ping -n -c 3 $LOCAL_GW &
-      sleep 3
-      pkill ping
-      #This code is added to address ARP issue by pinging MGMT_GW
-      MGMT_GW=$(echo $MGMTNET | awk -F "." '{print $1"."$2"."$3".1"}')
-      ping -n -c 3 $MGMT_GW &
-      sleep 3
-      pkill ping
-
-  fi
-
-  local hyp=$(hypervisor)
-  if [ "$hyp" == "vmware" ]; then
-      ntpq -p &> /dev/null || vmware-toolbox-cmd timesync enable
-  fi
 }
 
 setup_dnsmasq() {
@@ -1278,11 +1256,20 @@ for i in $CMDLINE
       eth0ip)
           ETH0_IP=$VALUE
           ;;
+      eth0mac)
+          ETH0_MAC=$VALUE
+          ;;
       eth1ip)
           ETH1_IP=$VALUE
           ;;
+      eth1mac)
+          ETH1_MAC=$VALUE
+          ;;
       eth2ip)
           ETH2_IP=$VALUE
+          ;;
+      eth2mac)
+          ETH2_MAC=$VALUE
           ;;
       host)
           MGMT_HOST=$VALUE
@@ -1406,6 +1393,9 @@ for i in $CMDLINE
         ;;
       advert_int)
         ADVERT_INT=$VALUE
+        ;;
+      controlmac)
+        CONTROL_MAC=$VALUE
         ;;
     esac
 done
