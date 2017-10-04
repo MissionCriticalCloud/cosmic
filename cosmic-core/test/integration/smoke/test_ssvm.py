@@ -224,7 +224,7 @@ class TestSSVMs(cloudstackTestCase):
                 (self.apiclient.connection.mgtSvr, e)
             )
 
-        self.logger.debug("Checking cloud process status")
+        self.logger.debug("Checking cosmic-agent process status")
 
         try:
             host.user, host.passwd = get_host_credentials(
@@ -235,21 +235,21 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 cpvm.linklocalip,
-                "service cloud status"
+                "systemctl status cosmic-agent"
             )
         except KeyError:
             self.skipTest(
                 "Marvin configuration has no host credentials to check router services")
         res = str(result)
-        self.logger.debug("Cloud Process status: %s" % res)
+        self.logger.debug("cosmic-agent Process status: %s" % res)
         self.assertEqual(
             res.count("is running"),
             1,
-            "Check cloud service is running or not"
+            "Check cosmic-agent service is running or not"
         )
 
         linklocal_ip = None
-        # Check status of cloud service
+        # Check status of cosmic-agent service
         try:
             linklocal_ip = cpvm.linklocalip
             host.user, host.passwd = get_host_credentials(
@@ -260,7 +260,7 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 cpvm.linklocalip,
-                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
+                "cat /etc/cosmic/agent/agent.properties | grep eth0ip= | cut -d= -f2"
             )
         except KeyError:
             self.skipTest(
