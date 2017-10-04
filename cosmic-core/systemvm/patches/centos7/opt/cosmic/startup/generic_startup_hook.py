@@ -38,8 +38,8 @@ class App:
 
         with open(AGENT_PROPERTIES, "r") as f:
             for item in f:
-                key = item.split("=")[0]
-                value = item.split("=")[1]
+                key = item.split("=")[0].strip()
+                value = item.split("=")[1].strip()
 
                 self.cmdline[key] = value
 
