@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+
+ip=$1
+result=$ip
+while [ -n "$result" ]
+do
+    python /opt/cosmic/router/bin/passwd_server_ip.py $ip >/dev/null 2>/dev/null
+    rc=$?
+    if [ $rc -ne 0 ]
+    then
+        logger -t cloud "Password server failed with error code $rc. Restarting password server..."
+        sleep 3
+    fi
+    result=`ip addr show | grep $ip`
+done &
