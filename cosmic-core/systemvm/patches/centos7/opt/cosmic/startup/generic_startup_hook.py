@@ -96,7 +96,7 @@ if __name__ == "__main__":
     app = App()
 
     if os.path.exists("/etc/cosmic/agent/agent.properties"):
-        with("/etc/cosmic/agent/agent.properties", "r") as f:
+        with open("/etc/cosmic/agent/agent.properties", "r") as f:
             for line in f:
                 if 'secstorage' in line:
                     app.start_app()
