@@ -15,6 +15,8 @@ CMDLINE_FILE = "cmdline"
 CMDLINE_DONE = "cmdline_incoming"
 CMDLINE_JSON = "cmd_line.json"
 
+AGENT_PROPERTIES = "/etc/cosmic/agent/agent.properties"
+
 LOG_DIR = "/var/log/cosmic/startup/"
 
 
@@ -30,6 +32,16 @@ class App:
         super().__init__()
 
         self.cmdline = {}
+
+    def create_cmdline_json_from_properties(self):
+        self.cmdline = {}
+
+        with open(AGENT_PROPERTIES, "r") as f:
+            for item in f:
+                key = item.split("=")[0]
+                value = item.split("=")[1]
+
+                self.cmdline[key] = value
 
     def write_cmdline_json(self):
         logging.info("Writing for cmd_line.json")
@@ -84,6 +96,12 @@ def full_start(application):
     application.start_app()
 
 
+def reboot_start(application):
+    application.create_cmdline_json_from_properties()
+
+    application.start_app()
+
+
 if __name__ == "__main__":
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR, 0o755, True)
@@ -95,14 +113,14 @@ if __name__ == "__main__":
 
     app = App()
 
-    if os.path.exists("/etc/cosmic/agent/agent.properties"):
-        with open("/etc/cosmic/agent/agent.properties", "r") as f:
+    if os.path.exists(AGENT_PROPERTIES):
+        with open(AGENT_PROPERTIES, "r") as f:
             for line in f:
                 if 'secstorage' in line:
-                    app.start_app()
+                    reboot_start(app)
                     exit(0)
                 elif 'consoleproxy' in line:
-                    app.start_app()
+                    reboot_start(app)
                     exit(0)
             full_start(app)
     else:
