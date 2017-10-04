@@ -76,6 +76,14 @@ class App:
             sys.exit(1)
 
 
+def full_start(application):
+    wait_for_cmdline()
+
+    application.write_cmdline_json()
+
+    application.start_app()
+
+
 if __name__ == "__main__":
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR, 0o755, True)
@@ -87,8 +95,15 @@ if __name__ == "__main__":
 
     app = App()
 
-    wait_for_cmdline()
-
-    app.write_cmdline_json()
-
-    app.start_app()
+    if os.path.exists("/etc/cosmic/agent/agent.properties"):
+        with("/etc/cosmic/agent/agent.properties", "r") as f:
+            for line in f:
+                if 'secstorage' in line:
+                    app.start_app()
+                    exit(0)
+                elif 'consoleproxy' in line:
+                    app.start_app()
+                    exit(0)
+            full_start(app)
+    else:
+        full_start(app)
