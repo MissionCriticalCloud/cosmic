@@ -986,8 +986,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         final Script command = new Script("/bin/bash", s_logger);
         final String intf = "eth2";
         command.add("-c");
-        command.add("iptables -I INPUT -i " + intf + " -s " + sourceCidr
-                + " -p tcp -m state --state NEW -m tcp  -j ACCEPT");
+        command.add("iptables -I INPUT -i " + intf + " -s " + sourceCidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT");
 
         final String result = command.execute();
         if (result != null) {
