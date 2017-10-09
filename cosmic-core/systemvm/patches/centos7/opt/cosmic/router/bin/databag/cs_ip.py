@@ -7,13 +7,6 @@ def merge(dbag, ip):
     if 'public_ip' not in ip:
         ip['public_ip'] = ip['ip_address']
 
-    for dev in dbag:
-        if dev == "id":
-            continue
-        for address in dbag[dev]:
-            if address['public_ip'] == ip['public_ip']:
-                dbag[dev].remove(address)
-
     ipo = IPNetwork(ip['public_ip'] + '/' + ip['netmask'])
     ip['device'] = 'eth' + str(ip['nic_dev_id'])
     ip['broadcast'] = str(ipo.broadcast)
@@ -24,9 +17,6 @@ def merge(dbag, ip):
         ip['nw_type'] = 'public'
     else:
         ip['nw_type'] = ip['nw_type'].lower()
-    if ip['nw_type'] == 'control':
-        dbag['eth' + str(ip['nic_dev_id'])] = [ip]
-    else:
-        dbag.setdefault('eth' + str(ip['nic_dev_id']), []).append(ip)
+    dbag[ip['device']] = [ip]
 
     return dbag
