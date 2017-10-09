@@ -91,7 +91,7 @@
         <cs.jna.version>4.4.0</cs.jna.version>
         <cs.jsch.version>0.1.54</cs.jsch.version>
         <cs.jstl.version>1.2</cs.jstl.version>
-        <cs.libvirt.version>0.5.1</cs.libvirt.version>
+        <cs.libvirt.version>1.0.0</cs.libvirt.version>
         <cs.mail.version>1.4.7</cs.mail.version>
         <cs.mockito-all.version>1.10.19</cs.mockito-all.version>
         <cs.mycila.license.version>2.7</cs.mycila.license.version>
