@@ -1419,7 +1419,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             s_logger.debug("Found " + publicIps.size() + " ip(s) to apply as a part of domR " + router + " start.");
             // Re-apply public ip addresses - should come before PF/LB/VPN
             if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
-                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds, 0);
+                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds);
             }
         }
     }

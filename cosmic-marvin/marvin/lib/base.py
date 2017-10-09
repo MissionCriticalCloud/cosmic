@@ -4,7 +4,6 @@
 
 import base64
 import time
-
 from marvin.cloudstackAPI import *
 from marvin.cloudstackException import (
     printException,
@@ -23,12 +22,6 @@ from marvin.codes import (
     BACKED_UP,
     BACKING_UP
 )
-from utils import (
-    validate_list,
-    validate_state,
-    is_server_ssh_ready,
-    random_gen
-)
 
 from common import (
     list_routers,
@@ -39,6 +32,14 @@ from common import (
     get_network,
     get_vpc_offering
 )
+from utils import (
+    validate_list,
+    validate_state,
+    is_server_ssh_ready,
+    random_gen
+)
+
+
 class Domain:
     """ Domain Life Cycle """
 
@@ -47,7 +48,7 @@ class Domain:
 
     @classmethod
     def create(cls, api_client, services=None, name=None, networkdomain=None,
-               parentdomainid=None, randomizeID=True,):
+               parentdomainid=None, randomizeID=True, ):
         """Creates an domain"""
 
         cmd = createDomain.createDomainCmd()
@@ -302,7 +303,7 @@ class VirtualMachine:
             if not isinstance(list_security_groups, list):
                 basic_mode_security_group = SecurityGroup.create(
                     api_client,
-                    {"name": "basic_sec_grp"},
+                    { "name": "basic_sec_grp" },
                     cmd.account,
                     cmd.domainid,
                 )
@@ -384,10 +385,10 @@ class VirtualMachine:
                     aclid=acl_list[0].id
                 )
 
-                services_acl = {"protocol": services["protocol"] if "protocol" in services else 'TCP',
-                                "startport": services["publicport"] if "publicport" in services else 22,
-                                "endport": services["publicport"] if "publicport" in services else 22,
-                                "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress'}
+                services_acl = { "protocol": services["protocol"] if "protocol" in services else 'TCP',
+                                 "startport": services["publicport"] if "publicport" in services else 22,
+                                 "endport": services["publicport"] if "publicport" in services else 22,
+                                 "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress' }
 
                 ace_number = 1
                 for ace in target_acl:
@@ -542,7 +543,7 @@ class VirtualMachine:
         if "userdata" in services:
             cmd.userdata = base64.urlsafe_b64encode(services["userdata"])
 
-        cmd.details = [{}]
+        cmd.details = [{ }]
 
         if customcpunumber:
             cmd.details[0]["cpuNumber"] = customcpunumber
@@ -883,7 +884,7 @@ class VirtualMachine:
         cmd = scaleVirtualMachine.scaleVirtualMachineCmd()
         cmd.id = self.id
         cmd.serviceofferingid = serviceOfferingId
-        cmd.details = [{"cpuNumber": "", "cpuSpeed": "", "memory": ""}]
+        cmd.details = [{ "cpuNumber": "", "cpuSpeed": "", "memory": "" }]
         if customcpunumber:
             cmd.details[0]["cpuNumber"] = customcpunumber
         if customcpuspeed:
@@ -1700,35 +1701,6 @@ class StaticNATRule:
         return StaticNATRule(api_client.createFirewallRule(cmd).__dict__)
 
     @classmethod
-    def createIpForwardingRule(cls, api_client, startport, endport, protocol, ipaddressid, openfirewall):
-        """Creates static ip forwarding rule"""
-
-        cmd = createIpForwardingRule.createIpForwardingRuleCmd()
-        cmd.startport = startport
-        cmd.endport = endport
-        cmd.protocol = protocol
-        cmd.openfirewall = openfirewall
-        cmd.ipaddressid = ipaddressid
-        return StaticNATRule(api_client.createIpForwardingRule(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete IP forwarding rule"""
-        cmd = deleteIpForwardingRule.deleteIpForwardingRuleCmd()
-        cmd.id = self.id
-        api_client.deleteIpForwardingRule(cmd)
-        return
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """List all IP forwarding rules matching criteria"""
-
-        cmd = listIpForwardingRules.listIpForwardingRulesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listIpForwardingRules(cmd)
-
-    @classmethod
     def enable(cls, api_client, ipaddressid, virtualmachineid, networkid=None,
                vmguestip=None):
         """Enables Static NAT rule"""
@@ -2370,7 +2342,7 @@ class LoadBalancerRule:
         if param:
             cmd.param = []
             for name, value in param.items():
-                cmd.param.append({'name': name, 'value': value})
+                cmd.param.append({ 'name': name, 'value': value })
         return api_client.createLBStickinessPolicy(cmd)
 
     def deleteSticky(self, api_client, id):
@@ -2778,7 +2750,7 @@ class Network:
 
     @classmethod
     def create(cls, api_client, services=None, accountid=None, domainid=None, networkofferingid=None, projectid=None,
-               subdomainaccess=None, zoneid=None, gateway=None, netmask=None,  cidr=None, vpcid=None, aclid=None,
+               subdomainaccess=None, zoneid=None, gateway=None, netmask=None, cidr=None, vpcid=None, aclid=None,
                vlan=None, ipexclusionlist=None, domain=None, account=None, vpc=None, zone=None, acl=None, data=None):
         """Create Network for account"""
         if data:
@@ -3613,7 +3585,7 @@ class SecurityGroup:
         """Authorize Egress Rule"""
 
         if user_secgrp_list is None:
-            user_secgrp_list = {}
+            user_secgrp_list = { }
         cmd = authorizeSecurityGroupEgress.authorizeSecurityGroupEgressCmd()
 
         if domainid:
@@ -3678,7 +3650,7 @@ class VpnCustomerGateway:
         cmd.cidrlist = cidrlist
 
         if not services:
-            services = {}
+            services = { }
         if "ipsecpsk" in services:
             cmd.ipsecpsk = services["ipsecpsk"]
         elif presharedkey:
@@ -4193,7 +4165,7 @@ class VPC:
 
     @classmethod
     def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
-               domainid=None, zone=None, data=None, randomizeID=True,  **kwargs):
+               domainid=None, zone=None, data=None, randomizeID=True, **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
@@ -4230,7 +4202,7 @@ class VPC:
         if domainid:
             cmd.domainid = domainid
         elif account and not type(account) is str:
-                cmd.domainid = account.domainid
+            cmd.domainid = account.domainid
         if networkDomain:
             cmd.networkDomain = networkDomain
         [setattr(cmd, k, v) for k, v in kwargs.items()]

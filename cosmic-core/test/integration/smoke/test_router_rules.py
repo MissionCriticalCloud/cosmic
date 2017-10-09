@@ -1,6 +1,4 @@
 from ddt import ddt, data
-from nose.plugins.attrib import attr
-
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import (
     FAILED,
@@ -31,6 +29,8 @@ from marvin.lib.utils import (
 )
 from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
+from nose.plugins.attrib import attr
+
 
 @ddt
 class TestRouterRules(cloudstackTestCase):
@@ -126,10 +126,10 @@ class TestRouterRules(cloudstackTestCase):
 
         try:
             self.logger.debug("SSHing into VM with IP address %s with NAT IP %s" %
-                         (
-                             self.virtual_machine.ipaddress,
-                             self.ipaddress.ipaddress.ipaddress
-                         ))
+                              (
+                                  self.virtual_machine.ipaddress,
+                                  self.ipaddress.ipaddress.ipaddress
+                              ))
             self.virtual_machine.get_ssh_client(
                 self.ipaddress.ipaddress.ipaddress)
         except Exception as e:
@@ -139,7 +139,7 @@ class TestRouterRules(cloudstackTestCase):
             )
 
         # Validate the following:
-        # 1. listIpForwardingRules should not return the deleted rule anymore
+        # 1. listPortForwardingRules should not return the deleted rule anymore
         # 2. attempt to do ssh should now fail
 
         self.removeNetworkRules(rule=value)

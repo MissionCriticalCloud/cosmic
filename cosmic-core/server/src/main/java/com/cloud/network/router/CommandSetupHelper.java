@@ -419,13 +419,12 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final long vmId) {
+    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds) {
         final String ipAssocCommand = "IPAssocCommand";
-        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, vmId);
+        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
     }
 
-    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand, final
-    long vmId) {
+    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand) {
         final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = getVlanIpMap(ips);
 
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
@@ -478,11 +477,6 @@ public class CommandSetupHelper {
                 ipsToSend[i++] = ip;
             }
 
-            Long associatedWithNetworkId = ipAddrList.get(0).getAssociatedWithNetworkId();
-            if (associatedWithNetworkId == null || associatedWithNetworkId == 0) {
-                associatedWithNetworkId = ipAddrList.get(0).getNetworkId();
-            }
-
             final IpAssocCommand cmd;
             if (ipAssocCommand.equals("IPAssocVpcCommand")) {
                 cmd = new IpAssocVpcCommand(ipsToSend);
@@ -490,7 +484,6 @@ public class CommandSetupHelper {
                 cmd = new IpAssocCommand(ipsToSend);
             }
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-            cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(associatedWithNetworkId, router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
             final Zone zone = zoneRepository.findOne(router.getDataCenterId());
             cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
@@ -874,7 +867,7 @@ public class CommandSetupHelper {
                                                    final Map<String, String> vlanMacAddress) {
         final String ipAssocCommand = "IPAssocVpcCommand";
         if (router.getIsRedundantRouter()) {
-            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, 0);
+            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
             return;
         }
 

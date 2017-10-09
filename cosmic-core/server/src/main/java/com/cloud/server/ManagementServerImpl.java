@@ -318,11 +318,8 @@ import com.cloud.api.command.user.loadbalancer.UpdateLBHealthCheckPolicyCmd;
 import com.cloud.api.command.user.loadbalancer.UpdateLBStickinessPolicyCmd;
 import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.api.command.user.loadbalancer.UploadSslCertCmd;
-import com.cloud.api.command.user.nat.CreateIpForwardingRuleCmd;
-import com.cloud.api.command.user.nat.DeleteIpForwardingRuleCmd;
 import com.cloud.api.command.user.nat.DisableStaticNatCmd;
 import com.cloud.api.command.user.nat.EnableStaticNatCmd;
-import com.cloud.api.command.user.nat.ListIpForwardingRulesCmd;
 import com.cloud.api.command.user.network.CreateNetworkACLCmd;
 import com.cloud.api.command.user.network.CreateNetworkACLListCmd;
 import com.cloud.api.command.user.network.CreateNetworkCmd;
@@ -2918,7 +2915,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             if (dedicatedResourceVO != null && dedicatedResourceVO.getDomainId() != account.getDomainId()) {
                 final Domain domain = _domainDao.findById(dedicatedResourceVO.getDomainId());
                 if (domain != null) {
-                    s_logger.debug("Host " + host.getName() + " is dedicated to domain " + domain.getName() + " so not suitable for migration for VM " + vmProfile.getInstanceName());
+                    s_logger.debug("Host " + host.getName() + " is dedicated to domain " + domain.getName() + " so not suitable for migration for VM " + vmProfile
+                            .getInstanceName());
                 }
                 excludes.addHost(host.getId());
             }
@@ -3657,11 +3655,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(ListLoadBalancerRulesCmd.class);
         cmdList.add(RemoveFromLoadBalancerRuleCmd.class);
         cmdList.add(UpdateLoadBalancerRuleCmd.class);
-        cmdList.add(CreateIpForwardingRuleCmd.class);
-        cmdList.add(DeleteIpForwardingRuleCmd.class);
         cmdList.add(DisableStaticNatCmd.class);
         cmdList.add(EnableStaticNatCmd.class);
-        cmdList.add(ListIpForwardingRulesCmd.class);
         cmdList.add(CreateNetworkACLCmd.class);
         cmdList.add(CreateNetworkCmd.class);
         cmdList.add(DeleteNetworkACLCmd.class);

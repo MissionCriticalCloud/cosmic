@@ -1238,18 +1238,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='listIpForwardingRules'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='listPreallocatedLuns'">
                                 <td>
                                     <A HREF="resumepage.html">
@@ -1740,18 +1728,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='deleteIpForwardingRule'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='changeServiceForVirtualMachine'">
                                 <td>
                                     <A HREF="resumepage.html">
@@ -2091,28 +2067,6 @@
                         </tr>
                         <tr>
                             <xsl:if test="name='updateIso'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
-                            <xsl:if test="name='createIpForwardingRule'">
-                                <tr>
-                                    <td>
-                                        <h4 ALIGN='CENTER'>NAT Specific Commands</h4>
-                                        <br></br>
-                                    </td>
-                                    <td>
-                                        <h4 ALIGN='CENTER'>NAT Specific Command Descriptions</h4>
-                                        <br></br>
-                                    </td>
-                                </tr>
                                 <td>
                                     <A HREF="resumepage.html">
                                         <xsl:value-of select="name" />
