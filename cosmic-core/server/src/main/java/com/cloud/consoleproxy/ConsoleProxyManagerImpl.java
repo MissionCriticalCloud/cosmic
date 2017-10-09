@@ -601,9 +601,11 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             if (nic.getIPv4Address() == null) {
                 buf.append(" eth").append(deviceId).append("ip=").append("0.0.0.0");
                 buf.append(" eth").append(deviceId).append("mask=").append("0.0.0.0");
+                buf.append(" eth").append(deviceId).append("mac=").append("00:00:00:00:00:00");
             } else {
                 buf.append(" eth").append(deviceId).append("ip=").append(nic.getIPv4Address());
                 buf.append(" eth").append(deviceId).append("mask=").append(nic.getIPv4Netmask());
+                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
             }
 
             if (nic.isDefaultNic()) {

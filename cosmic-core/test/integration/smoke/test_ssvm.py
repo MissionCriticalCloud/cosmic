@@ -1,13 +1,10 @@
 import telnetlib
 import time
-
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
-
 from marvin.cloudstackAPI import (
     rebootSystemVm,
     destroySystemVm
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.common import (
     get_zone,
     list_hosts,
@@ -21,6 +18,7 @@ from marvin.lib.utils import (
     get_host_credentials
 )
 from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestSSVMs(cloudstackTestCase):
@@ -124,7 +122,7 @@ class TestSSVMs(cloudstackTestCase):
             "Check for warnings in tests"
         )
 
-        # Check status of cloud service
+        # Check status of cosmic-agent service
         try:
             host.user, host.passwd = get_host_credentials(
                 self.config, host.ipaddress)
@@ -134,18 +132,18 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 ssvm.linklocalip,
-                "service cloud status"
+                "systemctl status cosmic-agent"
             )
         except KeyError:
             self.skipTest(
                 "Marvin configuration has no host credentials to check router services")
         res = str(result)
-        self.logger.debug("Cloud Process status: %s" % res)
+        self.logger.debug("cosmic-agent Process status: %s" % res)
         # cloud.com service (type=secstorage) is running: process id: 2346
         self.assertEqual(
-            res.count("is running"),
+            res.count("active (running)"),
             1,
-            "Check cloud service is running or not"
+            "Check cosmic-agent service is running or not"
         )
 
         linklocal_ip = None
@@ -160,7 +158,7 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 ssvm.linklocalip,
-                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
+                "cat /etc/cosmic/agent/agent.properties | grep eth0ip= | cut -d= -f2"
             )
         except KeyError:
             self.skipTest(
@@ -171,7 +169,7 @@ class TestSSVMs(cloudstackTestCase):
             linklocal_ip,
             res,
             "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
-            linklocal_ip, res)
+                linklocal_ip, res)
         )
 
         return
@@ -224,7 +222,7 @@ class TestSSVMs(cloudstackTestCase):
                 (self.apiclient.connection.mgtSvr, e)
             )
 
-        self.logger.debug("Checking cloud process status")
+        self.logger.debug("Checking cosmic-agent process status")
 
         try:
             host.user, host.passwd = get_host_credentials(
@@ -235,21 +233,21 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 cpvm.linklocalip,
-                "service cloud status"
+                "systemctl status cosmic-agent"
             )
         except KeyError:
             self.skipTest(
                 "Marvin configuration has no host credentials to check router services")
         res = str(result)
-        self.logger.debug("Cloud Process status: %s" % res)
+        self.logger.debug("cosmic-agent Process status: %s" % res)
         self.assertEqual(
-            res.count("is running"),
+            res.count("active (running)"),
             1,
-            "Check cloud service is running or not"
+            "Check cosmic-agent service is running or not"
         )
 
         linklocal_ip = None
-        # Check status of cloud service
+        # Check status of cosmic-agent service
         try:
             linklocal_ip = cpvm.linklocalip
             host.user, host.passwd = get_host_credentials(
@@ -260,7 +258,7 @@ class TestSSVMs(cloudstackTestCase):
                 host.user,
                 host.passwd,
                 cpvm.linklocalip,
-                "cat /var/cache/cloud/cmdline | xargs | sed \"s/ /\\n/g\" | grep eth0ip= | sed \"s/\=/ /g\" | awk '{print $2}'"
+                "cat /etc/cosmic/agent/agent.properties | grep eth0ip= | cut -d= -f2"
             )
         except KeyError:
             self.skipTest(
@@ -271,7 +269,7 @@ class TestSSVMs(cloudstackTestCase):
             linklocal_ip,
             res,
             "The cached Link Local should be the same as the current Link Local IP, but they are different! Current ==> %s; Cached ==> %s " % (
-            linklocal_ip, res)
+                linklocal_ip, res)
         )
 
         return

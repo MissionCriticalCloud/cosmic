@@ -1,0 +1,34 @@
+global_defs {
+   router_id [ROUTER_ID]
+}
+
+vrrp_script heartbeat {
+    script "[RROUTER_BIN_PATH]/heartbeat.sh"
+    interval 5
+}
+
+vrrp_instance inside_network {
+    state BACKUP
+    interface [INTERFACE]
+    virtual_router_id 51
+    nopreempt
+
+    advert_int [ADVERT_INT]
+    authentication {
+        auth_type AH
+        auth_pass PASS
+    }
+
+    virtual_ipaddress {
+        [ROUTER_IP] brd [BOARDCAST] dev eth2
+    }
+
+    track_script {
+        heartbeat
+    }
+
+    !That's the correct path of the master.py file.
+    notify_backup "/opt/cosmic/router/bin/master.py --backup"
+    notify_master "/opt/cosmic/router/bin/master.py --master"
+    notify_fault "/opt/cosmic/router/bin/master.py --fault"
+}

@@ -27,26 +27,30 @@ public class VRScripts {
     public final static int DEFAULT_EXECUTEINVR_TIMEOUT = 120; //Seconds
 
     // New scripts for use with chef
-    public static final String UPDATE_CONFIG = "update_config.py";
+    public static final String UPDATE_CONFIG = "bin/update_config.py";
 
     // TODO Remove scripts
-    public static final String S2SVPN_CHECK = "checkbatchs2svpn.sh";
-    public static final String S2SVPN_IPSEC = "ipsectunnel.sh";
-    public static final String DHCP = "edithosts.sh";
-    public static final String DNSMASQ_CONFIG = "dnsmasq.sh";
-    public static final String IPASSOC = "ipassoc.sh";
-    public static final String LB = "loadbalancer.sh";
-    public static final String MONITOR_SERVICE = "monitor_service.sh";
-    public static final String PASSWORD = "savepassword.sh";
-    public static final String ROUTER_ALERTS = "getRouterAlerts.sh";
-    public static final String RVR_CHECK = "checkrouter.sh";
-    public static final String VMDATA = "vmdata.py";
-    public static final String RVR_BUMPUP_PRI = "bumpup_priority.sh";
-    public static final String VERSION = "get_template_version.sh";
-    public static final String VPC_SOURCE_NAT = "vpc_snat.sh";
-    public static final String VPC_STATIC_ROUTE = "vpc_staticroute.sh";
-    public static final String VPN_L2TP = "vpn_l2tp.sh";
+    // Present inside the router
+    public static final String S2SVPN_CHECK = "scripts/checkbatchs2svpn.sh";
+    public static final String S2SVPN_IPSEC = "scripts/ipsectunnel.sh";
+    public static final String DHCP = "scripts/edithosts.sh";
+    public static final String DNSMASQ_CONFIG = "scripts/dnsmasq.sh";
+    public static final String IPASSOC = "scripts/ipassoc.sh";
+    public static final String LB = "scripts/loadbalancer.sh";
+    public static final String MONITOR_SERVICE = "scripts/monitor_service.sh";
+    public static final String PASSWORD = "scripts/savepassword.sh";
+    public static final String ROUTER_ALERTS = "scripts/getRouterAlerts.sh";
+    public static final String RVR_CHECK = "scripts/checkrouter.sh";
+    public static final String VMDATA = "bin/vmdata.py";
+    public static final String RVR_BUMPUP_PRI = "scripts/bumpup_priority.sh";
+    public static final String VERSION = "scripts/get_template_version.sh";
+    public static final String VPC_NETUSAGE = "scripts/vpc_netusage.sh";
+    public static final String VPC_SOURCE_NAT = "scripts/vpc_snat.sh";
+    public static final String VPC_STATIC_ROUTE = "scripts/vpc_staticroute.sh";
+    public static final String VPN_L2TP = "scripts/vpn_l2tp.sh";
+
+    // Present on the KVM hypervisor
     public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";
 
-    public static final String VR_CFG = "vr_cfg.sh";
+    public static final String VR_CFG = "scripts/vr_cfg.sh";
 }

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+. /etc/default/cloud-passwd-srvr
+addr=$1;
+ENABLED=1
+while [ "$ENABLED" == "1" ]
+do
+    python /opt/cosmic/router/bin/passwd_server_ip.py $addr >/dev/null 2>/dev/null
+    rc=$?
+    if [ $rc -ne 0 ]
+    then
+        logger -t cloud "Password server failed with error code $rc. Restarting it..."
+        sleep 3
+    fi
+    . /etc/default/cloud-passwd-srvr
+done

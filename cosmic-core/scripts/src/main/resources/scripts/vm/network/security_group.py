@@ -1028,7 +1028,7 @@ def addFWFramework(brname):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="/var/log/cosmic/agent/security_group.log", format="%(asctime)s - %(message)s", level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
     parser = OptionParser()
     parser.add_option("--vmname", dest="vmName")
     parser.add_option("--vmip", dest="vmIP")

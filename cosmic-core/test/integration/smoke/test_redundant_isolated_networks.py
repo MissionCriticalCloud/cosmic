@@ -525,7 +525,7 @@ class TestRedundantIsolatedNetworks(cloudstackTestCase):
                         host.user,
                         host.passwd,
                         router.linklocalip,
-                        "sh /opt/cloud/bin/checkrouter.sh "
+                        "sh /opt/cosmic/router/scripts/checkrouter.sh "
                     ))
 
                 except KeyError:

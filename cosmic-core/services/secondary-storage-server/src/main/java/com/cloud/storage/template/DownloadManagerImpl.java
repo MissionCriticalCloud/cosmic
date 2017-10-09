@@ -23,7 +23,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Proxy;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
-import com.cloud.utils.storage.QCOW2Utils;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedReader;
@@ -685,13 +684,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             }
         }
 
-        final String inSystemVM = (String) params.get("secondary.storage.vm");
-        if (inSystemVM != null && "true".equalsIgnoreCase(inSystemVM)) {
-            s_logger.info("DownloadManager: starting additional services since we are inside system vm");
-            startAdditionalServices();
-            blockOutgoingOnPrivate();
-        }
-
         value = (String) params.get("install.timeout.pergig");
         installTimeoutPerGig = NumbersUtil.parseInt(value, 15 * 60) * 1000;
 
@@ -768,48 +760,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     @Override
     public boolean stop() {
         return true;
-    }
-
-    private void startAdditionalServices() {
-
-        Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("if [ -d /etc/apache2 ] ; then service apache2 stop; else service httpd stop; fi ");
-        String result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in stopping httpd service err=" + result);
-        }
-
-        command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("if [ -d /etc/apache2 ] ; then service apache2 start; else service httpd start; fi ");
-        result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in starting httpd service err=" + result);
-            return;
-        }
-        command = new Script("mkdir", s_logger);
-        command.add("-p");
-        command.add("/var/www/html/copy/template");
-        result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in creating directory =" + result);
-            return;
-        }
-    }
-
-    private void blockOutgoingOnPrivate() {
-        final Script command = new Script("/bin/bash", s_logger);
-        final String intf = "eth1";
-        command.add("-c");
-        command.add("iptables -A OUTPUT -o " + intf + " -p tcp -m state --state NEW -m tcp --dport " + "80" + " -j REJECT;" + "iptables -A OUTPUT -o " + intf +
-                " -p tcp -m state --state NEW -m tcp --dport " + "443" + " -j REJECT;");
-
-        final String result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in blocking outgoing to port 80/443 err=" + result);
-            return;
-        }
     }
 
     private static class DownloadJob {
