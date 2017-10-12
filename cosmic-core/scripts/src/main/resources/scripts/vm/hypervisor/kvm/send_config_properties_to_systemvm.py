@@ -14,8 +14,8 @@ import sys
 SOCK_FILE = "/var/lib/libvirt/qemu/{name}.agent"
 PUB_KEY_FILE = "/root/.ssh/id_rsa.pub.cloud"
 MESSAGE = "pubkey:{key}\ncmdline:{cmdline}\n"
-CMDLINE_INCOMING = "/var/cache/cloud/cmdline_incoming"
-CMDLINE_FILE = "/var/cache/cloud/cmdline"
+CMDLINE_INCOMING = "/tmp/cmdline_incoming"
+CMDLINE_FILE = "/tmp/cmdline"
 AUTHORIZED_KEYS_FILE_ROOT = "/root/.ssh/authorized_keys"
 AUTHORIZED_KEYS_FILE_CACHE = "/var/cache/cloud/authorized_keys"
 
