@@ -67,9 +67,9 @@ class App:
             os.remove(CMDLINE_DIR + CMDLINE_FILE)
             os.remove(CMDLINE_DIR + CMDLINE_DONE)
             os.system("sync")
-        except OSError as e: # name the Exception `e`
-            print "Failed with:", e.strerror # look what it says
-            print "Error code:", e.code
+        except OSError as e:
+            logging.info("Failed with: %s" % e.strerror)
+            logging.info("Error code: %s" % e.code)
 
         self.cmdline = cmdline_json["cmd_line"]
 
