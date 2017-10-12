@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+import glob
 
 from setup_cpvm import ConsoleProxyVM
 from setup_routervm import RouterVM
@@ -60,9 +61,15 @@ class App:
 
         json.dump(cmdline_json, open(CMDLINE_DIR + CMDLINE_JSON, "w"))
 
-        os.remove(CMDLINE_DIR + CMDLINE_FILE)
-        os.remove(CMDLINE_DIR + CMDLINE_DONE)
-        os.system("sync")
+        logging.info("Cmd_line json: %s" % cmdline_json)
+
+        try:
+            os.remove(CMDLINE_DIR + CMDLINE_FILE)
+            os.remove(CMDLINE_DIR + CMDLINE_DONE)
+            os.system("sync")
+        except OSError as e: # name the Exception `e`
+            print "Failed with:", e.strerror # look what it says
+            print "Error code:", e.code
 
         self.cmdline = cmdline_json["cmd_line"]
 
