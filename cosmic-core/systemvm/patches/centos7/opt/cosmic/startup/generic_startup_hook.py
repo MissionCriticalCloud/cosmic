@@ -62,6 +62,7 @@ class App:
 
         os.remove(CMDLINE_DIR + CMDLINE_FILE)
         os.remove(CMDLINE_DIR + CMDLINE_DONE)
+        os.system("sync")
 
         self.cmdline = cmdline_json["cmd_line"]
 
