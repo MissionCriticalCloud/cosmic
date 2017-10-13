@@ -3,8 +3,7 @@ import json
 import logging
 import os
 import sys
-import time
-import glob
+import inotify.adapters
 
 from setup_cpvm import ConsoleProxyVM
 from setup_routervm import RouterVM
@@ -22,11 +21,23 @@ LOG_DIR = "/var/log/cosmic/startup/"
 
 
 def wait_for_cmdline():
+    i = inotify.adapters.Inotify()
+    i.add_watch(b'/var/cache/cloud/')
+
     logging.info("Waiting for cmdline to arrive")
 
-    while not os.path.exists(CMDLINE_DIR + CMDLINE_DONE):
-        time.sleep(1)
-
+    try:
+        for event in i.event_gen():
+            if event is not None:
+                if filename == CMDLINE_DONE:
+                    (header, type_names, watch_path, filename) = event
+                    logging.info("WD=(%d) MASK=(%d) COOKIE=(%d) LEN=(%d) MASK->NAMES=%s "
+                                 "WATCH-PATH=[%s] FILENAME=[%s]",
+                                 header.wd, header.mask, header.cookie, header.len, type_names,
+                                 watch_path.decode('utf-8'), filename.decode('utf-8'))
+                    break
+    finally:
+        i.remove_watch(b'/var/cache/cloud/')
 
 class App:
     def __init__(self) -> None:
