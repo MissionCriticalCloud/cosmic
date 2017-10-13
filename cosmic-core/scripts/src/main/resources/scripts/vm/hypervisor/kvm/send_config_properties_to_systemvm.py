@@ -47,6 +47,7 @@ def write_guest_file(path, content):
             EXE(FILE_CLOSE % file_handle)
     return write_count
 
+
 def read_guest_file(path, write_count):
     file_handle = -1
     try:
@@ -63,6 +64,7 @@ def read_guest_file(path, write_count):
         if file_handle > -1:
             EXE(FILE_CLOSE % file_handle)
     return read_count
+
 
 def get_key(key_file):
     if not os.path.exists(key_file):

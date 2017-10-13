@@ -29,8 +29,9 @@ def wait_for_cmdline():
     try:
         for event in i.event_gen():
             if event is not None:
+                (header, type_names, watch_path, filename) = event
+                logging.info("Event on %s" % filename)
                 if filename == CMDLINE_DONE:
-                    (header, type_names, watch_path, filename) = event
                     logging.info("WD=(%d) MASK=(%d) COOKIE=(%d) LEN=(%d) MASK->NAMES=%s "
                                  "WATCH-PATH=[%s] FILENAME=[%s]",
                                  header.wd, header.mask, header.cookie, header.len, type_names,
