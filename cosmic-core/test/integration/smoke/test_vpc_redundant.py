@@ -160,39 +160,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_vpc_test(False)
 
     @attr(tags=['advanced'])
-    def test_04_rvpc_network_garbage_collector_nics(self):
-        """ Create a redundant VPC with 1 Tier, 1 VM, 1 ACL, 1 PF and test Network GC Nics"""
-        self.logger.debug("Starting test_04_rvpc_network_garbage_collector_nics")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1", nr_vms=1))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
-
-        self.stop_vm()
-
-        gc_wait = Configurations.list(self.apiclient, name="network.gc.wait")
-        gc_interval = Configurations.list(self.apiclient, name="network.gc.interval")
-
-        self.logger.debug("network.gc.wait is ==> %s" % gc_wait)
-        self.logger.debug("network.gc.interval is ==> %s" % gc_wait)
-
-        total_sleep = 120
-        if gc_wait and gc_interval:
-            total_sleep = int(gc_wait[0].value) + int(gc_interval[0].value)
-        else:
-            self.logger.debug("Could not retrieve the keys 'network.gc.interval' and 'network.gc.wait'. Sleeping for 2 minutes.")
-
-        time.sleep(total_sleep * 3)
-
-        self.check_routers_interface(interface_to_check="eth2", expected_exists=False)
-        self.start_vm()
-        self.check_routers_state(status_to_check="MASTER")
-        self.check_routers_interface(interface_to_check="eth2", expected_exists=True)
-
-    @attr(tags=['advanced'])
-    def test_05_rvpc_multi_tiers(self):
+    def test_04_rvpc_multi_tiers(self):
         """ Create a redundant VPC with 3 Tiers, 3 VMs, 3 PF rules"""
         self.logger.debug("Starting test_05_rvpc_multi_tiers")
         self.query_routers()

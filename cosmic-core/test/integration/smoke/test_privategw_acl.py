@@ -365,7 +365,8 @@ class TestPrivateGateway(cloudstackTestCase):
             if router.redundantstate == 'MASTER':
                 cmd = stopRouter.stopRouterCmd()
                 cmd.id = router.id
-                cmd.forced = 'true'
+                # This will not fail-over gracefully and cause a ~3.6sec downtime
+                # cmd.forced = 'true'
                 self.api_client.stopRouter(cmd)
                 break
 
