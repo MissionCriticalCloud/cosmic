@@ -44,7 +44,8 @@ class CSTestClient(object):
                  async_timeout=3600,
                  test_data_filepath=None,
                  zone=None,
-                 hypervisor_type=None):
+                 hypervisor_type=None,
+                 halt_on_failure=False):
         self.__mgmtDetails = mgmt_details
         self.__dbSvrDetails = dbsvr_details
         self.__csConnection = None
@@ -62,6 +63,7 @@ class CSTestClient(object):
         self.__zone = zone
         self.__setHypervisorInfo()
         self.__scenarioManager = None
+        self.__halt_on_failure = halt_on_failure
 
     @property
     def identifier(self):
@@ -70,6 +72,9 @@ class CSTestClient(object):
     @identifier.setter
     def identifier(self, id):
         self.__id = id
+
+    def getHaltOnFailure(self):
+        return self.__halt_on_failure
 
     def getParsedTestDataConfig(self):
         '''
