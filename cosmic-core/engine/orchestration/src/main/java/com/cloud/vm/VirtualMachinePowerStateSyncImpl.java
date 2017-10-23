@@ -69,7 +69,7 @@ public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStat
             if (vm != null) {
                 map.put(vm.getId(), entry.getValue().getState());
             } else {
-                s_logger.info("Unable to find matched VM in CloudStack DB. name: " + entry.getKey());
+                s_logger.info("Unable to find matched VM in Cosmic DB. name: " + entry.getKey() + ", host: " + entry.getValue().getHost());
             }
         }
 
