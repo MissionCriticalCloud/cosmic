@@ -45,6 +45,7 @@ public class VirtualMachineTO {
     String configDriveLabel = null;
     String configDriveIsoRootFolder = null;
     String configDriveIsoFile = null;
+    MetadataTO metadata;
     private long id;
     private String name;
     private BootloaderType bootloader;
@@ -310,5 +311,13 @@ public class VirtualMachineTO {
 
     public void setManufacturer(final String manufacturer) {
         this.manufacturer = manufacturer;
+    }
+
+    public MetadataTO getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(final MetadataTO metadata) {
+        this.metadata = metadata;
     }
 }

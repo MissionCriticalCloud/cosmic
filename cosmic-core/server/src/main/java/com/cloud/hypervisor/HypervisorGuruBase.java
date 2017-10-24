@@ -2,8 +2,11 @@ package com.cloud.hypervisor;
 
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.agent.api.to.MetadataTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
+import com.cloud.domain.DomainVO;
+import com.cloud.domain.dao.DomainDao;
 import com.cloud.gpu.GPU;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
@@ -58,6 +61,8 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     ServiceOfferingDetailsDao _serviceOfferingDetailsDao;
     @Inject
     ServiceOfferingDao _serviceOfferingDao;
+    @Inject
+    DomainDao _domainDao;
 
     protected HypervisorGuruBase() {
         super();
@@ -113,6 +118,13 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         to.setConfigDriveLabel(vmProfile.getConfigDriveLabel());
         to.setConfigDriveIsoRootFolder(vmProfile.getConfigDriveIsoRootFolder());
         to.setConfigDriveIsoFile(vmProfile.getConfigDriveIsoFile());
+
+        final MetadataTO metadataTO = new MetadataTO();
+
+        final DomainVO domain = _domainDao.findById(vm.getDomainId());
+        metadataTO.setDomainUuid(domain.getUuid());
+
+        to.setMetadata(metadataTO);
 
         return to;
     }

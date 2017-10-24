@@ -39,6 +39,7 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.IpAddressTO;
+import com.cloud.agent.api.to.MetadataTO;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
@@ -65,6 +66,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GuestResourceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InputDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef.GuestNetType;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.MetadataDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.QemuGuestAgentDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
@@ -1580,6 +1582,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.setDomDescription(vmTo.getOs());
         vm.setPlatformEmulator(vmTo.getPlatformEmulator());
 
+        final MetadataTO metadataTo = vmTo.getMetadata();
+        if (metadataTo != null) {
+            final MetadataDef metadata = new MetadataDef();
+            metadata.getNodes().put("domainUuid", metadataTo.getDomainUuid());
+            vm.addComponent(metadata);
+        }
+
         final GuestDef guest = new GuestDef();
 
         guest.setGuestType(GuestDef.GuestType.KVM);
@@ -1594,7 +1603,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         guest.setBootOrder(GuestDef.BootOrder.CDROM);
         guest.setBootOrder(GuestDef.BootOrder.HARDISK);
 
-        vm.addComp(guest);
+        vm.addComponent(guest);
 
         final GuestResourceDef grd = new GuestResourceDef();
 
@@ -1607,7 +1616,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
         final int vcpus = vmTo.getCpus();
         grd.setVcpuNum(vcpus);
-        vm.addComp(grd);
+        vm.addComponent(grd);
 
         final CpuModeDef cmd = new CpuModeDef();
         cmd.setMode(getGuestCpuMode());
@@ -1623,7 +1632,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             final int sockets = vcpus / 4;
             cmd.setTopology(4, sockets);
         }
-        vm.addComp(cmd);
+        vm.addComponent(cmd);
 
         if (hypervisorLibvirtVersion >= 9000) {
             final CpuTuneDef ctd = new CpuTuneDef();
@@ -1632,20 +1641,20 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             } else {
                 ctd.setShares(vmTo.getCpus() * vmTo.getSpeed());
             }
-            vm.addComp(ctd);
+            vm.addComponent(ctd);
         }
 
         final FeaturesDef features = new FeaturesDef();
         features.addFeatures("pae");
         features.addFeatures("apic");
         features.addFeatures("acpi");
-        vm.addComp(features);
+        vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
         term.setCrashPolicy("destroy");
         term.setPowerOffPolicy("destroy");
         term.setRebootPolicy("restart");
-        vm.addComp(term);
+        vm.addComponent(term);
 
         final ClockDef clock = new ClockDef();
         if (vmTo.getOs().startsWith("Windows")) {
@@ -1657,7 +1666,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
         }
 
-        vm.addComp(clock);
+        vm.addComponent(clock);
 
         final DevicesDef devices = new DevicesDef();
         devices.setEmulatorPath(hypervisorPath);
@@ -1703,7 +1712,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             devices.addDevice(sd);
             logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
         }
-        vm.addComp(devices);
+        vm.addComponent(devices);
 
         return vm;
     }
@@ -1764,7 +1773,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         if (nic.getType().equals(TrafficType.Guest) && nic.getBroadcastType().equals(BroadcastDomainType.Vsp)) {
             final String vrIp = nic.getBroadcastUri().getPath().substring(1);
-            vm.getMetaData().getMetadataNode(LibvirtVmDef.NuageExtensionDef.class).addNuageExtension(nic.getMac(), vrIp);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("NIC with MAC " + nic.getMac() + " and BroadcastDomainType " + nic.getBroadcastType()
