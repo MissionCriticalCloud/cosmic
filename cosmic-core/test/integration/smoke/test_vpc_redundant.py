@@ -342,14 +342,18 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state()
         self.logger.debug('Stopping %s router' % type)
         for router in self.routers:
+            self.logger.debug('Checking state of router %s' % router)
             if router.redundantstate == type:
+                self.logger.debug('Stopping router %s' % router)
                 self.stop_router(router)
 
     def reboot_router_by_type(self, type):
         self.check_routers_state()
         self.logger.debug('Rebooting %s router' % type)
         for router in self.routers:
+            self.logger.debug('Checking state of router %s' % router)
             if router.redundantstate == type:
+                self.logger.debug('Rebooting router %s' % router)
                 self.reboot_router(router)
 
     def destroy_routers(self):
@@ -358,6 +362,7 @@ class TestVPCRedundancy(cloudstackTestCase):
             self.stop_router(router)
             cmd = destroyRouter.destroyRouterCmd()
             cmd.id = router.id
+            self.logger.debug('Destroying router %s' % router)
             self.apiclient.destroyRouter(cmd)
         self.routers = []
 
