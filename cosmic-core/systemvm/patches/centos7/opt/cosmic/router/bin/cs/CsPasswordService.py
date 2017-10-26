@@ -47,13 +47,23 @@ class CsPasswordServiceVMConfig:
                 logging.debug(
                     "Cidr %s matches vm ip address %s so adding passwd to passwd server at %s" % (cidr, vm_ip, ip))
                 proc = CsProcess(['/opt/cosmic/router/bin/passwd_server_ip.py', ip])
-                if proc.find():
-                    update_command = 'curl --header "DomU_Request: save_password" "http://{SERVER_IP}:8080/" -F "ip=' \
-                                     '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}" --interface 127.0.0.1 ' \
-                                     '>/dev/null 2>/dev/null &'.format(SERVER_IP=ip, VM_IP=vm_ip, PASSWORD=password,
-                                                                       TOKEN=token)
-                    result = CsHelper.execute(update_command)
-                    logging.debug("Update password server result ==> %s" % result)
-                else:
-                    logging.debug("Update password server skipped because we didn't find a passwd server process for "
-                                  "%s (makes sense on backup routers)" % ip)
+
+                max_tries = 5
+                test_tries = 0
+                while test_tries < max_tries:
+                    logging.debug("Updating passwd server on %s" % ip)
+                    if proc.find():
+                        update_command = 'curl --header "DomU_Request: save_password" "http://{SERVER_IP}:8080/" -F "ip=' \
+                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}" --interface 127.0.0.1 ' \
+                                         '>/dev/null 2>/dev/null &'.format(SERVER_IP=ip, VM_IP=vm_ip, PASSWORD=password,
+                                                                           TOKEN=token)
+                        result = CsHelper.execute(update_command)
+                        logging.debug("Update password server result ==> %s" % result)
+                        return result
+
+                    test_tries += 1
+                    self.logger.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
+                    time.sleep(2)
+
+                logging.debug("Update password server skipped because we didn't find a passwd server process for "
+                              "%s (makes sense on backup routers)" % ip)
