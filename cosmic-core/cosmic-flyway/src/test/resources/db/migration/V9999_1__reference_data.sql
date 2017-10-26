@@ -99,6 +99,7 @@ VALUES
   ('Advanced', 'DEFAULT', 'NetworkManager', 'router.template.kvm', 'SystemVM Template (KVM)', 'Name of the default router template on KVM.', 'SystemVM Template (KVM)', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'NetworkManager', 'router.template.ovm3', 'SystemVM Template (Ovm3)', 'Name of the default router template on Ovm3.', 'SystemVM Template (Ovm3)', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'NetworkManager', 'router.template.xenserver', 'SystemVM Template (XenServer)', 'Name of the default router template on Xenserver.', 'SystemVM Template (XenServer)', NULL, NULL, 0),
+  ('Advanced', 'DEFAULT', 'NetworkManager', 'router.check.interval', '5', 'Interval (in seconds) to report redundant router status.', '30', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 's3.rrs.enabled', 'false', 'enable s3 reduced redundancy storage', 'false', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 's3.singleupload.max.size', '5', 'The maximum size limit for S3 single part upload API(in GB). If it is set to 0, then it means always use multi-part upload to upload object to S3. If it is set to -1, then it means always use single-part upload to upload object to S3.', '5', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'scale.retry', '2', 'Number of times to retry scaling up the vm', '2', NULL, NULL, 0),
