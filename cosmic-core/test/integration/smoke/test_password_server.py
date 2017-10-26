@@ -285,12 +285,23 @@ class TestPasswordService(cloudstackTestCase):
                 self._testMethodName)
 
         command_result = str(password_log_result)
+        self.logger.debug("Got this response: %s " % command_result)
+
+        if command_result.count("password saved for VM IP") == 0:
+            self.logger.debug('Sleeping for manual debugging...')
+            while True:
+                time.sleep(10)
 
         # Check to see if our VM is in the password file
         self.assertGreater(
             command_result.count("password saved for VM IP"),
             0,
             "Log line 'password saved for VM IP' not found, password was not saved.")
+
+        if command_result.count("password sent to") == 0:
+            self.logger.debug('Sleeping for manual debugging...')
+            while True:
+                time.sleep(10)
 
         # Check if the password was retrieved from the passwd server. If it is, the actual password is replaced with 'saved_password'
         self.assertGreater(
