@@ -121,17 +121,9 @@ class TestPasswordService(cloudstackTestCase):
             self.createACLItem(acl1.id, cidr="0.0.0.0/0")
             self.replaceNetworkAcl(acl1.id, network_1)
 
-        # VM
-        vm1 = self.createVM(network_1)
-        vm2 = self.createVM(network_1)
-
-        # Routers in the right state?
-        self.assertEqual(self.routers_in_right_state(), True,
-                         "Check whether the routers are in the right state.")
-
         routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
         for router in routers:
-            self._perform_password_service_test(router, vm2)
+            self._perform_password_service_test(router, network_1)
 
         # Do the same after restart with cleanup
         if vpc_off is None:
@@ -146,14 +138,8 @@ class TestPasswordService(cloudstackTestCase):
                          "Check for list routers response return valid data")
         self.logger.debug("Check whether routers are happy")
 
-        vm3 = self.createVM(network_1)
-
-        # Routers in the right state?
-        self.assertEqual(self.routers_in_right_state(), True,
-                         "Check whether the routers are in the right state.")
-
         for router in routers:
-            self._perform_password_service_test(router, vm3)
+            self._perform_password_service_test(router, network_1)
 
     def wait_vm_ready(self, router, vmip):
         self.logger.debug("Check whether VM %s is up" % vmip)
@@ -220,14 +206,25 @@ class TestPasswordService(cloudstackTestCase):
             return True
         return False
 
-    def _perform_password_service_test(self, router, vm):
-        self.wait_vm_ready(router, vm.nic[0].ipaddress)
-        self.logger.debug("Checking router %s for passwd_server_ip.py process, state %s", router.linklocalip, router.redundantstate)
-        self.test_process_running("passwd_server_ip.py", router)
-        self.logger.debug("Checking router %s for dnsmasq process, state %s", router.linklocalip, router.redundantstate)
-        self.test_process_running("dnsmasq", router)
-        self.logger.debug("Checking password of %s in router %s, state %s", vm.name, router.linklocalip, router.redundantstate)
-        self.test_password_server_logs(vm, router)
+    def _perform_password_service_test(self, router, network):
+        max_tries = 5
+        test_tries = 0
+        while test_tries < max_tries:
+            self.logger.debug("Starting test round %s/%s" % (test_tries, max_tries))
+            vm = self.createVM(network)
+            self.wait_vm_ready(router, vm.nic[0].ipaddress)
+            self.logger.debug("Checking router %s for passwd_server_ip.py process, state %s", router.linklocalip, router.redundantstate)
+            self.test_process_running("passwd_server_ip.py", router)
+            self.logger.debug("Checking router %s for dnsmasq process, state %s", router.linklocalip, router.redundantstate)
+            self.test_process_running("dnsmasq", router)
+            self.logger.debug("Checking password of %s in router %s, state %s", vm.name, router.linklocalip, router.redundantstate)
+            if self.test_password_server_logs(vm, router):
+                self.logger.debug("Test succeeded!")
+                return
+            self.logger.debug("Test %s failed, retrying (max %s times)" % (test_tries, max_tries))
+            vm.get_vm().delete(self.apiclient)
+            test_tries += 1
+        self.fail('Test _perform_password_service_test failed %s times, giving up.' % test_tries)
 
     def test_process_running(self, find_process, router):
         host = self.get_host_details(router)
@@ -287,27 +284,15 @@ class TestPasswordService(cloudstackTestCase):
         command_result = str(password_log_result)
         self.logger.debug("Got this response: %s " % command_result)
 
-        if command_result.count("password saved for VM IP") == 0:
-            self.logger.debug('Sleeping for manual debugging...')
-            while True:
-                time.sleep(10)
-
         # Check to see if our VM is in the password file
-        self.assertGreater(
-            command_result.count("password saved for VM IP"),
-            0,
-            "Log line 'password saved for VM IP' not found, password was not saved.")
-
-        if command_result.count("password sent to") == 0:
-            self.logger.debug('Sleeping for manual debugging...')
-            while True:
-                time.sleep(10)
+        if command_result.count("password saved for VM IP") == 0:
+            return False
 
         # Check if the password was retrieved from the passwd server. If it is, the actual password is replaced with 'saved_password'
-        self.assertGreater(
-            command_result.count("password sent to"),
-            0,
-            "Log line 'password sent to' not found. The password was not retrieved by the VM!")
+        if command_result.count("password sent to") == 0:
+            return False
+
+        return True
 
     def get_host_details(self, router):
         hosts = list_hosts(self.apiclient, id=router.hostid, type="Routing")

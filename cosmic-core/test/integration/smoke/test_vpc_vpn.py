@@ -399,7 +399,7 @@ class TestVpcVpn(cloudstackTestCase):
             for i in range(num_VPCs)[1:]:
                 packet_loss = ssh_client.execute(
                     "/bin/ping -c 3 -t 10 " + vm_list[i].nic[0].ipaddress + " |grep packet|cut -d ' ' -f 7| cut -f1 -d'%'")[0]
-                self.assertEquals(int(packet_loss), 0, "Ping towards vm" + `i` + "did not succeed")
+                self.assertEquals(int(packet_loss), 0, " Ping towards vm" + `i` + "did not succeed")
                 self.logger.debug("SUCCESS! Ping from vm0 to vm%d succeeded." % i)
         else:
             self.fail("Failed to setup ssh connection to %s" % vm_list[0].public_ip)
