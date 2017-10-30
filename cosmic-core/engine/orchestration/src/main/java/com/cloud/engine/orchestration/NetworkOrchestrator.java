@@ -418,7 +418,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Shared Security group enabled networks",
                             TrafficType.Guest, null, true, Availability.Optional, null, defaultSharedSGEnabledNetworkOfferingProviders, true,
                             GuestType.Shared, false, null, null, true, null, true,
-                            false, null, false, null, true
+                            true, null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -431,7 +431,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Shared networks",
                             TrafficType.Guest, null, true, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Shared, false, null, null, true, null, true,
-                            false, null, false, null, true
+                            true, null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -444,7 +444,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Isolated networks with Source Nat service enabled",
                             TrafficType.Guest, null, false, Availability.Required, null, defaultIsolatedNetworkOfferingProviders,
                             true, GuestType.Isolated, false, null, null, true, null,
-                            false, false, null, false, null, true
+                            false, true, null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -456,7 +456,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks,
                             "Offering for Isolated VPC networks with Source Nat service enabled",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultVPCOffProviders, true, GuestType.Isolated,
-                            false, null, null, false, null, false, false,
+                            false, null, null, false, null, false, true,
                             null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
@@ -470,7 +470,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksNoLB,
                             "Offering for Isolated VPC networks with Source Nat service enabled and LB service disabled",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultVPCOffProviders, true, GuestType.Isolated,
-                            false, null, null, false, null, false, false,
+                            false, null, null, false, null, false, true,
                             null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
@@ -490,7 +490,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat,
                             "Offering for Isolated VPC networks without Source Nat service enabled and LB service disabled",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultVPCOffProviders, true, GuestType.Isolated,
-                            false, null, null, false, null, false, false,
+                            false, null, null, false, null, false, true,
                             null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
@@ -509,7 +509,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC,
                             "Offering for Isolated VPC networks for Internal VPC networks",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultVPCOffProviders, true, GuestType.Isolated,
-                            false, null, null, false, null, false, false,
+                            false, null, null, false, null, false, true,
                             null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
@@ -523,7 +523,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Isolated networks with Source Nat service",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Isolated, false, null, null, true, null, false,
-                            false, null, false, null, true
+                            true, null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -536,7 +536,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Isolated networks with egress and Source Nat service",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Isolated, false, null, null, true, null, false,
-                            false, null, true, null, true
+                            true, null, true, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);
                     _networkOfferingDao.update(offering.getId(), offering);
@@ -549,7 +549,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Isolated networks with Source Nat service (redundant)",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Isolated, false, null, null, true, null, false,
-                            false, null, false, null, true
+                            true, null, false, null, true
                     );
                     offering.setRedundantRouter(true);
                     offering.setDedicatedLB(true);
@@ -564,7 +564,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             "Offering for Isolated networks with egress and Source Nat service (redundant)",
                             TrafficType.Guest, null, false, Availability.Optional, null, defaultIsolatedNetworkOfferingProviders, true,
                             GuestType.Isolated, false, null, null, true, null, false,
-                            false, null, true, null, true
+                            true, null, true, null, true
                     );
                     offering.setRedundantRouter(true);
                     offering.setDedicatedLB(true);
@@ -578,7 +578,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
                             "Offering for Isolated VPC networks with Internal Lb support",
                             TrafficType.Guest, null, false, Availability.Optional, null, internalLbOffProviders, true, GuestType.Isolated,
-                            false, null, null, false, null, false, false,
+                            false, null, null, false, null, false, true,
                             null, false, null, true
                     );
                     offering.setState(NetworkOffering.State.Enabled);

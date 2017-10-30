@@ -48,6 +48,9 @@ class MarvinPlugin(Plugin):
         self.__tcRunLogger = MarvinLog('marvin').get_logger()
         self.__testModName = ''
         self.__hypervisorType = None
+
+        self.__halt_on_failure = False
+
         Plugin.__init__(self)
 
     def configure(self, options, conf):
@@ -65,6 +68,7 @@ class MarvinPlugin(Plugin):
         self.__deployDcFlag = options.deployDc
         self.__zoneForTests = options.zone
         self.__hypervisorType = options.hypervisor_type
+        self.__halt_on_failure = options.haltOnFailure
         self.conf = conf
         if self.startMarvin() == FAILED:
             self.__tcRunLogger.error('Starting Marvin Failed, exiting. Please Check')
@@ -100,8 +104,11 @@ class MarvinPlugin(Plugin):
                           default=None,
                           dest="logFolder",
                           help="Collects all logs under the user specified"
-                               "folder"
-                          )
+                               "folder")
+        parser.add_option("--halt-on-failure", action="store_true",
+                          default=False,
+                          dest="haltOnFailure",
+                          help="Halt the test on failure")
         Plugin.options(self, parser, env)
 
     def wantClass(self, cls):

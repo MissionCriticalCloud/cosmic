@@ -500,7 +500,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultSharedNetworkOfferingWithSGService,
                         "Offering for Shared Security group enabled networks",
                         TrafficType.Guest, false, true, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Shared, true, true, false, false, false
+                        Network.GuestType.Shared, true, true, true, false, false
                 );
                 defaultSharedSGNetworkOffering.setState(NetworkOffering.State.Enabled);
                 defaultSharedSGNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultSharedSGNetworkOffering);
@@ -520,7 +520,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultSharedNetworkOffering,
                         "Offering for Shared networks",
                         TrafficType.Guest, false, true, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Shared, true, true, false, false, false
+                        Network.GuestType.Shared, true, true, true, false, false
                 );
                 defaultSharedNetworkOffering.setState(NetworkOffering.State.Enabled);
                 defaultSharedNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultSharedNetworkOffering);
@@ -540,7 +540,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultIsolatedNetworkOfferingWithSourceNatService,
                         "Offering for Isolated networks with Source Nat service enabled",
                         TrafficType.Guest, false, false, null, null, true, Availability.Required, null,
-                        Network.GuestType.Isolated, true, false, false, false, true
+                        Network.GuestType.Isolated, true, false, true, false, true
                 );
                 defaultIsolatedSourceNatEnabledNetworkOffering.setState(NetworkOffering.State.Enabled);
                 defaultIsolatedSourceNatEnabledNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultIsolatedSourceNatEnabledNetworkOffering);
@@ -577,7 +577,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         "Offering for Isolated networks with Source Nat service",
                         TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
                         GuestType.Isolated, false, null, null, true, null, false,
-                        false, null, false, null, true
+                        true, null, false, null, true
                 );
                 defaultIsolatedEnabledNetworkOffering.setState(NetworkOffering.State.Enabled);
                 _networkOfferingDao.update(defaultIsolatedEnabledNetworkOffering.getId(), defaultIsolatedEnabledNetworkOffering);
@@ -588,7 +588,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         "Offering for Isolated networks with egress and Source Nat service",
                         TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
                         GuestType.Isolated, false, null, null, true, null, false,
-                        false, null, true, null, true
+                        true, null, true, null, true
                 );
                 defaultIsolatedEnabledNetworkOfferingWithEgress.setState(NetworkOffering.State.Enabled);
                 _networkOfferingDao.update(defaultIsolatedEnabledNetworkOfferingWithEgress.getId(), defaultIsolatedEnabledNetworkOfferingWithEgress);
@@ -599,7 +599,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         "Offering for Isolated networks with Source Nat service (redundant)",
                         TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
                         GuestType.Isolated, false, null, null, true, null, false,
-                        false, null, false, null, true
+                        true, null, false, null, true
                 );
                 defaultRedundantIsolatedEnabledNetworkOffering.setRedundantRouter(true);
                 defaultRedundantIsolatedEnabledNetworkOffering.setDedicatedLB(true);
@@ -612,7 +612,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         "Offering for Isolated networks with egress and Source Nat service (redundant)",
                         TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
                         GuestType.Isolated, false, null, null, true, null, false,
-                        false, null, true, null, true
+                        true, null, true, null, true
                 );
                 defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.setRedundantRouter(true);
                 defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.setDedicatedLB(true);
@@ -624,7 +624,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks,
                         "Offering for Isolated Vpc networks with Source Nat service enabled",
                         TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, false, false, true
+                        Network.GuestType.Isolated, false, false, true, false, true
                 );
                 defaultNetworkOfferingForVpcNetworks.setState(NetworkOffering.State.Enabled);
                 defaultNetworkOfferingForVpcNetworks = _networkOfferingDao.persistDefaultNetworkOffering(defaultNetworkOfferingForVpcNetworks);
@@ -656,7 +656,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksNoLB,
                         "Offering for Isolated Vpc networks with Source Nat service enabled and LB service Disabled",
                         TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, false, false, false
+                        Network.GuestType.Isolated, false, false, true, false, false
                 );
                 defaultNetworkOfferingForVpcNetworksNoLB.setState(NetworkOffering.State.Enabled);
                 defaultNetworkOfferingForVpcNetworksNoLB = _networkOfferingDao.persistDefaultNetworkOffering(defaultNetworkOfferingForVpcNetworksNoLB);
@@ -687,7 +687,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
                         "Offering for Isolated Vpc networks with Internal LB support",
                         TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, false, true, false
+                        Network.GuestType.Isolated, false, false, true, true, false
                 );
                 internalLbOff.setState(NetworkOffering.State.Enabled);
                 internalLbOff = _networkOfferingDao.persistDefaultNetworkOffering(internalLbOff);

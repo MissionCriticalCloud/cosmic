@@ -1,4 +1,5 @@
 import unittest
+import time
 
 from cloudstackTestClient import CSTestClient
 from codes import PASS
@@ -42,3 +43,14 @@ class cloudstackTestCase(unittest.case.TestCase):
     @classmethod
     def getClsConfig(cls):
         return cls.config
+
+    def tearDown(self):
+        while self.clstestclient.getHaltOnFailure():
+            time.sleep(0.2)
+        super(cloudstackTestCase, self).tearDown()
+
+    @classmethod
+    def tearDownClass(cls):
+        while cls.clstestclient.getHaltOnFailure():
+            time.sleep(0.2)
+        super(cloudstackTestCase, cls).tearDownClass()

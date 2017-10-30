@@ -22,7 +22,7 @@ from marvin.utils.MarvinLog import MarvinLog
 
 
 class MarvinInit:
-    def __init__(self, config_file, deploy_dc_flag=False, test_mod_name="deploydc", zone=None, hypervisor_type=None):
+    def __init__(self, config_file, deploy_dc_flag=False, test_mod_name="deploydc", zone=None, hypervisor_type=None, halt_on_failure=False):
         self.__configFile = config_file
         self.__deployFlag = deploy_dc_flag
         self.__tcRunLogger = MarvinLog('marvin').get_logger()
@@ -34,6 +34,7 @@ class MarvinInit:
         self.__zoneForTests = zone
         self.__parsedConfig = None
         self.__hypervisorType = hypervisor_type
+        self.__halt_on_failure = halt_on_failure
 
     def __parseConfig(self):
         '''
@@ -144,7 +145,9 @@ class MarvinInit:
                 dbsvr_details,
                 test_data_filepath=self.__testDataFilePath,
                 zone=self.__zoneForTests,
-                hypervisor_type=self.__hypervisorType)
+                hypervisor_type=self.__hypervisorType,
+                halt_on_failure=self.__halt_on_failure
+            )
             if self.__testClient:
                 return self.__testClient.createTestClient()
             return FAILED

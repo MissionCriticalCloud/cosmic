@@ -10,10 +10,10 @@ from setup_routervm import RouterVM
 from setup_ssvm import SecondaryStorageVM
 from utils import Utils
 
-CMDLINE_DIR = "/var/cache/cloud/"
+CMDLINE_DIR = "/tmp/"
 CMDLINE_FILE = "cmdline"
 CMDLINE_DONE = "cmdline_incoming"
-CMDLINE_JSON = "cmd_line.json"
+CMDLINE_JSON = "/var/cache/cloud/cmd_line.json"
 
 AGENT_PROPERTIES = "/etc/cosmic/agent/agent.properties"
 
@@ -58,10 +58,9 @@ class App:
 
                 cmdline_json["cmd_line"][key] = value
 
-        json.dump(cmdline_json, open(CMDLINE_DIR + CMDLINE_JSON, "w"))
+        json.dump(cmdline_json, open(CMDLINE_JSON, "w"))
 
-        os.remove(CMDLINE_DIR + CMDLINE_FILE)
-        os.remove(CMDLINE_DIR + CMDLINE_DONE)
+        logging.info("Cmd_line json: %s" % cmdline_json)
 
         self.cmdline = cmdline_json["cmd_line"]
 
