@@ -92,6 +92,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         AllFieldsSearch.and("account", AllFieldsSearch.entity().getAccountId(), Op.EQ);
         AllFieldsSearch.and("related", AllFieldsSearch.entity().getRelated(), Op.EQ);
         AllFieldsSearch.and("guestType", AllFieldsSearch.entity().getGuestType(), Op.EQ);
+        AllFieldsSearch.and("notGuestType", AllFieldsSearch.entity().getGuestType(), Op.NEQ);
         AllFieldsSearch.and("physicalNetwork", AllFieldsSearch.entity().getPhysicalNetworkId(), Op.EQ);
         AllFieldsSearch.and("broadcastUri", AllFieldsSearch.entity().getBroadcastUri(), Op.EQ);
         AllFieldsSearch.and("vpcId", AllFieldsSearch.entity().getVpcId(), Op.EQ);
@@ -153,6 +154,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         CountBy.and("offeringId", CountBy.entity().getNetworkOfferingId(), Op.EQ);
         CountBy.and("vpcId", CountBy.entity().getVpcId(), Op.EQ);
         CountBy.and("removed", CountBy.entity().getRemoved(), Op.NULL);
+        CountBy.and("notGuestType", CountBy.entity().getGuestType(), Op.NEQ);
         final SearchBuilder<NetworkOfferingVO> ntwkOffJoin = _ntwkOffDao.createSearchBuilder();
         ntwkOffJoin.and("isSystem", ntwkOffJoin.entity().isSystemOnly(), Op.EQ);
         CountBy.join("offerings", ntwkOffJoin, CountBy.entity().getNetworkOfferingId(), ntwkOffJoin.entity().getId(), JoinBuilder.JoinType.INNER);
@@ -201,6 +203,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
 
         VpcNetworksCount = createSearchBuilder(Long.class);
         VpcNetworksCount.and("vpcId", VpcNetworksCount.entity().getVpcId(), Op.EQ);
+        VpcNetworksCount.and("notGuestType", VpcNetworksCount.entity().getGuestType(), Op.NEQ);
         VpcNetworksCount.select(null, Func.COUNT, VpcNetworksCount.entity().getId());
         final SearchBuilder<NetworkOfferingVO> join9 = _ntwkOffDao.createSearchBuilder();
         join9.and("isSystem", join9.entity().isSystemOnly(), Op.EQ);
@@ -554,6 +557,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public int getNetworkCountByVpcId(final long vpcId) {
         final SearchCriteria<Integer> sc = CountBy.create();
         sc.setParameters("vpcId", vpcId);
+        sc.setParameters("notGuestType", GuestType.Sync);
         final List<Integer> results = customSearch(sc, null);
         return results.get(0);
     }
@@ -562,6 +566,16 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public List<NetworkVO> listByVpc(final long vpcId) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
+        sc.setParameters("notGuestType", GuestType.Sync);
+
+        return listBy(sc, null);
+    }
+
+    @Override
+    public List<NetworkVO> listSyncNetworksByVpc(final long vpcId) {
+        final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
+        sc.setParameters("vpcId", vpcId);
+        sc.setParameters("guestType", GuestType.Sync);
 
         return listBy(sc, null);
     }
@@ -592,6 +606,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public long countVpcNetworks(final long vpcId) {
         final SearchCriteria<Long> sc = VpcNetworksCount.create();
         sc.setParameters("vpcId", vpcId);
+        sc.setParameters("notGuestType", GuestType.Sync);
         //offering shouldn't be system (the one used by the private gateway)
         sc.setJoinParameters("offerings", "isSystem", false);
         return customSearch(sc, null).get(0);
@@ -620,9 +635,11 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public List<NetworkVO> listVpcNetworks() {
         final SearchBuilder<NetworkVO> sb = createSearchBuilder();
         sb.and("vpcId", sb.entity().getVpcId(), Op.NNULL);
+        sb.and("notGuestType", sb.entity().getGuestType(), Op.NEQ);
         sb.done();
 
         final SearchCriteria<NetworkVO> sc = sb.create();
+        sc.setParameters("notGuestType", GuestType.Sync);
 
         return listBy(sc);
     }
@@ -639,6 +656,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public int getNonSystemNetworkCountByVpcId(final long vpcId) {
         final SearchCriteria<Integer> sc = CountBy.create();
         sc.setParameters("vpcId", vpcId);
+        sc.setParameters("notGuestType", GuestType.Sync);
         sc.setJoinParameters("offerings", "isSystem", false);
         final List<Integer> results = customSearch(sc, null);
         return results.get(0);

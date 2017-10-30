@@ -586,6 +586,19 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     offering.setPublicLb(false);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
+
+                //System vpc sync network
+                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering) == null) {
+                    offering = _configMgr.createNetworkOffering(
+                            NetworkOffering.DefaultVpcSyncNetworkOffering,
+                            "Offering for Vpc sync networks",
+                            TrafficType.Guest, null, false, Availability.Optional, null, null, true, GuestType.Sync,
+                            false, null, null, false, null, false, true,
+                            null, false, null, true
+                    );
+                    offering.setState(NetworkOffering.State.Enabled);
+                    _networkOfferingDao.update(offering.getId(), offering);
+                }
             }
         });
 
@@ -660,11 +673,14 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         try {
-            if (predefined == null
-                    || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null && !(predefined
-                    .getBroadcastDomainType() == BroadcastDomainType.Vlan || predefined.getBroadcastDomainType() == BroadcastDomainType.Lswitch || predefined
-                    .getBroadcastDomainType() == BroadcastDomainType.Vxlan)) {
-                final List<NetworkVO> configs = _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
+                if (predefined == null || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null &&
+                    !(predefined.getBroadcastDomainType() == BroadcastDomainType.Vlan ||
+                            predefined.getBroadcastDomainType() == BroadcastDomainType.Lswitch ||
+                            predefined.getBroadcastDomainType() == BroadcastDomainType.Vxlan
+                    )) {
+                final List<NetworkVO> configs = GuestType.Sync.equals(offering.getGuestType())
+                    ? _networksDao.listSyncNetworksByVpc(vpcId)
+                    : _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
                 if (configs.size() > 0) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Found existing network configuration for offering " + offering + ": " + configs.get(0));
@@ -711,7 +727,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFile, name, displayText,
-                                predefined.getNetworkDomain(), offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
+                                predefined != null ? predefined.getNetworkDomain() : null, offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
                                 vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
                         vo.setDisplayNetwork(isDisplayNetworkEnabled == null ? true : isDisplayNetworkEnabled);
                         vo.setStrechedL2Network(offering.getSupportsStrechedL2());
@@ -864,11 +880,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
     }
 
-    Pair<NetworkGuru, NetworkVO> implementNetwork(final long networkId, final DeployDestination dest, final ReservationContext context, final boolean isRouter) throws
-            ConcurrentOperationException,
-            ResourceUnavailableException, InsufficientCapacityException {
+    Pair<NetworkGuru, NetworkVO> implementNetwork(final long networkId, final DeployDestination dest, final ReservationContext context, final boolean isRouter)
+            throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException {
         Pair<NetworkGuru, NetworkVO> implemented = null;
-        if (!isRouter) {
+        final NetworkVO network = _networksDao.findById(networkId);
+        if (!isRouter || (TrafficType.Guest.equals(network.getTrafficType()) && GuestType.Sync.equals(network.getGuestType()))) {
             implemented = implementNetwork(networkId, dest, context);
         } else {
             // At the time of implementing network (using implementNetwork() method), if the VR needs to be deployed then
@@ -876,7 +892,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             // preparing VR nics. This flow creates issues in dealing with network state transitions. The original call
             // puts network in "Implementing" state and then the nested call again tries to put it into same state resulting
             // in issues. In order to avoid it, implementNetwork() call for VR is replaced with below code.
-            final NetworkVO network = _networksDao.findById(networkId);
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
             implemented = new Pair<>(guru, network);
         }

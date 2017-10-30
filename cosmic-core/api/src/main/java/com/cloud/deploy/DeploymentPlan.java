@@ -46,5 +46,7 @@ public interface DeploymentPlan {
 
     Long getPhysicalNetworkId();
 
+    void setPhysicalNetworkId(Long physicalNetworkId);
+
     ReservationContext getReservationContext();
 }

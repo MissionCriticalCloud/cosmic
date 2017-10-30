@@ -29,6 +29,7 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
     public final static String DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat = "DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat";
     public final static String DefaultIsolatedNetworkOfferingForVpcNetworksNoLB = "DefaultIsolatedNetworkOfferingForVpcNetworksNoLB";
     public final static String DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB = "DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB";
+    public final static String DefaultVpcSyncNetworkOffering = "DefaultVpcSyncNetworkOffering";
 
     /**
      * @return name for the network offering.

@@ -42,6 +42,7 @@ import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
+import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -95,6 +96,8 @@ public class NetworkHelperImpl implements NetworkHelper {
     protected NicDao _nicDao;
     @Inject
     protected NetworkDao _networkDao;
+    @Inject
+    protected NetworkOfferingDao _networkOfferingDao;
     @Inject
     protected DomainRouterDao _routerDao;
     @Inject
@@ -603,6 +606,37 @@ public class NetworkHelperImpl implements NetworkHelper {
         controlConfig.put(controlNic, new ArrayList<>());
 
         return controlConfig;
+    }
+
+    protected LinkedHashMap<Network, List<? extends NicProfile>> configureSyncNic(final RouterDeploymentDefinition routerDeploymentDefinition) {
+        final LinkedHashMap<Network, List<? extends NicProfile>> syncConfig = new LinkedHashMap<>(3);
+
+        logger.debug("Adding nic for Virtual Router in Sync network ");
+
+        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering);
+        final Vpc vpc = routerDeploymentDefinition.getVpc();
+        final String networkName = vpc.getName() + "-syncNetwork";
+        final Network syncNic = _networkMgr.setupNetwork(
+                routerDeploymentDefinition.getOwner(),
+                offering,
+                null,
+                routerDeploymentDefinition.getPlan(),
+                networkName,
+                networkName,
+                false,
+                vpc.getDomainId(),
+                null,
+                null,
+                vpc.getId(),
+                false,
+                null,
+                null,
+                null
+        ).get(0);
+
+        syncConfig.put(syncNic, new ArrayList<>());
+
+        return syncConfig;
     }
 
     protected LinkedHashMap<Network, List<? extends NicProfile>> configurePublicNic(final RouterDeploymentDefinition routerDeploymentDefinition, final boolean hasGuestNic) {

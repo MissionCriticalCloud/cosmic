@@ -19,6 +19,7 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.BroadcastDomainType;
@@ -222,6 +223,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             finalizeSshAndVersionAndNetworkUsageOnStart(cmds, profile, domainRouterVO, controlNic);
 
             // 2) FORM PLUG NIC COMMANDS
+            final List<Pair<Nic, Network>> syncNics = new ArrayList<>();
             final List<Pair<Nic, Network>> guestNics = new ArrayList<>();
             final List<Pair<Nic, Network>> publicNics = new ArrayList<>();
             final Map<String, String> vlanMacAddress = new HashMap<>();
@@ -231,7 +233,11 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 final Network network = _networkModel.getNetwork(routerNic.getNetworkId());
                 if (network.getTrafficType() == TrafficType.Guest) {
                     final Pair<Nic, Network> guestNic = new Pair<>(routerNic, network);
-                    guestNics.add(guestNic);
+                    if (GuestType.Sync.equals(network.getGuestType())) {
+                        syncNics.add(guestNic);
+                    } else {
+                        guestNics.add(guestNic);
+                    }
                 } else if (network.getTrafficType() == TrafficType.Public) {
                     final Pair<Nic, Network> publicNic = new Pair<>(routerNic, network);
                     publicNics.add(publicNic);
@@ -244,6 +250,17 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
             // 3) PREPARE PLUG NIC COMMANDS
             try {
+                // add VPC router to sync networks
+                for (final Pair<Nic, Network> nicNtwk : syncNics) {
+                    final Nic syncNic = nicNtwk.first();
+                    // plug sync nic
+                    final PlugNicCommand plugNicCmd = new PlugNicCommand(
+                            _nwHelper.getNicTO(domainRouterVO, syncNic.getNetworkId(), null),
+                            domainRouterVO.getInstanceName(),
+                            domainRouterVO.getType()
+                    );
+                    cmds.addCommand(plugNicCmd);
+                }
                 // add VPC router to public networks
                 final List<PublicIp> sourceNat = new ArrayList<>(1);
                 for (final Pair<Nic, Network> nicNtwk : publicNics) {
