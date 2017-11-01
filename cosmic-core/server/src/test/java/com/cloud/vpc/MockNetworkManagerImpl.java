@@ -658,6 +658,15 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
+     * @see com.cloud.network.NetworkManager#removeAndShutdownSyncNetwork(long)
+     */
+    @Override
+    public boolean removeAndShutdownSyncNetwork(final long networkId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /* (non-Javadoc)
      * @see com.cloud.network.NetworkManager#destroyNetwork(long, com.cloud.vm.ReservationContext)
      */
     @Override

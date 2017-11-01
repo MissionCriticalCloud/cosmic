@@ -131,6 +131,8 @@ public interface NetworkOrchestrationService {
 
     boolean shutdownNetwork(long networkId, ReservationContext context, boolean cleanupElements);
 
+    boolean removeAndShutdownSyncNetwork(long networkId);
+
     boolean destroyNetwork(long networkId, ReservationContext context, boolean forced);
 
     Network createGuestNetwork(long networkOfferingId, String name, String displayText, String gateway, String cidr,

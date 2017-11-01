@@ -1686,7 +1686,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             //do global lock for the network
             network = _networksDao.acquireInLockTable(networkId, NetworkLockTimeout.value());
             if (network == null) {
-                s_logger.warn("Unable to acquire lock for the network " + network + " as a part of network shutdown");
+                s_logger.warn("Unable to acquire lock for the network as a part of network shutdown");
                 return false;
             }
             if (s_logger.isDebugEnabled()) {
@@ -1761,6 +1761,59 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             });
 
             return result;
+        } finally {
+            if (network != null) {
+                _networksDao.releaseFromLockTable(network.getId());
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Lock is released for network " + network + " as a part of network shutdown");
+                }
+            }
+        }
+    }
+
+    @Override
+    @DB
+    public boolean removeAndShutdownSyncNetwork(final long networkId) {
+        NetworkVO network = _networksDao.findById(networkId);
+        if (network.getState() == Network.State.Allocated) {
+            s_logger.debug("Network is already shutdown: " + network);
+            return true;
+        }
+
+        if (network.getState() != Network.State.Implemented && network.getState() != Network.State.Shutdown) {
+            s_logger.debug("Network is not implemented: " + network);
+            return false;
+        }
+
+        try {
+            //do global lock for the network
+            network = _networksDao.acquireInLockTable(networkId, NetworkLockTimeout.value());
+            if (network == null) {
+                s_logger.warn("Unable to acquire lock for the network as a part of network shutdown");
+                return false;
+            }
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Lock is acquired for network " + network + " as a part of network shutdown");
+            }
+
+            if (network.getState() == Network.State.Allocated) {
+                s_logger.debug("Network is already shutdown: " + network);
+                return true;
+            }
+
+            if (network.getState() != Network.State.Implemented && network.getState() != Network.State.Shutdown) {
+                s_logger.debug("Network is not implemented: " + network);
+                return false;
+            }
+
+            try {
+                stateTransitTo(network, Event.DestroyNetwork);
+            } catch (final NoTransitionException e) {
+                network.setState(Network.State.Shutdown);
+                _networksDao.update(networkId, network);
+            }
+
+            return _networksDao.remove(networkId);
         } finally {
             if (network != null) {
                 _networksDao.releaseFromLockTable(network.getId());
@@ -1864,6 +1917,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, networkFinal.getGuruName());
+
+                        // Deleting sync networks
+                        final List<NetworkVO> syncNetworks = _networksDao.listSyncNetworksByRelatedNetwork(networkId);
+                        syncNetworks.forEach(syncNetwork -> removeAndShutdownSyncNetwork(syncNetwork.getId()));
 
                         guru.trash(networkFinal, _networkOfferingDao.findById(networkFinal.getNetworkOfferingId()));
 
