@@ -137,7 +137,8 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 final Iterator<NicProfile> it = profile.getNics().iterator();
                 while (it.hasNext()) {
                     final NicProfile nic = it.next();
-                    if (nic.getTrafficType() == TrafficType.Public || nic.getTrafficType() == TrafficType.Guest) {
+                    final Network network = _networkDao.findById(nic.getNetworkId());
+                    if (nic.getTrafficType() == TrafficType.Public || (TrafficType.Guest.equals(network.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType()))) {
                         // save dns information
                         if (nic.getTrafficType() == TrafficType.Public) {
                             defaultDns1 = nic.getIPv4Dns1();

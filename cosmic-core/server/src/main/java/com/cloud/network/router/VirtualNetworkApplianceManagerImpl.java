@@ -1163,11 +1163,13 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 controlNic = nic;
                 buf.append(" controlmac=").append(deviceMac);
                 buf.append(createRedundantRouterArgs(controlNic, router));
-            } else if (nic.getTrafficType() == TrafficType.Guest) {
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType())) {
                 dnsProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dns, Provider.VirtualRouter);
                 dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dhcp, Provider.VirtualRouter);
                 // build bootloader parameter for the guest
                 buf.append(createGuestBootLoadArgs(nic, defaultDns1, defaultDns2, router));
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && GuestType.Sync.equals(network.getGuestType())) {
+                buf.append(" syncmac=").append(deviceMac);
             } else if (nic.getTrafficType() == TrafficType.Public) {
                 publicNetwork = true;
             }
