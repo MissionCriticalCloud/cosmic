@@ -17,6 +17,7 @@ class Utils:
         self.setup_hostname()
         self.setup_dns()
         self.setup_private_nic()
+        self.setup_sync_nic()
         self.setup_ssh()
         self.setup_banner()
         self.setup_default_gw()
@@ -40,6 +41,35 @@ NETMASK="%s"
                     f.write(ifcfg)
 
                 os.system("ifdown eth%s; ifup eth%s" % (interface, interface))
+
+    def get_device_from_mac_address(macaddress):
+        device = os.system("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
+        if not device:
+            return False
+        return device[0]
+
+    def find_sync_nic(self):
+        return get_device_from_mac_address(self.cmdline["syncmac"])
+
+    def setup_sync_nic(self):
+
+        sync_device = find_sync_nic()
+
+        if not sync_device:
+            return False
+
+        ifcfg = """
+    DEVICE="%s"
+    IPV6INIT="yes"
+    BOOTPROTO="none"
+    ONBOOT="yes"
+    HWADDR="%s"
+    """ % (sync_device, self.cmdline["eth%smac" % interface])
+
+        with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
+            f.write(ifcfg)
+
+        os.system("ifdown %s; ifup %s" % (sync_device, sync_device))
 
     def setup_dns(self):
         resolv_conf = []
@@ -114,6 +144,10 @@ AcceptEnv XMODIFIERS
         with open("/etc/redhat-release", "r") as f:
             release = f.readline()
 
+        link_local_ip = self.cmdline["eth0ip"]
+        if self.is_legacy_router_vm:
+            link_local_ip = self.cmdline["eth1ip"]
+
         prelogin_banner = """
 Cosmic sytemvm powered by %s
 
@@ -139,7 +173,7 @@ Cosmic sytemvm powered by %s
   ____________________________________________
  ( Void 100%% of your warranty @ %s )
   --------------------------------------------
-""" % (release, self.cmdline["eth0ip"])
+""" % (release, link_local_ip)
 
         with open("/etc/issue", "w") as f:
             f.write(prelogin_banner)
