@@ -1,5 +1,5 @@
 import os
-
+import subprocess
 
 class Utils:
     def __init__(self, cmdline) -> None:
@@ -42,18 +42,18 @@ NETMASK="%s"
 
                 os.system("ifdown eth%s; ifup eth%s" % (interface, interface))
 
-    def get_device_from_mac_address(macaddress):
-        device = os.system("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
+    def get_device_from_mac_address(self, macaddress):
+        device = self.execute("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
         if not device:
             return False
         return device[0]
 
     def find_sync_nic(self):
-        return get_device_from_mac_address(self.cmdline["syncmac"])
+        return self.get_device_from_mac_address(self.cmdline["syncmac"])
 
     def setup_sync_nic(self):
 
-        sync_device = find_sync_nic()
+        sync_device = self.find_sync_nic()
 
         if not sync_device:
             return False
@@ -64,9 +64,9 @@ NETMASK="%s"
     BOOTPROTO="none"
     ONBOOT="yes"
     HWADDR="%s"
-    """ % (sync_device, self.cmdline["eth%smac" % interface])
+    """ % (sync_device, self.cmdline["%smac" % sync_device])
 
-        with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
+        with open("/etc/sysconfig/network-scripts/ifcfg-%s" % sync_device, "w") as f:
             f.write(ifcfg)
 
         os.system("ifdown %s; ifup %s" % (sync_device, sync_device))
@@ -202,3 +202,9 @@ Cosmic sytemvm powered by %s
                 f.write("GATEWAY=%s" % self.cmdline["gateway"])
 
             os.system("ip route add default via %s" % self.cmdline["gateway"])
+
+    def execute(self, command):
+        """ Execute command """
+
+        stdoutdata = subprocess.getoutput(command)
+        return stdoutdata.split()
