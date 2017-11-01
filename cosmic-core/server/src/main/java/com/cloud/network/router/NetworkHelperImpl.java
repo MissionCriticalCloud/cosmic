@@ -613,26 +613,13 @@ public class NetworkHelperImpl implements NetworkHelper {
 
         logger.debug("Adding nic for Virtual Router in Sync network ");
 
-        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering);
-        final Vpc vpc = routerDeploymentDefinition.getVpc();
-        final String networkName = vpc.getName() + "-syncNetwork";
-        final Network syncNic = _networkMgr.setupNetwork(
+        final Network syncNic = _networkMgr.setupSyncNetwork(
                 routerDeploymentDefinition.getOwner(),
-                offering,
-                null,
                 routerDeploymentDefinition.getPlan(),
-                networkName,
-                networkName,
-                false,
-                vpc.getDomainId(),
-                null,
-                null,
-                vpc.getId(),
-                false,
-                null,
-                null,
-                null
-        ).get(0);
+                routerDeploymentDefinition.isVpcRouter(),
+                routerDeploymentDefinition.getVpc(),
+                routerDeploymentDefinition.getGuestNetwork()
+        );
 
         syncConfig.put(syncNic, new ArrayList<>());
 
@@ -714,6 +701,10 @@ public class NetworkHelperImpl implements NetworkHelper {
         // 3) Public network
         final LinkedHashMap<Network, List<? extends NicProfile>> publicNic = configurePublicNic(routerDeploymentDefinition, networks.size() > 1);
         networks.putAll(publicNic);
+
+        // 4) Sync network
+        final LinkedHashMap<Network, List<? extends NicProfile>> syncNic = configureSyncNic(routerDeploymentDefinition);
+        networks.putAll(syncNic);
 
         return networks;
     }

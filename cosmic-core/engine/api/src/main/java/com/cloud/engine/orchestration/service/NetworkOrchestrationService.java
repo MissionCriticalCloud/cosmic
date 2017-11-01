@@ -23,6 +23,7 @@ import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.user.Account;
 import com.cloud.user.User;
@@ -70,11 +71,12 @@ public interface NetworkOrchestrationService {
                                          String displayText, boolean isDefault)
             throws ConcurrentOperationException;
 
-    List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan,
-                                         String name, String displayText,
-                                         boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId,
+    List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan, String name, String displayText,
+                                         boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId, Long relatedNetworkId,
                                          Boolean isDisplayNetworkEnabled, String dns1, String dns2, final String ipExclusionList)
             throws ConcurrentOperationException;
+
+    Network setupSyncNetwork(Account owner, DeploymentPlan plan, boolean isVpcRouter, Vpc vpc, Network isolatedNetwork);
 
     void allocate(VirtualMachineProfile vm, LinkedHashMap<? extends Network, List<? extends NicProfile>> networks)
             throws InsufficientCapacityException,

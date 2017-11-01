@@ -657,15 +657,18 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final DeploymentPlan plan, final String name, final String displayText,
                                                 final boolean isDefault)
             throws ConcurrentOperationException {
-        return setupNetwork(owner, offering, null, plan, name, displayText, false, null, null, null, null, true, null, null, null);
+        return setupNetwork(
+                owner, offering, null, plan, name, displayText, false, null, null, null, null, null,
+                true, null, null, null
+        );
     }
 
     @Override
     @DB
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                                 final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType,
-                                                final Boolean subdomainAccess, final Long vpcId, final Boolean isDisplayNetworkEnabled, final String dns1, final String dns2,
-                                                final String ipExclusionList)
+                                                final Boolean subdomainAccess, final Long vpcId, final Long relatedNetworkId, final Boolean isDisplayNetworkEnabled,
+                                                final String dns1, final String dns2, final String ipExclusionList)
             throws ConcurrentOperationException {
         final Account locked = _accountDao.acquireInLockTable(owner.getId());
         if (locked == null) {
@@ -673,14 +676,19 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         try {
-                if (predefined == null || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null &&
+            if (predefined == null || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null &&
                     !(predefined.getBroadcastDomainType() == BroadcastDomainType.Vlan ||
                             predefined.getBroadcastDomainType() == BroadcastDomainType.Lswitch ||
                             predefined.getBroadcastDomainType() == BroadcastDomainType.Vxlan
                     )) {
-                final List<NetworkVO> configs = GuestType.Sync.equals(offering.getGuestType())
-                    ? _networksDao.listSyncNetworksByVpc(vpcId)
-                    : _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
+                final List<NetworkVO> configs;
+                if (vpcId != null && GuestType.Sync.equals(offering.getGuestType())) {
+                    configs = _networksDao.listSyncNetworksByVpc(vpcId);
+                } else if (relatedNetworkId != null && GuestType.Sync.equals(offering.getGuestType())) {
+                    configs = _networksDao.listSyncNetworksByRelatedNetwork(relatedNetworkId);
+                } else {
+                    configs = _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
+                }
                 if (configs.size() > 0) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Found existing network configuration for offering " + offering + ": " + configs.get(0));
@@ -700,7 +708,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
             final List<NetworkVO> networks = new ArrayList<>();
 
-            long related = -1;
+            long related = relatedNetworkId != null ? relatedNetworkId : -1;
 
             for (final NetworkGuru guru : networkGurus) {
                 final Network network = guru.design(offering, plan, predefined, owner);
@@ -722,13 +730,13 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     related = id;
                 }
 
-                final long relatedFile = related;
+                final long relatedFinal = related;
                 Transaction.execute(new TransactionCallbackNoReturn() {
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFile, name, displayText,
-                                predefined != null ? predefined.getNetworkDomain() : null, offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
-                                vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
+                        final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFinal, name, displayText,
+                                predefined != null ? predefined.getNetworkDomain() : null, offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType,
+                                offering.getSpecifyIpRanges(), vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
                         vo.setDisplayNetwork(isDisplayNetworkEnabled == null ? true : isDisplayNetworkEnabled);
                         vo.setStrechedL2Network(offering.getSupportsStrechedL2());
                         networks.add(_networksDao.persist(vo, vo.getGuestType() == GuestType.Isolated,
@@ -757,6 +765,53 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             s_logger.debug("Releasing lock for " + locked);
             _accountDao.releaseFromLockTable(locked.getId());
         }
+    }
+
+    @Override
+    public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {
+        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering);
+
+        if (isVpcRouter) {
+            final String networkName = vpc.getName() + "-syncNetwork";
+            return setupNetwork(
+                    owner,
+                    offering,
+                    null,
+                    plan,
+                    networkName,
+                    networkName,
+                    false,
+                    vpc.getDomainId(),
+                    null,
+                    null,
+                    vpc.getId(),
+                    null,
+                    false,
+                    null,
+                    null,
+                    null
+            ).get(0);
+        }
+
+        final String networkName = isolatedNetwork.getName() + "-syncNetwork";
+        return setupNetwork(
+                owner,
+                offering,
+                null,
+                plan,
+                networkName,
+                networkName,
+                false,
+                isolatedNetwork.getDomainId(),
+                null,
+                null,
+                null,
+                isolatedNetwork.getId(),
+                false,
+                null,
+                null,
+                null
+        ).get(0);
     }
 
     @Override
@@ -2136,8 +2191,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     }
                 }
 
-                final List<? extends Network> networks = setupNetwork(owner, ntwkOff, userNetwork, plan, name, displayText, true, domainId, aclType, subdomainAccessFinal, vpcId,
-                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList);
+                final List<? extends Network> networks = setupNetwork(
+                        owner, ntwkOff, userNetwork, plan, name, displayText, true, domainId, aclType, subdomainAccessFinal, vpcId, null,
+                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList
+                );
 
                 Network network = null;
                 if (networks == null || networks.isEmpty()) {

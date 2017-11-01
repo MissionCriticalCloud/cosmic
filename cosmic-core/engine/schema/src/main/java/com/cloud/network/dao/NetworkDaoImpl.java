@@ -581,6 +581,15 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
+    public List<NetworkVO> listSyncNetworksByRelatedNetwork(final long relatedNetworkId) {
+        final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
+        sc.setParameters("related", relatedNetworkId);
+        sc.setParameters("guestType", GuestType.Sync);
+
+        return listBy(sc, null);
+    }
+
+    @Override
     public NetworkVO getPrivateNetwork(final String broadcastUri, final String cidr, final long accountId, final long zoneId, Long networkOfferingId) {
         if (networkOfferingId == null) {
             networkOfferingId = _ntwkOffDao.findByUniqueName(NetworkOffering.DefaultPrivateGatewayNetworkOffering).getId();

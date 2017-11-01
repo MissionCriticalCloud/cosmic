@@ -1121,6 +1121,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         String defaultIp6Dns1 = null;
         String defaultIp6Dns2 = null;
         for (final NicProfile nic : profile.getNics()) {
+            final Network network = _networkDao.findById(nic.getNetworkId());
+            if (TrafficType.Guest.equals(network.getTrafficType()) && GuestType.Sync.equals(network.getGuestType())) {
+                continue;
+            }
             final int deviceId = nic.getDeviceId();
             boolean ipv4 = false, ipv6 = false;
             if (nic.getIPv4Address() != null) {

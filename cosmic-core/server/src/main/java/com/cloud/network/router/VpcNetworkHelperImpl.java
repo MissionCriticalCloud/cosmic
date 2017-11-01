@@ -150,15 +150,15 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
         final LinkedHashMap<Network, List<? extends NicProfile>> controlNic = configureControlNic(routerDeploymentDefinition);
         networks.putAll(controlNic);
 
-        // 1) Sync network
+        // 2) Sync network
         final LinkedHashMap<Network, List<? extends NicProfile>> syncNic = configureSyncNic(routerDeploymentDefinition);
         networks.putAll(syncNic);
 
-        // 2) Public network
+        // 3) Public network
         final LinkedHashMap<Network, List<? extends NicProfile>> publicNic = configurePublicNic(routerDeploymentDefinition, false);
         networks.putAll(publicNic);
 
-        // 3) Guest Network
+        // 4) Guest Network
         final LinkedHashMap<Network, List<? extends NicProfile>> guestNic = configureGuestNic(routerDeploymentDefinition);
         networks.putAll(guestNic);
 
