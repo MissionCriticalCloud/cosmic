@@ -587,11 +587,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
 
-                //System vpc sync network
-                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering) == null) {
+                //Default offering for sync networks
+                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSyncNetworkOffering) == null) {
                     offering = _configMgr.createNetworkOffering(
-                            NetworkOffering.DefaultVpcSyncNetworkOffering,
-                            "Offering for Vpc sync networks",
+                            NetworkOffering.DefaultSyncNetworkOffering,
+                            "Offering for Sync networks",
                             TrafficType.Guest, null, false, Availability.Optional, null, null, true, GuestType.Sync,
                             false, null, null, false, null, false, true,
                             null, false, null, true
@@ -769,7 +769,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @Override
     public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {
-        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultVpcSyncNetworkOffering);
+        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSyncNetworkOffering);
 
         if (isVpcRouter) {
             final String networkName = vpc.getName() + "-syncNetwork";

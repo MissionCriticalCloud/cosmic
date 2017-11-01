@@ -712,14 +712,14 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 }
 
                 // Offering #11
-                NetworkOfferingVO vpcSyncNetworkOffering = new NetworkOfferingVO(
-                        NetworkOffering.DefaultVpcSyncNetworkOffering,
-                        "Offering for Vpc sync networks",
+                NetworkOfferingVO syncNetworkOffering = new NetworkOfferingVO(
+                        NetworkOffering.DefaultSyncNetworkOffering,
+                        "Offering for Sync networks",
                         TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
                         GuestType.Sync, false, false, true, false, false
                 );
-                vpcSyncNetworkOffering.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.persistDefaultNetworkOffering(vpcSyncNetworkOffering);
+                syncNetworkOffering.setState(NetworkOffering.State.Enabled);
+                _networkOfferingDao.persistDefaultNetworkOffering(syncNetworkOffering);
             }
         });
     }
