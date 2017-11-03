@@ -98,17 +98,14 @@ class CsRedundant(object):
         # keepalived configuration
         keepalived_conf = CsFile(self.KEEPALIVED_CONF)
         keepalived_conf.search(
-            " router_id ", "    router_id %s" % self.cl.get_name())
-        keepalived_conf.search(
-            " interface ", "    interface %s" % guest.get_device())
+            " router_id ", "    router_id %s" % guest.get_device().replace("eth",""))
         keepalived_conf.search(
             " advert_int ", "    advert_int %s" % self.cl.get_advert_int())
 
         keepalived_conf.greplace("[RROUTER_BIN_PATH]", self.CS_ROUTER_DIR)
-        keepalived_conf.section("authentication {", "}", [
-            "        auth_type AH \n", "        auth_pass %s\n" % self.cl.get_router_password()])
+
         keepalived_conf.section(
-            "virtual_ipaddress {", "}", self._collect_ips())
+            "virtual_ipaddress_excluded {", "}", self._collect_ips())
 
         # conntrackd configuration
         conntrackd_template_conf = "%s/%s" % (self.CS_TEMPLATES_DIR, "conntrackd.conf.templ")
