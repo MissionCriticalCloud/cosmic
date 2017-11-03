@@ -43,7 +43,7 @@ class CsRedundant(object):
     CONNTRACKD_BIN = "/usr/sbin/conntrackd"
     CONNTRACKD_KEEPALIVED_CONFLOCK = "/var/lock/conntrack.lock"
     CONNTRACKD_CONF = "/etc/conntrackd/conntrackd.conf"
-    KEEPALIVED_CONF = "/etc/keepalived/keepalived.conf"
+    KEEPALIVED_CONF = "/etc/keepalived/conf.d/cosmic_legacy_keepalived.conf"
     RROUTER_LOG = "/var/log/cosmic/router/redundantrouter.log"
 
     def __init__(self, config):
