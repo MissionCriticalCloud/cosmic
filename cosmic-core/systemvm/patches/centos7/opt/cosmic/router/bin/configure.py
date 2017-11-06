@@ -5,7 +5,6 @@ import re
 import sys
 from collections import OrderedDict
 
-from CsNetwork import CsNetwork
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsDatabag
 from cs.CsDhcp import CsDhcp
@@ -13,7 +12,6 @@ from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
-from cs.CsPrivateGateway import CsPrivateGateway
 from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsVrConfig import CsVrConfig
