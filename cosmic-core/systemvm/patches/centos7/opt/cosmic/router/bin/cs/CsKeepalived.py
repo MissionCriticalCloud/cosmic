@@ -12,10 +12,10 @@ class CsKeepalived(object):
         self.keepalived_config_path = '/etc/keepalived/conf.d/'
 
     def sync(self):
-        logging.debug(self.dbag)
         self.write_global_defs()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
+        self.reload_keepalived()
 
     def write_global_defs(self):
         content = self.jinja_env.get_template('keepalived_global_defs.conf').render(
@@ -41,4 +41,8 @@ class CsKeepalived(object):
 
     def zap_keepalived_config_directory(self):
         # TODO list files in self.keepalived_config_path, exclude the ones in self.filenames and remove them!
+        pass
+
+    def reload_keepalived(self):
+        # TODO reload keepalived
         pass
