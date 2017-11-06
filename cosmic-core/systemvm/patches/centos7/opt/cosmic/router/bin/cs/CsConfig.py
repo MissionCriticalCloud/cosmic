@@ -1,5 +1,5 @@
 from CsAddress import CsAddress
-from CsDatabag import CsCmdLine
+from CsCmdline import CsCmdline
 
 
 class CsConfig(object):
@@ -21,7 +21,7 @@ class CsConfig(object):
     @classmethod
     def get_cmdline_instance(cls):
         if cls.cl is None:
-            cls.cl = CsCmdLine("cmdline")
+            cls.cl = CsCmdline("cmdline")
         return cls.cl
 
     def cmdline(self):
