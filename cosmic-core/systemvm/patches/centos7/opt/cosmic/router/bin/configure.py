@@ -826,31 +826,31 @@ def main(argv):
 
     databag_map = OrderedDict(
         [
-            ("network.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("vm_metadata.json", {"process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config)}),
-            ("network_acl.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("public_ip_acl.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("firewall_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("forwarding_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("staticnat_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("site_2_site_vpn.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("remote_access_vpn.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("vpn_user_list.json", {"process_iptables": False, "executor": CsVpnUser("vpnuserlist", config)}),
-            ("vm_dhcp_entry.json", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
-            ("dhcp.json", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
-            ("load_balancer.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("monitor_service.json", {"process_iptables": False, "executor": CsMonitor("monitorservice", config)}),
-            ("static_routes.json", {"process_iptables": False, "executor": CsStaticRoutes("staticroutes", config)}),
-            ("vr.json", {"process_iptables": True, "executor": IpTablesExecutor(config)})
+            ("network", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("vm_metadata", {"process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config)}),
+            ("network_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("public_ip_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("firewall_rules", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("forwarding_rules", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("staticnat_rules", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("site_2_site_vpn", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("remote_access_vpn", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("vpn_user_list", {"process_iptables": False, "executor": CsVpnUser("vpnuserlist", config)}),
+            ("vm_dhcp_entry", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
+            ("dhcp", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
+            ("load_balancer", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("monitor_service", {"process_iptables": False, "executor": CsMonitor("monitorservice", config)}),
+            ("static_routes", {"process_iptables": False, "executor": CsStaticRoutes("staticroutes", config)}),
+            ("vr", {"process_iptables": True, "executor": IpTablesExecutor(config)})
         ]
     )
 
-    if process_file == "network.json":
+    if process_file == "network":
         logging.debug("Processing file %s" % process_file)
         cs_network = CsNetwork(process_file)
         cs_network.sync()
 
-    if process_file == "cmd_line.json":
+    if process_file == "cmd_line":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")
 
         while databag_map:
