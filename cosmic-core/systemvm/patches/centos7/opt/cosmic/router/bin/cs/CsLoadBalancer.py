@@ -3,13 +3,13 @@ import logging
 import CsHelper
 from CsFile import CsFile
 from CsProcess import CsProcess
-from cs.CsDatabag import CsDataBag
+from cs.CsDatabag import CsDatabag
 
 HAPROXY_CONF_T = "/etc/haproxy/haproxy.cfg.new"
 HAPROXY_CONF_P = "/etc/haproxy/haproxy.cfg"
 
 
-class CsLoadBalancer(CsDataBag):
+class CsLoadBalancer(CsDatabag):
     """ Manage Load Balancer entries """
 
     def process(self):

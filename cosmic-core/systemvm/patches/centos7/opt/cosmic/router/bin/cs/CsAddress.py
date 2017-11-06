@@ -8,7 +8,7 @@ from netaddr import IPAddress, IPNetwork
 
 import CsHelper
 from CsApp import CsDnsmasq
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 from CsMetadataService import CsMetadataService
 from CsPasswordService import CsPasswordService
 from CsRoute import CsRoute
@@ -17,7 +17,7 @@ from CsRule import CsRule
 VRRP_TYPES = ['guest']
 
 
-class CsAddress(CsDataBag):
+class CsAddress(CsDatabag):
     def compare(self):
         for dbag_data in self.config.ips.dbag.values():
             if dbag_data == "ips":
@@ -25,7 +25,6 @@ class CsAddress(CsDataBag):
             print dbag_data
             try:
                 device_data = dbag_data[0]
-                #device_data = dbag_data
                 ip = CsIP(device_data['device'], device_data["mac_address"], self.config)
                 # Process for all types, except the link local interface
                 if device_data['device'] is not self.get_control_if():

@@ -7,7 +7,7 @@ import sys
 
 import CsHelper
 from CsApp import CsApp
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 
 
 class CsMetadataService(CsApp):
@@ -116,7 +116,7 @@ server {
                         ])
 
 
-class CsMetadataServiceVMConfig(CsDataBag):
+class CsMetadataServiceVMConfig(CsDatabag):
     def process(self):
         for ip in self.dbag:
             if "id" == ip:

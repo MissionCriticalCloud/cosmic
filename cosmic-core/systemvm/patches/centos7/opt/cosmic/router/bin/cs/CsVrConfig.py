@@ -4,13 +4,13 @@
 import logging
 
 import CsHelper
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 
 from cs.CsFile import CsFile
 
 RSYSLOG_IPTABLES_CONF = "/etc/rsyslog.d/00-iptables.conf"
 
-class CsVrConfig(CsDataBag):
+class CsVrConfig(CsDatabag):
     def process(self):
         logging.debug("Processing CsVrConfig file ==> %s" % self.dbag)
 

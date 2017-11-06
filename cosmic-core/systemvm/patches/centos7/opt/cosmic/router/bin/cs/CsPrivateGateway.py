@@ -5,10 +5,10 @@
 import sys
 import logging
 
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 
 
-class CsPrivateGateway(CsDataBag):
+class CsPrivateGateway(CsDatabag):
     def process(self):
         is_master = self.cl.is_master()
         if self.cl.is_redundant() and not is_master:

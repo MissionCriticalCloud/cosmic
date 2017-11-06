@@ -28,7 +28,6 @@ if len(sys.argv) != 2:
 # FIXME we should get this location from a configuration class
 jsonPath = "/var/cache/cloud/%s"
 jsonCmdConfigPath = jsonPath % sys.argv[1]
-currentGuestNetConfig = "/etc/cosmic/router/guestnetwork.json"
 
 
 def finish_config():

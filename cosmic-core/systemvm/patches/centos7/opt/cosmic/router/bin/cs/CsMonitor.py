@@ -1,10 +1,10 @@
 from CsFile import CsFile
-from cs.CsDatabag import CsDataBag
+from cs.CsDatabag import CsDatabag
 
 MON_CONFIG = "/etc/monitor.conf"
 
 
-class CsMonitor(CsDataBag):
+class CsMonitor(CsDatabag):
     """ Manage dhcp entries """
 
     def process(self):

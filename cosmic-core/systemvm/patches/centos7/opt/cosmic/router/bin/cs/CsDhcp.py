@@ -3,7 +3,7 @@ import logging
 from netaddr import *
 
 import CsHelper
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 from CsGuestNetwork import CsGuestNetwork
 from cs.CsFile import CsFile
 
@@ -13,7 +13,7 @@ DHCP_OPTS = "/etc/dhcpopts.txt"
 CLOUD_CONF = "/etc/dnsmasq.d/cloud.conf"
 
 
-class CsDhcp(CsDataBag):
+class CsDhcp(CsDatabag):
     """ Manage dhcp entries """
 
     def process(self):

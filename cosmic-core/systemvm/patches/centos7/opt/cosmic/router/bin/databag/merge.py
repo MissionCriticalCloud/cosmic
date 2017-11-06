@@ -11,12 +11,9 @@ import cs_cmdline
 import cs_dhcp
 import cs_firewallrules
 import cs_forwardingrules
-import cs_guestnetwork
-import cs_ip
 import cs_loadbalancer
 import cs_monitorservice
 import cs_network_acl
-import cs_privategateway
 import cs_public_ip_acl
 import cs_remoteaccessvpn
 import cs_site2sitevpn
@@ -84,12 +81,10 @@ class updateDataBag:
         self.db.load()
         logging.info("Command of type %s received", self.qFile.type)
 
-        if self.qFile.type == 'ips':
-            dbag = self.process_ip(self.db.getDataBag())
-        elif self.qFile.type == 'guestnetwork':
-            dbag = self.process_guestnetwork(self.db.getDataBag())
-        elif self.qFile.type == 'cmdline':
+        if self.qFile.type == 'cmdline':
             dbag = self.processCL(self.db.getDataBag())
+        elif self.qFile.type == 'network':
+            dbag = self.db.getDataBag()
         elif self.qFile.type == 'networkacl':
             dbag = self.process_network_acl(self.db.getDataBag())
         elif self.qFile.type == 'publicipacl':
@@ -114,138 +109,12 @@ class updateDataBag:
             dbag = self.process_vpnusers(self.db.getDataBag())
         elif self.qFile.type == 'staticroutes':
             dbag = self.process_staticroutes(self.db.getDataBag())
-        elif self.qFile.type == 'ipaliases':
-            self.db.setKey('ips')
-            self.db.load()
-            dbag = self.process_ipaliases(self.db.getDataBag())
-        elif self.qFile.type == 'dhcpconfig':
-            logging.error("I don't think I need %s anymore", self.qFile.type)
-            return
-        elif self.qFile.type == 'privategateway':
-            dbag = self.process_privategateway(self.db.getDataBag())
         elif self.qFile.type == 'virtualrouter':
             dbag = self.process_virtualrouter(self.db.getDataBag())
         else:
             logging.error("Error I do not know what to do with file of type %s", self.qFile.type)
             return
         self.db.save(dbag)
-
-    def process_guestnetwork(self, dbag):
-        d = self.update_dbag_contents()
-        self.save_ip_dbag(d['d_ip_to_save'])
-        return cs_guestnetwork.merge(dbag, d['d_to_merge'])
-
-    def process_privategateway(self, dbag):
-        d = self.update_dbag_contents()
-        self.save_ip_dbag(d['d_ip_to_save'])
-        return cs_privategateway.merge(dbag, d['d_to_merge'])
-
-        # Networks of type Guest and Private are stored in their own json but in order for interfaces to work properly these need to be
-        # stored in ips.json as well.
-
-    def save_ip_dbag(self, dbag):
-        qf = QueueFile()
-        qf.load({ 'ip_address': [dbag], 'type': 'ips' })
-
-    # Based on mac address, find the device we should use
-    def get_device_from_mac_address(self):
-        d_to_merge = self.qFile.data
-
-        mac_address_to_find_device_for = self.get_macaddress_from_databag(d_to_merge)
-        if not mac_address_to_find_device_for:
-            message = "Unable to get device from mac_address because we couldn't locate the mac_address in the json (need 'mac_address' property."
-            logging.error(message)
-            print message
-            sys.exit(1)
-
-        device_name = csHelper.get_device_from_mac_address(mac_address_to_find_device_for)
-        if not device_name:
-            message = "Unable to get device from mac_address because we couldn't find mac_address %s on the router" % mac_address_to_find_device_for
-            logging.error(message)
-            print message
-            sys.exit(1)
-
-        # Use the device we found from now on
-        d_to_merge['device'] = device_name
-        logging.info("From device %s from mac_address %s" % (device_name, mac_address_to_find_device_for))
-        return d_to_merge
-
-    @staticmethod
-    def get_macaddress_from_databag(d_to_merge):
-        # Find mac address
-        if 'mac_address' in d_to_merge:
-            return d_to_merge['mac_address']
-        logging.warning("Unable to get mac_address from json (need 'mac_address' property.")
-        return False
-
-    def update_dbag_contents(self):
-        # Databag to save to guest_networks.json
-        d_to_merge = self.get_device_from_mac_address()
-        # Databag to save to ips.json
-        d_ip_to_save = {}
-
-        # Mac address
-        d_ip_to_save['mac_address'] = d_to_merge['mac_address']
-
-        # device and device id
-        d_ip_to_save['device'] = d_to_merge['device']
-        d_to_merge['nic_dev_id'] = d_to_merge['device'].replace("eth", "")
-        d_ip_to_save['nic_dev_id'] = d_to_merge['nic_dev_id']
-
-        # public_ip
-        if 'router_guest_ip' in d_to_merge:
-            d_ip_to_save['public_ip'] = d_to_merge['router_guest_ip']
-        elif 'type' in d_to_merge and d_to_merge['type'] == "guestnetwork":
-            d_to_merge['public_ip'] = d_to_merge['ip_address']
-            d_ip_to_save['public_ip'] = d_to_merge['ip_address']
-        else:
-            d_ip_to_save['ip_address'] = d_to_merge['ip_address']
-
-        # netmask
-        if 'router_guest_netmask' in d_to_merge:
-            d_to_merge['netmask'] = d_to_merge['router_guest_netmask']
-            d_ip_to_save['netmask'] = d_to_merge['router_guest_netmask']
-        else:
-            d_to_merge['netmask'] = d_to_merge['netmask']
-            d_ip_to_save['netmask'] = d_to_merge['netmask']
-
-        # sourcenat
-        if 'source_nat' in d_to_merge:
-            d_ip_to_save['source_nat'] = d_to_merge['source_nat']
-        else:
-            d_ip_to_save['source_nat'] = False
-
-        # one-to-one nat
-        if 'one_to_one_nat' in d_to_merge:
-            d_to_merge['one_to_one_nat'] = d_to_merge['one_to_one_nat']
-        else:
-            d_ip_to_save['one_to_one_nat'] = False
-
-        # gateway
-        if 'router_guest_gateway' in d_to_merge:
-            d_to_merge['gateway'] = d_to_merge['router_guest_gateway']
-            d_ip_to_save['gateway'] = d_to_merge['router_guest_gateway']
-        elif 'gateway' in d_to_merge:
-            d_to_merge['gateway'] = d_to_merge['gateway']
-            d_ip_to_save['gateway'] = d_to_merge['gateway']
-        elif 'type' in d_to_merge and d_to_merge['type'] == "guestnetwork":
-            d_to_merge['gateway'] = ''
-            d_ip_to_save['gateway'] = ''
-
-        # Network type
-        if d_to_merge['type'] == "guestnetwork":
-            d_ip_to_save['nw_type'] = 'guest'
-        elif 'type' in d_to_merge:
-            d_ip_to_save['nw_type'] = d_to_merge['type']
-
-        # Set default domain
-        if 'domain_name' not in d_to_merge.keys() or d_to_merge['domain_name'] == '':
-            d_to_merge['domain_name'] = "cloudnine.internal"
-
-        # Pass the add boolean
-        d_ip_to_save['add'] = d_to_merge['add']
-
-        return { 'd_ip_to_save': d_ip_to_save, 'd_to_merge': d_to_merge }
 
     def process_dhcp_entry(self, dbag):
         return cs_dhcp.merge(dbag, self.qFile.data)
@@ -285,21 +154,6 @@ class updateDataBag:
 
     def process_virtualrouter(self, dbag):
         return cs_virtualrouter.merge(dbag, self.qFile.data)
-
-    def process_ip(self, dbag):
-        for ip in self.qFile.data["ip_address"]:
-            # Find the right device we should use to configure the ip address
-            device_name = csHelper.get_device_from_mac_address(ip['mac_address'])
-            if not device_name:
-                log_message = "Cannot find device while looking for %s. Ignoring for now, it may arrive later.." \
-                              % ip['mac_address']
-                logging.warning(log_message)
-                print("Warning! " + log_message)
-
-            ip['device'] = device_name
-            ip['nic_dev_id'] = device_name.replace("eth", "")
-            dbag = cs_ip.merge(dbag, ip)
-        return dbag
 
     def processCL(self, dbag):
         # Convert the ip stuff to an ip object and pass that into cs_ip_merge
@@ -343,31 +197,6 @@ class updateDataBag:
     def processVmData(self, dbag):
         cs_vmdata.merge(dbag, self.qFile.data)
         return dbag
-
-    def process_ipaliases(self, dbag):
-        nic_dev = None
-
-        for interface, data in dbag.items():
-            if interface == 'id':
-                continue
-            elif any([net['nw_type'] == 'guest' for net in data]):
-                nic_dev = interface
-                break
-        assert nic_dev is not None, 'Unable to determine Guest interface'
-
-        nic_dev_id = nic_dev[3:]
-
-        for alias in self.qFile.data['aliases']:
-            ip = {
-                'add': not alias['revoke'],
-                'nw_type': 'guest',
-                'public_ip': alias['ip_address'],
-                'netmask': alias['netmask'],
-                'nic_dev_id': nic_dev_id
-            }
-            dbag = cs_ip.merge(dbag, ip)
-        return dbag
-
 
 class QueueFile:
     fileName = ''

@@ -5,8 +5,9 @@ import re
 import sys
 from collections import OrderedDict
 
+from CsNetwork import CsNetwork
 from cs.CsConfig import CsConfig
-from cs.CsDatabag import CsDataBag
+from cs.CsDatabag import CsDatabag
 from cs.CsDhcp import CsDhcp
 from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMetadataService import CsMetadataServiceVMConfig
@@ -20,7 +21,7 @@ from cs.CsVrConfig import CsVrConfig
 OCCURRENCES = 1
 
 
-class CsAcl(CsDataBag):
+class CsAcl(CsDatabag):
     """
         Deal with Network acls
     """
@@ -262,7 +263,7 @@ class CsAcl(CsDataBag):
                 self.AclIP(self.dbag[item], self.config).create()
 
 
-class CsSite2SiteVpn(CsDataBag):
+class CsSite2SiteVpn(CsDatabag):
     """
     Setup any configured vpns (using strongswan)
     left is the local machine
@@ -403,7 +404,7 @@ class CsSite2SiteVpn(CsDataBag):
         return "%sh" % hrs
 
 
-class CsVpnUser(CsDataBag):
+class CsVpnUser(CsDatabag):
     PPP_CHAP = '/etc/ppp/chap-secrets'
 
     def process(self):
@@ -464,7 +465,7 @@ class CsVpnUser(CsDataBag):
                             CsHelper.execute('kill -9 %s' % pid)
 
 
-class CsRemoteAccessVpn(CsDataBag):
+class CsRemoteAccessVpn(CsDatabag):
     VPNCONFDIR = "/etc/strongswan/ipsec.d"
 
     def process(self):
@@ -579,7 +580,7 @@ class CsRemoteAccessVpn(CsDataBag):
         self.fw.append(["mangle", "", "-I PREROUTING  -d %s -j VPN_%s " % (publicip, publicip)])
 
 
-class CsForwardingRules(CsDataBag):
+class CsForwardingRules(CsDatabag):
     def process(self):
         for public_ip in self.dbag:
             if public_ip == "id":
@@ -812,6 +813,8 @@ class IpTablesExecutor:
 def main(argv):
     # The file we are currently processing, if it is "cmd_line.json" everything will be processed.
     process_file = argv[1]
+    logging.debug("Processing file %s" % process_file)
+    process_file = process_file.split('.')[0]
 
     if process_file is None:
         logging.debug("No file was received, do not go on processing the other actions. Just leave for now.")
@@ -822,33 +825,33 @@ def main(argv):
 
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
-    # Load stored ip addresses from disk to CsConfig()
-    config.set_address()
+    databag_map = OrderedDict(
+        [
+            ("network.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("vm_metadata.json", {"process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config)}),
+            ("network_acl.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("public_ip_acl.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("firewall_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("forwarding_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("staticnat_rules.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("site_2_site_vpn.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("remote_access_vpn.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("vpn_user_list.json", {"process_iptables": False, "executor": CsVpnUser("vpnuserlist", config)}),
+            ("vm_dhcp_entry.json", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
+            ("dhcp.json", {"process_iptables": False, "executor": CsDhcp("dhcpentry", config)}),
+            ("load_balancer.json", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("monitor_service.json", {"process_iptables": False, "executor": CsMonitor("monitorservice", config)}),
+            ("static_routes.json", {"process_iptables": False, "executor": CsStaticRoutes("staticroutes", config)}),
+            ("vr.json", {"process_iptables": True, "executor": IpTablesExecutor(config)})
+        ]
+    )
 
-    logging.debug("Configuring ip addresses")
-    config.address().compare()
-    config.address().process()
+    if process_file == "network.json":
+        logging.debug("Processing file %s" % process_file)
+        cs_network = CsNetwork(process_file)
+        cs_network.sync()
 
-    databag_map = OrderedDict([("guest_network.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("vm_metadata.json", { "process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config) }),
-                               ("network_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("public_ip_acl.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("firewall_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("forwarding_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("staticnat_rules.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("site_2_site_vpn.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("remote_access_vpn.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("vpn_user_list.json", { "process_iptables": False, "executor": CsVpnUser("vpnuserlist", config) }),
-                               ("vm_dhcp_entry.json", { "process_iptables": False, "executor": CsDhcp("dhcpentry", config) }),
-                               ("dhcp.json", { "process_iptables": False, "executor": CsDhcp("dhcpentry", config) }),
-                               ("load_balancer.json", { "process_iptables": True, "executor": IpTablesExecutor(config) }),
-                               ("monitor_service.json", { "process_iptables": False, "executor": CsMonitor("monitorservice", config) }),
-                               ("static_routes.json", { "process_iptables": False, "executor": CsStaticRoutes("staticroutes", config) }),
-                               ("private_gateway.json", { "process_iptables": True, "executor": CsPrivateGateway("privategateway", config) }),
-                               ("vr.json", { "process_iptables": True, "executor": IpTablesExecutor(config) })
-                               ])
-
-    if process_file.count("cmd_line.json") == OCCURRENCES:
+    if process_file == "cmd_line.json":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")
 
         while databag_map:

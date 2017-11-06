@@ -4,11 +4,11 @@
 
 import sys
 
-from CsDatabag import CsDataBag
+from CsDatabag import CsDatabag
 from CsRedundant import *
 
 
-class CsStaticRoutes(CsDataBag):
+class CsStaticRoutes(CsDatabag):
     def process(self):
         is_master = self.cl.is_master()
         if self.cl.is_redundant() and not is_master:
