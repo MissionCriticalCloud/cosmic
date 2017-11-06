@@ -27,7 +27,7 @@ class DataBag:
     DPATH = "/etc/cosmic/router"
 
     def __init__(self):
-        self.bdata = { }
+        self.bdata = {}
 
     def load(self):
         data = self.bdata
@@ -38,7 +38,7 @@ class DataBag:
             handle = open(self.fpath)
         except IOError:
             logging.debug("Creating data bag type %s", self.key)
-            data.update({ "id": self.key })
+            data.update({"id": self.key})
         else:
             logging.debug("Loading data bag type %s", self.key)
             data = json.load(handle)
@@ -69,7 +69,7 @@ class updateDataBag:
     def __init__(self, qFile):
         self.qFile = qFile
         self.fpath = ''
-        self.bdata = { }
+        self.bdata = {}
         self.process()
 
     def process(self):
@@ -84,7 +84,7 @@ class updateDataBag:
         if self.qFile.type == 'cmdline':
             dbag = self.processCL(self.db.getDataBag())
         elif self.qFile.type == 'network':
-            dbag = self.db.getDataBag()
+            dbag = self.qFile.data
         elif self.qFile.type == 'networkacl':
             dbag = self.process_network_acl(self.db.getDataBag())
         elif self.qFile.type == 'publicipacl':
@@ -175,7 +175,7 @@ class updateDataBag:
         key = 'eth' + num + 'ip'
         if num == 0:
             key = "controlmac"
-        dp = { }
+        dp = {}
         if key in self.qFile.data['cmd_line']:
             dp['public_ip'] = self.qFile.data['cmd_line'][key]
             dp['netmask'] = self.qFile.data['cmd_line']['eth' + num + 'mask']
@@ -192,18 +192,20 @@ class updateDataBag:
                     dp['gateway'] = 'None'
             dp['nw_type'] = nw_type
             qf = QueueFile()
-            qf.load({ 'ip_address': [dp], 'type': 'ips' })
+            qf.load({'ip_address': [dp], 'type': 'ips'})
 
     def processVmData(self, dbag):
         cs_vmdata.merge(dbag, self.qFile.data)
         return dbag
 
+
 class QueueFile:
     fileName = ''
+    type = ''
     configCache = "/var/cache/cloud"
     keep = True
     do_merge = True
-    data = { }
+    data = {}
 
     def update_databag(self):
         if self.do_merge:
@@ -222,19 +224,24 @@ class QueueFile:
         try:
             handle = open(filename)
         except IOError as exception:
-            error_message = ("Exception occurred with the following exception error '{error}'. Could not open '{file}'. "
-                             "It seems that the file has already been moved.".format(error=exception, file=filename))
+            error_message = (
+            "Exception occurred with the following exception error '{error}'. Could not open '{file}'. "
+            "It seems that the file has already been moved.".format(error=exception, file=filename))
             logging.error(error_message)
         else:
             logging.info("Continuing with the processing of file '{file}'".format(file=filename))
 
             self.data = json.load(handle)
-            self.type = self.data["type"]
+            if 'type' in self.data:
+                self.type = self.data["type"]
+            else:
+                self.type = self.fileName.split('.')[0]
             handle.close()
             if self.keep:
                 self.__moveFile(filename, self.configCache + "/processed")
             else:
                 os.remove(filename)
+
             self.update_databag()
 
     def setFile(self, name):
