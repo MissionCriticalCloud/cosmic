@@ -5,7 +5,7 @@ import re
 import sys
 from collections import OrderedDict
 
-from CsNetwork import CsNetwork
+from cs.CsNetwork import CsNetwork
 from cs.CsConfig import CsConfig
 from cs.CsDatabag import CsDatabag
 from cs.CsDhcp import CsDhcp
