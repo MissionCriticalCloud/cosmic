@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRule;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRules;
 
@@ -32,7 +31,7 @@ public class SetPortForwardingRulesConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.FORWARDING_RULES_CONFIG;
 
         return super.generateConfigItems(configuration);

@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddress;
 import com.cloud.agent.resource.virtualnetwork.model.IpAssociation;
 
@@ -33,7 +32,7 @@ public class IpAssociationConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.IP_ASSOCIATION_CONFIG;
 
         return super.generateConfigItems(configuration);

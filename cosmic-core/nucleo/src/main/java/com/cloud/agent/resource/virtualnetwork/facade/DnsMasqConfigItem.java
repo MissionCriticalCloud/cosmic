@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.DhcpTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.DhcpConfig;
 import com.cloud.agent.resource.virtualnetwork.model.DhcpConfigEntry;
 
@@ -29,7 +28,7 @@ public class DnsMasqConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.DHCP_CONFIG;
 
         return super.generateConfigItems(configuration);

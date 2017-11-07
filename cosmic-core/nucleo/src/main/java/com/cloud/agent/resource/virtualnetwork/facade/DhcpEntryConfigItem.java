@@ -4,7 +4,6 @@ import com.cloud.agent.api.routing.DhcpEntryCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.VmDhcpConfig;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class DhcpEntryConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.VM_DHCP_CONFIG;
 
         return super.generateConfigItems(configuration);

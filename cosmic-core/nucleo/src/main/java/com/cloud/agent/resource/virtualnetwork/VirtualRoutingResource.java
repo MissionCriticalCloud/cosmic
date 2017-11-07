@@ -306,7 +306,6 @@ public class VirtualRoutingResource {
         s_logger.debug("Transforming " + cmd.getClass().getCanonicalName() + " to ConfigItems");
 
         final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(cmd.getClass());
-
         return configItemFacade.generateConfig(cmd);
     }
 

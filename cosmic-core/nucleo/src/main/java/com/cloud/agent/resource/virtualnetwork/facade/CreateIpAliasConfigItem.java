@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddressAlias;
 import com.cloud.agent.resource.virtualnetwork.model.IpAliases;
 
@@ -30,7 +29,7 @@ public class CreateIpAliasConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.IP_ALIAS_CONFIG;
 
         return super.generateConfigItems(configuration);

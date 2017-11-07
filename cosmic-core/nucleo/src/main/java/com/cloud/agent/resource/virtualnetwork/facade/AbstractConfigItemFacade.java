@@ -29,7 +29,6 @@ import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.Hashtable;
@@ -73,7 +72,7 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
         flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem());
-        flyweight.put(SetupGuestNetworkCommand.class, new SetGuestNetworkConfigItem());
+        flyweight.put(SetupGuestNetworkCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetupPrivateGatewayCommand.class, new SetPrivateGatewayConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem());
@@ -93,7 +92,7 @@ public abstract class AbstractConfigItemFacade {
         return flyweight.get(key);
     }
 
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         final List<ConfigItem> cfg = new LinkedList<>();
 
         final String remoteFilename = appendUuidToJsonFiles(destinationFile);
