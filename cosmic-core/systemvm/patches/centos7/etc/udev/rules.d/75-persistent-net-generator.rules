@@ -1,2 +1,2 @@
 # Bring up any new plugged interface
-ACTION=="add", SUBSYSTEM=="net",  RUN+="/sbin/ifconfig '%k' up"
+ACTION=="add", SUBSYSTEM=="net",  RUN+="/usr/sbin/ip link set dev '%k' up"
