@@ -776,8 +776,6 @@ class IpTablesExecutor:
         self.config = config
 
     def process(self):
-        # TODO fixme
-        return
         acls = CsAcl('networkacl', self.config)
         acls.process()
 
