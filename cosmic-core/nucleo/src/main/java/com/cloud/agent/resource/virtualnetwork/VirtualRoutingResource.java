@@ -307,7 +307,10 @@ public class VirtualRoutingResource {
 
         final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(cmd.getClass());
 
-        return configItemFacade.generateConfig(cmd);
+        final List<ConfigItem> configItems = new ArrayList<>();
+        configItems.addAll(configItemFacade.generateConfig(cmd));
+        configItems.addAll(configItemFacade.generateNetworkOverviewConfig(cmd));
+        return configItems;
     }
 
     private Answer execute(final AggregationControlCommand cmd) {

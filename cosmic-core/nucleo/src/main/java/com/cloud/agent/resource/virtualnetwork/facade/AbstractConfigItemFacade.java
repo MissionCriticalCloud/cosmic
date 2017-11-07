@@ -122,4 +122,23 @@ public abstract class AbstractConfigItemFacade {
     }
 
     public abstract List<ConfigItem> generateConfig(NetworkElementCommand cmd);
+
+    public List<ConfigItem> generateNetworkOverviewConfig(final NetworkElementCommand cmd) {
+        final List<ConfigItem> networkOverviewConfig = new LinkedList<>();
+
+        if (cmd.getNetworkOverview() == null) {
+            return networkOverviewConfig;
+        }
+
+        final String fileName = appendUuidToJsonFiles(VRScripts.NETWORK_OVERVIEW_CONFIG);
+        final String fileContents = gson.toJson(cmd.getNetworkOverview());
+
+        final ConfigItem networkOverviewConfigFile = new FileConfigItem(VRScripts.CONFIG_PERSIST_LOCATION, fileName, fileContents);
+        networkOverviewConfig.add(networkOverviewConfigFile);
+
+        final ConfigItem updateConfigCommand = new ScriptConfigItem(VRScripts.UPDATE_CONFIG, fileName);
+        networkOverviewConfig.add(updateConfigCommand);
+
+        return networkOverviewConfig;
+    }
 }

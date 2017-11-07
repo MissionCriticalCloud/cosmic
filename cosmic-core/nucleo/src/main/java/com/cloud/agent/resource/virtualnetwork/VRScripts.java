@@ -22,6 +22,7 @@ public class VRScripts {
     public static final String IP_ALIAS_CONFIG = "ip_aliases.json";
     public static final String LOAD_BALANCER_CONFIG = "load_balancer.json";
     public static final String VR_CONFIG = "vr.json";
+    public static final String NETWORK_OVERVIEW_CONFIG = "network_overview.json";
 
     public final static String CONFIG_CACHE_LOCATION = "/var/cache/cloud/";
     public final static int DEFAULT_EXECUTEINVR_TIMEOUT = 120; //Seconds
