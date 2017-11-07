@@ -1,43 +1,123 @@
 import logging
+
+
 from jinja2 import Environment, FileSystemLoader
+import socket
+import utils
 
 
 class CsKeepalived(object):
     def __init__(self, dbag):
         self.dbag = dbag
 
-        self.filenames = []
-        self.jinja_env = Environment(loader=FileSystemLoader('/opt/cosmic/router/bin/cs/templates'))
-
+        self.jinja_env = Environment(
+            loader=FileSystemLoader('/opt/cosmic/router/bin/cs/templates'),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
+        # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
         self.keepalived_config_path = '/etc/keepalived/conf.d/'
+        # self.keepalived_config_path = '/tmp/keep/'
+
+        self.sync_group_name = 'cosmic'
+
+        self.filenames = []
+        self.vrrp_instances = []
+
+        self.vrrp_excluded_interface_types = ['sync', 'other']
 
     def sync(self):
         self.write_global_defs()
+        self.parse_vrrp_instances()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
 
     def write_global_defs(self):
         content = self.jinja_env.get_template('keepalived_global_defs.conf').render(
-            router_id="hostname_todo"
+            router_id=socket.gethostname()
         )
 
         self.write_keepalived_config('global_defs.conf', content)
 
-    def write_sync_group(self):
-        content = self.jinja_env.get_template('keepalived_sync_group.conf').render(
-            sync_group_name="test_sync_group_name",
-            vrrp_instances=["instance1", "instance2"]
+    def parse_vrrp_instances(self):
+        sync_interface_name = self.get_sync_interface_name()
+
+        for interface in self.dbag['interfaces']:
+            # Skip the certain networks
+            if interface['metadata']['type'] in self.vrrp_excluded_interface_types:
+                continue
+
+            interface_name = utils.get_interface_name_from_mac_address(interface['macaddress'])
+            interface_id = utils.get_interface_id_from_mac_address(interface['macaddress'])
+
+            if interface_name is None or interface_id is None:
+                continue
+
+            name = '%s_%s' % (interface['metadata']['type'], interface_name)
+
+            ipv4addresses = []
+            for i in interface['ipv4addresses']:
+                ipv4addresses.append('%s dev %s' % (i, interface_name))
+
+            self.write_vrrp_instance(
+                name=name,
+                state='BACKUP',
+                interface=sync_interface_name,
+                virtual_router_id=interface_id,
+                advert_int='1',
+                virtual_ipaddress=['fe80:1::%s' % interface_id],
+                virtual_ipaddress_excluded=ipv4addresses
+            )
+
+    def write_vrrp_instance(
+            self,
+            name,
+            state,
+            interface,
+            virtual_router_id,
+            advert_int,
+            virtual_ipaddress=None,
+            virtual_ipaddress_excluded=None,
+            virtual_routes=None
+    ):
+        content = self.jinja_env.get_template('keepalived_vrrp_instance.conf').render(
+            name=name,
+            state=state,
+            interface=interface,
+            virtual_router_id=virtual_router_id,
+            advert_int=advert_int,
+            virtual_ipaddress=virtual_ipaddress,
+            virtual_ipaddress_excluded=virtual_ipaddress_excluded,
+            virtual_routes=virtual_routes
         )
 
-        logging.debug(content)
-        self.write_keepalived_config('sync_group.conf', content)
+        self.vrrp_instances.append(name)
+
+        filename = 'keepalived_vrrp_instance__%s__.conf' % name
+
+        self.write_keepalived_config(filename, content)
+
+    def write_sync_group(self):
+        content = self.jinja_env.get_template('keepalived_sync_group.conf').render(
+            sync_group_name=self.sync_group_name,
+            vrrp_instances=self.vrrp_instances,
+        )
+
+        filename = 'keepalived_sync_group__%s__.conf' % self.sync_group_name
+
+        self.write_keepalived_config(filename, content)
 
     def write_keepalived_config(self, filename, content):
         self.filenames.append(filename)
 
         with open(self.keepalived_config_path + filename, 'w') as f:
             f.write(content)
+
+    def get_sync_interface_name(self):
+        for interface in self.dbag['interfaces']:
+            if interface['metadata']['type'] == 'sync':
+                return utils.get_interface_name_from_mac_address(interface['macaddress'])
 
     def zap_keepalived_config_directory(self):
         # TODO list files in self.keepalived_config_path, exclude the ones in self.filenames and remove them!
