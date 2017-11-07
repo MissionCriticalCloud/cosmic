@@ -17,7 +17,8 @@ class Utils:
         self.setup_hostname()
         self.setup_dns()
         self.setup_private_nic()
-        self.setup_sync_nic()
+        if "type" in self.cmdline and self.cmdline['type'] == "router":
+            self.setup_sync_nic()
         self.setup_ssh()
         self.setup_banner()
         self.setup_default_gw()
