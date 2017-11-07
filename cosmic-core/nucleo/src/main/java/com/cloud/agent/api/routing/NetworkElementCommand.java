@@ -1,8 +1,10 @@
 package com.cloud.agent.api.routing;
 
 import com.cloud.agent.api.Command;
+import com.cloud.agent.api.to.NetworkOverviewTO;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class NetworkElementCommand extends Command {
     public static final String ACCOUNT_ID = "account.id";
@@ -17,8 +19,9 @@ public abstract class NetworkElementCommand extends Command {
     public static final String VPC_PRIVATE_GATEWAY = "vpc.gateway.private";
     public static final String FIREWALL_EGRESS_DEFAULT = "firewall.egress.default";
     public static final String ROUTER_MONITORING_ENABLE = "router.monitor.enable";
-    HashMap<String, String> accessDetails = new HashMap<>(0);
+    private Map<String, String> accessDetails = new HashMap<>(0);
     private String routerAccessIp;
+    private NetworkOverviewTO networkOverview;
 
     protected NetworkElementCommand() {
         super();
@@ -51,5 +54,13 @@ public abstract class NetworkElementCommand extends Command {
 
     public boolean isQuery() {
         return false;
+    }
+
+    public NetworkOverviewTO getNetworkOverview() {
+        return networkOverview;
+    }
+
+    public void setNetworkOverview(final NetworkOverviewTO networkOverview) {
+        this.networkOverview = networkOverview;
     }
 }
