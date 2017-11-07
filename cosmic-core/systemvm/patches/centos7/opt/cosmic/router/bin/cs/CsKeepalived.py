@@ -28,11 +28,29 @@ class CsKeepalived(object):
 
     def sync(self):
         logging.info("Going to sync configuration for keepalived")
+        self.init_config()
         self.write_global_defs()
         self.parse_vrrp_instances()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
+
+    def init_config(self):
+        if not os.path.exists(self.keepalived_config_path):
+            os.makedirs(self.keepalived_config_path)
+
+        self.write_keepalived_conf()
+
+    def write_keepalived_conf(self):
+        filepath = '/etc/keepalived/keepalived.conf'
+        content = 'include /etc/keepalived/conf.d/*.conf'
+
+        logging.debug("Writing keepalived config file %s with content \n%s" % (
+            self.keepalived_config_path + filepath, content
+        ))
+
+        with open(self.keepalived_config_path + filepath, 'w') as f:
+            f.write(content)
 
     def write_global_defs(self):
         content = self.jinja_env.get_template('keepalived_global_defs.conf').render(
