@@ -160,6 +160,11 @@ class CsKeepalived(object):
         logging.debug("Reloading keepalived with new config")
 
         try:
+            subprocess.call(['systemctl', 'start', 'keepalived'])
+        except Exception as e:
+            logging.error("Failed to start keepalived with error: %s" % e)
+
+        try:
             subprocess.call(['systemctl', 'reload', 'keepalived'])
         except Exception as e:
             logging.error("Failed to reload keepalived with error: %s" % e)
