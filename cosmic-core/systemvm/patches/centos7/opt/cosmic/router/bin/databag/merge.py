@@ -4,9 +4,8 @@ import logging
 import os
 import shutil
 import uuid
-import sys
 
-import cs.CsHelper as csHelper
+import cs.utils as utils
 import cs_cmdline
 import cs_dhcp
 import cs_firewallrules
@@ -86,9 +85,7 @@ class updateDataBag:
         elif self.qFile.type == 'network_overview':
             dbag = self.qFile.data
         elif self.qFile.type == 'networkacl':
-            # TODO fixme
-            # dbag = self.process_network_acl(self.db.getDataBag())
-            dbag = None
+            dbag = self.process_network_acl(self.db.getDataBag())
         elif self.qFile.type == 'publicipacl':
             dbag = self.process_public_ip_acl(self.db.getDataBag())
         elif self.qFile.type == 'firewallrules':
@@ -131,11 +128,11 @@ class updateDataBag:
         return cs_vpnusers.merge(dbag, self.qFile.data)
 
     def process_network_acl(self, dbag):
-        d_to_merge = self.get_device_from_mac_address()
+        d_to_merge = self.validate_device_based_on_mac_address()
         return cs_network_acl.merge(dbag, d_to_merge)
 
     def process_public_ip_acl(self, dbag):
-        d_to_merge = self.get_device_from_mac_address()
+        d_to_merge = self.validate_device_based_on_mac_address()
         return cs_public_ip_acl.merge(dbag, d_to_merge)
 
     def process_firewallrules(self, dbag):
@@ -199,6 +196,19 @@ class updateDataBag:
     def processVmData(self, dbag):
         cs_vmdata.merge(dbag, self.qFile.data)
         return dbag
+
+    def validate_device_based_on_mac_address(self):
+        d_to_merge = self.qFile.data
+
+        if 'mac_address' not in d_to_merge:
+            return d_to_merge
+
+        device_name = utils.get_interface_name_from_mac_address(d_to_merge['mac_address'])
+
+        if device_name:
+            d_to_merge['device'] = device_name
+
+        return d_to_merge
 
 
 class QueueFile:
