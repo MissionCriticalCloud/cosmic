@@ -52,6 +52,8 @@ class CsRedundant(object):
         self.config = config
 
     def set(self):
+        return
+
         logging.debug("Router redundancy status is %s", self.cl.is_redundant())
         if self.cl.is_redundant():
             self._redundant_on()
@@ -59,6 +61,8 @@ class CsRedundant(object):
             self._redundant_off()
 
     def _redundant_off(self):
+        return
+
         CsHelper.service("conntrackd", "stop")
         CsHelper.service("keepalived", "stop")
         CsHelper.umount_tmpfs(self.CS_RAMDISK_DIR)
@@ -67,6 +71,8 @@ class CsRedundant(object):
         CsHelper.rm(self.KEEPALIVED_CONF)
 
     def _redundant_on(self):
+        return
+
         guest = self.address.get_guest_if()
 
         # No redundancy if there is no guest network
@@ -159,12 +165,14 @@ class CsRedundant(object):
             CsHelper.service("keepalived", "restart")
 
     def release_lock(self):
+        return
         try:
             os.remove("/tmp/master_lock")
         except OSError:
             pass
 
     def set_lock(self):
+        return
         """
         Make sure that master state changes happen sequentially
         """
@@ -184,6 +192,7 @@ class CsRedundant(object):
                 sleep(time_between)
 
     def set_fault(self):
+        return
         """ Set fault mode on this router """
         if not self.cl.is_redundant():
             logging.error("Set fault called on non-redundant router")
@@ -216,6 +225,7 @@ class CsRedundant(object):
         CsHelper.reconfigure_interfaces(self.cl, interfaces)
 
     def set_backup(self):
+        return
         """ Set the current router to backup """
         if not self.cl.is_redundant():
             logging.error("Set backup called on non-redundant router")
@@ -254,6 +264,7 @@ class CsRedundant(object):
         logging.info("Router switched to backup mode")
 
     def set_master(self):
+        return
         """ Set the current router to master """
         if not self.cl.is_redundant():
             logging.error("Set master called on non-redundant router")
@@ -319,6 +330,7 @@ class CsRedundant(object):
         static_routes.process()
 
     def _collect_ignore_ips(self):
+        return
         """
         This returns a list of ip objects that should be ignored
         by conntrackd
@@ -331,6 +343,7 @@ class CsRedundant(object):
         return lines
 
     def _collect_ips(self):
+        return
         """
         Construct a list containing all the ips that need to be looked afer by vrrp
         This is based upon the address_needs_vrrp method in CsAddress which looks at
