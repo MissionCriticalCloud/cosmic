@@ -5,7 +5,6 @@
 import sys
 
 from CsDatabag import CsDatabag
-from CsRedundant import *
 
 
 class CsStaticRoutes(CsDatabag):

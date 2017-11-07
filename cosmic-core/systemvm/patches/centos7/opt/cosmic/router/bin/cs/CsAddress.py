@@ -580,7 +580,6 @@ class CsIP:
 
         cmdline = self.config.cmdline()
         # Start passwd server on non-redundant routers and on the master router of redundant pairs
-        # CsRedundant will handle fail-over.
         if self.get_type() in ["guest"] and (not self.cl.is_redundant() or self.cl.is_master()):
             CsPasswordService(self.address['public_ip']).start()
         elif self.get_type() in ["guest"]:

@@ -13,7 +13,6 @@ from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
-from cs.CsRedundant import *
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsVrConfig import CsVrConfig
 
@@ -879,10 +878,6 @@ def main(argv):
                     iptables_executor.process()
 
                 break
-
-    red = CsRedundant(config)
-    red.set()
-
 
 if __name__ == "__main__":
     main(sys.argv)
