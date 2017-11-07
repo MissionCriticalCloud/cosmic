@@ -17,7 +17,7 @@ class Utils:
         self.setup_hostname()
         self.setup_dns()
         self.setup_private_nic()
-        if "type" in self.cmdline and self.cmdline['type'] == "router":
+        if "type" in self.cmdline and self.cmdline['type'] not in ("secstorage", "consoleproxy"):
             self.setup_sync_nic()
         self.setup_ssh()
         self.setup_banner()
