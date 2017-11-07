@@ -1,5 +1,5 @@
 import logging
-
+import os, subprocess
 
 from jinja2 import Environment, FileSystemLoader
 import socket
@@ -27,6 +27,7 @@ class CsKeepalived(object):
         self.vrrp_excluded_interface_types = ['sync', 'other']
 
     def sync(self):
+        logging.info("Going to sync configuration for keepalived")
         self.write_global_defs()
         self.parse_vrrp_instances()
         self.write_sync_group()
@@ -111,6 +112,10 @@ class CsKeepalived(object):
     def write_keepalived_config(self, filename, content):
         self.filenames.append(filename)
 
+        logging.debug("Writing keepalived config file %s with content \n%s" % (
+            self.keepalived_config_path + filename, content
+        ))
+
         with open(self.keepalived_config_path + filename, 'w') as f:
             f.write(content)
 
@@ -120,9 +125,23 @@ class CsKeepalived(object):
                 return utils.get_interface_name_from_mac_address(interface['macaddress'])
 
     def zap_keepalived_config_directory(self):
-        # TODO list files in self.keepalived_config_path, exclude the ones in self.filenames and remove them!
-        pass
+        logging.debug("Zapping directory %s" % self.keepalived_config_path)
+        for file_name in os.listdir(self.keepalived_config_path):
+            if file_name in self.filenames:
+                continue
+
+            file_path = os.path.join(self.keepalived_config_path, file_name)
+            try:
+                if os.path.isfile(file_path):
+                    logging.debug("Removing file %s" % file_path)
+                    os.unlink(file_path)
+            except Exception as e:
+                logging.error("Failed to remove file: %s" % e)
 
     def reload_keepalived(self):
-        # TODO reload keepalived
-        pass
+        logging.debug("Reloading keepalived with new config")
+
+        try:
+            subprocess.call(['systemctl', 'reload', 'keepalived'])
+        except Exception as e:
+            logging.error("Failed to reload keepalived with error: %s" % e)

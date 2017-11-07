@@ -1,4 +1,5 @@
 import json
+import logging
 import unittest
 from cs.CsKeepalived import CsKeepalived
 
@@ -6,6 +7,8 @@ from cs.CsKeepalived import CsKeepalived
 class TestCsKeepalived(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestCsKeepalived, self).__init__(*args, **kwargs)
+
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
         self.dbag = json.loads('''
 {
