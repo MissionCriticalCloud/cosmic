@@ -67,8 +67,8 @@ class CsKeepalived(object):
             if interface['metadata']['type'] in self.vrrp_excluded_interface_types:
                 continue
 
-            interface_name = utils.get_interface_name_from_mac_address(interface['macaddress'])
-            interface_id = utils.get_interface_id_from_mac_address(interface['macaddress'])
+            interface_name = utils.get_interface_name_from_mac_address(interface['mac_address'])
+            interface_id = utils.get_interface_id_from_mac_address(interface['mac_address'])
 
             if interface_name is None or interface_id is None:
                 continue
@@ -76,7 +76,7 @@ class CsKeepalived(object):
             name = '%s_%s' % (interface['metadata']['type'], interface_name)
 
             ipv4addresses = []
-            for i in interface['ipv4addresses']:
+            for i in interface['ipv4_addresses']:
                 ipv4addresses.append('%s dev %s' % (i, interface_name))
 
             self.write_vrrp_instance(
@@ -140,7 +140,7 @@ class CsKeepalived(object):
     def get_sync_interface_name(self):
         for interface in self.dbag['interfaces']:
             if interface['metadata']['type'] == 'sync':
-                return utils.get_interface_name_from_mac_address(interface['macaddress'])
+                return utils.get_interface_name_from_mac_address(interface['mac_address'])
 
     def zap_keepalived_config_directory(self):
         logging.debug("Zapping directory %s" % self.keepalived_config_path)

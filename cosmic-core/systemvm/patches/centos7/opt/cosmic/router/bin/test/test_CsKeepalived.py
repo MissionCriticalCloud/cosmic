@@ -14,45 +14,45 @@ class TestCsKeepalived(unittest.TestCase):
 {
     "interfaces": [
         {
-            "ipv4addresses": [
+            "ipv4_addresses": [
                 "169.254.3.90/16"
             ],
-            "macaddress": "",
+            "mac_address": "",
             "metadata": {
                 "type": "other"
             }
         },
         {
-            "ipv4addresses": [],
-            "macaddress": "72:00:02:42:00:e0",
+            "ipv4_addresses": [],
+            "mac_address": "72:00:02:42:00:e0",
             "metadata": {
                 "type": "sync"
             }
         },
         {
-            "ipv4addresses": [
+            "ipv4_addresses": [
                 "100.64.0.4/24"
             ],
-            "macaddress": "06:51:d8:00:00:18",
+            "mac_address": "06:51:d8:00:00:18",
             "metadata": {
                 "type": "public"
             }
         },
         {
-            "ipv4addresses": [
+            "ipv4_addresses": [
                 "10.1.1.1/24"
             ],
-            "macaddress": "72:00:02:42:00:e1",
+            "mac_address": "72:00:02:42:00:e1",
             "metadata": {
                 "domain": "cs2cloud",
                 "type": "tier"
             }
         },
         {
-            "ipv4addresses": [
+            "ipv4_addresses": [
                 "10.1.2.1/24"
             ],
-            "macaddress": "02:00:01:c1:00:01",
+            "mac_address": "02:00:01:c1:00:01",
             "metadata": {
                 "domain": "cs2cloud",
                 "type": "tier"
