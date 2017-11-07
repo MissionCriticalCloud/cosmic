@@ -46,10 +46,10 @@ class CsKeepalived(object):
         content = 'include /etc/keepalived/conf.d/*.conf'
 
         logging.debug("Writing keepalived config file %s with content \n%s" % (
-            self.keepalived_config_path + filepath, content
+            filepath, content
         ))
 
-        with open(self.keepalived_config_path + filepath, 'w') as f:
+        with open(filepath, 'w') as f:
             f.write(content)
 
     def write_global_defs(self):
