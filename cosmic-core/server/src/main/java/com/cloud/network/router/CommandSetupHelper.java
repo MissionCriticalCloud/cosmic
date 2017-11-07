@@ -30,6 +30,9 @@ import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
+import com.cloud.agent.api.to.NetworkOverviewTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
@@ -45,10 +48,12 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
@@ -56,6 +61,7 @@ import com.cloud.network.VpnUser;
 import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
+import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
@@ -89,6 +95,7 @@ import com.cloud.uservm.UserVm;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
+import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
@@ -112,6 +119,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1008,7 +1016,7 @@ public class CommandSetupHelper {
         cmds.addCommand("SetupPrivateGatewayCommand", cmd);
     }
 
-    public SetupGuestNetworkCommand createSetupGuestNetworkCommand(final DomainRouterVO router, final boolean add, final NicProfile guestNic) {
+    public SetupGuestNetworkCommand createSetupGuestNetworkCommand(final VirtualRouter router, final boolean add, final NicProfile guestNic) {
         final Network network = _networkModel.getNetwork(guestNic.getNetworkId());
 
         String networkDns1 = null;
@@ -1030,8 +1038,18 @@ public class CommandSetupHelper {
 
         final NicProfile nicProfile = _networkModel.getNicProfile(router, nic.getNetworkId(), null);
 
-        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(dhcpRange, networkDomain, router.getIsRedundantRouter(), networkDns1, networkDns2, add, _itMgr
-                .toNicTO(nicProfile, router.getHypervisorType()));
+        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(
+                dhcpRange,
+                networkDomain,
+                router.getIsRedundantRouter(),
+                networkDns1,
+                networkDns2,
+                add,
+                _itMgr.toNicTO(nicProfile, router.getHypervisorType())
+        );
+
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router);
+        setupCmd.setNetworkOverview(networkOverview);
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
         setupCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
@@ -1065,5 +1083,92 @@ public class CommandSetupHelper {
             }
         }
         return dhcpRange;
+    }
+
+    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router) {
+        final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
+        final List<InterfaceTO> interfacesTO = new ArrayList<>();
+
+        final List<NicVO> nics = _nicDao.listByVmId(router.getId());
+        for (final NicVO nic : nics) {
+            final InterfaceTO interfaceTO = new InterfaceTO();
+
+            interfaceTO.setMacAddress(nic.getMacAddress());
+
+            final List<String> ipv4Addresses = new ArrayList<>();
+
+            if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
+                ipv4Addresses.add(getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
+            }
+
+            final NetworkVO network = _networkDao.findById(nic.getNetworkId());
+            if (network != null) {
+                final MetadataTO metadataTO = new MetadataTO();
+
+                final TrafficType trafficType = network.getTrafficType();
+                final GuestType guestType = network.getGuestType();
+                if (TrafficType.Public.equals(trafficType)) {
+                    metadataTO.setType("public");
+
+                    if (router.getVpcId() != null) {
+                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
+                                                          .stream()
+                                                          .map(IPAddressVO::getAddress)
+                                                          .map(Ip::addr)
+                                                          .map(ip -> getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                          .collect(Collectors.toList()));
+                    } else {
+                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
+                                                          .stream()
+                                                          .map(IPAddressVO::getAddress)
+                                                          .map(Ip::addr)
+                                                          .map(ip -> getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                          .collect(Collectors.toList()));
+                    }
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Isolated.equals(guestType)) {
+                    metadataTO.setType("tier");
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Private.equals(guestType)) {
+                    metadataTO.setType("private");
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Sync.equals(guestType)) {
+                    metadataTO.setType("sync");
+                } else {
+                    metadataTO.setType("other");
+                }
+
+                if (StringUtils.isNotBlank(network.getNetworkDomain())) {
+                    metadataTO.setDomainName(network.getNetworkDomain());
+                }
+
+                if (StringUtils.isNotBlank(network.getDns1())) {
+                    metadataTO.setDns1(network.getDns1());
+                }
+
+                if (StringUtils.isNotBlank(network.getDns2())) {
+                    metadataTO.setDns2(network.getDns2());
+                }
+
+                interfaceTO.setMetadata(metadataTO);
+            }
+
+            interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new String[ipv4Addresses.size()]));
+
+            interfacesTO.add(interfaceTO);
+        }
+
+        networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
+
+        return networkOverviewTO;
+    }
+
+    private String getIpv4AddressWithCidrSize(final String ipv4Address, final String netmask) {
+        if (StringUtils.isBlank(ipv4Address)) {
+            return null;
+        }
+
+        if (StringUtils.isBlank(netmask)) {
+            return ipv4Address;
+        }
+
+        return ipv4Address + "/" + NetUtils.getCidrSize(netmask);
     }
 }
