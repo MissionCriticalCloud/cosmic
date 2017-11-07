@@ -43,7 +43,7 @@ class CsRedundant(object):
     CONNTRACKD_BIN = "/usr/sbin/conntrackd"
     CONNTRACKD_KEEPALIVED_CONFLOCK = "/var/lock/conntrack.lock"
     CONNTRACKD_CONF = "/etc/conntrackd/conntrackd.conf"
-    KEEPALIVED_CONF = "/etc/keepalived/keepalived.conf"
+    KEEPALIVED_CONF = "/etc/keepalived/conf.d/cosmic_legacy_keepalived.conf"
     RROUTER_LOG = "/var/log/cosmic/router/redundantrouter.log"
 
     def __init__(self, config):
@@ -75,28 +75,6 @@ class CsRedundant(object):
             self._redundant_off()
             return
 
-        interfaces = [interface for interface in self.address.get_interfaces() if interface.is_guest()]
-        isDeviceReady = False
-        dev = ''
-        for interface in interfaces:
-            if dev == interface.get_device():
-                continue
-            dev = interface.get_device()
-            logging.info("Wait for devices to be configured so we can start keepalived")
-            devConfigured = CsDevice(dev, self.config).waitfordevice()
-            if devConfigured:
-                command = "ip link show %s | grep 'state UP'" % dev
-                devUp = CsHelper.execute(command)
-                if devUp:
-                    logging.info("Device %s is present, let's start keepalive now." % dev)
-                    isDeviceReady = True
-
-        if not isDeviceReady:
-            logging.info("Guest network not configured yet, let's stop router redundancy for now.")
-            CsHelper.service("conntrackd", "stop")
-            CsHelper.service("keepalived", "stop")
-            return
-
         CsHelper.mkdir(self.CS_RAMDISK_DIR, 0o755, False)
         CsHelper.mount_tmpfs(self.CS_RAMDISK_DIR)
         CsHelper.mkdir(self.CS_ROUTER_DIR, 0o755, False)
@@ -120,17 +98,14 @@ class CsRedundant(object):
         # keepalived configuration
         keepalived_conf = CsFile(self.KEEPALIVED_CONF)
         keepalived_conf.search(
-            " router_id ", "    router_id %s" % self.cl.get_name())
-        keepalived_conf.search(
-            " interface ", "    interface %s" % guest.get_device())
+            " router_id ", "    router_id %s" % guest.get_device().replace("eth",""))
         keepalived_conf.search(
             " advert_int ", "    advert_int %s" % self.cl.get_advert_int())
 
         keepalived_conf.greplace("[RROUTER_BIN_PATH]", self.CS_ROUTER_DIR)
-        keepalived_conf.section("authentication {", "}", [
-            "        auth_type AH \n", "        auth_pass %s\n" % self.cl.get_router_password()])
+
         keepalived_conf.section(
-            "virtual_ipaddress {", "}", self._collect_ips())
+            "virtual_ipaddress_excluded {", "}", self._collect_ips())
 
         # conntrackd configuration
         conntrackd_template_conf = "%s/%s" % (self.CS_TEMPLATES_DIR, "conntrackd.conf.templ")

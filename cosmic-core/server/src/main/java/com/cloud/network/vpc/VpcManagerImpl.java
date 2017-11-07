@@ -68,6 +68,7 @@ import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
+import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ConfigurationServer;
@@ -161,6 +162,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     AccountManager _accountMgr;
     @Inject
     NetworkDao _ntwkDao;
+    @Inject
+    NetworkOfferingDao _ntwkOffDao;
     @Inject
     NetworkOrchestrationService _ntwkMgr;
     @Inject
@@ -2411,6 +2414,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 _networkAclMgr.deleteNetworkACL(networkAcl);
             }
         });
+
+        // 6) Deleting sync networks
+        final List<NetworkVO> syncNetworks = _ntwkDao.listSyncNetworksByVpc(vpcId);
+        syncNetworks.forEach(syncNetwork -> _ntwkMgr.removeAndShutdownSyncNetwork(syncNetwork.getId()));
 
         return success;
     }

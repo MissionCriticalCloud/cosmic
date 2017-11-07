@@ -1,4 +1,5 @@
 import logging
+import time
 
 import CsHelper
 from CsProcess import CsProcess
@@ -62,7 +63,7 @@ class CsPasswordServiceVMConfig:
                         return result
 
                     test_tries += 1
-                    self.logger.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
+                    logging.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
                     time.sleep(2)
 
                 logging.debug("Update password server skipped because we didn't find a passwd server process for "

@@ -586,6 +586,19 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     offering.setPublicLb(false);
                     _networkOfferingDao.update(offering.getId(), offering);
                 }
+
+                //Default offering for sync networks
+                if (_networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSyncNetworkOffering) == null) {
+                    offering = _configMgr.createNetworkOffering(
+                            NetworkOffering.DefaultSyncNetworkOffering,
+                            "Offering for Sync networks",
+                            TrafficType.Guest, null, false, Availability.Optional, null, null, true, GuestType.Sync,
+                            false, null, null, false, null, false, true,
+                            null, false, null, true
+                    );
+                    offering.setState(NetworkOffering.State.Enabled);
+                    _networkOfferingDao.update(offering.getId(), offering);
+                }
             }
         });
 
@@ -644,15 +657,18 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final DeploymentPlan plan, final String name, final String displayText,
                                                 final boolean isDefault)
             throws ConcurrentOperationException {
-        return setupNetwork(owner, offering, null, plan, name, displayText, false, null, null, null, null, true, null, null, null);
+        return setupNetwork(
+                owner, offering, null, plan, name, displayText, false, null, null, null, null, null,
+                true, null, null, null
+        );
     }
 
     @Override
     @DB
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                                 final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType,
-                                                final Boolean subdomainAccess, final Long vpcId, final Boolean isDisplayNetworkEnabled, final String dns1, final String dns2,
-                                                final String ipExclusionList)
+                                                final Boolean subdomainAccess, final Long vpcId, final Long relatedNetworkId, final Boolean isDisplayNetworkEnabled,
+                                                final String dns1, final String dns2, final String ipExclusionList)
             throws ConcurrentOperationException {
         final Account locked = _accountDao.acquireInLockTable(owner.getId());
         if (locked == null) {
@@ -660,11 +676,19 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         try {
-            if (predefined == null
-                    || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null && !(predefined
-                    .getBroadcastDomainType() == BroadcastDomainType.Vlan || predefined.getBroadcastDomainType() == BroadcastDomainType.Lswitch || predefined
-                    .getBroadcastDomainType() == BroadcastDomainType.Vxlan)) {
-                final List<NetworkVO> configs = _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
+            if (predefined == null || offering.getTrafficType() != TrafficType.Guest && predefined.getCidr() == null && predefined.getBroadcastUri() == null &&
+                    !(predefined.getBroadcastDomainType() == BroadcastDomainType.Vlan ||
+                            predefined.getBroadcastDomainType() == BroadcastDomainType.Lswitch ||
+                            predefined.getBroadcastDomainType() == BroadcastDomainType.Vxlan
+                    )) {
+                final List<NetworkVO> configs;
+                if (vpcId != null && GuestType.Sync.equals(offering.getGuestType())) {
+                    configs = _networksDao.listSyncNetworksByVpc(vpcId);
+                } else if (relatedNetworkId != null && GuestType.Sync.equals(offering.getGuestType())) {
+                    configs = _networksDao.listSyncNetworksByRelatedNetwork(relatedNetworkId);
+                } else {
+                    configs = _networksDao.listBy(owner.getId(), offering.getId(), plan.getDataCenterId());
+                }
                 if (configs.size() > 0) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Found existing network configuration for offering " + offering + ": " + configs.get(0));
@@ -684,7 +708,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
             final List<NetworkVO> networks = new ArrayList<>();
 
-            long related = -1;
+            long related = relatedNetworkId != null ? relatedNetworkId : -1;
 
             for (final NetworkGuru guru : networkGurus) {
                 final Network network = guru.design(offering, plan, predefined, owner);
@@ -706,13 +730,13 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     related = id;
                 }
 
-                final long relatedFile = related;
+                final long relatedFinal = related;
                 Transaction.execute(new TransactionCallbackNoReturn() {
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFile, name, displayText,
-                                predefined.getNetworkDomain(), offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType, offering.getSpecifyIpRanges(),
-                                vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
+                        final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFinal, name, displayText,
+                                predefined != null ? predefined.getNetworkDomain() : null, offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType,
+                                offering.getSpecifyIpRanges(), vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
                         vo.setDisplayNetwork(isDisplayNetworkEnabled == null ? true : isDisplayNetworkEnabled);
                         vo.setStrechedL2Network(offering.getSupportsStrechedL2());
                         networks.add(_networksDao.persist(vo, vo.getGuestType() == GuestType.Isolated,
@@ -741,6 +765,53 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             s_logger.debug("Releasing lock for " + locked);
             _accountDao.releaseFromLockTable(locked.getId());
         }
+    }
+
+    @Override
+    public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {
+        final NetworkOffering offering = _networkOfferingDao.findByUniqueName(NetworkOffering.DefaultSyncNetworkOffering);
+
+        if (isVpcRouter) {
+            final String networkName = vpc.getName() + "-syncNetwork";
+            return setupNetwork(
+                    owner,
+                    offering,
+                    null,
+                    plan,
+                    networkName,
+                    networkName,
+                    false,
+                    vpc.getDomainId(),
+                    null,
+                    null,
+                    vpc.getId(),
+                    null,
+                    false,
+                    null,
+                    null,
+                    null
+            ).get(0);
+        }
+
+        final String networkName = isolatedNetwork.getName() + "-syncNetwork";
+        return setupNetwork(
+                owner,
+                offering,
+                null,
+                plan,
+                networkName,
+                networkName,
+                false,
+                isolatedNetwork.getDomainId(),
+                null,
+                null,
+                null,
+                isolatedNetwork.getId(),
+                false,
+                null,
+                null,
+                null
+        ).get(0);
     }
 
     @Override
@@ -864,11 +935,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
     }
 
-    Pair<NetworkGuru, NetworkVO> implementNetwork(final long networkId, final DeployDestination dest, final ReservationContext context, final boolean isRouter) throws
-            ConcurrentOperationException,
-            ResourceUnavailableException, InsufficientCapacityException {
+    Pair<NetworkGuru, NetworkVO> implementNetwork(final long networkId, final DeployDestination dest, final ReservationContext context, final boolean isRouter)
+            throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException {
         Pair<NetworkGuru, NetworkVO> implemented = null;
-        if (!isRouter) {
+        final NetworkVO network = _networksDao.findById(networkId);
+        if (!isRouter || (TrafficType.Guest.equals(network.getTrafficType()) && GuestType.Sync.equals(network.getGuestType()))) {
             implemented = implementNetwork(networkId, dest, context);
         } else {
             // At the time of implementing network (using implementNetwork() method), if the VR needs to be deployed then
@@ -876,7 +947,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             // preparing VR nics. This flow creates issues in dealing with network state transitions. The original call
             // puts network in "Implementing" state and then the nested call again tries to put it into same state resulting
             // in issues. In order to avoid it, implementNetwork() call for VR is replaced with below code.
-            final NetworkVO network = _networksDao.findById(networkId);
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
             implemented = new Pair<>(guru, network);
         }
@@ -1616,7 +1686,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             //do global lock for the network
             network = _networksDao.acquireInLockTable(networkId, NetworkLockTimeout.value());
             if (network == null) {
-                s_logger.warn("Unable to acquire lock for the network " + network + " as a part of network shutdown");
+                s_logger.warn("Unable to acquire lock for the network as a part of network shutdown");
                 return false;
             }
             if (s_logger.isDebugEnabled()) {
@@ -1691,6 +1761,59 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             });
 
             return result;
+        } finally {
+            if (network != null) {
+                _networksDao.releaseFromLockTable(network.getId());
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Lock is released for network " + network + " as a part of network shutdown");
+                }
+            }
+        }
+    }
+
+    @Override
+    @DB
+    public boolean removeAndShutdownSyncNetwork(final long networkId) {
+        NetworkVO network = _networksDao.findById(networkId);
+        if (network.getState() == Network.State.Allocated) {
+            s_logger.debug("Network is already shutdown: " + network);
+            return true;
+        }
+
+        if (network.getState() != Network.State.Implemented && network.getState() != Network.State.Shutdown) {
+            s_logger.debug("Network is not implemented: " + network);
+            return false;
+        }
+
+        try {
+            //do global lock for the network
+            network = _networksDao.acquireInLockTable(networkId, NetworkLockTimeout.value());
+            if (network == null) {
+                s_logger.warn("Unable to acquire lock for the network as a part of network shutdown");
+                return false;
+            }
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Lock is acquired for network " + network + " as a part of network shutdown");
+            }
+
+            if (network.getState() == Network.State.Allocated) {
+                s_logger.debug("Network is already shutdown: " + network);
+                return true;
+            }
+
+            if (network.getState() != Network.State.Implemented && network.getState() != Network.State.Shutdown) {
+                s_logger.debug("Network is not implemented: " + network);
+                return false;
+            }
+
+            try {
+                stateTransitTo(network, Event.DestroyNetwork);
+            } catch (final NoTransitionException e) {
+                network.setState(Network.State.Shutdown);
+                _networksDao.update(networkId, network);
+            }
+
+            return _networksDao.remove(networkId);
         } finally {
             if (network != null) {
                 _networksDao.releaseFromLockTable(network.getId());
@@ -1794,6 +1917,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, networkFinal.getGuruName());
+
+                        // Deleting sync networks
+                        final List<NetworkVO> syncNetworks = _networksDao.listSyncNetworksByRelatedNetwork(networkId);
+                        syncNetworks.forEach(syncNetwork -> removeAndShutdownSyncNetwork(syncNetwork.getId()));
 
                         guru.trash(networkFinal, _networkOfferingDao.findById(networkFinal.getNetworkOfferingId()));
 
@@ -2121,8 +2248,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     }
                 }
 
-                final List<? extends Network> networks = setupNetwork(owner, ntwkOff, userNetwork, plan, name, displayText, true, domainId, aclType, subdomainAccessFinal, vpcId,
-                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList);
+                final List<? extends Network> networks = setupNetwork(
+                        owner, ntwkOff, userNetwork, plan, name, displayText, true, domainId, aclType, subdomainAccessFinal, vpcId, null,
+                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList
+                );
 
                 Network network = null;
                 if (networks == null || networks.isEmpty()) {

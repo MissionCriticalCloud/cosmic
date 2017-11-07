@@ -42,6 +42,7 @@ import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
+import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -95,6 +96,8 @@ public class NetworkHelperImpl implements NetworkHelper {
     protected NicDao _nicDao;
     @Inject
     protected NetworkDao _networkDao;
+    @Inject
+    protected NetworkOfferingDao _networkOfferingDao;
     @Inject
     protected DomainRouterDao _routerDao;
     @Inject
@@ -605,6 +608,24 @@ public class NetworkHelperImpl implements NetworkHelper {
         return controlConfig;
     }
 
+    protected LinkedHashMap<Network, List<? extends NicProfile>> configureSyncNic(final RouterDeploymentDefinition routerDeploymentDefinition) {
+        final LinkedHashMap<Network, List<? extends NicProfile>> syncConfig = new LinkedHashMap<>(3);
+
+        logger.debug("Adding nic for Virtual Router in Sync network ");
+
+        final Network syncNic = _networkMgr.setupSyncNetwork(
+                routerDeploymentDefinition.getOwner(),
+                routerDeploymentDefinition.getPlan(),
+                routerDeploymentDefinition.isVpcRouter(),
+                routerDeploymentDefinition.getVpc(),
+                routerDeploymentDefinition.getGuestNetwork()
+        );
+
+        syncConfig.put(syncNic, new ArrayList<>());
+
+        return syncConfig;
+    }
+
     protected LinkedHashMap<Network, List<? extends NicProfile>> configurePublicNic(final RouterDeploymentDefinition routerDeploymentDefinition, final boolean hasGuestNic) {
         final LinkedHashMap<Network, List<? extends NicProfile>> publicConfig = new LinkedHashMap<>(3);
 
@@ -680,6 +701,10 @@ public class NetworkHelperImpl implements NetworkHelper {
         // 3) Public network
         final LinkedHashMap<Network, List<? extends NicProfile>> publicNic = configurePublicNic(routerDeploymentDefinition, networks.size() > 1);
         networks.putAll(publicNic);
+
+        // 4) Sync network
+        final LinkedHashMap<Network, List<? extends NicProfile>> syncNic = configureSyncNic(routerDeploymentDefinition);
+        networks.putAll(syncNic);
 
         return networks;
     }

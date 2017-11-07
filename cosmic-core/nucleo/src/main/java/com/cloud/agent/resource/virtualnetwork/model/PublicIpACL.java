@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.virtualnetwork.model;
 
 public class PublicIpACL extends ConfigBase {
-    private String device;
     private String macAddress;
     private String nicIp;
     private String nicNetmask;
@@ -13,25 +12,16 @@ public class PublicIpACL extends ConfigBase {
         super(ConfigBase.PUBLIC_IP_ACL);
     }
 
-    public PublicIpACL(final String device, final String macAddress, final String nicIp, final String nicNetmask, final String publicIp, final AclRule[] ingressRules,
+    public PublicIpACL(final String macAddress, final String nicIp, final String nicNetmask, final String publicIp, final AclRule[] ingressRules,
                        final AclRule[] egressRules) {
         super(ConfigBase.PUBLIC_IP_ACL);
 
-        this.device = device;
         this.macAddress = macAddress;
         this.nicIp = nicIp;
         this.nicNetmask = nicNetmask;
         this.publicIp = publicIp;
         this.ingressRules = ingressRules;
         this.egressRules = egressRules;
-    }
-
-    public String getDevice() {
-        return device;
-    }
-
-    public void setDevice(final String device) {
-        this.device = device;
     }
 
     public String getMacAddress() {

@@ -102,7 +102,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
     boolean isStrechedL2Network();
 
     enum GuestType {
-        Shared, Isolated, Private
+        Shared, Isolated, Private, Sync
     }
 
     enum Event {

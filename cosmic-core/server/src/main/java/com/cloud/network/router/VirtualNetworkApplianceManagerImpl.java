@@ -1121,7 +1121,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         String defaultIp6Dns1 = null;
         String defaultIp6Dns2 = null;
         for (final NicProfile nic : profile.getNics()) {
+            final Network network = _networkDao.findById(nic.getNetworkId());
             final int deviceId = nic.getDeviceId();
+            final String deviceMac = nic.getMacAddress();
             boolean ipv4 = false, ipv6 = false;
             if (nic.getIPv4Address() != null) {
                 ipv4 = true;
@@ -1135,6 +1137,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 buf.append(" eth").append(deviceId).append("ip6prelen=").append(NetUtils.getIp6CidrSize(nic.getIPv6Cidr()));
                 buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
             }
+
+            // Send mac address
+            buf.append(" eth").append(deviceId).append("mac=").append(deviceMac);
 
             if (nic.isDefaultNic()) {
                 if (ipv4) {
@@ -1153,12 +1158,15 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 buf.append(" localgw=").append(dest.getPod().getGateway());
             } else if (nic.getTrafficType() == TrafficType.Control) {
                 controlNic = nic;
+                buf.append(" controlmac=").append(deviceMac);
                 buf.append(createRedundantRouterArgs(controlNic, router));
-            } else if (nic.getTrafficType() == TrafficType.Guest) {
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType())) {
                 dnsProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dns, Provider.VirtualRouter);
                 dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dhcp, Provider.VirtualRouter);
                 // build bootloader parameter for the guest
                 buf.append(createGuestBootLoadArgs(nic, defaultDns1, defaultDns2, router));
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && GuestType.Sync.equals(network.getGuestType())) {
+                buf.append(" syncmac=").append(deviceMac);
             } else if (nic.getTrafficType() == TrafficType.Public) {
                 publicNetwork = true;
             }

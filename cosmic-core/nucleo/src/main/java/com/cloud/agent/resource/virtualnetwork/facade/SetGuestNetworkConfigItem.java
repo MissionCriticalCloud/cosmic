@@ -18,7 +18,7 @@ public class SetGuestNetworkConfigItem extends AbstractConfigItemFacade {
         final SetupGuestNetworkCommand command = (SetupGuestNetworkCommand) cmd;
 
         final NicTO nic = command.getNic();
-        final String routerGIP = command.getAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP);
+        final String routerGuestIp = command.getAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP);
         final String gateway = command.getAccessDetail(NetworkElementCommand.GUEST_NETWORK_GATEWAY);
         final String cidr = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
         final String netmask = nic.getNetmask();
@@ -34,8 +34,7 @@ public class SetGuestNetworkConfigItem extends AbstractConfigItemFacade {
             }
         }
 
-        final GuestNetwork guestNetwork = new GuestNetwork(command.isAdd(), nic.getMac(), "eth" + nic.getDeviceId(), routerGIP, netmask, gateway,
-                cidr, dns, domainName);
+        final GuestNetwork guestNetwork = new GuestNetwork(command.isAdd(), nic.getMac(), routerGuestIp, netmask, gateway, cidr, dns, domainName);
 
         return generateConfigItems(guestNetwork);
     }

@@ -83,8 +83,11 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     protected boolean canHandle(final NetworkOffering offering, final NetworkType networkType, final PhysicalNetwork physicalNetwork) {
         s_logger.debug("Checking of guru can handle request");
         // This guru handles only Guest Isolated network that supports Source nat service
-        if (networkType == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() != Network.GuestType.Shared
-                && isMyIsolationMethod(physicalNetwork) && ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
+        if (networkType == NetworkType.Advanced &&
+                isMyTrafficType(offering.getTrafficType()) &&
+                offering.getGuestType() != Network.GuestType.Shared &&
+                isMyIsolationMethod(physicalNetwork) &&
+                ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;
         } else {
             s_logger.debug("Cannot handle rquest. See GuestNetworkGuru message to check isolation methods. Details I have:\nNetwork type = " + networkType + "\nTraffic type = "
@@ -96,10 +99,23 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     @Override
     public Network design(final NetworkOffering offering, final DeploymentPlan plan, final Network userSpecified, final Account owner) {
         // Check if the isolation type of the related physical network is supported
-        final PhysicalNetworkVO physnet = physicalNetworkDao.findById(plan.getPhysicalNetworkId());
+        PhysicalNetworkVO physnet = physicalNetworkDao.findById(plan.getPhysicalNetworkId());
         final DataCenter dc = _dcDao.findById(plan.getDataCenterId());
+        if (physnet == null) {
+            final List<PhysicalNetworkVO> physicalNetworks = physicalNetworkDao.listByZoneAndTrafficTypeAndIsolationMethod(
+                    dc.getId(),
+                    offering.getTrafficType(),
+                    IsolationMethod.STT
+            );
+
+            if (!physicalNetworks.isEmpty()) {
+                physnet = physicalNetworks.get(0);
+                plan.setPhysicalNetworkId(physnet.getId());
+            }
+        }
+
         if (!canHandle(offering, dc.getNetworkType(), physnet)) {
-            s_logger.debug("Refusing to design this network");
+            s_logger.debug(this.getClass().getSimpleName() + ": Refusing to design this network");
             return null;
         }
 
@@ -124,7 +140,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
     }
 
     private void checkThatLogicalSwitchExists(final Network userSpecified, final NiciraNvpDeviceVO niciraNvpDeviceVO) {
-        final URI broadcastUri = userSpecified.getBroadcastUri();
+        final URI broadcastUri = userSpecified == null ? null : userSpecified.getBroadcastUri();
         if (broadcastUri != null) {
             final String lswitchUuid = broadcastUri.getRawSchemeSpecificPart();
             if (!lswitchExists(lswitchUuid, niciraNvpDeviceVO)) {

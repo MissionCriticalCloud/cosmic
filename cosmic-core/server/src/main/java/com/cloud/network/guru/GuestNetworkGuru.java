@@ -21,6 +21,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
@@ -164,11 +165,20 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             return null;
         }
 
-        final NetworkVO network =
-                new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), State.Allocated, plan.getDataCenterId(),
-                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+        final NetworkVO network = new NetworkVO(
+                offering.getTrafficType(),
+                GuestType.Sync.equals(offering.getGuestType())
+                        ? Mode.Static
+                        : Mode.Dhcp,
+                BroadcastDomainType.Vlan,
+                offering.getId(),
+                State.Allocated,
+                plan.getDataCenterId(),
+                plan.getPhysicalNetworkId(),
+                offering.getRedundantRouter()
+        );
         if (userSpecified != null) {
-            if (!Network.GuestType.Private.equals(offering.getGuestType()) &&
+            if (!GuestType.Private.equals(offering.getGuestType()) &&
                     ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null))) {
                 throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
@@ -199,7 +209,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 network.setBroadcastUri(userSpecified.getBroadcastUri());
                 network.setState(State.Setup);
             }
-        } else {
+        } else if (!GuestType.Sync.equals(offering.getGuestType())) {
             final String guestNetworkCidr = dc.getGuestNetworkCidr();
             if (guestNetworkCidr == null && dc.getNetworkType() == NetworkType.Advanced) {
                 throw new CloudRuntimeException("Can't design network " + network + "; guest CIDR is not configured per zone " + dc);
@@ -273,7 +283,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
         final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
-        if (nic.getIPv4Address() == null) {
+        if (nic.getIPv4Address() == null && !GuestType.Sync.equals(network.getGuestType())) {
             nic.setBroadcastUri(network.getBroadcastUri());
             nic.setIsolationUri(network.getBroadcastUri());
             nic.setIPv4Gateway(network.getGateway());

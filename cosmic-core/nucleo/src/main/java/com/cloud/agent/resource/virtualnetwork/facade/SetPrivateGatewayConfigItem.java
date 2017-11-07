@@ -17,7 +17,7 @@ public class SetPrivateGatewayConfigItem extends AbstractConfigItemFacade {
         final SetupPrivateGatewayCommand command = (SetupPrivateGatewayCommand) cmd;
 
         final IpAddressTO ip = command.getIpAddress();
-        return generateConfigItems(new PrivateGateway(ip.getPublicIp(), ip.isSourceNat(), ip.isAdd(), ip.getVlanNetmask(), ip.getVifMacAddress(), ip.getNicDevId()));
+        return generateConfigItems(new PrivateGateway(ip.getPublicIp(), ip.isSourceNat(), ip.isAdd(), ip.getVlanNetmask(), ip.getMacAddress()));
     }
 
     @Override
