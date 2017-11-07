@@ -826,7 +826,7 @@ def main(argv):
 
     databag_map = OrderedDict(
         [
-            ("network", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("network_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("vm_metadata", {"process_iptables": False, "executor": CsMetadataServiceVMConfig('vmdata', config)}),
             ("network_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("public_ip_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
@@ -845,7 +845,7 @@ def main(argv):
         ]
     )
 
-    if process_file == "network":
+    if process_file == "network_overview":
         logging.debug("Processing file %s" % process_file)
         cs_network = CsNetwork(process_file)
         cs_network.sync()
