@@ -86,7 +86,9 @@ class updateDataBag:
         elif self.qFile.type == 'network_overview':
             dbag = self.qFile.data
         elif self.qFile.type == 'networkacl':
-            dbag = self.process_network_acl(self.db.getDataBag())
+            # TODO fixme
+            # dbag = self.process_network_acl(self.db.getDataBag())
+            dbag = None
         elif self.qFile.type == 'publicipacl':
             dbag = self.process_public_ip_acl(self.db.getDataBag())
         elif self.qFile.type == 'firewallrules':
