@@ -57,15 +57,16 @@ class Config(object):
         return self.dbag_cmdline['config']['domain']
 
     def get_dns(self):
-        conf = self.cmdline().idata()
+        conf = self.dbag_cmdline['config']
         dns = []
         if not self.use_extdns():
             pass
-            # if not self.is_vpc() and self.cl.is_redundant() and self.cl.get_guest_gw():
-            #     dns.append(self.cl.get_guest_gw())
+            if not self.is_vpc() and 'guestgw' in conf:
+                dns.append(conf['guestgw'])
             # else:
-            # FIXME look at the below line
-            # dns.append(self.address().get_guest_ip())
+            #     # FIXME look at the below line
+            #     dns.append(self.address().get_guest_ip())
+
         for name in ["dns1", "dns2"]:
             if name in conf:
                 dns.append(conf[name])

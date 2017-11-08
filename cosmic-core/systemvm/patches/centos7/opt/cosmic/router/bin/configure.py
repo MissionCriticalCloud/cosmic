@@ -52,7 +52,7 @@ class IpTablesExecutor:
         lb.process()
 
         logging.debug("Configuring iptables rules")
-        nf = CsNetfilters(False)
+        nf = CsNetfilters(self.config, False)
         nf.compare(self.config.get_fw())
 
         logging.debug("Configuring iptables rules done ...saving rules")
