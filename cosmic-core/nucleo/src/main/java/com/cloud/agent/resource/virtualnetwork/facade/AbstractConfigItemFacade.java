@@ -77,8 +77,8 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem());
         flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());
-        flyweight.put(IpAssocCommand.class, new IpAssociationConfigItem());
-        flyweight.put(IpAssocVpcCommand.class, new IpAssociationConfigItem());
+        flyweight.put(IpAssocCommand.class, new NetworkOverviewConfigItem());
+        flyweight.put(IpAssocVpcCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
     }
 
