@@ -21,9 +21,9 @@ class Firewall(object):
         self.cmdline = CsCmdline("cmdline")
 
     def sync(self):
-        if self.cmdline['config']['type'] == 'vpcrouter':
+        if self.cmdline.dbag['config']['type'] == 'vpcrouter':
             self.sync_vpc()
-        elif self.cmdline['config']['type'] == 'router':
+        elif self.cmdline.dbag['config']['type'] == 'router':
             self.sync_nonvpc()
 
     def sync_vpc(self):
