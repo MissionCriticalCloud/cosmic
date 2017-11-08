@@ -9,7 +9,8 @@ import utils
 
 
 class Keepalived(object):
-    def __init__(self, dbag):
+    def __init__(self, config, dbag):
+        self.config = config
         self.dbag = dbag
 
         self.jinja_env = Environment(

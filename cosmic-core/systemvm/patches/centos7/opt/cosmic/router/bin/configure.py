@@ -851,7 +851,7 @@ def main(argv):
 
     if process_file == "network_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_network = CsNetwork(process_file)
+        cs_network = CsNetwork(config, process_file)
         cs_network.sync()
 
     if process_file == "cmd_line":

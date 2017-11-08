@@ -7,7 +7,8 @@ import utils
 
 
 class Firewall(object):
-    def __init__(self, dbag):
+    def __init__(self, config, dbag):
+        self.config = config
         self.dbag = dbag
 
         self.jinja_env = Environment(
@@ -16,7 +17,7 @@ class Firewall(object):
             lstrip_blocks=True
         )
         # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
-        self.fw = []
+        self.fw = self.config.fw
 
         self.cmdline = CsCmdline("cmdline")
 

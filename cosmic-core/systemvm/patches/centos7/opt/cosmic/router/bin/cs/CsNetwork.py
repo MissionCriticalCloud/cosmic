@@ -6,11 +6,13 @@ from firewall import Firewall
 
 
 class CsNetwork(CsDatabag):
-    def __init__(self, cs_databag):
+    def __init__(self, config, cs_databag):
         super(CsNetwork, self).__init__(cs_databag)
 
-        self.keepalived = Keepalived(self.dbag)
-        self.firewall = Firewall(self.dbag)
+        self.config = config
+
+        self.keepalived = Keepalived(self.config, self.dbag)
+        self.firewall = Firewall(self.config, self.dbag)
 
     def sync(self):
         logging.debug("Starting sync of network!")
