@@ -19,28 +19,6 @@ STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;
                    "vpcrouter": "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'" }
 
 
-def reconfigure_interfaces(router_config, interfaces):
-    for interface in interfaces:
-        cmd = "ip link show %s | grep 'state DOWN'" % interface.get_device()
-        for device in execute(cmd):
-            if " DOWN " in device:
-                cmd = "ip link set %s up" % interface.get_device()
-                # If redundant only bring up public interfaces that are not eth1.
-                # Reason: private gateways are public interfaces.
-                # master.py and keepalived will deal with eth1 public interface.
-                if router_config.is_redundant() and interface.is_privategateway():
-                    state_cmd = STATE_COMMANDS[router_config.get_type()]
-                    logging.info("Check state command => %s" % state_cmd)
-                    state = execute(state_cmd)[0]
-                    logging.info("Router state => %s" % state)
-                    if state == "MASTER":
-                        execute(cmd)
-                elif router_config.is_redundant() and interface.is_public():
-                    pass
-                else:
-                    execute(cmd)
-
-
 def get_device_from_mac_address(macaddress):
     logging.info("Looking for interface with macaddress " + macaddress)
     device = execute("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)

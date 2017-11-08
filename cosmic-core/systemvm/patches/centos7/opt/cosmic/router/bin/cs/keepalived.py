@@ -1,12 +1,14 @@
 import logging
-import os, subprocess
+import os
+import socket
+import subprocess
 
 from jinja2 import Environment, FileSystemLoader
-import socket
+
 import utils
 
 
-class CsKeepalived(object):
+class Keepalived(object):
     def __init__(self, dbag):
         self.dbag = dbag
 

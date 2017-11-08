@@ -2,9 +2,8 @@
 
 import logging
 
-import CsHelper
 from CsDatabag import CsDatabag
-from CsDevice import CsDevice
+from CsIP import CsIP
 from CsInterface import CsInterface
 
 VRRP_TYPES = ['guest']
@@ -95,6 +94,49 @@ class CsAddress(CsDatabag):
             if identifier == "id":
                 continue
 
+            identifier = 'eth1'
+            self.dbag[identifier] = ''''
+            [
+        {
+            "add": true,
+            "broadcast": "85.222.237.255",
+            "cidr": "85.222.237.205/25",
+            "device": "eth1",
+            "device_mac_address": "06:80:fc:00:00:10",
+            "first_i_p": false,
+            "gateway": "85.222.237.129",
+            "netmask": "255.255.255.128",
+            "network": "85.222.237.128/25",
+            "new_nic": false,
+            "nic_dev_id": "1",
+            "nw_type": "public",
+            "one_to_one_nat": false,
+            "public_ip": "85.222.237.205",
+            "size": "25",
+            "source_nat": true,
+            "vif_mac_address": "06:80:fc:00:00:10"
+        },
+        {
+            "add": true,
+            "broadcast": "195.43.158.255",
+            "cidr": "195.43.158.123/24",
+            "device": "eth1",
+            "device_mac_address": "06:80:fc:00:00:10",
+            "first_i_p": false,
+            "gateway": "195.43.158.1",
+            "netmask": "255.255.255.0",
+            "network": "195.43.158.0/24",
+            "new_nic": false,
+            "nic_dev_id": "1",
+            "nw_type": "public",
+            "one_to_one_nat": false,
+            "public_ip": "195.43.158.123",
+            "size": "24",
+            "source_nat": false,
+            "vif_mac_address": "06:80:fc:00:00:10"
+        }
+    ],'''
+
             try:
                 dev = self.dbag[identifier][0]['device']
                 ip = CsIP(dev, identifier, self.config)
@@ -105,17 +147,7 @@ class CsAddress(CsDatabag):
                 ip.setAddress(address)
                 logging.info("Address found in DataBag ==> %s" % address)
 
-                if not address['add'] and not ip.configured():
-                    logging.info("Skipping %s as the add flag is set to %s " % (address['public_ip'], address['add']))
-                    continue
-
-                if ip.configured():
-                    logging.info("Address %s on device %s already configured", ip.ip(), dev)
-                    ip.post_configure(address)
-                else:
-                    logging.info("Address %s on device %s not configured", ip.ip(), dev)
-                    if CsDevice(dev, identifier, self.config).waitfordevice():
-                        ip.configure(address)
+                ip.post_configure()
 
         cmdline = self.config.cmdline()
         if self.config.is_vpc():
