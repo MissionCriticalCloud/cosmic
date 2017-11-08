@@ -55,7 +55,7 @@ class CsDhcp(object):
 
         # TODO FIME Do we restart dnsmasq???? Who is master?
         # if not self.cl.is_redundant() or self.cl.is_master():
-        #     CsHelper.execute2("systemctl restart dnsmasq")
+        CsHelper.execute2("systemctl restart dnsmasq")
 
     def configure_server(self):
         # self.conf.addeq("dhcp-hostsfile=%s" % DHCP_HOSTS)
@@ -90,7 +90,7 @@ class CsDhcp(object):
                 line = "dhcp-option=tag:interface-%s-%s,3,%s" % (device, idx, gateway)
                 self.conf.search(sline, line)
             # Netmask
-            netmask = self.config.address().get_guest_netmask()
+            netmask = i['network'].netmask()
             sline = "dhcp-option=tag:interface-%s-%s,1," % (device, idx)
             line = "dhcp-option=tag:interface-%s-%s,1,%s" % (device, idx, netmask)
             self.conf.search(sline, line)
