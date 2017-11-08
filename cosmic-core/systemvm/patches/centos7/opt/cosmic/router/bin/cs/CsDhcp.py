@@ -90,7 +90,7 @@ class CsDhcp(object):
                 line = "dhcp-option=tag:interface-%s-%s,3,%s" % (device, idx, gateway)
                 self.conf.search(sline, line)
             # Netmask
-            netmask = i['network'].netmask()
+            netmask = i['network'].netmask.__str__()
             sline = "dhcp-option=tag:interface-%s-%s,1," % (device, idx)
             line = "dhcp-option=tag:interface-%s-%s,1,%s" % (device, idx, netmask)
             self.conf.search(sline, line)
