@@ -18,6 +18,7 @@ from cs.CsNetfilter import CsNetfilters
 from cs.CsNetwork import CsNetwork
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsVrConfig import CsVrConfig
+from firewall import Firewall
 
 OCCURRENCES = 1
 
@@ -776,6 +777,9 @@ class IpTablesExecutor:
         self.config = config
 
     def process(self):
+        firewall = Firewall(self.config, CsDatabag('network_overview'))
+        firewall.sync()
+
         acls = CsAcl('networkacl', self.config)
         acls.process()
 
