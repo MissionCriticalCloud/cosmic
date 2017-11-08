@@ -42,7 +42,6 @@ import com.cloud.configuration.Config;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
@@ -1023,7 +1022,12 @@ public class CommandSetupHelper {
 
         final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(_itMgr.toNicTO(nicProfile, router.getHypervisorType()));
 
-        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router);
+        final List<Nic> nicsToExclude = new ArrayList<>();
+        if (!add) {
+            nicsToExclude.add(nic);
+        }
+
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, nicsToExclude);
         setupCmd.setNetworkOverview(networkOverview);
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
@@ -1042,52 +1046,51 @@ public class CommandSetupHelper {
         return setupCmd;
     }
 
-    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router) {
+    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
-        for (final NicVO nic : nics) {
-            final InterfaceTO interfaceTO = new InterfaceTO();
+        nics.stream()
+            .filter(nic -> !nicsToExclude.contains(nic))
+            .forEach(nic -> {
+                final InterfaceTO interfaceTO = new InterfaceTO();
+                interfaceTO.setMacAddress(nic.getMacAddress());
 
-            interfaceTO.setMacAddress(nic.getMacAddress());
-
-            final List<String> ipv4Addresses = new ArrayList<>();
-            if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                ipv4Addresses.add(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
-            }
-
-            final NetworkVO network = _networkDao.findById(nic.getNetworkId());
-            if (network != null) {
-                final TrafficType trafficType = network.getTrafficType();
-                if (TrafficType.Public.equals(trafficType)) {
-                    if (router.getVpcId() != null) {
-                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
-                                                          .stream()
-                                                          .map(IPAddressVO::getAddress)
-                                                          .map(Ip::addr)
-                                                          .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
-                                                          .collect(Collectors.toList()));
-                    } else {
-                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
-                                                          .stream()
-                                                          .map(IPAddressVO::getAddress)
-                                                          .map(Ip::addr)
-                                                          .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
-                                                          .collect(Collectors.toList()));
-                    }
+                final List<String> ipv4Addresses = new ArrayList<>();
+                if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
+                    ipv4Addresses.add(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
                 }
 
-                interfaceTO.setMetadata(new MetadataTO(network));
-            }
+                final NetworkVO network = _networkDao.findById(nic.getNetworkId());
+                if (network != null) {
+                    final TrafficType trafficType = network.getTrafficType();
+                    if (TrafficType.Public.equals(trafficType)) {
+                        if (router.getVpcId() != null) {
+                            ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
+                                                              .stream()
+                                                              .map(IPAddressVO::getAddress)
+                                                              .map(Ip::addr)
+                                                              .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                              .collect(Collectors.toList()));
+                        } else {
+                            ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
+                                                              .stream()
+                                                              .map(IPAddressVO::getAddress)
+                                                              .map(Ip::addr)
+                                                              .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                              .collect(Collectors.toList()));
+                        }
+                    }
 
-            interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new String[ipv4Addresses.size()]));
+                    interfaceTO.setMetadata(new MetadataTO(network));
+                }
 
-            interfacesTO.add(interfaceTO);
-        }
+                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new String[ipv4Addresses.size()]));
+                interfacesTO.add(interfaceTO);
+            });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
-
         return networkOverviewTO;
     }
 }
