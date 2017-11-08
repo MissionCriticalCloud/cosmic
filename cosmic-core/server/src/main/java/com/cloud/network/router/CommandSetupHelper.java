@@ -478,6 +478,15 @@ public class CommandSetupHelper {
             } else {
                 cmd = new IpAssocCommand(ipsToSend);
             }
+
+            final List<Ip> ipsToExclude = ipAddrList.stream()
+                                                    .filter(ip -> IpAddress.State.Releasing.equals(ip.getState()))
+                                                    .map(PublicIpAddress::getAddress)
+                                                    .collect(Collectors.toList());
+
+            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude);
+            cmd.setNetworkOverview(networkOverviewTO);
+
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(associatedWithNetworkId, router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
@@ -901,6 +910,15 @@ public class CommandSetupHelper {
                 }
             }
             final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipsToSend);
+
+            final List<Ip> ipsToExclude = ipAddrList.stream()
+                                                    .filter(ip -> IpAddress.State.Releasing.equals(ip.getState()))
+                                                    .map(PublicIpAddress::getAddress)
+                                                    .collect(Collectors.toList());
+
+            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude);
+            cmd.setNetworkOverview(networkOverviewTO);
+
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(ipAddrList.get(0).getNetworkId(), router.getId()));
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
@@ -981,7 +999,7 @@ public class CommandSetupHelper {
             nicsToExclude.add(nic);
         }
 
-        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, nicsToExclude);
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, nicsToExclude, new ArrayList<>());
         setupCmd.setNetworkOverview(networkOverview);
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
@@ -1000,7 +1018,7 @@ public class CommandSetupHelper {
         return setupCmd;
     }
 
-    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude) {
+    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
 
@@ -1024,6 +1042,7 @@ public class CommandSetupHelper {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
                                                               .stream()
                                                               .map(IPAddressVO::getAddress)
+                                                              .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
                                                               .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                               .collect(Collectors.toList()));
@@ -1031,6 +1050,7 @@ public class CommandSetupHelper {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
                                                               .stream()
                                                               .map(IPAddressVO::getAddress)
+                                                              .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
                                                               .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                               .collect(Collectors.toList()));
