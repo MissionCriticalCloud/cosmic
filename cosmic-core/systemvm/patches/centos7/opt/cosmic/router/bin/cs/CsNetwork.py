@@ -1,22 +1,19 @@
 import logging
 
-from CsDatabag import CsDatabag
-from keepalived import Keepalived
 from firewall import Firewall
+from keepalived import Keepalived
 
 
-class CsNetwork(CsDatabag):
-    def __init__(self, config, cs_databag):
-        super(CsNetwork, self).__init__(cs_databag)
-
+class CsNetwork(object):
+    def __init__(self, config):
         self.config = config
 
-        self.keepalived = Keepalived(self.config, self.dbag)
-        self.firewall = Firewall(self.config, self.dbag)
+        self.keepalived = Keepalived(self.config)
+        self.firewall = Firewall(self.config)
 
     def sync(self):
         logging.debug("Starting sync of network!")
-        logging.debug(self.dbag)
+        logging.debug(self.config.dbag_network_overview)
 
         self.keepalived.sync()
         self.firewall.sync()

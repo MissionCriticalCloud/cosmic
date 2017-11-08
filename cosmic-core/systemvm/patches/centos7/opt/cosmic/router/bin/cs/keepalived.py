@@ -9,9 +9,8 @@ import utils
 
 
 class Keepalived(object):
-    def __init__(self, config, dbag):
+    def __init__(self, config):
         self.config = config
-        self.dbag = dbag
 
         self.jinja_env = Environment(
             loader=FileSystemLoader('/opt/cosmic/router/bin/cs/templates'),
@@ -65,7 +64,7 @@ class Keepalived(object):
     def parse_vrrp_instances(self):
         sync_interface_name = self.get_sync_interface_name()
 
-        for interface in self.dbag['interfaces']:
+        for interface in self.config.dbag_network_overview['interfaces']:
             # Skip the certain networks
             if interface['metadata']['type'] in self.vrrp_excluded_interface_types:
                 continue
@@ -141,7 +140,7 @@ class Keepalived(object):
             f.write(content)
 
     def get_sync_interface_name(self):
-        for interface in self.dbag['interfaces']:
+        for interface in self.config.dbag_network_overview['interfaces']:
             if interface['metadata']['type'] == 'sync':
                 return utils.get_interface_name_from_mac_address(interface['mac_address'])
 

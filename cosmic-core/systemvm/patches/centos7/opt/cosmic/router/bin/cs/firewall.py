@@ -2,14 +2,12 @@ import logging
 
 from jinja2 import Environment, FileSystemLoader
 
-from CsCmdline import CsCmdline
 import utils
 
 
 class Firewall(object):
-    def __init__(self, config, dbag):
+    def __init__(self, config):
         self.config = config
-        self.dbag = dbag
 
         self.jinja_env = Environment(
             loader=FileSystemLoader('/opt/cosmic/router/bin/cs/templates'),
@@ -19,18 +17,16 @@ class Firewall(object):
         # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
         self.fw = self.config.fw
 
-        self.cmdline = CsCmdline("cmdline")
-
     def sync(self):
-        if self.cmdline.dbag['config']['type'] == 'vpcrouter':
+        if self.config.dbag_cmdline['config']['type'] == 'vpcrouter':
             self.sync_vpc()
-        elif self.cmdline.dbag['config']['type'] == 'router':
+        elif self.config.dbag_cmdline['config']['type'] == 'router':
             self.sync_nonvpc()
 
     def sync_vpc(self):
         self.add_default_vpc_rules()
 
-        for interface in self.dbag['interfaces']:
+        for interface in self.config.dbag_network_overview['interfaces']:
             device = utils.get_interface_name_from_mac_address(interface['mac_address'])
 
             if interface['metadata']['type'] in ['sync', 'other']:
