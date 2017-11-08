@@ -4,16 +4,12 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class NetworkOverviewConfigItem extends AbstractConfigItemFacade {
 
     @Override
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {
-        if (cmd.getNetworkOverview() == null) {
-            return new LinkedList<>();
-        }
         return generateConfigItems(cmd.getNetworkOverview());
     }
 

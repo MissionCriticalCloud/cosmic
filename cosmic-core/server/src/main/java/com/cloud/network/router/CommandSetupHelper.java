@@ -48,7 +48,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
@@ -1019,34 +1018,10 @@ public class CommandSetupHelper {
     public SetupGuestNetworkCommand createSetupGuestNetworkCommand(final VirtualRouter router, final boolean add, final NicProfile guestNic) {
         final Network network = _networkModel.getNetwork(guestNic.getNetworkId());
 
-        String networkDns1 = null;
-        String networkDns2 = null;
-
-        final boolean dnsProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dns, Provider.VPCVirtualRouter);
-        final boolean dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dhcp, Provider.VPCVirtualRouter);
-
-        final boolean setupDns = dnsProvided || dhcpProvided;
-
-        if (setupDns) {
-            networkDns1 = network.getDns1();
-            networkDns2 = network.getDns2();
-        }
-
         final Nic nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
-        final String networkDomain = network.getNetworkDomain();
-        final String dhcpRange = getGuestDhcpRange(guestNic, network, _entityMgr.findById(DataCenter.class, network.getDataCenterId()));
-
         final NicProfile nicProfile = _networkModel.getNicProfile(router, nic.getNetworkId(), null);
 
-        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(
-                dhcpRange,
-                networkDomain,
-                router.getIsRedundantRouter(),
-                networkDns1,
-                networkDns2,
-                add,
-                _itMgr.toNicTO(nicProfile, router.getHypervisorType())
-        );
+        final SetupGuestNetworkCommand setupCmd = new SetupGuestNetworkCommand(_itMgr.toNicTO(nicProfile, router.getHypervisorType()));
 
         final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router);
         setupCmd.setNetworkOverview(networkOverview);
@@ -1096,58 +1071,32 @@ public class CommandSetupHelper {
             interfaceTO.setMacAddress(nic.getMacAddress());
 
             final List<String> ipv4Addresses = new ArrayList<>();
-
             if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                ipv4Addresses.add(getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
+                ipv4Addresses.add(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
             }
 
             final NetworkVO network = _networkDao.findById(nic.getNetworkId());
             if (network != null) {
-                final MetadataTO metadataTO = new MetadataTO();
-
                 final TrafficType trafficType = network.getTrafficType();
-                final GuestType guestType = network.getGuestType();
                 if (TrafficType.Public.equals(trafficType)) {
-                    metadataTO.setType("public");
-
                     if (router.getVpcId() != null) {
                         ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
                                                           .stream()
                                                           .map(IPAddressVO::getAddress)
                                                           .map(Ip::addr)
-                                                          .map(ip -> getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                          .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                           .collect(Collectors.toList()));
                     } else {
                         ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
                                                           .stream()
                                                           .map(IPAddressVO::getAddress)
                                                           .map(Ip::addr)
-                                                          .map(ip -> getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                          .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                           .collect(Collectors.toList()));
                     }
-                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Isolated.equals(guestType)) {
-                    metadataTO.setType("tier");
-                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Private.equals(guestType)) {
-                    metadataTO.setType("private");
-                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Sync.equals(guestType)) {
-                    metadataTO.setType("sync");
-                } else {
-                    metadataTO.setType("other");
                 }
 
-                if (StringUtils.isNotBlank(network.getNetworkDomain())) {
-                    metadataTO.setDomainName(network.getNetworkDomain());
-                }
-
-                if (StringUtils.isNotBlank(network.getDns1())) {
-                    metadataTO.setDns1(network.getDns1());
-                }
-
-                if (StringUtils.isNotBlank(network.getDns2())) {
-                    metadataTO.setDns2(network.getDns2());
-                }
-
-                interfaceTO.setMetadata(metadataTO);
+                interfaceTO.setMetadata(new MetadataTO(network));
             }
 
             interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new String[ipv4Addresses.size()]));
@@ -1158,17 +1107,5 @@ public class CommandSetupHelper {
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
 
         return networkOverviewTO;
-    }
-
-    private String getIpv4AddressWithCidrSize(final String ipv4Address, final String netmask) {
-        if (StringUtils.isBlank(ipv4Address)) {
-            return null;
-        }
-
-        if (StringUtils.isBlank(netmask)) {
-            return ipv4Address;
-        }
-
-        return ipv4Address + "/" + NetUtils.getCidrSize(netmask);
     }
 }

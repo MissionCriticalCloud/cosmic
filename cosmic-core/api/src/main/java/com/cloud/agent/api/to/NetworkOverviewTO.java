@@ -1,5 +1,10 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
+import com.cloud.network.Networks.TrafficType;
+import com.cloud.utils.StringUtils;
+
 public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
 
@@ -45,6 +50,38 @@ public class NetworkOverviewTO {
             private String domainName;
             private String dns1;
             private String dns2;
+
+            public MetadataTO() {
+            }
+
+            public MetadataTO(Network network) {
+                final TrafficType trafficType = network.getTrafficType();
+                final GuestType guestType = network.getGuestType();
+
+                if (TrafficType.Public.equals(trafficType)) {
+                    type = "public";
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Isolated.equals(guestType)) {
+                    type = "tier";
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Private.equals(guestType)) {
+                    type = "private";
+                } else if (TrafficType.Guest.equals(trafficType) && GuestType.Sync.equals(guestType)) {
+                    type = "sync";
+                } else {
+                    type = "other";
+                }
+
+                if (StringUtils.isNotBlank(network.getNetworkDomain())) {
+                    domainName = network.getNetworkDomain();
+                }
+
+                if (StringUtils.isNotBlank(network.getDns1())) {
+                    dns1 = network.getDns1();
+                }
+
+                if (StringUtils.isNotBlank(network.getDns2())) {
+                    dns2 = network.getDns2();
+                }
+            }
 
             public String getType() {
                 return type;
