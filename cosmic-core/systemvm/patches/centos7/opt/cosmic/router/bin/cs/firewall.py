@@ -111,7 +111,8 @@ class Firewall(object):
         # )])
 
     def add_public_vpc_rules(self, device):
-        self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % device])
+        # TODO FIXME Look at this rule
+        # self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % device])
         self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % device])
         self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % device])
 
