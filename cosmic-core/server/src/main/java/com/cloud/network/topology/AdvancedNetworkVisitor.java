@@ -31,7 +31,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,12 +97,11 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final VirtualRouter router = vpcip.getRouter();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
-        final Map<String, String> vlanMacAddress = vpcip.getVlanMacAddress();
         final List<PublicIpAddress> ipsToSend = vpcip.getIpsToSend();
 
         if (!ipsToSend.isEmpty()) {
             s_logger.debug("DEBUG::in AdvancedNetworkTopology --> will createVpcAssociatePublicIPCommands and send to router --> " + router.getId());
-            _commandSetupHelper.createVpcAssociatePublicIPCommands(router, ipsToSend, cmds, vlanMacAddress);
+            _commandSetupHelper.createVpcAssociatePublicIPCommands(router, ipsToSend, cmds);
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
         } else {
             return true;

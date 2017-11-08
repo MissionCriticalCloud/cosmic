@@ -425,13 +425,12 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final long vmId) {
+    public void createAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds) {
         final String ipAssocCommand = "IPAssocCommand";
-        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, vmId);
+        createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
     }
 
-    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand, final
-    long vmId) {
+    public void createRedundantAssociateIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds, final String ipAssocCommand) {
         final Map<String, ArrayList<PublicIpAddress>> vlanIpMap = getVlanIpMap(ips);
 
         for (final Map.Entry<String, ArrayList<PublicIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
@@ -860,11 +859,10 @@ public class CommandSetupHelper {
         cmds.addCommand("deleteIpalias", deleteIpaliasCmd);
     }
 
-    public void createVpcAssociatePublicIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds,
-                                                   final Map<String, String> vlanMacAddress) {
+    public void createVpcAssociatePublicIPCommands(final VirtualRouter router, final List<? extends PublicIpAddress> ips, final Commands cmds) {
         final String ipAssocCommand = "IPAssocVpcCommand";
         if (router.getIsRedundantRouter()) {
-            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand, 0);
+            createRedundantAssociateIPCommands(router, ips, cmds, ipAssocCommand);
             return;
         }
 
@@ -950,50 +948,6 @@ public class CommandSetupHelper {
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand("applyS2SVpn", cmd);
-    }
-
-    public void createVpcAssociatePrivateIPCommands(final VirtualRouter router, final List<PrivateIpAddress> ips, final Commands cmds, final NicProfile nicProfile, final boolean
-            add) {
-        // Ensure that in multiple vlans case we first send all ip addresses of
-        // vlan1, then all ip addresses of vlan2, etc..
-        final Map<String, ArrayList<PrivateIpAddress>> vlanIpMap = new HashMap<>();
-        for (final PrivateIpAddress ipAddress : ips) {
-            final String vlanTag = ipAddress.getBroadcastUri();
-            ArrayList<PrivateIpAddress> ipList = vlanIpMap.get(vlanTag);
-            if (ipList == null) {
-                ipList = new ArrayList<>();
-            }
-
-            ipList.add(ipAddress);
-            vlanIpMap.put(vlanTag, ipList);
-        }
-
-        for (final Map.Entry<String, ArrayList<PrivateIpAddress>> vlanAndIp : vlanIpMap.entrySet()) {
-            final List<PrivateIpAddress> ipAddrList = vlanAndIp.getValue();
-            final IpAddressTO[] ipsToSend = new IpAddressTO[ipAddrList.size()];
-            int i = 0;
-
-            for (final PrivateIpAddress ipAddr : ipAddrList) {
-                final Network network = _networkModel.getNetwork(ipAddr.getNetworkId());
-                final String deviceMacAddress = getMacAddressOfPluggedNic(router, ipAddr.getNetworkId());
-                final IpAddressTO ip = new IpAddressTO(Account.ACCOUNT_ID_SYSTEM, ipAddr.getIpAddress(), add, false,
-                        ipAddr.getSourceNat(), ipAddr.getBroadcastUri(), ipAddr.getGateway(), ipAddr.getNetmask(),
-                        deviceMacAddress, null, false);
-
-                ip.setTrafficType(network.getTrafficType());
-                ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
-
-                ipsToSend[i++] = ip;
-            }
-            final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipsToSend);
-            cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-            cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(ipAddrList.get(0).getNetworkId(), router.getId()));
-            cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-            final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-            cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-            cmds.addCommand("IPAssocVpcCommand", cmd);
-        }
     }
 
     public void createSetupPrivateGatewayCommand(final VirtualRouter router, final PrivateIpAddress ipAddr, final Commands cmds, final NicProfile nicProfile, final boolean add) {

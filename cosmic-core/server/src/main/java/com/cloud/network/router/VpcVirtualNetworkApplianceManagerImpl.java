@@ -179,7 +179,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             if (publicIps != null && !publicIps.isEmpty()) {
                 s_logger.debug("Found " + publicIps.size() + " ip(s) to apply as a part of domR " + domainRouterVO + " start.");
                 // Re-apply public ip addresses - should come before PF/LB/VPN
-                _commandSetupHelper.createVpcAssociatePublicIPCommands(domainRouterVO, publicIps, cmds, vlanMacAddress);
+                _commandSetupHelper.createVpcAssociatePublicIPCommands(domainRouterVO, publicIps, cmds);
             }
         }
     }
@@ -301,7 +301,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
                 // create ip assoc for source nat
                 if (!sourceNat.isEmpty()) {
-                    _commandSetupHelper.createVpcAssociatePublicIPCommands(domainRouterVO, sourceNat, cmds, vlanMacAddress);
+                    _commandSetupHelper.createVpcAssociatePublicIPCommands(domainRouterVO, sourceNat, cmds);
                 }
 
                 // add VPC router to guest networks

@@ -1427,7 +1427,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             s_logger.debug("Found " + publicIps.size() + " ip(s) to apply as a part of domR " + router + " start.");
             // Re-apply public ip addresses - should come before PF/LB/VPN
             if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
-                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds, 0);
+                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds);
             }
         }
     }
@@ -1569,8 +1569,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
     }
 
-    private void finalizeMonitorServiceOnStrat(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final Provider provider,
-                                               final long networkId, final Boolean add) {
+    private void finalizeMonitorServiceOnStart(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final long networkId, final Boolean add) {
 
         final NetworkVO network = _networkDao.findById(networkId);
 
@@ -1802,9 +1801,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     final String serviceMonitringSet = _configDao.getValue(Config.EnableServiceMonitoring.key());
 
                     if (serviceMonitringSet != null && serviceMonitringSet.equalsIgnoreCase("true")) {
-                        finalizeMonitorServiceOnStrat(cmds, profile, router, provider, guestNetworkId, true);
+                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, true);
                     } else {
-                        finalizeMonitorServiceOnStrat(cmds, profile, router, provider, guestNetworkId, false);
+                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, false);
                     }
                 }
             }
