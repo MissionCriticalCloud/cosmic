@@ -27,28 +27,13 @@ public class VRScripts {
     public final static String CONFIG_CACHE_LOCATION = "/var/cache/cloud/";
     public final static int DEFAULT_EXECUTEINVR_TIMEOUT = 120; //Seconds
 
-    // New scripts for use with chef
-    public static final String UPDATE_CONFIG = "bin/update_config.py";
-
-    // TODO Remove scripts
     // Present inside the router
+    public static final String UPDATE_CONFIG = "bin/update_config.py";
     public static final String S2SVPN_CHECK = "scripts/checkbatchs2svpn.sh";
-    public static final String S2SVPN_IPSEC = "scripts/ipsectunnel.sh";
-    public static final String DHCP = "scripts/edithosts.sh";
-    public static final String DNSMASQ_CONFIG = "scripts/dnsmasq.sh";
-    public static final String IPASSOC = "scripts/ipassoc.sh";
-    public static final String LB = "scripts/loadbalancer.sh";
-    public static final String MONITOR_SERVICE = "scripts/monitor_service.sh";
-    public static final String PASSWORD = "scripts/savepassword.sh";
     public static final String ROUTER_ALERTS = "scripts/getRouterAlerts.sh";
     public static final String RVR_CHECK = "scripts/checkrouter.sh";
-    public static final String VMDATA = "bin/vmdata.py";
-    public static final String RVR_BUMPUP_PRI = "scripts/bumpup_priority.sh";
     public static final String VERSION = "scripts/get_template_version.sh";
     public static final String VPC_NETUSAGE = "scripts/vpc_netusage.sh";
-    public static final String VPC_SOURCE_NAT = "scripts/vpc_snat.sh";
-    public static final String VPC_STATIC_ROUTE = "scripts/vpc_staticroute.sh";
-    public static final String VPN_L2TP = "scripts/vpn_l2tp.sh";
 
     // Present on the KVM hypervisor
     public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";

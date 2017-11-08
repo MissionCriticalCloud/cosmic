@@ -1,6 +1,5 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.BumpUpPriorityCommand;
 import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
@@ -70,7 +69,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(DeleteIpAliasCommand.class, new DeleteIpAliasConfigItem());
         flyweight.put(VmDataCommand.class, new VmDataConfigItem());
         flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
-        flyweight.put(BumpUpPriorityCommand.class, new BumpUpPriorityConfigItem());
         flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
