@@ -51,7 +51,9 @@ class Config(object):
         return any((self.is_vpc(), self.is_router(), self.is_dhcp()))
 
     def use_extdns(self):
-        return self.dbag_cmdline.idata().get('useextdns', 'false') == 'true'
+        if 'useextdns' in self.dbag_cmdline['config']:
+            return self.dbag_cmdline['config']['useextdns'] == 'true'
+        return False
 
     def get_domain(self):
         return self.dbag_cmdline['config']['domain']
