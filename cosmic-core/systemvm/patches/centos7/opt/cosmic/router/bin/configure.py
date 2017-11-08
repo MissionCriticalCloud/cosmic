@@ -777,7 +777,7 @@ class IpTablesExecutor:
         self.config = config
 
     def process(self):
-        firewall = Firewall(self.config, CsDatabag('network_overview'))
+        firewall = Firewall(self.config, CsDatabag('network_overview').dbag)
         firewall.sync()
 
         acls = CsAcl('networkacl', self.config)
