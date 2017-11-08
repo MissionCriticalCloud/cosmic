@@ -3,14 +3,15 @@ import logging
 import CsHelper
 from CsFile import CsFile
 from CsProcess import CsProcess
-from cs.CsDatabag import CsDatabag
 
 HAPROXY_CONF_T = "/etc/haproxy/haproxy.cfg.new"
 HAPROXY_CONF_P = "/etc/haproxy/haproxy.cfg"
 
 
-class CsLoadBalancer(CsDatabag):
-    """ Manage Load Balancer entries """
+class CsLoadBalancer(object):
+    def __init__(self, config):
+        self.config = config
+        self.dbag = self.config.dbag_loadbalancer
 
     def process(self):
         if "config" not in self.dbag.keys():
@@ -60,30 +61,39 @@ class CsLoadBalancer(CsDatabag):
                 dstport = None
 
             if ingress_rules is None or dstport is None:
-                firewall.append(["filter", "", "-A INPUT -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (protocol, ip, port)])
+                firewall.append(["filter", "", "-A INPUT -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
+                    protocol, ip, port)])
             else:
                 for ingress_rule in ingress_rules:
                     ingress_cidrs = ingress_rule['cidr'].split(',')
-                    if 'first_port' in ingress_rule.keys() and 'type' in ingress_rule.keys() and ingress_rule['first_port'] == int(dstport) and ingress_rule['type'] == protocol:
+                    if 'first_port' in ingress_rule.keys() and 'type' in ingress_rule.keys() and ingress_rule[
+                        'first_port'] == int(dstport) and ingress_rule['type'] == protocol:
                         for ingress_cidr in ingress_cidrs:
-                            firewall.append(["filter", "", "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (ingress_cidr, protocol, ip, port)])
+                            firewall.append(["filter", "",
+                                             "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
+                                                 ingress_cidr, protocol, ip, port)])
 
         for rules in stat_rules:
             path = rules.split(':')
             ip = path[0]
             port = path[1]
             if ingress_rules is None:
-                firewall.append(["filter", "", "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+                firewall.append(
+                    ["filter", "", "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
             else:
                 for ingress_rule in ingress_rules:
                     ingress_cidrs = ingress_rule['cidr'].split(',')
                     if 'first_port' in ingress_rule.keys() and ingress_rule['first_port'] == int(port):
                         for ingress_cidr in ingress_cidrs:
-                            firewall.append(["filter", "", "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (ingress_cidr, ingress_rule['type'], ip, port)])
+                            firewall.append(["filter", "",
+                                             "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
+                                                 ingress_cidr, ingress_rule['type'], ip, port)])
 
         for rules in remove_rules:
             path = rules.split(':')
             ip = path[0]
             port = path[1]
-            if ["filter", "", "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)] in firewall:
-                firewall.remove(["filter", "", "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])
+            if ["filter", "",
+                "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)] in firewall:
+                firewall.remove(
+                    ["filter", "", "-A INPUT -p tcp -d %s --dport %s -m state --state NEW -j ACCEPT" % (ip, port)])

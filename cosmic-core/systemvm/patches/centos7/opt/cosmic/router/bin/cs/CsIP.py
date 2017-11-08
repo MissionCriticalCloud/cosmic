@@ -10,7 +10,7 @@ from CsPasswordService import CsPasswordService
 VRRP_TYPES = ['guest']
 
 
-class CsIP:
+class CsIP(object):
     def __init__(self, dev, macaddress, config):
         self.dev = dev
         self.macaddress = macaddress

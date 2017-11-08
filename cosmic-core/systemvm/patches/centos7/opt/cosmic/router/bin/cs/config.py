@@ -1,5 +1,3 @@
-from CsAddress import CsAddress
-from CsCmdline import CsCmdline
 from CsDatabag import CsDatabag
 
 
@@ -10,12 +8,18 @@ class Config(object):
 
         self.dbag_cmdline = CsDatabag('cmdline').dbag
         self.dbag_dhcpentry = CsDatabag('dhcpentry').dbag
+        self.dbag_firewallrules = CsDatabag('firewallrules').dbag
         self.dbag_forwardingrules = CsDatabag('forwardingrules').dbag
+        self.dbag_loadbalancer = CsDatabag('loadbalancer').dbag
+        self.dbag_monitorservice = CsDatabag('monitorservice').dbag
         self.dbag_network_acl = CsDatabag('networkacl').dbag
         self.dbag_network_overview = CsDatabag('network_overview').dbag
         self.dbag_network_virtualrouter = CsDatabag('virtualrouter').dbag
         self.dbag_publicip_acl = CsDatabag('publicipacl').dbag
+        self.dbag_remoteaccessvpn = CsDatabag('remoteaccessvpn').dbag
+        self.dbag_site2sitevpn = CsDatabag('site2sitevpn').dbag
         self.dbag_vmdata = CsDatabag('vmdata').dbag
+        self.dbag_vpnuserlist = CsDatabag('vpnuserlist').dbag
 
     def cmdline(self):
         return self.dbag_cmdline

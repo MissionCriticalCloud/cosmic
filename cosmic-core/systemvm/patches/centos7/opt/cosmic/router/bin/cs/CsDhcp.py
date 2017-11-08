@@ -3,7 +3,6 @@ import logging
 from netaddr import *
 
 import CsHelper
-from CsDatabag import CsDatabag
 from CsGuestNetwork import CsGuestNetwork
 from cs.CsFile import CsFile
 
@@ -13,7 +12,11 @@ DHCP_OPTS = "/etc/dhcpopts.txt"
 CLOUD_CONF = "/etc/dnsmasq.d/cloud.conf"
 
 
-class CsDhcp(CsDatabag):
+class CsDhcp(object):
+    def __init__(self, config):
+        self.config = config
+        self.dbag = self.config.dbag_dhcpentry
+
     """ Manage dhcp entries """
 
     def process(self):
@@ -49,8 +52,10 @@ class CsDhcp(CsDatabag):
         # We restart DNSMASQ every time the configure.py is called in order to avoid lease problems.
         # But only do that on the master or else VMs will get leases from the backup resulting in
         # Cloud-init to get the passwd and other meta-data from the backup as well.
-        if not self.cl.is_redundant() or self.cl.is_master():
-            CsHelper.execute2("systemctl restart dnsmasq")
+
+        # TODO FIME Do we restart dnsmasq???? Who is master?
+        # if not self.cl.is_redundant() or self.cl.is_master():
+        #     CsHelper.execute2("systemctl restart dnsmasq")
 
     def configure_server(self):
         # self.conf.addeq("dhcp-hostsfile=%s" % DHCP_HOSTS)

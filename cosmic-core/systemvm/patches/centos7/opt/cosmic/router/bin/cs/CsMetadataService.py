@@ -1,13 +1,11 @@
 import base64
 import logging
 import os
-from fcntl import flock, LOCK_EX, LOCK_UN
-
 import sys
+from fcntl import flock, LOCK_EX, LOCK_UN
 
 import CsHelper
 from CsApp import CsApp
-from CsDatabag import CsDatabag
 
 
 class CsMetadataService(CsApp):
@@ -116,7 +114,11 @@ server {
                         ])
 
 
-class CsMetadataServiceVMConfig(CsDatabag):
+class CsMetadataServiceVMConfig(object):
+    def __init__(self, config):
+        self.config = config
+        self.dbag = self.config.dbag_vmdata
+
     def process(self):
         for ip in self.dbag:
             if "id" == ip:

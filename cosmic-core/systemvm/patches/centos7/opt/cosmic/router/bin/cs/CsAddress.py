@@ -10,20 +10,6 @@ VRRP_TYPES = ['guest']
 
 
 class CsAddress(CsDatabag):
-    def compare(self):
-        for dbag_data in self.config.ips.dbag.values():
-            if dbag_data == "ips":
-                continue
-            print dbag_data
-            try:
-                device_data = dbag_data[0]
-                ip = CsIP(device_data['device'], device_data["mac_address"], self.config)
-                # Process for all types, except the link local interface
-                if device_data['device'] is not self.get_control_if():
-                    ip.compare(self.dbag)
-            except:
-                pass
-
     def get_interfaces(self):
         interfaces = []
         for dev in self.dbag:
@@ -69,23 +55,6 @@ class CsAddress(CsDatabag):
         if ip:
             return ip.get_netmask()
         return "255.255.255.0"
-
-    def needs_vrrp(self, o):
-        """
-        Returns if the ip needs to be managed by keepalived or not
-        """
-        if "nw_type" in o and o['nw_type'] in VRRP_TYPES:
-            return True
-        return False
-
-    def get_control_if(self):
-        """
-        Return the address object that has the control interface
-        """
-        for interface in self.get_interfaces():
-            if interface.is_control():
-                return interface
-        return None
 
     def process(self):
         has_sourcenat = False
