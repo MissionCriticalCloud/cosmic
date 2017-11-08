@@ -2,11 +2,12 @@ import logging
 import subprocess
 
 import CsHelper
-from CsAddress import VRRP_TYPES
 from CsDnsmasq import CsDnsmasq
 from CsInterface import CsInterface
 from CsMetadataService import CsMetadataService
 from CsPasswordService import CsPasswordService
+
+VRRP_TYPES = ['guest']
 
 
 class CsIP:

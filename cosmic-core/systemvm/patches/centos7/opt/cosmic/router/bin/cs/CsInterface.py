@@ -1,6 +1,6 @@
 from netaddr import IPAddress, IPNetwork
 
-from CsAddress import VRRP_TYPES
+VRRP_TYPES = ['guest']
 
 
 class CsInterface:
