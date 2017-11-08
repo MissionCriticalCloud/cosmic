@@ -18,7 +18,7 @@ from cs.CsNetfilter import CsNetfilters
 from cs.CsNetwork import CsNetwork
 from cs.CsStaticRoutes import CsStaticRoutes
 from cs.CsVrConfig import CsVrConfig
-from firewall import Firewall
+from cs.firewall import Firewall
 
 OCCURRENCES = 1
 
