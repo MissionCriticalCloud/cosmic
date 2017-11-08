@@ -1042,24 +1042,6 @@ public class CommandSetupHelper {
         return setupCmd;
     }
 
-    protected String getGuestDhcpRange(final NicProfile guestNic, final Network guestNetwork, final DataCenter dc) {
-        String dhcpRange = null;
-        // setup dhcp range
-        if (dc.getNetworkType() == NetworkType.Basic) {
-            final long cidrSize = NetUtils.getCidrSize(guestNic.getIPv4Netmask());
-            final String cidr = NetUtils.getCidrSubNet(guestNic.getIPv4Gateway(), cidrSize);
-            if (cidr != null) {
-                dhcpRange = NetUtils.getIpRangeStartIpFromCidr(cidr, cidrSize);
-            }
-        } else if (dc.getNetworkType() == NetworkType.Advanced) {
-            final String cidr = guestNetwork.getCidr();
-            if (cidr != null) {
-                dhcpRange = NetUtils.getDhcpRange(cidr);
-            }
-        }
-        return dhcpRange;
-    }
-
     private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
