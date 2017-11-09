@@ -22,10 +22,15 @@ class Conntrackd(object):
         self.restart_conntrackd()
 
     def write_config_file(self):
-        content = self.jinja_env.get_template('keepalived_sync_group.conf').render(
+        address_ignore = []
+
+        for ipv4 in self.config.get_all_ipv4_addresses_on_router():
+            address_ignore.append('IPv4_address %s' % ipv4)
+
+        content = self.jinja_env.get_template('conntrackd.conf').render(
             ipv6_multicast_address=self.conntrackd_ipv6_multicast_address,
             sync_interface=self.config.get_sync_interface_name(),
-            address_ignore=self.config.get_all_ipv4_addresses_on_router()
+            address_ignore=address_ignore
         )
 
         logging.debug("Writing keepalived config file %s with content \n%s" % (
