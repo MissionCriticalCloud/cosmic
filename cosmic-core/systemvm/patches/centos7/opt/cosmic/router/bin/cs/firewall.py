@@ -68,6 +68,10 @@ class Firewall(object):
                         "state --state NEW,ESTABLISHED -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"])
 
+        self.fw.append(["filter", "", "-A FORWARD -s %s ! -d %s -j ACCEPT" % (
+            self.config.dbag_cmdline['config']['vpccidr'], self.config.dbag_cmdline['config']['vpccidr']
+        )])
+
     def add_tier_vpc_rules(self, device, cidr):
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % device])
         self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
@@ -101,11 +105,9 @@ class Firewall(object):
         self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % device])
         self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % device])
 
-        if 'source_nat' in self.config.dbag_network_overview['services'] and \
-                self.config.dbag_network_overview['services']['source_nat']:
-            self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (
-                cidr, device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
-            )])
+        self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (
+            cidr, device, cidr.split('/')[0]
+        )])
 
     def add_public_vpc_rules(self, device):
         # TODO FIXME Look at this rule
@@ -134,6 +136,18 @@ class Firewall(object):
 
         # create source nat list chain
         self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
+
+        if 'source_nat' in self.config.dbag_network_overview['services'] and \
+                self.config.dbag_network_overview['services']['source_nat']:
+            logging.info("Adding SourceNAT for interface %s to %s" % (
+                device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
+            ))
+            self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 10.0.0.0/8 -j RETURN" % device])
+            self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 172.16.0.0/12 -j RETURN" % device])
+            self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 192.168.0.0/16 -j RETURN" % device])
+            self.fw.append(["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (
+                device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
+            )])
 
     def add_private_vpc_rules(self, device, cidr):
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % device])
