@@ -32,7 +32,8 @@ class Keepalived(object):
         logging.info("Going to sync configuration for keepalived")
         self.init_config()
         self.write_global_defs()
-        self.parse_vrrp_instances()
+        self.parse_vrrp_interface_instances()
+        # self.parse_vrrp_routes_instance()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
@@ -61,7 +62,7 @@ class Keepalived(object):
 
         self.write_keepalived_config('global_defs.conf', content)
 
-    def parse_vrrp_instances(self):
+    def parse_vrrp_interface_instances(self):
         sync_interface_name = self.get_sync_interface_name()
 
         for interface in self.config.dbag_network_overview['interfaces']:
@@ -79,7 +80,7 @@ class Keepalived(object):
 
             ipv4addresses = []
             for i in interface['ipv4_addresses']:
-                ipv4addresses.append('%s dev %s' % (i, interface_name))
+                ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
 
             self.write_vrrp_instance(
                 name=name,
@@ -90,6 +91,30 @@ class Keepalived(object):
                 virtual_ipaddress=['fe80:1::%s' % interface_id],
                 virtual_ipaddress_excluded=ipv4addresses
             )
+
+    def parse_vrrp_routes_instance(self):
+        sync_interface_name = self.get_sync_interface_name()
+
+        virtualroutes = []
+        # TODO Add static routes
+
+        # if 'source_nat' in self.config.dbag_network_overview['services'] and \
+        #         self.config.dbag_network_overview['services']['source_nat']:
+        #         self.config.dbag_network_overview['services']['source_nat'][0]['to']
+        #     )]
+
+
+
+        self.write_vrrp_instance(
+            name='routes',
+            state='BACKUP',
+            interface=sync_interface_name,
+            virtual_router_id=255,
+            advert_int='1',
+            virtual_routes=virtualroutes
+        )
+
+
 
     def write_vrrp_instance(
             self,

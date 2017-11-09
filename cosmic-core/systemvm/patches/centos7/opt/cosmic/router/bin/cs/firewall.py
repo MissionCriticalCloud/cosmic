@@ -34,9 +34,9 @@ class Firewall(object):
             elif interface['metadata']['type'] == 'public':
                 self.add_public_vpc_rules(device)
             elif interface['metadata']['type'] == 'tier':
-                self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0])
+                self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
             elif interface['metadata']['type'] == 'private':
-                self.add_private_vpc_rules(device, interface['ipv4_addresses'][0])
+                self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
 
     def sync_nonvpc(self):
         print "NON VPC NOT YET IMPLEMENTED"
