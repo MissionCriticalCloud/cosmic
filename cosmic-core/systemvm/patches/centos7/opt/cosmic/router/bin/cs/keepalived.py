@@ -98,12 +98,12 @@ class Keepalived(object):
         virtualroutes = []
         # TODO Add static routes
 
-        # if 'source_nat' in self.config.dbag_network_overview['services'] and \
-        #         self.config.dbag_network_overview['services']['source_nat']:
-        #         self.config.dbag_network_overview['services']['source_nat'][0]['to']
-        #     )]
-
-
+        # Set the default route here until we handle it from the management server
+        if 'source_nat' in self.config.dbag_network_overview['services'] and \
+                self.config.dbag_network_overview['services']['source_nat']:
+            virtualroutes.append(
+                'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
+            )
 
         self.write_vrrp_instance(
             name='routes',
@@ -113,8 +113,6 @@ class Keepalived(object):
             advert_int='1',
             virtual_routes=virtualroutes
         )
-
-
 
     def write_vrrp_instance(
             self,

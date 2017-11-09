@@ -1058,7 +1058,7 @@ public class CommandSetupHelper {
                                                                     .map(IPAddressVO::getAddress)
                                                                     .filter(ip -> !ipsToExclude.contains(ip))
                                                                     .map(Ip::addr)
-                                                                    .map(ServiceSourceNatTO::new)
+                                                                    .map(ip -> new ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
                                                                     .collect(Collectors.toList()));
                         } else {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)

@@ -163,12 +163,14 @@ public class NetworkOverviewTO {
 
         public static class ServiceSourceNatTO {
             private String to;
+            private String gateway;
 
             public ServiceSourceNatTO() {
             }
 
-            public ServiceSourceNatTO(final String to) {
+            public ServiceSourceNatTO(final String to, final String gateway) {
                 this.to = to;
+                this.gateway = gateway;
             }
 
             public String getTo() {
@@ -177,6 +179,14 @@ public class NetworkOverviewTO {
 
             public void setTo(final String to) {
                 this.to = to;
+            }
+
+            public String getGateway() {
+                return gateway;
+            }
+
+            public void setGateway(final String gateway) {
+                this.gateway = gateway;
             }
         }
 
