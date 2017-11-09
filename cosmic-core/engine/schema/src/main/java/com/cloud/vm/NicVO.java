@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.net.URI;
 import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -329,48 +328,5 @@ public class NicVO implements Nic {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final NicVO nicVO = (NicVO) o;
-        return id == nicVO.id &&
-                networkId == nicVO.networkId &&
-                deviceId == nicVO.deviceId &&
-                defaultNic == nicVO.defaultNic &&
-                secondaryIp == nicVO.secondaryIp &&
-                Objects.equals(instanceId, nicVO.instanceId) &&
-                Objects.equals(iPv4Address, nicVO.iPv4Address) &&
-                Objects.equals(iPv6Address, nicVO.iPv6Address) &&
-                Objects.equals(iPv4Netmask, nicVO.iPv4Netmask) &&
-                Objects.equals(isolationUri, nicVO.isolationUri) &&
-                addressFormat == nicVO.addressFormat &&
-                Objects.equals(broadcastUri, nicVO.broadcastUri) &&
-                Objects.equals(iPv4Gateway, nicVO.iPv4Gateway) &&
-                Objects.equals(macAddress, nicVO.macAddress) &&
-                mode == nicVO.mode &&
-                state == nicVO.state &&
-                Objects.equals(reserver, nicVO.reserver) &&
-                Objects.equals(reservationId, nicVO.reservationId) &&
-                Objects.equals(updateTime, nicVO.updateTime) &&
-                Objects.equals(iPv6Gateway, nicVO.iPv6Gateway) &&
-                Objects.equals(iPv6Cidr, nicVO.iPv6Cidr) &&
-                reservationStrategy == nicVO.reservationStrategy &&
-                vmType == nicVO.vmType &&
-                Objects.equals(removed, nicVO.removed) &&
-                Objects.equals(created, nicVO.created) &&
-                Objects.equals(uuid, nicVO.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, instanceId, iPv4Address, iPv6Address, iPv4Netmask, isolationUri, addressFormat, broadcastUri, iPv4Gateway, macAddress, mode, networkId, state, reserver,
-                reservationId, deviceId, updateTime, defaultNic, iPv6Gateway, iPv6Cidr, reservationStrategy, vmType, removed, created, uuid, secondaryIp);
     }
 }

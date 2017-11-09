@@ -1096,7 +1096,7 @@ public class CommandSetupHelper {
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         for (final NicVO nic : nics) {
-            if (nicToBeRemoved.equals(nic)) {
+            if (nicToBeRemoved != null && nicToBeRemoved.equals(nic)) {
                 // FIXME Discuss options regarding DB update first or passing removed items along..
                 continue;
             }
