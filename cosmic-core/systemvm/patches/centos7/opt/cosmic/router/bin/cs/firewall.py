@@ -101,10 +101,11 @@ class Firewall(object):
         self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % device])
         self.fw.append(["", "front", "-A NETWORK_STATS -i %s" % device])
 
-        # TODO FIXME Do source natting in a different place.
-        # self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (
-        #     cidr, device, self.address['public_ip']
-        # )])
+        if 'source_nat' in self.config.dbag_network_overview['services'] and \
+                self.config.dbag_network_overview['services']['source_nat']:
+            self.fw.append(["nat", "front", "-A POSTROUTING -s %s -o %s -j SNAT --to-source %s" % (
+                cidr, device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
+            )])
 
     def add_public_vpc_rules(self, device):
         # TODO FIXME Look at this rule

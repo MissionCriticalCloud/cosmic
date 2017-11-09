@@ -1023,6 +1023,7 @@ public class CommandSetupHelper {
     private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
+
         final ServiceTO servicesTO = new ServiceTO();
         final List<ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
@@ -1056,7 +1057,6 @@ public class CommandSetupHelper {
                                                                     .map(IPAddressVO::getAddress)
                                                                     .filter(ip -> !ipsToExclude.contains(ip))
                                                                     .map(Ip::addr)
-                                                                    .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                                     .map(ServiceSourceNatTO::new)
                                                                     .collect(Collectors.toList()));
                         } else {
@@ -1081,6 +1081,7 @@ public class CommandSetupHelper {
 
         servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new ServiceSourceNatTO[serviceSourceNatsTO.size()]));
         networkOverviewTO.setServices(servicesTO);
+
         return networkOverviewTO;
     }
 }
