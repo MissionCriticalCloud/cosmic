@@ -39,7 +39,6 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.server.ConfigurationServer;
@@ -299,21 +298,11 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                         guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
                         break;
                     case DomainRouter:
-                        if (network.getVpcId() != null) {
-                            final Vpc vpc = _vpcDao.findById(network.getVpcId());
-                            if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway,
-                                    Provider.VPCVirtualRouter) && !vpc.isRedundant()) {
-                                // Non-redundant VPCs that support Gateway acquire the gateway ip on their nic
-                                guestIp = network.getGateway();
-                            } else {
-                                // In other cases, acquire an ip address from the DHCP range (take lowest possible)
-                                guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
-                            }
-                        } else if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat,
-                                Provider.VirtualRouter)) {
-                            // Non VPCs that support SourceNat acquire the gateway ip on their nic
+                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VirtualRouter)) {
+                            // Networks that support SourceNat acquire the gateway ip on their nic
                             guestIp = network.getGateway();
                         } else {
+                            // In other cases, acquire an ip address from the DHCP range (take lowest possible)
                             guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
                         }
                         break;

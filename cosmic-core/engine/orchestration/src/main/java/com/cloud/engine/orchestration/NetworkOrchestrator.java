@@ -2396,14 +2396,14 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @Override
     public NicProfile prepareNic(final VirtualMachineProfile vmProfile, final DeployDestination dest, final ReservationContext context, final long nicId, final Network network)
-            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException, InsufficientCapacityException,
+            throws ConcurrentOperationException, InsufficientCapacityException,
             ResourceUnavailableException {
 
         final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vmProfile.getId());
         final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
         final NicVO nic = _nicDao.findById(nicId);
 
-        NicProfile profile = null;
+        NicProfile profile;
         if (nic.getReservationStrategy() == Nic.ReservationStrategy.Start) {
             nic.setState(Nic.State.Reserving);
             nic.setReservationId(context.getReservationId());
@@ -2415,9 +2415,9 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
             final URI isolationUri = nic.getIsolationUri();
 
-            profile = new NicProfile(nic, network, broadcastUri, isolationUri,
+            profile = new NicProfile(nic, network, broadcastUri, isolationUri, networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
+                    _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
 
-                    networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
             guru.reserve(profile, network, vmProfile, dest, context);
             nic.setIPv4Address(profile.getIPv4Address());
             nic.setAddressFormat(profile.getFormat());
