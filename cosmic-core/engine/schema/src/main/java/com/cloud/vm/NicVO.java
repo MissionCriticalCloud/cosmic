@@ -340,7 +340,32 @@ public class NicVO implements Nic {
             return false;
         }
         final NicVO nicVO = (NicVO) o;
-        return id == nicVO.id;
+        return id == nicVO.id &&
+                networkId == nicVO.networkId &&
+                deviceId == nicVO.deviceId &&
+                defaultNic == nicVO.defaultNic &&
+                secondaryIp == nicVO.secondaryIp &&
+                Objects.equals(instanceId, nicVO.instanceId) &&
+                Objects.equals(iPv4Address, nicVO.iPv4Address) &&
+                Objects.equals(iPv6Address, nicVO.iPv6Address) &&
+                Objects.equals(iPv4Netmask, nicVO.iPv4Netmask) &&
+                Objects.equals(isolationUri, nicVO.isolationUri) &&
+                addressFormat == nicVO.addressFormat &&
+                Objects.equals(broadcastUri, nicVO.broadcastUri) &&
+                Objects.equals(iPv4Gateway, nicVO.iPv4Gateway) &&
+                Objects.equals(macAddress, nicVO.macAddress) &&
+                mode == nicVO.mode &&
+                state == nicVO.state &&
+                Objects.equals(reserver, nicVO.reserver) &&
+                Objects.equals(reservationId, nicVO.reservationId) &&
+                Objects.equals(updateTime, nicVO.updateTime) &&
+                Objects.equals(iPv6Gateway, nicVO.iPv6Gateway) &&
+                Objects.equals(iPv6Cidr, nicVO.iPv6Cidr) &&
+                reservationStrategy == nicVO.reservationStrategy &&
+                vmType == nicVO.vmType &&
+                Objects.equals(removed, nicVO.removed) &&
+                Objects.equals(created, nicVO.created) &&
+                Objects.equals(uuid, nicVO.uuid);
     }
 
     @Override
