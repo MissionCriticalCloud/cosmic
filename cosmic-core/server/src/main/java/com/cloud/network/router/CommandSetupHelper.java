@@ -32,6 +32,7 @@ import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NetworkOverviewTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.IPv4Address;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
@@ -1034,9 +1035,9 @@ public class CommandSetupHelper {
                 final InterfaceTO interfaceTO = new InterfaceTO();
                 interfaceTO.setMacAddress(nic.getMacAddress());
 
-                final List<String> ipv4Addresses = new ArrayList<>();
+                final List<IPv4Address> ipv4Addresses = new ArrayList<>();
                 if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                    ipv4Addresses.add(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()));
+                    ipv4Addresses.add(new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()), nic.getIPv4Gateway()));
                 }
 
                 final NetworkVO network = _networkDao.findById(nic.getNetworkId());
@@ -1049,7 +1050,7 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                              .map(ip -> new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
                                                               .collect(Collectors.toList()));
 
                             serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
@@ -1065,7 +1066,7 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                              .map(ip -> new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
                                                               .collect(Collectors.toList()));
                         }
                     }
@@ -1073,7 +1074,7 @@ public class CommandSetupHelper {
                     interfaceTO.setMetadata(new MetadataTO(network));
                 }
 
-                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new String[ipv4Addresses.size()]));
+                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new IPv4Address[ipv4Addresses.size()]));
                 interfacesTO.add(interfaceTO);
             });
 
