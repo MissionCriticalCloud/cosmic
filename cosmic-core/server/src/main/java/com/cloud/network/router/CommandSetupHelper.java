@@ -1048,6 +1048,15 @@ public class CommandSetupHelper {
                                                               .map(Ip::addr)
                                                               .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                               .collect(Collectors.toList()));
+
+                            servicesTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
+                                                           .stream()
+                                                           .map(IPAddressVO::getAddress)
+                                                           .filter(ip -> !ipsToExclude.contains(ip))
+                                                           .map(Ip::addr)
+                                                           .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                           .map(NetworkOverviewTO.ServiceSourceNatTO::new)
+                                                           .collect(Collectors.toList()));
                         } else {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
                                                               .stream()

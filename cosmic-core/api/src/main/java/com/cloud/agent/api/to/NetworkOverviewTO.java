@@ -130,23 +130,13 @@ public class NetworkOverviewTO {
     }
 
     public static class ServiceSourceNatTO extends ServiceTO {
-        private String from;
         private String to;
 
         public ServiceSourceNatTO() {
         }
 
-        public ServiceSourceNatTO(final String from, final String to) {
-            this.from = from;
+        public ServiceSourceNatTO(final String to) {
             this.to = to;
-        }
-
-        public String getFrom() {
-            return from;
-        }
-
-        public void setFrom(final String from) {
-            this.from = from;
         }
 
         public String getTo() {
