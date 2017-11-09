@@ -22,6 +22,7 @@ class Keepalived(object):
         # self.keepalived_config_path = '/tmp/keep/'
 
         self.sync_group_name = 'cosmic'
+        self.routes_vrrp_id = '255'
 
         self.filenames = []
         self.vrrp_instances = []
@@ -33,7 +34,7 @@ class Keepalived(object):
         self.init_config()
         self.write_global_defs()
         self.parse_vrrp_interface_instances()
-        # self.parse_vrrp_routes_instance()
+        self.parse_vrrp_routes_instance()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
@@ -109,8 +110,9 @@ class Keepalived(object):
             name='routes',
             state='BACKUP',
             interface=sync_interface_name,
-            virtual_router_id=255,
+            virtual_router_id=self.routes_vrrp_id,
             advert_int='1',
+            virtual_ipaddress=['fe80:1::%s' % self.routes_vrrp_id],
             virtual_routes=virtualroutes
         )
 
