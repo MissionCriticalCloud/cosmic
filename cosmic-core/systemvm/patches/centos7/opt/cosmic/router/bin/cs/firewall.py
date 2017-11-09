@@ -136,6 +136,7 @@ class Firewall(object):
 
         # create source nat list chain
         self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
+        self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
 
         if 'source_nat' in self.config.dbag_network_overview['services'] and \
                 self.config.dbag_network_overview['services']['source_nat']:
