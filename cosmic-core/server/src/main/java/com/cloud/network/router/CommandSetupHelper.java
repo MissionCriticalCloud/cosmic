@@ -1032,7 +1032,7 @@ public class CommandSetupHelper {
             networkDns2 = network.getDns2();
         }
 
-        final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
+        final Nic nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
         final String networkDomain = network.getNetworkDomain();
         final String dhcpRange = getGuestDhcpRange(guestNic, network, _entityMgr.findById(DataCenter.class, network.getDataCenterId()));
 
@@ -1048,12 +1048,7 @@ public class CommandSetupHelper {
                 _itMgr.toNicTO(nicProfile, router.getHypervisorType())
         );
 
-        NicVO toBeRemovedNic = null;
-        if (!add) {
-            toBeRemovedNic = nic;
-        }
-
-        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, toBeRemovedNic);
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router);
         setupCmd.setNetworkOverview(networkOverview);
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
@@ -1090,16 +1085,12 @@ public class CommandSetupHelper {
         return dhcpRange;
     }
 
-    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final NicVO nicToBeRemoved) {
+    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         for (final NicVO nic : nics) {
-            if (nicToBeRemoved != null && nicToBeRemoved.equals(nic)) {
-                // FIXME Discuss options regarding DB update first or passing removed items along..
-                continue;
-            }
             final InterfaceTO interfaceTO = new InterfaceTO();
 
             interfaceTO.setMacAddress(nic.getMacAddress());
