@@ -12,7 +12,7 @@ from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
-from cs.CsNetwork import CsNetwork
+from cs.network import Network
 from cs.CsRemoteAccessVpn import CsRemoteAccessVpn
 from cs.CsSite2SiteVpn import CsSite2SiteVpn
 from cs.CsVpnUser import CsVpnUser
@@ -101,7 +101,7 @@ def main(argv):
 
     if process_file == "network_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_network = CsNetwork(config)
+        cs_network = Network(config)
         cs_network.sync()
 
     if process_file == "cmd_line":

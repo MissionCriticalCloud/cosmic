@@ -64,7 +64,7 @@ class Keepalived(object):
         self.write_keepalived_config('global_defs.conf', content)
 
     def parse_vrrp_interface_instances(self):
-        sync_interface_name = self.get_sync_interface_name()
+        sync_interface_name = self.config.get_sync_interface_name()
 
         for interface in self.config.dbag_network_overview['interfaces']:
             # Skip the certain networks
@@ -94,7 +94,7 @@ class Keepalived(object):
             )
 
     def parse_vrrp_routes_instance(self):
-        sync_interface_name = self.get_sync_interface_name()
+        sync_interface_name = self.config.get_sync_interface_name()
 
         virtualroutes = []
         # TODO Add static routes
@@ -163,11 +163,6 @@ class Keepalived(object):
 
         with open(self.keepalived_config_path + filename, 'w') as f:
             f.write(content)
-
-    def get_sync_interface_name(self):
-        for interface in self.config.dbag_network_overview['interfaces']:
-            if interface['metadata']['type'] == 'sync':
-                return utils.get_interface_name_from_mac_address(interface['mac_address'])
 
     def zap_keepalived_config_directory(self):
         logging.debug("Zapping directory %s" % self.keepalived_config_path)

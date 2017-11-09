@@ -1,3 +1,4 @@
+import utils
 from CsDatabag import CsDatabag
 
 
@@ -73,3 +74,17 @@ class Config(object):
             if name in conf:
                 dns.append(conf[name])
         return dns
+
+    def get_sync_interface_name(self):
+        for interface in self.dbag_network_overview['interfaces']:
+            if interface['metadata']['type'] == 'sync':
+                return utils.get_interface_name_from_mac_address(interface['mac_address'])
+
+    def get_all_ipv4_addresses_on_router(self):
+        ipv4_addresses = []
+
+        for interface in self.dbag_network_overview['interfaces']:
+            for ip in interface['ipv4_addresses']:
+                ipv4_addresses.append(ip['cidr'].split('/')[0])
+
+        return ipv4_addresses

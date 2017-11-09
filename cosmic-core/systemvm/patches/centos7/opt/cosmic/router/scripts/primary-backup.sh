@@ -1,24 +1,4 @@
 #!/bin/sh
-#
-# (C) 2006-2011 by Pablo Neira Ayuso <pablo@netfilter.org>
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# Description:
-#
-# This is the script for primary-backup setups for keepalived
-# (http://www.keepalived.org). You may adapt it to make it work with other
-# high-availability managers.
-#
-# Do not forget to include the required modifications to your keepalived.conf
-# file to invoke this script during keepalived's state transitions.
-#
-# Contributions to improve this script are welcome :).
-#
-# For Cosmic added state writes to KEEPALIVED_STATE file
 
 CONNTRACKD_BIN=/usr/sbin/conntrackd
 CONNTRACKD_LOCK=/var/lock/conntrack.lock
