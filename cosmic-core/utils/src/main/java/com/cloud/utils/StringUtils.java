@@ -62,11 +62,11 @@ public class StringUtils {
     }
 
     public static boolean isNotBlank(final String str) {
-        return str != null && str.trim().length() > 0;
-    }
+        if (str != null && str.trim().length() > 0) {
+            return true;
+        }
 
-    public static boolean isBlank(final String str) {
-        return str == null || str.trim().length() == 0;
+        return false;
     }
 
     public static String cleanupTags(String tags) {
