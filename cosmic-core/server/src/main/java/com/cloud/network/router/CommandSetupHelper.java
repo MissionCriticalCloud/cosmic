@@ -33,6 +33,7 @@ import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NetworkOverviewTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
@@ -1021,6 +1022,7 @@ public class CommandSetupHelper {
     private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
+        final List<ServiceTO> servicesTO = new ArrayList<>();
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
@@ -1065,6 +1067,7 @@ public class CommandSetupHelper {
             });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
+        networkOverviewTO.setServices(servicesTO.toArray(new ServiceTO[servicesTO.size()]));
         return networkOverviewTO;
     }
 }
