@@ -40,7 +40,6 @@ import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.StaticRouteDao;
@@ -54,7 +53,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -64,7 +62,6 @@ import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,8 +82,6 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
     private VMInstanceDao _vmDao;
     @Inject
     private StaticRouteDao _staticRouteDao;
-    @Inject
-    private VpcManager _vpcMgr;
     @Inject
     private PrivateIpDao _privateIpDao;
     @Inject
@@ -722,68 +717,5 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         final Commands cmds = new Commands(Command.OnError.Continue);
         _commandSetupHelper.createSite2SiteVpnCfgCommands(conn, isCreate, router, cmds);
         return _nwHelper.sendCommandsToRouter(router, cmds);
-    }
-
-    protected Pair<Map<String, PublicIpAddress>, Map<String, PublicIpAddress>> getNicsToChangeOnRouter(final List<? extends PublicIpAddress> publicIps, final VirtualRouter
-            router) {
-        // 1) check which nics need to be plugged/unplugged and plug/unplug them
-
-        final Map<String, PublicIpAddress> nicsToPlug = new HashMap<>();
-        final Map<String, PublicIpAddress> nicsToUnplug = new HashMap<>();
-
-        // find out nics to unplug
-        for (final PublicIpAddress ip : publicIps) {
-            final long publicNtwkId = ip.getNetworkId();
-
-            // if ip is not associated to any network, and there are no firewall
-            // rules, release it on the backend
-            if (!_vpcMgr.isIpAllocatedToVpc(ip)) {
-                ip.setState(IpAddress.State.Releasing);
-            }
-
-            if (ip.getState() == IpAddress.State.Releasing) {
-                final Nic nic = _nicDao.findByIp4AddressAndNetworkIdAndInstanceId(publicNtwkId, router.getId(), ip.getAddress().addr());
-                if (nic != null) {
-                    nicsToUnplug.put(ip.getVlanTag(), ip);
-                    s_logger.debug("Need to unplug the nic for ip=" + ip + "; vlan=" + ip.getVlanTag() + " in public network id =" + publicNtwkId);
-                }
-            }
-        }
-
-        // find out nics to plug
-        for (final PublicIpAddress ip : publicIps) {
-            final URI broadcastUri = BroadcastDomainType.Vlan.toUri(ip.getVlanTag());
-            final long publicNtwkId = ip.getNetworkId();
-
-            // if ip is not associated to any network, and there are no firewall
-            // rules, release it on the backend
-            if (!_vpcMgr.isIpAllocatedToVpc(ip)) {
-                ip.setState(IpAddress.State.Releasing);
-            }
-
-            if (ip.getState() == IpAddress.State.Allocated || ip.getState() == IpAddress.State.Allocating) {
-                // nic has to be plugged only when there are no nics for this
-                // vlan tag exist on VR
-                final Nic nic = _nicDao.findByNetworkIdInstanceIdAndBroadcastUri(publicNtwkId, router.getId(), broadcastUri.toString());
-
-                if (nic == null && nicsToPlug.get(ip.getVlanTag()) == null) {
-                    nicsToPlug.put(ip.getVlanTag(), ip);
-                    s_logger.debug("Need to plug the nic for ip=" + ip + "; vlan=" + ip.getVlanTag() + " in public network id =" + publicNtwkId);
-                } else {
-                    final PublicIpAddress nicToUnplug = nicsToUnplug.get(ip.getVlanTag());
-                    if (nicToUnplug != null) {
-                        final NicVO nicVO = _nicDao.findByIp4AddressAndNetworkIdAndInstanceId(publicNtwkId, router.getId(), nicToUnplug.getAddress().addr());
-                        nicVO.setIPv4Address(ip.getAddress().addr());
-                        _nicDao.update(nicVO.getId(), nicVO);
-                        s_logger.debug("Updated the nic " + nicVO + " with the new ip address " + ip.getAddress().addr());
-                        nicsToUnplug.remove(ip.getVlanTag());
-                    }
-                }
-            }
-        }
-
-        final Pair<Map<String, PublicIpAddress>, Map<String, PublicIpAddress>> nicsToChange = new Pair<>(nicsToPlug,
-                nicsToUnplug);
-        return nicsToChange;
     }
 }
