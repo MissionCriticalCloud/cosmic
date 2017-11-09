@@ -34,6 +34,7 @@ import com.cloud.agent.api.to.NetworkOverviewTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
@@ -1022,7 +1023,8 @@ public class CommandSetupHelper {
     private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
-        final List<ServiceTO> servicesTO = new ArrayList<>();
+        final ServiceTO servicesTO = new ServiceTO();
+        final List<ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
@@ -1049,14 +1051,14 @@ public class CommandSetupHelper {
                                                               .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
                                                               .collect(Collectors.toList()));
 
-                            servicesTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
-                                                           .stream()
-                                                           .map(IPAddressVO::getAddress)
-                                                           .filter(ip -> !ipsToExclude.contains(ip))
-                                                           .map(Ip::addr)
-                                                           .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
-                                                           .map(NetworkOverviewTO.ServiceSourceNatTO::new)
-                                                           .collect(Collectors.toList()));
+                            serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
+                                                                    .stream()
+                                                                    .map(IPAddressVO::getAddress)
+                                                                    .filter(ip -> !ipsToExclude.contains(ip))
+                                                                    .map(Ip::addr)
+                                                                    .map(ip -> NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()))
+                                                                    .map(ServiceSourceNatTO::new)
+                                                                    .collect(Collectors.toList()));
                         } else {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
                                                               .stream()
@@ -1076,7 +1078,9 @@ public class CommandSetupHelper {
             });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
-        networkOverviewTO.setServices(servicesTO.toArray(new ServiceTO[servicesTO.size()]));
+
+        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new ServiceSourceNatTO[serviceSourceNatsTO.size()]));
+        networkOverviewTO.setServices(servicesTO);
         return networkOverviewTO;
     }
 }

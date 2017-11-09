@@ -7,7 +7,7 @@ import com.cloud.utils.StringUtils;
 
 public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
-    private ServiceTO[] services;
+    private ServiceTO services;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -17,11 +17,11 @@ public class NetworkOverviewTO {
         this.interfaces = interfaces;
     }
 
-    public ServiceTO[] getServices() {
+    public ServiceTO getServices() {
         return services;
     }
 
-    public void setServices(final ServiceTO[] services) {
+    public void setServices(final ServiceTO services) {
         this.services = services;
     }
 
@@ -126,25 +126,37 @@ public class NetworkOverviewTO {
         }
     }
 
-    public static abstract class ServiceTO {
-    }
+    public static class ServiceTO {
+        private ServiceSourceNatTO[] sourceNat;
 
-    public static class ServiceSourceNatTO extends ServiceTO {
-        private String to;
-
-        public ServiceSourceNatTO() {
+        public ServiceTO() {
         }
 
-        public ServiceSourceNatTO(final String to) {
-            this.to = to;
+        public static class ServiceSourceNatTO {
+            private String to;
+
+            public ServiceSourceNatTO() {
+            }
+
+            public ServiceSourceNatTO(final String to) {
+                this.to = to;
+            }
+
+            public String getTo() {
+                return to;
+            }
+
+            public void setTo(final String to) {
+                this.to = to;
+            }
         }
 
-        public String getTo() {
-            return to;
+        public ServiceSourceNatTO[] getSourceNat() {
+            return sourceNat;
         }
 
-        public void setTo(final String to) {
-            this.to = to;
+        public void setSourceNat(final ServiceSourceNatTO[] sourceNat) {
+            this.sourceNat = sourceNat;
         }
     }
 }
