@@ -13,16 +13,20 @@ class PasswordService(object):
             elif interface['metadata']['type'] == 'public':
                 pass
             elif interface['metadata']['type'] == 'tier':
-                self.start_password_service(interface['ipv4_addresses'])
+                self.start_password_service(interface['ipv4_addresses'][0]['cidr'])
             elif interface['metadata']['type'] == 'private':
                 pass
 
     @staticmethod
-    def start_password_service(listen_ip):
+    def start_password_service(cidr):
+        listen_ip = cidr.split("/")[0]
 
         try:
-            subprocess.call(['systemctl', 'start', 'cosmic-password-server@%s' % listen_ip])
+            try:
+                subprocess.call(['systemctl', 'start', 'cosmic-password-server@%s' % listen_ip])
+            except Exception as e:
+                logging.error("Failed to reload nginx with error: %s" % e)
             return True
         except Exception as e:
-            logging.error("Failed to start password service on %s due to error: %s" % (listen_ip, e))
+            logging.error('Failed to start password service on %s due to error: %s' % (listen_ip, e))
             return False
