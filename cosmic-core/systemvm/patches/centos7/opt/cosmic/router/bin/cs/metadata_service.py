@@ -120,8 +120,9 @@ class CsMetadataServiceVMConfig(object):
         self.config = config
         self.dbag = self.config.dbag_vmdata
 
-        self.app = CsMetadataService(self)
-        self.app.setup()
+        # FIXME
+        # self.app = CsMetadataService(self)
+        # self.app.setup()
 
     def process(self):
         for ip in self.dbag:
