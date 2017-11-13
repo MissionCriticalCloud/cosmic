@@ -58,7 +58,7 @@ public abstract class AbstractConfigItemFacade {
 
         flyweight.put(SetPortForwardingRulesVpcCommand.class, new SetPortForwardingRulesVpcConfigItem());
         flyweight.put(SetPortForwardingRulesCommand.class, new SetPortForwardingRulesConfigItem());
-        flyweight.put(SetStaticRouteCommand.class, new SetStaticRouteConfigItem());
+        flyweight.put(SetStaticRouteCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetStaticNatRulesCommand.class, new SetStaticNatRulesConfigItem());
         flyweight.put(LoadBalancerConfigCommand.class, new LoadBalancerConfigItem());
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());

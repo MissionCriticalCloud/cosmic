@@ -15,7 +15,6 @@ public class VRScripts {
     public static final String VPN_USER_LIST_CONFIG = "vpn_user_list.json";
     public static final String STATICNAT_RULES_CONFIG = "staticnat_rules.json";
     public static final String SITE_2_SITE_VPN_CONFIG = "site_2_site_vpn.json";
-    public static final String STATIC_ROUTES_CONFIG = "static_routes.json";
     public static final String REMOTE_ACCESS_VPN_CONFIG = "remote_access_vpn.json";
     public static final String MONITOR_SERVICE_CONFIG = "monitor_service.json";
     public static final String DHCP_CONFIG = "dhcp.json";

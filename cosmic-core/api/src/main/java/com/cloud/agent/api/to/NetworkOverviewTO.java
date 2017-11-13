@@ -8,6 +8,7 @@ import com.cloud.utils.StringUtils;
 public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
     private ServiceTO services;
+    private RouteTO[] routes;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -23,6 +24,14 @@ public class NetworkOverviewTO {
 
     public void setServices(final ServiceTO services) {
         this.services = services;
+    }
+
+    public RouteTO[] getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(final RouteTO[] routes) {
+        this.routes = routes;
     }
 
     public static class InterfaceTO {
@@ -196,6 +205,35 @@ public class NetworkOverviewTO {
 
         public void setSourceNat(final ServiceSourceNatTO[] sourceNat) {
             this.sourceNat = sourceNat;
+        }
+    }
+
+    public static class RouteTO {
+        private String cidr;
+        private String nextHop;
+
+        public RouteTO() {
+        }
+
+        public RouteTO(final String cidr, final String nextHop) {
+            this.cidr = cidr;
+            this.nextHop = nextHop;
+        }
+
+        public String getCidr() {
+            return cidr;
+        }
+
+        public void setCidr(final String cidr) {
+            this.cidr = cidr;
+        }
+
+        public String getNextHop() {
+            return nextHop;
+        }
+
+        public void setNextHop(final String nextHop) {
+            this.nextHop = nextHop;
         }
     }
 }

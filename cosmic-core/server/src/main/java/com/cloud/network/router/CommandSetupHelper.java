@@ -34,6 +34,7 @@ import com.cloud.agent.api.to.NetworkOverviewTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.IPv4Address;
 import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.RouteTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO;
 import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
 import com.cloud.agent.api.to.NicTO;
@@ -84,6 +85,7 @@ import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
+import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
@@ -163,6 +165,8 @@ public class CommandSetupHelper {
     private Site2SiteCustomerGatewayDao _s2sCustomerGatewayDao;
     @Inject
     private Site2SiteVpnGatewayDao _s2sVpnGatewayDao;
+    @Inject
+    private StaticRouteDao _staticRouteDao;
     @Inject
     private VpcDao _vpcDao;
     @Inject
@@ -625,6 +629,10 @@ public class CommandSetupHelper {
 
     public void createStaticRouteCommands(final List<StaticRouteProfile> staticRoutes, final VirtualRouter router, final Commands cmds) {
         final SetStaticRouteCommand cmd = new SetStaticRouteCommand(staticRoutes);
+
+        final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>());
+        cmd.setNetworkOverview(networkOverviewTO);
+
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
@@ -1027,6 +1035,15 @@ public class CommandSetupHelper {
 
         final ServiceTO servicesTO = new ServiceTO();
         final List<ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
+
+        final List<RouteTO> routesTO = new ArrayList<>();
+
+        routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
+                                       .stream()
+                                       .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress()))
+                                       .collect(Collectors.toList()));
+
+        networkOverviewTO.setRoutes(routesTO.toArray(new RouteTO[routesTO.size()]));
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
