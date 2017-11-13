@@ -1040,7 +1040,7 @@ public class CommandSetupHelper {
 
         routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
                                        .stream()
-                                       .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress()))
+                                       .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
                                        .collect(Collectors.toList()));
 
         networkOverviewTO.setRoutes(routesTO.toArray(new RouteTO[routesTO.size()]));

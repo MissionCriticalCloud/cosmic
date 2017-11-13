@@ -38,6 +38,8 @@ public class StaticRouteVO implements StaticRoute {
     private String cidr;
     @Column(name = "vpc_id")
     private Long vpcId;
+    @Column(name = "metric")
+    private Integer metric;
 
     protected StaticRouteVO() {
         uuid = UUID.randomUUID().toString();
@@ -101,6 +103,11 @@ public class StaticRouteVO implements StaticRoute {
     @Override
     public long getDomainId() {
         return domainId;
+    }
+
+    @Override
+    public Integer getMetric() {
+        return metric;
     }
 
     @Override

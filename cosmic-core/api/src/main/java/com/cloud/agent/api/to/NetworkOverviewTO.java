@@ -211,13 +211,15 @@ public class NetworkOverviewTO {
     public static class RouteTO {
         private String cidr;
         private String nextHop;
+        private Integer metric;
 
         public RouteTO() {
         }
 
-        public RouteTO(final String cidr, final String nextHop) {
+        public RouteTO(final String cidr, final String nextHop, final Integer metric) {
             this.cidr = cidr;
             this.nextHop = nextHop;
+            this.metric = metric;
         }
 
         public String getCidr() {
@@ -234,6 +236,14 @@ public class NetworkOverviewTO {
 
         public void setNextHop(final String nextHop) {
             this.nextHop = nextHop;
+        }
+
+        public Integer getMetric() {
+            return metric;
+        }
+
+        public void setMetric(final Integer metric) {
+            this.metric = metric;
         }
     }
 }

@@ -9,6 +9,7 @@ public class StaticRouteProfile implements StaticRoute {
     private final long domainId;
     private final StaticRoute.State state;
     private final long vpcId;
+    private final int metric;
 
     public StaticRouteProfile(final StaticRoute staticRoute) {
         id = staticRoute.getId();
@@ -19,6 +20,7 @@ public class StaticRouteProfile implements StaticRoute {
         state = staticRoute.getState();
         vpcId = staticRoute.getVpcId();
         ipAddress = staticRoute.getGwIpAddress();
+        metric = staticRoute.getMetric();
     }
 
     @Override
@@ -48,6 +50,11 @@ public class StaticRouteProfile implements StaticRoute {
 
     public String getGwIpAddress() {
         return ipAddress;
+    }
+
+    @Override
+    public Integer getMetric() {
+        return metric;
     }
 
     @Override
