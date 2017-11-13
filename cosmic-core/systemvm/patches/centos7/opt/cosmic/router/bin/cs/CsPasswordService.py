@@ -5,20 +5,6 @@ import CsHelper
 from CsProcess import CsProcess
 
 
-class CsPasswordService:
-    def __init__(self, ip):
-        self.ip = ip
-
-    def start(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "start")
-
-    def stop(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "stop")
-
-    def restart(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "restart")
-
-
 class CsPasswordServiceVMConfig:
     TOKEN_FILE = "/tmp/passwdsrvrtoken"
 

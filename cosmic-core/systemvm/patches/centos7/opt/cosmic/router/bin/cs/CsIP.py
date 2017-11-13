@@ -5,7 +5,6 @@ import CsHelper
 from CsDnsmasq import CsDnsmasq
 from CsInterface import CsInterface
 from CsMetadataService import CsMetadataService
-from CsPasswordService import CsPasswordService
 
 VRRP_TYPES = ['guest']
 
@@ -73,13 +72,6 @@ class CsIP(object):
             if self.config.has_metadata():
                 app = CsMetadataService(self)
                 app.setup()
-
-        # Start passwd server on non-redundant routers and on the master router of redundant pairs
-        if self.get_type() in ["guest"] and (not self.cl.is_redundant() or self.cl.is_master()):
-            CsPasswordService(self.address['public_ip']).start()
-        elif self.get_type() in ["guest"]:
-            # Or else make sure it's stopped
-            CsPasswordService(self.address['public_ip']).stop()
 
         if self.get_type() == "public" and self.config.is_vpc():
             if self.address["source_nat"]:
