@@ -97,7 +97,6 @@ class Keepalived(object):
         sync_interface_name = self.config.get_sync_interface_name()
 
         virtualroutes = []
-        # TODO Add static routes
 
         # Set the default route here until we handle it from the management server
         if 'source_nat' in self.config.dbag_network_overview['services'] and \
@@ -105,6 +104,9 @@ class Keepalived(object):
             virtualroutes.append(
                 'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
             )
+
+        for route in self.config.dbag_network_overview['routes']:
+            virtualroutes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
 
         self.write_vrrp_instance(
             name='routes',
