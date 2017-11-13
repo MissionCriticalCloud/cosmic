@@ -41,7 +41,7 @@ class CsPasswordServiceVMConfig:
                     logging.debug("Updating passwd server on %s" % ip)
                     if proc.find():
                         update_command = 'curl --header "DomU_Request: save_password" "http://{SERVER_IP}:8080/" -F "ip=' \
-                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}" --interface 127.0.0.1 ' \
+                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}"' \
                                          '>/dev/null 2>/dev/null &'.format(SERVER_IP=ip, VM_IP=vm_ip, PASSWORD=password,
                                                                            TOKEN=token)
                         result = CsHelper.execute(update_command)
