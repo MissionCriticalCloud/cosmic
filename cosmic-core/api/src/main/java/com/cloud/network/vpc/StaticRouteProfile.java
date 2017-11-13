@@ -1,5 +1,7 @@
 package com.cloud.network.vpc;
 
+import java.util.Objects;
+
 public class StaticRouteProfile implements StaticRoute {
     String ipAddress;
     private final long id;
@@ -74,5 +76,30 @@ public class StaticRouteProfile implements StaticRoute {
     @Override
     public Class<?> getEntityType() {
         return StaticRoute.class;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final StaticRouteProfile that = (StaticRouteProfile) o;
+        return id == that.id &&
+                accountId == that.accountId &&
+                domainId == that.domainId &&
+                vpcId == that.vpcId &&
+                metric == that.metric &&
+                Objects.equals(ipAddress, that.ipAddress) &&
+                Objects.equals(uuid, that.uuid) &&
+                Objects.equals(targetCidr, that.targetCidr) &&
+                state == that.state;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ipAddress, id, uuid, targetCidr, accountId, domainId, state, vpcId, metric);
     }
 }

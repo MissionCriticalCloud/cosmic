@@ -82,6 +82,7 @@ import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateIpAddress;
+import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
@@ -491,7 +492,7 @@ public class CommandSetupHelper {
                                                     .map(PublicIpAddress::getAddress)
                                                     .collect(Collectors.toList());
 
-            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude);
+            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
             cmd.setNetworkOverview(networkOverviewTO);
 
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
@@ -630,7 +631,9 @@ public class CommandSetupHelper {
     public void createStaticRouteCommands(final List<StaticRouteProfile> staticRoutes, final VirtualRouter router, final Commands cmds) {
         final SetStaticRouteCommand cmd = new SetStaticRouteCommand(staticRoutes);
 
-        final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>());
+        final List<StaticRouteProfile> staticRoutesToExclude = staticRoutes.stream().filter(route -> route.getState().equals(StaticRoute.State.Revoke)).collect(Collectors.toList());
+
+        final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>(), staticRoutesToExclude);
         cmd.setNetworkOverview(networkOverviewTO);
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
@@ -927,7 +930,7 @@ public class CommandSetupHelper {
                                                     .map(PublicIpAddress::getAddress)
                                                     .collect(Collectors.toList());
 
-            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude);
+            final NetworkOverviewTO networkOverviewTO = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
             cmd.setNetworkOverview(networkOverviewTO);
 
             cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
@@ -1010,7 +1013,7 @@ public class CommandSetupHelper {
             nicsToExclude.add(nic);
         }
 
-        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, nicsToExclude, new ArrayList<>());
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, nicsToExclude, new ArrayList<>(), new ArrayList<>());
         setupCmd.setNetworkOverview(networkOverview);
 
         final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
@@ -1029,7 +1032,8 @@ public class CommandSetupHelper {
         return setupCmd;
     }
 
-    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude) {
+    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude, final List<StaticRouteProfile>
+            staticRoutesToExclude) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
 
@@ -1040,6 +1044,8 @@ public class CommandSetupHelper {
 
         routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
                                        .stream()
+                                       .map(StaticRouteProfile::new)
+                                       .filter(route -> !staticRoutesToExclude.contains(route))
                                        .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
                                        .collect(Collectors.toList()));
 
