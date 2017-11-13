@@ -9,16 +9,16 @@ from cs.CsAcl import CsAcl
 from cs.CsDhcp import CsDhcp
 from cs.CsForwardingRules import CsForwardingRules
 from cs.CsLoadBalancer import CsLoadBalancer
-from cs.CsMetadataService import CsMetadataServiceVMConfig
 from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
-from cs.network import Network
 from cs.CsRemoteAccessVpn import CsRemoteAccessVpn
 from cs.CsSite2SiteVpn import CsSite2SiteVpn
 from cs.CsVpnUser import CsVpnUser
 from cs.CsVrConfig import CsVrConfig
 from cs.config import Config
 from cs.firewall import Firewall
+from cs.metadata_service import CsMetadataServiceVMConfig
+from cs.network import Network
 
 OCCURRENCES = 1
 

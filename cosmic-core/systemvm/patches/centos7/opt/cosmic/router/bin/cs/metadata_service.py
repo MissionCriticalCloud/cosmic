@@ -1,6 +1,7 @@
 import base64
 import logging
-from os import subprocess, os
+import os
+import subprocess
 import sys
 from fcntl import flock, LOCK_EX, LOCK_UN
 
