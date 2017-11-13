@@ -46,7 +46,7 @@ case "$1" in
     #
     # save file to mention we're master
     #
-    /usr/bin/echo MASTER > KEEPALIVED_STATE
+    /usr/bin/echo MASTER > $KEEPALIVED_STATE
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
@@ -100,7 +100,7 @@ case "$1" in
     #
     # save file to mention we're backup
     #
-    /usr/bin/echo BACKUP > KEEPALIVED_STATE
+    /usr/bin/echo BACKUP > $KEEPALIVED_STATE
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
@@ -118,7 +118,7 @@ case "$1" in
     #
     # save file to mention we're in fault/unknown state
     #
-    /usr/bin/echo UNKNOWN > KEEPALIVED_STATE
+    /usr/bin/echo UNKNOWN > $KEEPALIVED_STATE
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
