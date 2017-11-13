@@ -39,7 +39,7 @@ public class StaticRouteVO implements StaticRoute {
     @Column(name = "vpc_id")
     private Long vpcId;
     @Column(name = "metric")
-    private Integer metric;
+    private Integer metric = 100;
 
     protected StaticRouteVO() {
         uuid = UUID.randomUUID().toString();
