@@ -1,6 +1,6 @@
 import base64
 import logging
-import os
+from os import subprocess, os
 import sys
 from fcntl import flock, LOCK_EX, LOCK_UN
 
@@ -15,7 +15,10 @@ class CsMetadataService(CsApp):
         file = "/etc/nginx/conf.d/vhost-%s.conf" % self.dev
         if os.path.isfile(file):
             os.remove(file)
-            CsHelper.service("nginx", "reload")
+            try:
+                subprocess.call(['systemctl', 'reload', 'nginx'])
+            except Exception as e:
+                logging.error("Failed to reload nginx with error: %s" % e)
 
     def setup(self):
         vhost = """
@@ -100,24 +103,24 @@ server {
         with open(filename, 'w') as f:
             f.write(vhost)
 
-        CsHelper.service("nginx", "start")
-        CsHelper.service("nginx", "reload")
+        try:
+            subprocess.call(['systemctl', 'start', 'nginx'])
+        except Exception as e:
+            logging.error("Failed to start nginx with error: %s" % e)
 
-        self.fw.append(["", "front",
-                        "-A INPUT -i %s -d %s/32 -p tcp -m tcp -m state --state NEW --dport 80 -j ACCEPT" % (
-                            self.dev, self.ip)
-                        ])
-
-        self.fw.append(["", "front",
-                        "-A INPUT -i %s -d %s/32 -p tcp -m tcp -m state --state NEW --dport 443 -j ACCEPT" % (
-                            self.dev, self.ip)
-                        ])
+        try:
+            subprocess.call(['systemctl', 'reload', 'nginx'])
+        except Exception as e:
+            logging.error("Failed to reload nginx with error: %s" % e)
 
 
 class CsMetadataServiceVMConfig(object):
     def __init__(self, config):
         self.config = config
         self.dbag = self.config.dbag_vmdata
+
+        self.app = CsMetadataService(self)
+        self.app.setup()
 
     def process(self):
         for ip in self.dbag:

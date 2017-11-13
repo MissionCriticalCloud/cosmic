@@ -109,6 +109,14 @@ class Firewall(object):
             cidr, device, cidr.split('/')[0]
         )])
 
+        self.fw.append(["", "front", "-A INPUT -i %s -d %s -p tcp -m tcp -m state --state NEW --dport 80 -j ACCEPT" % (
+            device, cidr
+        )])
+
+        self.fw.append(["", "front", "-A INPUT -i %s -d %s -p tcp -m tcp -m state --state NEW --dport 443 -j ACCEPT" % (
+            device, cidr
+        )])
+
     def add_public_vpc_rules(self, device):
         # TODO FIXME Look at this rule
         # self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % device])
