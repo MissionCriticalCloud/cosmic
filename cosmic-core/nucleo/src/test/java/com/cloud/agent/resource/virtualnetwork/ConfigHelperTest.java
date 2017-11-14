@@ -153,7 +153,7 @@ public class ConfigHelperTest {
         ip.setGateway("1.1.1.254");
 
         eth0.setIpv4Addresses(new IPv4Address[] { ip });
-        networkOverview.setInterfaces(new InterfaceTO[]{ eth0 });
+        networkOverview.setInterfaces(new InterfaceTO[] { eth0 });
 
         command.setNetworkOverview(networkOverview);
 
@@ -181,7 +181,7 @@ public class ConfigHelperTest {
 
         final IPv4Address[] ips = interfaces[0].getIpv4Addresses();
         assertNotNull(ips);
-        assertEquals(1,ips.length);
+        assertEquals(1, ips.length);
         assertEquals(ip, ips[0]);
         assertEquals("1.1.1.1/24", ips[0].getCidr());
         assertEquals("1.1.1.254", ips[0].getGateway());
