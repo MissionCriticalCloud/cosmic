@@ -5885,8 +5885,11 @@
                                 name: {
                                     label: 'label.name'
                                 },
-                                publicip: {
-                                    label: 'label.public.ip'
+                                hostname: {
+                                    label: 'label.hypervisor'
+                                },
+                                linklocalip: {
+                                    label: 'label.linklocal.ip'
                                 },
                                 routerType: {
                                     label: 'label.type'
@@ -5903,10 +5906,6 @@
                                         'Error': 'off'
                                     }
                                 },
-                                requiresupgrade: {
-                                    label: 'label.requires.upgrade',
-                                    converter: cloudStack.converters.toBooleanText
-                                }
                             },
                             dataProvider: function (args) {
                                 var array1 = [];
