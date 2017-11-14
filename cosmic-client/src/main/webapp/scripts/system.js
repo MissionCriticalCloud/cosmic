@@ -2668,7 +2668,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listroutersresponse.router[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: routerActionfilter,
                                                                 data: jsonObj
@@ -3212,7 +3211,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listinternallbvmssresponse.internalloadbalancervm[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: internallbinstanceActionfilter,
                                                                 data: jsonObj
@@ -3827,7 +3825,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listroutersresponse.router[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: routerActionfilter,
                                                                 data: jsonObj
@@ -6499,7 +6496,6 @@
                                                 async: true,
                                                 success: function (json) {
                                                     var jsonObj = json.listroutersresponse.router[0];
-                                                    addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                     args.response.success({
                                                         actionFilter: routerActionfilter,
                                                         data: jsonObj
@@ -13392,14 +13388,6 @@
             jsonObj.state = jsonObj.allocationstate; //jsonObj.state == Enabled, Disabled
         } else {
             jsonObj.state = jsonObj.managedstate; //jsonObj.state == Unmanaged, PrepareUnmanaged, PrepareUnmanagedError
-        }
-    }
-
-    var addExtraPropertiesToRouterInstanceObject = function (jsonObj) {
-        if (jsonObj.isredundantrouter == true) {
-            jsonObj["redundantRouterState"] = jsonObj.redundantstate;
-        } else {
-            jsonObj["redundantRouterState"] = "";
         }
     }
 
