@@ -5,104 +5,31 @@ import subprocess
 import sys
 from fcntl import flock, LOCK_EX, LOCK_UN
 
+from jinja2 import Environment, FileSystemLoader
+
 import CsHelper
-from CsApp import CsApp
 
 
-class CsMetadataService(CsApp):
-    """ Set up Nginx """
+class MetadataService(object):
+    def __init__(self, config):
+        self.config = config
 
-    def remove(self):
-        file = "/etc/nginx/conf.d/vhost-%s.conf" % self.dev
-        if os.path.isfile(file):
-            os.remove(file)
-            try:
-                subprocess.call(['systemctl', 'reload', 'nginx'])
-            except Exception as e:
-                logging.error("Failed to reload nginx with error: %s" % e)
+        self.jinja_env = Environment(
+            loader=FileSystemLoader('/opt/cosmic/router/bin/cs/templates'),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
 
-    def setup(self):
-        vhost = """
-server {
-    listen       %s:80;
-    listen       %s:443 ssl;
-    server_name  _;
-    root         /var/www/html;
-    
-    autoindex off;
-    
-    location /latest/user-data {
-        rewrite ^/latest/user-data/?$ /userdata/$remote_addr/user-data break;
-        rewrite ^/latest/user-data$ /userdata/$remote_addr/user-data break;
-    }
-    
-    location /latest/meta-data {
-        rewrite ^/latest/meta-data/?$ /metadata/$remote_addr/meta-data break;
-        rewrite ^/latest/meta-data/(.+[^/])/?$ /metadata/$remote_addr/$1 break;
-        rewrite ^/latest/meta-data/(.+)$ /metadata/$remote_addr/$1 break;
-        rewrite ^/latest/meta-data/$ /metadata/$remote_addr/meta-data break;
-    }
-    
-    location /latest/availability-zone {
-        rewrite ^/latest/availability-zone/?$ /metadata/$remote_addr/availability-zone break;
-        rewrite ^/latest/availability-zone$ /metadata/$remote_addr/availability-zone break;
-    }
-    
-    location /latest/cloud-identifier {
-        rewrite ^/latest/cloud-identifier/?$ /metadata/$remote_addr/cloud-identifier break;
-        rewrite ^/latest/cloud-identifier$ /metadata/$remote_addr/cloud-identifier break;
-    }
-    
-    location /latest/instance-id {
-        rewrite ^/latest/instance-id/?$ /metadata/$remote_addr/instance-id break;
-        rewrite ^/latest/instance-id$ /metadata/$remote_addr/instance-id break;
-    }
-    
-    location /latest/local-hostname {
-        rewrite ^/latest/local-hostname/?$ /metadata/$remote_addr/local-hostname break;
-        rewrite ^/latest/local-hostname$ /metadata/$remote_addr/local-hostname break;
-    }
-    
-    location /latest/local-ipv4 {
-        rewrite ^/latest/local-ipv4/?$ /metadata/$remote_addr/local-ipv4 break;
-        rewrite ^/latest/local-ipv4$ /metadata/$remote_addr/local-ipv4 break;
-    }
-    
-    location /latest/public-hostname {
-        rewrite ^/latest/public-hostname/?$ /metadata/$remote_addr/public-hostname break;
-        rewrite ^/latest/public-hostname$ /metadata/$remote_addr/public-hostname break;
-    }
-    
-    location /latest/public-ipv4 {
-        rewrite ^/latest/public-ipv4/?$ /metadata/$remote_addr/public-ipv4 break;
-        rewrite ^/latest/public-ipv4$ /metadata/$remote_addr/public-ipv4 break;
-    }
-    
-    location /latest/public-keys {
-        rewrite ^/latest/public-keys/?$ /metadata/$remote_addr/public-keys break;
-        rewrite ^/latest/public-keys$ /metadata/$remote_addr/public-keys break;
-    }
-    
-    location /latest/service-offering {
-        rewrite ^/latest/service-offering/?$ /metadata/$remote_addr/service-offering break;
-        rewrite ^/latest/service-offering$ /metadata/$remote_addr/service-offering break;
-    }
-    
-    location /latest/vm-id {
-        rewrite ^/latest/vm-id/?$ /metadata/$remote_addr/vm-id break;
-        rewrite ^/latest/vm-id$ /metadata/$remote_addr/vm-id break;
-    }
-    
-    location /(userdata|metadata)/$remote_addr {
-        autoindex off;
-    }
-}
-""" % (self.ip, self.ip)
+        self.nginx_conf_path = '/etc/nginx/conf.d/'
 
-        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.ip)
+        self.filenames = []
 
-        with open(filename, 'w') as f:
-            f.write(vhost)
+    def sync(self):
+        for interface in self.config.dbag_network_overview['interfaces']:
+            if interface['metadata']['type'] == 'tier':
+                self.setup(interface['ipv4_addresses'][0]['cidr'])
+
+        self.zap_nginx_config_directory()
 
         try:
             subprocess.call(['systemctl', 'start', 'nginx'])
@@ -114,15 +41,37 @@ server {
         except Exception as e:
             logging.error("Failed to reload nginx with error: %s" % e)
 
+    def setup(self, ip):
+        content = self.jinja_env.get_template('vhost-metadata.conf').render(
+            ipaddress=ip
+        )
+
+        filename = "vhost-%s.conf" % ip
+
+        self.filenames.append(filename)
+
+        with open(self.nginx_conf_path + filename, 'w') as f:
+            f.write(content)
+
+    def zap_nginx_config_directory(self):
+        logging.debug("Zapping directory %s" % self.nginx_conf_path)
+        for file_name in os.listdir(self.nginx_conf_path):
+            if file_name in self.filenames:
+                continue
+
+            file_path = os.path.join(self.keepalived_config_path, file_name)
+            try:
+                if os.path.isfile(file_path):
+                    logging.debug("Removing file %s" % file_path)
+                    os.unlink(file_path)
+            except Exception as e:
+                logging.error("Failed to remove file: %s" % e)
+
 
 class CsMetadataServiceVMConfig(object):
     def __init__(self, config):
         self.config = config
         self.dbag = self.config.dbag_vmdata
-
-        # FIXME
-        # self.app = CsMetadataService(self)
-        # self.app.setup()
 
     def process(self):
         for ip in self.dbag:

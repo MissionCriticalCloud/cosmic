@@ -8,14 +8,8 @@ class PasswordService(object):
 
     def sync(self):
         for interface in self.config.dbag_network_overview['interfaces']:
-            if interface['metadata']['type'] in ['sync', 'other']:
-                pass
-            elif interface['metadata']['type'] == 'public':
-                pass
-            elif interface['metadata']['type'] == 'tier':
+            if interface['metadata']['type'] == 'tier':
                 self.start_password_service(interface['ipv4_addresses'][0]['cidr'])
-            elif interface['metadata']['type'] == 'private':
-                pass
 
     @staticmethod
     def start_password_service(cidr):
