@@ -27,7 +27,7 @@ class MetadataService(object):
     def sync(self):
         for interface in self.config.dbag_network_overview['interfaces']:
             if interface['metadata']['type'] == 'tier':
-                self.setup(interface['ipv4_addresses'][0]['cidr'])
+                self.setup(interface['ipv4_addresses'][0]['cidr'].split('/')[0])
 
         self.zap_nginx_config_directory()
 
@@ -59,7 +59,7 @@ class MetadataService(object):
             if file_name in self.filenames:
                 continue
 
-            file_path = os.path.join(self.keepalived_config_path, file_name)
+            file_path = os.path.join(self.nginx_conf_path, file_name)
             try:
                 if os.path.isfile(file_path):
                     logging.debug("Removing file %s" % file_path)
