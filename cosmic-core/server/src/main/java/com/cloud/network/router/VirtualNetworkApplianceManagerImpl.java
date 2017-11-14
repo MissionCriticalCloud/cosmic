@@ -2452,7 +2452,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
                 updateSite2SiteVpnConnectionState(routers);
 
-                final List<DomainRouterVO> vpcRouters = _routerDao.listByHostId(null);
+                final List<DomainRouterVO> vpcRouters = _routerDao.listAllRunning();
 
                 s_logger.debug("Found " + vpcRouters.size() + " routers to update RvR status. ");
                 pushToUpdateQueue(vpcRouters);
