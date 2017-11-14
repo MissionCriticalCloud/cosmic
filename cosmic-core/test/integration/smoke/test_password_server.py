@@ -125,7 +125,8 @@ class TestPasswordService(cloudstackTestCase):
         self.logger.debug("Check whether routers are happy")
 
         for router in routers:
-            self._perform_password_service_test(router, network_1)
+            if router.redundantstate == 'MASTER' or len(routers) == 1:
+                self._perform_password_service_test(router, network_1)
 
     def wait_vm_ready(self, router, vmip):
         self.logger.debug("Check whether VM %s is up" % vmip)
@@ -215,8 +216,6 @@ class TestPasswordService(cloudstackTestCase):
     def test_process_running(self, find_process, router):
         host = self.get_host_details(router)
 
-        router_state = self.get_router_state(router)
-
         number_of_processes_found = 0
         try:
             number_of_processes_found = get_process_status(
@@ -234,8 +233,6 @@ class TestPasswordService(cloudstackTestCase):
         self.logger.debug("Result from the Router on IP '%s' is -> Number of processess found: '%s'" % (router.linklocalip, number_of_processes_found[0]))
 
         expected_nr_or_processes = 1
-        if router.isredundantrouter and router_state == "BACKUP":
-            expected_nr_or_processes = 0
 
         self.assertEqual(int(number_of_processes_found[0]), expected_nr_or_processes,
                          msg="Router should have " + str(expected_nr_or_processes) + " '" + find_process + "' processes running, found " + str(number_of_processes_found[0]))
