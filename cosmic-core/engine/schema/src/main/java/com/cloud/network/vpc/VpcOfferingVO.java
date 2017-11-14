@@ -41,10 +41,6 @@ public class VpcOfferingVO implements VpcOffering {
     @Column(name = "secondary_service_offering_id")
     Long secondaryServiceOfferingId;
     @Column(name = "supports_distributed_router")
-    boolean supportsDistributedRouter = false;
-    @Column(name = "supports_region_level_vpc")
-    boolean offersRegionLevelVPC = false;
-    @Column(name = "redundant_router_service")
     boolean redundantRouter = false;
     @Column(name = "uuid")
     private String uuid;
@@ -54,12 +50,9 @@ public class VpcOfferingVO implements VpcOffering {
     }
 
     public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
-                         final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC,
                          final boolean redundantRouter) {
         this(name, displayText, serviceOfferingId, secondaryServiceOfferingId);
         this.isDefault = isDefault;
-        this.supportsDistributedRouter = supportsDistributedRouter;
-        this.offersRegionLevelVPC = offersRegionLevelVPC;
         this.redundantRouter = redundantRouter;
     }
 
@@ -73,12 +66,9 @@ public class VpcOfferingVO implements VpcOffering {
         this.state = State.Disabled;
     }
 
-    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
-                         final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC) {
+    public VpcOfferingVO(final String name, final String displayText, final boolean isDefault, final Long serviceOfferingId, final Long secondaryServiceOfferingId) {
         this(name, displayText, serviceOfferingId, secondaryServiceOfferingId);
         this.isDefault = isDefault;
-        this.supportsDistributedRouter = supportsDistributedRouter;
-        this.offersRegionLevelVPC = offersRegionLevelVPC;
     }
 
     public void setId(final long id) {
@@ -99,18 +89,6 @@ public class VpcOfferingVO implements VpcOffering {
 
     public void setServiceOfferingId(final Long serviceOfferingId) {
         this.serviceOfferingId = serviceOfferingId;
-    }
-
-    public void setSupportsDistributedRouter(final boolean supportsDistributedRouter) {
-        this.supportsDistributedRouter = supportsDistributedRouter;
-    }
-
-    public void setOffersRegionLevelVPC(final boolean offersRegionLevelVPC) {
-        this.offersRegionLevelVPC = offersRegionLevelVPC;
-    }
-
-    public void setRedundantRouter(final boolean redundantRouter) {
-        this.redundantRouter = redundantRouter;
     }
 
     public void setUuid(final String uuid) {
@@ -150,16 +128,6 @@ public class VpcOfferingVO implements VpcOffering {
     @Override
     public Long getServiceOfferingId() {
         return serviceOfferingId;
-    }
-
-    @Override
-    public boolean supportsDistributedRouter() {
-        return supportsDistributedRouter;
-    }
-
-    @Override
-    public boolean offersRegionLevelVPC() {
-        return offersRegionLevelVPC;
     }
 
     @Override

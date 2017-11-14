@@ -2498,8 +2498,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setDisplayText(offering.getDisplayText());
         response.setIsDefault(offering.isDefault());
         response.setState(offering.getState().name());
-        response.setSupportsDistributedRouter(offering.supportsDistributedRouter());
-        response.setSupportsRegionLevelVpc(offering.offersRegionLevelVPC());
         final ServiceOffering serviceOffering = _serviceOfferingDao.findById(offering.getServiceOfferingId());
         if (serviceOffering != null) {
             response.setServiceOfferingId(serviceOffering.getUuid());
@@ -2535,9 +2533,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setRestartRequired(vpc.isRestartRequired());
         response.setNetworkDomain(vpc.getNetworkDomain());
         response.setForDisplay(vpc.isDisplay());
-        response.setUsesDistributedRouter(vpc.usesDistributedRouter());
         response.setRedundantRouter(vpc.isRedundant());
-        response.setRegionLevelVpc(vpc.isRegionLevelVpc());
         response.setSourceNatList(vpc.getSourceNatList());
         response.setSyslogServerList(vpc.getSyslogServerList());
 
