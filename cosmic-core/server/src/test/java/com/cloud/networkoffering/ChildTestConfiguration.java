@@ -48,6 +48,7 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDomainDaoImpl;
 import com.cloud.network.dao.NetworkServiceMapDaoImpl;
 import com.cloud.network.dao.PhysicalNetworkDaoImpl;
+import com.cloud.network.dao.PhysicalNetworkIsolationMethodDaoImpl;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDaoImpl;
 import com.cloud.network.dao.PhysicalNetworkTrafficTypeDaoImpl;
 import com.cloud.network.dao.UserIpv6AddressDaoImpl;
@@ -114,7 +115,7 @@ import org.springframework.core.type.filter.TypeFilter;
         DataCenterDetailsDaoImpl.class, NicSecondaryIpDaoImpl.class, UserIpv6AddressDaoImpl.class, UserDaoImpl.class, NicDaoImpl.class,
         NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
         FirewallRulesCidrsDaoImpl.class, PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class,
-        LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
+        PhysicalNetworkIsolationMethodDaoImpl.class, LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
         PortableIpRangeDaoImpl.class, RegionDaoImpl.class, PortableIpDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
         includeFilters = {@Filter(value = ChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
         useDefaultFilters = false)
