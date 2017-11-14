@@ -5,6 +5,9 @@ import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.StringUtils;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
     private ServiceTO services;
@@ -34,6 +37,25 @@ public class NetworkOverviewTO {
         this.routes = routes;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NetworkOverviewTO)) {
+            return false;
+        }
+        final NetworkOverviewTO that = (NetworkOverviewTO) o;
+        return Arrays.equals(getInterfaces(), that.getInterfaces()) &&
+                Objects.equals(getServices(), that.getServices()) &&
+                Arrays.equals(getRoutes(), that.getRoutes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInterfaces(), getServices(), getRoutes());
+    }
+
     public static class InterfaceTO {
         private String macAddress;
         private IPv4Address[] ipv4Addresses;
@@ -61,6 +83,25 @@ public class NetworkOverviewTO {
 
         public void setMetadata(final MetadataTO metadata) {
             this.metadata = metadata;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof InterfaceTO)) {
+                return false;
+            }
+            final InterfaceTO that = (InterfaceTO) o;
+            return Objects.equals(getMacAddress(), that.getMacAddress()) &&
+                    Arrays.equals(getIpv4Addresses(), that.getIpv4Addresses()) &&
+                    Objects.equals(getMetadata(), that.getMetadata());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getMacAddress(), getIpv4Addresses(), getMetadata());
         }
 
         public static class MetadataTO {
@@ -132,6 +173,26 @@ public class NetworkOverviewTO {
             public void setDns2(final String dns2) {
                 this.dns2 = dns2;
             }
+
+            @Override
+            public boolean equals(final Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof MetadataTO)) {
+                    return false;
+                }
+                final MetadataTO that = (MetadataTO) o;
+                return Objects.equals(getType(), that.getType()) &&
+                        Objects.equals(getDomainName(), that.getDomainName()) &&
+                        Objects.equals(getDns1(), that.getDns1()) &&
+                        Objects.equals(getDns2(), that.getDns2());
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(getType(), getDomainName(), getDns1(), getDns2());
+            }
         }
 
         public static class IPv4Address {
@@ -161,6 +222,24 @@ public class NetworkOverviewTO {
             public void setGateway(final String gateway) {
                 this.gateway = gateway;
             }
+
+            @Override
+            public boolean equals(final Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof IPv4Address)) {
+                    return false;
+                }
+                final IPv4Address that = (IPv4Address) o;
+                return Objects.equals(getCidr(), that.getCidr()) &&
+                        Objects.equals(getGateway(), that.getGateway());
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(getCidr(), getGateway());
+            }
         }
     }
 
@@ -168,6 +247,32 @@ public class NetworkOverviewTO {
         private ServiceSourceNatTO[] sourceNat;
 
         public ServiceTO() {
+        }
+
+
+        public ServiceSourceNatTO[] getSourceNat() {
+            return sourceNat;
+        }
+
+        public void setSourceNat(final ServiceSourceNatTO[] sourceNat) {
+            this.sourceNat = sourceNat;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof ServiceTO)) {
+                return false;
+            }
+            final ServiceTO serviceTO = (ServiceTO) o;
+            return Arrays.equals(getSourceNat(), serviceTO.getSourceNat());
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(getSourceNat());
         }
 
         public static class ServiceSourceNatTO {
@@ -197,14 +302,24 @@ public class NetworkOverviewTO {
             public void setGateway(final String gateway) {
                 this.gateway = gateway;
             }
-        }
 
-        public ServiceSourceNatTO[] getSourceNat() {
-            return sourceNat;
-        }
+            @Override
+            public boolean equals(final Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof ServiceSourceNatTO)) {
+                    return false;
+                }
+                final ServiceSourceNatTO that = (ServiceSourceNatTO) o;
+                return Objects.equals(getTo(), that.getTo()) &&
+                        Objects.equals(getGateway(), that.getGateway());
+            }
 
-        public void setSourceNat(final ServiceSourceNatTO[] sourceNat) {
-            this.sourceNat = sourceNat;
+            @Override
+            public int hashCode() {
+                return Objects.hash(getTo(), getGateway());
+            }
         }
     }
 
@@ -244,6 +359,25 @@ public class NetworkOverviewTO {
 
         public void setMetric(final Integer metric) {
             this.metric = metric;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof RouteTO)) {
+                return false;
+            }
+            final RouteTO routeTO = (RouteTO) o;
+            return Objects.equals(getCidr(), routeTO.getCidr()) &&
+                    Objects.equals(getNextHop(), routeTO.getNextHop()) &&
+                    Objects.equals(getMetric(), routeTO.getMetric());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getCidr(), getNextHop(), getMetric());
         }
     }
 }

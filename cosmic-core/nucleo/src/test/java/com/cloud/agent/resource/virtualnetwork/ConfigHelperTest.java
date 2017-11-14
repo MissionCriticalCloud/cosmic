@@ -14,6 +14,9 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.to.DhcpTO;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
+import com.cloud.agent.api.to.NetworkOverviewTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
+import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.IPv4Address;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
@@ -21,10 +24,8 @@ import com.cloud.agent.resource.virtualnetwork.model.DhcpConfig;
 import com.cloud.agent.resource.virtualnetwork.model.DhcpConfigEntry;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRule;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRules;
-import com.cloud.agent.resource.virtualnetwork.model.IpAddress;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddressAlias;
 import com.cloud.agent.resource.virtualnetwork.model.IpAliases;
-import com.cloud.agent.resource.virtualnetwork.model.IpAssociation;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRule;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRules;
 import com.cloud.network.Networks.TrafficType;
@@ -142,6 +143,20 @@ public class ConfigHelperTest {
 
         final IpAssocVpcCommand command = generateIpAssocVpcCommand();
 
+        final NetworkOverviewTO networkOverview = new NetworkOverviewTO();
+
+        final InterfaceTO eth0 = new InterfaceTO();
+        eth0.setMacAddress("00:00:00:00:00:00");
+
+        final IPv4Address ip = new IPv4Address();
+        ip.setCidr("1.1.1.1/24");
+        ip.setGateway("1.1.1.254");
+
+        eth0.setIpv4Addresses(new IPv4Address[] { ip });
+        networkOverview.setInterfaces(new InterfaceTO[]{ eth0 });
+
+        command.setNetworkOverview(networkOverview);
+
         final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
 
         final List<ConfigItem> config = configItemFacade.generateConfig(command);
@@ -154,14 +169,22 @@ public class ConfigHelperTest {
         final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
         assertNotNull(fileContents);
 
-        final IpAssociation jsonClass = gson.fromJson(fileContents, IpAssociation.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "ips");
+        final NetworkOverviewTO networkOverviewDeserialized = gson.fromJson(fileContents, NetworkOverviewTO.class);
+        assertNotNull(networkOverviewDeserialized);
+        assertEquals(networkOverview, networkOverviewDeserialized);
 
-        final IpAddress[] ips = jsonClass.getIpAddress();
+        final InterfaceTO[] interfaces = networkOverviewDeserialized.getInterfaces();
+        assertNotNull(interfaces);
+        assertEquals(1, interfaces.length);
+        assertEquals(eth0, interfaces[0]);
+        assertEquals("00:00:00:00:00:00", interfaces[0].getMacAddress());
+
+        final IPv4Address[] ips = interfaces[0].getIpv4Addresses();
         assertNotNull(ips);
-        assertTrue(ips.length == 3);
-        assertEquals(ips[0].getPublicIp(), "64.1.1.10");
+        assertEquals(1,ips.length);
+        assertEquals(ip, ips[0]);
+        assertEquals("1.1.1.1/24", ips[0].getCidr());
+        assertEquals("1.1.1.254", ips[0].getGateway());
 
         final ConfigItem scriptConfig = config.get(1);
         assertNotNull(scriptConfig);
