@@ -1866,6 +1866,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 // Send network usage command for public nic in VPC VR
                 // Send network usage command for isolated guest nic of non VPC
                 // VR
+                if (network == null) {
+                    s_logger.error("Could not find a network with ID => " + routerNic.getNetworkId() + ".");
+                    continue;
+                }
                 if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
                         && network.getGuestType() == Network.GuestType.Isolated) {
                     final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
