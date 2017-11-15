@@ -1816,6 +1816,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
             final NetworkProfile profile = new NetworkProfile(network);
             guru.shutdown(profile, _networkOfferingDao.findById(network.getNetworkOfferingId()));
+            applyProfileToNetwork(network, profile);
+            _networksDao.update(networkId, network);
 
             return _networksDao.remove(networkId);
         } finally {
