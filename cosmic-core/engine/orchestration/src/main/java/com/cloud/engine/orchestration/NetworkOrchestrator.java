@@ -1813,6 +1813,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 _networksDao.update(networkId, network);
             }
 
+            final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
+            final NetworkProfile profile = new NetworkProfile(network);
+            guru.shutdown(profile, _networkOfferingDao.findById(network.getNetworkOfferingId()));
+
             return _networksDao.remove(networkId);
         } finally {
             if (network != null) {
