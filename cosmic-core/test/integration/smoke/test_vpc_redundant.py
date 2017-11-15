@@ -162,7 +162,7 @@ class TestVPCRedundancy(cloudstackTestCase):
     @attr(tags=['advanced'])
     def test_04_rvpc_multi_tiers(self):
         """ Create a redundant VPC with 3 Tiers, 3 VMs, 3 PF rules"""
-        self.logger.debug("Starting test_05_rvpc_multi_tiers")
+        self.logger.debug("Starting test_045_rvpc_multi_tiers")
         self.query_routers()
 
         net_off = get_default_network_offering(self.apiclient)
@@ -184,11 +184,12 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.check_routers_state(status_to_check="MASTER")
         self.do_vpc_test(False)
 
+        #### OK above ####
         self.destroy_vm(network2)
         network2.get_net().delete(self.apiclient)
         self.networks.remove(network2)
 
-        self.check_routers_state(status_to_check="MASTER")
+        self.check_routers_state(status_to_check="MASTER")  #### FAILS due to 2x master
         self.do_vpc_test(False)
 
     def query_routers(self, count=2, showall=False):

@@ -22,7 +22,7 @@ class Keepalived(object):
         # self.keepalived_config_path = '/tmp/keep/'
 
         self.sync_group_name = 'cosmic'
-        self.routes_vrrp_id = '255'
+        self.routes_vrrp_id = '254'
 
         self.filenames = []
         self.vrrp_instances = []
@@ -89,7 +89,7 @@ class Keepalived(object):
                 interface=sync_interface_name,
                 virtual_router_id=interface_id,
                 advert_int='1',
-                virtual_ipaddress=['fe80:1::%s' % interface_id],
+                virtual_ipaddress=[],
                 virtual_ipaddress_excluded=ipv4addresses
             )
 
@@ -114,7 +114,7 @@ class Keepalived(object):
             interface=sync_interface_name,
             virtual_router_id=self.routes_vrrp_id,
             advert_int='1',
-            virtual_ipaddress=['fe80:1::%s' % self.routes_vrrp_id],
+            virtual_ipaddress=[],
             virtual_routes=virtualroutes
         )
 

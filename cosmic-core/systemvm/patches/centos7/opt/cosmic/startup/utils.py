@@ -9,6 +9,7 @@ class Utils:
         self.config_dir = "/etc/cosmic/agent/"
         self.ssh_port = 3922
         self.is_legacy_router_vm = False
+        self.link_local_ip = None
 
         if "type" in self.cmdline and self.cmdline['type'] == "router":
             self.is_legacy_router_vm = True
@@ -38,6 +39,8 @@ NETMASK="%s"
 """ % (interface, self.cmdline["eth%smac" % interface], self.cmdline["eth%sip" % interface], self.cmdline["eth%smask" %
                                                                                                           interface])
 
+                self.link_local_ip = self.cmdline["eth%sip" % interface]
+
                 with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
                     f.write(ifcfg)
 
@@ -55,17 +58,20 @@ NETMASK="%s"
     def setup_sync_nic(self):
 
         sync_device = self.find_sync_nic()
+        sync_ip_address = self.link_local_ip.replace("169.254", "100.100")
 
         if not sync_device:
             return False
 
         ifcfg = """
     DEVICE="%s"
-    IPV6INIT="yes"
+    IPV6INIT="no"
     BOOTPROTO="none"
     ONBOOT="yes"
+    IPADDR="%s"
+    NETMASK="255.255.0.0"
     HWADDR="%s"
-    """ % (sync_device, self.cmdline["%smac" % sync_device])
+    """ % (sync_device, sync_ip_address, self.cmdline["%smac" % sync_device])
 
         with open("/etc/sysconfig/network-scripts/ifcfg-%s" % sync_device, "w") as f:
             f.write(ifcfg)
