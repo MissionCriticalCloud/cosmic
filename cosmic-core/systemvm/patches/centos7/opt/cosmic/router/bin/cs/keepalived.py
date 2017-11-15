@@ -88,7 +88,7 @@ class Keepalived(object):
                 state='BACKUP',
                 interface=sync_interface_name,
                 virtual_router_id=interface_id,
-                advert_int='1',
+                advert_int=self.config.get_advert_int(),
                 virtual_ipaddress=[],
                 virtual_ipaddress_excluded=ipv4addresses
             )
@@ -113,7 +113,7 @@ class Keepalived(object):
             state='BACKUP',
             interface=sync_interface_name,
             virtual_router_id=self.routes_vrrp_id,
-            advert_int='1',
+            advert_int=self.config.get_advert_int(),
             virtual_ipaddress=[],
             virtual_routes=virtualroutes
         )

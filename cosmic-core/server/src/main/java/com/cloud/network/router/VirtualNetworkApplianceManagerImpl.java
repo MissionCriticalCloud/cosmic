@@ -1221,12 +1221,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final long networkId = nic.getNetworkId();
         _networkDao.findById(networkId);
 
+        final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
+        buf.append(" advert_int=").append(advertInt);
+
         final boolean isRedundant = router.getIsRedundantRouter();
         if (isRedundant) {
             buf.append(" redundant_router=1");
-
-            final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
-            buf.append(" advert_int=").append(advertInt);
 
             final Long vpcId = router.getVpcId();
             final List<DomainRouterVO> routers;

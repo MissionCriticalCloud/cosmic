@@ -33,6 +33,11 @@ class Config(object):
             return self.ingress_rules[key]
         return None
 
+    def get_advert_int(self):
+        if 'advert_int' in self.dbag_cmdline['config']:
+            return self.dbag_cmdline['config']['advert_int']
+        return 1
+
     def set_ingress_rules(self, key, ingress_rules):
         self.ingress_rules[key] = ingress_rules
 
