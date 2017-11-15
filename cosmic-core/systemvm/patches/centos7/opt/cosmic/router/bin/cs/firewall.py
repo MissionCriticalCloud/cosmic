@@ -41,7 +41,7 @@ class Firewall(object):
     def sync_nonvpc(self):
         print "NON VPC NOT YET IMPLEMENTED"
         logging.error("NON VPC NOT YET IMPLEMENTED")
-        exit(1)
+        exit(0)
 
     def add_default_vpc_rules(self):
         self.fw.append(["filter", "", "-P INPUT DROP"])
