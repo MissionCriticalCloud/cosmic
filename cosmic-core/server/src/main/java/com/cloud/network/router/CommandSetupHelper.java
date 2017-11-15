@@ -1041,14 +1041,14 @@ public class CommandSetupHelper {
         final List<ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
         final List<RouteTO> routesTO = new ArrayList<>();
-
-        routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
-                                       .stream()
-                                       .map(StaticRouteProfile::new)
-                                       .filter(route -> !staticRoutesToExclude.contains(route))
-                                       .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
-                                       .collect(Collectors.toList()));
-
+        if (router.getVpcId() != null) {
+            routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
+                                           .stream()
+                                           .map(StaticRouteProfile::new)
+                                           .filter(route -> !staticRoutesToExclude.contains(route))
+                                           .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
+                                           .collect(Collectors.toList()));
+        }
         networkOverviewTO.setRoutes(routesTO.toArray(new RouteTO[routesTO.size()]));
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
