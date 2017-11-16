@@ -8,11 +8,7 @@ class Utils:
         self.cmdline = cmdline
         self.config_dir = "/etc/cosmic/agent/"
         self.ssh_port = 3922
-        self.is_legacy_router_vm = False
         self.link_local_ip = None
-
-        if "type" in self.cmdline and self.cmdline['type'] == "router":
-            self.is_legacy_router_vm = True
 
     def bootstrap(self):
         self.setup_hostname()
@@ -104,8 +100,6 @@ NETMASK="%s"
     def setup_ssh(self):
 
         link_local_ip = self.cmdline["eth0ip"]
-        if self.is_legacy_router_vm:
-            link_local_ip = self.cmdline["eth1ip"]
 
         sshd_config = """
 Port %s
@@ -154,8 +148,6 @@ AcceptEnv XMODIFIERS
             release = f.readline()
 
         link_local_ip = self.cmdline["eth0ip"]
-        if self.is_legacy_router_vm:
-            link_local_ip = self.cmdline["eth1ip"]
 
         prelogin_banner = """
 Cosmic sytemvm powered by %s
