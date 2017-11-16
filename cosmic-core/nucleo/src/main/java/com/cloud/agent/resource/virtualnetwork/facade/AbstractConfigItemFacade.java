@@ -73,7 +73,7 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
         flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem());
         flyweight.put(SetupGuestNetworkCommand.class, new NetworkOverviewConfigItem());
-        flyweight.put(SetupPrivateGatewayCommand.class, new SetPrivateGatewayConfigItem());
+        flyweight.put(SetupPrivateGatewayCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem());
         flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());

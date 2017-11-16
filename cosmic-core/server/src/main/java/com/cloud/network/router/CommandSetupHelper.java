@@ -991,6 +991,14 @@ public class CommandSetupHelper {
         ip.setNetworkName(_networkModel.getNetworkTag(router.getHypervisorType(), network));
 
         final SetupPrivateGatewayCommand cmd = new SetupPrivateGatewayCommand(ip);
+
+        final List<Ip> ipsToExclude = new ArrayList<>();
+        if (!add) {
+            ipsToExclude.add(new Ip(ipAddr.getIpAddress()));
+        }
+
+        final NetworkOverviewTO networkOverview = createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+        cmd.setNetworkOverview(networkOverview);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(ipAddr.getNetworkId(), router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
