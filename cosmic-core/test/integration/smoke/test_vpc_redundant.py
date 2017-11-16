@@ -205,6 +205,10 @@ class TestVPCRedundancy(cloudstackTestCase):
             isinstance(self.routers, list), True,
             "Check for list routers response return valid data")
 
+        if self.routers.count() != count:
+            self.logger.debug("INVESTIGATE!! Check that %s routers were indeed created" % count)
+            while True:
+                time.sleep(1)
         self.assertEqual(
             len(self.routers), count,
             "Check that %s routers were indeed created" % count)
