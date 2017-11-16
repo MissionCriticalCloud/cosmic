@@ -2657,7 +2657,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         }
                                                     }],
@@ -3200,7 +3200,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         }
                                                     }],
@@ -3811,7 +3811,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         },
                                                         vpcid: {
@@ -6481,7 +6481,7 @@
                                                     label: 'label.redundant.router',
                                                     converter: cloudStack.converters.toBooleanText
                                                 },
-                                                redundantRouterState: {
+                                                redundantstate: {
                                                     label: 'label.redundant.state'
                                                 },
                                                 vpcid: {
