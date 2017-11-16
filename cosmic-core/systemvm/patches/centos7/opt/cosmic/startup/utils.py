@@ -39,7 +39,9 @@ NETMASK="%s"
 """ % (interface, self.cmdline["eth%smac" % interface], self.cmdline["eth%sip" % interface], self.cmdline["eth%smask" %
                                                                                                           interface])
 
-                self.link_local_ip = self.cmdline["eth%sip" % interface]
+                if self.cmdline["eth%sip" % interface].count("169.254.") == 1:
+                    self.link_local_ip = self.cmdline["eth%sip" % interface]
+                    print(self.link_local_ip)
 
                 with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
                     f.write(ifcfg)
