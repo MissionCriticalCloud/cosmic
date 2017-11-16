@@ -33,7 +33,7 @@ class Firewall(object):
                 pass
             elif interface['metadata']['type'] == 'public':
                 self.add_public_vpc_rules(device)
-            elif interface['metadata']['type'] == 'tier':
+            elif interface['metadata']['type'] == 'guesttier':
                 self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
             elif interface['metadata']['type'] == 'private':
                 self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])

@@ -120,7 +120,7 @@ public class NetworkOverviewTO {
                 if (TrafficType.Public.equals(trafficType)) {
                     type = "public";
                 } else if (TrafficType.Guest.equals(trafficType) && GuestType.Isolated.equals(guestType)) {
-                    type = "tier";
+                    type = "guesttier";
                 } else if (TrafficType.Guest.equals(trafficType) && GuestType.Private.equals(guestType)) {
                     type = "private";
                 } else if (TrafficType.Guest.equals(trafficType) && GuestType.Sync.equals(guestType)) {

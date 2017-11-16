@@ -26,7 +26,7 @@ class MetadataService(object):
 
     def sync(self):
         for interface in self.config.dbag_network_overview['interfaces']:
-            if interface['metadata']['type'] == 'tier':
+            if interface['metadata']['type'] == 'guesttier':
                 self.setup(interface['ipv4_addresses'][0]['cidr'].split('/')[0])
 
         self.zap_nginx_config_directory()

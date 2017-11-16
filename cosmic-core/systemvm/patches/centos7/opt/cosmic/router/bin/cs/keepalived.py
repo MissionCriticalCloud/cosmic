@@ -109,7 +109,7 @@ class Keepalived(object):
             virtualroutes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
 
         self.write_vrrp_instance(
-            name='zzz_routes',
+            name='routes',
             state='BACKUP',
             interface=sync_interface_name,
             virtual_router_id=self.routes_vrrp_id,

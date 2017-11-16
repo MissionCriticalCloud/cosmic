@@ -8,7 +8,7 @@ class PasswordService(object):
 
     def sync(self):
         for interface in self.config.dbag_network_overview['interfaces']:
-            if interface['metadata']['type'] == 'tier':
+            if interface['metadata']['type'] == 'guesttier':
                 self.start_password_service(interface['ipv4_addresses'][0]['cidr'])
 
     @staticmethod

@@ -45,7 +45,7 @@ class TestCsKeepalived(unittest.TestCase):
             "mac_address": "72:00:02:42:00:e1",
             "metadata": {
                 "domain": "cs2cloud",
-                "type": "tier"
+                "type": "guesttier"
             }
         },
         {
@@ -55,7 +55,7 @@ class TestCsKeepalived(unittest.TestCase):
             "mac_address": "02:00:01:c1:00:01",
             "metadata": {
                 "domain": "cs2cloud",
-                "type": "tier"
+                "type": "guesttier"
             }
         }
     ]
