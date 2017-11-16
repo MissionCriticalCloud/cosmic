@@ -1798,16 +1798,17 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final List<? extends Nic> routerNics = _nicDao.listByVmId(profile.getId());
             for (final Nic nic : routerNics) {
                 final Network network = _networkModel.getNetwork(nic.getNetworkId());
-                final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+                if (network != null) {
+                    final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+                    if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
+                        final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
 
-                if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
-
-                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
-                    try {
-                        networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
-                    } catch (final ResourceUnavailableException e) {
-                        s_logger.debug("ERROR in finalizeStop: ", e);
+                        final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
+                        try {
+                            networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
+                        } catch (final ResourceUnavailableException e) {
+                            s_logger.debug("ERROR in finalizeStop: ", e);
+                        }
                     }
                 }
             }
