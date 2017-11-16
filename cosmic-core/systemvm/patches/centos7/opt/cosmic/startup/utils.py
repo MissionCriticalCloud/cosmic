@@ -22,7 +22,7 @@ class Utils:
 
     def setup_private_nic(self):
 
-        for interface in [0, 1, 2]:
+        for interface in [0, 1, 2, 3]:
             if "eth%sip" % interface in self.cmdline:
                 ifcfg = """
 DEVICE="eth%s"
