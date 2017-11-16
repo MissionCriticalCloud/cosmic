@@ -690,21 +690,21 @@ public class NetworkHelperImpl implements NetworkHelper {
 
         final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>(3);
 
-        // 1) Guest Network
-        final LinkedHashMap<Network, List<? extends NicProfile>> guestNic = configureGuestNic(routerDeploymentDefinition);
-        networks.putAll(guestNic);
-
-        // 2) Control network
+        // 1) Control network (was 2)
         final LinkedHashMap<Network, List<? extends NicProfile>> controlNic = configureControlNic(routerDeploymentDefinition);
         networks.putAll(controlNic);
 
-        // 3) Public network
+        // 2) Sync network (was 4)
+        final LinkedHashMap<Network, List<? extends NicProfile>> syncNic = configureSyncNic(routerDeploymentDefinition);
+        networks.putAll(syncNic);
+
+        // 3) Public network (was 3)
         final LinkedHashMap<Network, List<? extends NicProfile>> publicNic = configurePublicNic(routerDeploymentDefinition, networks.size() > 1);
         networks.putAll(publicNic);
 
-        // 4) Sync network
-        final LinkedHashMap<Network, List<? extends NicProfile>> syncNic = configureSyncNic(routerDeploymentDefinition);
-        networks.putAll(syncNic);
+        // 4) Guest Network (was 1)
+        final LinkedHashMap<Network, List<? extends NicProfile>> guestNic = configureGuestNic(routerDeploymentDefinition);
+        networks.putAll(guestNic);
 
         return networks;
     }
