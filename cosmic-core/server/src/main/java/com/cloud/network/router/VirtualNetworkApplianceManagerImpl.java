@@ -1798,17 +1798,20 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final List<? extends Nic> routerNics = _nicDao.listByVmId(profile.getId());
             for (final Nic nic : routerNics) {
                 final Network network = _networkModel.getNetwork(nic.getNetworkId());
-                if (network != null) {
-                    final Zone zone = zoneRepository.findOne(network.getDataCenterId());
-                    if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                        final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+                if (network == null) {
+                    s_logger.error("Could not find a network with ID => " + nic.getNetworkId() + ".");
+                    continue;
+                }
+                final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
-                        final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
-                        try {
-                            networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
-                        } catch (final ResourceUnavailableException e) {
-                            s_logger.debug("ERROR in finalizeStop: ", e);
-                        }
+                if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
+                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+
+                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
+                    try {
+                        networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
+                    } catch (final ResourceUnavailableException e) {
+                        s_logger.debug("ERROR in finalizeStop: ", e);
                     }
                 }
             }
