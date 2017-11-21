@@ -56,11 +56,11 @@ class CsVrConfig(object):
             first = True
             for ip in ips:
                 if first:
-                    self.syslogconf.append(":msg, regex, \"^\[ *[0-9]*\.[0-9]*\] iptables denied: \" @@%s:514" % ip)
+                    self.syslogconf.append(":msg, regex, \"^\[ *[0-9]*\.[0-9]*\] iptables denied: \" @%s:514" % ip)
                     first = False
                 else:
-                    self.syslogconf.append("& @@%s:514" % ip)
-
+                    self.syslogconf.append("& @%s:514" % ip)
+            self.syslogconf.append(":msg, regex, \"^\[ *[0-9]*\.[0-9]*\] iptables denied: \" /var/log/iptables.log")
             self.syslogconf.append("& ~")
 
         changed = self.syslogconf.is_changed()
