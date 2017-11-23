@@ -122,18 +122,6 @@ def get_domain():
     return "cloudnine.internal"
 
 
-def get_device(ip):
-    """ Returns the device which has a specific ip
-    If the ip is not found returns an empty string
-    """
-    for i in execute("ip addr show"):
-        vals = i.strip().lstrip().rstrip().split()
-        if vals[0] == "inet":
-            if vals[1].split('/')[0] == ip:
-                return vals[-1]
-    return ""
-
-
 def get_ip(device):
     """ Return first ip on an interface """
     cmd = "ip addr show dev %s" % device

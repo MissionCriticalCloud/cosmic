@@ -31,14 +31,7 @@ class CsSite2SiteVpn(object):
             if vpn == "id":
                 continue
 
-            local_ip = self.dbag[vpn]['local_public_ip']
-            dev = CsHelper.get_device(local_ip)
-
-            if dev == "":
-                logging.error("Request for ipsec to %s not possible because ip is not configured", local_ip)
-                continue
-
-            self.configure_iptables(dev, self.dbag[vpn])
+            self.configure_iptables("eth1", self.dbag[vpn])
             self.configure_ipsec(self.dbag[vpn])
 
         # Delete vpns that are no longer in the configuration
