@@ -22,6 +22,8 @@ class CsDhcp(object):
     def process(self):
         self.hosts = { }
         self.changed = []
+        # TODO FIXME: race condition with keepalived bringing up the interfaces
+        # --> get info from data bags instead of looking it up
         self.devinfo = CsHelper.get_device_info()
         self.preseed()
         self.cloud = CsFile(DHCP_HOSTS)
