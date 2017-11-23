@@ -275,6 +275,9 @@ class TestVPCNics(cloudstackTestCase):
                     self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
                                       (virtual_machine.name, public_ip.ipaddress.ipaddress))
                 except:
+                    self.logger.debug("SSH failed, investigate!!")
+                    while True:
+                        time.sleep(10)
                     self.fail("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 
     def do_default_routes_test(self):

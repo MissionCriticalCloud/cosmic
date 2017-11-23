@@ -224,6 +224,9 @@ class EntityManager(object):
             self.logger.debug("SSH into VM=%s on public_ip=%s is successful" %
                               (vm.name, public_ip.ipaddress.ipaddress))
         except:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             raise Exception("Failed to SSH into VM - %s" % (public_ip.ipaddress.ipaddress))
 
     def create_network(self, network_offering, vpc_id, gateway='10.1.1.1'):

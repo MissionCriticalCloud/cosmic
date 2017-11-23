@@ -1,3 +1,5 @@
+import time
+
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     VirtualMachine,
@@ -289,6 +291,9 @@ class TestRouterDHCPHosts(cloudstackTestCase):
 
             self.logger.debug("SSH result: %s; COUNT is ==> %s" % (result, result.count("3 packets received")))
         except:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             self.fail("Failed to SSH into VM - %s" % (nat_rule.ipaddress))
 
         self.assertEqual(
