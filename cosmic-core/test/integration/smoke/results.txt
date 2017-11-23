@@ -1,6 +1,1 @@
-Test Site 2 Site multiple VPNs Across VPCs ... === TestName: test_04_vpc_site2site_multiple_vpn | Status : SUCCESS ===ok
-
-----------------------------------------------------------------------
-Ran 1 test in 523.825s
-
-OK
+Create a VPC with two networks with one VM in each network and test nics after destroy ... 

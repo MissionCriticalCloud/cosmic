@@ -260,6 +260,9 @@ class TestLoadBalance(cloudstackTestCase):
                 "Check if ssh succeeded for server1"
             )
         except Exception as e:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, src_nat_ip_addr.ipaddress))
 
@@ -375,6 +378,9 @@ class TestLoadBalance(cloudstackTestCase):
             )
             self.logger.debug("UNAME after removing VM2: %s" % str(unameResults))
         except Exception as e:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, self.non_src_nat_ip.ipaddress.ipaddress))
 
@@ -471,6 +477,9 @@ class TestLoadBalance(cloudstackTestCase):
                 "Check if ssh succeeded for server1"
             )
         except Exception as e:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             self.fail("SSH failed for VM with IP: %s" %
                       self.non_src_nat_ip.ipaddress.ipaddress)
 
@@ -515,6 +524,9 @@ class TestLoadBalance(cloudstackTestCase):
             unameCmd.append(ssh_1.execute("uname")[0])
             self.logger.debug(unameCmd)
         except Exception as e:
+            self.logger.debug("SSH failed, investigate!!")
+            while True:
+                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, ip_addr))
         time.sleep(10)
