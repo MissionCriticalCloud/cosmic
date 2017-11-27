@@ -692,6 +692,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw ex;
         }
 
+        if (!GuestType.Private.equals(ntwkOff.getGuestType()) && vpcId == null) {
+            throw new InvalidParameterValueException("VPC ID is required");
+        }
+
         if (GuestType.Private.equals(ntwkOff.getGuestType()) && (startIP != null || endIP != null || vpcId != null || gateway != null || netmask != null)) {
             throw new InvalidParameterValueException("StartIp/endIp/vpcId/gateway/netmask can't be specified for guest type " + GuestType.Private);
         }
