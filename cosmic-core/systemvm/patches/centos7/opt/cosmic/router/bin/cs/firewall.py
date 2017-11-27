@@ -20,8 +20,6 @@ class Firewall(object):
     def sync(self):
         if self.config.dbag_cmdline['config']['type'] == 'vpcrouter':
             self.sync_vpc()
-        elif self.config.dbag_cmdline['config']['type'] == 'router':
-            self.sync_nonvpc()
 
     def sync_vpc(self):
         self.add_default_vpc_rules()
@@ -37,11 +35,6 @@ class Firewall(object):
                 self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
             elif interface['metadata']['type'] == 'private':
                 self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
-
-    def sync_nonvpc(self):
-        print "NON VPC NOT YET IMPLEMENTED"
-        logging.error("NON VPC NOT YET IMPLEMENTED")
-        exit(0)
 
     def add_default_vpc_rules(self):
         self.fw.append(["filter", "", "-P INPUT DROP"])

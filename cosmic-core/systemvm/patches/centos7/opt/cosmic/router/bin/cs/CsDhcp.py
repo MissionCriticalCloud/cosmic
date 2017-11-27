@@ -16,6 +16,7 @@ class CsDhcp(object):
     def __init__(self, config):
         self.config = config
         self.dbag = self.config.dbag_dhcpentry
+        self.interfaces = self.config.dbag_network_overview['interfaces']
 
     """ Manage dhcp entries """
 
@@ -24,7 +25,7 @@ class CsDhcp(object):
         self.changed = []
         # TODO FIXME: race condition with keepalived bringing up the interfaces
         # --> get info from data bags instead of looking it up
-        self.devinfo = CsHelper.get_device_info()
+        self.devinfo = CsHelper.get_device_info(self.interfaces)
         self.preseed()
         self.cloud = CsFile(DHCP_HOSTS)
         self.dhcp_opts = CsFile(DHCP_OPTS)

@@ -13,19 +13,11 @@ import sys
 from subprocess import check_output
 
 from netaddr import *
+import cs.utils as utils
 
 # @TODO fix hardcoded eth1 public interface -- is OK for now since it's for redundant VPCs and these have always a public interface. Although that is still an assumption and may not be true anymore some day
 STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
                    "vpcrouter": "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'" }
-
-
-def get_device_from_mac_address(macaddress):
-    logging.info("Looking for interface with macaddress " + macaddress)
-    device = execute("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
-    if not device:
-        return False
-    logging.info("Looking for mac address " + macaddress + " we found matching interface => " + str(device))
-    return device[0]
 
 
 def get_systemvm_version():
@@ -99,19 +91,20 @@ def bool_to_yn(val):
     return "no"
 
 
-def get_device_info():
+def get_device_info(interfaces):
     """ Returns all devices on system with their ipv4 ip netmask """
-    list = []
-    for i in execute("ip addr show"):
-        vals = i.strip().lstrip().rstrip().split()
-        if vals[0] == "inet":
-            to = { }
-            to['ip'] = vals[1]
-            to['dev'] = vals[-1]
-            to['network'] = IPNetwork(to['ip'])
-            to['dnsmasq'] = False
-            list.append(to)
-    return list
+    devices = []
+    for interface in interfaces:
+        if interface['metadata']['type'] == 'guesttier':
+            device = {}
+            ip = next(iter(interface['ipv4_addresses'] or []), None)
+            if 'cidr' in ip:
+                device['ip'] = ip['cidr']
+                device['network'] = IPNetwork(ip['cidr'])
+            device['dev'] = utils.get_interface_name_from_mac_address(interface['mac_address'])
+            device['dnsmasq'] = False
+            devices.append(device)
+    return devices
 
 
 def get_domain():
