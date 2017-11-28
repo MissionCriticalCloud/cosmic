@@ -122,7 +122,7 @@ class TestDeleteAccount(cloudstackTestCase):
 
         self.nat_rule = NATRule.create(
             self.apiclient,
-            self.vm_1,
+            self.vm1,
             self.services["natrule"],
             src_nat_ip_addr.id
         )
