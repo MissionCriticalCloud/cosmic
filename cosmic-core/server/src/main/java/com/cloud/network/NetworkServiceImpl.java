@@ -3923,7 +3923,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     }
 
                     // Create guest network
-                    Network network = null;
+                    Network network;
                     if (vpcId != null) {
                         if (!_configMgr.isOfferingForVpc(ntwkOff)) {
                             throw new InvalidParameterValueException("Network offering can't be used for VPC networks");
