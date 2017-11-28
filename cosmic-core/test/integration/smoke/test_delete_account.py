@@ -23,7 +23,8 @@ from marvin.lib.common import (
     get_domain,
     get_default_network_offering,
     get_default_virtual_machine_offering,
-    get_default_vpc_offering
+    get_default_vpc_offering,
+    get_network_acl
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -62,8 +63,11 @@ class TestDeleteAccount(cloudstackTestCase):
         self.virtual_machine_offering = get_default_virtual_machine_offering(self.apiclient)
         self.logger.debug("Virtual Machine Offering '%s' selected", self.virtual_machine_offering.name)
 
+        self.default_allow_acl = get_network_acl(self.apiclient, 'default_allow')
+        self.logger.debug("ACL '%s' selected", self.default_allow_acl.name)
+
         self.vpc1 = VPC.create(self.apiclient,
-                              self.attributes['vpcs']['vpc1'],
+                              self.services['vpcs']['vpc1'],
                               vpcofferingid=self.vpc_offering.id,
                               zoneid=self.zone.id,
                               domainid=self.domain.id,
@@ -71,7 +75,7 @@ class TestDeleteAccount(cloudstackTestCase):
         self.logger.debug("VPC '%s' created, CIDR: %s", self.vpc1.name, self.vpc1.cidr)
 
         self.network1 = Network.create(self.apiclient,
-                                      self.attributes['networks']['network1'],
+                                      self.services['networks']['network1'],
                                       networkofferingid=self.network_offering.id,
                                       aclid=self.default_allow_acl.id,
                                       vpcid=self.vpc1.id,
@@ -81,7 +85,7 @@ class TestDeleteAccount(cloudstackTestCase):
         self.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", self.network1.name, self.network1.cidr, self.network1.gateway)
 
         self.vm1 = VirtualMachine.create(self.apiclient,
-                                        self.attributes['vms']['vm1'],
+                                        self.services['vms']['vm1'],
                                         templateid=self.template.id,
                                         serviceofferingid=self.virtual_machine_offering.id,
                                         networkids=[self.network1.id],
