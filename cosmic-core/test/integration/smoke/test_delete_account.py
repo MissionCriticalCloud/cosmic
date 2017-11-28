@@ -66,6 +66,9 @@ class TestDeleteAccount(cloudstackTestCase):
         self.default_allow_acl = get_network_acl(self.apiclient, 'default_allow')
         self.logger.debug("ACL '%s' selected", self.default_allow_acl.name)
 
+        self.template = get_template(self.apiclient, self.zone.id)
+        self.logger.debug("Template '%s' selected" % self.template.name)
+
         self.vpc1 = VPC.create(self.apiclient,
                               self.services['vpcs']['vpc1'],
                               vpcofferingid=self.vpc_offering.id,
