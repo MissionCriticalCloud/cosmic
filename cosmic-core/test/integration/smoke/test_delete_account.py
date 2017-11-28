@@ -5,10 +5,12 @@ from nose.plugins.attrib import attr
 from marvin.cloudstackException import CloudstackAPIException
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
-    NATRule,
+    Account,
     LoadBalancerRule,
+    NATRule,
+    Network,
     VirtualMachine,
-    Account
+    VPC
 )
 from marvin.lib.common import (
     list_routers,
@@ -19,7 +21,9 @@ from marvin.lib.common import (
     get_template,
     get_zone,
     get_domain,
-    get_default_virtual_machine_offering
+    get_default_network_offering,
+    get_default_virtual_machine_offering,
+    get_default_vpc_offering
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -48,15 +52,43 @@ class TestDeleteAccount(cloudstackTestCase):
             admin=True,
             domainid=self.domain.id
         )
-        self.service_offering = get_default_virtual_machine_offering(self.apiclient)
-        self.vm_1 = VirtualMachine.create(
-            self.apiclient,
-            self.services["virtual_machine"],
-            templateid=template.id,
-            accountid=self.account.name,
-            domainid=self.account.domainid,
-            serviceofferingid=self.service_offering.id
-        )
+
+        self.vpc_offering = get_default_vpc_offering(self.apiclient)
+        self.logger.debug("VPC Offering '%s' selected", self.vpc_offering.name)
+
+        self.network_offering = get_default_network_offering(self.apiclient)
+        self.logger.debug("Network Offering '%s' selected", self.network_offering.name)
+
+        self.virtual_machine_offering = get_default_virtual_machine_offering(self.apiclient)
+        self.logger.debug("Virtual Machine Offering '%s' selected", self.virtual_machine_offering.name)
+
+        self.vpc1 = VPC.create(self.apiclient,
+                              self.attributes['vpcs']['vpc1'],
+                              vpcofferingid=self.vpc_offering.id,
+                              zoneid=self.zone.id,
+                              domainid=self.domain.id,
+                              account=self.account.name)
+        self.logger.debug("VPC '%s' created, CIDR: %s", self.vpc1.name, self.vpc1.cidr)
+
+        self.network1 = Network.create(self.apiclient,
+                                      self.attributes['networks']['network1'],
+                                      networkofferingid=self.network_offering.id,
+                                      aclid=self.default_allow_acl.id,
+                                      vpcid=self.vpc1.id,
+                                      zoneid=self.zone.id,
+                                      domainid=self.domain.id,
+                                      accountid=self.account.name)
+        self.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", self.network1.name, self.network1.cidr, self.network1.gateway)
+
+        self.vm1 = VirtualMachine.create(self.apiclient,
+                                        self.attributes['vms']['vm1'],
+                                        templateid=self.template.id,
+                                        serviceofferingid=self.virtual_machine_offering.id,
+                                        networkids=[self.network1.id],
+                                        zoneid=self.zone.id,
+                                        domainid=self.domain.id,
+                                        accountid=self.account.name)
+        self.logger.debug("VM '%s' created, Network: %s, IP %s", self.vm1.name, self.network1.name, self.vm1.nic[0].ipaddress)
 
         src_nat_ip_addrs = list_public_ip(
             self.apiclient,
@@ -79,7 +111,7 @@ class TestDeleteAccount(cloudstackTestCase):
             src_nat_ip_addr.id,
             self.account.name
         )
-        self.lb_rule.assign(self.apiclient, [self.vm_1])
+        self.lb_rule.assign(self.apiclient, [self.vm1])
 
         self.nat_rule = NATRule.create(
             self.apiclient,
