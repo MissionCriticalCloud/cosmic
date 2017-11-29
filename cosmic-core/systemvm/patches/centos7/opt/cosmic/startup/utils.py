@@ -19,6 +19,7 @@ class Utils:
         self.setup_ssh()
         self.setup_banner()
         self.setup_default_gw()
+        self.enable_keepalived()
 
     def setup_private_nic(self):
 
@@ -209,3 +210,9 @@ Cosmic sytemvm powered by %s
 
         stdoutdata = subprocess.getoutput(command)
         return stdoutdata.split()
+
+    def enable_keepalived(self):
+        # On startup, make sure keepalived is enabled and started, or else redundancy will fail
+        # When router is rebooted without Cosmic knowing it
+        os.system("systemctl enable keepalived")
+        os.system("systemctl start keepalived")
