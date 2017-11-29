@@ -809,17 +809,12 @@ public class CommandSetupHelper {
         final DhcpEntryCommand dhcpCommand = new DhcpEntryCommand(nic.getMacAddress(), nic.getIPv4Address(), vm.getHostName(), nic.getIPv6Address(),
                 _networkModel.getExecuteInSeqNtwkElmtCmd());
 
-        String gatewayIp = nic.getIPv4Gateway();
-        if (!nic.isDefaultNic()) {
-            final GuestOSVO guestOS = _guestOSDao.findById(vm.getGuestOSId());
-            if (guestOS == null || !guestOS.getDisplayName().toLowerCase().contains("windows")) {
-                gatewayIp = "0.0.0.0";
-            }
+        if (nic.isDefaultNic()) {
+            dhcpCommand.setDefaultRouter(nic.getIPv4Gateway());
         }
 
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
 
-        dhcpCommand.setDefaultRouter(gatewayIp);
         dhcpCommand.setIp6Gateway(nic.getIPv6Gateway());
         String ipaddress = null;
         final NicVO domrDefaultNic = findDefaultDnsIp(vm.getId());

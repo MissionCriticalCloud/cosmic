@@ -35,7 +35,7 @@ class CsDhcp(object):
             if item == "id":
                 continue
             self.add(self.dbag[item])
-            if self.dbag[item]['default_gateway'] == "0.0.0.0":
+            if 'default_gateway' not in self.dbag[item]:
                 self.add_dhcp_opts(self.dbag[item])
 
         self.write_hosts()
