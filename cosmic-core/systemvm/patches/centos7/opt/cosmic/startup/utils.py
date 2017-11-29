@@ -20,6 +20,7 @@ class Utils:
         self.setup_banner()
         self.setup_default_gw()
         self.enable_keepalived()
+        self.restart_watchdog()
 
     def setup_private_nic(self):
 
@@ -206,8 +207,6 @@ Cosmic sytemvm powered by %s
             os.system("ip route add default via %s" % self.cmdline["gateway"])
 
     def execute(self, command):
-        """ Execute command """
-
         stdoutdata = subprocess.getoutput(command)
         return stdoutdata.split()
 
@@ -216,3 +215,6 @@ Cosmic sytemvm powered by %s
         # When router is rebooted without Cosmic knowing it
         os.system("systemctl enable keepalived")
         os.system("systemctl start keepalived")
+
+    def restart_watchdog(self):
+        os.system("systemctl restart watchdog")
