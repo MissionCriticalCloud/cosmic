@@ -135,6 +135,8 @@ public class NetworkOverviewTO {
 
                 if (StringUtils.isNotBlank(network.getDns1())) {
                     dns1 = network.getDns1();
+                } else {
+                    dns1 = network.getGateway();
                 }
 
                 if (StringUtils.isNotBlank(network.getDns2())) {

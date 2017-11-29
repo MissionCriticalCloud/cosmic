@@ -3,13 +3,11 @@ import logging
 from netaddr import *
 
 import CsHelper
-from CsGuestNetwork import CsGuestNetwork
 from cs.CsFile import CsFile
 
 LEASES = "/var/lib/misc/dnsmasq.leases"
 DHCP_HOSTS = "/etc/dhcphosts.txt"
 DHCP_OPTS = "/etc/dhcpopts.txt"
-CLOUD_CONF = "/etc/dnsmasq.d/cloud.conf"
 
 
 class CsDhcp(object):
@@ -29,7 +27,6 @@ class CsDhcp(object):
         self.preseed()
         self.cloud = CsFile(DHCP_HOSTS)
         self.dhcp_opts = CsFile(DHCP_OPTS)
-        self.conf = CsFile(CLOUD_CONF)
 
         self.cloud.repopulate()
         self.dhcp_opts.repopulate()
@@ -46,9 +43,6 @@ class CsDhcp(object):
         if self.cloud.is_changed():
             self.delete_leases()
 
-        self.configure_server()
-
-        self.conf.commit()
         self.cloud.commit()
         self.dhcp_opts.commit()
 
@@ -59,45 +53,6 @@ class CsDhcp(object):
         # TODO FIME Do we restart dnsmasq???? Who is master?
         # if not self.cl.is_redundant() or self.cl.is_master():
         CsHelper.execute2("systemctl restart dnsmasq")
-
-    def configure_server(self):
-        # self.conf.addeq("dhcp-hostsfile=%s" % DHCP_HOSTS)
-        idx = 0
-        for i in self.devinfo:
-            if not i['dnsmasq']:
-                continue
-            device = i['dev']
-            # Listen only on the interfaces we configure VMs on
-            sline = "interface=%s" % (device)
-            line = "interface=%s" % (device)
-            self.conf.search(sline, line)
-            # Ip address
-            ip = i['ip'].split('/')[0]
-            sline = "dhcp-range=tag:%s,set:interface-%s-%s" % (device, device, idx)
-            line = "dhcp-range=tag:%s,set:interface-%s-%s,%s,static" % (device, device, idx, ip)
-            self.conf.search(sline, line)
-            gn = CsGuestNetwork(device, self.config)
-            sline = "dhcp-option=tag:interface-%s-%s,15" % (device, idx)
-            line = "dhcp-option=tag:interface-%s-%s,15,%s" % (device, idx, gn.get_domain())
-            self.conf.search(sline, line)
-            # DNS search order
-            if gn.get_dns() and device:
-                sline = "dhcp-option=tag:interface-%s-%s,6" % (device, idx)
-                dns_list = [x for x in gn.get_dns() if x is not None]
-                line = "dhcp-option=tag:interface-%s-%s,6,%s" % (device, idx, ','.join(dns_list))
-                self.conf.search(sline, line)
-            # Gateway
-            gateway = i['gateway']
-            if gateway != '0.0.0.0':
-                sline = "dhcp-option=tag:interface-%s-%s,3," % (device, idx)
-                line = "dhcp-option=tag:interface-%s-%s,3,%s" % (device, idx, gateway)
-                self.conf.search(sline, line)
-            # Netmask
-            netmask = i['network'].netmask.__str__()
-            sline = "dhcp-option=tag:interface-%s-%s,1," % (device, idx)
-            line = "dhcp-option=tag:interface-%s-%s,1,%s" % (device, idx, netmask)
-            self.conf.search(sline, line)
-            idx += 1
 
     def delete_leases(self):
         try:

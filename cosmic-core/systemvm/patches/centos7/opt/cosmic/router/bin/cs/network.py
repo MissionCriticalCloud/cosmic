@@ -1,6 +1,7 @@
 import logging
 
 from conntrackd import Conntrackd
+from dhcp_service import DhcpService
 from firewall import Firewall
 from keepalived import Keepalived
 from metadata_service import MetadataService
@@ -16,6 +17,7 @@ class Network(object):
         self.firewall = Firewall(self.config)
         self.password_service = PasswordService(self.config)
         self.metadata_service = MetadataService(self.config)
+        self.dhcp_service = DhcpService(self.config)
 
     def sync(self):
         logging.debug("Starting sync of network!")
@@ -26,3 +28,4 @@ class Network(object):
         self.firewall.sync()
         self.password_service.sync()
         self.metadata_service.sync()
+        self.dhcp_service.sync()
