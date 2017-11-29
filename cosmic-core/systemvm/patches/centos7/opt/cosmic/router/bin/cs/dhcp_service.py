@@ -52,9 +52,9 @@ class DhcpService:
         ip = next(iter(interface['ipv4_addresses'] or []), None)
         network = IPNetwork(ip['cidr'])
 
-        dns_servers = [ip['dns1']]
-        if 'dns2' in ip:
-            dns_servers.append(ip['dns2'])
+        dns_servers = [interface['metadata']['dns1']]
+        if 'dns2' in interface['metadata']:
+            dns_servers.append(interface['metadata']['dns2'])
 
         content = self.jinja_env.get_template('dnsmasq_interface.conf').render(
             interface_name=interface_name,
