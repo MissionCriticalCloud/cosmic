@@ -21,9 +21,6 @@ class CsDhcp(object):
     def process(self):
         self.hosts = { }
         self.changed = []
-        # TODO FIXME: race condition with keepalived bringing up the interfaces
-        # --> get info from data bags instead of looking it up
-        self.devinfo = CsHelper.get_device_info(self.interfaces)
         self.preseed()
         self.cloud = CsFile(DHCP_HOSTS)
         self.dhcp_opts = CsFile(DHCP_OPTS)
@@ -45,14 +42,6 @@ class CsDhcp(object):
 
         self.cloud.commit()
         self.dhcp_opts.commit()
-
-        # We restart DNSMASQ every time the configure.py is called in order to avoid lease problems.
-        # But only do that on the master or else VMs will get leases from the backup resulting in
-        # Cloud-init to get the passwd and other meta-data from the backup as well.
-
-        # TODO FIME Do we restart dnsmasq???? Who is master?
-        # if not self.cl.is_redundant() or self.cl.is_master():
-        CsHelper.execute2("systemctl restart dnsmasq")
 
     def delete_leases(self):
         try:
@@ -84,13 +73,6 @@ class CsDhcp(object):
                                               tag,
                                               entry['ipv4_adress'],
                                               entry['host_name']))
-        i = IPAddress(entry['ipv4_adress'])
-        # Calculate the device
-        for v in self.devinfo:
-            if i > v['network'].network and i < v['network'].broadcast:
-                v['dnsmasq'] = True
-                # Virtual Router
-                v['gateway'] = entry['default_gateway']
 
     def add_dhcp_opts(self, entry):
         # This means we won't serve these DHCP options for hosts with this tag
