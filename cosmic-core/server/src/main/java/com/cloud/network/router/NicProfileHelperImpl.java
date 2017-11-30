@@ -100,6 +100,7 @@ public class NicProfileHelperImpl implements NicProfileHelper {
             guestNic.setIPv4Address(guestNetwork.getGateway());
         }
 
+        guestNic.setIPv4Gateway(guestNetwork.getGateway());
         guestNic.setBroadcastUri(guestNetwork.getBroadcastUri());
         guestNic.setBroadcastType(guestNetwork.getBroadcastDomainType());
         guestNic.setIsolationUri(guestNetwork.getBroadcastUri());
