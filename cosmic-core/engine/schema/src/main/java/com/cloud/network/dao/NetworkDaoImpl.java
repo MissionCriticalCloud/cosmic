@@ -257,6 +257,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public List<NetworkVO> listByOwner(final long ownerId) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("account", ownerId);
+        sc.setParameters("notGuestType", GuestType.Sync);
         return listBy(sc);
     }
 
