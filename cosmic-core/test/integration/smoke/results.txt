@@ -1,6 +1,0 @@
-test_legacy (integration.smoke.test_redundant_isolated_networks.TestRedundantIsolatedNetworks) ... === TestName: test_legacy | Status : SUCCESS ===ok
-
-----------------------------------------------------------------------
-Ran 1 test in 0.030s
-
-OK
