@@ -36,8 +36,16 @@ class DhcpService:
                 logging.error("Failed to cleanup dnsmasq config directory with error: %s" % e)
 
     def write_dnsmasq_global_config(self):
+        interfaces = []
+        for interface in self.config.dbag_network_overview['interfaces']:
+            if interface['metadata']['type'] != 'guesttier':
+                interface_name = utils.get_interface_name_from_mac_address(interface['mac_address'])
+                interfaces.append(interface_name)
+
         filename = 'dnsmasq_global.conf'
-        content = self.jinja_env.get_template('dnsmasq_global.conf').render()
+        content = self.jinja_env.get_template('dnsmasq_global.conf').render(
+            interfaces=interfaces
+        )
 
         logging.debug("Writing dnsmasq config file %s with content \n%s" % (
             self.dnsmasq_config_path + filename, content
