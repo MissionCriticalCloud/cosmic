@@ -38,7 +38,7 @@ class DhcpVm:
             }
             counter += 1
 
-        filename = 'dhcphosts'
+        filename = 'dhcphosts.txt'
         content = self.jinja_env.get_template('etc_dhcphosts.conf').render(
             hosts=hosts
         )
@@ -85,7 +85,7 @@ class DhcpVm:
                 continue
             tags.append(self.generate_dhcp_tag(dhcp_host['ipv4_adress']))
 
-        filename = 'dhcpopts'
+        filename = 'dhcpopts.txt'
         content = self.jinja_env.get_template('etc_dhcpopts.conf').render(
             tags=tags
         )
