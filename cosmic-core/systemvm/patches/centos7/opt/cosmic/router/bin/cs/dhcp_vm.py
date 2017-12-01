@@ -1,9 +1,7 @@
 import cs.utils as utils
 import logging
-import os
 import subprocess
 from jinja2 import Environment, FileSystemLoader
-from netaddr import IPNetwork
 
 
 class DhcpVm:
@@ -25,18 +23,23 @@ class DhcpVm:
         self.restart_dnsmasq()
 
     def write_dnsmasq_dhcphosts(self):
-        hosts = []
+        hosts = {}
 
-        for dhcp_host in self.config.dbag_dhcpentry:
-            hosts[dhcp_host] = {
+        counter = 0
+        for data in self.config.dbag_dhcpentry:
+            if data == 'id':
+                continue
+            dhcp_host = self.config.dbag_dhcpentry[data]
+            hosts[counter] = {
                 'ip_address': dhcp_host['ipv4_adress'],
                 'mac_address': dhcp_host['mac_address'],
                 'tag': self.generate_dhcp_tag(dhcp_host['ipv4_adress']),
                 'hostname': dhcp_host['host_name']
             }
+            counter += 1
 
-        filename = '%s/dhcphosts' % self.config_path
-        content = self.jinja_env.get_template('etc_hosts.conf').render(
+        filename = 'dhcphosts'
+        content = self.jinja_env.get_template('etc_dhcphosts.conf').render(
             hosts=hosts
         )
 
@@ -51,16 +54,17 @@ class DhcpVm:
 
         host_entries = {}
 
-        for host_entry in self.config.dbag_dhcpentry:
-            host_entries.update({
-                host_entry['ipv4_adress']: host_entry['host_name']
-            })
+        for data in self.config.dbag_dhcpentry:
+            if data == 'id':
+                continue
+            dhcp_host = self.config.dbag_dhcpentry[data]
+            host_entries[dhcp_host['ipv4_adress']] = dhcp_host['host_name']
 
-        content = self.jinja_env.get_template('etc_dhcphosts.conf').render(
+        content = self.jinja_env.get_template('etc_hosts.conf').render(
             host_entries=host_entries
         )
 
-        filename = '%s/hosts' % self.config_path
+        filename = 'hosts'
 
         logging.debug("Writing hosts config file %s with content \n%s" % (
             self.config_path + filename, content
@@ -73,9 +77,13 @@ class DhcpVm:
 
         tags = []
 
-        for dhcp_host in self.config.dbag_dhcpentry:
-            if 'default_gateway' not in dhcp_host:
-                tags.append(self.generate_dhcp_tag(dhcp_host['ipv4_adress']),)
+        for data in self.config.dbag_dhcpentry:
+            dhcp_host = self.config.dbag_dhcpentry[data]
+            if data == 'id':
+                continue
+            if 'default_gateway' in dhcp_host:
+                continue
+            tags.append(self.generate_dhcp_tag(dhcp_host['ipv4_adress']))
 
         filename = 'dhcpopts'
         content = self.jinja_env.get_template('etc_dhcpopts.conf').render(
