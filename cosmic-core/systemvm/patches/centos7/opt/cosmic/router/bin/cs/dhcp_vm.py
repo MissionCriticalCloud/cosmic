@@ -4,6 +4,9 @@ import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 
+#@TODO Old code used to delete leases file: still needed??
+
+
 class DhcpVm:
 
     def __init__(self, config):
@@ -20,6 +23,7 @@ class DhcpVm:
         self.write_dnsmasq_dhcphosts()
         self.write_dnsmasq_dhcpopts()
         self.write_hosts()
+        self.delete_leases()
         self.restart_dnsmasq()
 
     def write_dnsmasq_dhcphosts(self):
@@ -96,6 +100,13 @@ class DhcpVm:
 
         with open(self.config_path + filename, 'w') as f:
             f.write(content)
+
+    @staticmethod
+    def delete_leases():
+        try:
+            open('/var/lib/misc/dnsmasq.leases', 'w').close()
+        except IOError:
+            return
 
     @staticmethod
     def generate_dhcp_tag(ip):
