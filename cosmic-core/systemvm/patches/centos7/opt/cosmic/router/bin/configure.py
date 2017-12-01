@@ -6,7 +6,6 @@ from collections import OrderedDict
 
 import cs.CsHelper as CsHelper
 from cs.CsAcl import CsAcl
-from cs.CsDhcp import CsDhcp
 from cs.CsForwardingRules import CsForwardingRules
 from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsMonitor import CsMonitor
@@ -19,7 +18,7 @@ from cs.config import Config
 from cs.firewall import Firewall
 from cs.metadata_service import CsMetadataServiceVMConfig
 from cs.network import Network
-from virtual_machine import VirtualMachine
+from cs.virtual_machine import VirtualMachine
 
 OCCURRENCES = 1
 

@@ -1,12 +1,6 @@
 import logging
 
-from conntrackd import Conntrackd
-from dhcp_service import DhcpService
 from dhcp_vm import DhcpVm
-from firewall import Firewall
-from keepalived import Keepalived
-from metadata_service import MetadataService
-from password_service import PasswordService
 
 
 class VirtualMachine(object):
