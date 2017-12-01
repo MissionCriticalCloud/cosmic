@@ -253,33 +253,26 @@ class TestVPCRedundancy(cloudstackTestCase):
                 )
                 host = hosts[0]
 
-                try:
-                    for _ in range(5):
-                        host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
-                        result = str(get_process_status(
-                            host.ipaddress,
-                            22,
-                            host.user,
-                            host.passwd,
-                            router.linklocalip,
-                            "sh /opt/cosmic/router/scripts/checkrouter.sh "
-                        ))
+                for _ in range(5):
+                    host.user, host.passwd = get_host_credentials(self.config, host.name)
+                    result = str(get_process_status(
+                        host.ipaddress,
+                        22,
+                        host.user,
+                        host.passwd,
+                        router.linklocalip,
+                        "sh /opt/cosmic/router/scripts/checkrouter.sh "
+                    ))
 
-                        self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))
+                    self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))
 
-                        if result.count(status_to_check) == 1:
-                            cnts[vals.index(status_to_check)] += 1
-                            break
-                        elif result.count("UNKNOWN") == 1:
-                            time.sleep(5)
-                        else:
-                            break
-
-
-                except KeyError:
-                    self.skipTest(
-                        "Marvin configuration has no host credentials to\
-                                check router services")
+                    if result.count(status_to_check) == 1:
+                        cnts[vals.index(status_to_check)] += 1
+                        break
+                    elif result.count("UNKNOWN") == 1:
+                        time.sleep(5)
+                    else:
+                        break
 
         if cnts[vals.index(status_to_check)] != expected_count:
             self.logger.debug("Investigate! not MASTER/BACKUP")
@@ -308,7 +301,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                 host = hosts[0]
 
                 try:
-                    host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
+                    host.user, host.passwd = get_host_credentials(self.config, host.name)
                     result = str(get_process_status(
                         host.ipaddress,
                         22,
