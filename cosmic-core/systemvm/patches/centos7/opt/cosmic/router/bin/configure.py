@@ -19,6 +19,7 @@ from cs.config import Config
 from cs.firewall import Firewall
 from cs.metadata_service import CsMetadataServiceVMConfig
 from cs.network import Network
+from virtual_machine import VirtualMachine
 
 OCCURRENCES = 1
 
@@ -81,7 +82,10 @@ def main(argv):
 
     databag_map = OrderedDict(
         [
+            # New style
             ("network_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
+            ("vm_dhcp_entry", {"process_iptables": False, "executor": IpTablesExecutor(config)}),
+            # Legacy
             ("vm_metadata", {"process_iptables": False, "executor": CsMetadataServiceVMConfig(config)}),
             ("network_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("public_ip_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
@@ -91,8 +95,6 @@ def main(argv):
             ("site_2_site_vpn", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("remote_access_vpn", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("vpn_user_list", {"process_iptables": False, "executor": CsVpnUser(config)}),
-            ("vm_dhcp_entry", {"process_iptables": False, "executor": CsDhcp(config)}),
-            ("dhcp", {"process_iptables": False, "executor": CsDhcp(config)}),
             ("load_balancer", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("monitor_service", {"process_iptables": False, "executor": CsMonitor(config)}),
             ("vr", {"process_iptables": True, "executor": IpTablesExecutor(config)})
@@ -103,6 +105,11 @@ def main(argv):
         logging.debug("Processing file %s" % process_file)
         cs_network = Network(config)
         cs_network.sync()
+
+    if process_file == "vm_dhcp_entry":
+        logging.debug("Processing file %s" % process_file)
+        cs_virtualmachine = VirtualMachine(config)
+        cs_virtualmachine.sync()
 
     if process_file == "cmd_line":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")

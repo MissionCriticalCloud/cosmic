@@ -2,6 +2,7 @@ import logging
 
 from conntrackd import Conntrackd
 from dhcp_service import DhcpService
+from dhcp_vm import DhcpVm
 from firewall import Firewall
 from keepalived import Keepalived
 from metadata_service import MetadataService
@@ -18,6 +19,8 @@ class Network(object):
         self.password_service = PasswordService(self.config)
         self.metadata_service = MetadataService(self.config)
         self.dhcp_service = DhcpService(self.config)
+        self.dhcp_vm = DhcpVm(self.config)
+
 
     def sync(self):
         logging.debug("Starting sync of network!")
@@ -29,3 +32,4 @@ class Network(object):
         self.password_service.sync()
         self.metadata_service.sync()
         self.dhcp_service.sync()
+        self.dhcp_vm.sync()
