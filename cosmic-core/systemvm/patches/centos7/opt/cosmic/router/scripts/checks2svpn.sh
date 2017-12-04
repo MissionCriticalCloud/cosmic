@@ -33,18 +33,6 @@ if (( "${SYSTEMVM_VERSION}" > "170312" )); then
     exit 0
 fi
 
-# Openswan check
-ipsec auto --status | grep vpn-$1 > /tmp/vpn-$1.status
-
-cat /tmp/vpn-$1.status | grep "ISAKMP SA established" > /dev/null
-isakmpok=$?
-if [ $isakmpok -ne 0 ]
-then
-    echo -n "ISAKMP SA NOT found but checking IPsec;"
-else
-    echo -n "ISAKMP SA found;"
-fi
-
 cat /tmp/vpn-$1.status | grep "IPsec SA established" > /dev/null
 ipsecok=$?
 if [ $ipsecok -ne 0 ]
