@@ -1,5 +1,5 @@
 import time
-
+import traceback
 from nose.plugins.attrib import attr
 
 from marvin.cloudstackException import CloudstackAPIException
@@ -9,7 +9,9 @@ from marvin.lib.base import (
     NATRule,
     PublicIPAddress,
     VirtualMachine,
-    Account
+    Account,
+    VPC,
+    Network
 )
 from marvin.lib.common import (
     list_lb_rules,
@@ -18,7 +20,9 @@ from marvin.lib.common import (
     get_template,
     get_zone,
     get_domain,
-    get_default_virtual_machine_offering)
+    get_default_virtual_machine_offering,
+    get_default_vpc_offering,
+    get_default_network_offering)
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
 from marvin.utils.SshClient import SshClient
@@ -30,6 +34,8 @@ class TestReleaseIP(cloudstackTestCase):
 
         self.apiclient = self.testClient.getApiClient()
         self.services = self.testClient.getParsedTestDataConfig()
+        self.vpc_offering = get_default_vpc_offering(self.apiclient)
+        self.network_offering = get_default_network_offering(self.apiclient)
 
         # Get Zone, Domain and templates
         self.domain = get_domain(self.apiclient)
@@ -49,6 +55,26 @@ class TestReleaseIP(cloudstackTestCase):
         )
 
         self.service_offering = get_default_virtual_machine_offering(self.apiclient)
+        self.vpc = VPC.create(
+            self.apiclient,
+            self.services["vpc"],
+            vpcofferingid=self.vpc_offering.id,
+            zoneid=self.zone.id,
+            account=self.account.name,
+            domainid=self.account.domainid)
+
+        ntwk = Network.create(
+            api_client=self.apiclient,
+            services=self.services["network_1"],
+            accountid=self.account.name,
+            domainid=self.domain.id,
+            networkofferingid=self.network_offering.id,
+            zoneid=self.zone.id,
+            vpcid=self.vpc.id
+        )
+
+        networkids = []
+        networkids.append(ntwk.id)
 
         self.virtual_machine = VirtualMachine.create(
             self.apiclient,
@@ -56,14 +82,16 @@ class TestReleaseIP(cloudstackTestCase):
             templateid=template.id,
             accountid=self.account.name,
             domainid=self.account.domainid,
-            serviceofferingid=self.service_offering.id
+            serviceofferingid=self.service_offering.id,
+            networkids=networkids
         )
 
         self.ip_address = PublicIPAddress.create(
             self.apiclient,
             self.account.name,
             self.zone.id,
-            self.account.domainid
+            self.account.domainid,
+            vpcid=self.vpc.id
         )
 
         ip_addrs = list_public_ip(
@@ -72,6 +100,7 @@ class TestReleaseIP(cloudstackTestCase):
             domainid=self.account.domainid,
             issourcenat=False
         )
+
         try:
             self.ip_addr = ip_addrs[0]
         except Exception as e:
@@ -83,13 +112,15 @@ class TestReleaseIP(cloudstackTestCase):
             self.apiclient,
             self.virtual_machine,
             self.services["natrule"],
-            self.ip_addr.id
+            self.ip_addr.id,
+            networkid=ntwk.id
         )
         self.lb_rule = LoadBalancerRule.create(
             self.apiclient,
             self.services["lbrule"],
             self.ip_addr.id,
-            accountid=self.account.name
+            accountid=self.account.name,
+            networkid=ntwk.id
         )
         self.cleanup = [
             self.virtual_machine,
