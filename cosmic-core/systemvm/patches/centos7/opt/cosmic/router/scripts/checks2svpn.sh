@@ -18,7 +18,7 @@ fi
 
 # Strongswan check
 if (( "${SYSTEMVM_VERSION}" > "170312" )); then
-    ipsec status  vpn-$1 > /tmp/vpn-$1.status
+    strongswan status vpn-$1 > /tmp/vpn-$1.status
 
     cat /tmp/vpn-$1.status | grep "INSTALLED" > /dev/null
     ipsecok=$?
