@@ -16,26 +16,6 @@ class CsIP(object):
         self.dnum = hex(int(dev[3:]))
         self.iplist = {}
         self.address = {}
-        self.address = '''
-                {
-            "add": true,
-            "broadcast": "85.222.237.255",
-            "cidr": "85.222.237.205/25",
-            "device": "eth1",
-            "device_mac_address": "06:80:fc:00:00:10",
-            "first_i_p": false,
-            "gateway": "85.222.237.129",
-            "netmask": "255.255.255.128",
-            "network": "85.222.237.128/25",
-            "new_nic": false,
-            "nic_dev_id": "1",
-            "nw_type": "public",
-            "one_to_one_nat": false,
-            "public_ip": "85.222.237.205",
-            "size": "25",
-            "source_nat": true,
-            "vif_mac_address": "06:80:fc:00:00:10"
-        }'''
         self.list()
         self.fw = config.get_fw()
         self.cl = config.cmdline()
@@ -53,16 +33,8 @@ class CsIP(object):
         if not self.get_type() in ["control"]:
             self.post_config_change()
 
-        '''For isolated/redundant and dhcpsrvr routers, call this method after the post_config is complete '''
-        if not self.config.is_vpc():
-            self.setup_router_control()
-
     def post_config_change(self):
         self.fw_router()
-
-
-        #self.fw_vpcrouter()
-        # DONE ^^^
 
         if self.get_type() in 'guest':
             if self.config.has_dns() or self.config.is_dhcp():
@@ -102,16 +74,6 @@ class CsIP(object):
         if "public_ip" in self.address:
             return self.address['public_ip']
         return "unknown"
-
-    def setup_router_control(self):
-        if self.config.is_vpc():
-            return
-
-        self.fw.append(["filter", "",
-                        "-A INPUT -i eth1 -p tcp -s 169.254.0.1/32 -m tcp --dport 3922 -m state --state NEW,ESTABLISHED -j ACCEPT"])
-
-        self.fw.append(["filter", "", "-P INPUT DROP"])
-        self.fw.append(["filter", "", "-P FORWARD DROP"])
 
     def fw_router(self):
         if self.config.is_vpc():
