@@ -15,6 +15,7 @@ class Config(object):
         self.dbag_monitorservice = CsDatabag('monitorservice').dbag
         self.dbag_network_acl = CsDatabag('networkacl').dbag
         self.dbag_network_overview = CsDatabag('network_overview').dbag
+        self.dbag_vm_overview = CsDatabag('vm_overview').dbag
         self.dbag_network_virtualrouter = CsDatabag('virtualrouter').dbag
         self.dbag_publicip_acl = CsDatabag('publicipacl').dbag
         self.dbag_remoteaccessvpn = CsDatabag('remoteaccessvpn').dbag

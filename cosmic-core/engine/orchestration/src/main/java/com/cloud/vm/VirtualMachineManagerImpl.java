@@ -803,63 +803,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
     }
 
-    private void ensureVmRunningContext(final long hostId, VMInstanceVO vm, final Event cause) throws OperationTimedoutException, ResourceUnavailableException,
-            NoTransitionException, InsufficientAddressCapacityException {
-        final VirtualMachineGuru vmGuru = getVmGuru(vm);
-
-        s_logger.debug("VM state is starting on full sync so updating it to running");
-        vm = _vmDao.findById(vm.getId());
-
-        // grab outstanding work item if any
-        final ItWorkVO work = _workDao.findByOutstandingWork(vm.getId(), vm.getState());
-        if (work != null) {
-            s_logger.debug("Found an outstanding work item for this vm " + vm + " in state:" + vm.getState() + ", work id:" + work.getId());
-        }
-
-        try {
-            stateTransitTo(vm, cause, hostId);
-        } catch (final NoTransitionException e1) {
-            s_logger.warn(e1.getMessage());
-        }
-
-        s_logger.debug("VM's " + vm + " state is starting on full sync so updating it to Running");
-        vm = _vmDao.findById(vm.getId()); // this should ensure vm has the most
-        // up to date info
-
-        final VirtualMachineProfile profile = new VirtualMachineProfileImpl(vm);
-        final List<NicVO> nics = _nicsDao.listByVmId(profile.getId());
-        for (final NicVO nic : nics) {
-            final Network network = _networkModel.getNetwork(nic.getNetworkId());
-            final NicProfile nicProfile =
-                    new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), null, _networkModel.isSecurityGroupSupportedInNetwork(network),
-                            _networkModel.getNetworkTag(profile.getHypervisorType(), network));
-            profile.addNic(nicProfile);
-        }
-
-        final Commands cmds = new Commands(Command.OnError.Stop);
-        s_logger.debug("Finalizing commands that need to be send to complete Start process for the vm " + vm);
-
-        if (vmGuru.finalizeCommandsOnStart(cmds, profile)) {
-            if (cmds.size() != 0) {
-                _agentMgr.send(vm.getHostId(), cmds);
-            }
-
-            if (vmGuru.finalizeStart(profile, vm.getHostId(), cmds, null)) {
-                stateTransitTo(vm, cause, vm.getHostId());
-            } else {
-                s_logger.error("Unable to finish finialization for running vm: " + vm);
-            }
-        } else {
-            s_logger.error("Unable to finalize commands on start for vm: " + vm);
-        }
-
-        if (work != null) {
-            s_logger.debug("Updating outstanding work item to Done, id:" + work.getId());
-            work.setStep(Step.Done);
-            _workDao.update(work.getId(), work);
-        }
-    }
-
     @Override
     public void advanceExpunge(final String vmUuid) throws ResourceUnavailableException, OperationTimedoutException, ConcurrentOperationException {
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);

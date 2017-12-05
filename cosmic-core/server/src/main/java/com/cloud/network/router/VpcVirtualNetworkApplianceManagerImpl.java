@@ -6,8 +6,10 @@ import com.cloud.agent.api.Command.OnError;
 import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.api.PlugNicCommand;
 import com.cloud.agent.api.SetupGuestNetworkCommand;
+import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
+import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
@@ -46,6 +48,7 @@ import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.user.UserStatisticsVO;
+import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.StateMachine2;
@@ -53,6 +56,7 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
+import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -348,11 +352,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             final List<? extends StaticRoute> routes = _staticRouteDao.listByVpcId(domainRouterVO.getVpcId());
             final List<StaticRouteProfile> staticRouteProfiles = new ArrayList<>(routes.size());
 
-            final Map<String, String> cidrGwIpMap = new HashMap<>();
-
             for (final StaticRoute route : routes) {
-                cidrGwIpMap.put(route.getCidr(), route.getGwIpAddress());
-
                 staticRouteProfiles.add(new StaticRouteProfile(route));
             }
 
@@ -368,10 +368,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             }
 
             // 6) REPROGRAM GUEST NETWORK
-            boolean reprogramGuestNtwks = true;
-            if (profile.getParameter(Param.ReProgramGuestNetworks) != null && (Boolean) profile.getParameter(Param.ReProgramGuestNetworks) == false) {
-                reprogramGuestNtwks = false;
-            }
+            boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
 
             final VirtualRouterProvider vrProvider = _vrProviderDao.findById(domainRouterVO.getElementId());
             if (vrProvider == null) {
@@ -382,22 +379,60 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 throw new CloudRuntimeException("Cannot find related provider of virtual router provider: " + vrProvider.getType().toString());
             }
 
+            boolean updateVmOverview = false;
+            final Map<UserVm, List<Nic>> vmsAndNicsMap = new HashMap<>();
+
             for (final Pair<Nic, Network> nicNtwk : guestNics) {
                 final Nic guestNic = nicNtwk.first();
-                final AggregationControlCommand startCmd = new AggregationControlCommand(Action.Start, domainRouterVO.getInstanceName(), controlNic.getIPv4Address(),
-                        _routerControlHelper.getRouterIpInNetwork(
-                                guestNic.getNetworkId(), domainRouterVO.getId()));
+
+                final AggregationControlCommand startCmd = new AggregationControlCommand(
+                        Action.Start,
+                        domainRouterVO.getInstanceName(),
+                        controlNic.getIPv4Address(),
+                        _routerControlHelper.getRouterIpInNetwork(guestNic.getNetworkId(), domainRouterVO.getId())
+                );
                 cmds.addCommand(startCmd);
+
                 if (reprogramGuestNtwks) {
                     finalizeIpAssocForNetwork(cmds, domainRouterVO, provider, guestNic.getNetworkId(), vlanMacAddress);
                     finalizeNetworkRulesForNetwork(cmds, domainRouterVO, provider, guestNic.getNetworkId());
                 }
 
-                finalizeUserDataAndDhcpOnStart(cmds, domainRouterVO, provider, guestNic.getNetworkId());
-                final AggregationControlCommand finishCmd = new AggregationControlCommand(Action.Finish, domainRouterVO.getInstanceName(), controlNic.getIPv4Address(),
-                        _routerControlHelper.getRouterIpInNetwork(
-                                guestNic.getNetworkId(), domainRouterVO.getId()));
+                if (_networkModel.isProviderSupportServiceInNetwork(guestNic.getNetworkId(), Service.Dhcp, provider)) {
+                    updateVmOverview = true;
+                    _userVmDao.listByNetworkIdAndStates(
+                            guestNic.getNetworkId(),
+                            State.Starting,
+                            State.Running,
+                            State.Paused,
+                            State.Migrating,
+                            State.Stopping
+                    ).forEach(vm -> {
+                        final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(guestNic.getNetworkId(), vm.getId());
+                        if (nic != null) {
+                            if (!vmsAndNicsMap.containsKey(vm)) {
+                                vmsAndNicsMap.put(vm, new ArrayList<Nic>() {{
+                                    add(nic);
+                                }});
+                            } else {
+                                vmsAndNicsMap.get(vm).add(nic);
+                            }
+                        }
+                    });
+                }
+                finalizeUserDataOnStart(cmds, domainRouterVO, provider, guestNic.getNetworkId());
+
+                final AggregationControlCommand finishCmd = new AggregationControlCommand(
+                        Action.Finish,
+                        domainRouterVO.getInstanceName(),
+                        controlNic.getIPv4Address(),
+                        _routerControlHelper.getRouterIpInNetwork(guestNic.getNetworkId(), domainRouterVO.getId())
+                );
                 cmds.addCommand(finishCmd);
+            }
+
+            if (updateVmOverview) {
+                cmds.addCommand(new UpdateVmOverviewCommand(new VMOverviewTO(vmsAndNicsMap)));
             }
 
             // 7) RE-APPLY VR Configuration
@@ -453,7 +488,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 result = false;
             }
             // 3) apply networking rules
-            if (result && params.get(Param.ReProgramGuestNetworks) != null && (Boolean) params.get(Param.ReProgramGuestNetworks) == true) {
+            if (result && params.get(Param.ReProgramGuestNetworks) != null && (Boolean) params.get(Param.ReProgramGuestNetworks)) {
                 sendNetworkRulesToRouter(router.getId(), network.getId());
             }
         } catch (final Exception ex) {

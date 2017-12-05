@@ -1,4 +1,4 @@
-package com.cloud.agent.api.to;
+package com.cloud.agent.api.to.overviews;
 
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
@@ -247,10 +247,6 @@ public class NetworkOverviewTO {
 
     public static class ServiceTO {
         private ServiceSourceNatTO[] sourceNat;
-
-        public ServiceTO() {
-        }
-
 
         public ServiceSourceNatTO[] getSourceNat() {
             return sourceNat;

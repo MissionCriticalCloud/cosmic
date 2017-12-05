@@ -1586,13 +1586,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         cmds.addCommand("monitor", command);
     }
 
-    protected void finalizeUserDataAndDhcpOnStart(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
-        if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Dhcp, provider)) {
-            // Resend dhcp
-            s_logger.debug("Reapplying dhcp entries as a part of domR " + router + " start...");
-            _commandSetupHelper.createDhcpEntryCommandsForVMs(router, cmds, guestNetworkId);
-        }
-
+    protected void finalizeUserDataOnStart(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
         if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.UserData, provider)) {
             // Resend user data
             s_logger.debug("Reapplying vm data (userData and metaData) entries as a part of domR " + router + " start...");
@@ -1756,9 +1750,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         final List<Long> routerGuestNtwkIds = _routerDao.getRouterNetworks(router.getId());
         for (final Long guestNetworkId : routerGuestNtwkIds) {
-            final AggregationControlCommand startCmd = new AggregationControlCommand(Action.Start, router.getInstanceName(), controlNic.getIPv4Address(), _routerControlHelper
-                    .getRouterIpInNetwork(
-                            guestNetworkId, router.getId()));
+            final AggregationControlCommand startCmd = new AggregationControlCommand(
+                    Action.Start,
+                    router.getInstanceName(),
+                    controlNic.getIPv4Address(),
+                    _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId())
+            );
             cmds.addCommand(startCmd);
 
             if (reprogramGuestNtwks) {
@@ -1778,11 +1775,14 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 }
             }
 
-            finalizeUserDataAndDhcpOnStart(cmds, router, provider, guestNetworkId);
+            finalizeUserDataOnStart(cmds, router, provider, guestNetworkId);
 
-            final AggregationControlCommand finishCmd = new AggregationControlCommand(Action.Finish, router.getInstanceName(), controlNic.getIPv4Address(), _routerControlHelper
-                    .getRouterIpInNetwork(
-                            guestNetworkId, router.getId()));
+            final AggregationControlCommand finishCmd = new AggregationControlCommand(
+                    Action.Finish,
+                    router.getInstanceName(),
+                    controlNic.getIPv4Address(),
+                    _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId())
+            );
             cmds.addCommand(finishCmd);
         }
 

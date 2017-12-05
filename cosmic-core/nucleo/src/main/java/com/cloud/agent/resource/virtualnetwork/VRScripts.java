@@ -3,12 +3,12 @@ package com.cloud.agent.resource.virtualnetwork;
 public class VRScripts {
     public final static String CONFIG_PERSIST_LOCATION = "/var/cache/cloud/";
     public static final String NETWORK_OVERVIEW_CONFIG = "network_overview.json";
+    public static final String VM_OVERVIEW_CONFIG = "vm_overview.json";
     public final static String IP_ASSOCIATION_CONFIG = "ip_associations.json";
     public final static String PRIVATE_GATEWAY_CONFIG = "private_gateway.json";
     public final static String NETWORK_ACL_CONFIG = "network_acl.json";
     public final static String PUBLIC_IP_ACL_CONFIG = "public_ip_acl.json";
     public final static String VM_METADATA_CONFIG = "vm_metadata.json";
-    public final static String VM_DHCP_CONFIG = "vm_dhcp_entry.json";
     public final static String VM_PASSWORD_CONFIG = "vm_password.json";
     public static final String FORWARDING_RULES_CONFIG = "forwarding_rules.json";
     public static final String FIREWALL_RULES_CONFIG = "firewall_rules.json";

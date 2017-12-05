@@ -1,7 +1,7 @@
 package com.cloud.agent.api.routing;
 
 import com.cloud.agent.api.Command;
-import com.cloud.agent.api.to.NetworkOverviewTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 
 import java.util.HashMap;
 import java.util.Map;

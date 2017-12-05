@@ -39,8 +39,8 @@ class IpTablesExecutor:
         fwd = CsForwardingRules(self.config)
         fwd.process()
 
-        acls = CsVrConfig(self.config)
-        acls.process()
+        vr = CsVrConfig(self.config)
+        vr.process()
 
         vpns = CsSite2SiteVpn(self.config)
         vpns.process()
@@ -77,13 +77,11 @@ def main(argv):
 
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
-    # CsAddress.process
-
     databag_map = OrderedDict(
         [
             # New style
             ("network_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("vm_dhcp_entry", {"process_iptables": False, "executor": IpTablesExecutor(config)}),
+            ("vm_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             # Legacy
             ("vm_metadata", {"process_iptables": False, "executor": CsMetadataServiceVMConfig(config)}),
             ("network_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
@@ -105,10 +103,10 @@ def main(argv):
         cs_network = Network(config)
         cs_network.sync()
 
-    if process_file == "vm_dhcp_entry":
+    if process_file == "vm_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_virtualmachine = VirtualMachine(config)
-        cs_virtualmachine.sync()
+        cs_virtual_machine = VirtualMachine(config)
+        cs_virtual_machine.sync()
 
     if process_file == "cmd_line":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")

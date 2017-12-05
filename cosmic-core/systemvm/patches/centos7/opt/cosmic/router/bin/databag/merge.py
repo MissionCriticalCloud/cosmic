@@ -84,6 +84,8 @@ class updateDataBag:
             dbag = self.processCL(self.db.getDataBag())
         elif self.qFile.type == 'network_overview':
             dbag = self.qFile.data
+        elif self.qFile.type == 'vm_overview':
+            dbag = self.qFile.data
         elif self.qFile.type == 'networkacl':
             dbag = self.process_network_acl(self.db.getDataBag())
         elif self.qFile.type == 'publicipacl':

@@ -1249,12 +1249,6 @@ public class NetUtils {
         return new BigInteger(inetAddr.getAddress());
     }
 
-    //RFC3315, section 9.4
-    public static String getDuidLL(final String macAddress) {
-        final String duid = "00:03:00:01:" + macAddress;
-        return duid;
-    }
-
     public static boolean isIp6InRange(final String ip6, final String ip6Range) {
         if (ip6Range == null) {
             return false;

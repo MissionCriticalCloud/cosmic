@@ -12,6 +12,6 @@ class VirtualMachine(object):
 
     def sync(self):
         logging.debug("Starting sync of virtual machine!")
-        logging.debug(self.config.dbag_network_overview)
+        logging.debug(self.config.dbag_vm_overview)
 
         self.dhcp_vm.sync()

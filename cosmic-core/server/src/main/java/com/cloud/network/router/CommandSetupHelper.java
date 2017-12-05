@@ -4,7 +4,6 @@ import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
-import com.cloud.agent.api.routing.DhcpEntryCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
 import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.routing.IpAssocCommand;
@@ -30,20 +29,19 @@ import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
-import com.cloud.agent.api.to.NetworkOverviewTO;
-import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO;
-import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.IPv4Address;
-import com.cloud.agent.api.to.NetworkOverviewTO.InterfaceTO.MetadataTO;
-import com.cloud.agent.api.to.NetworkOverviewTO.RouteTO;
-import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO;
-import com.cloud.agent.api.to.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
 import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.IPv4Address;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.MetadataTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.RouteTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
-import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.VlanDao;
@@ -51,8 +49,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
@@ -92,8 +88,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.GuestOSVO;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.NumbersUtil;
@@ -132,12 +126,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class CommandSetupHelper {
 
     private static final Logger s_logger = LoggerFactory.getLogger(CommandSetupHelper.class);
-    private final String _dnsBasicZoneUpdates = "all";
     @Inject
     @Qualifier("networkHelper")
     protected NetworkHelper _networkHelper;
-    @Inject
-    private EntityManager _entityMgr;
     @Inject
     private NicDao _nicDao;
     @Inject
@@ -174,8 +165,6 @@ public class CommandSetupHelper {
     private VlanDao _vlanDao;
     @Inject
     private IPAddressDao _ipAddressDao;
-    @Inject
-    private GuestOSDao _guestOSDao;
     @Inject
     private RouterControlHelper _routerControlHelper;
     @Inject
@@ -786,84 +775,6 @@ public class CommandSetupHelper {
         return cmd;
     }
 
-    public void createDhcpEntryCommandsForVMs(final DomainRouterVO router, final Commands cmds, final long guestNetworkId) {
-        final List<UserVmVO> vms = _userVmDao.listByNetworkIdAndStates(guestNetworkId, VirtualMachine.State.Running, VirtualMachine.State.Migrating, VirtualMachine.State.Stopping);
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        for (final UserVmVO vm : vms) {
-            boolean createDhcp = true;
-            if (zone.getNetworkType() == NetworkType.Basic && router.getPodIdToDeployIn().longValue() != vm.getPodIdToDeployIn().longValue()
-                    && _dnsBasicZoneUpdates.equalsIgnoreCase("pod")) {
-                createDhcp = false;
-            }
-            if (createDhcp) {
-                final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(guestNetworkId, vm.getId());
-                if (nic != null) {
-                    s_logger.debug("Creating dhcp entry for vm " + vm + " on domR " + router + ".");
-                    createDhcpEntryCommand(router, vm, nic, cmds);
-                }
-            }
-        }
-    }
-
-    public void createDhcpEntryCommand(final VirtualRouter router, final UserVm vm, final NicVO nic, final Commands cmds) {
-        final DhcpEntryCommand dhcpCommand = new DhcpEntryCommand(nic.getMacAddress(), nic.getIPv4Address(), vm.getHostName(), nic.getIPv6Address(),
-                _networkModel.getExecuteInSeqNtwkElmtCmd());
-
-        if (nic.isDefaultNic()) {
-            dhcpCommand.setDefaultRouter(nic.getIPv4Gateway());
-        }
-
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-
-        dhcpCommand.setIp6Gateway(nic.getIPv6Gateway());
-        String ipaddress = null;
-        final NicVO domrDefaultNic = findDefaultDnsIp(vm.getId());
-        if (domrDefaultNic != null) {
-            ipaddress = domrDefaultNic.getIPv4Address();
-        }
-        dhcpCommand.setDefaultDns(ipaddress);
-        dhcpCommand.setDuid(NetUtils.getDuidLL(nic.getMacAddress()));
-        dhcpCommand.setDefault(nic.isDefaultNic());
-
-        dhcpCommand.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        dhcpCommand.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        dhcpCommand.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(nic.getNetworkId(), router.getId()));
-        dhcpCommand.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("dhcp", dhcpCommand);
-    }
-
-    private NicVO findDefaultDnsIp(final long userVmId) {
-        final NicVO defaultNic = _nicDao.findDefaultNicForVM(userVmId);
-
-        // check if DNS provider is the domR
-        if (!_networkModel.isProviderSupportServiceInNetwork(defaultNic.getNetworkId(), Service.Dns, Provider.VirtualRouter)) {
-            return null;
-        }
-
-        final NetworkOffering offering = _networkOfferingDao.findById(_networkDao.findById(defaultNic.getNetworkId()).getNetworkOfferingId());
-        if (offering.getRedundantRouter()) {
-            return findGatewayIp(userVmId);
-        }
-
-        final Zone zone = zoneRepository.findOne(_networkModel.getNetwork(defaultNic.getNetworkId()).getDataCenterId());
-        final boolean isZoneBasic = zone.getNetworkType() == NetworkType.Basic;
-
-        // find domR's nic in the network
-        final NicVO domrDefaultNic;
-        if (isZoneBasic) {
-            domrDefaultNic = _nicDao.findByNetworkIdTypeAndGateway(defaultNic.getNetworkId(), VirtualMachine.Type.DomainRouter, defaultNic.getIPv4Gateway());
-        } else {
-            domrDefaultNic = _nicDao.findByNetworkIdAndType(defaultNic.getNetworkId(), VirtualMachine.Type.DomainRouter);
-        }
-        return domrDefaultNic;
-    }
-
-    private NicVO findGatewayIp(final long userVmId) {
-        final NicVO defaultNic = _nicDao.findDefaultNicForVM(userVmId);
-        return defaultNic;
-    }
-
     public void createDeleteIpAliasCommand(final DomainRouterVO router, final List<IpAliasTO> deleteIpAliasTOs, final List<IpAliasTO> createIpAliasTos, final long networkId,
                                            final Commands cmds) {
         final String routerip = _routerControlHelper.getRouterIpInNetwork(networkId, router.getId());
@@ -1035,8 +946,12 @@ public class CommandSetupHelper {
         return setupCmd;
     }
 
-    private NetworkOverviewTO createNetworkOverviewFromRouter(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude, final List<StaticRouteProfile>
-            staticRoutesToExclude) {
+    private NetworkOverviewTO createNetworkOverviewFromRouter(
+            final VirtualRouter router,
+            final List<Nic> nicsToExclude,
+            final List<Ip> ipsToExclude,
+            final List<StaticRouteProfile> staticRoutesToExclude
+    ) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<InterfaceTO> interfacesTO = new ArrayList<>();
 

@@ -2,9 +2,9 @@ package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.SetupVRCommand;
+import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
-import com.cloud.agent.api.routing.DhcpEntryCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
 import com.cloud.agent.api.routing.IpAssocCommand;
 import com.cloud.agent.api.routing.IpAssocVpcCommand;
@@ -62,21 +62,21 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SetStaticNatRulesCommand.class, new SetStaticNatRulesConfigItem());
         flyweight.put(LoadBalancerConfigCommand.class, new LoadBalancerConfigItem());
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());
-        flyweight.put(DhcpEntryCommand.class, new DhcpEntryConfigItem());
-        flyweight.put(CreateIpAliasCommand.class, new CreateIpAliasConfigItem());
-        flyweight.put(DnsMasqConfigCommand.class, new DnsMasqConfigItem());
-        flyweight.put(DeleteIpAliasCommand.class, new DeleteIpAliasConfigItem());
-        flyweight.put(VmDataCommand.class, new VmDataConfigItem());
+        flyweight.put(UpdateVmOverviewCommand.class, new VmOverviewConfigItem());
+        flyweight.put(CreateIpAliasCommand.class, new CreateIpAliasConfigItem()); // Deprecated
+        flyweight.put(DnsMasqConfigCommand.class, new DnsMasqConfigItem()); // Deprecated
+        flyweight.put(DeleteIpAliasCommand.class, new DeleteIpAliasConfigItem()); // Deprecated
+        flyweight.put(VmDataCommand.class, new VmDataConfigItem()); // Move to vm overview
         flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
         flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
-        flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem());
+        flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem()); // Deprecated
         flyweight.put(SetupGuestNetworkCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetupPrivateGatewayCommand.class, new NetworkOverviewConfigItem());
-        flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem());
-        flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem());
-        flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem());
+        flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
+        flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
+        flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem()); // Move to network overview
         flyweight.put(IpAssocCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(IpAssocVpcCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
