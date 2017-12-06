@@ -64,8 +64,6 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final NicVO nicVo = dhcp.getNicVo();
         final UserVmVO userVM = dhcp.getUserVM();
 
-        _commandSetupHelper.createDhcpEntryCommand(router, userVM, nicVo, commands);
-
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }
 

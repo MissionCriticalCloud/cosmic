@@ -175,8 +175,6 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
         final DeployDestination destination = dhcp.getDestination();
 
         if (router.getPodIdToDeployIn().longValue() == destination.getPod().getId()) {
-            _commandSetupHelper.createDhcpEntryCommand(router, userVM, nicVo, commands);
-
             return _networkGeneralHelper.sendCommandsToRouter(router, commands);
         }
         return true;
