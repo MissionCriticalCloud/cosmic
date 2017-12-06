@@ -9,7 +9,6 @@ import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
@@ -374,7 +373,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             if (vrProvider == null) {
                 throw new CloudRuntimeException("Cannot find related virtual router provider of router: " + domainRouterVO.getHostName());
             }
-            final Provider provider = Network.Provider.getProvider(vrProvider.getType().toString());
+            final Provider provider = Provider.getProvider(vrProvider.getType().toString());
             if (provider == null) {
                 throw new CloudRuntimeException("Cannot find related provider of virtual router provider: " + vrProvider.getType().toString());
             }
@@ -432,7 +431,8 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             }
 
             if (updateVmOverview) {
-                cmds.addCommand(new UpdateVmOverviewCommand(new VMOverviewTO(vmsAndNicsMap)));
+                final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(domainRouterVO, vmsAndNicsMap);
+                cmds.addCommand(updateVmOverviewCommand);
             }
 
             // 7) RE-APPLY VR Configuration

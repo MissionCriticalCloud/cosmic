@@ -2,6 +2,7 @@ package com.cloud.network.router;
 
 import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.SetupVRCommand;
+import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
@@ -40,6 +41,7 @@ import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.MetadataTO
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO.RouteTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
+import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
@@ -1025,5 +1027,15 @@ public class CommandSetupHelper {
         networkOverviewTO.setServices(servicesTO);
 
         return networkOverviewTO;
+    }
+
+    public UpdateVmOverviewCommand createUpdateVmOverviewCommand(final VirtualRouter router, final Map<UserVm, List<Nic>> vmsAndNicsMap) {
+        final UpdateVmOverviewCommand cmd = new UpdateVmOverviewCommand(new VMOverviewTO(vmsAndNicsMap));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
+        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
+
+        return cmd;
     }
 }
