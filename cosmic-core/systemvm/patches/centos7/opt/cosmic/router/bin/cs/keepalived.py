@@ -17,9 +17,7 @@ class Keepalived(object):
             trim_blocks=True,
             lstrip_blocks=True
         )
-        # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
         self.keepalived_config_path = '/etc/keepalived/conf.d/'
-        # self.keepalived_config_path = '/tmp/keep/'
 
         self.sync_group_name = 'cosmic'
         self.routes_vrrp_id = '254'
