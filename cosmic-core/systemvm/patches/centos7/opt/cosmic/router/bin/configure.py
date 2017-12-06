@@ -8,7 +8,6 @@ import cs.CsHelper as CsHelper
 from cs.CsAcl import CsAcl
 from cs.CsForwardingRules import CsForwardingRules
 from cs.CsLoadBalancer import CsLoadBalancer
-from cs.CsMonitor import CsMonitor
 from cs.CsNetfilter import CsNetfilters
 from cs.CsRemoteAccessVpn import CsRemoteAccessVpn
 from cs.CsSite2SiteVpn import CsSite2SiteVpn
@@ -93,7 +92,6 @@ def main(argv):
             ("remote_access_vpn", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("vpn_user_list", {"process_iptables": False, "executor": CsVpnUser(config)}),
             ("load_balancer", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
-            ("monitor_service", {"process_iptables": False, "executor": CsMonitor(config)}),
             ("vr", {"process_iptables": True, "executor": IpTablesExecutor(config)})
         ]
     )
