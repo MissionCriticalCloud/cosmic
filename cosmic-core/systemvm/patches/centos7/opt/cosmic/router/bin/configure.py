@@ -54,13 +54,6 @@ class IpTablesExecutor:
         nf = CsNetfilters(self.config, False)
         nf.compare(self.config.get_fw())
 
-        logging.debug("Configuring iptables rules done ...saving rules")
-
-        # Save iptables configuration - will be loaded on reboot by the iptables-restore that is configured on /etc/rc.local
-        CsHelper.save_iptables("iptables-save", "/etc/iptables/router_rules.v4")
-        CsHelper.save_iptables("ip6tables-save", "/etc/iptables/router_rules.v6")
-
-
 def main(argv):
     # The file we are currently processing, if it is "cmd_line.json" everything will be processed.
     process_file = argv[1]
