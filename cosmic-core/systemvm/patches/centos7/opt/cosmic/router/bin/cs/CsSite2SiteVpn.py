@@ -31,7 +31,7 @@ class CsSite2SiteVpn(object):
             if vpn == "id":
                 continue
 
-            self.configure_iptables("eth1", self.dbag[vpn])
+            self.configure_iptables("eth2", self.dbag[vpn])
             self.configure_ipsec(self.dbag[vpn])
 
         # Delete vpns that are no longer in the configuration
