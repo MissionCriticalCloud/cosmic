@@ -29,6 +29,8 @@ from marvin.lib.common import (
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
 
+import traceback
+from pprint import pprint
 
 class TestDeleteAccount(cloudstackTestCase):
     def setUp(self):
@@ -116,7 +118,9 @@ class TestDeleteAccount(cloudstackTestCase):
             self.apiclient,
             self.services["lbrule"],
             src_nat_ip_addr.id,
-            self.account.name
+            self.account.name,
+            self.network1.id,
+            self.vpc1.id
         )
         self.lb_rule.assign(self.apiclient, [self.vm1])
 

@@ -3,7 +3,9 @@ from marvin.cloudstackAPI import stopRouter
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     VirtualMachine,
-    Account
+    Account,
+    VPC,
+    Network
 )
 from marvin.lib.common import (
     list_routers,
@@ -11,7 +13,10 @@ from marvin.lib.common import (
     get_template,
     get_zone,
     get_domain,
-    get_default_virtual_machine_offering
+    get_default_virtual_machine_offering,
+    get_default_vpc_offering,
+    get_default_network_offering,
+    get_network_acl
 )
 from marvin.lib.utils import (
     get_process_status,
@@ -20,42 +25,72 @@ from marvin.lib.utils import (
 from marvin.utils.MarvinLog import MarvinLog
 from nose.plugins.attrib import attr
 
+import traceback
+
 
 class TestRouterIpTablesPolicies(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
+        try:
+            cls.logger = MarvinLog(MarvinLog.LOGGER_TEST).get_logger()
 
-        # We want to fail quicker if it's failure
-        socket.setdefaulttimeout(60)
+            # We want to fail quicker if it's failure
+            socket.setdefaulttimeout(60)
 
-        cls.testClient = super(TestRouterIpTablesPolicies, cls).getClsTestClient()
-        cls.apiclient = cls.testClient.getApiClient()
+            cls.testClient = super(TestRouterIpTablesPolicies, cls).getClsTestClient()
+            cls.apiclient = cls.testClient.getApiClient()
 
-        cls.services = cls.testClient.getParsedTestDataConfig()
-        # Get Zone, Domain and templates
-        cls.domain = get_domain(cls.apiclient)
-        cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
-        cls.template = get_template(
-            cls.apiclient,
-            cls.zone.id
-        )
-        cls.services["vpc"]["cidr"] = '10.1.1.1/16'
-        cls.services["virtual_machine"]["zoneid"] = cls.zone.id
-        cls.services["virtual_machine"]["template"] = cls.template.id
+            cls.services = cls.testClient.getParsedTestDataConfig()
+            # Get Zone, Domain and templates
+            cls.domain = get_domain(cls.apiclient)
+            cls.zone = get_zone(cls.apiclient, cls.testClient.getZoneForTests())
+            cls.template = get_template(
+                cls.apiclient,
+                cls.zone.id
+            )
+            cls.services["vpc"]["cidr"] = '10.1.1.1/16'
+            cls.services["virtual_machine"]["zoneid"] = cls.zone.id
+            cls.services["virtual_machine"]["template"] = cls.template.id
+            cls.vpc_offering = get_default_vpc_offering(cls.apiclient)
+            cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
 
-        cls.account = Account.create(
-            cls.apiclient,
-            cls.services["account"],
-            admin=True,
-            domainid=cls.domain.id)
+            cls.network_offering = get_default_network_offering(cls.apiclient)
+            cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
 
-        cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+            cls.default_allow_acl = get_network_acl(cls.apiclient, 'default_allow')
+            cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
 
-        cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.logger)
+            cls.account = Account.create(
+                cls.apiclient,
+                cls.services["account"],
+                admin=True,
+                domainid=cls.domain.id)
+            cls.vpc1 = VPC.create(cls.apiclient,
+                                   cls.services['vpcs']['vpc1'],
+                                   vpcofferingid=cls.vpc_offering.id,
+                                   zoneid=cls.zone.id,
+                                   domainid=cls.domain.id,
+                                   account=cls.account.name)
+            cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
 
-        cls._cleanup = [cls.account]
-        return
+            cls.network1 = Network.create(cls.apiclient,
+                                           cls.services['networks']['network1'],
+                                           networkofferingid=cls.network_offering.id,
+                                           aclid=cls.default_allow_acl.id,
+                                           vpcid=cls.vpc1.id,
+                                           zoneid=cls.zone.id,
+                                           domainid=cls.domain.id,
+                                           accountid=cls.account.name)
+            cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+
+            cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
+
+            cls.entity_manager = EntityManager(cls.apiclient, cls.services, cls.service_offering, cls.account, cls.zone, cls.network1, cls.logger)
+
+            cls._cleanup = [cls.account]
+            return
+        except Exception as e:
+            traceback.print_exc()
 
     @classmethod
     def tearDownClass(cls):
@@ -132,12 +167,13 @@ class TestRouterIpTablesPolicies(cloudstackTestCase):
 
 
 class EntityManager(object):
-    def __init__(self, apiclient, services, service_offering, account, zone, logger):
+    def __init__(self, apiclient, services, service_offering, account, zone, network, logger):
         self.apiclient = apiclient
         self.services = services
         self.service_offering = service_offering
         self.account = account
         self.zone = zone
+        self.network = network
         self.logger = logger
 
         self.cleanup = []
@@ -156,7 +192,9 @@ class EntityManager(object):
                 self.services["virtual_machine"],
                 accountid=self.account.name,
                 domainid=self.account.domainid,
-                serviceofferingid=self.service_offering.id)
+                serviceofferingid=self.service_offering.id,
+                networkids=[self.network.id]
+            )
 
             self.cleanup.insert(0, vm)
             self.logger.debug('Created VM=%s' % vm.id)
