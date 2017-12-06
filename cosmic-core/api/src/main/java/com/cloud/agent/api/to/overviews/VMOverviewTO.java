@@ -28,25 +28,25 @@ public class VMOverviewTO {
     }
 
     public static class VMTO {
-        private String instanceName;
+        private String hostName;
         private InterfaceTO[] interfaces;
 
         public VMTO() {
         }
 
         public VMTO(final UserVm vm, final List<Nic> nics) {
-            instanceName = vm.getInstanceName();
+            hostName = vm.getHostName();
             final List<InterfaceTO> interfacesTO = new ArrayList<>();
             nics.forEach(nic -> interfacesTO.add(new InterfaceTO(nic.getIPv4Address(), nic.getMacAddress(), nic.isDefaultNic())));
             interfaces = interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]);
         }
 
-        public String getInstanceName() {
-            return instanceName;
+        public String getHostName() {
+            return hostName;
         }
 
-        public void setInstanceName(final String instanceName) {
-            this.instanceName = instanceName;
+        public void setHostName(final String hostName) {
+            this.hostName = hostName;
         }
 
         public InterfaceTO[] getInterfaces() {
