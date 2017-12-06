@@ -30,6 +30,8 @@ class DhcpVm:
         hosts = {}
 
         counter = 0
+        if "vms" not in self.config.dbag_vm_overview:
+            return
         for vm in self.config.dbag_vm_overview["vms"]:
             for interface in vm["interfaces"]:
                 hosts[counter] = {
@@ -56,6 +58,9 @@ class DhcpVm:
 
         host_entries = {}
 
+        if "vms" not in self.config.dbag_vm_overview:
+            return
+
         for vm in self.config.dbag_vm_overview["vms"]:
             for interface in vm["interfaces"]:
                 host_entries[interface['ipv4_address']] = vm['host_name']
@@ -76,6 +81,9 @@ class DhcpVm:
     def write_dnsmasq_dhcpopts(self):
 
         tags = []
+
+        if "vms" not in self.config.dbag_vm_overview:
+            return
 
         for vm in self.config.dbag_vm_overview["vms"]:
             for interface in vm["interfaces"]:
