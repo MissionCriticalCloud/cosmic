@@ -381,8 +381,9 @@ class TestVpcVpn(cloudstackTestCase):
             time.sleep(15)
             self.logger.debug("Resetting VPN connection with id %s" % (passiveVpn['id']))
             Vpn.resetVpnConnection(self.apiclient, passiveVpn['id'])
-            self.logger.debug("Waiting 20s for the VPN to connect")
-            time.sleep(60)
+            self.logger.debug("Waiting 120s for the VPN to connect")
+            Vpn.listVpnConnection(self.apiclient)
+            time.sleep(120)
 
         # First the last VM
         # setup ssh connection to vm maxnumVM

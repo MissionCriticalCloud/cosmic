@@ -30,17 +30,15 @@ class DhcpVm:
         hosts = {}
 
         counter = 0
-        for data in self.config.dbag_dhcpentry:
-            if data == 'id':
-                continue
-            dhcp_host = self.config.dbag_dhcpentry[data]
-            hosts[counter] = {
-                'ip_address': dhcp_host['ipv4_adress'],
-                'mac_address': dhcp_host['mac_address'],
-                'tag': self.generate_dhcp_tag(dhcp_host['ipv4_adress']),
-                'hostname': dhcp_host['host_name']
-            }
-            counter += 1
+        for vm in self.config.dbag_vm_overview["vms"]:
+            for interface in vm["interfaces"]:
+                hosts[counter] = {
+                    'ip_address': interface["ipv4_address"],
+                    'mac_address': interface["mac_address"],
+                    'tag': self.generate_dhcp_tag(interface["ipv4_address"]),
+                    'hostname': vm['host_name']
+                }
+                counter += 1
 
         filename = 'dhcphosts.txt'
         content = self.jinja_env.get_template('etc_dhcphosts.conf').render(
@@ -58,11 +56,9 @@ class DhcpVm:
 
         host_entries = {}
 
-        for data in self.config.dbag_dhcpentry:
-            if data == 'id':
-                continue
-            dhcp_host = self.config.dbag_dhcpentry[data]
-            host_entries[dhcp_host['ipv4_adress']] = dhcp_host['host_name']
+        for vm in self.config.dbag_vm_overview["vms"]:
+            for interface in vm["interfaces"]:
+                host_entries[interface['ipv4_address']] = vm['host_name']
 
         content = self.jinja_env.get_template('etc_hosts.conf').render(
             host_entries=host_entries
@@ -81,13 +77,12 @@ class DhcpVm:
 
         tags = []
 
-        for data in self.config.dbag_dhcpentry:
-            dhcp_host = self.config.dbag_dhcpentry[data]
-            if data == 'id':
-                continue
-            if 'default_gateway' in dhcp_host:
-                continue
-            tags.append(self.generate_dhcp_tag(dhcp_host['ipv4_adress']))
+        for vm in self.config.dbag_vm_overview["vms"]:
+            for interface in vm["interfaces"]:
+                if interface["is_default"]:
+                    continue
+                # Add excludes on DHCP options when it's not the default NIC
+                tags.append(self.generate_dhcp_tag(interface["ipv4_address"]))
 
         filename = 'dhcpopts.txt'
         content = self.jinja_env.get_template('etc_dhcpopts.conf').render(

@@ -9,7 +9,6 @@ class VirtualMachine(object):
 
         self.dhcp_vm = DhcpVm(self.config)
 
-
     def sync(self):
         logging.debug("Starting sync of virtual machine!")
         logging.debug(self.config.dbag_vm_overview)
