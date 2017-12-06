@@ -70,7 +70,7 @@ class CsLoadBalancer(object):
                         'first_port'] == int(dstport) and ingress_rule['type'] == protocol:
                         for ingress_cidr in ingress_cidrs:
                             firewall.append(["filter", "",
-                                             "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
+                                             "-A INPUT -i eth2 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
                                                  ingress_cidr, protocol, ip, port)])
 
         for rules in stat_rules:
@@ -86,7 +86,7 @@ class CsLoadBalancer(object):
                     if 'first_port' in ingress_rule.keys() and ingress_rule['first_port'] == int(port):
                         for ingress_cidr in ingress_cidrs:
                             firewall.append(["filter", "",
-                                             "-A INPUT -i eth1 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
+                                             "-A INPUT -i eth2 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (
                                                  ingress_cidr, ingress_rule['type'], ip, port)])
 
         for rules in remove_rules:

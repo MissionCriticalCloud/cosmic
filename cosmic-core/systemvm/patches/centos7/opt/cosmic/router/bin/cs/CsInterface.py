@@ -75,16 +75,6 @@ class CsInterface:
             return True
         return False
 
-    def is_privategateway(self):
-        if "nw_type" in self.address and self.address['nw_type'] in ['privategateway']:
-            return True
-        # Backwards compatibility with pre-5.3
-        # Interfaces with nw_type=public other than eth1, are private gateways
-        if "nw_type" in self.address and self.address['nw_type'] in ['public'] \
-                and "nic_dev_id" in self.address and self.address['nic_dev_id'] != "1":
-            return True
-        return False
-
     def is_added(self):
         return self.get_attr("add")
 

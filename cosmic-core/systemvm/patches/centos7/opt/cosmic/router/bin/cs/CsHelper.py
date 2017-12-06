@@ -15,10 +15,6 @@ from subprocess import check_output
 from netaddr import *
 import cs.utils as utils
 
-# @TODO fix hardcoded eth1 public interface -- is OK for now since it's for redundant VPCs and these have always a public interface. Although that is still an assumption and may not be true anymore some day
-STATE_COMMANDS = { "router": "ip addr | grep eth2 | grep state | awk '{print $9;}' | xargs bash -c 'if [ \"$0\" == \"UP\" ]; then echo \"MASTER\"; else echo \"BACKUP\"; fi'",
-                   "vpcrouter": "ip addr | grep eth1 | grep state | awk '{print $9;}' | xargs bash -c 'if [ $0 == \"UP\" ];     then echo \"MASTER\"; else echo \"BACKUP\"; fi'" }
-
 
 def get_systemvm_version():
     try:
