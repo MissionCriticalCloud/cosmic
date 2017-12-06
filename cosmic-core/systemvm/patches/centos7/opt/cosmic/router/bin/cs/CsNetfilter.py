@@ -170,7 +170,7 @@ class CsNetfilters(object):
         else:
             print("iptables-restore failed, resulted in %s" % stderr)
             logging.info("iptables-restore failed, result: %s", stderr)
-            exit(1)
+            exit(0)
 
     def del_standard(self):
         """ Del rules that are there but should not be deleted
