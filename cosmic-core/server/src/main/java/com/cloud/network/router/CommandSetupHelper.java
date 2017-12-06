@@ -1038,4 +1038,36 @@ public class CommandSetupHelper {
 
         return cmd;
     }
+
+    public Map<UserVm, List<Nic>> createVmOverviewFromRouter(final VirtualRouter router) {
+        final Map<UserVm, List<Nic>> vmsAndNicsMap = new HashMap<>();
+
+        final List<? extends Nic> routerNics = _nicDao.listByVmId(router.getId());
+        for (final Nic routerNic : routerNics) {
+            final Network network = _networkModel.getNetwork(routerNic.getNetworkId());
+            if (TrafficType.Guest.equals(network.getTrafficType()) && !Network.GuestType.Sync.equals(network.getGuestType())) {
+                _userVmDao.listByNetworkIdAndStates(
+                        network.getId(),
+                        VirtualMachine.State.Starting,
+                        VirtualMachine.State.Running,
+                        VirtualMachine.State.Paused,
+                        VirtualMachine.State.Migrating,
+                        VirtualMachine.State.Stopping
+                ).forEach(vm -> {
+                    final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), vm.getId());
+                    if (nic != null) {
+                        if (!vmsAndNicsMap.containsKey(vm)) {
+                            vmsAndNicsMap.put(vm, new ArrayList<Nic>() {{
+                                add(nic);
+                            }});
+                        } else {
+                            vmsAndNicsMap.get(vm).add(nic);
+                        }
+                    }
+                });
+            }
+        }
+
+        return vmsAndNicsMap;
+    }
 }

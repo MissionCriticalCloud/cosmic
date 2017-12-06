@@ -55,7 +55,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -379,7 +378,6 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             }
 
             boolean updateVmOverview = false;
-            final Map<UserVm, List<Nic>> vmsAndNicsMap = new HashMap<>();
 
             for (final Pair<Nic, Network> nicNtwk : guestNics) {
                 final Nic guestNic = nicNtwk.first();
@@ -399,26 +397,8 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
                 if (_networkModel.isProviderSupportServiceInNetwork(guestNic.getNetworkId(), Service.Dhcp, provider)) {
                     updateVmOverview = true;
-                    _userVmDao.listByNetworkIdAndStates(
-                            guestNic.getNetworkId(),
-                            State.Starting,
-                            State.Running,
-                            State.Paused,
-                            State.Migrating,
-                            State.Stopping
-                    ).forEach(vm -> {
-                        final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(guestNic.getNetworkId(), vm.getId());
-                        if (nic != null) {
-                            if (!vmsAndNicsMap.containsKey(vm)) {
-                                vmsAndNicsMap.put(vm, new ArrayList<Nic>() {{
-                                    add(nic);
-                                }});
-                            } else {
-                                vmsAndNicsMap.get(vm).add(nic);
-                            }
-                        }
-                    });
                 }
+
                 finalizeUserDataOnStart(cmds, domainRouterVO, provider, guestNic.getNetworkId());
 
                 final AggregationControlCommand finishCmd = new AggregationControlCommand(
@@ -431,6 +411,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             }
 
             if (updateVmOverview) {
+                final Map<UserVm, List<Nic>> vmsAndNicsMap = _commandSetupHelper.createVmOverviewFromRouter(domainRouterVO);
                 final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(domainRouterVO, vmsAndNicsMap);
                 cmds.addCommand(updateVmOverviewCommand);
             }
