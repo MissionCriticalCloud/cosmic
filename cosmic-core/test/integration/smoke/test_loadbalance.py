@@ -4,12 +4,16 @@ from nose.plugins.attrib import attr
 
 from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.codes import FAILED
+from marvin.cloudstackAPI import (
+    replaceNetworkACLList
+)
 from marvin.lib.base import (
     Account,
     VirtualMachine,
     PublicIPAddress,
-    FireWallRule,
-    LoadBalancerRule
+    LoadBalancerRule,
+    VPC,
+    Network
 )
 from marvin.lib.common import (
     get_domain,
@@ -17,7 +21,10 @@ from marvin.lib.common import (
     get_template,
     list_lb_rules,
     list_lb_instances,
-    get_default_virtual_machine_offering
+    get_default_virtual_machine_offering,
+    get_default_network_offering,
+    get_default_vpc_offering,
+    get_network_acl
 )
 from marvin.lib.utils import cleanup_resources
 from marvin.utils.MarvinLog import MarvinLog
@@ -53,13 +60,41 @@ class TestLoadBalance(cloudstackTestCase):
         )
         cls.service_offering = get_default_virtual_machine_offering(cls.apiclient)
 
+        cls.network_offering = get_default_network_offering(cls.apiclient)
+        cls.logger.debug("Network Offering '%s' selected", cls.network_offering.name)
+
+        cls.vpc_offering = get_default_vpc_offering(cls.apiclient)
+        cls.logger.debug("VPC Offering '%s' selected", cls.vpc_offering.name)
+
+        cls.vpc1 = VPC.create(cls.apiclient,
+                               cls.services['vpcs']['vpc1'],
+                               vpcofferingid=cls.vpc_offering.id,
+                               zoneid=cls.zone.id,
+                               domainid=cls.domain.id,
+                               account=cls.account.name)
+        cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
+
+        cls.default_allow_acl = get_network_acl(cls.apiclient, 'default_allow')
+        cls.logger.debug("ACL '%s' selected", cls.default_allow_acl.name)
+
+        cls.network1 = Network.create(cls.apiclient,
+                                       cls.services['networks']['network1'],
+                                       networkofferingid=cls.network_offering.id,
+                                       aclid=cls.default_allow_acl.id,
+                                       vpcid=cls.vpc1.id,
+                                       zoneid=cls.zone.id,
+                                       domainid=cls.domain.id,
+                                       accountid=cls.account.name)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+
         cls.vm_1 = VirtualMachine.create(
             cls.apiclient,
             cls.services["virtual_machine"],
             templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
-            serviceofferingid=cls.service_offering.id
+            serviceofferingid=cls.service_offering.id,
+            networkids=[cls.network1.id]
         )
         cls.vm_2 = VirtualMachine.create(
             cls.apiclient,
@@ -67,7 +102,8 @@ class TestLoadBalance(cloudstackTestCase):
             templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
-            serviceofferingid=cls.service_offering.id
+            serviceofferingid=cls.service_offering.id,
+            networkids=[cls.network1.id]
         )
         cls.vm_3 = VirtualMachine.create(
             cls.apiclient,
@@ -75,24 +111,23 @@ class TestLoadBalance(cloudstackTestCase):
             templateid=cls.template.id,
             accountid=cls.account.name,
             domainid=cls.account.domainid,
-            serviceofferingid=cls.service_offering.id
+            serviceofferingid=cls.service_offering.id,
+            networkids=[cls.network1.id]
         )
-        cls.non_src_nat_ip = PublicIPAddress.create(
-            cls.apiclient,
-            cls.account.name,
-            cls.zone.id,
-            cls.account.domainid,
-            cls.services["virtual_machine"]
-        )
-        # Open up firewall port for SSH
-        cls.fw_rule = FireWallRule.create(
-            cls.apiclient,
-            ipaddressid=cls.non_src_nat_ip.ipaddress.id,
-            protocol=cls.services["lbrule"]["protocol"],
-            cidrlist=['0.0.0.0/0'],
-            startport=cls.services["lbrule"]["publicport"],
-            endport=cls.services["lbrule"]["publicport"]
-        )
+
+        cls.non_src_nat_ip = PublicIPAddress.create(cls.apiclient,
+            zoneid=cls.zone.id,
+            domainid=cls.account.domainid,
+            accountid=cls.account.name,
+            vpcid=cls.vpc1.id,
+            networkid=cls.network1.id)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.non_src_nat_ip.ipaddress.ipaddress, cls.vpc1.name, cls.network1.name)
+
+        command = replaceNetworkACLList.replaceNetworkACLListCmd()
+        command.aclid = cls.default_allow_acl.id
+        command.publicipid = cls.non_src_nat_ip.ipaddress.id
+        cls.apiclient.replaceNetworkACLList(command)
+
         cls._cleanup = [
             cls.account
         ]
@@ -162,7 +197,9 @@ class TestLoadBalance(cloudstackTestCase):
             self.apiclient,
             self.services["lbrule"],
             src_nat_ip_addr.id,
-            accountid=self.account.name
+            accountid=self.account.name,
+            vpcid=self.vpc1.id,
+            networkid=self.network1.id
         )
         self.cleanup.append(lb_rule)
         lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
@@ -260,9 +297,6 @@ class TestLoadBalance(cloudstackTestCase):
                 "Check if ssh succeeded for server1"
             )
         except Exception as e:
-            self.logger.debug("SSH failed, investigate!!")
-            while True:
-                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, src_nat_ip_addr.ipaddress))
 
@@ -288,7 +322,9 @@ class TestLoadBalance(cloudstackTestCase):
             self.apiclient,
             self.services["lbrule"],
             self.non_src_nat_ip.ipaddress.id,
-            accountid=self.account.name
+            accountid=self.account.name,
+            vpcid=self.vpc1.id,
+            networkid=self.network1.id
         )
         self.cleanup.append(lb_rule)
         lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
@@ -378,9 +414,6 @@ class TestLoadBalance(cloudstackTestCase):
             )
             self.logger.debug("UNAME after removing VM2: %s" % str(unameResults))
         except Exception as e:
-            self.logger.debug("SSH failed, investigate!!")
-            while True:
-                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, self.non_src_nat_ip.ipaddress.ipaddress))
 
@@ -435,7 +468,9 @@ class TestLoadBalance(cloudstackTestCase):
             self.apiclient,
             self.services["lbrule"],
             self.non_src_nat_ip.ipaddress.id,
-            self.account.name
+            self.account.name,
+            vpcid=self.vpc1.id,
+            networkid=self.network1.id
         )
         lb_rule.assign(self.apiclient, [self.vm_1, self.vm_2])
 
@@ -477,9 +512,6 @@ class TestLoadBalance(cloudstackTestCase):
                 "Check if ssh succeeded for server1"
             )
         except Exception as e:
-            self.logger.debug("SSH failed, investigate!!")
-            while True:
-                time.sleep(10)
             self.fail("SSH failed for VM with IP: %s" %
                       self.non_src_nat_ip.ipaddress.ipaddress)
 
@@ -524,9 +556,6 @@ class TestLoadBalance(cloudstackTestCase):
             unameCmd.append(ssh_1.execute("uname")[0])
             self.logger.debug(unameCmd)
         except Exception as e:
-            self.logger.debug("SSH failed, investigate!!")
-            while True:
-                time.sleep(10)
             self.fail("%s: SSH failed for VM with IP Address: %s" %
                       (e, ip_addr))
         time.sleep(10)

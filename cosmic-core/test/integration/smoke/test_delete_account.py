@@ -108,9 +108,6 @@ class TestDeleteAccount(cloudstackTestCase):
         try:
             src_nat_ip_addr = src_nat_ip_addrs[0]
         except Exception as e:
-            self.logger.debug("SSH failed, investigate!!")
-            while True:
-                time.sleep(10)
             self.fail("SSH failed for VM with IP: %s %s" %
                       (src_nat_ip_addr.ipaddress, e))
 
