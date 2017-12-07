@@ -14,6 +14,7 @@ class Firewall(object):
             trim_blocks=True,
             lstrip_blocks=True
         )
+        # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
         self.fw = self.config.fw
 
     def sync(self):
@@ -21,26 +22,21 @@ class Firewall(object):
             self.sync_vpc()
 
     def sync_vpc(self):
-        logging.info("Running firewall sync")
         self.add_default_vpc_rules()
 
-        try:
-            for interface in self.config.dbag_network_overview['interfaces']:
-                device = utils.get_interface_name_from_mac_address(interface['mac_address'])
+        for interface in self.config.dbag_network_overview['interfaces']:
+            device = utils.get_interface_name_from_mac_address(interface['mac_address'])
 
-                if interface['metadata']['type'] in ['sync', 'other']:
-                    pass
-                elif interface['metadata']['type'] == 'public':
-                    self.add_public_vpc_rules(device)
-                elif interface['metadata']['type'] == 'guesttier':
-                    self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
-                elif interface['metadata']['type'] == 'private':
-                    self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
-        except:
-            logging.debug("Warning: Cannot find interfaces key in network overview data bag. Skipping!")
+            if interface['metadata']['type'] in ['sync', 'other']:
+                pass
+            elif interface['metadata']['type'] == 'public':
+                self.add_public_vpc_rules(device)
+            elif interface['metadata']['type'] == 'guesttier':
+                self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
+            elif interface['metadata']['type'] == 'private':
+                self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
 
     def add_default_vpc_rules(self):
-        logging.info("Configuring default VPC rules")
         self.fw.append(["filter", "", "-P INPUT DROP"])
         self.fw.append(["filter", "", "-P FORWARD DROP"])
 
@@ -70,7 +66,6 @@ class Firewall(object):
         )])
 
     def add_tier_vpc_rules(self, device, cidr):
-        logging.info("Configuring VPC tier rules for device %s" % device)
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % device])
         self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
         self.fw.append(["filter", "", "-A OUTPUT -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
@@ -116,8 +111,6 @@ class Firewall(object):
         )])
 
     def add_public_vpc_rules(self, device):
-        logging.info("Configuring Public VPC rules")
-
         # TODO FIXME Look at this rule
         # self.fw.append(["mangle", "", "-A FORWARD -j VPN_STATS_%s" % device])
         self.fw.append(["", "front", "-A NETWORK_STATS -o %s" % device])
@@ -159,8 +152,6 @@ class Firewall(object):
             )])
 
     def add_private_vpc_rules(self, device, cidr):
-        logging.info("Configuring Private VPC rules")
-
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % device])
 
         # create egress chain
