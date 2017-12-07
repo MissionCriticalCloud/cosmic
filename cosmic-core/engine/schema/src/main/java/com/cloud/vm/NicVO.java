@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.net.URI;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -319,6 +320,26 @@ public class NicVO implements Nic {
                                         .append(iPv4Address)
                                         .append("]")
                                         .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof NicVO)) {
+            return false;
+        }
+
+        final NicVO nicVO = (NicVO) o;
+
+        return getId() == nicVO.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
     @Override

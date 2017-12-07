@@ -123,8 +123,7 @@ public class RouterDeploymentDefinitionBuilder {
         return routerDeploymentDefinition;
     }
 
-    protected void injectVpcDependencies(
-            final VpcRouterDeploymentDefinition routerDeploymentDefinition) {
+    protected void injectVpcDependencies(final VpcRouterDeploymentDefinition routerDeploymentDefinition) {
 
         routerDeploymentDefinition.vpcDao = vpcDao;
         routerDeploymentDefinition.vpcOffDao = vpcOffDao;

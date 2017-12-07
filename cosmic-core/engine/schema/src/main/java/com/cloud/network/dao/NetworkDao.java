@@ -89,6 +89,10 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
 
     List<NetworkVO> listByVpc(long vpcId);
 
+    List<NetworkVO> listSyncNetworksByVpc(long vpcId);
+
+    List<NetworkVO> listSyncNetworksByRelatedNetwork(long relatedNetworkId);
+
     NetworkVO getPrivateNetwork(String broadcastUri, String cidr, long accountId, long zoneId, Long networkOfferingId);
 
     NetworkVO findByIdAndDomainId(final Long networkId, final long domainId);

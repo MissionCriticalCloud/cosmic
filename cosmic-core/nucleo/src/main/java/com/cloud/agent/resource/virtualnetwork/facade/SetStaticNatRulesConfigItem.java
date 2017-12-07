@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRule;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRules;
 
@@ -29,7 +28,7 @@ public class SetStaticNatRulesConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.STATICNAT_RULES_CONFIG;
 
         return super.generateConfigItems(configuration);

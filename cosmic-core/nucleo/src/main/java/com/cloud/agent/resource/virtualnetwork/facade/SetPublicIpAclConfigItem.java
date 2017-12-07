@@ -7,7 +7,6 @@ import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
 import com.cloud.agent.resource.virtualnetwork.model.AllAclRule;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IcmpAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.ProtocolAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.PublicIpACL;
@@ -32,7 +31,6 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
         final String[][] rules = command.generateFwRules();
         final String[] aclRules = rules[0];
         final NicTO nic = command.getNic();
-        final String dev = "eth" + nic.getDeviceId();
         final String netmask = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
 
         final List<AclRule> ingressRules = new ArrayList<>();
@@ -74,7 +72,6 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
         }
 
         final PublicIpACL publicIpACL = new PublicIpACL(
-                dev,
                 nic.getMac(),
                 nic.getIp(),
                 netmask,
@@ -87,7 +84,7 @@ public class SetPublicIpAclConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.PUBLIC_IP_ACL_CONFIG;
 
         return super.generateConfigItems(configuration);

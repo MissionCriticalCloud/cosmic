@@ -378,11 +378,19 @@ class TestVpcVpn(cloudstackTestCase):
             self.assertEqual(vpnconn2_response['state'], "Connected", "Failed to connect between VPCs 0 and %d!" % i)
             self.logger.debug("VPN connected between VPC0 and VPC%d" % i)
 
-            time.sleep(5)
+            time.sleep(15)
             self.logger.debug("Resetting VPN connection with id %s" % (passiveVpn['id']))
             Vpn.resetVpnConnection(self.apiclient, passiveVpn['id'])
-            self.logger.debug("Waiting 20s for the VPN to connect")
-            time.sleep(20)
+            self.logger.debug("Waiting for the VPN with id %s to connect" % (passiveVpn['id']))
+            max_retries = 30
+            retries = 0
+            while retries < max_retries:
+                vpnconn2_response = Vpn.listVpnConnection(self.apiclient, listall=True, id=passiveVpn['id'])
+                if len(vpnconn2_response) > 0 and vpnconn2_response[0].state.lower() == 'connected':
+                    break
+                retries += 1
+                time.sleep(2)
+            self.assertLess(retries, max_retries, "Failed to reconnect VPN with id %s" % (passiveVpn['id']))
 
         # First the last VM
         # setup ssh connection to vm maxnumVM

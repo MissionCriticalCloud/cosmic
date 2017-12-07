@@ -637,7 +637,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final Command[] cmds = new Command[1];
         cmds[0] = new PropagateResourceEventCommand(agentId, event);
 
-        final String AnsStr = _clusterMgr.execute(msPeer, agentId, _gson.toJson(cmds), true);
+        final String AnsStr = _clusterMgr.execute(msPeer, agentId, _gson.toJson(cmds), false);
         if (AnsStr == null) {
             throw new AgentUnavailableException(agentId);
         }

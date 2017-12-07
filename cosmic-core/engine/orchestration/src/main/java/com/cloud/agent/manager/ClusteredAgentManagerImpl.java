@@ -332,7 +332,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
         final Command[] cmds = new Command[1];
         cmds[0] = new ChangeAgentCommand(agentId, event);
 
-        final String ansStr = _clusterMgr.execute(msPeer, agentId, _gson.toJson(cmds), true);
+        final String ansStr = _clusterMgr.execute(msPeer, agentId, _gson.toJson(cmds), false);
         if (ansStr == null) {
             throw new AgentUnavailableException(agentId);
         }

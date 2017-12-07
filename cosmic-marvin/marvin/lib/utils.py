@@ -82,7 +82,7 @@ def is_server_ssh_ready(ip_address, port, username, password, retries=20, retry_
         return ssh
 
 
-def get_host_credentials(config, hostip):
+def get_host_credentials(config, hostname):
     """Get login information for a host `hostip` (ipv4) from marvin's `config`
 
     @return the tuple username, password for the host else raise keyerror"""
@@ -91,11 +91,11 @@ def get_host_credentials(config, hostip):
             for cluster in pod.clusters:
                 for host in cluster.hosts:
                     if str(host.url).startswith('http'):
-                        hostname = urlparse.urlsplit(str(host.url)).netloc
+                        hostname_marvin = urlparse.urlsplit(str(host.url)).netloc
                     else:
-                        hostname = str(host.url)
+                        hostname_marvin = str(host.url)
                     try:
-                        if socket.getfqdn(hostip) == socket.getfqdn(hostname):
+                        if hostname == hostname_marvin:
                             return host.username, host.password
                     except socket.error, e:
                         raise Exception("Unresolvable host %s error is %s" % (hostip, e))

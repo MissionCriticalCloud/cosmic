@@ -1,6 +1,7 @@
 package com.cloud.network.dao;
 
 import com.cloud.network.Networks.TrafficType;
+import com.cloud.network.PhysicalNetwork.IsolationMethod;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder;
@@ -20,6 +21,9 @@ public class PhysicalNetworkDaoImpl extends GenericDaoBase<PhysicalNetworkVO, Lo
 
     @Inject
     protected PhysicalNetworkTrafficTypeDao _trafficTypeDao;
+
+    @Inject
+    protected PhysicalNetworkIsolationMethodDao _isolationMethodDao;
 
     protected PhysicalNetworkDaoImpl() {
         super();
@@ -55,6 +59,34 @@ public class PhysicalNetworkDaoImpl extends GenericDaoBase<PhysicalNetworkVO, Lo
 
         final SearchCriteria<PhysicalNetworkVO> sc = pnSearch.create();
         sc.setJoinParameters("trafficTypeSearch", "trafficType", trafficType);
+        sc.setParameters("dataCenterId", dataCenterId);
+
+        return listBy(sc);
+    }
+
+    @Override
+    public List<PhysicalNetworkVO> listByZoneAndTrafficTypeAndIsolationMethod(
+            final long dataCenterId,
+            final TrafficType trafficType,
+            final IsolationMethod isolationMethod
+    ) {
+
+        final SearchBuilder<PhysicalNetworkTrafficTypeVO> trafficTypeSearch = _trafficTypeDao.createSearchBuilder();
+        final PhysicalNetworkTrafficTypeVO trafficTypeEntity = trafficTypeSearch.entity();
+        trafficTypeSearch.and("trafficType", trafficTypeSearch.entity().getTrafficType(), SearchCriteria.Op.EQ);
+
+        final SearchBuilder<PhysicalNetworkIsolationMethodVO> isolationMethodSearch = _isolationMethodDao.createSearchBuilder();
+        final PhysicalNetworkIsolationMethodVO isolationMethodEntity = isolationMethodSearch.entity();
+        isolationMethodSearch.and("isolationMethod", isolationMethodSearch.entity().getIsolationMethod(), SearchCriteria.Op.EQ);
+
+        final SearchBuilder<PhysicalNetworkVO> pnSearch = createSearchBuilder();
+        pnSearch.and("dataCenterId", pnSearch.entity().getDataCenterId(), Op.EQ);
+        pnSearch.join("trafficTypeSearch", trafficTypeSearch, pnSearch.entity().getId(), trafficTypeEntity.getPhysicalNetworkId(), JoinBuilder.JoinType.INNER);
+        pnSearch.join("isolationMethodSearch", isolationMethodSearch, pnSearch.entity().getId(), isolationMethodEntity.getPhysicalNetworkId(), JoinBuilder.JoinType.INNER);
+
+        final SearchCriteria<PhysicalNetworkVO> sc = pnSearch.create();
+        sc.setJoinParameters("trafficTypeSearch", "trafficType", trafficType);
+        sc.setJoinParameters("isolationMethodSearch", "isolationMethod", isolationMethod);
         sc.setParameters("dataCenterId", dataCenterId);
 
         return listBy(sc);

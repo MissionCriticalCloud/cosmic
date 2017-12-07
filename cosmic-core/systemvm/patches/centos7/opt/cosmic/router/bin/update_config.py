@@ -18,7 +18,7 @@ if not os.path.isdir(LOG_DIR):
     mkdir(LOG_DIR, 0o755, False)
 
 logging.basicConfig(filename="/var/log/cosmic/router/router.log", level=logging.DEBUG,
-                    format='%(asctime)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
+                    format='%(asctime)s %(levelname)s  %(filename)s %(funcName)s:%(lineno)d %(message)s')
 
 # first commandline argument should be the file to process
 if len(sys.argv) != 2:
@@ -28,7 +28,6 @@ if len(sys.argv) != 2:
 # FIXME we should get this location from a configuration class
 jsonPath = "/var/cache/cloud/%s"
 jsonCmdConfigPath = jsonPath % sys.argv[1]
-currentGuestNetConfig = "/etc/cosmic/router/guestnetwork.json"
 
 
 def finish_config():

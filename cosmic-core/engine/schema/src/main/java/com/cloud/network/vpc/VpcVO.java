@@ -43,10 +43,6 @@ public class VpcVO implements Vpc {
     String networkDomain;
     @Column(name = "restart_required")
     boolean restartRequired = false;
-    @Column(name = "uses_distributed_router")
-    boolean usesDistributedRouter = false;
-    @Column(name = "region_level_vpc")
-    boolean regionLevelVpc = false;
     @Column(name = "uuid")
     private String uuid;
     @Column(name = "name")
@@ -63,8 +59,8 @@ public class VpcVO implements Vpc {
     }
 
     public VpcVO(final long zoneId, final String name, final String displayText, final long accountId, final long domainId,
-                 final long vpcOffId, final String cidr, final String networkDomain, final boolean useDistributedRouter,
-                 final boolean regionLevelVpc, final boolean isRedundant, final String sourceNatList, final String syslogServerList) {
+                 final long vpcOffId, final String cidr, final String networkDomain, final boolean isRedundant, final String sourceNatList,
+                 final String syslogServerList) {
         this.zoneId = zoneId;
         this.name = name;
         this.displayText = displayText;
@@ -75,8 +71,6 @@ public class VpcVO implements Vpc {
         state = State.Enabled;
         this.networkDomain = networkDomain;
         vpcOfferingId = vpcOffId;
-        usesDistributedRouter = useDistributedRouter;
-        this.regionLevelVpc = regionLevelVpc;
         redundant = isRedundant;
         this.sourceNatList = sourceNatList;
         this.syslogServerList = syslogServerList;
@@ -168,16 +162,6 @@ public class VpcVO implements Vpc {
 
     public void setRedundant(final boolean isRedundant) {
         redundant = isRedundant;
-    }
-
-    @Override
-    public boolean usesDistributedRouter() {
-        return usesDistributedRouter;
-    }
-
-    @Override
-    public boolean isRegionLevelVpc() {
-        return regionLevelVpc;
     }
 
     public void setName(final String name) {

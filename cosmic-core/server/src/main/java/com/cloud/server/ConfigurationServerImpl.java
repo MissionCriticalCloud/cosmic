@@ -710,6 +710,16 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     _ntwkOfferingServiceMapDao.persist(offService);
                     s_logger.trace("Added service for the network offering: " + offService);
                 }
+
+                // Offering #11
+                NetworkOfferingVO syncNetworkOffering = new NetworkOfferingVO(
+                        NetworkOffering.DefaultSyncNetworkOffering,
+                        "Offering for Sync networks",
+                        TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
+                        GuestType.Sync, false, false, true, false, false
+                );
+                syncNetworkOffering.setState(NetworkOffering.State.Enabled);
+                _networkOfferingDao.persistDefaultNetworkOffering(syncNetworkOffering);
             }
         });
     }

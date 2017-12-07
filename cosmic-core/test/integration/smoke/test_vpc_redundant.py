@@ -128,7 +128,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_vpc_test(False)
 
     @attr(tags=['advanced'])
-    def test_02_redundant_VPC_default_routes(self):
+    def _test_02_redundant_VPC_default_routes(self):
         """ Create a redundant VPC with two networks with two VMs in each network and check default routes"""
         self.logger.debug("Starting test_02_redundant_VPC_default_routes")
         self.query_routers()
@@ -141,7 +141,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_default_routes_test()
 
     @attr(tags=['advanced'])
-    def test_03_create_redundant_VPC_1tier_2VMs_2IPs_2PF_ACL_reboot_routers(self):
+    def _test_03_create_redundant_VPC_1tier_2VMs_2IPs_2PF_ACL_reboot_routers(self):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
         self.query_routers()
@@ -160,9 +160,9 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.do_vpc_test(False)
 
     @attr(tags=['advanced'])
-    def test_04_rvpc_multi_tiers(self):
+    def _test_04_rvpc_multi_tiers(self):
         """ Create a redundant VPC with 3 Tiers, 3 VMs, 3 PF rules"""
-        self.logger.debug("Starting test_05_rvpc_multi_tiers")
+        self.logger.debug("Starting test_04_rvpc_multi_tiers")
         self.query_routers()
 
         net_off = get_default_network_offering(self.apiclient)
@@ -205,6 +205,10 @@ class TestVPCRedundancy(cloudstackTestCase):
             isinstance(self.routers, list), True,
             "Check for list routers response return valid data")
 
+        if len(self.routers) != count:
+            self.logger.debug("INVESTIGATE!! Check that %s routers were indeed created" % count)
+            while True:
+                time.sleep(1)
         self.assertEqual(
             len(self.routers), count,
             "Check that %s routers were indeed created" % count)
@@ -249,35 +253,31 @@ class TestVPCRedundancy(cloudstackTestCase):
                 )
                 host = hosts[0]
 
-                try:
-                    for _ in range(5):
-                        host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
-                        result = str(get_process_status(
-                            host.ipaddress,
-                            22,
-                            host.user,
-                            host.passwd,
-                            router.linklocalip,
-                            "sh /opt/cosmic/router/scripts/checkrouter.sh "
-                        ))
+                for _ in range(5):
+                    host.user, host.passwd = get_host_credentials(self.config, host.name)
+                    result = str(get_process_status(
+                        host.ipaddress,
+                        22,
+                        host.user,
+                        host.passwd,
+                        router.linklocalip,
+                        "sh /opt/cosmic/router/scripts/checkrouter.sh "
+                    ))
 
-                        self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))
+                    self.logger.debug('check_routers_state router: %s, result: %s' % (router.name, result))
 
-                        if result.count(status_to_check) == 1:
-                            cnts[vals.index(status_to_check)] += 1
-                            break
-                        elif result.count("UNKNOWN") == 1:
-                            time.sleep(5)
-                        else:
-                            break
-
-
-                except KeyError:
-                    self.skipTest(
-                        "Marvin configuration has no host credentials to\
-                                check router services")
+                    if result.count(status_to_check) == 1:
+                        cnts[vals.index(status_to_check)] += 1
+                        break
+                    elif result.count("UNKNOWN") == 1:
+                        time.sleep(5)
+                    else:
+                        break
 
         if cnts[vals.index(status_to_check)] != expected_count:
+            self.logger.debug("Investigate! not MASTER/BACKUP")
+            while True:
+                time.sleep(1)
             self.fail("Expected '%s' router[s] at state '%s', but found '%s'! Result: %s" % (expected_count, status_to_check, cnts[vals.index(status_to_check)], result))
 
     def check_routers_interface(self, count=2, interface_to_check="eth1", expected_exists=True, showall=False):
@@ -301,7 +301,7 @@ class TestVPCRedundancy(cloudstackTestCase):
                 host = hosts[0]
 
                 try:
-                    host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
+                    host.user, host.passwd = get_host_credentials(self.config, host.name)
                     result = str(get_process_status(
                         host.ipaddress,
                         22,

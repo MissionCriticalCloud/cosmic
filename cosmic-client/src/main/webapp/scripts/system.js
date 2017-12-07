@@ -2657,7 +2657,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         }
                                                     }],
@@ -2668,7 +2668,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listroutersresponse.router[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: routerActionfilter,
                                                                 data: jsonObj
@@ -3201,7 +3200,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         }
                                                     }],
@@ -3212,7 +3211,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listinternallbvmssresponse.internalloadbalancervm[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: internallbinstanceActionfilter,
                                                                 data: jsonObj
@@ -3813,7 +3811,7 @@
                                                             label: 'label.redundant.router',
                                                             converter: cloudStack.converters.toBooleanText
                                                         },
-                                                        redundantRouterState: {
+                                                        redundantstate: {
                                                             label: 'label.redundant.state'
                                                         },
                                                         vpcid: {
@@ -3827,7 +3825,6 @@
                                                         async: true,
                                                         success: function (json) {
                                                             var jsonObj = json.listroutersresponse.router[0];
-                                                            addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                             args.response.success({
                                                                 actionFilter: routerActionfilter,
                                                                 data: jsonObj
@@ -5888,11 +5885,14 @@
                                 name: {
                                     label: 'label.name'
                                 },
-                                publicip: {
-                                    label: 'label.public.ip'
+                                hostname: {
+                                    label: 'label.hypervisor'
                                 },
-                                routerType: {
-                                    label: 'label.type'
+                                linklocalip: {
+                                    label: 'label.linklocal.ip'
+                                },
+                                redundantstate: {
+                                    label: 'label.redundant.state'
                                 },
                                 state: {
                                     converter: function (str) {
@@ -5906,10 +5906,6 @@
                                         'Error': 'off'
                                     }
                                 },
-                                requiresupgrade: {
-                                    label: 'label.requires.upgrade',
-                                    converter: cloudStack.converters.toBooleanText
-                                }
                             },
                             dataProvider: function (args) {
                                 var array1 = [];
@@ -5973,7 +5969,7 @@
                                         });
 
                                         /*
-                                         * In project view, the first listRotuers API(without projectid=-1) will return the same objects as the second listRouters API(with projectid=-1),
+                                         * In project view, the first listRouters API(without projectid=-1) will return the same objects as the second listRouters API(with projectid=-1),
                                          * because in project view, all API calls are appended with projectid=[projectID].
                                          * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                          */
@@ -6485,7 +6481,7 @@
                                                     label: 'label.redundant.router',
                                                     converter: cloudStack.converters.toBooleanText
                                                 },
-                                                redundantRouterState: {
+                                                redundantstate: {
                                                     label: 'label.redundant.state'
                                                 },
                                                 vpcid: {
@@ -6499,7 +6495,6 @@
                                                 async: true,
                                                 success: function (json) {
                                                     var jsonObj = json.listroutersresponse.router[0];
-                                                    addExtraPropertiesToRouterInstanceObject(jsonObj);
                                                     args.response.success({
                                                         actionFilter: routerActionfilter,
                                                         data: jsonObj
@@ -13392,14 +13387,6 @@
             jsonObj.state = jsonObj.allocationstate; //jsonObj.state == Enabled, Disabled
         } else {
             jsonObj.state = jsonObj.managedstate; //jsonObj.state == Unmanaged, PrepareUnmanaged, PrepareUnmanagedError
-        }
-    }
-
-    var addExtraPropertiesToRouterInstanceObject = function (jsonObj) {
-        if (jsonObj.isredundantrouter == true) {
-            jsonObj["redundantRouterState"] = jsonObj.redundantstate;
-        } else {
-            jsonObj["redundantRouterState"] = "";
         }
     }
 

@@ -21,6 +21,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
+import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
@@ -38,7 +39,6 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.server.ConfigurationServer;
@@ -164,11 +164,20 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             return null;
         }
 
-        final NetworkVO network =
-                new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), State.Allocated, plan.getDataCenterId(),
-                        plan.getPhysicalNetworkId(), offering.getRedundantRouter());
+        final NetworkVO network = new NetworkVO(
+                offering.getTrafficType(),
+                GuestType.Sync.equals(offering.getGuestType())
+                        ? Mode.Static
+                        : Mode.Dhcp,
+                BroadcastDomainType.Vlan,
+                offering.getId(),
+                State.Allocated,
+                plan.getDataCenterId(),
+                plan.getPhysicalNetworkId(),
+                offering.getRedundantRouter()
+        );
         if (userSpecified != null) {
-            if (!Network.GuestType.Private.equals(offering.getGuestType()) &&
+            if (!GuestType.Private.equals(offering.getGuestType()) &&
                     ((userSpecified.getCidr() == null && userSpecified.getGateway() != null) || (userSpecified.getCidr() != null && userSpecified.getGateway() == null))) {
                 throw new InvalidParameterValueException("CIDR and gateway must be specified together or the CIDR must represents the gateway.");
             }
@@ -199,7 +208,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 network.setBroadcastUri(userSpecified.getBroadcastUri());
                 network.setState(State.Setup);
             }
-        } else {
+        } else if (!GuestType.Sync.equals(offering.getGuestType())) {
             final String guestNetworkCidr = dc.getGuestNetworkCidr();
             if (guestNetworkCidr == null && dc.getNetworkType() == NetworkType.Advanced) {
                 throw new CloudRuntimeException("Can't design network " + network + "; guest CIDR is not configured per zone " + dc);
@@ -273,7 +282,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
         final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
-        if (nic.getIPv4Address() == null) {
+        if (nic.getIPv4Address() == null && !GuestType.Sync.equals(network.getGuestType())) {
             nic.setBroadcastUri(network.getBroadcastUri());
             nic.setIsolationUri(network.getBroadcastUri());
             nic.setIPv4Gateway(network.getGateway());
@@ -289,21 +298,12 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                         guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
                         break;
                     case DomainRouter:
-                        if (network.getVpcId() != null) {
-                            final Vpc vpc = _vpcDao.findById(network.getVpcId());
-                            if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway,
-                                    Provider.VPCVirtualRouter) && !vpc.isRedundant()) {
-                                // Non-redundant VPCs that support Gateway acquire the gateway ip on their nic
-                                guestIp = network.getGateway();
-                            } else {
-                                // In other cases, acquire an ip address from the DHCP range (take lowest possible)
-                                guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
-                            }
-                        } else if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat,
-                                Provider.VirtualRouter)) {
-                            // Non VPCs that support SourceNat acquire the gateway ip on their nic
+                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VirtualRouter) ||
+                                _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VPCVirtualRouter)) {
+                            // Networks that support SourceNat acquire the gateway ip on their nic
                             guestIp = network.getGateway();
                         } else {
+                            // In other cases, acquire an ip address from the DHCP range (take lowest possible)
                             guestIp = _ipAddrMgr.acquireGuestIpAddressForRouter(network, nic.getRequestedIPv4());
                         }
                         break;

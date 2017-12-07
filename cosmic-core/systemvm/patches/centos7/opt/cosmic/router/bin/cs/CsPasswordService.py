@@ -1,21 +1,8 @@
 import logging
+import time
 
 import CsHelper
 from CsProcess import CsProcess
-
-
-class CsPasswordService:
-    def __init__(self, ip):
-        self.ip = ip
-
-    def start(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "start")
-
-    def stop(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "stop")
-
-    def restart(self):
-        CsHelper.service("cosmic-password-server@%s" % self.ip, "restart")
 
 
 class CsPasswordServiceVMConfig:
@@ -54,7 +41,7 @@ class CsPasswordServiceVMConfig:
                     logging.debug("Updating passwd server on %s" % ip)
                     if proc.find():
                         update_command = 'curl --header "DomU_Request: save_password" "http://{SERVER_IP}:8080/" -F "ip=' \
-                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}" --interface 127.0.0.1 ' \
+                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}"' \
                                          '>/dev/null 2>/dev/null &'.format(SERVER_IP=ip, VM_IP=vm_ip, PASSWORD=password,
                                                                            TOKEN=token)
                         result = CsHelper.execute(update_command)
@@ -62,7 +49,7 @@ class CsPasswordServiceVMConfig:
                         return result
 
                     test_tries += 1
-                    self.logger.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
+                    logging.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
                     time.sleep(2)
 
                 logging.debug("Update password server skipped because we didn't find a passwd server process for "
