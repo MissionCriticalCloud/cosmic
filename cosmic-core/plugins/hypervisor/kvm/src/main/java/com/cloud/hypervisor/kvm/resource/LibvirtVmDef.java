@@ -1234,7 +1234,11 @@ public class LibvirtVmDef {
 
             if (features != null) {
                 for (final String feature : features) {
-                    modeBuilder.append("<feature policy='require' name='" + feature + "'/>");
+                    if (feature.startsWith("-")) {
+                        modeBuilder.append("<feature policy='disable' name='" + feature.substring(1) + "'/>");
+                    } else {
+                        modeBuilder.append("<feature policy='require' name='" + feature + "'/>");
+                    }
                 }
             }
 
