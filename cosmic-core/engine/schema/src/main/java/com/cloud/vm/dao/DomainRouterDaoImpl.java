@@ -192,6 +192,13 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
+    public List<DomainRouterVO> listAllRunning() {
+        final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
+        sc.setParameters("state", State.Running);
+        return listBy(sc);
+    }
+
+    @Override
     public List<DomainRouterVO> listByLastHostId(final Long hostId) {
         final SearchCriteria<DomainRouterVO> sc = AllFieldsSearch.create();
         sc.setParameters("lastHost", hostId);

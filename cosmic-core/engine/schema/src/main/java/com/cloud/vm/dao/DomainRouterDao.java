@@ -48,6 +48,8 @@ public interface DomainRouterDao extends GenericDao<DomainRouterVO, Long> {
      */
     public List<DomainRouterVO> listByHostId(Long hostId);
 
+    public List<DomainRouterVO> listAllRunning();
+
     public List<DomainRouterVO> listByLastHostId(Long hostId);
 
     /**
