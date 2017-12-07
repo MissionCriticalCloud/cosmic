@@ -1,7 +1,5 @@
 package com.cloud.utils.net;
 
-import static org.apache.commons.lang.StringUtils.split;
-
 import com.cloud.utils.IteratorUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -11,10 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1252,12 +1249,6 @@ public class NetUtils {
         return new BigInteger(inetAddr.getAddress());
     }
 
-    //RFC3315, section 9.4
-    public static String getDuidLL(final String macAddress) {
-        final String duid = "00:03:00:01:" + macAddress;
-        return duid;
-    }
-
     public static boolean isIp6InRange(final String ip6, final String ip6Range) {
         if (ip6Range == null) {
             return false;
@@ -1579,7 +1570,19 @@ public class NetUtils {
         return MAX_CIDR - count;
     }
 
-    public static enum SupersetOrSubset {
+    public static String getIpv4AddressWithCidrSize(final String ipv4Address, final String netmask) {
+        if (StringUtils.isBlank(ipv4Address)) {
+            return null;
+        }
+
+        if (StringUtils.isBlank(netmask)) {
+            return ipv4Address;
+        }
+
+        return ipv4Address + "/" + NetUtils.getCidrSize(netmask);
+    }
+
+    public enum SupersetOrSubset {
         isSuperset, isSubset, neitherSubetNorSuperset, sameSubnet, errorInCidrFormat
     }
 
