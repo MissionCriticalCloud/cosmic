@@ -28,10 +28,7 @@ class Firewall(object):
             for interface in self.config.dbag_network_overview['interfaces']:
                 device = utils.get_interface_name_from_mac_address(interface['mac_address'])
 
-                logging.debug("Processing rules of type %s") % interface['metadata']['type']
-
                 if interface['metadata']['type'] in ['sync', 'other']:
-                    logging.debug("Skipping tyoe %s" % interface['metadata']['type'])
                     pass
                 elif interface['metadata']['type'] == 'public':
                     self.add_public_vpc_rules(device)
