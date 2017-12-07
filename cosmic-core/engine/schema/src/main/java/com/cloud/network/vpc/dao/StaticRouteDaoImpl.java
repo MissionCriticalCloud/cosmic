@@ -35,6 +35,7 @@ public class StaticRouteDaoImpl extends GenericDaoBase<StaticRouteVO, Long> impl
         AllFieldsSearch.and("vpcId", AllFieldsSearch.entity().getVpcId(), Op.EQ);
         AllFieldsSearch.and("state", AllFieldsSearch.entity().getState(), Op.EQ);
         AllFieldsSearch.and("id", AllFieldsSearch.entity().getId(), Op.EQ);
+        AllFieldsSearch.and("metric", AllFieldsSearch.entity().getMetric(), Op.EQ);
         AllFieldsSearch.done();
 
         NotRevokedSearch = createSearchBuilder();
