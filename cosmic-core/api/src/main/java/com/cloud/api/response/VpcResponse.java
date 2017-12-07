@@ -102,14 +102,6 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "is vpc for display to the regular user", since = "4.4", authorized = {RoleType.Admin})
     private Boolean forDisplay;
 
-    @SerializedName(ApiConstants.DISTRIBUTED_VPC_ROUTER)
-    @Param(description = "is VPC uses distributed router for one hop forwarding and host based network ACL's", since = "4.4")
-    private boolean usesDistributedRouter;
-
-    @SerializedName(ApiConstants.REGION_LEVEL_VPC)
-    @Param(description = "true if VPC is region level", since = "4.4")
-    private Boolean regionLevelVpc;
-
     @SerializedName(ApiConstants.REDUNDANT_VPC_ROUTER)
     @Param(description = "if this VPC has redundant router", since = "4.6")
     private boolean redundantRouter;
@@ -209,14 +201,6 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
 
     public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
-    }
-
-    public void setRegionLevelVpc(final Boolean regionLevelVpc) {
-        this.regionLevelVpc = regionLevelVpc;
-    }
-
-    public void setUsesDistributedRouter(final Boolean usesDistributedRouter) {
-        this.usesDistributedRouter = usesDistributedRouter;
     }
 
     public void setRedundantRouter(final Boolean redundantRouter) {

@@ -4,7 +4,6 @@ import logging
 from subprocess import Popen, PIPE
 
 import CsHelper
-from CsDatabag import CsCmdLine
 from databag.cs_iptables_save import Tables
 
 
@@ -63,7 +62,9 @@ class CsTable(object):
 
 
 class CsNetfilters(object):
-    def __init__(self, load=True):
+    def __init__(self, config, load=True):
+        self.config = config
+
         self.rules = []
         self.iptablerules = []
         self.table = CsTable()
@@ -175,7 +176,7 @@ class CsNetfilters(object):
         """ Del rules that are there but should not be deleted
         These standard firewall rules vary according to the device type
         """
-        type = CsCmdLine("cmdline").get_type()
+        type = self.config.dbag_cmdline['config']['type']
 
         try:
             table = ''

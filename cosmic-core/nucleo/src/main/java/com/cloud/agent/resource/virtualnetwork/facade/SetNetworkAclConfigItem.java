@@ -7,7 +7,6 @@ import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
 import com.cloud.agent.resource.virtualnetwork.model.AllAclRule;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IcmpAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.NetworkACL;
 import com.cloud.agent.resource.virtualnetwork.model.ProtocolAclRule;
@@ -34,7 +33,6 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
         final String[][] rules = command.generateFwRules();
         final String[] aclRules = rules[0];
         final NicTO nic = command.getNic();
-        final String dev = "eth" + nic.getDeviceId();
         final String netmask = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
 
         final List<AclRule> ingressRules = new ArrayList<>();
@@ -75,21 +73,14 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
             }
         }
 
-        final NetworkACL networkACL = new NetworkACL(
-                dev,
-                nic.getMac(),
-                privateGw != null,
-                nic.getIp(),
-                netmask,
-                ingressRules.toArray(new AclRule[ingressRules.size()]),
-                egressRules.toArray(new AclRule[egressRules.size()])
-        );
 
+        final NetworkACL networkACL = new NetworkACL(nic.getMac(), privateGw != null, nic.getIp(), netmask, ingressRules.toArray(new AclRule[ingressRules.size()]),
+                egressRules.toArray(new AclRule[egressRules.size()]));
         return generateConfigItems(networkACL);
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.NETWORK_ACL_CONFIG;
 
         return super.generateConfigItems(configuration);

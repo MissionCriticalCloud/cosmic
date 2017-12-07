@@ -4,13 +4,16 @@
 import logging
 
 import CsHelper
-from CsDatabag import CsDataBag
-
 from cs.CsFile import CsFile
 
 RSYSLOG_IPTABLES_CONF = "/etc/rsyslog.d/00-iptables.conf"
 
-class CsVrConfig(CsDataBag):
+
+class CsVrConfig(object):
+    def __init__(self, config):
+        self.config = config
+        self.dbag = self.config.dbag_network_virtualrouter
+
     def process(self):
         logging.debug("Processing CsVrConfig file ==> %s" % self.dbag)
 
@@ -33,7 +36,7 @@ class CsVrConfig(CsDataBag):
 
         logging.debug("Processing source NAT list: %s" % sourcenatlist)
         for cidr in sourcenatlist.split(','):
-            firewall.append(["filter", "", "-A SOURCE_NAT_LIST -o eth1 -s %s -j ACCEPT" % cidr])
+            firewall.append(["filter", "", "-A SOURCE_NAT_LIST -o eth2 -s %s -j ACCEPT" % cidr])
 
     def _configure_syslog(self, syslogserverlist):
         self.syslogconf = CsFile(RSYSLOG_IPTABLES_CONF)

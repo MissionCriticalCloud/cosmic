@@ -274,7 +274,7 @@ class TestPublicIpAcl(cloudstackTestCase):
                 host = next(iter(hosts or []), None)
 
                 try:
-                    host.user, host.passwd = get_host_credentials(self.config, host.ipaddress)
+                    host.user, host.passwd = get_host_credentials(self.config, host.name)
                     get_process_status(host.ipaddress, 22, host.user, host.passwd, router.linklocalip, "sh /opt/cosmic/router/scripts/checkrouter.sh ")
 
                 except KeyError as e:

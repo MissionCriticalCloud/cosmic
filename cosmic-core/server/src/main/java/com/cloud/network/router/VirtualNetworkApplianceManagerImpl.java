@@ -375,7 +375,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     ScheduledExecutorService _checkExecutor;
     ScheduledExecutorService _networkStatsUpdateExecutor;
     ExecutorService _rvrStatusUpdateExecutor;
-    BlockingQueue<Long> _vrUpdateQueue = null;
+    BlockingQueue<DomainRouterVO> _vrUpdateQueue = null;
     private String _dnsBasicZoneUpdates = "all";
     private boolean _disableRpFilter = false;
     private int _usageAggregationRange = 1440;
@@ -646,84 +646,54 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
     }
 
-    protected void updateRoutersRedundantState(final List<DomainRouterVO> routers) {
+    protected void updateRoutersRedundantState(final DomainRouterVO router) {
         boolean updated;
-        for (final DomainRouterVO router : routers) {
-            updated = false;
-            if (!router.getIsRedundantRouter()) {
-                continue;
-            }
-            final RedundantState prevState = router.getRedundantState();
-            if (router.getState() != VirtualMachine.State.Running) {
+        updated = false;
+        final RedundantState prevState = router.getRedundantState();
+        if (router.getState() != VirtualMachine.State.Running) {
+            router.setRedundantState(RedundantState.UNKNOWN);
+            updated = true;
+        } else {
+            final String privateIP = router.getPrivateIpAddress();
+            final HostVO host = _hostDao.findById(router.getHostId());
+            if (host == null || host.getState() != Status.Up) {
                 router.setRedundantState(RedundantState.UNKNOWN);
                 updated = true;
-            } else {
-                final String privateIP = router.getPrivateIpAddress();
-                final HostVO host = _hostDao.findById(router.getHostId());
-                if (host == null || host.getState() != Status.Up) {
-                    router.setRedundantState(RedundantState.UNKNOWN);
-                    updated = true;
-                } else if (privateIP != null) {
-                    final CheckRouterCommand command = new CheckRouterCommand();
-                    command.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-                    command.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-                    command.setWait(30);
-                    final Answer origAnswer = _agentMgr.easySend(router.getHostId(), command);
-                    CheckRouterAnswer answer = null;
-                    if (origAnswer instanceof CheckRouterAnswer) {
-                        answer = (CheckRouterAnswer) origAnswer;
+            } else if (privateIP != null) {
+                final CheckRouterCommand command = new CheckRouterCommand();
+                command.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
+                command.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
+                command.setWait(30);
+                final Answer origAnswer = _agentMgr.easySend(router.getHostId(), command);
+                CheckRouterAnswer answer = null;
+                if (origAnswer instanceof CheckRouterAnswer) {
+                    answer = (CheckRouterAnswer) origAnswer;
+                } else {
+                    s_logger.warn("Unable to update router " + router.getHostName() + "'s status");
+                }
+                RedundantState state = RedundantState.UNKNOWN;
+                if (answer != null) {
+                    if (answer.getResult()) {
+                        state = answer.getState();
                     } else {
-                        s_logger.warn("Unable to update router " + router.getHostName() + "'s status");
+                        s_logger.info("Agent response doesn't seem to be correct ==> " + answer.getResult());
                     }
-                    RedundantState state = RedundantState.UNKNOWN;
-                    if (answer != null) {
-                        if (answer.getResult()) {
-                            state = answer.getState();
-                        } else {
-                            s_logger.info("Agent response doesn't seem to be correct ==> " + answer.getResult());
-                        }
-                    }
-                    router.setRedundantState(state);
-                    updated = true;
                 }
-            }
-            if (updated) {
-                _routerDao.update(router.getId(), router);
-            }
-            final RedundantState currState = router.getRedundantState();
-            if (prevState != currState) {
-                final String title = "Redundant virtual router " + router.getInstanceName() + " just switch from " + prevState + " to " + currState;
-                final String context = "Redundant virtual router (name: " + router.getHostName() + ", id: " + router.getId() + ") " + " just switch from " + prevState + " to "
-                        + currState;
-                s_logger.info(context);
-                if (currState == RedundantState.MASTER) {
-                    _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER, router.getDataCenterId(), router.getPodIdToDeployIn(), title, context);
-                }
+                router.setRedundantState(state);
+                updated = true;
             }
         }
-    }
-
-    // Ensure router status is update to date before execute this function. The
-    // function would try best to recover all routers except MASTER
-    protected void recoverRedundantNetwork(final DomainRouterVO masterRouter, final DomainRouterVO backupRouter) {
-        if (masterRouter.getState() == VirtualMachine.State.Running && backupRouter.getState() == VirtualMachine.State.Running) {
-            final HostVO masterHost = _hostDao.findById(masterRouter.getHostId());
-            final HostVO backupHost = _hostDao.findById(backupRouter.getHostId());
-            if (masterHost.getState() == Status.Up && backupHost.getState() == Status.Up) {
-                final String title = "Reboot " + backupRouter.getInstanceName() + " to ensure redundant virtual routers work";
-                if (s_logger.isDebugEnabled()) {
-                    s_logger.debug(title);
-                }
-                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER, backupRouter.getDataCenterId(), backupRouter.getPodIdToDeployIn(), title, title);
-                try {
-                    rebootRouter(backupRouter.getId(), true);
-                } catch (final ConcurrentOperationException e) {
-                    s_logger.warn("Fail to reboot " + backupRouter.getInstanceName(), e);
-                } catch (final ResourceUnavailableException e) {
-                    s_logger.warn("Fail to reboot " + backupRouter.getInstanceName(), e);
-                } catch (final InsufficientCapacityException e) {
-                    s_logger.warn("Fail to reboot " + backupRouter.getInstanceName(), e);
-                }
+        if (updated) {
+            _routerDao.update(router.getId(), router);
+        }
+        final RedundantState currState = router.getRedundantState();
+        if (prevState != currState) {
+            final String title = "Virtual router " + router.getInstanceName() + " just switch from " + prevState + " to " + currState;
+            final String context = "Virtual router (name: " + router.getHostName() + ", id: " + router.getId() + ") " + " just switch from " + prevState + " to "
+                    + currState;
+            s_logger.info(context);
+            if (currState == RedundantState.MASTER) {
+                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER, router.getDataCenterId(), router.getPodIdToDeployIn(), title, context);
             }
         }
     }
@@ -1121,7 +1091,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         String defaultIp6Dns1 = null;
         String defaultIp6Dns2 = null;
         for (final NicProfile nic : profile.getNics()) {
+            final Network network = _networkDao.findById(nic.getNetworkId());
             final int deviceId = nic.getDeviceId();
+            final String deviceMac = nic.getMacAddress();
             boolean ipv4 = false, ipv6 = false;
             if (nic.getIPv4Address() != null) {
                 ipv4 = true;
@@ -1135,6 +1107,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 buf.append(" eth").append(deviceId).append("ip6prelen=").append(NetUtils.getIp6CidrSize(nic.getIPv6Cidr()));
                 buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
             }
+
+            // Send mac address
+            buf.append(" eth").append(deviceId).append("mac=").append(deviceMac);
 
             if (nic.isDefaultNic()) {
                 if (ipv4) {
@@ -1153,12 +1128,15 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 buf.append(" localgw=").append(dest.getPod().getGateway());
             } else if (nic.getTrafficType() == TrafficType.Control) {
                 controlNic = nic;
+                buf.append(" controlmac=").append(deviceMac);
                 buf.append(createRedundantRouterArgs(controlNic, router));
-            } else if (nic.getTrafficType() == TrafficType.Guest) {
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType())) {
                 dnsProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dns, Provider.VirtualRouter);
                 dhcpProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dhcp, Provider.VirtualRouter);
                 // build bootloader parameter for the guest
                 buf.append(createGuestBootLoadArgs(nic, defaultDns1, defaultDns2, router));
+            } else if (TrafficType.Guest.equals(nic.getTrafficType()) && GuestType.Sync.equals(network.getGuestType())) {
+                buf.append(" syncmac=").append(deviceMac);
             } else if (nic.getTrafficType() == TrafficType.Public) {
                 publicNetwork = true;
             }
@@ -1243,12 +1221,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final long networkId = nic.getNetworkId();
         _networkDao.findById(networkId);
 
+        final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
+        buf.append(" advert_int=").append(advertInt);
+
         final boolean isRedundant = router.getIsRedundantRouter();
         if (isRedundant) {
             buf.append(" redundant_router=1");
-
-            final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
-            buf.append(" advert_int=").append(advertInt);
 
             final Long vpcId = router.getVpcId();
             final List<DomainRouterVO> routers;
@@ -1419,7 +1397,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             s_logger.debug("Found " + publicIps.size() + " ip(s) to apply as a part of domR " + router + " start.");
             // Re-apply public ip addresses - should come before PF/LB/VPN
             if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
-                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds, 0);
+                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds);
             }
         }
     }
@@ -1561,8 +1539,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
     }
 
-    private void finalizeMonitorServiceOnStrat(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final Provider provider,
-                                               final long networkId, final Boolean add) {
+    private void finalizeMonitorServiceOnStart(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final long networkId, final Boolean add) {
 
         final NetworkVO network = _networkDao.findById(networkId);
 
@@ -1609,13 +1586,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         cmds.addCommand("monitor", command);
     }
 
-    protected void finalizeUserDataAndDhcpOnStart(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
-        if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Dhcp, provider)) {
-            // Resend dhcp
-            s_logger.debug("Reapplying dhcp entries as a part of domR " + router + " start...");
-            _commandSetupHelper.createDhcpEntryCommandsForVMs(router, cmds, guestNetworkId);
-        }
-
+    protected void finalizeUserDataOnStart(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
         if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.UserData, provider)) {
             // Resend user data
             s_logger.debug("Reapplying vm data (userData and metaData) entries as a part of domR " + router + " start...");
@@ -1779,9 +1750,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         final List<Long> routerGuestNtwkIds = _routerDao.getRouterNetworks(router.getId());
         for (final Long guestNetworkId : routerGuestNtwkIds) {
-            final AggregationControlCommand startCmd = new AggregationControlCommand(Action.Start, router.getInstanceName(), controlNic.getIPv4Address(), _routerControlHelper
-                    .getRouterIpInNetwork(
-                            guestNetworkId, router.getId()));
+            final AggregationControlCommand startCmd = new AggregationControlCommand(
+                    Action.Start,
+                    router.getInstanceName(),
+                    controlNic.getIPv4Address(),
+                    _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId())
+            );
             cmds.addCommand(startCmd);
 
             if (reprogramGuestNtwks) {
@@ -1794,18 +1768,21 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     final String serviceMonitringSet = _configDao.getValue(Config.EnableServiceMonitoring.key());
 
                     if (serviceMonitringSet != null && serviceMonitringSet.equalsIgnoreCase("true")) {
-                        finalizeMonitorServiceOnStrat(cmds, profile, router, provider, guestNetworkId, true);
+                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, true);
                     } else {
-                        finalizeMonitorServiceOnStrat(cmds, profile, router, provider, guestNetworkId, false);
+                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, false);
                     }
                 }
             }
 
-            finalizeUserDataAndDhcpOnStart(cmds, router, provider, guestNetworkId);
+            finalizeUserDataOnStart(cmds, router, provider, guestNetworkId);
 
-            final AggregationControlCommand finishCmd = new AggregationControlCommand(Action.Finish, router.getInstanceName(), controlNic.getIPv4Address(), _routerControlHelper
-                    .getRouterIpInNetwork(
-                            guestNetworkId, router.getId()));
+            final AggregationControlCommand finishCmd = new AggregationControlCommand(
+                    Action.Finish,
+                    router.getInstanceName(),
+                    controlNic.getIPv4Address(),
+                    _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId())
+            );
             cmds.addCommand(finishCmd);
         }
 
@@ -1821,6 +1798,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final List<? extends Nic> routerNics = _nicDao.listByVmId(profile.getId());
             for (final Nic nic : routerNics) {
                 final Network network = _networkModel.getNetwork(nic.getNetworkId());
+                if (network == null) {
+                    s_logger.error("Could not find a network with ID => " + nic.getNetworkId() + ".");
+                    continue;
+                }
                 final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
                 if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
@@ -1889,6 +1870,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 // Send network usage command for public nic in VPC VR
                 // Send network usage command for isolated guest nic of non VPC
                 // VR
+                if (network == null) {
+                    s_logger.error("Could not find a network with ID => " + routerNic.getNetworkId() + ".");
+                    continue;
+                }
                 if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
                         && network.getGuestType() == Network.GuestType.Isolated) {
                     final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
@@ -2425,64 +2410,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     protected class RvRStatusUpdateTask extends ManagedContextRunnable {
 
-        /*
-         * In order to make fail-over works well at any time, we have to ensure:
-         * 1. Backup router's priority = Master's priority - DELTA + 1
-         */
-        private void checkSanity(final List<DomainRouterVO> routers) {
-            final Set<Long> checkedNetwork = new HashSet<>();
-            for (final DomainRouterVO router : routers) {
-                if (!router.getIsRedundantRouter()) {
-                    continue;
-                }
-
-                final List<Long> routerGuestNtwkIds = _routerDao.getRouterNetworks(router.getId());
-
-                for (final Long routerGuestNtwkId : routerGuestNtwkIds) {
-                    if (checkedNetwork.contains(routerGuestNtwkId)) {
-                        continue;
-                    }
-                    checkedNetwork.add(routerGuestNtwkId);
-
-                    final List<DomainRouterVO> checkingRouters;
-                    final Long vpcId = router.getVpcId();
-                    if (vpcId != null) {
-                        checkingRouters = _routerDao.listByVpcId(vpcId);
-                    } else {
-                        checkingRouters = _routerDao.listByNetworkAndRole(routerGuestNtwkId, Role.VIRTUAL_ROUTER);
-                    }
-
-                    if (checkingRouters.size() != 2) {
-                        continue;
-                    }
-
-                    DomainRouterVO masterRouter = null;
-                    DomainRouterVO backupRouter = null;
-                    for (final DomainRouterVO r : checkingRouters) {
-                        if (r.getRedundantState() == RedundantState.MASTER) {
-                            if (masterRouter == null) {
-                                masterRouter = r;
-                            } else {
-                                // Wilder Rodrigues (wrodrigues@schubergphilis.com
-                                // Force a restart in order to fix the conflict
-                                // recoverRedundantNetwork(masterRouter, r);
-                                break;
-                            }
-                        } else if (r.getRedundantState() == RedundantState.BACKUP) {
-                            if (backupRouter == null) {
-                                backupRouter = r;
-                            } else {
-                                // Wilder Rodrigues (wrodrigues@schubergphilis.com
-                                // Do we have 2 routers in Backup state? Perhaps a restart of 1 router is needed.
-                                // recoverRedundantNetwork(backupRouter, r);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         private void checkDuplicateMaster(final List<DomainRouterVO> routers) {
             final Map<Long, DomainRouterVO> networkRouterMaps = new HashMap<>();
             for (final DomainRouterVO router : routers) {
@@ -2511,56 +2438,8 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         protected void runInContext() {
             while (true) {
                 try {
-                    final Long networkId = _vrUpdateQueue.take(); // This is a blocking call so this thread won't run all the time if no work item in queue.
-
-                    final NetworkVO network = _networkDao.findById(networkId);
-                    final Long vpcId = network.getVpcId();
-
-                    final List<DomainRouterVO> routers;
-                    if (vpcId != null) {
-                        routers = _routerDao.listByVpcId(vpcId);
-                    } else {
-                        routers = _routerDao.listByNetworkAndRole(networkId, Role.VIRTUAL_ROUTER);
-                    }
-
-                    if (routers.size() != 2) {
-                        continue;
-                    }
-          /*
-           * We update the router pair which the lower id router owned
-           * by this mgmt server, in order to prevent duplicate update
-           * of router status from cluster mgmt servers
-           */
-                    final DomainRouterVO router0 = routers.get(0);
-                    final DomainRouterVO router1 = routers.get(1);
-
-                    if (router0.getState() != VirtualMachine.State.Running || router1.getState() != VirtualMachine.State.Running) {
-                        updateRoutersRedundantState(routers);
-                        // Wilder Rodrigues (wrodrigues@schubergphilis.com) - One of the routers is not running,
-                        // so we don't have to continue here since the host will be null any way. Also, there is no need
-                        // To check either for sanity of duplicate master. Thus, just update the state and get lost.
-                        continue;
-                    }
-
-                    DomainRouterVO router = router0;
-                    if (router0.getId() < router1.getId()) {
-                        router = router0;
-                    } else {
-                        router = router1;
-                    }
-                    // && router.getState() == VirtualMachine.State.Stopped
-                    if (router.getHostId() == null && router.getState() == VirtualMachine.State.Running) {
-                        s_logger.debug("Skip router pair (" + router0.getInstanceName() + "," + router1.getInstanceName() + ") due to can't find host");
-                        continue;
-                    }
-                    final HostVO host = _hostDao.findById(router.getHostId());
-                    if (host == null || host.getManagementServerId() == null || host.getManagementServerId() != ManagementServerNode.getManagementServerId()) {
-                        s_logger.debug("Skip router pair (" + router0.getInstanceName() + "," + router1.getInstanceName() + ") due to not belong to this mgmt server");
-                        continue;
-                    }
-                    updateRoutersRedundantState(routers);
-                    checkDuplicateMaster(routers);
-                    checkSanity(routers);
+                    final DomainRouterVO router = _vrUpdateQueue.take(); // This is a blocking call so this thread won't run all the time if no work item in queue.
+                    updateRoutersRedundantState(router);
                 } catch (final Exception ex) {
                     s_logger.error("Fail to complete the RvRStatusUpdateTask! ", ex);
                 }
@@ -2581,21 +2460,18 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
                 updateSite2SiteVpnConnectionState(routers);
 
-                List<NetworkVO> networks = _networkDao.listVpcNetworks();
-                s_logger.debug("Found " + networks.size() + " VPC networks to update Redundant State. ");
-                pushToUpdateQueue(networks);
+                final List<DomainRouterVO> vpcRouters = _routerDao.listAllRunning();
 
-                networks = _networkDao.listRedundantNetworks();
-                s_logger.debug("Found " + networks.size() + " networks to update RvR status. ");
-                pushToUpdateQueue(networks);
+                s_logger.debug("Found " + vpcRouters.size() + " routers to update RvR status. ");
+                pushToUpdateQueue(vpcRouters);
             } catch (final Exception ex) {
                 s_logger.error("Fail to complete the CheckRouterTask! ", ex);
             }
         }
 
-        protected void pushToUpdateQueue(final List<NetworkVO> networks) throws InterruptedException {
-            for (final NetworkVO network : networks) {
-                if (!_vrUpdateQueue.offer(network.getId(), 500, TimeUnit.MILLISECONDS)) {
+        protected void pushToUpdateQueue(final List<DomainRouterVO> routers) throws InterruptedException {
+            for (final DomainRouterVO router : routers) {
+                if (!_vrUpdateQueue.offer(router, 500, TimeUnit.MILLISECONDS)) {
                     s_logger.warn("Cannot insert into virtual router update queue! Adjustment of router.check.interval and router.check.poolsize maybe needed.");
                     break;
                 }

@@ -68,6 +68,7 @@ import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
+import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ConfigurationServer;
@@ -162,6 +163,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Inject
     NetworkDao _ntwkDao;
     @Inject
+    NetworkOfferingDao _ntwkOffDao;
+    @Inject
     NetworkOrchestrationService _ntwkMgr;
     @Inject
     NetworkModel _ntwkModel;
@@ -244,7 +247,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.defaultVPCOfferingName, VpcOffering.defaultVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, null, false, false, false);
+                            true, State.Enabled, null, null, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayVPCOfferingName) == null) {
@@ -252,7 +255,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_SERVICES);
                     createVpcOffering(VpcOffering.defaultRemoteGatewayVPCOfferingName, VpcOffering.defaultRemoteGatewayVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, null, false, false, false);
+                            true, State.Enabled, null, null, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName) == null) {
@@ -260,7 +263,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(REMOTE_GATEWAY_WITH_VPN_SERVICES);
                     createVpcOffering(VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, VpcOffering.defaultRemoteGatewayWithVPNVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, null, false, false, false);
+                            true, State.Enabled, null, null, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.defaultInternalVPCOfferingName) == null) {
@@ -268,7 +271,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(INTERNAL_VPC_SERVICES);
                     createVpcOffering(VpcOffering.defaultInternalVPCOfferingName, VpcOffering.defaultInternalVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, null, null, false, false, false);
+                            true, State.Enabled, null, null, false);
                 }
 
                 if (_vpcOffDao.findByUniqueName(VpcOffering.redundantVPCOfferingName) == null) {
@@ -288,7 +291,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.redundantVPCOfferingName, VpcOffering.redundantVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId, false, false, true);
+                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId,true);
                 }
             }
         });
@@ -382,14 +385,14 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private VpcOffering createVpcOffering(final String name, final String displayText,
                                           final Map<Network.Service, Set<Network.Provider>> svcProviderMap,
                                           final boolean isDefault, final State state, final Long serviceOfferingId, final Long secondaryServiceOfferingId,
-                                          final boolean supportsDistributedRouter, final boolean offersRegionLevelVPC, final boolean redundantRouter) {
+                                          final boolean redundantRouter) {
 
         return Transaction.execute(new TransactionCallback<VpcOffering>() {
             @Override
             public VpcOffering doInTransaction(final TransactionStatus status) {
                 // create vpc offering object
                 VpcOfferingVO offering = new VpcOfferingVO(name, displayText, isDefault, serviceOfferingId, secondaryServiceOfferingId,
-                        supportsDistributedRouter, offersRegionLevelVPC, redundantRouter);
+                        redundantRouter);
 
                 if (state != null) {
                     offering.setState(state);
@@ -497,11 +500,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         validateConnectivtyServiceCapabilities(svcProviderMap.get(Service.Connectivity), serviceCapabilitystList);
 
-        final boolean supportsDistributedRouter = isVpcOfferingSupportsDistributedRouter(serviceCapabilitystList);
-        final boolean offersRegionLevelVPC = isVpcOfferingForRegionLevelVpc(serviceCapabilitystList);
         final boolean redundantRouter = isVpcOfferingRedundantRouter(serviceCapabilitystList);
         final VpcOffering offering = createVpcOffering(name, displayText, svcProviderMap, false, null, serviceOfferingId, secondaryServiceOfferingId,
-                supportsDistributedRouter, offersRegionLevelVPC, redundantRouter);
+                redundantRouter);
         CallContext.current().setEventDetails(" Id: " + offering.getId() + " Name: " + name);
 
         return offering;
@@ -536,14 +537,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 }
             }
         }
-    }
-
-    private boolean isVpcOfferingSupportsDistributedRouter(final Map serviceCapabilitystList) {
-        return findCapabilityForService(serviceCapabilitystList, Capability.DistributedRouter, Service.Connectivity);
-    }
-
-    private boolean isVpcOfferingForRegionLevelVpc(final Map serviceCapabilitystList) {
-        return findCapabilityForService(serviceCapabilitystList, Capability.RegionLevelVpc, Service.Connectivity);
     }
 
     private boolean isVpcOfferingRedundantRouter(final Map serviceCapabilitystList) {
@@ -788,11 +781,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw ex;
         }
 
-        final boolean isRegionLevelVpcOff = vpcOff.offersRegionLevelVPC();
-        if (isRegionLevelVpcOff && networkDomain == null) {
-            throw new InvalidParameterValueException("Network domain must be specified for region level VPC");
-        }
-
         // Validate zone
         final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
         if (zone == null) {
@@ -819,10 +807,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         }
 
-        final boolean useDistributedRouter = vpcOff.supportsDistributedRouter();
         final VpcVO vpc = new VpcVO(zoneId, vpcName, displayText, owner.getId(), owner.getDomainId(), vpcOffId, cidr,
-                networkDomain, useDistributedRouter, isRegionLevelVpcOff,
-                vpcOff.getRedundantRouter(), sourceNatList, syslogServerList);
+                networkDomain, vpcOff.getRedundantRouter(), sourceNatList, syslogServerList);
 
         return createVpc(displayVpc, vpc);
     }
@@ -2412,6 +2398,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         });
 
+        // 6) Deleting sync networks
+        final List<NetworkVO> syncNetworks = _ntwkDao.listSyncNetworksByVpc(vpcId);
+        syncNetworks.forEach(syncNetwork -> _ntwkMgr.removeAndShutdownSyncNetwork(syncNetwork.getId()));
+
         return success;
     }
 
@@ -2650,10 +2640,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         if (networkDomain == null) {
             networkDomain = vpc.getNetworkDomain();
-        }
-
-        if (!vpc.isRegionLevelVpc() && vpc.getZoneId() != zoneId) {
-            throw new InvalidParameterValueException("New network doesn't belong to vpc zone");
         }
 
         // 1) Validate if network can be created for VPC

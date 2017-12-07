@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.IpAddress;
 import com.cloud.agent.resource.virtualnetwork.model.IpAssociation;
 
@@ -22,8 +21,8 @@ public class IpAssociationConfigItem extends AbstractConfigItemFacade {
 
         for (final IpAddressTO ip : command.getIpAddresses()) {
             final IpAddress ipAddress = new IpAddress(ip.getPublicIp(), ip.isSourceNat(), ip.isAdd(),
-                    ip.isOneToOneNat(), ip.isFirstIP(), ip.getVlanGateway(), ip.getVlanNetmask(), ip.getVifMacAddress(),
-                    ip.getDeviceMacAddress(), ip.getNicDevId(), ip.isNewNic(), ip.getTrafficType().toString().toLowerCase());
+                    ip.isOneToOneNat(), ip.isFirstIP(), ip.getVlanGateway(), ip.getVlanNetmask(),
+                    ip.getMacAddress(), ip.isNewNic(), ip.getTrafficType().toString().toLowerCase());
             ips.add(ipAddress);
         }
 
@@ -33,7 +32,7 @@ public class IpAssociationConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.IP_ASSOCIATION_CONFIG;
 
         return super.generateConfigItems(configuration);

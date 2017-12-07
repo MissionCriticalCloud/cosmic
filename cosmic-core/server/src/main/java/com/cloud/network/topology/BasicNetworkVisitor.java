@@ -136,13 +136,12 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final IpAssociationRules ipRules) throws ResourceUnavailableException {
-        final Network network = ipRules.getNetwork();
         final VirtualRouter router = ipRules.getRouter();
 
         final Commands commands = new Commands(Command.OnError.Continue);
         final List<? extends PublicIpAddress> ips = ipRules.getIpAddresses();
 
-        _commandSetupHelper.createAssociateIPCommands(router, ips, commands, network.getId());
+        _commandSetupHelper.createAssociateIPCommands(router, ips, commands);
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }
 
@@ -176,8 +175,6 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
         final DeployDestination destination = dhcp.getDestination();
 
         if (router.getPodIdToDeployIn().longValue() == destination.getPod().getId()) {
-            _commandSetupHelper.createDhcpEntryCommand(router, userVM, nicVo, commands);
-
             return _networkGeneralHelper.sendCommandsToRouter(router, commands);
         }
         return true;

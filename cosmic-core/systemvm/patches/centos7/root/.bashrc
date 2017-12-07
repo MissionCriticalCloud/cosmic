@@ -87,3 +87,7 @@ replay() {
     return 1
   fi
 }
+
+cosmicrouterlogs() {
+  less /var/log/cosmic/router/router.log
+}

@@ -26,8 +26,7 @@ from marvin.lib.common import (
     get_default_virtual_machine_offering,
     get_template,
     get_zone,
-    get_domain,
-    get_default_isolated_network_offering_with_egress
+    get_domain
 )
 from marvin.lib.utils import (
     get_process_status,
@@ -99,37 +98,24 @@ class TestPasswordService(cloudstackTestCase):
         vpc_off = get_default_redundant_vpc_offering(self.apiclient)
         self.perform_password_service_tests(vpc_off)
 
-    @attr(tags=['advanced'])
-    def test_03_password_service_isolated(self):
-        self.logger.debug("Starting test for Isolated network")
-        self.perform_password_service_tests(None)
-
     # Generic methods
     def perform_password_service_tests(self, vpc_off):
-
-        if vpc_off is None:
-            self.logger.debug("No need to create a VPC, creating isolated network")
-            network_1 = self.createIsolatedNetwork()
-            vpc_1 = None
-        else:
-            self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
-            vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
-            self.logger.debug("Creating network inside VPC")
-            net_off = get_default_network_offering(self.apiclient)
-            network_1 = self.createNetwork(vpc_1, net_off, gateway='10.0.0.1')
-            acl1 = self.createACL(vpc_1)
-            self.createACLItem(acl1.id, cidr="0.0.0.0/0")
-            self.replaceNetworkAcl(acl1.id, network_1)
+        self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
+        vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
+        self.logger.debug("Creating network inside VPC")
+        net_off = get_default_network_offering(self.apiclient)
+        network_1 = self.createNetwork(vpc_1, net_off, gateway='10.0.0.1')
+        acl1 = self.createACL(vpc_1)
+        self.createACLItem(acl1.id, cidr="0.0.0.0/0")
+        self.replaceNetworkAcl(acl1.id, network_1)
 
         routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
         for router in routers:
-            self._perform_password_service_test(router, network_1)
+            if router.redundantstate == 'MASTER' or len(routers) == 1:
+                self._perform_password_service_test(router, network_1)
 
         # Do the same after restart with cleanup
-        if vpc_off is None:
-            self.restart_network_with_cleanup(network_1, True)
-        else:
-            self.restart_vpc_with_cleanup(vpc_1, True)
+        self.restart_vpc_with_cleanup(vpc_1, True)
 
         self.logger.debug("Getting the router info again after the cleanup (router names / ip addresses changed)")
         routers = list_routers(self.apiclient, account=self.account.name, domainid=self.account.domainid)
@@ -139,7 +125,8 @@ class TestPasswordService(cloudstackTestCase):
         self.logger.debug("Check whether routers are happy")
 
         for router in routers:
-            self._perform_password_service_test(router, network_1)
+            if router.redundantstate == 'MASTER' or len(routers) == 1:
+                self._perform_password_service_test(router, network_1)
 
     def wait_vm_ready(self, router, vmip):
         self.logger.debug("Check whether VM %s is up" % vmip)
@@ -229,8 +216,6 @@ class TestPasswordService(cloudstackTestCase):
     def test_process_running(self, find_process, router):
         host = self.get_host_details(router)
 
-        router_state = self.get_router_state(router)
-
         number_of_processes_found = 0
         try:
             number_of_processes_found = get_process_status(
@@ -248,8 +233,6 @@ class TestPasswordService(cloudstackTestCase):
         self.logger.debug("Result from the Router on IP '%s' is -> Number of processess found: '%s'" % (router.linklocalip, number_of_processes_found[0]))
 
         expected_nr_or_processes = 1
-        if router.isredundantrouter and router_state == "BACKUP":
-            expected_nr_or_processes = 0
 
         self.assertEqual(int(number_of_processes_found[0]), expected_nr_or_processes,
                          msg="Router should have " + str(expected_nr_or_processes) + " '" + find_process + "' processes running, found " + str(number_of_processes_found[0]))
@@ -391,21 +374,6 @@ class TestPasswordService(cloudstackTestCase):
             self.fail('Unable to create a Network with offering=%s because of %s ' % (network_offering.id, e))
 
         return obj_network
-
-    def createIsolatedNetwork(self):
-
-        network_offering = get_default_isolated_network_offering_with_egress(self.apiclient)
-
-        self.logger.debug("Creating Network for Account %s using offering %s" % (self.account.name, network_offering.id))
-        network_obj = Network.create(self.api_client,
-                                     self.services["network"],
-                                     accountid=self.account.name,
-                                     domainid=self.account.domainid,
-                                     networkofferingid=network_offering.id,
-                                     zoneid=self.zone.id
-                                     )
-
-        return network_obj
 
     def replaceNetworkAcl(self, aclId, network):
         self.logger.debug("Replacing Network ACL with ACL ID ==> %s" % aclId)

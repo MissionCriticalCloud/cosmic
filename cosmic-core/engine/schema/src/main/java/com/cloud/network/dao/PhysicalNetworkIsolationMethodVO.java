@@ -1,9 +1,12 @@
 package com.cloud.network.dao;
 
 import com.cloud.api.InternalIdentity;
+import com.cloud.network.PhysicalNetwork.IsolationMethod;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +27,8 @@ public class PhysicalNetworkIsolationMethodVO implements InternalIdentity {
     private long physicalNetworkId;
 
     @Column(name = "isolation_method")
-    private String isolationMethod;
+    @Enumerated(value = EnumType.STRING)
+    private IsolationMethod isolationMethod;
 
     /**
      * There should never be a public constructor for this class. Since it's
@@ -33,7 +37,7 @@ public class PhysicalNetworkIsolationMethodVO implements InternalIdentity {
     protected PhysicalNetworkIsolationMethodVO() {
     }
 
-    protected PhysicalNetworkIsolationMethodVO(final long physicalNetworkId, final String isolationMethod) {
+    protected PhysicalNetworkIsolationMethodVO(final long physicalNetworkId, final IsolationMethod isolationMethod) {
         this.physicalNetworkId = physicalNetworkId;
         this.isolationMethod = isolationMethod;
     }
@@ -47,7 +51,7 @@ public class PhysicalNetworkIsolationMethodVO implements InternalIdentity {
         return physicalNetworkId;
     }
 
-    public String getIsolationMethod() {
+    public IsolationMethod getIsolationMethod() {
         return isolationMethod;
     }
 }

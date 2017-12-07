@@ -38,6 +38,7 @@ import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.user.Account;
@@ -548,8 +549,18 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     @Override
     public List<NetworkVO> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                         final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType, final Boolean subdomainAccess,
-                                        final Long vpcId, final Boolean isNetworkDisplayEnabled, final String dns1, final String dns2, final String ipExclusionList)
+                                        final Long vpcId, final Long relatedNetworkId, final Boolean isNetworkDisplayEnabled, final String dns1, final String dns2,
+                                        final String ipExclusionList)
             throws ConcurrentOperationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.user.Account, com.cloud.deploy.DeploymentPlan, boolean, com.cloud.network.vpc.Vpc, com.cloud.network.Network)
+     */
+    @Override
+    public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -642,6 +653,15 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
      */
     @Override
     public boolean shutdownNetwork(final long networkId, final ReservationContext context, final boolean cleanupElements) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see com.cloud.network.NetworkManager#removeAndShutdownSyncNetwork(long)
+     */
+    @Override
+    public boolean removeAndShutdownSyncNetwork(final long networkId) {
         // TODO Auto-generated method stub
         return false;
     }

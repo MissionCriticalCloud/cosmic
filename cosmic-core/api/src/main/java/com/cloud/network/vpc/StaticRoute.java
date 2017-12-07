@@ -22,6 +22,8 @@ public interface StaticRoute extends ControlledEntity, Identity, InternalIdentit
 
     String getGwIpAddress();
 
+    Integer getMetric();
+
     enum State {
         Staged, // route been created but has never got through network rule conflict detection.  Routes in this state can not be sent to VPC virtual router.
         Add,    // Add means the route has been created and has gone through network rule conflict detection.

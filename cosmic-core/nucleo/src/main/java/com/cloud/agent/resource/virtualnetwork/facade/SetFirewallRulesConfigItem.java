@@ -5,7 +5,6 @@ import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.model.ConfigBase;
 import com.cloud.agent.resource.virtualnetwork.model.FirewallRule;
 import com.cloud.agent.resource.virtualnetwork.model.FirewallRules;
 
@@ -31,7 +30,7 @@ public class SetFirewallRulesConfigItem extends AbstractConfigItemFacade {
     }
 
     @Override
-    protected List<ConfigItem> generateConfigItems(final ConfigBase configuration) {
+    protected List<ConfigItem> generateConfigItems(final Object configuration) {
         destinationFile = VRScripts.FIREWALL_RULES_CONFIG;
 
         return super.generateConfigItems(configuration);
