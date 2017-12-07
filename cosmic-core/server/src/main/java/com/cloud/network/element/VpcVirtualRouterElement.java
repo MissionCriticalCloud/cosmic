@@ -132,9 +132,12 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
         params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 
-        final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create().setVpc(vpc).setDeployDestination(dest)
-                                                                                                       .setAccountOwner(_accountMgr.getAccount(vpc.getAccountId())).setParams
-                        (params).build();
+        final RouterDeploymentDefinition routerDeploymentDefinition = routerDeploymentDefinitionBuilder.create()
+                                                                                                       .setVpc(vpc)
+                                                                                                       .setDeployDestination(dest)
+                                                                                                       .setAccountOwner(_accountMgr.getAccount(vpc.getAccountId()))
+                                                                                                       .setParams(params)
+                                                                                                       .build();
 
         routerDeploymentDefinition.deployVirtualRouter();
 

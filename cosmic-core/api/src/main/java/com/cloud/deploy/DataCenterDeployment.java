@@ -74,6 +74,11 @@ public class DataCenterDeployment implements DeploymentPlan {
     }
 
     @Override
+    public void setPhysicalNetworkId(final Long physicalNetworkId) {
+        this._physicalNetworkId = physicalNetworkId;
+    }
+
+    @Override
     public ReservationContext getReservationContext() {
         return _context;
     }

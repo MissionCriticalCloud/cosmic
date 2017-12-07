@@ -94,8 +94,15 @@ public class ExternalGuestNetworkGuru extends GuestNetworkGuru {
     @Override
     protected boolean canHandle(final NetworkOffering offering, final NetworkType networkType, final PhysicalNetwork physicalNetwork) {
         s_logger.debug("Checking of guru can handle request");
-        if (networkType == NetworkType.Advanced && isMyTrafficType(offering.getTrafficType()) && offering.getGuestType() == Network.GuestType.Isolated &&
-                isMyIsolationMethod(physicalNetwork) && !offering.isSystemOnly()) {
+        if (NetworkType.Advanced.equals(networkType) &&
+                isMyTrafficType(offering.getTrafficType()) &&
+                isMyIsolationMethod(physicalNetwork) &&
+                GuestType.Isolated.equals(offering.getGuestType()) &&
+                !offering.isSystemOnly()) {
+            return true;
+        } else if (NetworkType.Advanced.equals(networkType) &&
+                isMyTrafficType(offering.getTrafficType()) &&
+                GuestType.Sync.equals(offering.getGuestType())) {
             return true;
         } else {
             s_logger.trace("We only take care of Guest networks of type   " + GuestType.Isolated + " in zone of type " + NetworkType.Advanced);

@@ -2398,6 +2398,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         });
 
+        // 6) Deleting sync networks
+        final List<NetworkVO> syncNetworks = _ntwkDao.listSyncNetworksByVpc(vpcId);
+        syncNetworks.forEach(syncNetwork -> _ntwkMgr.removeAndShutdownSyncNetwork(syncNetwork.getId()));
+
         return success;
     }
 
