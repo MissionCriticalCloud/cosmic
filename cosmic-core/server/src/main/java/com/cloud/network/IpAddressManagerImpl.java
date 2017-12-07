@@ -1,6 +1,5 @@
 package com.cloud.network;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
 import com.cloud.alert.AlertManager;
@@ -25,7 +24,6 @@ import com.cloud.dc.dao.DataCenterVnetDao;
 import com.cloud.dc.dao.DomainVlanMapDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
-import com.cloud.deploy.DeployDestination;
 import com.cloud.domain.Domain;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
@@ -74,7 +72,6 @@ import com.cloud.network.element.IpDeployer;
 import com.cloud.network.element.IpDeployingRequester;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.StaticNatServiceProvider;
-import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
@@ -105,12 +102,8 @@ import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.User;
-import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.Journal;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
@@ -132,8 +125,6 @@ import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.ReservationContext;
-import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
@@ -153,7 +144,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1497,24 +1487,20 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
             throw new InvalidParameterValueException("Network " + guestNetworkFinal + " is not of a type " + TrafficType.Guest);
         }
 
-        Ternary<Boolean, List<NetworkOfferingVO>, Network> pair = null;
         try {
-            pair = Transaction.execute(new TransactionCallbackWithException<Ternary<Boolean, List<NetworkOfferingVO>, Network>, Exception>() {
+            Transaction.execute(new TransactionCallbackWithExceptionNoReturn<Exception>() {
                 @Override
-                public Ternary<Boolean, List<NetworkOfferingVO>, Network> doInTransaction(final TransactionStatus status) throws InsufficientCapacityException,
+                public void doInTransactionWithoutResult(final TransactionStatus status) throws InsufficientCapacityException,
                         ResourceAllocationException {
-                    boolean createNetwork = false;
                     Network guestNetwork = guestNetworkFinal;
 
                     if (guestNetwork == null) {
                         final List<? extends Network> networks = getIsolatedNetworksWithSourceNATOwnedByAccountInZone(zoneId, owner);
-                        if (networks.size() == 0) {
-                            createNetwork = true;
-                        } else if (networks.size() == 1) {
+                        if (networks.size() == 1) {
                             guestNetwork = networks.get(0);
                         } else {
-                            throw new InvalidParameterValueException("Error, more than 1 Guest Isolated Networks with SourceNAT "
-                                    + "service enabled found for this account, cannot assosiate the IP range, please provide the network ID");
+                            throw new InvalidParameterValueException("Error, exactly one guest isolated network with SourceNAT "
+                                    + "service enabled is expected for this account, cannot associate the IP range, please provide the network ID");
                         }
                     }
 
@@ -1523,31 +1509,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                     if (requiredOfferings.size() < 1) {
                         throw new CloudRuntimeException("Unable to find network offering with availability=" + Availability.Required
                                 + " to automatically create the network as part of createVlanIpRange");
-                    }
-                    if (createNetwork) {
-                        if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
-                            final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zoneId, requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
-                                                                                                                                                            .getTrafficType());
-                            // Validate physical network
-                            final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
-                            if (physicalNetwork == null) {
-                                throw new InvalidParameterValueException("Unable to find physical network with id: " + physicalNetworkId + " and tag: "
-                                        + requiredOfferings.get(0).getTags());
-                            }
-
-                            s_logger.debug("Creating network for account " + owner + " from the network offering id=" + requiredOfferings.get(0).getId()
-                                    + " as a part of createVlanIpRange process");
-                            guestNetwork = _networkMgr.createGuestNetwork(requiredOfferings.get(0).getId(), owner.getAccountName() + "-network", owner.getAccountName()
-                                            + "-network", null, null, null, null, owner, null, physicalNetwork, zoneId, ACLType.Account,
-                                    null, null, null, null, true, null, null, null, null);
-                            if (guestNetwork == null) {
-                                s_logger.warn("Failed to create default Virtual network for the account " + accountId + "in zone " + zoneId);
-                                throw new CloudRuntimeException("Failed to create a Guest Isolated Networks with SourceNAT "
-                                        + "service enabled as a part of createVlanIpRange, for the account " + accountId + "in zone " + zoneId);
-                            }
-                        } else {
-                            throw new CloudRuntimeException("Required network offering id=" + requiredOfferings.get(0).getId() + " is not in " + NetworkOffering.State.Enabled);
-                        }
                     }
 
                     // Check if there is a source nat ip address for this account; if not - we have to allocate one
@@ -1578,7 +1539,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                             markPublicIpAsAllocated(addr);
                         }
                     }
-                    return new Ternary<>(createNetwork, requiredOfferings, guestNetwork);
                 }
             });
         } catch (final Exception e1) {
@@ -1588,35 +1548,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
             throw new IllegalStateException(e1);
         }
 
-        final boolean createNetwork = pair.first();
-        final List<NetworkOfferingVO> requiredOfferings = pair.second();
-        Network guestNetwork = pair.third();
-
-        // if the network offering has persistent set to true, implement the network
-        if (createNetwork && requiredOfferings.get(0).getIsPersistent()) {
-            final Zone zone = zoneRepository.findOne(zoneId);
-            final DeployDestination dest = new DeployDestination(zone, null, null, null);
-            final Account callerAccount = CallContext.current().getCallingAccount();
-            final UserVO callerUser = _userDao.findById(CallContext.current().getCallingUserId());
-            final Journal journal = new Journal.LogJournal("Implementing " + guestNetwork, s_logger);
-            final ReservationContext context = new ReservationContextImpl(UUID.randomUUID().toString(), journal, callerUser, callerAccount);
-            s_logger.debug("Implementing network " + guestNetwork + " as a part of network provision for persistent network");
-            try {
-                final Pair<? extends NetworkGuru, ? extends Network> implementedNetwork = _networkMgr.implementNetwork(guestNetwork.getId(), dest, context);
-                if (implementedNetwork == null || implementedNetwork.first() == null) {
-                    s_logger.warn("Failed to implement the network " + guestNetwork);
-                }
-                if (implementedNetwork != null) {
-                    guestNetwork = implementedNetwork.second();
-                }
-            } catch (final Exception ex) {
-                s_logger.warn("Failed to implement network " + guestNetwork + " elements and resources as a part of" + " network provision due to ", ex);
-                final CloudRuntimeException e = new CloudRuntimeException("Failed to implement network (with specified id)"
-                        + " elements and resources as a part of network provision for persistent network");
-                e.addProxyObject(guestNetwork.getUuid(), "networkId");
-                throw e;
-            }
-        }
         return true;
     }
 
