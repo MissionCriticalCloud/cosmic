@@ -38,6 +38,9 @@ public class GuestOSVO implements GuestOS {
     @Column(name = "manufacturer_string")
     String manufacturer;
 
+    @Column(name = "cpuflags")
+    String cpuflags;
+
     @Override
     public long getId() {
         return id;
@@ -108,5 +111,13 @@ public class GuestOSVO implements GuestOS {
 
     public void setManufacturer(final String manufacturer) {
         this.manufacturer = manufacturer;
+    }
+
+    public String getCpuflags() {
+        return cpuflags;
+    }
+
+    public void setCpuflags(final String cpuflags) {
+        this.cpuflags = cpuflags;
     }
 }
