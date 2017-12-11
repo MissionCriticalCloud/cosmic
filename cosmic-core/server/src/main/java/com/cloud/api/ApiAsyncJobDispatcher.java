@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,16 +96,8 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
                 CallContext.unregister();
             }
         } catch (IllegalAccessException | InstantiationException | ClassNotFoundException | ServerApiException e) {
-            final String errorMsg;
-            int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
-            if (!(e instanceof ServerApiException)) {
-                s_logger.error("Unexpected exception while executing " + job.getCmd(), e);
-                errorMsg = e.getMessage();
-            } else {
-                final ServerApiException sApiEx = (ServerApiException) e;
-                errorMsg = sApiEx.getDescription();
-                errorCode = sApiEx.getErrorCode().getHttpCode();
-            }
+            final String errorMsg = ExceptionUtils.getRootCauseMessage(e);
+            final int errorCode = ApiErrorCode.INTERNAL_ERROR.getHttpCode();
 
             final ExceptionResponse response = new ExceptionResponse();
             response.setErrorCode(errorCode);
