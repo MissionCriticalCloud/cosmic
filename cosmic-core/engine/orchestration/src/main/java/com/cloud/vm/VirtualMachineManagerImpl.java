@@ -3548,9 +3548,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     private void orchestrateStorageMigration(final String vmUuid, final StoragePool destPool) {
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
-        final Long srchostId = vm.getHostId() != null ? vm.getHostId() : vm.getLastHostId();
-        final HostVO srcHost = _hostDao.findById(srchostId);
-        final Long srcClusterId = srcHost.getClusterId();
 
         if (destPool == null) {
             throw new CloudRuntimeException("Unable to migrate vm: missing destination storage pool");
