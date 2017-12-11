@@ -74,7 +74,7 @@ public class NiciraRestClient extends BasicRestClient {
         } else if (HttpStatusCodeHelper.isSuccess(statusCode)) {
             return handleSuccessResponse(request, response);
         } else {
-            throw new CloudstackRESTException("Unexpecetd status code: " + statusCode);
+            throw new CloudstackRESTException("Unexpected status code: " + statusCode);
         }
     }
 
