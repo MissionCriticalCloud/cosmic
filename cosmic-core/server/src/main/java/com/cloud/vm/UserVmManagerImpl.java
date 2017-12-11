@@ -3708,6 +3708,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw ex;
         }
 
+        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final VirtualMachineTemplate template = _entityMgr.findByIdIncludingRemoved(VirtualMachineTemplate.class, vm.getTemplateId());
+
+        checkHypervisorEnabled(zone, template);
+
         _accountMgr.checkAccess(caller, null, true, vm);
 
         return restoreVMInternal(caller, vm, newTemplateId);
