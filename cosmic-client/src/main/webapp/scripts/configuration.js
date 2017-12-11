@@ -1489,7 +1489,8 @@
 
                                 dataProvider: function (args) {
                                     var data = {
-                                        id: args.context.systemServiceOfferings[0].id
+                                        id: args.context.systemServiceOfferings[0].id,
+                                        issystem: args.context.systemServiceOfferings[0].issystem
                                     };
                                     $.ajax({
                                         url: createURL('listServiceOfferings'),
