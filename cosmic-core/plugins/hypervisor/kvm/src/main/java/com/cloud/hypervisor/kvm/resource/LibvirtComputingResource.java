@@ -1674,7 +1674,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             devices.addDevice(rngDevice);
         }
 
-        final WatchDogDef watchDog = new WatchDogDef(watchDogAction, watchDogModel);
+        final WatchDogDef watchDog = new WatchDogDef(libvirtComputingResourceProperties.getVmWatchdogAction(), libvirtComputingResourceProperties.getVmWatchdogModel());
         devices.addDevice(watchDog);
 
         final VideoDef videoCard = new VideoDef(libvirtComputingResourceProperties.getVmVideoHardware(), libvirtComputingResourceProperties.getVmVideoRam());

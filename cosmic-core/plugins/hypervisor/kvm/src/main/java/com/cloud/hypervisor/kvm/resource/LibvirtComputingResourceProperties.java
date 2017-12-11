@@ -416,6 +416,14 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         this.networkBridgeType = bridgeType;
     }
 
+    public WatchDogAction getVmWatchdogAction() {
+        return vmWatchdogAction;
+    }
+
+    public WatchDogModel getVmWatchdogModel() {
+        return vmWatchdogModel;
+    }
+
     public static class Constants {
         public static final String PROPERTY_KEY_DOMR_SCRIPTS_DIR = "domr.scripts.dir";
         public static final String PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR = "hypervisor.scripts.dir";
