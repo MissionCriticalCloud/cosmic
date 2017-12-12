@@ -107,7 +107,7 @@ public class SecurityManagerMBeanImpl extends StandardMBean implements SecurityG
     @Override
     public void simulateVmStart(final Long vmId) {
         //all we need is the vmId
-        final VMInstanceVO vm = new VMInstanceVO(vmId, 5, "foo", "foo", Type.User, null, HypervisorType.Any, 8, 1, 1, 1, false, false, null);
+        final VMInstanceVO vm = new VMInstanceVO(vmId, 5, "foo", "foo", Type.User, null, HypervisorType.Any, 8, 1, 1, 1, false, false, null, null, null);
         _sgMgr.handleVmStarted(vm);
     }
 

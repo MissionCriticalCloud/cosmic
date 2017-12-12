@@ -653,7 +653,7 @@ public class UserVmManagerTest {
         final Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
         final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
-        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L);
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L, null, null);
         vm.setState(VirtualMachine.State.Stopped);
         when(_vmDao.findById(anyLong())).thenReturn(vm);
 

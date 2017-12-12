@@ -153,17 +153,22 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     transient String toString;
     @Column(name = "limit_cpu_use", updatable = true, nullable = true)
     private boolean limitCpuUse;
+    @Column(name = "cpunumber")
+    private Long cpuNumber;
+    @Column(name = "ramsize")
+    private Long ramSize;
+
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
-                        final boolean limitResourceUse, final Long diskOfferingId) {
-        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+                        final boolean limitResourceUse, final Long diskOfferingId, final Long cpuNumber, final Long ramSize) {
+        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled, cpuNumber, ramSize);
         limitCpuUse = limitResourceUse;
         this.diskOfferingId = diskOfferingId;
     }
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
-                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
+                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled, final Long cpuNumber, final Long ramSize) {
         this.id = id;
         hostName = name != null ? name : uuid;
         if (vmTemplateId != null) {
@@ -180,6 +185,8 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         this.hypervisorType = hypervisorType;
         this.userId = userId;
         limitCpuUse = false;
+        this.cpuNumber = cpuNumber;
+        this.ramSize = ramSize;
         try {
             final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             final byte[] randomBytes = new byte[16];
@@ -534,5 +541,13 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
 
     public void setPowerHostId(final Long hostId) {
         powerHostId = hostId;
+    }
+
+    public Long getCpuNumber() {
+        return cpuNumber;
+    }
+
+    public Long getRamSize() {
+        return ramSize;
     }
 }

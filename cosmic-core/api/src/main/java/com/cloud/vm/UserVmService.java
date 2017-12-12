@@ -169,8 +169,8 @@ public interface UserVmService {
                                                           hypervisor, HTTPMethod httpmethod,
                                                   String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIp, Boolean displayVm, String
                                                           keyboard,
-                                                  List<Long> affinityGroupIdList, Map<String, String> customParameter, String customId) throws InsufficientCapacityException,
-            ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException;
+                                                  List<Long> affinityGroupIdList, Map<String, String> customParameter, String customId, Long cpuNumber, Long ramSize)
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException;
 
     /**
      * Creates a User VM in Advanced Zone (Security Group feature is enabled) in
@@ -222,8 +222,8 @@ public interface UserVmService {
                                                      String group, HypervisorType hypervisor,
                                                      HTTPMethod httpmethod, String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps,
                                                      Boolean displayVm, String keyboard,
-                                                     List<Long> affinityGroupIdList, Map<String, String> customParameters, String customId) throws InsufficientCapacityException,
-            ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException;
+                                                     List<Long> affinityGroupIdList, Map<String, String> customParameters, String customId, Long cpuNumber, Long ramSize)
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException;
 
     /**
      * Creates a User VM in Advanced Zone (Security Group feature is disabled)
@@ -274,7 +274,7 @@ public interface UserVmService {
                                         String userData,
                                         String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps, Boolean displayVm, String keyboard, List<Long>
                                                 affinityGroupIdList,
-                                        Map<String, String> customParameters, String customId)
+                                        Map<String, String> customParameters, String customId, Long cpuNumber, Long ramSize)
 
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException;
 

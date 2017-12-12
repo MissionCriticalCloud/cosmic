@@ -199,6 +199,7 @@ public class ApiConstants {
     public static final String PUBLIC_START_PORT = "publicport";
     public static final String PUBLIC_END_PORT = "publicendport";
     public static final String PUBLIC_ZONE = "publiczone";
+    public static final String RAM_SIZE = "ramsize";
     public static final String RECEIVED_BYTES = "receivedbytes";
     public static final String REQUIRES_HVM = "requireshvm";
     public static final String RESOURCE_TYPE = "resourcetype";

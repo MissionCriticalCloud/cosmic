@@ -74,6 +74,16 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     private Long serviceOfferingId;
 
     @ACL
+    @Parameter(name = ApiConstants.CPU_NUMBER, type = CommandType.UUID, entityType = ServiceOfferingResponse.class, description = "number of CPUs " +
+            "for the virtual machine")
+    private Long cpuNumber = 0L;
+
+    @ACL
+    @Parameter(name = ApiConstants.RAM_SIZE, type = CommandType.UUID, entityType = ServiceOfferingResponse.class, description = "amount of RAM " +
+            "for the virtual machine")
+    private Long ramSize = 0L;
+
+    @ACL
     @Parameter(name = ApiConstants.TEMPLATE_ID, type = CommandType.UUID, entityType = TemplateResponse.class, required = true, description = "the ID of the template for the " +
             "virtual machine")
     private Long templateId;
@@ -438,6 +448,19 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     public void execute() {
         final UserVm result;
 
+        result = getUserVm();
+
+        if (result != null) {
+            final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
+            response.setResponseName(getCommandName());
+            setResponseObject(response);
+        } else {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to deploy vm uuid:" + getEntityUuid());
+        }
+    }
+
+    public UserVm getUserVm() {
+        final UserVm result;
         if (getStartVm()) {
             try {
                 CallContext.current().setEventDetails("Vm Id: " + getEntityId());
@@ -462,14 +485,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         } else {
             result = _userVmService.getUserVm(getEntityId());
         }
-
-        if (result != null) {
-            final UserVmResponse response = _responseGenerator.createUserVmResponse(ResponseView.Restricted, "virtualmachine", result).get(0);
-            response.setResponseName(getCommandName());
-            setResponseObject(response);
-        } else {
-            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to deploy vm uuid:" + getEntityUuid());
-        }
+        return result;
     }
 
     public boolean getStartVm() {
@@ -567,10 +583,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                 throw new InvalidParameterValueException("Unable to find zone by id=" + zoneId);
             }
 
-            final ServiceOffering serviceOffering = _entityMgr.findById(ServiceOffering.class, serviceOfferingId);
-            if (serviceOffering == null) {
-                throw new InvalidParameterValueException("Unable to find service offering: " + serviceOfferingId);
-            }
+            final ServiceOffering serviceOffering = getServiceOffering();
 
             final VirtualMachineTemplate template = _entityMgr.findById(VirtualMachineTemplate.class, templateId);
             // Make sure a valid template ID was specified
@@ -603,20 +616,20 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                 } else {
                     vm = _userVmService.createBasicSecurityGroupVirtualMachine(zone, serviceOffering, template, getSecurityGroupIdList(), owner, name, displayName, diskOfferingId,
                             size, group, getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(),
-                            getDetails(), getCustomId());
+                            getDetails(), getCustomId(), cpuNumber, ramSize);
                 }
             } else {
                 if (zone.isSecurityGroupEnabled()) {
                     vm = _userVmService.createAdvancedSecurityGroupVirtualMachine(zone, serviceOffering, template, getNetworkIds(), getSecurityGroupIdList(), owner, name,
                             displayName, diskOfferingId, size, group, getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard,
-                            getAffinityGroupIdList(), getDetails(), getCustomId());
+                            getAffinityGroupIdList(), getDetails(), getCustomId(), cpuNumber, ramSize);
                 } else {
                     if (getSecurityGroupIdList() != null && !getSecurityGroupIdList().isEmpty()) {
                         throw new InvalidParameterValueException("Can't create vm with security groups; security group feature is not enabled per zone");
                     }
                     vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
                             getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                            getCustomId());
+                            getCustomId(), cpuNumber, ramSize);
                 }
             }
 
@@ -640,6 +653,14 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             s_logger.warn("Exception: ", ex);
             throw new ServerApiException(ApiErrorCode.RESOURCE_ALLOCATION_ERROR, ex.getMessage());
         }
+    }
+
+    private ServiceOffering getServiceOffering() {
+        final ServiceOffering serviceOffering = _entityMgr.findById(ServiceOffering.class, serviceOfferingId);
+        if (serviceOffering == null) {
+            throw new InvalidParameterValueException("Unable to find service offering: " + serviceOfferingId);
+        }
+        return serviceOffering;
     }
 
     @Override
