@@ -15,8 +15,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NiciraNvpApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NiciraNvpApi.class);
 
     protected final static Map<Class, String> prefixMap;
     protected final static Map<Class, Type> listTypeMap;
@@ -32,6 +35,8 @@ public class NiciraNvpApi {
     private static final String UUID_QUERY_PARAMETER = NiciraConstants.UUID_QUERY_PARAMETER;
     private static final String FIELDS_QUERY_PARAMETER = NiciraConstants.FIELDS_QUERY_PARAMETER;
     private static final int DEFAULT_MAX_RETRIES = 5;
+
+    private final Builder builder;
 
     static {
         prefixMap = new HashMap<>();
@@ -54,9 +59,17 @@ public class NiciraNvpApi {
         defaultListParams.put(FIELDS_QUERY_PARAMETER, WILDCARD_QUERY_PARAMETER);
     }
 
-    private final RESTServiceConnector restConnector;
+    private RESTServiceConnector restConnector;
 
     private NiciraNvpApi(final Builder builder) {
+        LOGGER.info("Initializing NSX API endpoint for ip " + builder.host);
+
+        this.builder = builder;
+
+        createRestConnector(builder);
+    }
+
+    private void createRestConnector(final Builder builder) {
         final Map<Class<?>, JsonDeserializer<?>> classToDeserializerMap = new HashMap<>();
         classToDeserializerMap.put(NatRule.class, new NatRuleAdapter());
         classToDeserializerMap.put(RoutingConfig.class, new RoutingConfigAdapter());
@@ -70,10 +83,16 @@ public class NiciraNvpApi {
                                                                   .loginUrl(NiciraConstants.LOGIN_URL)
                                                                   .executionLimit(DEFAULT_MAX_RETRIES)
                                                                   .build();
+
         restConnector = RESTServiceConnector.create()
                                             .classToDeserializerMap(classToDeserializerMap)
                                             .client(niciraRestClient)
                                             .build();
+    }
+
+    public void recreate() {
+        LOGGER.info("Recreating NSX API endpoint for ip " + this.builder.host);
+        createRestConnector(this.builder);
     }
 
     public static Builder create() {

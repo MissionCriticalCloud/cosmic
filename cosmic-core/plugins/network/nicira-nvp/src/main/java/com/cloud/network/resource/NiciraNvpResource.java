@@ -26,6 +26,8 @@ import javax.naming.ConfigurationException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -42,12 +44,13 @@ public class NiciraNvpResource implements ServerResource {
     private String guid;
     private String zoneId;
 
-    private NiciraNvpApi niciraNvpApi;
+    private List<NiciraNvpApi> niciraNvpApis = new ArrayList<>();
+    private int activeNiciraNvpApi = 0;
     private NiciraNvpUtilities niciraNvpUtilities;
     private CommandRetryUtility retryUtility;
 
     public NiciraNvpApi getNiciraNvpApi() {
-        return niciraNvpApi;
+        return niciraNvpApis.get(activeNiciraNvpApi);
     }
 
     protected NiciraNvpApi createNiciraNvpApi(final String host, final String username, final String password) throws CloudstackRESTException {
@@ -84,9 +87,9 @@ public class NiciraNvpResource implements ServerResource {
             throw new ConfigurationException("Unable to find zone");
         }
 
-        final String ip = (String) params.get("ip");
-        if (ip == null) {
-            throw new ConfigurationException("Unable to find IP");
+        final String ips = (String) params.get("ip");
+        if (ips == null) {
+            throw new ConfigurationException("Unable to find IPs");
         }
 
         final String adminuser = (String) params.get("adminuser");
@@ -104,7 +107,9 @@ public class NiciraNvpResource implements ServerResource {
         retryUtility.setServerResource(this);
 
         try {
-            niciraNvpApi = createNiciraNvpApi(ip, adminuser, adminpass);
+            for (String ip : ips.split(",")) {
+                niciraNvpApis.add(createNiciraNvpApi(ip, adminuser, adminpass));
+            }
         } catch (final CloudstackRESTException e) {
             throw new ConfigurationException("Could not create a Nicira Nvp API client: " + e.getMessage());
         }
@@ -158,17 +163,33 @@ public class NiciraNvpResource implements ServerResource {
     @Override
     public PingCommand getCurrentStatus(final long id) {
         try {
-            final ControlClusterStatus ccs = niciraNvpApi.getControlClusterStatus();
+            final ControlClusterStatus ccs = getNiciraNvpApi().getControlClusterStatus();
             getApiProviderMajorityVersion(ccs);
             if (!"stable".equals(ccs.getClusterStatus())) {
                 s_logger.error("ControlCluster state is not stable: " + ccs.getClusterStatus());
+                rotateNiciraNvpApi();
                 return null;
             }
         } catch (final NiciraNvpApiException e) {
             s_logger.error("getControlClusterStatus failed", e);
+            rotateNiciraNvpApi();
             return null;
         }
         return new PingCommand(Host.Type.L2Networking, id);
+    }
+
+    private void rotateNiciraNvpApi() {
+        s_logger.info("Rotating NSX API endpoint");
+
+        getNiciraNvpApi().recreate();
+
+        int active = ++activeNiciraNvpApi;
+
+        if (active >= niciraNvpApis.size()) {
+            active = 0;
+        }
+
+        activeNiciraNvpApi = active;
     }
 
     private void getApiProviderMajorityVersion(final ControlClusterStatus ccs) {
