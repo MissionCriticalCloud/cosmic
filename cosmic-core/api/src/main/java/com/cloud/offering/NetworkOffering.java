@@ -11,25 +11,12 @@ import com.cloud.network.Networks.TrafficType;
  */
 public interface NetworkOffering extends InfrastructureEntity, InternalIdentity, Identity {
 
-    public final static String SystemPublicNetwork = "System-Public-Network";
-    public final static String SystemControlNetwork = "System-Control-Network";
-    public final static String SystemManagementNetwork = "System-Management-Network";
-    public final static String SystemStorageNetwork = "System-Storage-Network";
-    public final static String DefaultPrivateGatewayNetworkOffering = "DefaultPrivateGatewayNetworkOffering";
-    public final static String DefaultPrivateGatewayNetworkOfferingSpecifyVlan = "DefaultPrivateGatewayNetworkOfferingSpecifyVlan";
-    public final static String DefaultSharedNetworkOfferingWithSGService = "DefaultSharedNetworkOfferingWithSGService";
-    public final static String DefaultIsolatedNetworkOfferingWithSourceNatService = "DefaultIsolatedNetworkOfferingWithSourceNatService";
-    public final static String DefaultSharedNetworkOffering = "DefaultSharedNetworkOffering";
-    public final static String DefaultIsolatedNetworkOffering = "DefaultIsolatedNetworkOffering";
-    public final static String DefaultIsolatedNetworkOfferingWithEgress = "DefaultIsolatedNetworkOfferingWithEgress";
-    public final static String DefaultRedundantIsolatedNetworkOffering = "DefaultRedundantIsolatedNetworkOffering";
-    public final static String DefaultRedundantIsolatedNetworkOfferingWithEgress = "DefaultRedundantIsolatedNetworkOfferingWithEgress";
-    public final static String DefaultIsolatedNetworkOfferingForVpcNetworks = "DefaultIsolatedNetworkOfferingForVpcNetworks";
-    public final static String DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC = "DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC";
-    public final static String DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat = "DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat";
-    public final static String DefaultIsolatedNetworkOfferingForVpcNetworksNoLB = "DefaultIsolatedNetworkOfferingForVpcNetworksNoLB";
-    public final static String DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB = "DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB";
-    public final static String DefaultSyncNetworkOffering = "DefaultSyncNetworkOffering";
+    String SystemPublicNetwork = "System-Public-Network";
+    String SystemControlNetwork = "System-Control-Network";
+    String SystemManagementNetwork = "System-Management-Network";
+    String SystemStorageNetwork = "System-Storage-Network";
+    String DefaultPrivateGatewayNetworkOffering = "DefaultPrivateGatewayNetworkOffering";
+    String DefaultSyncNetworkOffering = "DefaultSyncNetworkOffering";
 
     /**
      * @return name for the network offering.
@@ -107,15 +94,15 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
 
     boolean getSupportsStrechedL2();
 
-    public enum Availability {
+    enum Availability {
         Required, Optional
     }
 
-    public enum State {
+    enum State {
         Disabled, Enabled
     }
 
-    public enum Detail {
+    enum Detail {
         InternalLbProvider, PublicLbProvider
     }
 }

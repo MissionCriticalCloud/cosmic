@@ -23,9 +23,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
@@ -37,8 +34,6 @@ import com.cloud.network.guru.DirectPodBasedNetworkGuru;
 import com.cloud.network.guru.PodBasedNetworkGuru;
 import com.cloud.network.guru.PublicNetworkGuru;
 import com.cloud.network.guru.StorageNetworkGuru;
-import com.cloud.offering.NetworkOffering;
-import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -88,7 +83,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -246,9 +240,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
             // generate a single sign-on key
             updateSSOKey();
-
-            // Create default network offerings
-            createDefaultNetworkOfferings();
 
             // Create default networks
             createDefaultNetworks();
@@ -442,286 +433,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         } catch (final NoSuchAlgorithmException ex) {
             s_logger.error("error generating sso key", ex);
         }
-    }
-
-    @DB
-    protected void createDefaultNetworkOfferings() {
-
-        final NetworkOfferingVO publicNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemPublicNetwork, TrafficType.Public, true);
-        _networkOfferingDao.persistDefaultNetworkOffering(publicNetworkOffering);
-
-        final NetworkOfferingVO managementNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemManagementNetwork, TrafficType.Management, false);
-        _networkOfferingDao.persistDefaultNetworkOffering(managementNetworkOffering);
-
-        final NetworkOfferingVO controlNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemControlNetwork, TrafficType.Control, false);
-        _networkOfferingDao.persistDefaultNetworkOffering(controlNetworkOffering);
-
-        final NetworkOfferingVO storageNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemStorageNetwork, TrafficType.Storage, true);
-        _networkOfferingDao.persistDefaultNetworkOffering(storageNetworkOffering);
-
-        final NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
-        _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOffering);
-
-        final NetworkOfferingVO privateGatewayNetworkOfferingSpecifyVlan = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOfferingSpecifyVlan, GuestType
-                .Private, true);
-        _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOfferingSpecifyVlan);
-
-        // Populate providers
-        final Map<Network.Service, Network.Provider> defaultSharedNetworkOfferingProviders = new HashMap<>();
-        defaultSharedNetworkOfferingProviders.put(Service.Dhcp, Provider.VirtualRouter);
-        defaultSharedNetworkOfferingProviders.put(Service.Dns, Provider.VirtualRouter);
-        defaultSharedNetworkOfferingProviders.put(Service.UserData, Provider.VirtualRouter);
-
-        final Map<Network.Service, Network.Provider> defaultSharedSGNetworkOfferingProviders = new HashMap<>();
-        defaultSharedSGNetworkOfferingProviders.put(Service.Dhcp, Provider.VirtualRouter);
-        defaultSharedSGNetworkOfferingProviders.put(Service.Dns, Provider.VirtualRouter);
-        defaultSharedSGNetworkOfferingProviders.put(Service.UserData, Provider.VirtualRouter);
-        defaultSharedSGNetworkOfferingProviders.put(Service.SecurityGroup, Provider.SecurityGroupProvider);
-
-        final Map<Network.Service, Network.Provider> defaultIsolatedSourceNatEnabledNetworkOfferingProviders = new HashMap<>();
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Dhcp, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Dns, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.UserData, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Firewall, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Gateway, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Lb, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.SourceNat, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.StaticNat, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.PortForwarding, Provider.VirtualRouter);
-        defaultIsolatedSourceNatEnabledNetworkOfferingProviders.put(Service.Vpn, Provider.VirtualRouter);
-
-        // The only one diff between 1 and 2 network offerings is that the first one has SG enabled. In Basic zone only
-        // first network offering has to be enabled, in Advance zone - the second one
-        Transaction.execute(new TransactionCallbackNoReturn() {
-            @Override
-            public void doInTransactionWithoutResult(final TransactionStatus status) {
-                // Offering #1
-                NetworkOfferingVO defaultSharedSGNetworkOffering = new NetworkOfferingVO(
-                        NetworkOffering.DefaultSharedNetworkOfferingWithSGService,
-                        "Offering for Shared Security group enabled networks",
-                        TrafficType.Guest, false, true, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Shared, true, true, true, false, false
-                );
-                defaultSharedSGNetworkOffering.setState(NetworkOffering.State.Enabled);
-                defaultSharedSGNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultSharedSGNetworkOffering);
-
-                for (final Service service : defaultSharedSGNetworkOfferingProviders.keySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            defaultSharedSGNetworkOffering.getId(),
-                            service,
-                            defaultSharedSGNetworkOfferingProviders.get(service)
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                // Offering #2
-                NetworkOfferingVO defaultSharedNetworkOffering = new NetworkOfferingVO(
-                        NetworkOffering.DefaultSharedNetworkOffering,
-                        "Offering for Shared networks",
-                        TrafficType.Guest, false, true, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Shared, true, true, true, false, false
-                );
-                defaultSharedNetworkOffering.setState(NetworkOffering.State.Enabled);
-                defaultSharedNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultSharedNetworkOffering);
-
-                for (final Service service : defaultSharedNetworkOfferingProviders.keySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            defaultSharedNetworkOffering.getId(),
-                            service,
-                            defaultSharedNetworkOfferingProviders.get(service)
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                // Offering #3
-                NetworkOfferingVO defaultIsolatedSourceNatEnabledNetworkOffering = new NetworkOfferingVO(
-                        NetworkOffering.DefaultIsolatedNetworkOfferingWithSourceNatService,
-                        "Offering for Isolated networks with Source Nat service enabled",
-                        TrafficType.Guest, false, false, null, null, true, Availability.Required, null,
-                        Network.GuestType.Isolated, true, false, true, false, true
-                );
-                defaultIsolatedSourceNatEnabledNetworkOffering.setState(NetworkOffering.State.Enabled);
-                defaultIsolatedSourceNatEnabledNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(defaultIsolatedSourceNatEnabledNetworkOffering);
-
-                for (final Service service : defaultIsolatedSourceNatEnabledNetworkOfferingProviders.keySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            defaultIsolatedSourceNatEnabledNetworkOffering.getId(),
-                            service,
-                            defaultIsolatedSourceNatEnabledNetworkOfferingProviders.get(service)
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                final Map<Network.Service, Set<Network.Provider>> defaultNetworkOfferingProviders = new HashMap<>();
-
-                final Set<Network.Provider> defaultProviders = new HashSet<>();
-                defaultProviders.add(Network.Provider.VirtualRouter);
-
-                defaultNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Firewall, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Gateway, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Lb, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.SourceNat, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.StaticNat, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.PortForwarding, defaultProviders);
-                defaultNetworkOfferingProviders.put(Service.Vpn, defaultProviders);
-
-                // Offering #4
-                NetworkOfferingVO defaultIsolatedEnabledNetworkOffering = _configMgr.createNetworkOffering(
-                        NetworkOffering.DefaultIsolatedNetworkOffering,
-                        "Offering for Isolated networks with Source Nat service",
-                        TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
-                        GuestType.Isolated, false, null, null, true, null, false,
-                        true, null, false, null, true
-                );
-                defaultIsolatedEnabledNetworkOffering.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.update(defaultIsolatedEnabledNetworkOffering.getId(), defaultIsolatedEnabledNetworkOffering);
-
-                // Offering #5
-                NetworkOfferingVO defaultIsolatedEnabledNetworkOfferingWithEgress = _configMgr.createNetworkOffering(
-                        NetworkOffering.DefaultIsolatedNetworkOfferingWithEgress,
-                        "Offering for Isolated networks with egress and Source Nat service",
-                        TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
-                        GuestType.Isolated, false, null, null, true, null, false,
-                        true, null, true, null, true
-                );
-                defaultIsolatedEnabledNetworkOfferingWithEgress.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.update(defaultIsolatedEnabledNetworkOfferingWithEgress.getId(), defaultIsolatedEnabledNetworkOfferingWithEgress);
-
-                // Offering #6
-                NetworkOfferingVO defaultRedundantIsolatedEnabledNetworkOffering = _configMgr.createNetworkOffering(
-                        NetworkOffering.DefaultRedundantIsolatedNetworkOffering,
-                        "Offering for Isolated networks with Source Nat service (redundant)",
-                        TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
-                        GuestType.Isolated, false, null, null, true, null, false,
-                        true, null, false, null, true
-                );
-                defaultRedundantIsolatedEnabledNetworkOffering.setRedundantRouter(true);
-                defaultRedundantIsolatedEnabledNetworkOffering.setDedicatedLB(true);
-                defaultRedundantIsolatedEnabledNetworkOffering.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.update(defaultRedundantIsolatedEnabledNetworkOffering.getId(), defaultRedundantIsolatedEnabledNetworkOffering);
-
-                // Offering #7
-                NetworkOfferingVO defaultRedundantIsolatedEnabledNetworkOfferingWithEgress = _configMgr.createNetworkOffering(
-                        NetworkOffering.DefaultRedundantIsolatedNetworkOfferingWithEgress,
-                        "Offering for Isolated networks with egress and Source Nat service (redundant)",
-                        TrafficType.Guest, null, false, Availability.Optional, null, defaultNetworkOfferingProviders, true,
-                        GuestType.Isolated, false, null, null, true, null, false,
-                        true, null, true, null, true
-                );
-                defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.setRedundantRouter(true);
-                defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.setDedicatedLB(true);
-                defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.update(defaultRedundantIsolatedEnabledNetworkOfferingWithEgress.getId(), defaultRedundantIsolatedEnabledNetworkOfferingWithEgress);
-
-                // Offering #8
-                NetworkOfferingVO defaultNetworkOfferingForVpcNetworks = new NetworkOfferingVO(
-                        NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworks,
-                        "Offering for Isolated Vpc networks with Source Nat service enabled",
-                        TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, true, false, true
-                );
-                defaultNetworkOfferingForVpcNetworks.setState(NetworkOffering.State.Enabled);
-                defaultNetworkOfferingForVpcNetworks = _networkOfferingDao.persistDefaultNetworkOffering(defaultNetworkOfferingForVpcNetworks);
-
-                final Map<Network.Service, Network.Provider> defaultVpcNetworkOfferingProviders = new HashMap<>();
-                defaultVpcNetworkOfferingProviders.put(Service.Dhcp, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.Dns, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.UserData, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.NetworkACL, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.Gateway, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.Lb, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.SourceNat, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.StaticNat, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.PortForwarding, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProviders.put(Service.Vpn, Provider.VPCVirtualRouter);
-
-                for (final Map.Entry<Service, Provider> entry : defaultVpcNetworkOfferingProviders.entrySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            defaultNetworkOfferingForVpcNetworks.getId(),
-                            entry.getKey(),
-                            entry.getValue()
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                // Offering #9
-                NetworkOfferingVO defaultNetworkOfferingForVpcNetworksNoLB = new NetworkOfferingVO(
-                        NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksNoLB,
-                        "Offering for Isolated Vpc networks with Source Nat service enabled and LB service Disabled",
-                        TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, true, false, false
-                );
-                defaultNetworkOfferingForVpcNetworksNoLB.setState(NetworkOffering.State.Enabled);
-                defaultNetworkOfferingForVpcNetworksNoLB = _networkOfferingDao.persistDefaultNetworkOffering(defaultNetworkOfferingForVpcNetworksNoLB);
-
-                final Map<Network.Service, Network.Provider> defaultVpcNetworkOfferingProvidersNoLB = new HashMap<>();
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.Dhcp, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.Dns, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.UserData, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.NetworkACL, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.Gateway, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.SourceNat, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.StaticNat, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.PortForwarding, Provider.VPCVirtualRouter);
-                defaultVpcNetworkOfferingProvidersNoLB.put(Service.Vpn, Provider.VPCVirtualRouter);
-
-                for (final Map.Entry<Service, Provider> entry : defaultVpcNetworkOfferingProvidersNoLB.entrySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            defaultNetworkOfferingForVpcNetworksNoLB.getId(),
-                            entry.getKey(),
-                            entry.getValue()
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                // Offering #10 - network offering with internal lb service
-                NetworkOfferingVO internalLbOff = new NetworkOfferingVO(
-                        NetworkOffering.DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB,
-                        "Offering for Isolated Vpc networks with Internal LB support",
-                        TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        Network.GuestType.Isolated, false, false, true, true, false
-                );
-                internalLbOff.setState(NetworkOffering.State.Enabled);
-                internalLbOff = _networkOfferingDao.persistDefaultNetworkOffering(internalLbOff);
-
-                final Map<Network.Service, Network.Provider> internalLbOffProviders = new HashMap<>();
-                internalLbOffProviders.put(Service.Dhcp, Provider.VPCVirtualRouter);
-                internalLbOffProviders.put(Service.Dns, Provider.VPCVirtualRouter);
-                internalLbOffProviders.put(Service.UserData, Provider.VPCVirtualRouter);
-                internalLbOffProviders.put(Service.NetworkACL, Provider.VPCVirtualRouter);
-                internalLbOffProviders.put(Service.Gateway, Provider.VPCVirtualRouter);
-                internalLbOffProviders.put(Service.Lb, Provider.InternalLbVm);
-                internalLbOffProviders.put(Service.SourceNat, Provider.VPCVirtualRouter);
-
-                for (final Service service : internalLbOffProviders.keySet()) {
-                    final NetworkOfferingServiceMapVO offService = new NetworkOfferingServiceMapVO(
-                            internalLbOff.getId(),
-                            service,
-                            internalLbOffProviders.get(service)
-                    );
-                    _ntwkOfferingServiceMapDao.persist(offService);
-                    s_logger.trace("Added service for the network offering: " + offService);
-                }
-
-                // Offering #11
-                NetworkOfferingVO syncNetworkOffering = new NetworkOfferingVO(
-                        NetworkOffering.DefaultSyncNetworkOffering,
-                        "Offering for Sync networks",
-                        TrafficType.Guest, false, false, null, null, true, Availability.Optional, null,
-                        GuestType.Sync, false, false, true, false, false
-                );
-                syncNetworkOffering.setState(NetworkOffering.State.Enabled);
-                _networkOfferingDao.persistDefaultNetworkOffering(syncNetworkOffering);
-            }
-        });
     }
 
     private void createDefaultNetworks() {
