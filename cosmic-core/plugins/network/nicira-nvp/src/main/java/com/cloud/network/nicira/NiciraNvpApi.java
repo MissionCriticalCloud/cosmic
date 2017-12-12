@@ -200,7 +200,6 @@ public class NiciraNvpApi {
      * PUT item given a UUID as key and an item object with the new data
      *
      * @param item
-     * @param uuid
      * @throws NiciraNvpApiException
      */
     private <T> void updateWithUri(final T item, final String uri) throws NiciraNvpApiException {
@@ -224,7 +223,6 @@ public class NiciraNvpApi {
     /**
      * DELETE Security Profile given a UUID as key
      *
-     * @param securityProfileUuid
      * @throws NiciraNvpApiException
      */
     private <T> void delete(final String uuid, final Class<T> clazz) throws NiciraNvpApiException {
@@ -235,7 +233,6 @@ public class NiciraNvpApi {
     /**
      * DELETE Security Profile given a UUID as key
      *
-     * @param securityProfileUuid
      * @throws NiciraNvpApiException
      */
     private void deleteWithUri(final String uri) throws NiciraNvpApiException {
@@ -292,7 +289,6 @@ public class NiciraNvpApi {
     /**
      * DELETE Acl given a UUID as key
      *
-     * @param acl
      * @throws NiciraNvpApiException
      */
     public void deleteAcl(final String aclUuid) throws NiciraNvpApiException {
