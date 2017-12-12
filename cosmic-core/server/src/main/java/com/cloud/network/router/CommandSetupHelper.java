@@ -23,7 +23,6 @@ import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
 import com.cloud.agent.api.routing.SetupPrivateGatewayCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VmDataCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.api.to.DhcpTO;
 import com.cloud.agent.api.to.FirewallRuleTO;
@@ -85,7 +84,6 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.user.Account;
-import com.cloud.uservm.UserVm;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
@@ -688,60 +686,6 @@ public class CommandSetupHelper {
         cmds.addCommand("users", cmd);
     }
 
-    public void createVmDataCommand(final VirtualRouter router, final UserVm vm, final NicVO nic, final String publicKey, final Commands cmds) {
-        final String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()).getDisplayText();
-        final String zoneName = zoneRepository.findOne(router.getDataCenterId()).getName();
-        cmds.addCommand(
-                "vmdata",
-                generateVmDataCommand(
-                        router,
-                        nic.getIPv4Address(),
-                        vm.getUserData(),
-                        serviceOffering,
-                        zoneName,
-                        nic.getIPv4Address(),
-                        vm.getHostName(),
-                        vm.getInstanceName(),
-                        vm.getId(),
-                        vm.getUuid(),
-                        publicKey,
-                        nic.getNetworkId()
-                )
-        );
-    }
-
-    private VmDataCommand generateVmDataCommand(final VirtualRouter router, final String vmPrivateIpAddress, final String userData, final String serviceOffering,
-                                                final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId,
-                                                final String vmUuid, final String publicKey, final long guestNetworkId) {
-        final VmDataCommand cmd = new VmDataCommand(vmName, vmPrivateIpAddress, _networkModel.getExecuteInSeqNtwkElmtCmd());
-
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        final NetworkVO networkVO = _networkDao.findById(guestNetworkId);
-        final String vmNameFQDN = networkVO != null ? vmName + "." + networkVO.getNetworkDomain() : vmName;
-
-        cmd.addVmData("userdata", "user-data", userData);
-        cmd.addVmData("metadata", "service-offering", StringUtils.unicodeEscape(serviceOffering));
-        cmd.addVmData("metadata", "availability-zone", StringUtils.unicodeEscape(zoneName));
-        cmd.addVmData("metadata", "local-ipv4", guestIpAddress);
-        cmd.addVmData("metadata", "local-hostname", StringUtils.unicodeEscape(vmNameFQDN));
-        cmd.addVmData("metadata", "public-ipv4", router.getPublicIpAddress() != null ? router.getPublicIpAddress() : guestIpAddress);
-        cmd.addVmData("metadata", "public-hostname", router.getPublicIpAddress());
-        cmd.addVmData("metadata", "instance-id", vmUuid != null ? vmUuid : vmInstanceName);
-        cmd.addVmData("metadata", "vm-id", vmUuid != null ? vmUuid : String.valueOf(vmId));
-        cmd.addVmData("metadata", "public-keys", publicKey);
-
-        final String cloudIdentifier = _configDao.getValue("cloud.identifier");
-        cmd.addVmData("metadata", "cloud-identifier", cloudIdentifier != null ? "CloudStack-{" + cloudIdentifier + "}" : "");
-
-        return cmd;
-    }
-
     public void createDeleteIpAliasCommand(final DomainRouterVO router, final List<IpAliasTO> deleteIpAliasTOs, final List<IpAliasTO> createIpAliasTos, final long networkId,
                                            final Commands cmds) {
         final String routerip = _routerControlHelper.getRouterIpInNetwork(networkId, router.getId());
@@ -994,17 +938,6 @@ public class CommandSetupHelper {
         return networkOverviewTO;
     }
 
-    public UpdateVmOverviewCommand createUpdateVmOverviewCommand(final VirtualRouter router, final VMOverviewTO vmOverview) {
-        final UpdateVmOverviewCommand cmd = new UpdateVmOverviewCommand(vmOverview);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        return cmd;
-    }
-
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
         final VMOverviewTO vmOverviewTO = new VMOverviewTO();
         final Map<UserVmVO, List<NicVO>> vmsAndNicsMap = new HashMap<>();
@@ -1080,5 +1013,16 @@ public class CommandSetupHelper {
         vmOverviewTO.setVms(vmsTO.toArray(new VMOverviewTO.VMTO[vmsTO.size()]));
 
         return vmOverviewTO;
+    }
+
+    public UpdateVmOverviewCommand createUpdateVmOverviewCommand(final VirtualRouter router, final VMOverviewTO vmOverview) {
+        final UpdateVmOverviewCommand cmd = new UpdateVmOverviewCommand(vmOverview);
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
+        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
+
+        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
+
+        return cmd;
     }
 }

@@ -1,3 +1,4 @@
+import cs.utils as utils
 import gzip
 import json
 import logging
@@ -5,7 +6,6 @@ import os
 import shutil
 import uuid
 
-import cs.utils as utils
 import cs_cmdline
 import cs_dhcp
 import cs_firewallrules
@@ -18,7 +18,6 @@ import cs_remoteaccessvpn
 import cs_site2sitevpn
 import cs_staticroutes
 import cs_virtualrouter
-import cs_vmdata
 import cs_vpnusers
 
 
@@ -96,8 +95,6 @@ class updateDataBag:
             dbag = self.process_loadbalancer(self.db.getDataBag())
         elif self.qFile.type == 'monitorservice':
             dbag = self.process_monitorservice(self.db.getDataBag())
-        elif self.qFile.type == 'vmdata':
-            dbag = self.processVmData(self.db.getDataBag())
         elif self.qFile.type == 'dhcpentry':
             dbag = self.process_dhcp_entry(self.db.getDataBag())
         elif self.qFile.type == 'staticnatrules' or self.qFile.type == 'forwardrules':
@@ -194,10 +191,6 @@ class updateDataBag:
             dp['nw_type'] = nw_type
             qf = QueueFile()
             qf.load({'ip_address': [dp], 'type': 'ips'})
-
-    def processVmData(self, dbag):
-        cs_vmdata.merge(dbag, self.qFile.data)
-        return dbag
 
     def validate_device_based_on_mac_address(self):
         d_to_merge = self.qFile.data
