@@ -4,7 +4,8 @@ import subprocess
 from jinja2 import Environment, FileSystemLoader
 
 
-class Conntrackd(object):
+class Conntrackd:
+
     def __init__(self, config):
         self.config = config
 

@@ -1,7 +1,9 @@
 package com.cloud.network.topology;
 
 import com.cloud.agent.api.Command;
+import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.IpAliasTO;
+import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ResourceUnavailableException;
@@ -151,13 +153,15 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
         final Commands commands = new Commands(Command.OnError.Stop);
         final VirtualMachineProfile profile = userdata.getProfile();
-        final NicVO nicVo = userdata.getNicVo();
-        final UserVmVO userVM = userdata.getUserVM();
+        final NicVO nicVO = userdata.getNicVo();
         final DeployDestination destination = userdata.getDestination();
 
-        if (router.getPodIdToDeployIn().longValue() == destination.getPod().getId()) {
-            _commandSetupHelper.createPasswordCommand(router, profile, nicVo, commands);
-            _commandSetupHelper.createVmDataCommand(router, userVM, nicVo, userVM.getDetail("SSH.PublicKey"), commands);
+        if (router.getPodIdToDeployIn() == destination.getPod().getId()) {
+            _commandSetupHelper.createPasswordCommand(router, profile, nicVO, commands);
+
+            final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(router);
+            final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmOverview);
+            commands.addCommand(updateVmOverviewCommand);
 
             return _networkGeneralHelper.sendCommandsToRouter(router, commands);
         }
@@ -184,18 +188,18 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     public boolean visit(final SshKeyToRouterRules sshkey) throws ResourceUnavailableException {
         final VirtualRouter router = sshkey.getRouter();
         final VirtualMachineProfile profile = sshkey.getProfile();
-        final String sshKeystr = sshkey.getSshPublicKey();
-        final UserVmVO userVM = sshkey.getUserVM();
 
         final Commands commands = new Commands(Command.OnError.Stop);
-        final NicVO nicVo = sshkey.getNicVo();
+        final NicVO nicVO = sshkey.getNicVo();
         final VMTemplateVO template = sshkey.getTemplate();
 
         if (template != null && template.getEnablePassword()) {
-            _commandSetupHelper.createPasswordCommand(router, profile, nicVo, commands);
+            _commandSetupHelper.createPasswordCommand(router, profile, nicVO, commands);
         }
 
-        _commandSetupHelper.createVmDataCommand(router, userVM, nicVo, sshKeystr, commands);
+        final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(router);
+        final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmOverview);
+        commands.addCommand(updateVmOverviewCommand);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }
@@ -231,11 +235,11 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     public boolean visit(final UserdataToRouterRules userdata) throws ResourceUnavailableException {
         final VirtualRouter router = userdata.getRouter();
 
-        final UserVmVO userVM = userdata.getUserVM();
-        final NicVO nicVo = userdata.getNicVo();
-
         final Commands commands = new Commands(Command.OnError.Stop);
-        _commandSetupHelper.createVmDataCommand(router, userVM, nicVo, null, commands);
+
+        final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(router);
+        final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmOverview);
+        commands.addCommand(updateVmOverviewCommand);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }

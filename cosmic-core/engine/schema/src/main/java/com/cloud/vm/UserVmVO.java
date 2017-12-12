@@ -18,21 +18,20 @@ import java.util.HashMap;
 @PrimaryKeyJoinColumn(name = "id")
 public class UserVmVO extends VMInstanceVO implements UserVm {
 
-    @Column(name = "update_parameters", updatable = true)
-    protected boolean updateParameters = true;
-    transient String password;
-    @Column(name = "iso_id", nullable = true, length = 17)
-    private Long isoId = null;
-    @Column(name = "user_data", updatable = true, nullable = true, length = 32768)
+    private transient String password;
+    @Column(name = "update_parameters")
+    private boolean updateParameters = true;
+    @Column(name = "iso_id", length = 17)
+    private Long isoId;
+    @Column(name = "user_data", length = 32768)
     @Basic(fetch = FetchType.LAZY)
     private String userData;
-    @Column(name = "display_name", updatable = true, nullable = true)
+    @Column(name = "display_name")
     private String displayName;
 
-    public UserVmVO(final long id, final String instanceName, final String displayName, final long templateId, final HypervisorType hypervisorType, final long guestOsId, final
-    boolean haEnabled,
-                    final boolean limitCpuUse, final long domainId, final long accountId, final long userId, final long serviceOfferingId, final String userData, final String
-                            name, final Long diskOfferingId) {
+    public UserVmVO(final long id, final String instanceName, final String displayName, final long templateId, final HypervisorType hypervisorType, final long guestOsId,
+                    final boolean haEnabled, final boolean limitCpuUse, final long domainId, final long accountId, final long userId, final long serviceOfferingId,
+                    final String userData, final String name, final Long diskOfferingId) {
         super(id, serviceOfferingId, name, instanceName, Type.User, templateId, hypervisorType, guestOsId, domainId, accountId, userId, haEnabled, limitCpuUse, diskOfferingId);
         this.userData = userData;
         this.displayName = displayName;

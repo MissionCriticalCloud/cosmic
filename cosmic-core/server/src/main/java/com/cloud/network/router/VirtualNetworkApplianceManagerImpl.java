@@ -1586,14 +1586,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         cmds.addCommand("monitor", command);
     }
 
-    protected void finalizeUserDataOnStart(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
-        if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.UserData, provider)) {
-            // Resend user data
-            s_logger.debug("Reapplying vm data (userData and metaData) entries as a part of domR " + router + " start...");
-            _commandSetupHelper.createVmDataCommandForVMs(router, cmds, guestNetworkId);
-        }
-    }
-
     protected ArrayList<? extends PublicIpAddress> getPublicIpsToApply(final VirtualRouter router, final Provider provider, final Long guestNetworkId,
                                                                        final com.cloud.network.IpAddress.State... skipInStates) {
         final long ownerId = router.getAccountId();
@@ -1636,8 +1628,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         // Only cover virtual router for now, if ELB use it this need to be
         // modified
 
-        final ArrayList<PublicIpAddress> publicIps = providerToIpList.get(provider);
-        return publicIps;
+        return providerToIpList.get(provider);
     }
 
     private void createDefaultEgressFirewallRule(final List<FirewallRule> rules, final long networkId) {
@@ -1774,8 +1765,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     }
                 }
             }
-
-            finalizeUserDataOnStart(cmds, router, provider, guestNetworkId);
 
             final AggregationControlCommand finishCmd = new AggregationControlCommand(
                     Action.Finish,

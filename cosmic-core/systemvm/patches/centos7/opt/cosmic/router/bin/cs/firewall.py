@@ -5,7 +5,8 @@ from jinja2 import Environment, FileSystemLoader
 import utils
 
 
-class Firewall(object):
+class Firewall:
+
     def __init__(self, config):
         self.config = config
 
@@ -14,7 +15,6 @@ class Firewall(object):
             trim_blocks=True,
             lstrip_blocks=True
         )
-        # self.jinja_env = Environment(loader=FileSystemLoader('/Users/bschrijver/github.com/MissionCriticalCloud/cosmic/cosmic-core/systemvm/patches/centos7/opt/cosmic/router/bin/cs/templates'), trim_blocks=True, lstrip_blocks=True)
         self.fw = self.config.fw
 
     def sync(self):

@@ -4,7 +4,6 @@ import logging
 import sys
 from collections import OrderedDict
 
-import cs.CsHelper as CsHelper
 from cs.CsAcl import CsAcl
 from cs.CsForwardingRules import CsForwardingRules
 from cs.CsLoadBalancer import CsLoadBalancer
@@ -15,7 +14,6 @@ from cs.CsVpnUser import CsVpnUser
 from cs.CsVrConfig import CsVrConfig
 from cs.config import Config
 from cs.firewall import Firewall
-from cs.metadata_service import CsMetadataServiceVMConfig
 from cs.network import Network
 from cs.virtual_machine import VirtualMachine
 
@@ -75,7 +73,6 @@ def main(argv):
             ("network_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("vm_overview", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             # Legacy
-            ("vm_metadata", {"process_iptables": False, "executor": CsMetadataServiceVMConfig(config)}),
             ("network_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("public_ip_acl", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
             ("firewall_rules", {"process_iptables": True, "executor": IpTablesExecutor(config)}),
@@ -91,13 +88,13 @@ def main(argv):
 
     if process_file == "network_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_network = Network(config)
-        cs_network.sync()
+        network = Network(config)
+        network.sync()
 
     if process_file == "vm_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_virtual_machine = VirtualMachine(config)
-        cs_virtual_machine.sync()
+        virtual_machine = VirtualMachine(config)
+        virtual_machine.sync()
 
     if process_file == "cmd_line":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")

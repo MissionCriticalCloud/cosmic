@@ -23,7 +23,6 @@ import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
 import com.cloud.agent.api.routing.SetupPrivateGatewayCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VmDataCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
@@ -66,7 +65,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(CreateIpAliasCommand.class, new CreateIpAliasConfigItem()); // Deprecated
         flyweight.put(DnsMasqConfigCommand.class, new DnsMasqConfigItem()); // Deprecated
         flyweight.put(DeleteIpAliasCommand.class, new DeleteIpAliasConfigItem()); // Deprecated
-        flyweight.put(VmDataCommand.class, new VmDataConfigItem()); // Move to vm overview
         flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
         flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());

@@ -58,7 +58,7 @@ public class NetworkOverviewTO {
 
     public static class InterfaceTO {
         private String macAddress;
-        private IPv4Address[] ipv4Addresses;
+        private IPv4AddressTO[] ipv4Addresses;
         private MetadataTO metadata;
 
         public String getMacAddress() {
@@ -69,11 +69,11 @@ public class NetworkOverviewTO {
             this.macAddress = macAddress;
         }
 
-        public IPv4Address[] getIpv4Addresses() {
+        public IPv4AddressTO[] getIpv4Addresses() {
             return ipv4Addresses;
         }
 
-        public void setIpv4Addresses(final IPv4Address[] ipv4Addresses) {
+        public void setIpv4Addresses(final IPv4AddressTO[] ipv4Addresses) {
             this.ipv4Addresses = ipv4Addresses;
         }
 
@@ -197,14 +197,14 @@ public class NetworkOverviewTO {
             }
         }
 
-        public static class IPv4Address {
+        public static class IPv4AddressTO {
             private String cidr;
             private String gateway;
 
-            public IPv4Address() {
+            public IPv4AddressTO() {
             }
 
-            public IPv4Address(final String cidr, final String gateway) {
+            public IPv4AddressTO(final String cidr, final String gateway) {
                 this.cidr = cidr;
                 this.gateway = gateway;
             }
@@ -230,10 +230,10 @@ public class NetworkOverviewTO {
                 if (this == o) {
                     return true;
                 }
-                if (!(o instanceof IPv4Address)) {
+                if (!(o instanceof IPv4AddressTO)) {
                     return false;
                 }
-                final IPv4Address that = (IPv4Address) o;
+                final IPv4AddressTO that = (IPv4AddressTO) o;
                 return Objects.equals(getCidr(), that.getCidr()) &&
                         Objects.equals(getGateway(), that.getGateway());
             }

@@ -16,7 +16,7 @@ import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.IPv4Address;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.IPv4AddressTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
@@ -148,11 +148,11 @@ public class ConfigHelperTest {
         final InterfaceTO eth0 = new InterfaceTO();
         eth0.setMacAddress("00:00:00:00:00:00");
 
-        final IPv4Address ip = new IPv4Address();
+        final IPv4AddressTO ip = new IPv4AddressTO();
         ip.setCidr("1.1.1.1/24");
         ip.setGateway("1.1.1.254");
 
-        eth0.setIpv4Addresses(new IPv4Address[] { ip });
+        eth0.setIpv4Addresses(new IPv4AddressTO[] { ip });
         networkOverview.setInterfaces(new InterfaceTO[] { eth0 });
 
         command.setNetworkOverview(networkOverview);
@@ -179,7 +179,7 @@ public class ConfigHelperTest {
         assertEquals(eth0, interfaces[0]);
         assertEquals("00:00:00:00:00:00", interfaces[0].getMacAddress());
 
-        final IPv4Address[] ips = interfaces[0].getIpv4Addresses();
+        final IPv4AddressTO[] ips = interfaces[0].getIpv4Addresses();
         assertNotNull(ips);
         assertEquals(1, ips.length);
         assertEquals(ip, ips[0]);
