@@ -201,7 +201,6 @@
     <bean id="nicDetailsDaoImpl" class="com.cloud.vm.dao.NicDetailsDaoImpl" />
     <bean id="nicSecondaryIpDaoImpl" class="com.cloud.vm.dao.NicSecondaryIpDaoImpl" />
     <bean id="nicIpAliasDaoImpl" class="com.cloud.vm.dao.NicIpAliasDaoImpl" />
-    <bean id="objectInDataStoreDaoImpl" class="com.cloud.storage.db.ObjectInDataStoreDaoImpl" />
     <bean id="physicalNetworkDaoImpl" class="com.cloud.network.dao.PhysicalNetworkDaoImpl" />
     <bean id="physicalNetworkIsolationMethodDaoImpl" class="com.cloud.network.dao.PhysicalNetworkIsolationMethodDaoImpl" />
     <bean id="physicalNetworkServiceProviderDaoImpl" class="com.cloud.network.dao.PhysicalNetworkServiceProviderDaoImpl" />
@@ -275,7 +274,6 @@
     <bean id="userStatisticsDaoImpl" class="com.cloud.user.dao.UserStatisticsDaoImpl" />
     <bean id="userStatsLogDaoImpl" class="com.cloud.user.dao.UserStatsLogDaoImpl" />
     <bean id="userVmDiskStatsDaoImpl" class="com.cloud.user.dao.VmDiskStatisticsDaoImpl" />
-    <bean id="userVmCloneSettingDaoImpl" class="com.cloud.vm.dao.UserVmCloneSettingDaoImpl" />
     <bean id="userVmDaoImpl" class="com.cloud.vm.dao.UserVmDaoImpl" />
     <bean id="userVmDetailsDaoImpl" class="com.cloud.vm.dao.UserVmDetailsDaoImpl" />
     <bean id="userVmJoinDaoImpl" class="com.cloud.api.query.dao.UserVmJoinDaoImpl" />
