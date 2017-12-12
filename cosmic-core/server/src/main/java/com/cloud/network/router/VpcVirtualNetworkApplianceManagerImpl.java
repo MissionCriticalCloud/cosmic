@@ -9,6 +9,7 @@ import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
+import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
@@ -47,7 +48,6 @@ import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.user.UserStatisticsVO;
-import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.StateMachine2;
@@ -377,7 +377,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 throw new CloudRuntimeException("Cannot find related provider of virtual router provider: " + vrProvider.getType().toString());
             }
 
-            boolean updateVmOverview = false;
+            boolean isDhcpSupported = false;
 
             for (final Pair<Nic, Network> nicNtwk : guestNics) {
                 final Nic guestNic = nicNtwk.first();
@@ -395,11 +395,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     finalizeNetworkRulesForNetwork(cmds, domainRouterVO, provider, guestNic.getNetworkId());
                 }
 
-                if (_networkModel.isProviderSupportServiceInNetwork(guestNic.getNetworkId(), Service.Dhcp, provider)) {
-                    updateVmOverview = true;
-                }
-
-                finalizeUserDataOnStart(cmds, domainRouterVO, provider, guestNic.getNetworkId());
+                isDhcpSupported = isDhcpSupported || _networkModel.isProviderSupportServiceInNetwork(guestNic.getNetworkId(), Service.Dhcp, provider);
 
                 final AggregationControlCommand finishCmd = new AggregationControlCommand(
                         Action.Finish,
@@ -410,9 +406,9 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(finishCmd);
             }
 
-            if (updateVmOverview) {
-                final Map<UserVm, List<Nic>> vmsAndNicsMap = _commandSetupHelper.createVmOverviewFromRouter(domainRouterVO);
-                final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(domainRouterVO, vmsAndNicsMap);
+            if (isDhcpSupported) {
+                final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(domainRouterVO);
+                final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(domainRouterVO, vmOverview);
                 cmds.addCommand(updateVmOverviewCommand);
             }
 

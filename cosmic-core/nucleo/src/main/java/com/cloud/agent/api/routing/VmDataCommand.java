@@ -8,34 +8,19 @@ import java.util.List;
 
 public class VmDataCommand extends NetworkElementCommand {
 
-    String vmIpAddress;
-    String vmName;
+    private String vmName;
+    private String vmIpAddress;
     @LogLevel(Level.Trace)
-    List<String[]> vmData;
-    boolean executeInSequence = false;
+    private List<String[]> vmData = new ArrayList<>();
+    private boolean executeInSequence = false;
 
     protected VmDataCommand() {
     }
 
-    public VmDataCommand(final String vmIpAddress, final boolean executeInSequence) {
-        this(vmIpAddress, null, executeInSequence);
-    }
-
-    public VmDataCommand(final String vmIpAddress, final String vmName, final boolean executeInSequence) {
+    public VmDataCommand(final String vmName, final String vmIpAddress, final boolean executeInSequence) {
         this.vmName = vmName;
         this.vmIpAddress = vmIpAddress;
-        this.vmData = new ArrayList<>();
         this.executeInSequence = executeInSequence;
-    }
-
-    public VmDataCommand(final String vmName) {
-        this.vmName = vmName;
-        this.vmData = new ArrayList<>();
-    }
-
-    @Override
-    public boolean executeInSequence() {
-        return executeInSequence;
     }
 
     public String getVmName() {
@@ -52,5 +37,10 @@ public class VmDataCommand extends NetworkElementCommand {
 
     public void addVmData(final String folder, final String file, final String contents) {
         vmData.add(new String[]{folder, file, contents});
+    }
+
+    @Override
+    public boolean executeInSequence() {
+        return executeInSequence;
     }
 }

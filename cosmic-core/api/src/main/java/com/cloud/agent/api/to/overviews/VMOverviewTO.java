@@ -1,23 +1,10 @@
 package com.cloud.agent.api.to.overviews;
 
-import com.cloud.uservm.UserVm;
-import com.cloud.vm.Nic;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class VMOverviewTO {
     private VMTO[] vms;
-
-    public VMOverviewTO() {
-    }
-
-    public VMOverviewTO(final Map<UserVm, List<Nic>> vmsAndNicsMap) {
-        final List<VMTO> vmsTO = new ArrayList<>();
-        vmsAndNicsMap.forEach((vm, nics) -> vmsTO.add(new VMTO(vm, nics)));
-        vms = vmsTO.toArray(new VMTO[vmsTO.size()]);
-    }
 
     public VMTO[] getVms() {
         return vms;
@@ -34,11 +21,8 @@ public class VMOverviewTO {
         public VMTO() {
         }
 
-        public VMTO(final UserVm vm, final List<Nic> nics) {
-            hostName = vm.getHostName();
-            final List<InterfaceTO> interfacesTO = new ArrayList<>();
-            nics.forEach(nic -> interfacesTO.add(new InterfaceTO(nic.getIPv4Address(), nic.getMacAddress(), nic.isDefaultNic())));
-            interfaces = interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]);
+        public VMTO(final String hostName) {
+            this.hostName = hostName;
         }
 
         public String getHostName() {
@@ -61,6 +45,8 @@ public class VMOverviewTO {
             private String ipv4Address;
             private String macAddress;
             private boolean isDefault;
+            private Map<String, String> metadata;
+            private Map<String, String> userData;
 
             public InterfaceTO() {
             }
@@ -93,6 +79,22 @@ public class VMOverviewTO {
 
             public void setDefault(final boolean aDefault) {
                 isDefault = aDefault;
+            }
+
+            public Map<String, String> getMetadata() {
+                if (metadata == null) {
+                    metadata = new HashMap<>();
+                }
+
+                return metadata;
+            }
+
+            public Map<String, String> getUserData() {
+                if (userData == null) {
+                    userData = new HashMap<>();
+                }
+
+                return userData;
             }
         }
     }

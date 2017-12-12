@@ -3,6 +3,7 @@ package com.cloud.network.topology;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PvlanSetupCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
+import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dc.DataCenter;
 import com.cloud.exception.ResourceUnavailableException;
@@ -24,9 +25,7 @@ import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
@@ -34,7 +33,6 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +63,8 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final VirtualRouter router = dhcp.getRouter();
 
         final Commands commands = new Commands(Command.OnError.Stop);
-        final Map<UserVm, List<Nic>> vmsAndNicsMap = _commandSetupHelper.createVmOverviewFromRouter(router);
-        final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmsAndNicsMap);
+        final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(router);
+        final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmOverview);
         commands.addCommand(updateVmOverviewCommand);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);

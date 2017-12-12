@@ -35,12 +35,6 @@ import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
 import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.IPv4Address;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.MetadataTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.RouteTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.ServiceTO.ServiceSourceNatTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
@@ -48,7 +42,6 @@ import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
@@ -89,6 +82,7 @@ import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
+import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
@@ -694,45 +688,32 @@ public class CommandSetupHelper {
         cmds.addCommand("users", cmd);
     }
 
-    public void createVmDataCommandForVMs(final DomainRouterVO router, final Commands cmds, final long guestNetworkId) {
-        final List<UserVmVO> vms = _userVmDao.listByNetworkIdAndStates(guestNetworkId, VirtualMachine.State.Running, VirtualMachine.State.Migrating, VirtualMachine.State.Stopping);
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        for (final UserVmVO vm : vms) {
-            boolean createVmData = true;
-            if (zone.getNetworkType() == NetworkType.Basic && router.getPodIdToDeployIn().longValue() != vm.getPodIdToDeployIn().longValue()) {
-                createVmData = false;
-            }
-
-            if (createVmData) {
-                final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(guestNetworkId, vm.getId());
-                if (nic != null) {
-                    s_logger.debug("Creating user data entry for vm " + vm + " on domR " + router);
-                    _userVmDao.loadDetails(vm);
-                    createVmDataCommand(router, vm, nic, vm.getDetail("SSH.PublicKey"), cmds);
-                }
-            }
-        }
-    }
-
     public void createVmDataCommand(final VirtualRouter router, final UserVm vm, final NicVO nic, final String publicKey, final Commands cmds) {
         final String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()).getDisplayText();
         final String zoneName = zoneRepository.findOne(router.getDataCenterId()).getName();
         cmds.addCommand(
                 "vmdata",
-                generateVmDataCommand(router, nic.getIPv4Address(), vm.getUserData(), serviceOffering, zoneName, nic.getIPv4Address(), vm.getHostName(), vm.getInstanceName(),
-                        vm.getId(), vm.getUuid(), publicKey, nic.getNetworkId()));
+                generateVmDataCommand(
+                        router,
+                        nic.getIPv4Address(),
+                        vm.getUserData(),
+                        serviceOffering,
+                        zoneName,
+                        nic.getIPv4Address(),
+                        vm.getHostName(),
+                        vm.getInstanceName(),
+                        vm.getId(),
+                        vm.getUuid(),
+                        publicKey,
+                        nic.getNetworkId()
+                )
+        );
     }
 
     private VmDataCommand generateVmDataCommand(final VirtualRouter router, final String vmPrivateIpAddress, final String userData, final String serviceOffering,
-                                                final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId, final
-                                                String vmUuid, final String publicKey, final long guestNetworkId) {
-        final VmDataCommand cmd = new VmDataCommand(vmPrivateIpAddress, vmName, _networkModel.getExecuteInSeqNtwkElmtCmd());
-
-        final NetworkVO networkVO = _networkDao.findById(guestNetworkId);
-        String vmNameFQDN = vmName;
-        if (networkVO != null) {
-            vmNameFQDN = vmName + "." + networkVO.getNetworkDomain();
-        }
+                                                final String zoneName, final String guestIpAddress, final String vmName, final String vmInstanceName, final long vmId,
+                                                final String vmUuid, final String publicKey, final long guestNetworkId) {
+        final VmDataCommand cmd = new VmDataCommand(vmName, vmPrivateIpAddress, _networkModel.getExecuteInSeqNtwkElmtCmd());
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(guestNetworkId, router.getId()));
@@ -741,38 +722,22 @@ public class CommandSetupHelper {
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
+        final NetworkVO networkVO = _networkDao.findById(guestNetworkId);
+        final String vmNameFQDN = networkVO != null ? vmName + "." + networkVO.getNetworkDomain() : vmName;
+
         cmd.addVmData("userdata", "user-data", userData);
         cmd.addVmData("metadata", "service-offering", StringUtils.unicodeEscape(serviceOffering));
         cmd.addVmData("metadata", "availability-zone", StringUtils.unicodeEscape(zoneName));
         cmd.addVmData("metadata", "local-ipv4", guestIpAddress);
         cmd.addVmData("metadata", "local-hostname", StringUtils.unicodeEscape(vmNameFQDN));
-        if (zone.getNetworkType() == NetworkType.Basic) {
-            cmd.addVmData("metadata", "public-ipv4", guestIpAddress);
-            cmd.addVmData("metadata", "public-hostname", StringUtils.unicodeEscape(vmName));
-        } else {
-            if (router.getPublicIpAddress() == null) {
-                cmd.addVmData("metadata", "public-ipv4", guestIpAddress);
-            } else {
-                cmd.addVmData("metadata", "public-ipv4", router.getPublicIpAddress());
-            }
-            cmd.addVmData("metadata", "public-hostname", router.getPublicIpAddress());
-        }
-        if (vmUuid == null) {
-            cmd.addVmData("metadata", "instance-id", vmInstanceName);
-            cmd.addVmData("metadata", "vm-id", String.valueOf(vmId));
-        } else {
-            cmd.addVmData("metadata", "instance-id", vmUuid);
-            cmd.addVmData("metadata", "vm-id", vmUuid);
-        }
+        cmd.addVmData("metadata", "public-ipv4", router.getPublicIpAddress() != null ? router.getPublicIpAddress() : guestIpAddress);
+        cmd.addVmData("metadata", "public-hostname", router.getPublicIpAddress());
+        cmd.addVmData("metadata", "instance-id", vmUuid != null ? vmUuid : vmInstanceName);
+        cmd.addVmData("metadata", "vm-id", vmUuid != null ? vmUuid : String.valueOf(vmId));
         cmd.addVmData("metadata", "public-keys", publicKey);
 
-        String cloudIdentifier = _configDao.getValue("cloud.identifier");
-        if (cloudIdentifier == null) {
-            cloudIdentifier = "";
-        } else {
-            cloudIdentifier = "CloudStack-{" + cloudIdentifier + "}";
-        }
-        cmd.addVmData("metadata", "cloud-identifier", cloudIdentifier);
+        final String cloudIdentifier = _configDao.getValue("cloud.identifier");
+        cmd.addVmData("metadata", "cloud-identifier", cloudIdentifier != null ? "CloudStack-{" + cloudIdentifier + "}" : "");
 
         return cmd;
     }
@@ -955,32 +920,32 @@ public class CommandSetupHelper {
             final List<StaticRouteProfile> staticRoutesToExclude
     ) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
-        final List<InterfaceTO> interfacesTO = new ArrayList<>();
+        final List<NetworkOverviewTO.InterfaceTO> interfacesTO = new ArrayList<>();
 
-        final ServiceTO servicesTO = new ServiceTO();
-        final List<ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
+        final NetworkOverviewTO.ServiceTO servicesTO = new NetworkOverviewTO.ServiceTO();
+        final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
-        final List<RouteTO> routesTO = new ArrayList<>();
+        final List<NetworkOverviewTO.RouteTO> routesTO = new ArrayList<>();
         if (router.getVpcId() != null) {
             routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
                                            .stream()
                                            .map(StaticRouteProfile::new)
                                            .filter(route -> !staticRoutesToExclude.contains(route))
-                                           .map(route -> new RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
+                                           .map(route -> new NetworkOverviewTO.RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
                                            .collect(Collectors.toList()));
         }
-        networkOverviewTO.setRoutes(routesTO.toArray(new RouteTO[routesTO.size()]));
+        networkOverviewTO.setRoutes(routesTO.toArray(new NetworkOverviewTO.RouteTO[routesTO.size()]));
 
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
             .filter(nic -> !nicsToExclude.contains(nic))
             .forEach(nic -> {
-                final InterfaceTO interfaceTO = new InterfaceTO();
+                final NetworkOverviewTO.InterfaceTO interfaceTO = new NetworkOverviewTO.InterfaceTO();
                 interfaceTO.setMacAddress(nic.getMacAddress());
 
-                final List<IPv4Address> ipv4Addresses = new ArrayList<>();
+                final List<NetworkOverviewTO.InterfaceTO.IPv4AddressTO> ipv4Addresses = new ArrayList<>();
                 if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                    ipv4Addresses.add(new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()), nic.getIPv4Gateway()));
+                    ipv4Addresses.add(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()), nic.getIPv4Gateway()));
                 }
 
                 final NetworkVO network = _networkDao.findById(nic.getNetworkId());
@@ -993,7 +958,7 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
+                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
                                                               .collect(Collectors.toList()));
 
                             serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
@@ -1001,7 +966,7 @@ public class CommandSetupHelper {
                                                                     .map(IPAddressVO::getAddress)
                                                                     .filter(ip -> !ipsToExclude.contains(ip))
                                                                     .map(Ip::addr)
-                                                                    .map(ip -> new ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
+                                                                    .map(ip -> new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
                                                                     .collect(Collectors.toList()));
                         } else {
                             ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
@@ -1009,41 +974,43 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> new IPv4Address(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
+                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
                                                               .collect(Collectors.toList()));
                         }
                     }
 
-                    interfaceTO.setMetadata(new MetadataTO(network));
+                    interfaceTO.setMetadata(new NetworkOverviewTO.InterfaceTO.MetadataTO(network));
                 }
 
-                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new IPv4Address[ipv4Addresses.size()]));
+                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO[ipv4Addresses.size()]));
                 interfacesTO.add(interfaceTO);
             });
 
-        networkOverviewTO.setInterfaces(interfacesTO.toArray(new InterfaceTO[interfacesTO.size()]));
+        networkOverviewTO.setInterfaces(interfacesTO.toArray(new NetworkOverviewTO.InterfaceTO[interfacesTO.size()]));
 
-        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new ServiceSourceNatTO[serviceSourceNatsTO.size()]));
+        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
         networkOverviewTO.setServices(servicesTO);
 
         return networkOverviewTO;
     }
 
-    public UpdateVmOverviewCommand createUpdateVmOverviewCommand(final VirtualRouter router, final Map<UserVm, List<Nic>> vmsAndNicsMap) {
-        final UpdateVmOverviewCommand cmd = new UpdateVmOverviewCommand(new VMOverviewTO(vmsAndNicsMap));
+    public UpdateVmOverviewCommand createUpdateVmOverviewCommand(final VirtualRouter router, final VMOverviewTO vmOverview) {
+        final UpdateVmOverviewCommand cmd = new UpdateVmOverviewCommand(vmOverview);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
+
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         return cmd;
     }
 
-    public Map<UserVm, List<Nic>> createVmOverviewFromRouter(final VirtualRouter router) {
-        final Map<UserVm, List<Nic>> vmsAndNicsMap = new HashMap<>();
+    public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
+        final VMOverviewTO vmOverviewTO = new VMOverviewTO();
+        final Map<UserVmVO, List<NicVO>> vmsAndNicsMap = new HashMap<>();
 
-        final List<? extends Nic> routerNics = _nicDao.listByVmId(router.getId());
-        for (final Nic routerNic : routerNics) {
+        final List<NicVO> routerNics = _nicDao.listByVmId(router.getId());
+        for (final NicVO routerNic : routerNics) {
             final Network network = _networkModel.getNetwork(routerNic.getNetworkId());
             if (TrafficType.Guest.equals(network.getTrafficType()) && !Network.GuestType.Sync.equals(network.getGuestType())) {
                 _userVmDao.listByNetworkIdAndStates(
@@ -1057,7 +1024,7 @@ public class CommandSetupHelper {
                     final NicVO nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), vm.getId());
                     if (nic != null) {
                         if (!vmsAndNicsMap.containsKey(vm)) {
-                            vmsAndNicsMap.put(vm, new ArrayList<Nic>() {{
+                            vmsAndNicsMap.put(vm, new ArrayList<NicVO>() {{
                                 add(nic);
                             }});
                         } else {
@@ -1068,6 +1035,50 @@ public class CommandSetupHelper {
             }
         }
 
-        return vmsAndNicsMap;
+        final List<VMOverviewTO.VMTO> vmsTO = new ArrayList<>();
+        vmsAndNicsMap.forEach((vm, nics) -> {
+             _userVmDao.loadDetails(vm);
+            final VMOverviewTO.VMTO vmTO = new VMOverviewTO.VMTO(vm.getHostName());
+            final List<VMOverviewTO.VMTO.InterfaceTO> interfacesTO = new ArrayList<>();
+
+            final ServiceOfferingVO serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId());
+            final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+            nics.forEach(nic -> {
+                final VMOverviewTO.VMTO.InterfaceTO interfaceTO = new VMOverviewTO.VMTO.InterfaceTO(
+                        nic.getIPv4Address(),
+                        nic.getMacAddress(),
+                        nic.isDefaultNic()
+                );
+
+                final NetworkVO networkVO = _networkDao.findById(nic.getNetworkId());
+                final String vmNameFQDN = networkVO != null ? vm.getHostName() + "." + networkVO.getNetworkDomain() : vm.getHostName();
+
+                final Map<String, String> metadata = interfaceTO.getMetadata();
+                metadata.put("service-offering", StringUtils.unicodeEscape(serviceOffering.getDisplayText()));
+                metadata.put("availability-zone", StringUtils.unicodeEscape(zone.getName()));
+                metadata.put("local-ipv4", nic.getIPv4Address());
+                metadata.put("local-hostname", StringUtils.unicodeEscape(vmNameFQDN));
+                metadata.put("public-ipv4", router.getPublicIpAddress() != null ? router.getPublicIpAddress() : nic.getIPv4Address());
+                metadata.put("public-hostname", router.getPublicIpAddress());
+                metadata.put("instance-id", vm.getUuid() != null ? vm.getUuid() : vm.getInstanceName());
+                metadata.put("vm-id", vm.getUuid() != null ? vm.getUuid() : String.valueOf(vm.getId()));
+                metadata.put("public-keys", vm.getDetail("SSH.PublicKey"));
+
+                final String cloudIdentifier = _configDao.getValue("cloud.identifier");
+                metadata.put("cloud-identifier", cloudIdentifier != null ? "CloudStack-{" + cloudIdentifier + "}" : "");
+
+                final Map<String, String> userData = interfaceTO.getUserData();
+                userData.put("user-data", vm.getUserData());
+
+                interfacesTO.add(interfaceTO);
+            });
+
+            vmTO.setInterfaces(interfacesTO.toArray(new VMOverviewTO.VMTO.InterfaceTO[interfacesTO.size()]));
+            vmsTO.add(vmTO);
+        });
+
+        vmOverviewTO.setVms(vmsTO.toArray(new VMOverviewTO.VMTO[vmsTO.size()]));
+
+        return vmOverviewTO;
     }
 }
