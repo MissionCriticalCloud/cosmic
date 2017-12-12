@@ -179,6 +179,8 @@ public class NiciraNvpResource implements ServerResource {
     }
 
     private void rotateNiciraNvpApi() {
+        getNiciraNvpApi().recreate();
+
         int active = ++activeNiciraNvpApi;
 
         if (active >= niciraNvpApis.size()) {

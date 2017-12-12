@@ -33,6 +33,8 @@ public class NiciraNvpApi {
     private static final String FIELDS_QUERY_PARAMETER = NiciraConstants.FIELDS_QUERY_PARAMETER;
     private static final int DEFAULT_MAX_RETRIES = 5;
 
+    private final Builder builder;
+
     static {
         prefixMap = new HashMap<>();
         prefixMap.put(SecurityProfile.class, NiciraConstants.SEC_PROFILE_URI_PREFIX);
@@ -54,9 +56,15 @@ public class NiciraNvpApi {
         defaultListParams.put(FIELDS_QUERY_PARAMETER, WILDCARD_QUERY_PARAMETER);
     }
 
-    private final RESTServiceConnector restConnector;
+    private RESTServiceConnector restConnector;
 
     private NiciraNvpApi(final Builder builder) {
+        this.builder = builder;
+
+        createRestConnector(builder);
+    }
+
+    private void createRestConnector(final Builder builder) {
         final Map<Class<?>, JsonDeserializer<?>> classToDeserializerMap = new HashMap<>();
         classToDeserializerMap.put(NatRule.class, new NatRuleAdapter());
         classToDeserializerMap.put(RoutingConfig.class, new RoutingConfigAdapter());
@@ -70,10 +78,15 @@ public class NiciraNvpApi {
                                                                   .loginUrl(NiciraConstants.LOGIN_URL)
                                                                   .executionLimit(DEFAULT_MAX_RETRIES)
                                                                   .build();
+
         restConnector = RESTServiceConnector.create()
                                             .classToDeserializerMap(classToDeserializerMap)
                                             .client(niciraRestClient)
                                             .build();
+    }
+
+    public void recreate() {
+        createRestConnector(this.builder);
     }
 
     public static Builder create() {
