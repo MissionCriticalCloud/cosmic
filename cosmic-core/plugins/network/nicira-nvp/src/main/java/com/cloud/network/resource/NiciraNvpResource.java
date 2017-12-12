@@ -179,6 +179,8 @@ public class NiciraNvpResource implements ServerResource {
     }
 
     private void rotateNiciraNvpApi() {
+        s_logger.info("Rotating NSX API endpoint");
+
         getNiciraNvpApi().recreate();
 
         int active = ++activeNiciraNvpApi;

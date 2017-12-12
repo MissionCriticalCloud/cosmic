@@ -15,8 +15,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NiciraNvpApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NiciraNvpApi.class);
 
     protected final static Map<Class, String> prefixMap;
     protected final static Map<Class, Type> listTypeMap;
@@ -59,6 +62,8 @@ public class NiciraNvpApi {
     private RESTServiceConnector restConnector;
 
     private NiciraNvpApi(final Builder builder) {
+        LOGGER.info("Initializing NSX API endpoint for ip " + builder.host);
+
         this.builder = builder;
 
         createRestConnector(builder);
@@ -86,6 +91,7 @@ public class NiciraNvpApi {
     }
 
     public void recreate() {
+        LOGGER.info("Recreating NSX API endpoint for ip " + this.builder.host);
         createRestConnector(this.builder);
     }
 
