@@ -126,6 +126,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -1068,7 +1069,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             }
             final ExceptionResponse apiResponse = new ExceptionResponse();
             apiResponse.setErrorCode(ex.getErrorCode().getHttpCode());
-            apiResponse.setErrorText(ex.getDescription());
+            apiResponse.setErrorText(ExceptionUtils.getRootCauseMessage(ex));
             apiResponse.setResponseName(responseName);
             final ArrayList<ExceptionProxyObject> idList = ex.getIdProxyList();
             if (idList != null) {
