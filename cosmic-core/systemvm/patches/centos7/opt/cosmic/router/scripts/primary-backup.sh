@@ -8,6 +8,14 @@ KEEPALIVED_STATE=/tmp/keepalived_state
 case "$1" in
   primary)
     #
+    # save file to mention we're master
+    #
+    /usr/bin/echo MASTER > $KEEPALIVED_STATE
+    if [ $? -eq 1 ]
+    then
+        logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
+    fi
+    #
     # commit the external cache into the kernel table
     #
     $CONNTRACKD_BIN -C $CONNTRACKD_CONFIG -c
@@ -42,17 +50,17 @@ case "$1" in
     then
         logger "ERROR: failed to invoke conntrackd -B"
     fi
-
+    ;;
+  backup)
     #
-    # save file to mention we're master
+    # save file to mention we're backup
     #
-    /usr/bin/echo MASTER > $KEEPALIVED_STATE
+    /usr/bin/echo BACKUP > $KEEPALIVED_STATE
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
     fi
-    ;;
-  backup)
+
     #
     # is conntrackd running? request some statistics to check it
     #
@@ -95,15 +103,6 @@ case "$1" in
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to invoke conntrackd -n"
-    fi
-
-    #
-    # save file to mention we're backup
-    #
-    /usr/bin/echo BACKUP > $KEEPALIVED_STATE
-    if [ $? -eq 1 ]
-    then
-        logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
     fi
     ;;
   fault)
