@@ -1,5 +1,7 @@
 package com.cloud.exception;
 
+import com.cloud.vm.Nic;
+
 public class NicPreparationException extends InsufficientCapacityException {
 
     public NicPreparationException(final String message, final Throwable cause) {
@@ -7,6 +9,6 @@ public class NicPreparationException extends InsufficientCapacityException {
     }
 
     public NicPreparationException(final String message) {
-        super(message, null);
+        super(message, Nic.class, 0L);
     }
 }
