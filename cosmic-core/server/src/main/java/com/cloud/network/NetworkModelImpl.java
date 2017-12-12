@@ -110,10 +110,9 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     static final Logger s_logger = LoggerFactory.getLogger(NetworkModelImpl.class);
-    static Long s_privateOfferingId = null;
     static HashMap<Service, List<Provider>> s_serviceToImplementedProvidersMap = new HashMap<>();
     static HashMap<String, String> s_providerToNetworkElementMap = new HashMap<>();
-    private final HashMap<String, NetworkOfferingVO> _systemNetworks = new HashMap<>(5);
+    private final HashMap<String, NetworkOfferingVO> _systemNetworks = new HashMap<>(4);
     protected boolean _executeInSequenceNtwkElmtCmd;
     @Inject
     EntityManager _entityMgr;
@@ -302,22 +301,14 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         _allowSubdomainNetworkAccess = Boolean.valueOf(_configs.get(Config.SubDomainNetworkAccess.key()));
         _executeInSequenceNtwkElmtCmd = Boolean.valueOf(_configs.get(Config.ExecuteInSequenceNetworkElementCommands.key()));
 
-        NetworkOfferingVO publicNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemPublicNetwork, TrafficType.Public, true);
-        publicNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(publicNetworkOffering);
+        NetworkOfferingVO publicNetworkOffering = _networkOfferingDao.findByUniqueName(NetworkOffering.SystemPublicNetwork);
         _systemNetworks.put(NetworkOffering.SystemPublicNetwork, publicNetworkOffering);
-        NetworkOfferingVO managementNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemManagementNetwork, TrafficType.Management, false);
-        managementNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(managementNetworkOffering);
+        NetworkOfferingVO managementNetworkOffering = _networkOfferingDao.findByUniqueName(NetworkOffering.SystemManagementNetwork);
         _systemNetworks.put(NetworkOffering.SystemManagementNetwork, managementNetworkOffering);
-        NetworkOfferingVO controlNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemControlNetwork, TrafficType.Control, false);
-        controlNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(controlNetworkOffering);
+        NetworkOfferingVO controlNetworkOffering = _networkOfferingDao.findByUniqueName(NetworkOffering.SystemControlNetwork);
         _systemNetworks.put(NetworkOffering.SystemControlNetwork, controlNetworkOffering);
-        NetworkOfferingVO storageNetworkOffering = new NetworkOfferingVO(NetworkOffering.SystemStorageNetwork, TrafficType.Storage, true);
-        storageNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(storageNetworkOffering);
+        NetworkOfferingVO storageNetworkOffering = _networkOfferingDao.findByUniqueName(NetworkOffering.SystemStorageNetwork);
         _systemNetworks.put(NetworkOffering.SystemStorageNetwork, storageNetworkOffering);
-        NetworkOfferingVO privateGatewayNetworkOffering = new NetworkOfferingVO(NetworkOffering.DefaultPrivateGatewayNetworkOffering, GuestType.Private, false);
-        privateGatewayNetworkOffering = _networkOfferingDao.persistDefaultNetworkOffering(privateGatewayNetworkOffering);
-        _systemNetworks.put(NetworkOffering.DefaultPrivateGatewayNetworkOffering, privateGatewayNetworkOffering);
-        s_privateOfferingId = privateGatewayNetworkOffering.getId();
 
         IpAddressSearch = _ipAddressDao.createSearchBuilder();
         IpAddressSearch.and("accountId", IpAddressSearch.entity().getAllocatedToAccountId(), Op.EQ);
@@ -1625,7 +1616,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                     throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
                             ", permission denied");
                 }
-            } else if (! TrafficType.Public.equals(network.getTrafficType())) {
+            } else if (!TrafficType.Public.equals(network.getTrafficType())) {
                 final List<NetworkVO> networkMap = _networksDao.listBy(owner.getId(), network.getId());
                 if (networkMap == null || networkMap.isEmpty()) {
                     throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
@@ -1807,7 +1798,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
         for (final String ip : excludedIps) {
             if (requestedIp != null && requestedIp.equals(ip)) {
-                s_logger.warn("Requested ip address " + requestedIp + " is in excluded IPs range " + ((NetworkVO)network).getIpExclusionList());
+                s_logger.warn("Requested ip address " + requestedIp + " is in excluded IPs range " + ((NetworkVO) network).getIpExclusionList());
                 return null;
             }
 
@@ -2092,7 +2083,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                 throw new InvalidParameterValueException("Requested IPv6 is not in the predefined range!");
             }
             if (mac != null) {
-                if(!NetUtils.isValidMac(mac)) {
+                if (!NetUtils.isValidMac(mac)) {
                     throw new InvalidParameterValueException("Invalid specified MAC-Address " + mac);
                 }
                 if (_nicDao.findByNetworkIdAndMacAddress(networkId, mac) != null) {
