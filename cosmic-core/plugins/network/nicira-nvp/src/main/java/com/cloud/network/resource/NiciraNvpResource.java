@@ -19,7 +19,7 @@ import com.cloud.network.nicira.SourceNatRule;
 import com.cloud.network.utils.CommandRetryUtility;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.nicira.nvp.plugin.NiciraNvpApiVersion;
-import com.cloud.utils.rest.CloudstackRESTException;
+import com.cloud.utils.rest.CosmicRESTException;
 import com.cloud.utils.rest.HttpClientHelper;
 
 import javax.naming.ConfigurationException;
@@ -53,15 +53,15 @@ public class NiciraNvpResource implements ServerResource {
         return niciraNvpApis.get(activeNiciraNvpApi);
     }
 
-    protected NiciraNvpApi createNiciraNvpApi(final String host, final String username, final String password) throws CloudstackRESTException {
+    protected NiciraNvpApi createNiciraNvpApi(final String host, final String username, final String password) throws CosmicRESTException {
         try {
             return NiciraNvpApi.create().host(host).username(username).password(password).httpClient(HttpClientHelper.createHttpClient(MAX_REDIRECTS)).build();
         } catch (final KeyManagementException e) {
-            throw new CloudstackRESTException("Could not create HTTP client", e);
+            throw new CosmicRESTException("Could not create HTTP client", e);
         } catch (final NoSuchAlgorithmException e) {
-            throw new CloudstackRESTException("Could not create HTTP client", e);
+            throw new CosmicRESTException("Could not create HTTP client", e);
         } catch (final KeyStoreException e) {
-            throw new CloudstackRESTException("Could not create HTTP client", e);
+            throw new CosmicRESTException("Could not create HTTP client", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class NiciraNvpResource implements ServerResource {
             for (String ip : ips.split(",")) {
                 niciraNvpApis.add(createNiciraNvpApi(ip, adminuser, adminpass));
             }
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new ConfigurationException("Could not create a Nicira Nvp API client: " + e.getMessage());
         }
 

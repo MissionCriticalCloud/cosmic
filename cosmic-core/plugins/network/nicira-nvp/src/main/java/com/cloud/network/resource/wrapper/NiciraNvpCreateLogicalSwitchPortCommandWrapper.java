@@ -35,7 +35,7 @@ public final class NiciraNvpCreateLogicalSwitchPortCommandWrapper extends Comman
 
             final LogicalSwitchPort logicalSwitchPort = niciraNvpUtilities.createLogicalSwitchPort(command);
 
-            // Check if stale Logical Switch Port are present in NSX
+            // Check if stale Logical Switch Port is present in NSX
             final String staleSwitchPortUuid = niciraNvpApi.findLogicalSwitchPortUuidByVifAttachmentUuid(logicalSwitchUuid, attachmentUuid);
             if (staleSwitchPortUuid != null) {
                 niciraNvpApi.deleteLogicalSwitchPort(logicalSwitchUuid, staleSwitchPortUuid);
