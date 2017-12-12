@@ -6,10 +6,12 @@ from dhcp_vm import DhcpVm
 from firewall import Firewall
 from keepalived import Keepalived
 from metadata_service import MetadataService
+from metadata_vm import MetadataVm
 from password_service import PasswordService
 
 
-class Network(object):
+class Network:
+
     def __init__(self, config):
         self.config = config
 
@@ -18,9 +20,9 @@ class Network(object):
         self.firewall = Firewall(self.config)
         self.password_service = PasswordService(self.config)
         self.metadata_service = MetadataService(self.config)
+        self.metadata_vm = MetadataVm(self.config)
         self.dhcp_service = DhcpService(self.config)
         self.dhcp_vm = DhcpVm(self.config)
-
 
     def sync(self):
         logging.debug("Starting sync of network!")
@@ -31,5 +33,6 @@ class Network(object):
         self.firewall.sync()
         self.password_service.sync()
         self.metadata_service.sync()
+        self.metadata_vm.sync()
         self.dhcp_service.sync()
         self.dhcp_vm.sync()

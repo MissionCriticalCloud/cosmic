@@ -4,13 +4,13 @@ import os
 import subprocess
 import sys
 from fcntl import flock, LOCK_EX, LOCK_UN
-
 from jinja2 import Environment, FileSystemLoader
 
 import CsHelper
 
 
-class MetadataService(object):
+class MetadataService:
+
     def __init__(self, config):
         self.config = config
 
@@ -19,12 +19,14 @@ class MetadataService(object):
             trim_blocks=True,
             lstrip_blocks=True
         )
-
         self.nginx_conf_path = '/etc/nginx/conf.d/'
+        self.metadata_folder = '/var/www/html/metadata/'
+        self.user_data_folder = '/var/www/html/userdata/'
 
         self.filenames = []
 
     def sync(self):
+        self.create_data_folders()
         for interface in self.config.dbag_network_overview['interfaces']:
             if interface['metadata']['type'] == 'guesttier':
                 self.setup(interface['ipv4_addresses'][0]['cidr'].split('/')[0])
@@ -40,6 +42,12 @@ class MetadataService(object):
             subprocess.call(['systemctl', 'reload', 'nginx'])
         except Exception as e:
             logging.error("Failed to reload nginx with error: %s" % e)
+
+    def create_data_folders(self):
+        if not os.path.exists(self.metadata_folder):
+            os.makedirs(self.metadata_folder)
+        if not os.path.exists(self.user_data_folder):
+            os.makedirs(self.user_data_folder)
 
     def setup(self, ip):
         content = self.jinja_env.get_template('vhost-metadata.conf').render(
