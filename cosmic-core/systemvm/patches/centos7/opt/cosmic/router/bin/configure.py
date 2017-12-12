@@ -4,7 +4,6 @@ import logging
 import sys
 from collections import OrderedDict
 
-import cs.CsHelper as CsHelper
 from cs.CsAcl import CsAcl
 from cs.CsForwardingRules import CsForwardingRules
 from cs.CsLoadBalancer import CsLoadBalancer
@@ -91,13 +90,13 @@ def main(argv):
 
     if process_file == "network_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_network = Network(config)
-        cs_network.sync()
+        network = Network(config)
+        network.sync()
 
     if process_file == "vm_overview":
         logging.debug("Processing file %s" % process_file)
-        cs_virtual_machine = VirtualMachine(config)
-        cs_virtual_machine.sync()
+        virtual_machine = VirtualMachine(config)
+        virtual_machine.sync()
 
     if process_file == "cmd_line":
         logging.debug("cmd_line.json changed. All other files will be processed as well.")

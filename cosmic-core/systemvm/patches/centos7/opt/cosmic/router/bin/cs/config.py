@@ -2,7 +2,8 @@ import utils
 from CsDatabag import CsDatabag
 
 
-class Config(object):
+class Config:
+
     def __init__(self):
         self.fw = []
         self.ingress_rules = {}

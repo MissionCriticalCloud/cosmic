@@ -2,7 +2,8 @@ import logging
 import subprocess
 
 
-class PasswordService(object):
+class PasswordService:
+
     def __init__(self, config):
         self.config = config
 
