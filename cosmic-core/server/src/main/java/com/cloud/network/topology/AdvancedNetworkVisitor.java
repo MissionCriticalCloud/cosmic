@@ -28,7 +28,6 @@ import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
@@ -49,11 +48,13 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
 
         final Commands commands = new Commands(Command.OnError.Stop);
         final VirtualMachineProfile profile = userdata.getProfile();
-        final NicVO nicVo = userdata.getNicVo();
-        final UserVmVO userVM = userdata.getUserVM();
+        final NicVO nicVO = userdata.getNicVo();
 
-        _commandSetupHelper.createPasswordCommand(router, profile, nicVo, commands);
-        _commandSetupHelper.createVmDataCommand(router, userVM, nicVo, userVM.getDetail("SSH.PublicKey"), commands);
+        _commandSetupHelper.createPasswordCommand(router, profile, nicVO, commands);
+
+        final VMOverviewTO vmOverview = _commandSetupHelper.createVmOverviewFromRouter(router);
+        final UpdateVmOverviewCommand updateVmOverviewCommand = _commandSetupHelper.createUpdateVmOverviewCommand(router, vmOverview);
+        commands.addCommand(updateVmOverviewCommand);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }
