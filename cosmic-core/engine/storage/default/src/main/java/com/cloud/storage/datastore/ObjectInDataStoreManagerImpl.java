@@ -11,7 +11,6 @@ import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Stat
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
-import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.storage.DataStoreRole;
@@ -27,7 +26,6 @@ import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
-import com.cloud.storage.db.ObjectInDataStoreDao;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
@@ -59,8 +57,6 @@ public class ObjectInDataStoreManagerImpl implements ObjectInDataStoreManager {
     VMTemplatePoolDao templatePoolDao;
     @Inject
     SnapshotDataFactory snapshotFactory;
-    @Inject
-    ObjectInDataStoreDao objInStoreDao;
     @Inject
     VMTemplateDao templateDao;
     @Inject

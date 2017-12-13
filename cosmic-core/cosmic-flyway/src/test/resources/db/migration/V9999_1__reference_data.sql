@@ -314,18 +314,9 @@ VALUES
   (3, 3, '0.0.0.0/0'),
   (4, 4, '0.0.0.0/0');
 
-INSERT INTO `ovs_tunnel_interface` (`id`, `ip`, `netmask`, `mac`, `host_id`, `label`)
-VALUES
-  (1, '0', '0', '0', 0, 'lock');
-
-INSERT INTO `ovs_tunnel_network` (`id`, `from`, `to`, `network_id`, `key`, `port_name`, `state`)
-VALUES
-  (1, 0, 0, 0, 0, 'lock', 'SUCCESS');
-
 INSERT INTO `region` (`id`, `name`, `end_point`, `portableip_service_enabled`, `gslb_service_enabled`)
 VALUES
   (1, 'Local', 'http://localhost:8080/client/', 0, 1);
-
 
 INSERT INTO `resource_count` (`id`, `account_id`, `domain_id`, `type`, `count`)
 VALUES

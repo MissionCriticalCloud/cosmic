@@ -237,7 +237,6 @@ import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.InstanceGroupVMMapDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
-import com.cloud.vm.dao.UserVmCloneSettingDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -299,8 +298,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     protected TemplateDataStoreDao _templateStoreDao;
     @Inject
     protected DomainDao _domainDao = null;
-    @Inject
-    protected UserVmCloneSettingDao _vmCloneSettingDao = null;
     @Inject
     protected UserVmDao _vmDao = null;
     @Inject
@@ -1873,7 +1870,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
-        if(_nicDao.findByNetworkIdAndMacAddress(networkId, macAddress) != null) {
+        if (_nicDao.findByNetworkIdAndMacAddress(networkId, macAddress) != null) {
             throw new CloudRuntimeException("A NIC with this MAC-Address already exists for network: " + network.getUuid());
         }
 
@@ -2671,9 +2668,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_UPGRADE, eventDescription = "upgrading Vm")
-  /*
-   * TODO: cleanup eventually - Refactored API call
-   */
+            /*
+             * TODO: cleanup eventually - Refactored API call
+             */
     // This method will be deprecated as we use ScaleVMCmd for both stopped VMs and running VMs
     public UserVm upgradeVirtualMachine(final UpgradeVMCmd cmd) throws ResourceAllocationException {
         final Long vmId = cmd.getId();
@@ -4107,7 +4104,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 }
             }
 
-      /* If new template/ISO is provided allocate a new volume from new template/ISO otherwise allocate new volume from original template/ISO */
+            /* If new template/ISO is provided allocate a new volume from new template/ISO otherwise allocate new volume from original template/ISO */
             final Volume newVol;
             if (newTemplateId != null) {
                 if (isISO) {
