@@ -62,31 +62,6 @@ case "$1" in
     fi
 
     #
-    # is conntrackd running? request some statistics to check it
-    #
-    $CONNTRACKD_BIN -C $CONNTRACKD_CONFIG -s
-    if [ $? -eq 1 ]
-    then
-        #
-	# something's wrong, do we have a lock file?
-	#
-    if [ -f $CONNTRACKD_LOCK ]
-	then
-	    logger "WARNING: conntrackd was not cleanly stopped."
-	    logger "If you suspect that it has crashed:"
-	    logger "1) Enable coredumps"
-	    logger "2) Try to reproduce the problem"
-	    logger "3) Post the coredump to netfilter-devel@vger.kernel.org"
-	    rm -f $CONNTRACKD_LOCK
-	fi
-	$CONNTRACKD_BIN -C $CONNTRACKD_CONFIG -d
-	if [ $? -eq 1 ]
-	then
-	    logger "ERROR: cannot launch conntrackd"
-	    exit 1
-	fi
-    fi
-    #
     # shorten kernel conntrack timers to remove the zombie entries.
     #
     $CONNTRACKD_BIN -C $CONNTRACKD_CONFIG -t
@@ -107,20 +82,20 @@ case "$1" in
     ;;
   fault)
     #
+    # save file to mention we're in fault/unknown state
+    #
+    /usr/bin/echo FAULT > $KEEPALIVED_STATE
+    if [ $? -eq 1 ]
+    then
+        logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
+    fi
+    #
     # shorten kernel conntrack timers to remove the zombie entries.
     #
     $CONNTRACKD_BIN -C $CONNTRACKD_CONFIG -t
     if [ $? -eq 1 ]
     then
         logger "ERROR: failed to invoke conntrackd -t"
-    fi
-    #
-    # save file to mention we're in fault/unknown state
-    #
-    /usr/bin/echo UNKNOWN > $KEEPALIVED_STATE
-    if [ $? -eq 1 ]
-    then
-        logger "ERROR: failed to write to ${KEEPALIVED_STATE}"
     fi
     ;;
   *)
