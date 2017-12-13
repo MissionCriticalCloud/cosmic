@@ -126,6 +126,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -290,8 +291,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     private void handleAsyncJobPublishEvent(final String subject, final String senderAddress, final Object args) {
         assert (args != null);
 
-        final
-        Pair<AsyncJob, String> eventInfo = (Pair<AsyncJob, String>) args;
+        final Pair<AsyncJob, String> eventInfo = (Pair<AsyncJob, String>) args;
         final AsyncJob job = eventInfo.first();
         final String jobEvent = eventInfo.second();
 
@@ -693,7 +693,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             if (userId != null) {
                 final User user = ApiDBUtils.findUserById(userId);
 
-                if (! commandAvailable(remoteAddress, commandName, user)) {
+                if (!commandAvailable(remoteAddress, commandName, user)) {
                     return false;
                 }
                 return true;
@@ -791,7 +791,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 return false;
             }
 
-            if (! commandAvailable(remoteAddress, commandName, user)) {
+            if (!commandAvailable(remoteAddress, commandName, user)) {
                 return false;
             }
 
@@ -975,7 +975,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
                 if (ApiConstants.SESSIONKEY.equalsIgnoreCase(attrName)) {
                     response.setSessionKey(attrObj.toString());
                 }
-                if(ApiConstants.DOMAIN_NAME.equalsIgnoreCase(attrName)) {
+                if (ApiConstants.DOMAIN_NAME.equalsIgnoreCase(attrName)) {
                     response.setDomainName(attrObj.toString());
                 }
             }
@@ -1069,7 +1069,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             }
             final ExceptionResponse apiResponse = new ExceptionResponse();
             apiResponse.setErrorCode(ex.getErrorCode().getHttpCode());
-            apiResponse.setErrorText(ex.getDescription());
+            apiResponse.setErrorText(ExceptionUtils.getRootCauseMessage(ex));
             apiResponse.setResponseName(responseName);
             final ArrayList<ExceptionProxyObject> idList = ex.getIdProxyList();
             if (idList != null) {
@@ -1248,7 +1248,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
 
         // Get the CIDRs from where this account is allowed to make calls
         final Account account = _accountMgr.getAccount(user.getAccountId());
-        final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s","");
+        final String accessAllowedCidrs = ApiServiceConfiguration.ApiAllowedSourceCidrList.valueIn(account.getId()).replaceAll("\\s", "");
         final Boolean ApiSourceCidrChecksEnabled = ApiServiceConfiguration.ApiSourceCidrChecksEnabled.value();
 
         if (ApiSourceCidrChecksEnabled) {
@@ -1264,7 +1264,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             if (hostName == null || !NetUtils.isIpInCidrList(hostName, accessAllowedCidrs.split(","))) {
                 s_logger.warn("Request by account '" + account.toString() + "' was denied since " + remoteAddress + " does not match " + accessAllowedCidrs);
                 throw new PermissionDeniedException("Calls for domain '" + account.getAccountName() + "' are not allowed from ip address '"
-                        + remoteAddress.replaceAll("/","") + "'.");
+                        + remoteAddress.replaceAll("/", "") + "'.");
             }
         }
         for (final APIChecker apiChecker : _apiAccessCheckers) {

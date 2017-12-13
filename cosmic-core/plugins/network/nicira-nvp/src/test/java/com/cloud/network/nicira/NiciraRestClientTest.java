@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
-import com.cloud.utils.rest.CloudstackRESTException;
+import com.cloud.utils.rest.CosmicRESTException;
 import com.cloud.utils.rest.HttpMethods;
 import com.cloud.utils.rest.HttpRequestMatcher;
 import com.cloud.utils.rest.HttpUriRequestBuilder;
@@ -145,7 +145,7 @@ public class NiciraRestClientTest {
         try {
             client.execute(request);
             fail("Expected CloudstackRESTException exception");
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             assertThat(e.getMessage(), not(isEmptyOrNullString()));
             verifyPrivate(client).invoke("execute", HttpRequestMatcher.eq(request), eq(0));
             verifyPrivate(client).invoke("execute", HttpRequestMatcher.eq(loginRequest), eq(401));
@@ -188,7 +188,7 @@ public class NiciraRestClientTest {
         try {
             client.execute(request);
             fail("Execution count should have been maxed out");
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             assertThat(e.getMessage(), containsString("Reached max executions limit of "));
         }
     }

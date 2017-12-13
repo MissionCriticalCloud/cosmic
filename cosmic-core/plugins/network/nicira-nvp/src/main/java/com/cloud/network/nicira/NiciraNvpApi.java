@@ -1,6 +1,6 @@
 package com.cloud.network.nicira;
 
-import com.cloud.utils.rest.CloudstackRESTException;
+import com.cloud.utils.rest.CosmicRESTException;
 import com.cloud.utils.rest.RESTServiceConnector;
 
 import java.lang.reflect.Type;
@@ -133,7 +133,7 @@ public class NiciraNvpApi {
         final T createdEntity;
         try {
             createdEntity = restConnector.executeCreateObject(entity, uri, Collections.<String, String>emptyMap());
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
 
@@ -168,7 +168,7 @@ public class NiciraNvpApi {
         final NiciraNvpList<T> entities;
         try {
             entities = restConnector.executeRetrieveObject(listTypeMap.get(clazz), uri, params);
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
 
@@ -219,13 +219,12 @@ public class NiciraNvpApi {
      * PUT item given a UUID as key and an item object with the new data
      *
      * @param item
-     * @param uuid
      * @throws NiciraNvpApiException
      */
     private <T> void updateWithUri(final T item, final String uri) throws NiciraNvpApiException {
         try {
             restConnector.executeUpdateObject(item, uri, Collections.<String, String>emptyMap());
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -243,7 +242,6 @@ public class NiciraNvpApi {
     /**
      * DELETE Security Profile given a UUID as key
      *
-     * @param securityProfileUuid
      * @throws NiciraNvpApiException
      */
     private <T> void delete(final String uuid, final Class<T> clazz) throws NiciraNvpApiException {
@@ -254,13 +252,12 @@ public class NiciraNvpApi {
     /**
      * DELETE Security Profile given a UUID as key
      *
-     * @param securityProfileUuid
      * @throws NiciraNvpApiException
      */
     private void deleteWithUri(final String uri) throws NiciraNvpApiException {
         try {
             restConnector.executeDeleteObject(uri);
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -311,7 +308,6 @@ public class NiciraNvpApi {
     /**
      * DELETE Acl given a UUID as key
      *
-     * @param acl
      * @throws NiciraNvpApiException
      */
     public void deleteAcl(final String aclUuid) throws NiciraNvpApiException {
@@ -400,7 +396,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<LogicalSwitchPort>>() {
             }.getType();
             niciraList = restConnector.executeRetrieveObject(niciraListType, uri, params);
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
 
@@ -425,7 +421,7 @@ public class NiciraNvpApi {
         final String uri = NiciraConstants.CONTROL_CLUSTER_STATUS_URL;
         try {
             return restConnector.executeRetrieveObject(ControlClusterStatus.class, uri, new HashMap<>());
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -439,7 +435,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<LogicalSwitchPort>>() {
             }.getType();
             return restConnector.<NiciraNvpList<LogicalSwitchPort>>executeRetrieveObject(niciraListType, uri, params).getResults();
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -453,7 +449,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<LogicalRouterPort>>() {
             }.getType();
             return restConnector.<NiciraNvpList<LogicalRouterPort>>executeRetrieveObject(niciraListType, uri, params).getResults();
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -546,7 +542,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<LogicalRouterPort>>() {
             }.getType();
             return restConnector.<NiciraNvpList<LogicalRouterPort>>executeRetrieveObject(niciraListType, uri, params).getResults();
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -559,7 +555,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<NatRule>>() {
             }.getType();
             return restConnector.<NiciraNvpList<NatRule>>executeRetrieveObject(niciraListType, uri, params).getResults();
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }
@@ -574,7 +570,7 @@ public class NiciraNvpApi {
             final Type niciraListType = new TypeToken<NiciraNvpList<LogicalRouterPort>>() {
             }.getType();
             return restConnector.<NiciraNvpList<LogicalRouterPort>>executeRetrieveObject(niciraListType, uri, params).getResults();
-        } catch (final CloudstackRESTException e) {
+        } catch (final CosmicRESTException e) {
             throw new NiciraNvpApiException(e);
         }
     }

@@ -75,7 +75,7 @@ public class BasicRestClientTest {
         assertThat(response.getStatusLine(), sameInstance(HTTP_503_STATUSLINE));
     }
 
-    @Test(expected = CloudstackRESTException.class)
+    @Test(expected = CosmicRESTException.class)
     public void testExecuteRequestWhenClientThrowsIOException() throws Exception {
         final BasicRestClient restClient = BasicRestClient.create()
                                                           .host(LOCALHOST)

@@ -49,17 +49,17 @@ public class RESTServiceConnector {
         return new Builder();
     }
 
-    public <T> void executeUpdateObject(final T newObject, final String path) throws CloudstackRESTException {
+    public <T> void executeUpdateObject(final T newObject, final String path) throws CosmicRESTException {
         executeUpdateObject(newObject, path, new HashMap<>());
     }
 
-    public <T> void executeUpdateObject(final T newObject, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
+    public <T> void executeUpdateObject(final T newObject, final String path, final Map<String, String> parameters) throws CosmicRESTException {
         s_logger.debug("Executing update object on " + path);
         client.closeResponse(createAndExecuteRequest(HttpMethods.PUT, path, parameters, Optional.fromNullable(gson.toJson(newObject))));
     }
 
     private CloseableHttpResponse createAndExecuteRequest(final HttpMethods method, final String path, final Map<String, String> parameters, final Optional<String> jsonPayLoad)
-            throws CloudstackRESTException {
+            throws CosmicRESTException {
         final HttpUriRequest httpRequest = HttpUriRequestBuilder.create()
                                                                 .path(path)
                                                                 .parameters(parameters)
@@ -72,23 +72,23 @@ public class RESTServiceConnector {
         return executeRequest(httpRequest);
     }
 
-    private CloseableHttpResponse executeRequest(final HttpUriRequest httpRequest) throws CloudstackRESTException {
+    private CloseableHttpResponse executeRequest(final HttpUriRequest httpRequest) throws CosmicRESTException {
         final CloseableHttpResponse response = client.execute(httpRequest);
         s_logger.debug("Executed request: " + httpRequest + " status was " + response.getStatusLine().toString());
         return response;
     }
 
-    public <T> T executeCreateObject(final T newObject, final String uri) throws CloudstackRESTException {
+    public <T> T executeCreateObject(final T newObject, final String uri) throws CosmicRESTException {
         return executeCreateObject(newObject, uri, new HashMap<>());
     }
 
-    public <T> T executeCreateObject(final T newObject, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
+    public <T> T executeCreateObject(final T newObject, final String path, final Map<String, String> parameters) throws CosmicRESTException {
         s_logger.debug("Executing create object on " + path);
         final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.POST, path, parameters, Optional.fromNullable(gson.toJson(newObject)));
         return (T) readResponseBody(response, newObject.getClass());
     }
 
-    private <T> T readResponseBody(final CloseableHttpResponse response, final Type type) throws CloudstackRESTException {
+    private <T> T readResponseBody(final CloseableHttpResponse response, final Type type) throws CosmicRESTException {
         final HttpEntity entity = response.getEntity();
         try {
             final String stringEntity = EntityUtils.toString(entity);
@@ -96,22 +96,22 @@ public class RESTServiceConnector {
             EntityUtils.consumeQuietly(entity);
             return gson.fromJson(stringEntity, type);
         } catch (final IOException e) {
-            throw new CloudstackRESTException("Could not deserialize response to JSON. Entity: " + entity, e);
+            throw new CosmicRESTException("Could not deserialize response to JSON. Entity: " + entity, e);
         } finally {
             client.closeResponse(response);
         }
     }
 
-    public void executeDeleteObject(final String path) throws CloudstackRESTException {
+    public void executeDeleteObject(final String path) throws CosmicRESTException {
         s_logger.debug("Executing delete object on " + path);
         client.closeResponse(createAndExecuteRequest(HttpMethods.DELETE, path, new HashMap<>(), ABSENT));
     }
 
-    public <T> T executeRetrieveObject(final Type returnObjectType, final String path) throws CloudstackRESTException {
+    public <T> T executeRetrieveObject(final Type returnObjectType, final String path) throws CosmicRESTException {
         return executeRetrieveObject(returnObjectType, path, new HashMap<>());
     }
 
-    public <T> T executeRetrieveObject(final Type returnObjectType, final String path, final Map<String, String> parameters) throws CloudstackRESTException {
+    public <T> T executeRetrieveObject(final Type returnObjectType, final String path, final Map<String, String> parameters) throws CosmicRESTException {
         s_logger.debug("Executing retrieve object on " + path);
         final CloseableHttpResponse response = createAndExecuteRequest(HttpMethods.GET, path, parameters, ABSENT);
         return readResponseBody(response, returnObjectType);

@@ -317,9 +317,8 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             }
         }
 
-        final CreateLogicalSwitchPortCommand cmd =
-                new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
-                        context.getAccount().getAccountName(), nic.getName());
+        final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
+                context.getAccount().getAccountName(), nic.getName());
         final CreateLogicalSwitchPortAnswer answer = (CreateLogicalSwitchPortAnswer) agentMgr.easySend(niciraNvpHost.getId(), cmd);
 
         if (answer == null || !answer.getResult()) {

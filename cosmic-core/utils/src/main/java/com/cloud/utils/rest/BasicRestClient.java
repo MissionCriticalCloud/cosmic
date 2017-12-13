@@ -42,12 +42,12 @@ public class BasicRestClient implements RestClient {
     }
 
     @Override
-    public CloseableHttpResponse execute(final HttpUriRequest request) throws CloudstackRESTException {
+    public CloseableHttpResponse execute(final HttpUriRequest request) throws CosmicRESTException {
         logRequestExecution(request);
         try {
             return client.execute(clientContext.getTargetHost(), request, clientContext);
         } catch (final IOException e) {
-            throw new CloudstackRESTException("Could not execute request " + request, e);
+            throw new CosmicRESTException("Could not execute request " + request, e);
         }
     }
 
@@ -59,14 +59,14 @@ public class BasicRestClient implements RestClient {
     }
 
     @Override
-    public void closeResponse(final CloseableHttpResponse response) throws CloudstackRESTException {
+    public void closeResponse(final CloseableHttpResponse response) throws CosmicRESTException {
         try {
             s_logger.debug("Closing HTTP connection");
             response.close();
         } catch (final IOException e) {
             final StringBuilder sb = new StringBuilder();
             sb.append("Failed to close response object for request.\nResponse: ").append(response);
-            throw new CloudstackRESTException(sb.toString(), e);
+            throw new CosmicRESTException(sb.toString(), e);
         }
     }
 

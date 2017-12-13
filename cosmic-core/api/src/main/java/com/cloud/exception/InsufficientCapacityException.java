@@ -9,7 +9,7 @@ public abstract class InsufficientCapacityException extends CloudException {
     private static final long serialVersionUID = SerialVersionUID.InsufficientCapacityException;
 
     Long id;
-    Class<?> scope;
+    Class<?> scope = UnkownInsufficientCapacityExceptionScope.class;
 
     protected InsufficientCapacityException() {
         super();

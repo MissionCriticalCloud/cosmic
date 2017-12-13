@@ -1,7 +1,7 @@
 package com.cloud.network.nicira;
 
 import com.cloud.utils.rest.BasicRestClient;
-import com.cloud.utils.rest.CloudstackRESTException;
+import com.cloud.utils.rest.CosmicRESTException;
 import com.cloud.utils.rest.HttpConstants;
 import com.cloud.utils.rest.HttpMethods;
 import com.cloud.utils.rest.HttpStatusCodeHelper;
@@ -54,13 +54,13 @@ public class NiciraRestClient extends BasicRestClient {
     }
 
     @Override
-    public CloseableHttpResponse execute(final HttpUriRequest request) throws CloudstackRESTException {
+    public CloseableHttpResponse execute(final HttpUriRequest request) throws CosmicRESTException {
         return execute(request, 0);
     }
 
-    private CloseableHttpResponse execute(final HttpUriRequest request, final int previousStatusCode) throws CloudstackRESTException {
+    private CloseableHttpResponse execute(final HttpUriRequest request, final int previousStatusCode) throws CosmicRESTException {
         if (counter.hasReachedExecutionLimit()) {
-            throw new CloudstackRESTException("Reached max executions limit of " + executionLimit);
+            throw new CosmicRESTException("Reached max executions limit of " + executionLimit);
         }
         counter.incrementExecutionCounter();
         s_logger.debug("Executing " + request.getMethod() + " request [execution count = " + counter.getValue() + "]");
@@ -74,16 +74,16 @@ public class NiciraRestClient extends BasicRestClient {
         } else if (HttpStatusCodeHelper.isSuccess(statusCode)) {
             return handleSuccessResponse(request, response);
         } else {
-            throw new CloudstackRESTException("Unexpecetd status code: " + statusCode);
+            throw new CosmicRESTException("Unexpected status code: " + statusCode);
         }
     }
 
     private CloseableHttpResponse handleUnauthorizedResponse(final HttpUriRequest request, final int previousStatusCode, final CloseableHttpResponse response, final int statusCode)
-            throws CloudstackRESTException {
+            throws CosmicRESTException {
         super.closeResponse(response);
         if (HttpStatusCodeHelper.isUnauthorized(previousStatusCode)) {
             s_logger.error(responseToErrorMessage(response));
-            throw new CloudstackRESTException("Two consecutive failed attempts to authenticate against REST server");
+            throw new CosmicRESTException("Two consecutive failed attempts to authenticate against REST server");
         }
         final HttpUriRequest authenticateRequest = createAuthenticationRequest();
         final CloseableHttpResponse loginResponse = execute(authenticateRequest, statusCode);

@@ -34,7 +34,15 @@ public final class NiciraNvpCreateLogicalSwitchPortCommandWrapper extends Comman
             final NiciraNvpApi niciraNvpApi = niciraNvpResource.getNiciraNvpApi();
 
             final LogicalSwitchPort logicalSwitchPort = niciraNvpUtilities.createLogicalSwitchPort(command);
+
+            // Check if stale Logical Switch Port is present in NSX
+            final String staleSwitchPortUuid = niciraNvpApi.findLogicalSwitchPortUuidByVifAttachmentUuid(logicalSwitchUuid, attachmentUuid);
+            if (staleSwitchPortUuid != null) {
+                niciraNvpApi.deleteLogicalSwitchPort(logicalSwitchUuid, staleSwitchPortUuid);
+            }
+
             final LogicalSwitchPort newPort = niciraNvpApi.createLogicalSwitchPort(logicalSwitchUuid, logicalSwitchPort);
+
             try {
                 niciraNvpApi.updateLogicalSwitchPortAttachment(command.getLogicalSwitchUuid(), newPort.getUuid(), new VifAttachment(attachmentUuid));
             } catch (final NiciraNvpApiException ex) {
