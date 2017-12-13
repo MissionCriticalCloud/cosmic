@@ -37,17 +37,12 @@ import com.cloud.api.response.ApplicationLoadBalancerInstanceResponse;
 import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.ApplicationLoadBalancerRuleResponse;
 import com.cloud.api.response.AsyncJobResponse;
-import com.cloud.api.response.AutoScalePolicyResponse;
-import com.cloud.api.response.AutoScaleVmGroupResponse;
-import com.cloud.api.response.AutoScaleVmProfileResponse;
 import com.cloud.api.response.CapabilityResponse;
 import com.cloud.api.response.CapacityResponse;
 import com.cloud.api.response.ClusterResponse;
-import com.cloud.api.response.ConditionResponse;
 import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.api.response.ControlledEntityResponse;
 import com.cloud.api.response.ControlledViewEntityResponse;
-import com.cloud.api.response.CounterResponse;
 import com.cloud.api.response.CreateCmdResponse;
 import com.cloud.api.response.CreateSSHKeyPairResponse;
 import com.cloud.api.response.DiskOfferingResponse;
@@ -180,13 +175,6 @@ import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VpnUser;
 import com.cloud.network.VpnUserVO;
-import com.cloud.network.as.AutoScalePolicy;
-import com.cloud.network.as.AutoScaleVmGroup;
-import com.cloud.network.as.AutoScaleVmProfile;
-import com.cloud.network.as.AutoScaleVmProfileVO;
-import com.cloud.network.as.Condition;
-import com.cloud.network.as.ConditionVO;
-import com.cloud.network.as.Counter;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkVO;
@@ -194,7 +182,6 @@ import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
@@ -2788,127 +2775,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setRemoved(result.getRemoved());
         response.setForDisplay(result.isDisplay());
         response.setObjectName("vpnconnection");
-        return response;
-    }
-
-    @Override
-    public CounterResponse createCounterResponse(final Counter counter) {
-        final CounterResponse response = new CounterResponse();
-        response.setId(counter.getUuid());
-        response.setSource(counter.getSource().toString());
-        response.setName(counter.getName());
-        response.setValue(counter.getValue());
-        response.setObjectName("counter");
-        return response;
-    }
-
-    @Override
-    public ConditionResponse createConditionResponse(final Condition condition) {
-        final ConditionResponse response = new ConditionResponse();
-        response.setId(condition.getUuid());
-        final List<CounterResponse> counterResponseList = new ArrayList<>();
-        counterResponseList.add(createCounterResponse(ApiDBUtils.getCounter(condition.getCounterid())));
-        response.setCounterResponse(counterResponseList);
-        response.setRelationalOperator(condition.getRelationalOperator().toString());
-        response.setThreshold(condition.getThreshold());
-        response.setObjectName("condition");
-        populateOwner(response, condition);
-        return response;
-    }
-
-    @Override
-    public AutoScalePolicyResponse createAutoScalePolicyResponse(final AutoScalePolicy policy) {
-        final AutoScalePolicyResponse response = new AutoScalePolicyResponse();
-        response.setId(policy.getUuid());
-        response.setDuration(policy.getDuration());
-        response.setQuietTime(policy.getQuietTime());
-        response.setAction(policy.getAction());
-        final List<ConditionVO> vos = ApiDBUtils.getAutoScalePolicyConditions(policy.getId());
-        final ArrayList<ConditionResponse> conditions = new ArrayList<>(vos.size());
-        for (final ConditionVO vo : vos) {
-            conditions.add(createConditionResponse(vo));
-        }
-        response.setConditions(conditions);
-        response.setObjectName("autoscalepolicy");
-
-        // Populates the account information in the response
-        populateOwner(response, policy);
-
-        return response;
-    }
-
-    @Override
-    public AutoScaleVmProfileResponse createAutoScaleVmProfileResponse(final AutoScaleVmProfile profile) {
-        final AutoScaleVmProfileResponse response = new AutoScaleVmProfileResponse();
-        response.setId(profile.getUuid());
-        if (profile.getZoneId() != null) {
-            final DataCenter zone = ApiDBUtils.findZoneById(profile.getZoneId());
-            if (zone != null) {
-                response.setZoneId(zone.getUuid());
-            }
-        }
-        if (profile.getServiceOfferingId() != null) {
-            final ServiceOffering so = ApiDBUtils.findServiceOfferingById(profile.getServiceOfferingId());
-            if (so != null) {
-                response.setServiceOfferingId(so.getUuid());
-            }
-        }
-        if (profile.getTemplateId() != null) {
-            final VMTemplateVO template = ApiDBUtils.findTemplateById(profile.getTemplateId());
-            if (template != null) {
-                response.setTemplateId(template.getUuid());
-            }
-        }
-        response.setOtherDeployParams(profile.getOtherDeployParams());
-        response.setCounterParams(profile.getCounterParams());
-        response.setDestroyVmGraceperiod(profile.getDestroyVmGraceperiod());
-        final User user = ApiDBUtils.findUserById(profile.getAutoScaleUserId());
-        if (user != null) {
-            response.setAutoscaleUserId(user.getUuid());
-        }
-        response.setObjectName("autoscalevmprofile");
-
-        // Populates the account information in the response
-        populateOwner(response, profile);
-        return response;
-    }
-
-    @Override
-    public AutoScaleVmGroupResponse createAutoScaleVmGroupResponse(final AutoScaleVmGroup vmGroup) {
-        final AutoScaleVmGroupResponse response = new AutoScaleVmGroupResponse();
-        response.setId(vmGroup.getUuid());
-        response.setMinMembers(vmGroup.getMinMembers());
-        response.setMaxMembers(vmGroup.getMaxMembers());
-        response.setState(vmGroup.getState());
-        response.setInterval(vmGroup.getInterval());
-        response.setForDisplay(vmGroup.isDisplay());
-        final AutoScaleVmProfileVO profile = ApiDBUtils.findAutoScaleVmProfileById(vmGroup.getProfileId());
-        if (profile != null) {
-            response.setProfileId(profile.getUuid());
-        }
-        final FirewallRuleVO fw = ApiDBUtils.findFirewallRuleById(vmGroup.getLoadBalancerId());
-        if (fw != null) {
-            response.setLoadBalancerId(fw.getUuid());
-        }
-
-        final List<AutoScalePolicyResponse> scaleUpPoliciesResponse = new ArrayList<>();
-        final List<AutoScalePolicyResponse> scaleDownPoliciesResponse = new ArrayList<>();
-        response.setScaleUpPolicies(scaleUpPoliciesResponse);
-        response.setScaleDownPolicies(scaleDownPoliciesResponse);
-        response.setObjectName("autoscalevmgroup");
-
-        // Fetch policies for vmgroup
-        final List<AutoScalePolicy> scaleUpPolicies = new ArrayList<>();
-        final List<AutoScalePolicy> scaleDownPolicies = new ArrayList<>();
-        ApiDBUtils.getAutoScaleVmGroupPolicies(vmGroup.getId(), scaleUpPolicies, scaleDownPolicies);
-        // populate policies
-        for (final AutoScalePolicy autoScalePolicy : scaleUpPolicies) {
-            scaleUpPoliciesResponse.add(createAutoScalePolicyResponse(autoScalePolicy));
-        }
-        for (final AutoScalePolicy autoScalePolicy : scaleDownPolicies) {
-            scaleDownPoliciesResponse.add(createAutoScalePolicyResponse(autoScalePolicy));
-        }
-
         return response;
     }
 

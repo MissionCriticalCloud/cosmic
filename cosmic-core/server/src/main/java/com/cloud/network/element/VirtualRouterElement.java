@@ -30,8 +30,6 @@ import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.VpnUser;
-import com.cloud.network.as.AutoScaleCounter;
-import com.cloud.network.as.AutoScaleCounter.AutoScaleCounterType;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.NetworkDao;
@@ -90,8 +88,6 @@ import org.slf4j.LoggerFactory;
 public class VirtualRouterElement extends AdapterBase implements VirtualRouterElementService, DhcpServiceProvider, UserDataServiceProvider, SourceNatServiceProvider,
         StaticNatServiceProvider, FirewallServiceProvider, LoadBalancingServiceProvider, PortForwardingServiceProvider, RemoteAccessVPNServiceProvider, IpDeployer,
         NetworkMigrationResponder, AggregatedCommandExecutor {
-    public static final AutoScaleCounterType AutoScaleCounterCpu = new AutoScaleCounterType("cpu");
-    public static final AutoScaleCounterType AutoScaleCounterMemory = new AutoScaleCounterType("memory");
     protected static final Map<Service, Map<Capability, String>> capabilities = setCapabilities();
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualRouterElement.class);
     @Inject
@@ -145,18 +141,6 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         lbCapabilities.put(Capability.SupportedProtocols, "tcp, udp, tcp-proxy");
         lbCapabilities.put(Capability.SupportedStickinessMethods, getHAProxyStickinessCapability());
         lbCapabilities.put(Capability.LbSchemes, LoadBalancerContainer.Scheme.Public.toString());
-
-        // specifies that LB rules can support autoscaling and the list of
-        // counters it supports
-        AutoScaleCounter counter;
-        final List<AutoScaleCounter> counterList = new ArrayList<>();
-        counter = new AutoScaleCounter(AutoScaleCounterCpu);
-        counterList.add(counter);
-        counter = new AutoScaleCounter(AutoScaleCounterMemory);
-        counterList.add(counter);
-        final Gson gson = new Gson();
-        final String autoScaleCounterList = gson.toJson(counterList);
-        lbCapabilities.put(Capability.AutoScaleCounters, autoScaleCounterList);
         capabilities.put(Service.Lb, lbCapabilities);
 
         // Set capabilities for Firewall service

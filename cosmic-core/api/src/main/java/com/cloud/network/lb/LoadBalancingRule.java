@@ -1,10 +1,5 @@
 package com.cloud.network.lb;
 
-import com.cloud.network.as.AutoScalePolicy;
-import com.cloud.network.as.AutoScaleVmGroup;
-import com.cloud.network.as.AutoScaleVmProfile;
-import com.cloud.network.as.Condition;
-import com.cloud.network.as.Counter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
@@ -18,7 +13,6 @@ public class LoadBalancingRule {
     private final Ip sourceIp;
     private List<LbDestination> destinations;
     private final List<LbStickinessPolicy> stickinessPolicies;
-    private LbAutoScaleVmGroup autoScaleVmGroup;
     private List<LbHealthCheckPolicy> healthCheckPolicies;
     private LbSslCert sslCert;
     private String lbProtocol;
@@ -133,14 +127,6 @@ public class LoadBalancingRule {
         return sslCert;
     }
 
-    public LbAutoScaleVmGroup getAutoScaleVmGroup() {
-        return autoScaleVmGroup;
-    }
-
-    public void setAutoScaleVmGroup(final LbAutoScaleVmGroup autoScaleVmGroup) {
-        this.autoScaleVmGroup = autoScaleVmGroup;
-    }
-
     public int getClientTimeout() {
         return clientTimeout;
     }
@@ -155,10 +141,6 @@ public class LoadBalancingRule {
 
     public void setServerTimeout(final int serverTimeout) {
         this.serverTimeout = serverTimeout;
-    }
-
-    public boolean isAutoScaleConfig() {
-        return this.autoScaleVmGroup != null;
     }
 
     public Ip getSourceIp() {
@@ -301,149 +283,6 @@ public class LoadBalancingRule {
 
         public void setRevoked(final boolean revoked) {
             this.revoked = revoked;
-        }
-    }
-
-    public static class LbCondition {
-        private final Condition condition;
-        private final Counter counter;
-
-        public LbCondition(final Counter counter, final Condition condition) {
-            this.condition = condition;
-            this.counter = counter;
-        }
-
-        public Condition getCondition() {
-            return condition;
-        }
-
-        public Counter getCounter() {
-            return counter;
-        }
-    }
-
-    public static class LbAutoScalePolicy {
-        private final List<LbCondition> conditions;
-        private final AutoScalePolicy policy;
-        private boolean revoked;
-
-        public LbAutoScalePolicy(final AutoScalePolicy policy, final List<LbCondition> conditions) {
-            this.policy = policy;
-            this.conditions = conditions;
-        }
-
-        public List<LbCondition> getConditions() {
-            return conditions;
-        }
-
-        public AutoScalePolicy getPolicy() {
-            return policy;
-        }
-
-        public boolean isRevoked() {
-            return revoked;
-        }
-
-        public void setRevoked(final boolean revoked) {
-            this.revoked = revoked;
-        }
-    }
-
-    public static class LbAutoScaleVmProfile {
-        private final String autoScaleUserApiKey;
-        private final String autoScaleUserSecretKey;
-        private final String csUrl;
-        private final String zoneId;
-        private final String domainId;
-        private final String serviceOfferingId;
-        private final String templateId;
-        private final String networkId;
-        private final String vmName;
-        AutoScaleVmProfile profile;
-
-        public LbAutoScaleVmProfile(final AutoScaleVmProfile profile, final String autoScaleUserApiKey, final String autoScaleUserSecretKey, final String csUrl, final String
-                zoneId, final String domainId,
-                                    final String serviceOfferingId, final String templateId, final String vmName, final String networkId) {
-            this.profile = profile;
-            this.autoScaleUserApiKey = autoScaleUserApiKey;
-            this.autoScaleUserSecretKey = autoScaleUserSecretKey;
-            this.csUrl = csUrl;
-            this.zoneId = zoneId;
-            this.domainId = domainId;
-            this.serviceOfferingId = serviceOfferingId;
-            this.templateId = templateId;
-            this.vmName = vmName;
-            this.networkId = networkId;
-        }
-
-        public AutoScaleVmProfile getProfile() {
-            return profile;
-        }
-
-        public String getAutoScaleUserApiKey() {
-            return autoScaleUserApiKey;
-        }
-
-        public String getAutoScaleUserSecretKey() {
-            return autoScaleUserSecretKey;
-        }
-
-        public String getCsUrl() {
-            return csUrl;
-        }
-
-        public String getZoneId() {
-            return zoneId;
-        }
-
-        public String getDomainId() {
-            return domainId;
-        }
-
-        public String getServiceOfferingId() {
-            return serviceOfferingId;
-        }
-
-        public String getTemplateId() {
-            return templateId;
-        }
-
-        public String getVmName() {
-            return vmName;
-        }
-
-        public String getNetworkId() {
-            return networkId;
-        }
-    }
-
-    public static class LbAutoScaleVmGroup {
-        private final List<LbAutoScalePolicy> policies;
-        private final LbAutoScaleVmProfile profile;
-        private final String currentState;
-        AutoScaleVmGroup vmGroup;
-
-        public LbAutoScaleVmGroup(final AutoScaleVmGroup vmGroup, final List<LbAutoScalePolicy> policies, final LbAutoScaleVmProfile profile, final String currentState) {
-            this.vmGroup = vmGroup;
-            this.policies = policies;
-            this.profile = profile;
-            this.currentState = currentState;
-        }
-
-        public AutoScaleVmGroup getVmGroup() {
-            return vmGroup;
-        }
-
-        public List<LbAutoScalePolicy> getPolicies() {
-            return policies;
-        }
-
-        public LbAutoScaleVmProfile getProfile() {
-            return profile;
-        }
-
-        public String getCurrentState() {
-            return currentState;
         }
     }
 

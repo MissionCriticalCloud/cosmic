@@ -46,8 +46,6 @@ public interface LoadBalancingRulesManager {
 
     String getLBCapability(long networkid, String capabilityName);
 
-    boolean configureLbAutoScaleVmGroup(long vmGroupid, String currentState) throws ResourceUnavailableException;
-
     boolean revokeLoadBalancersForNetwork(long networkId, Scheme scheme) throws ResourceUnavailableException;
 
     boolean validateLbRule(LoadBalancingRule lbRule);

@@ -280,7 +280,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
         public static final Capability ElasticIp = new Capability("ElasticIp");
         public static final Capability AssociatePublicIP = new Capability("AssociatePublicIP");
         public static final Capability ElasticLb = new Capability("ElasticLb");
-        public static final Capability AutoScaleCounters = new Capability("AutoScaleCounters");
         public static final Capability InlineMode = new Capability("InlineMode");
         public static final Capability SupportedTrafficDirection = new Capability("SupportedTrafficDirection");
         public static final Capability SupportedEgressProtocols = new Capability("SupportedEgressProtocols");
@@ -320,7 +319,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
             setIp6Address(ip6Address);
         }
 
-        public IpAddresses(String ipAddress, String ip6Address, String macAddress) {
+        public IpAddresses(final String ipAddress, final String ip6Address, final String macAddress) {
             this(ipAddress, ip6Address);
             setMacAddress(macAddress);
         }

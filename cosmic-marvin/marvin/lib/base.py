@@ -4,7 +4,6 @@
 
 import base64
 import time
-
 from marvin.cloudstackAPI import *
 from marvin.cloudstackException import (
     printException,
@@ -23,12 +22,6 @@ from marvin.codes import (
     BACKED_UP,
     BACKING_UP
 )
-from utils import (
-    validate_list,
-    validate_state,
-    is_server_ssh_ready,
-    random_gen
-)
 
 from common import (
     list_routers,
@@ -39,6 +32,14 @@ from common import (
     get_network,
     get_vpc_offering
 )
+from utils import (
+    validate_list,
+    validate_state,
+    is_server_ssh_ready,
+    random_gen
+)
+
+
 class Domain:
     """ Domain Life Cycle """
 
@@ -47,7 +48,7 @@ class Domain:
 
     @classmethod
     def create(cls, api_client, services=None, name=None, networkdomain=None,
-               parentdomainid=None, randomizeID=True,):
+               parentdomainid=None, randomizeID=True, ):
         """Creates an domain"""
 
         cmd = createDomain.createDomainCmd()
@@ -302,7 +303,7 @@ class VirtualMachine:
             if not isinstance(list_security_groups, list):
                 basic_mode_security_group = SecurityGroup.create(
                     api_client,
-                    {"name": "basic_sec_grp"},
+                    { "name": "basic_sec_grp" },
                     cmd.account,
                     cmd.domainid,
                 )
@@ -384,10 +385,10 @@ class VirtualMachine:
                     aclid=acl_list[0].id
                 )
 
-                services_acl = {"protocol": services["protocol"] if "protocol" in services else 'TCP',
-                                "startport": services["publicport"] if "publicport" in services else 22,
-                                "endport": services["publicport"] if "publicport" in services else 22,
-                                "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress'}
+                services_acl = { "protocol": services["protocol"] if "protocol" in services else 'TCP',
+                                 "startport": services["publicport"] if "publicport" in services else 22,
+                                 "endport": services["publicport"] if "publicport" in services else 22,
+                                 "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress' }
 
                 ace_number = 1
                 for ace in target_acl:
@@ -542,7 +543,7 @@ class VirtualMachine:
         if "userdata" in services:
             cmd.userdata = base64.urlsafe_b64encode(services["userdata"])
 
-        cmd.details = [{}]
+        cmd.details = [{ }]
 
         if customcpunumber:
             cmd.details[0]["cpuNumber"] = customcpunumber
@@ -883,7 +884,7 @@ class VirtualMachine:
         cmd = scaleVirtualMachine.scaleVirtualMachineCmd()
         cmd.id = self.id
         cmd.serviceofferingid = serviceOfferingId
-        cmd.details = [{"cpuNumber": "", "cpuSpeed": "", "memory": ""}]
+        cmd.details = [{ "cpuNumber": "", "cpuSpeed": "", "memory": "" }]
         if customcpunumber:
             cmd.details[0]["cpuNumber"] = customcpunumber
         if customcpuspeed:
@@ -1869,162 +1870,6 @@ class FireWallRule:
         return api_client.listFirewallRules(cmd)
 
 
-class Autoscale:
-    """Manage Auto scale"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def listCounters(cls, api_client, **kwargs):
-        """Lists all available Counters."""
-
-        cmd = listCounters.listCountersCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.listCounters(cmd)
-
-    @classmethod
-    def createCondition(cls, api_client, counterid, relationaloperator, threshold):
-        """creates condition."""
-
-        cmd = createCondition.createConditionCmd()
-        cmd.counterid = counterid
-        cmd.relationaloperator = relationaloperator
-        cmd.threshold = threshold
-        return api_client.createCondition(cmd)
-
-    @classmethod
-    def listConditions(cls, api_client, **kwargs):
-        """Lists all available Conditions."""
-
-        cmd = listConditions.listConditionsCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.listConditions(cmd)
-
-    @classmethod
-    def listAutoscalePolicies(cls, api_client, **kwargs):
-        """Lists all available Autoscale Policies."""
-
-        cmd = listAutoScalePolicies.listAutoScalePoliciesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.listAutoScalePolicies(cmd)
-
-    @classmethod
-    def createAutoscalePolicy(cls, api_client, action, conditionids, duration, quiettime=None):
-        """creates condition."""
-
-        cmd = createAutoScalePolicy.createAutoScalePolicyCmd()
-        cmd.action = action
-        cmd.conditionids = conditionids
-        cmd.duration = duration
-        if quiettime:
-            cmd.quiettime = quiettime
-
-        return api_client.createAutoScalePolicy(cmd)
-
-    @classmethod
-    def updateAutoscalePolicy(cls, api_client, id, **kwargs):
-        """Updates Autoscale Policy."""
-
-        cmd = updateAutoScalePolicy.updateAutoScalePolicyCmd()
-        cmd.id = id
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.updateAutoScalePolicy(cmd)
-
-    @classmethod
-    def listAutoscaleVmPofiles(cls, api_client, **kwargs):
-        """Lists all available AutoscaleVM  Profiles."""
-
-        cmd = listAutoScaleVmProfiles.listAutoScaleVmProfilesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.listAutoScaleVmProfiles(cmd)
-
-    @classmethod
-    def createAutoscaleVmProfile(cls, api_client, serviceofferingid, zoneid, templateid,
-                                 autoscaleuserid=None, destroyvmgraceperiod=None, counterparam=None):
-        """creates Autoscale VM Profile."""
-
-        cmd = createAutoScaleVmProfile.createAutoScaleVmProfileCmd()
-        cmd.serviceofferingid = serviceofferingid
-        cmd.zoneid = zoneid
-        cmd.templateid = templateid
-        if autoscaleuserid:
-            cmd.autoscaleuserid = autoscaleuserid
-
-        if destroyvmgraceperiod:
-            cmd.destroyvmgraceperiod = destroyvmgraceperiod
-
-        if counterparam:
-            for name, value in counterparam.items():
-                cmd.counterparam.append({
-                    'name': name,
-                    'value': value
-                })
-
-        return api_client.createAutoScaleVmProfile(cmd)
-
-    @classmethod
-    def updateAutoscaleVMProfile(cls, api_client, id, **kwargs):
-        """Updates Autoscale Policy."""
-
-        cmd = updateAutoScaleVmProfile.updateAutoScaleVmProfileCmd()
-        cmd.id = id
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.updateAutoScaleVmProfile(cmd)
-
-    @classmethod
-    def createAutoscaleVmGroup(cls, api_client, lbruleid, minmembers, maxmembers,
-                               scaledownpolicyids, scaleuppolicyids, vmprofileid, interval=None):
-        """creates Autoscale VM Group."""
-
-        cmd = createAutoScaleVmGroup.createAutoScaleVmGroupCmd()
-        cmd.lbruleid = lbruleid
-        cmd.minmembers = minmembers
-        cmd.maxmembers = maxmembers
-        cmd.scaledownpolicyids = scaledownpolicyids
-        cmd.scaleuppolicyids = scaleuppolicyids
-        cmd.vmprofileid = vmprofileid
-        if interval:
-            cmd.interval = interval
-
-        return api_client.createAutoScaleVmGroup(cmd)
-
-    @classmethod
-    def listAutoscaleVmGroup(cls, api_client, **kwargs):
-        """Lists all available AutoscaleVM  Group."""
-
-        cmd = listAutoScaleVmGroups.listAutoScaleVmGroupsCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.listAutoScaleVmGroups(cmd)
-
-    @classmethod
-    def enableAutoscaleVmGroup(cls, api_client, id, **kwargs):
-        """Enables AutoscaleVM  Group."""
-
-        cmd = enableAutoScaleVmGroup.enableAutoScaleVmGroupCmd()
-        cmd.id = id
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.enableAutoScaleVmGroup(cmd)
-
-    @classmethod
-    def disableAutoscaleVmGroup(cls, api_client, id, **kwargs):
-        """Disables AutoscaleVM  Group."""
-
-        cmd = disableAutoScaleVmGroup.disableAutoScaleVmGroupCmd()
-        cmd.id = id
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.disableAutoScaleVmGroup(cmd)
-
-    @classmethod
-    def updateAutoscaleVMGroup(cls, api_client, id, **kwargs):
-        """Updates Autoscale VM Group."""
-
-        cmd = updateAutoScaleVmGroup.updateAutoScaleVmGroupCmd()
-        cmd.id = id
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        return api_client.updateAutoScaleVmGroup(cmd)
-
-
 class ServiceOffering:
     """Manage service offerings cycle"""
 
@@ -2370,7 +2215,7 @@ class LoadBalancerRule:
         if param:
             cmd.param = []
             for name, value in param.items():
-                cmd.param.append({'name': name, 'value': value})
+                cmd.param.append({ 'name': name, 'value': value })
         return api_client.createLBStickinessPolicy(cmd)
 
     def deleteSticky(self, api_client, id):
@@ -2778,7 +2623,7 @@ class Network:
 
     @classmethod
     def create(cls, api_client, services=None, accountid=None, domainid=None, networkofferingid=None, projectid=None,
-               subdomainaccess=None, zoneid=None, gateway=None, netmask=None,  cidr=None, vpcid=None, aclid=None,
+               subdomainaccess=None, zoneid=None, gateway=None, netmask=None, cidr=None, vpcid=None, aclid=None,
                vlan=None, ipexclusionlist=None, domain=None, account=None, vpc=None, zone=None, acl=None, data=None):
         """Create Network for account"""
         if data:
@@ -3613,7 +3458,7 @@ class SecurityGroup:
         """Authorize Egress Rule"""
 
         if user_secgrp_list is None:
-            user_secgrp_list = {}
+            user_secgrp_list = { }
         cmd = authorizeSecurityGroupEgress.authorizeSecurityGroupEgressCmd()
 
         if domainid:
@@ -3678,7 +3523,7 @@ class VpnCustomerGateway:
         cmd.cidrlist = cidrlist
 
         if not services:
-            services = {}
+            services = { }
         if "ipsecpsk" in services:
             cmd.ipsecpsk = services["ipsecpsk"]
         elif presharedkey:
@@ -4193,7 +4038,7 @@ class VPC:
 
     @classmethod
     def create(cls, api_client, services=None, vpcofferingid=None, zoneid=None, networkDomain=None, account=None,
-               domainid=None, zone=None, data=None, randomizeID=True,  **kwargs):
+               domainid=None, zone=None, data=None, randomizeID=True, **kwargs):
         """Creates the virtual private connection (VPC)"""
         if data:
             services = data
@@ -4230,7 +4075,7 @@ class VPC:
         if domainid:
             cmd.domainid = domainid
         elif account and not type(account) is str:
-                cmd.domainid = account.domainid
+            cmd.domainid = account.domainid
         if networkDomain:
             cmd.networkDomain = networkDomain
         [setattr(cmd, k, v) for k, v in kwargs.items()]

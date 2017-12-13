@@ -6,8 +6,6 @@ import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.network.dao.NetworkDetailsDao;
 import com.cloud.resourcedetail.ResourceDetailsDao;
-import com.cloud.resourcedetail.dao.AutoScaleVmGroupDetailsDao;
-import com.cloud.resourcedetail.dao.AutoScaleVmProfileDetailsDao;
 import com.cloud.resourcedetail.dao.DiskOfferingDetailsDao;
 import com.cloud.resourcedetail.dao.FirewallRuleDetailsDao;
 import com.cloud.resourcedetail.dao.LBHealthCheckPolicyDetailsDao;
@@ -95,10 +93,6 @@ public class ResourceMetaDataManagerImpl extends ManagerBase implements Resource
     @Inject
     UserDetailsDao _userDetailsDao;
     @Inject
-    AutoScaleVmProfileDetailsDao _autoScaleVmProfileDetailsDao;
-    @Inject
-    AutoScaleVmGroupDetailsDao _autoScaleVmGroupDetailsDao;
-    @Inject
     LBStickinessPolicyDetailsDao _stickinessPolicyDetailsDao;
     @Inject
     LBHealthCheckPolicyDetailsDao _healthcheckPolicyDetailsDao;
@@ -127,8 +121,6 @@ public class ResourceMetaDataManagerImpl extends ManagerBase implements Resource
         s_daoMap.put(ResourceObjectType.VpnConnection, _vpnConnectionDetailsDao);
         s_daoMap.put(ResourceObjectType.DiskOffering, _diskOfferingDetailsDao);
         s_daoMap.put(ResourceObjectType.User, _userDetailsDao);
-        s_daoMap.put(ResourceObjectType.AutoScaleVmProfile, _autoScaleVmProfileDetailsDao);
-        s_daoMap.put(ResourceObjectType.AutoScaleVmGroup, _autoScaleVmGroupDetailsDao);
         s_daoMap.put(ResourceObjectType.LBStickinessPolicy, _stickinessPolicyDetailsDao);
         s_daoMap.put(ResourceObjectType.LBHealthCheckPolicy, _healthcheckPolicyDetailsDao);
 

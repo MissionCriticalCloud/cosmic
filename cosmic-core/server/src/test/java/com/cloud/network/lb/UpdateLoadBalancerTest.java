@@ -13,7 +13,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.PublicIpAddress;
-import com.cloud.network.as.dao.AutoScaleVmGroupDao;
 import com.cloud.network.dao.LBHealthCheckPolicyDao;
 import com.cloud.network.dao.LBStickinessPolicyDao;
 import com.cloud.network.dao.LoadBalancerCertMapDao;
@@ -53,7 +52,6 @@ public class UpdateLoadBalancerTest {
     @Before
     public void setUp() {
         _lbMgr._accountMgr = new MockAccountManagerImpl();
-        _lbMgr._autoScaleVmGroupDao = Mockito.mock(AutoScaleVmGroupDao.class);
         _lbMgr._networkDao = netDao;
         _lbMgr._networkModel = netModel;
         _lbMgr._lb2healthcheckDao = Mockito.mock(LBHealthCheckPolicyDao.class);

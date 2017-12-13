@@ -24,8 +24,6 @@ import com.cloud.api.command.admin.address.AssociateIPAddrCmdByAdmin;
 import com.cloud.api.command.admin.address.ListPublicIpAddressesCmdByAdmin;
 import com.cloud.api.command.admin.affinitygroup.UpdateVMAffinityGroupCmdByAdmin;
 import com.cloud.api.command.admin.alert.GenerateAlertCmd;
-import com.cloud.api.command.admin.autoscale.CreateCounterCmd;
-import com.cloud.api.command.admin.autoscale.DeleteCounterCmd;
 import com.cloud.api.command.admin.cloudops.ListHAWorkersCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisIpCmd;
 import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
@@ -245,24 +243,6 @@ import com.cloud.api.command.user.affinitygroup.DeleteAffinityGroupCmd;
 import com.cloud.api.command.user.affinitygroup.ListAffinityGroupTypesCmd;
 import com.cloud.api.command.user.affinitygroup.ListAffinityGroupsCmd;
 import com.cloud.api.command.user.affinitygroup.UpdateVMAffinityGroupCmd;
-import com.cloud.api.command.user.autoscale.CreateAutoScalePolicyCmd;
-import com.cloud.api.command.user.autoscale.CreateAutoScaleVmGroupCmd;
-import com.cloud.api.command.user.autoscale.CreateAutoScaleVmProfileCmd;
-import com.cloud.api.command.user.autoscale.CreateConditionCmd;
-import com.cloud.api.command.user.autoscale.DeleteAutoScalePolicyCmd;
-import com.cloud.api.command.user.autoscale.DeleteAutoScaleVmGroupCmd;
-import com.cloud.api.command.user.autoscale.DeleteAutoScaleVmProfileCmd;
-import com.cloud.api.command.user.autoscale.DeleteConditionCmd;
-import com.cloud.api.command.user.autoscale.DisableAutoScaleVmGroupCmd;
-import com.cloud.api.command.user.autoscale.EnableAutoScaleVmGroupCmd;
-import com.cloud.api.command.user.autoscale.ListAutoScalePoliciesCmd;
-import com.cloud.api.command.user.autoscale.ListAutoScaleVmGroupsCmd;
-import com.cloud.api.command.user.autoscale.ListAutoScaleVmProfilesCmd;
-import com.cloud.api.command.user.autoscale.ListConditionsCmd;
-import com.cloud.api.command.user.autoscale.ListCountersCmd;
-import com.cloud.api.command.user.autoscale.UpdateAutoScalePolicyCmd;
-import com.cloud.api.command.user.autoscale.UpdateAutoScaleVmGroupCmd;
-import com.cloud.api.command.user.autoscale.UpdateAutoScaleVmProfileCmd;
 import com.cloud.api.command.user.config.ListCapabilitiesCmd;
 import com.cloud.api.command.user.event.ArchiveEventsCmd;
 import com.cloud.api.command.user.event.DeleteEventsCmd;
@@ -2918,7 +2898,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             if (dedicatedResourceVO != null && dedicatedResourceVO.getDomainId() != account.getDomainId()) {
                 final Domain domain = _domainDao.findById(dedicatedResourceVO.getDomainId());
                 if (domain != null) {
-                    s_logger.debug("Host " + host.getName() + " is dedicated to domain " + domain.getName() + " so not suitable for migration for VM " + vmProfile.getInstanceName());
+                    s_logger.debug("Host " + host.getName() + " is dedicated to domain " + domain.getName() + " so not suitable for migration for VM " + vmProfile
+                            .getInstanceName());
                 }
                 excludes.addHost(host.getId());
             }
@@ -3456,8 +3437,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(EnableAccountCmd.class);
         cmdList.add(LockAccountCmd.class);
         cmdList.add(UpdateAccountCmd.class);
-        cmdList.add(CreateCounterCmd.class);
-        cmdList.add(DeleteCounterCmd.class);
         cmdList.add(AddClusterCmd.class);
         cmdList.add(DeleteClusterCmd.class);
         cmdList.add(ListClustersCmd.class);
@@ -3592,24 +3571,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(AssociateIPAddrCmd.class);
         cmdList.add(DisassociateIPAddrCmd.class);
         cmdList.add(ListPublicIpAddressesCmd.class);
-        cmdList.add(CreateAutoScalePolicyCmd.class);
-        cmdList.add(CreateAutoScaleVmGroupCmd.class);
-        cmdList.add(CreateAutoScaleVmProfileCmd.class);
-        cmdList.add(CreateConditionCmd.class);
-        cmdList.add(DeleteAutoScalePolicyCmd.class);
-        cmdList.add(DeleteAutoScaleVmGroupCmd.class);
-        cmdList.add(DeleteAutoScaleVmProfileCmd.class);
-        cmdList.add(DeleteConditionCmd.class);
-        cmdList.add(DisableAutoScaleVmGroupCmd.class);
-        cmdList.add(EnableAutoScaleVmGroupCmd.class);
-        cmdList.add(ListAutoScalePoliciesCmd.class);
-        cmdList.add(ListAutoScaleVmGroupsCmd.class);
-        cmdList.add(ListAutoScaleVmProfilesCmd.class);
-        cmdList.add(ListConditionsCmd.class);
-        cmdList.add(ListCountersCmd.class);
-        cmdList.add(UpdateAutoScalePolicyCmd.class);
-        cmdList.add(UpdateAutoScaleVmGroupCmd.class);
-        cmdList.add(UpdateAutoScaleVmProfileCmd.class);
         cmdList.add(ListCapabilitiesCmd.class);
         cmdList.add(ListEventsCmd.class);
         cmdList.add(ListEventTypesCmd.class);

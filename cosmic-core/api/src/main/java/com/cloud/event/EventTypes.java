@@ -17,11 +17,6 @@ import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
-import com.cloud.network.as.AutoScaleCounter;
-import com.cloud.network.as.AutoScalePolicy;
-import com.cloud.network.as.AutoScaleVmGroup;
-import com.cloud.network.as.AutoScaleVmProfile;
-import com.cloud.network.as.Condition;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
@@ -361,22 +356,7 @@ public class EventTypes {
     public static final String EVENT_EXTERNAL_VSP_VSD_ADD = "PHYSICAL.NUAGE.VSD.ADD";
     public static final String EVENT_EXTERNAL_VSP_VSD_UPDATE = "PHYSICAL.NUAGE.VSD.UPDATE";
     public static final String EVENT_EXTERNAL_VSP_VSD_DELETE = "PHYSICAL.NUAGE.VSD.DELETE";
-    // AutoScale
-    public static final String EVENT_COUNTER_CREATE = "COUNTER.CREATE";
-    public static final String EVENT_COUNTER_DELETE = "COUNTER.DELETE";
-    public static final String EVENT_CONDITION_CREATE = "CONDITION.CREATE";
-    public static final String EVENT_CONDITION_DELETE = "CONDITION.DELETE";
-    public static final String EVENT_AUTOSCALEPOLICY_CREATE = "AUTOSCALEPOLICY.CREATE";
-    public static final String EVENT_AUTOSCALEPOLICY_UPDATE = "AUTOSCALEPOLICY.UPDATE";
-    public static final String EVENT_AUTOSCALEPOLICY_DELETE = "AUTOSCALEPOLICY.DELETE";
-    public static final String EVENT_AUTOSCALEVMPROFILE_CREATE = "AUTOSCALEVMPROFILE.CREATE";
-    public static final String EVENT_AUTOSCALEVMPROFILE_DELETE = "AUTOSCALEVMPROFILE.DELETE";
-    public static final String EVENT_AUTOSCALEVMPROFILE_UPDATE = "AUTOSCALEVMPROFILE.UPDATE";
-    public static final String EVENT_AUTOSCALEVMGROUP_CREATE = "AUTOSCALEVMGROUP.CREATE";
-    public static final String EVENT_AUTOSCALEVMGROUP_DELETE = "AUTOSCALEVMGROUP.DELETE";
-    public static final String EVENT_AUTOSCALEVMGROUP_UPDATE = "AUTOSCALEVMGROUP.UPDATE";
-    public static final String EVENT_AUTOSCALEVMGROUP_ENABLE = "AUTOSCALEVMGROUP.ENABLE";
-    public static final String EVENT_AUTOSCALEVMGROUP_DISABLE = "AUTOSCALEVMGROUP.DISABLE";
+
     public static final String EVENT_AFFINITY_GROUP_CREATE = "AG.CREATE";
     public static final String EVENT_AFFINITY_GROUP_DELETE = "AG.DELETE";
     public static final String EVENT_AFFINITY_GROUP_ASSIGN = "AG.ASSIGN";
@@ -385,6 +365,7 @@ public class EventTypes {
     public static final String EVENT_INTERNAL_LB_VM_START = "INTERNALLBVM.START";
     public static final String EVENT_INTERNAL_LB_VM_STOP = "INTERNALLBVM.STOP";
     public static final String EVENT_HOST_RESERVATION_RELEASE = "HOST.RESERVATION.RELEASE";
+
     // Dedicated guest vlan range
     public static final String EVENT_GUEST_VLAN_RANGE_DEDICATE = "GUESTVLANRANGE.DEDICATE";
     public static final String EVENT_DEDICATED_GUEST_VLAN_RANGE_RELEASE = "GUESTVLANRANGE.RELEASE";
@@ -732,22 +713,6 @@ public class EventTypes {
         entityEventDetails.put(EVENT_EXTERNAL_VSP_VSD_ADD, "NuageVsp");
         entityEventDetails.put(EVENT_EXTERNAL_VSP_VSD_DELETE, "NuageVsp");
 
-        // AutoScale
-        entityEventDetails.put(EVENT_COUNTER_CREATE, AutoScaleCounter.class);
-        entityEventDetails.put(EVENT_COUNTER_DELETE, AutoScaleCounter.class);
-        entityEventDetails.put(EVENT_CONDITION_CREATE, Condition.class);
-        entityEventDetails.put(EVENT_CONDITION_DELETE, Condition.class);
-        entityEventDetails.put(EVENT_AUTOSCALEPOLICY_CREATE, AutoScalePolicy.class);
-        entityEventDetails.put(EVENT_AUTOSCALEPOLICY_UPDATE, AutoScalePolicy.class);
-        entityEventDetails.put(EVENT_AUTOSCALEPOLICY_DELETE, AutoScalePolicy.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMPROFILE_CREATE, AutoScaleVmProfile.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMPROFILE_DELETE, AutoScaleVmProfile.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMPROFILE_UPDATE, AutoScaleVmProfile.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMGROUP_CREATE, AutoScaleVmGroup.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMGROUP_DELETE, AutoScaleVmGroup.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMGROUP_UPDATE, AutoScaleVmGroup.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMGROUP_ENABLE, AutoScaleVmGroup.class);
-        entityEventDetails.put(EVENT_AUTOSCALEVMGROUP_DISABLE, AutoScaleVmGroup.class);
         entityEventDetails.put(EVENT_GUEST_VLAN_RANGE_DEDICATE, GuestVlan.class);
         entityEventDetails.put(EVENT_DEDICATED_GUEST_VLAN_RANGE_RELEASE, GuestVlan.class);
 
