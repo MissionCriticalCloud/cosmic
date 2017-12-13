@@ -5,13 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LibvirtVmDef {
-    private static final Logger s_logger = LoggerFactory.getLogger(LibvirtVmDef.class);
     private static long s_libvirtVersion;
     private static long s_qemuVersion;
     private final Map<String, Object> components = new HashMap<>();
@@ -77,17 +73,8 @@ public class LibvirtVmDef {
         return null;
     }
 
-    public MetadataDef getMetaData() {
-        MetadataDef metaData = (MetadataDef) components.get(MetadataDef.class.toString());
-        if (metaData == null) {
-            metaData = new MetadataDef();
-            addComp(metaData);
-        }
-        return metaData;
-    }
-
-    public void addComp(final Object comp) {
-        components.put(comp.getClass().toString(), comp);
+    public void addComponent(final Object component) {
+        components.put(component.getClass().toString(), component);
     }
 
     public static class GuestDef {
@@ -1418,49 +1405,29 @@ public class LibvirtVmDef {
     }
 
     public static class MetadataDef {
-        Map<String, Object> customNodes = new HashMap<>();
+        private Map<String, Object> nodes = new HashMap<>();
 
-        public <T> T getMetadataNode(final Class<T> fieldClass) {
-            T field = (T) customNodes.get(fieldClass.getName());
-            if (field == null) {
-                try {
-                    field = fieldClass.newInstance();
-                    customNodes.put(field.getClass().getName(), field);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    s_logger.debug("No default constructor available in class " + fieldClass.getName() + ", ignoring exception",
-                            e);
-                }
-            }
-            return field;
+        public Map<String, Object> getNodes() {
+            return nodes;
         }
 
         @Override
         public String toString() {
-            final StringBuilder fsBuilder = new StringBuilder();
-            fsBuilder.append("<metadata>\n");
-            for (final Object field : customNodes.values()) {
-                fsBuilder.append(field.toString());
+            final StringBuilder xmlBuilder = new StringBuilder();
+            xmlBuilder.append("<metadata>");
+            xmlBuilder.append("<cosmic:metadata xmlns:cosmic=\"https://github.com/MissionCriticalCloud\">");
+            for (final Map.Entry<String, Object> entry : nodes.entrySet()) {
+                xmlBuilder.append("<cosmic:");
+                xmlBuilder.append(entry.getKey());
+                xmlBuilder.append(">");
+                xmlBuilder.append(entry.getValue());
+                xmlBuilder.append("</cosmic:");
+                xmlBuilder.append(entry.getKey());
+                xmlBuilder.append(">");
             }
-            fsBuilder.append("</metadata>\n");
-            return fsBuilder.toString();
-        }
-    }
-
-    public static class NuageExtensionDef {
-        private final Map<String, String> addresses = Maps.newHashMap();
-
-        public void addNuageExtension(final String macAddress, final String vrIp) {
-            addresses.put(macAddress, vrIp);
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder fsBuilder = new StringBuilder();
-            for (final Map.Entry<String, String> address : addresses.entrySet()) {
-                fsBuilder.append("<nuage-extension>\n").append("  <interface mac='").append(address.getKey()).append(
-                        "' vsp-vr-ip='").append(address.getValue()).append("'></interface>\n").append("</nuage-extension>\n");
-            }
-            return fsBuilder.toString();
+            xmlBuilder.append("</cosmic:metadata>");
+            xmlBuilder.append("</metadata>");
+            return xmlBuilder.toString();
         }
     }
 
