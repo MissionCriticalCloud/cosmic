@@ -1,6 +1,5 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef.NicModel;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
@@ -8,6 +7,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogAction;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogModel;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 public class LibvirtDomainXmlParser {
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtDomainXmlParser.class);
     private final List<InterfaceDef> interfaces = new ArrayList<>();
-    private final List<DiskDef> diskDefs = new ArrayList<>();
+    private final List<LibvirtDiskDef> diskDefs = new ArrayList<>();
     private final List<RngDef> rngDefs = new ArrayList<>();
     private final List<WatchDogDef> watchDogDefs = new ArrayList<>();
     private Integer vncPort;
@@ -54,7 +54,7 @@ public class LibvirtDomainXmlParser {
             for (int i = 0; i < disks.getLength(); i++) {
                 final Element disk = (Element) disks.item(i);
                 final String type = disk.getAttribute("type");
-                final DiskDef def = new DiskDef();
+                final LibvirtDiskDef def = new LibvirtDiskDef();
                 if (type.equalsIgnoreCase("network")) {
                     final String diskFmtType = getAttrValue("driver", "type", disk);
                     final String diskCacheMode = getAttrValue("driver", "cache", disk);
@@ -67,15 +67,15 @@ public class LibvirtDomainXmlParser {
                     final String diskLabel = getAttrValue("target", "dev", disk);
                     final String bus = getAttrValue("target", "bus", disk);
 
-                    DiskDef.DiskFmtType fmt = null;
+                    LibvirtDiskDef.DiskFmtType fmt = null;
                     if (diskFmtType != null) {
-                        fmt = DiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
+                        fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
                     }
 
                     def.defNetworkBasedDisk(diskPath, host, port, authUserName, poolUuid, diskLabel,
-                            DiskDef.DiskBus.valueOf(bus.toUpperCase()),
-                            DiskDef.DiskProtocol.valueOf(protocol.toUpperCase()), fmt);
-                    def.setCacheMode(DiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
+                            LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()),
+                            LibvirtDiskDef.DiskProtocol.valueOf(protocol.toUpperCase()), fmt);
+                    def.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
                 } else {
                     final String diskFmtType = getAttrValue("driver", "type", disk);
                     final String diskCacheMode = getAttrValue("driver", "cache", disk);
@@ -88,20 +88,20 @@ public class LibvirtDomainXmlParser {
 
                     if (type.equalsIgnoreCase("file")) {
                         if (device.equalsIgnoreCase("disk")) {
-                            DiskDef.DiskFmtType fmt = null;
+                            LibvirtDiskDef.DiskFmtType fmt = null;
                             if (diskFmtType != null) {
-                                fmt = DiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
+                                fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
                             }
-                            def.defFileBasedDisk(diskFile, diskLabel, DiskDef.DiskBus.valueOf(bus.toUpperCase()), fmt);
+                            def.defFileBasedDisk(diskFile, diskLabel, LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()), fmt);
                         } else if (device.equalsIgnoreCase("cdrom")) {
                             def.defIsoDisk(diskFile);
                         }
                     } else if (type.equalsIgnoreCase("block")) {
                         def.defBlockBasedDisk(diskDev, diskLabel,
-                                DiskDef.DiskBus.valueOf(bus.toUpperCase()));
+                                LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()));
                     }
                     if (diskCacheMode != null) {
-                        def.setCacheMode(DiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
+                        def.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
                     }
                 }
 
@@ -255,7 +255,7 @@ public class LibvirtDomainXmlParser {
         return interfaces;
     }
 
-    public List<DiskDef> getDisks() {
+    public List<LibvirtDiskDef> getDisks() {
         return diskDefs;
     }
 

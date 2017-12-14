@@ -7,6 +7,8 @@ import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
 
 public interface VolumeInfo extends DataObject, Volume {
+    boolean isToBeLiveMigrated();
+
     boolean isAttachedVM();
 
     void addPayload(Object data);

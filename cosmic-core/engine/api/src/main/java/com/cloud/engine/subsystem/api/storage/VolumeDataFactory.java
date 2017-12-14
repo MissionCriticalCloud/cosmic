@@ -13,5 +13,7 @@ public interface VolumeDataFactory {
 
     VolumeInfo getVolume(long volumeId);
 
+    VolumeInfo getVolume(long volumeId, final boolean toBeMigrated);
+
     List<VolumeInfo> listVolumeOnCache(long volumeId);
 }

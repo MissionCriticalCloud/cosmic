@@ -43,6 +43,7 @@ public class VolumeObject implements VolumeInfo {
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeObject.class);
     protected VolumeVO volumeVO;
     protected DataStore dataStore;
+    protected boolean toBeLiveMigrated;
     @Inject
     VolumeDao volumeDao;
     @Inject
@@ -61,14 +62,19 @@ public class VolumeObject implements VolumeInfo {
     }
 
     public static VolumeObject getVolumeObject(final DataStore dataStore, final VolumeVO volumeVO) {
+        return getVolumeObject(dataStore, volumeVO, false);
+    }
+
+    public static VolumeObject getVolumeObject(final DataStore dataStore, final VolumeVO volumeVO, final boolean toBeLiveMigrated) {
         final VolumeObject vo = ComponentContext.inject(VolumeObject.class);
-        vo.configure(dataStore, volumeVO);
+        vo.configure(dataStore, volumeVO, toBeLiveMigrated);
         return vo;
     }
 
-    protected void configure(final DataStore dataStore, final VolumeVO volumeVO) {
+    protected void configure(final DataStore dataStore, final VolumeVO volumeVO, final boolean toBeLiveMigrated) {
         this.volumeVO = volumeVO;
         this.dataStore = dataStore;
+        this.toBeLiveMigrated = toBeLiveMigrated;
     }
 
     public void update() {
@@ -77,8 +83,13 @@ public class VolumeObject implements VolumeInfo {
     }
 
     @Override
+    public boolean isToBeLiveMigrated() {
+        return toBeLiveMigrated;
+    }
+
+    @Override
     public boolean isAttachedVM() {
-        return (volumeVO.getInstanceId() == null) ? false : true;
+        return volumeVO.getInstanceId() != null;
     }
 
     @Override

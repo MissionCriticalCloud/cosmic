@@ -42,7 +42,11 @@ public class VolumeObjectTest {
 
     @Before
     public void setUp() throws Exception {
-        volumeObject.configure(Mockito.mock(DataStore.class), new VolumeVO("name", 1l, 1l, 1l, 1l, 1l, "folder", "path", Storage.ProvisioningType.THIN, 1l, Volume.Type.DATADISK));
+        volumeObject.configure(
+                Mockito.mock(DataStore.class),
+                new VolumeVO("name", 1L, 1L, 1L, 1L, 1L, "folder", "path", Storage.ProvisioningType.THIN, 1L, Volume.Type.DATADISK),
+                false
+        );
     }
 
     /**

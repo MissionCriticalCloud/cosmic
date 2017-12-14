@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.utils.Pair;
 
 import junit.framework.TestCase;
@@ -54,10 +54,10 @@ public class LibvirtVMDefTest extends TestCase {
         final String filePath = "/var/lib/libvirt/images/disk.qcow2";
         final String diskLabel = "vda";
 
-        final DiskDef disk = new DiskDef();
-        final DiskDef.DiskBus bus = DiskDef.DiskBus.VIRTIO;
-        final DiskDef.DiskFmtType type = DiskDef.DiskFmtType.QCOW2;
-        final DiskDef.DiskCacheMode cacheMode = DiskDef.DiskCacheMode.WRITEBACK;
+        final LibvirtDiskDef disk = new LibvirtDiskDef();
+        final LibvirtDiskDef.DiskBus bus = LibvirtDiskDef.DiskBus.VIRTIO;
+        final LibvirtDiskDef.DiskFmtType type = LibvirtDiskDef.DiskFmtType.QCOW2;
+        final LibvirtDiskDef.DiskCacheMode cacheMode = LibvirtDiskDef.DiskCacheMode.WRITEBACK;
 
         disk.defFileBasedDisk(filePath, diskLabel, bus, type);
         disk.setCacheMode(cacheMode);
@@ -65,7 +65,7 @@ public class LibvirtVMDefTest extends TestCase {
         assertEquals(filePath, disk.getDiskPath());
         assertEquals(diskLabel, disk.getDiskLabel());
         assertEquals(bus, disk.getBusType());
-        assertEquals(DiskDef.DeviceType.DISK, disk.getDeviceType());
+        assertEquals(LibvirtDiskDef.DeviceType.DISK, disk.getDeviceType());
 
         final String xmlDef = disk.toString();
         final String expectedXml = "<disk  device='disk' type='file'>\n<driver name='qemu' type='" + type.toString() + "' cache='"

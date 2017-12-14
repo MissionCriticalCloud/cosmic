@@ -1,4 +1,6 @@
-package com.cloud.hypervisor.kvm.resource;
+package com.cloud.hypervisor.kvm.resource.async;
+
+import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 
 import java.util.concurrent.Callable;
 

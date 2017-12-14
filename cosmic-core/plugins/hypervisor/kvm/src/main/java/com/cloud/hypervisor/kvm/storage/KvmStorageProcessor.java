@@ -11,10 +11,7 @@ import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DeviceType;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiscardType;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.DiskDef.DiskProtocol;
+import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.StoragePoolType;
@@ -762,20 +759,20 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk isoVol = secondaryPool.getPhysicalDisk(name);
             isoPath = isoVol.getPath();
 
-            final DiskDef iso = new DiskDef();
+            final LibvirtDiskDef iso = new LibvirtDiskDef();
             iso.defIsoDisk(isoPath);
             isoXml = iso.toString();
         } else {
-            final DiskDef iso = new DiskDef();
+            final LibvirtDiskDef iso = new LibvirtDiskDef();
             iso.defIsoDisk(null);
             isoXml = iso.toString();
         }
 
-        final List<DiskDef> disks = resource.getDisks(conn, vmName);
+        final List<LibvirtDiskDef> disks = resource.getDisks(conn, vmName);
         final String result = attachOrDetachDevice(conn, true, vmName, isoXml);
         if (result == null && !isAttach) {
-            for (final DiskDef disk : disks) {
-                if (disk.getDeviceType() == DiskDef.DeviceType.CDROM) {
+            for (final LibvirtDiskDef disk : disks) {
+                if (disk.getDeviceType() == LibvirtDiskDef.DeviceType.CDROM) {
                     resource.cleanupDisk(disk);
                 }
             }
@@ -1111,9 +1108,9 @@ public class KvmStorageProcessor implements StorageProcessor {
     protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName,
                                                      final KvmPhysicalDisk attachingDisk, final int devId, final String serial) throws LibvirtException,
             InternalErrorException {
-        List<DiskDef> disks = null;
+        List<LibvirtDiskDef> disks = null;
         Domain dm = null;
-        DiskDef diskdef = null;
+        LibvirtDiskDef diskdef = null;
         final KvmStoragePool attachingPool = attachingDisk.getPool();
         try {
             dm = conn.domainLookupByName(vmName);
@@ -1123,7 +1120,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             disks = parser.getDisks();
 
             if (!attach) {
-                for (final DiskDef disk : disks) {
+                for (final LibvirtDiskDef disk : disks) {
                     final String file = disk.getDiskPath();
                     if (file != null && file.equalsIgnoreCase(attachingDisk.getPath())) {
                         diskdef = disk;
@@ -1134,36 +1131,36 @@ public class KvmStorageProcessor implements StorageProcessor {
                     throw new InternalErrorException("disk: " + attachingDisk.getPath() + " is not attached before");
                 }
             } else {
-                DiskDef.DiskBus diskBusType = DiskDef.DiskBus.VIRTIO;
-                for (final DiskDef disk : disks) {
+                LibvirtDiskDef.DiskBus diskBusType = LibvirtDiskDef.DiskBus.VIRTIO;
+                for (final LibvirtDiskDef disk : disks) {
                     logger.debug("disk is type : " + disk.toString());
-                    if (disk.getDeviceType() == DeviceType.DISK) {
-                        if (disk.getBusType() == DiskDef.DiskBus.SCSI) {
-                            diskBusType = DiskDef.DiskBus.SCSI;
+                    if (disk.getDeviceType() == LibvirtDiskDef.DeviceType.DISK) {
+                        if (disk.getBusType() == LibvirtDiskDef.DiskBus.SCSI) {
+                            diskBusType = LibvirtDiskDef.DiskBus.SCSI;
                         }
                         logger.debug("Disk bus type: " + disk.getDeviceType().toString() + ", diskBusType: " + diskBusType.toString());
                         break;
                     }
                 }
-                diskdef = new DiskDef();
-                if (diskBusType == DiskDef.DiskBus.SCSI) {
+                diskdef = new LibvirtDiskDef();
+                if (diskBusType == LibvirtDiskDef.DiskBus.SCSI) {
                     diskdef.setQemuDriver(true);
-                    diskdef.setDiscard(DiscardType.UNMAP);
+                    diskdef.setDiscard(LibvirtDiskDef.DiscardType.UNMAP);
                 }
                 diskdef.setSerial(serial);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
-                            attachingPool.getUuid(), devId, diskBusType, DiskProtocol.RBD, DiskDef.DiskFmtType.RAW);
+                            attachingPool.getUuid(), devId, diskBusType, LibvirtDiskDef.DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
                     diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), null,
-                            null, devId, diskBusType, DiskProtocol.GLUSTER, DiskDef.DiskFmtType.QCOW2);
+                            null, devId, diskBusType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskBusType, DiskDef.DiskFmtType.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskBusType, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.RAW) {
                     diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskBusType);
                 }
