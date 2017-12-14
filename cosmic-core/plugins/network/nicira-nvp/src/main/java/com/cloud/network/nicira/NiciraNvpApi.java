@@ -404,7 +404,7 @@ public class NiciraNvpApi {
 
         final int listSize = lspl.size();
         if (listSize != 1) {
-            throw new NiciraNvpApiException("Expected 1 LogicalSwitchPort, but got " + listSize);
+            return null;
         }
 
         final LogicalSwitchPort lsp = lspl.get(0);
