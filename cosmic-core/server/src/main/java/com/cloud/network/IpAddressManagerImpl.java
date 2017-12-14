@@ -44,7 +44,6 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress.State;
-import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -313,30 +312,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         defaultVPCOffProviders.put(Service.StaticNat, defaultProviders);
         defaultVPCOffProviders.put(Service.PortForwarding, defaultProviders);
         defaultVPCOffProviders.put(Service.Vpn, defaultProviders);
-
-        //#8 - network offering with internal lb service
-        final Map<Network.Service, Set<Network.Provider>> internalLbOffProviders = new HashMap<>();
-        final Set<Network.Provider> defaultVpcProvider = new HashSet<>();
-        defaultVpcProvider.add(Network.Provider.VPCVirtualRouter);
-
-        final Set<Network.Provider> defaultInternalLbProvider = new HashSet<>();
-        defaultInternalLbProvider.add(Network.Provider.InternalLbVm);
-
-        internalLbOffProviders.put(Service.Dhcp, defaultVpcProvider);
-        internalLbOffProviders.put(Service.Dns, defaultVpcProvider);
-        internalLbOffProviders.put(Service.UserData, defaultVpcProvider);
-        internalLbOffProviders.put(Service.NetworkACL, defaultVpcProvider);
-        internalLbOffProviders.put(Service.Gateway, defaultVpcProvider);
-        internalLbOffProviders.put(Service.Lb, defaultInternalLbProvider);
-        internalLbOffProviders.put(Service.SourceNat, defaultVpcProvider);
-
-        final Map<Service, Map<Capability, String>> serviceCapabilityMap = new HashMap<>();
-        final Map<Capability, String> elb = new HashMap<>();
-        elb.put(Capability.ElasticLb, "true");
-        final Map<Capability, String> eip = new HashMap<>();
-        eip.put(Capability.ElasticIp, "true");
-        serviceCapabilityMap.put(Service.Lb, elb);
-        serviceCapabilityMap.put(Service.StaticNat, eip);
 
         AssignIpAddressSearch = _ipAddressDao.createSearchBuilder();
         AssignIpAddressSearch.and("dc", AssignIpAddressSearch.entity().getDataCenterId(), Op.EQ);

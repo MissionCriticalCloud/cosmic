@@ -120,8 +120,6 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
-import com.cloud.region.Region;
-import com.cloud.region.RegionVO;
 import com.cloud.region.dao.RegionDao;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementService;
@@ -154,7 +152,6 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
-import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
@@ -775,8 +772,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 vmType = VirtualMachine.Type.ConsoleProxy;
             } else if (VirtualMachine.Type.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
                 vmType = VirtualMachine.Type.SecondaryStorageVm;
-            } else if (VirtualMachine.Type.InternalLoadBalancerVm.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.InternalLoadBalancerVm;
             } else {
                 throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachine.Type.DomainRouter + ", " + VirtualMachine.Type.ConsoleProxy
                         + ", " + VirtualMachine.Type.SecondaryStorageVm);
@@ -2694,9 +2689,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                         throw new InvalidParameterValueException("Unknown specified value for " + Capability.InlineMode.getName());
                     }
                 } else if (cap == Capability.LbSchemes) {
-                    final boolean internalLb = value.contains("internal");
                     final boolean publicLb = value.contains("public");
-                    if (!internalLb && !publicLb) {
+                    if (!publicLb) {
                         throw new InvalidParameterValueException("Unknown specified value for " + Capability.LbSchemes.getName());
                     }
                 } else {
@@ -2800,7 +2794,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         for (final Detail detail : details.keySet()) {
 
             Provider lbProvider = null;
-            if (detail == NetworkOffering.Detail.InternalLbProvider || detail == NetworkOffering.Detail.PublicLbProvider) {
+            if (detail == NetworkOffering.Detail.PublicLbProvider) {
                 // 1) Vaidate the detail values - have to match the lb provider
                 // name
                 final String providerStr = details.get(detail);
@@ -2824,9 +2818,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 // 2) validate if the provider supports the scheme
                 final Set<Provider> lbProviders = new HashSet<>();
                 lbProviders.add(lbProvider);
-                if (detail == NetworkOffering.Detail.InternalLbProvider) {
-                    _networkModel.checkCapabilityForProvider(lbProviders, Service.Lb, Capability.LbSchemes, Scheme.Internal.toString());
-                } else if (detail == NetworkOffering.Detail.PublicLbProvider) {
+                if (detail == NetworkOffering.Detail.PublicLbProvider) {
                     _networkModel.checkCapabilityForProvider(lbProviders, Service.Lb, Capability.LbSchemes, Scheme.Public.toString());
                 }
             }
@@ -3708,7 +3700,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         boolean associatePublicIp = false;
         boolean inline = false;
         boolean publicLb = false;
-        boolean internalLb = false;
         boolean strechedL2Subnet = false;
 
         if (serviceCapabilityMap != null && !serviceCapabilityMap.isEmpty()) {
@@ -3740,16 +3731,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 if (serviceProviderMap.containsKey(Service.Lb)) {
                     if (publicLbStr != null) {
                         _networkModel.checkCapabilityForProvider(serviceProviderMap.get(Service.Lb), Service.Lb, Capability.LbSchemes, publicLbStr);
-                        internalLb = publicLbStr.contains("internal");
                         publicLb = publicLbStr.contains("public");
                     }
                 }
-            }
-
-            // in the current version of the code, publicLb and specificLb can't
-            // both be set to true for the same network offering
-            if (publicLb && internalLb) {
-                throw new InvalidParameterValueException("Public lb and internal lb can't be enabled at the same time on the offering");
             }
 
             final Map<Capability, String> sourceNatServiceCapabilityMap = serviceCapabilityMap.get(Service.SourceNat);
@@ -3788,14 +3772,14 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
-        if (serviceProviderMap != null && serviceProviderMap.containsKey(Service.Lb) && !internalLb && !publicLb) {
+        if (serviceProviderMap != null && serviceProviderMap.containsKey(Service.Lb) && !publicLb) {
             //if not specified, default public lb to true
             publicLb = true;
         }
 
         final NetworkOfferingVO offeringFinal = new NetworkOfferingVO(name, displayText, trafficType, systemOnly, specifyVlan, networkRate, multicastRate, isDefault, availability,
                 tags, type, conserveMode, dedicatedLb, sharedSourceNat, redundantRouter, elasticIp, elasticLb, specifyIpRanges, inline, isPersistent, associatePublicIp, publicLb,
-                internalLb, egressDefaultPolicy, strechedL2Subnet);
+                egressDefaultPolicy, strechedL2Subnet);
 
         if (serviceOfferingId != null) {
             offeringFinal.setServiceOfferingId(serviceOfferingId);
@@ -4727,7 +4711,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (nums > 16 || nums <= 0) {
             throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "is wrong, should be 1~16");
         }
-    /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
+        /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
         final String[] ipRanges = NetUtils.getLinkLocalIPRange(nums);
         if (ipRanges == null) {
             throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "may be wrong, should be 1~16");

@@ -7,7 +7,6 @@ import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.job.QueryAsyncJobResultCmd;
 import com.cloud.api.response.AccountResponse;
-import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.CapacityResponse;
 import com.cloud.api.response.ClusterResponse;
@@ -29,7 +28,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.InternalLoadBalancerElementResponse;
 import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
@@ -109,7 +107,6 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VpnUser;
-import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
@@ -147,7 +144,6 @@ import com.cloud.user.SSHKeyPair;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.net.Ip;
 import com.cloud.vm.InstanceGroup;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
@@ -157,7 +153,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 
 public interface ResponseGenerator {
     UserResponse createUserResponse(UserAccount user);
@@ -375,13 +370,9 @@ public interface ResponseGenerator {
 
     public NicResponse createNicResponse(Nic result);
 
-    ApplicationLoadBalancerResponse createLoadBalancerContainerReponse(ApplicationLoadBalancerRule lb, Map<Ip, UserVm> lbInstances);
-
     AffinityGroupResponse createAffinityGroupResponse(AffinityGroup group);
 
     Long getAffinityGroupId(String name, long entityOwnerId);
-
-    InternalLoadBalancerElementResponse createInternalLbElementResponse(VirtualRouterProvider result);
 
     IsolationMethodResponse createIsolationMethodResponse(IsolationType method);
 

@@ -82,7 +82,6 @@ public class LBHealthCheckManagerImpl extends ManagerBase implements LBHealthChe
         protected void runInContext() {
             try {
                 updateLBHealthCheck(Scheme.Public);
-                updateLBHealthCheck(Scheme.Internal);
             } catch (final Exception e) {
                 s_logger.error("Exception in LB HealthCheck Update Checker", e);
             }

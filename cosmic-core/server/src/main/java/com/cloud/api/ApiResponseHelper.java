@@ -33,9 +33,6 @@ import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.ApiResponseSerializer;
-import com.cloud.api.response.ApplicationLoadBalancerInstanceResponse;
-import com.cloud.api.response.ApplicationLoadBalancerResponse;
-import com.cloud.api.response.ApplicationLoadBalancerRuleResponse;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.CapabilityResponse;
 import com.cloud.api.response.CapacityResponse;
@@ -61,7 +58,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.InternalLoadBalancerElementResponse;
 import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckPolicyResponse;
@@ -176,12 +172,10 @@ import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNatRule;
@@ -243,7 +237,6 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.InstanceGroup;
@@ -3160,74 +3153,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public ApplicationLoadBalancerResponse createLoadBalancerContainerReponse(final ApplicationLoadBalancerRule lb, final Map<Ip, UserVm> lbInstances) {
-
-        final ApplicationLoadBalancerResponse lbResponse = new ApplicationLoadBalancerResponse();
-        lbResponse.setId(lb.getUuid());
-        lbResponse.setName(lb.getName());
-        lbResponse.setDescription(lb.getDescription());
-        lbResponse.setAlgorithm(lb.getAlgorithm());
-        lbResponse.setForDisplay(lb.isDisplay());
-        final Network nw = ApiDBUtils.findNetworkById(lb.getNetworkId());
-        lbResponse.setNetworkId(nw.getUuid());
-        populateOwner(lbResponse, lb);
-
-        if (lb.getScheme() == Scheme.Internal) {
-            lbResponse.setSourceIp(lb.getSourceIp().addr());
-            //TODO - create the view for the load balancer rule to reflect the network uuid
-            final Network network = ApiDBUtils.findNetworkById(lb.getNetworkId());
-            lbResponse.setSourceIpNetworkId(network.getUuid());
-        } else {
-            //for public, populate the ip information from the ip address
-            final IpAddress publicIp = ApiDBUtils.findIpAddressById(lb.getSourceIpAddressId());
-            lbResponse.setSourceIp(publicIp.getAddress().addr());
-            final Network ntwk = ApiDBUtils.findNetworkById(publicIp.getNetworkId());
-            lbResponse.setSourceIpNetworkId(ntwk.getUuid());
-        }
-
-        //set load balancer rules information (only one rule per load balancer in this release)
-        final List<ApplicationLoadBalancerRuleResponse> ruleResponses = new ArrayList<>();
-        final ApplicationLoadBalancerRuleResponse ruleResponse = new ApplicationLoadBalancerRuleResponse();
-        ruleResponse.setInstancePort(lb.getDefaultPortStart());
-        ruleResponse.setSourcePort(lb.getSourcePortStart());
-        FirewallRule.State stateToSet = lb.getState();
-        if (stateToSet.equals(FirewallRule.State.Revoke)) {
-            stateToSet = FirewallRule.State.Deleting;
-        }
-        ruleResponse.setState(stateToSet.toString());
-        ruleResponse.setObjectName("loadbalancerrule");
-        ruleResponses.add(ruleResponse);
-        lbResponse.setLbRules(ruleResponses);
-
-        //set Lb instances information
-        final List<ApplicationLoadBalancerInstanceResponse> instanceResponses = new ArrayList<>();
-        for (final Map.Entry<Ip, UserVm> entry : lbInstances.entrySet()) {
-            final Ip ip = entry.getKey();
-            final UserVm vm = entry.getValue();
-            final ApplicationLoadBalancerInstanceResponse instanceResponse = new ApplicationLoadBalancerInstanceResponse();
-            instanceResponse.setIpAddress(ip.addr());
-            instanceResponse.setId(vm.getUuid());
-            instanceResponse.setName(vm.getInstanceName());
-            instanceResponse.setObjectName("loadbalancerinstance");
-            instanceResponses.add(instanceResponse);
-        }
-
-        lbResponse.setLbInstances(instanceResponses);
-
-        //set tag information
-        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.LoadBalancer, lb.getId());
-        final List<ResourceTagResponse> tagResponses = new ArrayList<>();
-        for (final ResourceTag tag : tags) {
-            final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
-        }
-        lbResponse.setTags(tagResponses);
-
-        lbResponse.setObjectName("loadbalancer");
-        return lbResponse;
-    }
-
-    @Override
     public AffinityGroupResponse createAffinityGroupResponse(final AffinityGroup group) {
 
         final AffinityGroupResponse response = new AffinityGroupResponse();
@@ -3256,23 +3181,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         } else {
             return ag.getId();
         }
-    }
-
-    @Override
-    public InternalLoadBalancerElementResponse createInternalLbElementResponse(final VirtualRouterProvider result) {
-        if (result.getType() != VirtualRouterProvider.Type.InternalLbVm) {
-            return null;
-        }
-        final InternalLoadBalancerElementResponse response = new InternalLoadBalancerElementResponse();
-        response.setId(result.getUuid());
-        final PhysicalNetworkServiceProvider nsp = ApiDBUtils.findPhysicalNetworkServiceProviderById(result.getNspId());
-        if (nsp != null) {
-            response.setNspId(nsp.getUuid());
-        }
-        response.setEnabled(result.isEnabled());
-
-        response.setObjectName("internalloadbalancerelement");
-        return response;
     }
 
     @Override

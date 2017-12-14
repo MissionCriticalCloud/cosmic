@@ -17,7 +17,6 @@ import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmdByAdmin;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
-import com.cloud.api.command.admin.internallb.ListInternalLBVMsCmd;
 import com.cloud.api.command.admin.iso.ListIsosCmdByAdmin;
 import com.cloud.api.command.admin.router.ListRoutersCmd;
 import com.cloud.api.command.admin.storage.ListImageStoresCmd;
@@ -567,24 +566,24 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         if (entryTime != null && duration != null) {
             // TODO: waiting for response from dev list, logic is mystery to
             // me!!
-      /*
-       * if (entryTime <= duration) { throw new
-       * InvalidParameterValueException
-       * ("Entry time must be greater than duration"); } Calendar calMin =
-       * Calendar.getInstance(); Calendar calMax = Calendar.getInstance();
-       * calMin.add(Calendar.SECOND, -entryTime);
-       * calMax.add(Calendar.SECOND, -duration); Date minTime =
-       * calMin.getTime(); Date maxTime = calMax.getTime();
-       *
-       * sc.setParameters("state", com.cloud.event.Event.State.Completed);
-       * sc.setParameters("startId", 0); sc.setParameters("createDate",
-       * minTime, maxTime); List<EventJoinVO> startedEvents =
-       * _eventJoinDao.searchAllEvents(sc, searchFilter);
-       * List<EventJoinVO> pendingEvents = new ArrayList<EventJoinVO>();
-       * for (EventVO event : startedEvents) { EventVO completedEvent =
-       * _eventDao.findCompletedEvent(event.getId()); if (completedEvent
-       * == null) { pendingEvents.add(event); } } return pendingEvents;
-       */
+            /*
+             * if (entryTime <= duration) { throw new
+             * InvalidParameterValueException
+             * ("Entry time must be greater than duration"); } Calendar calMin =
+             * Calendar.getInstance(); Calendar calMax = Calendar.getInstance();
+             * calMin.add(Calendar.SECOND, -entryTime);
+             * calMax.add(Calendar.SECOND, -duration); Date minTime =
+             * calMin.getTime(); Date maxTime = calMax.getTime();
+             *
+             * sc.setParameters("state", com.cloud.event.Event.State.Completed);
+             * sc.setParameters("startId", 0); sc.setParameters("createDate",
+             * minTime, maxTime); List<EventJoinVO> startedEvents =
+             * _eventJoinDao.searchAllEvents(sc, searchFilter);
+             * List<EventJoinVO> pendingEvents = new ArrayList<EventJoinVO>();
+             * for (EventVO event : startedEvents) { EventVO completedEvent =
+             * _eventDao.findCompletedEvent(event.getId()); if (completedEvent
+             * == null) { pendingEvents.add(event); } } return pendingEvents;
+             */
         } else {
             eventPair = _eventJoinDao.searchAndCount(sc, searchFilter);
         }
@@ -2338,25 +2337,25 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         // FIXME: disk offerings should search back up the hierarchy for
         // available disk offerings...
-    /*
-     * sb.addAnd("domainId", sb.entity().getDomainId(),
-     * SearchCriteria.Op.EQ); if (domainId != null) {
-     * SearchBuilder<DomainVO> domainSearch =
-     * _domainDao.createSearchBuilder(); domainSearch.addAnd("path",
-     * domainSearch.entity().getPath(), SearchCriteria.Op.LIKE);
-     * sb.join("domainSearch", domainSearch, sb.entity().getDomainId(),
-     * domainSearch.entity().getId()); }
-     */
+        /*
+         * sb.addAnd("domainId", sb.entity().getDomainId(),
+         * SearchCriteria.Op.EQ); if (domainId != null) {
+         * SearchBuilder<DomainVO> domainSearch =
+         * _domainDao.createSearchBuilder(); domainSearch.addAnd("path",
+         * domainSearch.entity().getPath(), SearchCriteria.Op.LIKE);
+         * sb.join("domainSearch", domainSearch, sb.entity().getDomainId(),
+         * domainSearch.entity().getId()); }
+         */
 
         // FIXME: disk offerings should search back up the hierarchy for
         // available disk offerings...
-    /*
-     * if (domainId != null) { sc.setParameters("domainId", domainId); //
-     * //DomainVO domain = _domainDao.findById((Long)domainId); // // I want
-     * to join on user_vm.domain_id = domain.id where domain.path like
-     * 'foo%' //sc.setJoinParameters("domainSearch", "path",
-     * domain.getPath() + "%"); // }
-     */
+        /*
+         * if (domainId != null) { sc.setParameters("domainId", domainId); //
+         * //DomainVO domain = _domainDao.findById((Long)domainId); // // I want
+         * to join on user_vm.domain_id = domain.id where domain.path like
+         * 'foo%' //sc.setJoinParameters("domainSearch", "path",
+         * domain.getPath() + "%"); // }
+         */
 
         return _diskOfferingJoinDao.searchAndCount(sc, searchFilter);
     }
@@ -2604,10 +2603,10 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
                 sc.addAnd("name", SearchCriteria.Op.SC, ssc);
             }
 
-      /*
-       * List all resources due to Explicit Dedication except the
-       * dedicated resources of other account
-       */
+            /*
+             * List all resources due to Explicit Dedication except the
+             * dedicated resources of other account
+             */
             if (domainId != null) { //
                 // for domainId != null // right now, we made the decision to
                 // only list zones associated // with this domain, private zone
@@ -3406,18 +3405,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         }
 
         return responseList;
-    }
-
-    @Override
-    public ListResponse<DomainRouterResponse> searchForInternalLbVms(final ListInternalLBVMsCmd cmd) {
-        final Pair<List<DomainRouterJoinVO>, Integer> result =
-                searchForRoutersInternal(cmd, cmd.getId(), cmd.getRouterName(), cmd.getState(), cmd.getZoneId(), cmd.getPodId(), null, cmd.getHostId(), cmd.getKeyword(),
-                        cmd.getNetworkId(), cmd.getVpcId(), cmd.getForVpc(), cmd.getRole(), null);
-        final ListResponse<DomainRouterResponse> response = new ListResponse<>();
-
-        final List<DomainRouterResponse> routerResponses = ViewResponseHelper.createDomainRouterResponse(result.first().toArray(new DomainRouterJoinVO[result.first().size()]));
-        response.setResponses(routerResponses, result.second());
-        return response;
     }
 
     @Override

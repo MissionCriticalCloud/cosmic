@@ -4,13 +4,13 @@ import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
 
 public interface VirtualRouterProvider extends InternalIdentity, Identity {
-    public Type getType();
+    Type getType();
 
-    public boolean isEnabled();
+    boolean isEnabled();
 
-    public long getNspId();
+    long getNspId();
 
-    public enum Type {
-        VirtualRouter, ElasticLoadBalancerVm, VPCVirtualRouter, InternalLbVm
+    enum Type {
+        VirtualRouter, VPCVirtualRouter
     }
 }

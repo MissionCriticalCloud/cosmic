@@ -23,7 +23,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -47,10 +46,6 @@ public class ControlNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
 
     protected ControlNetworkGuru() {
         super();
-    }
-
-    protected boolean isRouterVm(final VirtualMachineProfile vm) {
-        return vm.getType() == VirtualMachine.Type.DomainRouter || vm.getType() == VirtualMachine.Type.InternalLoadBalancerVm;
     }
 
     @Override

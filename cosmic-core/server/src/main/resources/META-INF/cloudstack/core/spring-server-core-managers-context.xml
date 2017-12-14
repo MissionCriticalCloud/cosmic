@@ -221,8 +221,6 @@
                   value="#{storagePoolAllocatorsRegistry.registered}" />
     </bean>
 
-    <bean id="ApplicationLoadBalancerService" class="com.cloud.network.lb.ApplicationLoadBalancerManagerImpl" />
-
     <bean id="vMSnapshotManagerImpl" class="com.cloud.vm.snapshot.VMSnapshotManagerImpl" />
 
     <bean id="AffinityGroupServiceImpl"

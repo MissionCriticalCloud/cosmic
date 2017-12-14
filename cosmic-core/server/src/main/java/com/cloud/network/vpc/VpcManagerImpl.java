@@ -145,7 +145,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("VpcChecker"));
     private final List<Service> nonSupportedServices = Arrays.asList(Service.SecurityGroup, Service.Firewall);
-    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp, Provider.InternalLbVm);
+    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp);
     @Inject
     EntityManager _entityMgr;
     @Inject
@@ -325,7 +325,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             if (svc == Service.Lb) {
                 final Set<Provider> lbProviders = new HashSet<>();
                 lbProviders.add(Provider.VPCVirtualRouter);
-                lbProviders.add(Provider.InternalLbVm);
                 svcProviderMap.put(svc, lbProviders);
             } else {
                 svcProviderMap.put(svc, defaultProviders);

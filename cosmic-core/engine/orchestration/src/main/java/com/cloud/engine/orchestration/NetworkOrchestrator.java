@@ -867,12 +867,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             success = false;
         }
 
-        // apply internal load balancer rules
-        if (!_lbMgr.applyLoadBalancersForNetwork(networkId, Scheme.Internal)) {
-            s_logger.warn("Failed to reapply internal load balancer rules as a part of network id=" + networkId + " restart");
-            success = false;
-        }
-
         // apply vpn rules
         final List<? extends RemoteAccessVpn> vpnsToReapply = _vpnMgr.listRemoteAccessVpns(networkId);
         if (vpnsToReapply != null) {
@@ -961,16 +955,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         try {
             if (!_lbMgr.revokeLoadBalancersForNetwork(networkId, Scheme.Public)) {
                 s_logger.warn("Failed to cleanup public lb rules as a part of shutdownNetworkRules");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to cleanup public lb rules as a part of shutdownNetworkRules due to ", ex);
-            success = false;
-        }
-
-        try {
-            if (!_lbMgr.revokeLoadBalancersForNetwork(networkId, Scheme.Internal)) {
-                s_logger.warn("Failed to cleanup internal lb rules as a part of shutdownNetworkRules");
                 success = false;
             }
         } catch (final ResourceUnavailableException ex) {
@@ -2665,8 +2649,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final NetworkOffering off = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
             if (lbScheme == Scheme.Public) {
                 providerName = _ntwkOffDetailsDao.getDetail(off.getId(), NetworkOffering.Detail.PublicLbProvider);
-            } else {
-                providerName = _ntwkOffDetailsDao.getDetail(off.getId(), NetworkOffering.Detail.InternalLbProvider);
             }
             if (providerName == null) {
                 throw new InvalidParameterValueException("Can't find Lb provider supporting scheme " + lbScheme.toString() + " in network " + network);

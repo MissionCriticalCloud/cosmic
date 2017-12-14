@@ -7,7 +7,6 @@ import com.cloud.api.command.admin.cloudops.ListWhoHasThisMacCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.host.ListHostTagsCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
-import com.cloud.api.command.admin.internallb.ListInternalLBVMsCmd;
 import com.cloud.api.command.admin.router.ListRoutersCmd;
 import com.cloud.api.command.admin.storage.ListImageStoresCmd;
 import com.cloud.api.command.admin.storage.ListSecondaryStagingStoresCmd;
@@ -123,8 +122,6 @@ public interface QueryService {
 
     List<ResourceDetailResponse> listResourceDetails(ListResourceDetailsCmd cmd);
 
-    ListResponse<DomainRouterResponse> searchForInternalLbVms(ListInternalLBVMsCmd cmd);
-
     ListResponse<StorageTagResponse> searchForStorageTags(ListStorageTagsCmd cmd);
 
     ListResponse<HostTagResponse> searchForHostTags(ListHostTagsCmd cmd);
@@ -134,5 +131,4 @@ public interface QueryService {
     ListResponse<WhoHasThisAddressResponse> listWhoHasThisIp(ListWhoHasThisIpCmd cmd);
 
     ListResponse<WhoHasThisAddressResponse> listWhoHasThisMac(ListWhoHasThisMacCmd cmd);
-
 }

@@ -8,7 +8,6 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
@@ -157,11 +156,7 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
             routerResponse.setJobStatus(router.getJobStatus());
         }
 
-        if (router.getRole() == Role.INTERNAL_LB_VM) {
-            routerResponse.setObjectName("internalloadbalancervm");
-        } else {
-            routerResponse.setObjectName("router");
-        }
+        routerResponse.setObjectName("router");
 
         return routerResponse;
     }

@@ -82,8 +82,6 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
 
     boolean getIsPersistent();
 
-    boolean getInternalLb();
-
     boolean getPublicLb();
 
     boolean getEgressDefaultPolicy();
@@ -103,6 +101,6 @@ public interface NetworkOffering extends InfrastructureEntity, InternalIdentity,
     }
 
     enum Detail {
-        InternalLbProvider, PublicLbProvider
+        PublicLbProvider
     }
 }

@@ -14,7 +14,6 @@ public interface ServiceOffering extends DiskOffering, InfrastructureEntity, Int
     public static final String ssvmDefaultOffUniqueName = "Cloud.com-SecondaryStorage";
     public static final String routerDefaultOffUniqueName = "Cloud.Com-SoftwareRouter";
     public static final String routerDefaultSecondaryOffUniqueName = "Cloud.Com-SoftwareRouter2";
-    public static final String internalLbVmDefaultOffUniqueName = "Cloud.Com-InternalLBVm";
 
     /**
      * @return # of cpu.

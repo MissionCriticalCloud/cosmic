@@ -1453,7 +1453,6 @@ test_data = {
             "Dns": "VpcVirtualRouter",
             "Vpn": "VpcVirtualRouter",
             "UserData": "VpcVirtualRouter",
-            "Lb": "InternalLbVM",
             "SourceNat": "VpcVirtualRouter",
             "StaticNat": "VpcVirtualRouter",
             "PortForwarding": "VpcVirtualRouter",

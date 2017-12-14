@@ -17,6 +17,6 @@ public interface LoadBalancerContainer {
     Scheme getScheme();
 
     public enum Scheme {
-        Public, Internal
+        Public
     }
 }

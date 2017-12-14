@@ -350,18 +350,12 @@ public class EventTypes {
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_ADD = "PHYSICAL.NVPCONTROLLER.ADD";
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_DELETE = "PHYSICAL.NVPCONTROLLER.DELETE";
     public static final String EVENT_EXTERNAL_NVP_CONTROLLER_CONFIGURE = "PHYSICAL.NVPCONTROLLER.CONFIGURE";
-    // external network mapping events
-    public static final String EVENT_EXTERNAL_VSP_VSD_ADD = "PHYSICAL.NUAGE.VSD.ADD";
-    public static final String EVENT_EXTERNAL_VSP_VSD_UPDATE = "PHYSICAL.NUAGE.VSD.UPDATE";
-    public static final String EVENT_EXTERNAL_VSP_VSD_DELETE = "PHYSICAL.NUAGE.VSD.DELETE";
 
     public static final String EVENT_AFFINITY_GROUP_CREATE = "AG.CREATE";
     public static final String EVENT_AFFINITY_GROUP_DELETE = "AG.DELETE";
     public static final String EVENT_AFFINITY_GROUP_ASSIGN = "AG.ASSIGN";
     public static final String EVENT_AFFINITY_GROUP_REMOVE = "AG.REMOVE";
     public static final String EVENT_VM_AFFINITY_GROUP_UPDATE = "VM.AG.UPDATE";
-    public static final String EVENT_INTERNAL_LB_VM_START = "INTERNALLBVM.START";
-    public static final String EVENT_INTERNAL_LB_VM_STOP = "INTERNALLBVM.STOP";
     public static final String EVENT_HOST_RESERVATION_RELEASE = "HOST.RESERVATION.RELEASE";
 
     // Dedicated guest vlan range
@@ -701,10 +695,6 @@ public class EventTypes {
         entityEventDetails.put(EVENT_EXTERNAL_NVP_CONTROLLER_ADD, "NvpController");
         entityEventDetails.put(EVENT_EXTERNAL_NVP_CONTROLLER_DELETE, "NvpController");
         entityEventDetails.put(EVENT_EXTERNAL_NVP_CONTROLLER_CONFIGURE, "NvpController");
-
-        // external network mapping events
-        entityEventDetails.put(EVENT_EXTERNAL_VSP_VSD_ADD, "NuageVsp");
-        entityEventDetails.put(EVENT_EXTERNAL_VSP_VSD_DELETE, "NuageVsp");
 
         entityEventDetails.put(EVENT_GUEST_VLAN_RANGE_DEDICATE, GuestVlan.class);
         entityEventDetails.put(EVENT_DEDICATED_GUEST_VLAN_RANGE_RELEASE, GuestVlan.class);

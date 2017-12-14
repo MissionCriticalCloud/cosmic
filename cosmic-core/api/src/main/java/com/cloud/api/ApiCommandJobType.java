@@ -25,7 +25,6 @@ public enum ApiCommandJobType {
     StaticRoute,
     LoadBalancerRule,
     AffinityGroup,
-    InternalLbVm,
     DedicatedGuestVlanRange,
     GuestOs,
     GuestOsMapping,
