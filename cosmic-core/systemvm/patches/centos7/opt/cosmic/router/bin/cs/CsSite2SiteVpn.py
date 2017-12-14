@@ -116,7 +116,7 @@ class CsSite2SiteVpn(object):
             file.add(" esp=%s" % esppolicy, -1)
             file.add(" lifetime=%s" % self.convert_sec_to_h(obj['esp_lifetime']), -1)
             file.add(" keyingtries=%forever", -1)
-            file.add(" auto=start", -1)
+            file.add(" auto=route", -1)
             file.add(" closeaction=restart", -1)
             file.add(" inactivity=0", -1)
             if 'encap' not in obj:

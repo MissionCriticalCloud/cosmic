@@ -252,6 +252,8 @@ class TestVpcVpn(cloudstackTestCase):
                 if router_state == "MASTER":
                     master_found += 1
                     self.logger.debug("Router %s currently is in state MASTER" % router.linklocalip)
+                if router_state == "FAULT":
+                    self.logger.debug("Router %s currently is in state FAULT" % router.linklocalip)
             if master_found > 0 and backup_found > 0:
                 self.logger.debug("Found at least one router in MASTER and one in BACKUP state so continuing")
                 break
@@ -381,6 +383,18 @@ class TestVpcVpn(cloudstackTestCase):
             time.sleep(15)
             self.logger.debug("Resetting VPN connection with id %s" % (passiveVpn['id']))
             Vpn.resetVpnConnection(self.apiclient, passiveVpn['id'])
+
+            # Ping to put tunnel up
+            ssh_client = vm_list[0].get_ssh_client(retries=10)
+            self.assertIsNotNone(ssh_client, "Failed to setup SSH to VM0")
+            if ssh_client:
+                # run ping test
+                for i in range(num_VPCs)[1:]:
+                    packet_loss = ssh_client.execute("/bin/ping -c 3 -t 10 " + vm_list[i].nic[0].ipaddress)[0]
+                    self.logger.debug("Ping from vm0 to vm%d to make sure tunnel is up." % i)
+            else:
+                self.fail("Failed to setup ssh connection to %s" % vm_list[0].public_ip)
+
             self.logger.debug("Waiting for the VPN with id %s to connect" % (passiveVpn['id']))
             max_retries = 30
             retries = 0
@@ -407,7 +421,7 @@ class TestVpcVpn(cloudstackTestCase):
             for i in range(num_VPCs)[1:]:
                 packet_loss = ssh_client.execute(
                     "/bin/ping -c 3 -t 10 " + vm_list[i].nic[0].ipaddress + " |grep packet|cut -d ' ' -f 7| cut -f1 -d'%'")[0]
-                self.assertEquals(int(packet_loss), 0, " Ping towards vm" + `i` + "did not succeed")
+                self.assertEquals(int(packet_loss), 0, " Ping towards vm" + `i` + " did not succeed")
                 self.logger.debug("SUCCESS! Ping from vm0 to vm%d succeeded." % i)
         else:
             self.fail("Failed to setup ssh connection to %s" % vm_list[0].public_ip)
