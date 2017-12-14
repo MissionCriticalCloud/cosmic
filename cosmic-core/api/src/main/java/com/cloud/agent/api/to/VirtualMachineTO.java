@@ -27,6 +27,7 @@ public class VirtualMachineTO {
     String hostName;
     String arch;
     String os;
+    String cpuflags;
     String manufacturer;
     String platformEmulator;
     String bootArgs;
@@ -319,5 +320,13 @@ public class VirtualMachineTO {
 
     public void setMetadata(final MetadataTO metadata) {
         this.metadata = metadata;
+    }
+
+    public String getCpuflags() {
+        return cpuflags;
+    }
+
+    public void setCpuflags(final String cpuflags) {
+        this.cpuflags = cpuflags;
     }
 }

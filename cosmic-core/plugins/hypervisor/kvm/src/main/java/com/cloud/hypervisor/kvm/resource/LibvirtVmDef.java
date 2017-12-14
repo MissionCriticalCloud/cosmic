@@ -1181,6 +1181,7 @@ public class LibvirtVmDef {
     public static class CpuModeDef {
         private String mode;
         private String model;
+        private String cpuflags;
         private List<String> features;
         private int coresPerSocket = -1;
         private int sockets = -1;
@@ -1199,6 +1200,10 @@ public class LibvirtVmDef {
             this.model = model;
         }
 
+        public void setCpuflags(final String cpuflags) {
+            this.cpuflags = cpuflags;
+        }
+
         public void setTopology(final int coresPerSocket, final int sockets) {
             this.coresPerSocket = coresPerSocket;
             this.sockets = sockets;
@@ -1207,6 +1212,7 @@ public class LibvirtVmDef {
         @Override
         public String toString() {
             final StringBuilder modeBuilder = new StringBuilder();
+            final Map<String, Boolean> featureMap = new HashMap<>();
 
             // start cpu def, adding mode, model
             if ("custom".equalsIgnoreCase(mode) && model != null) {
@@ -1219,9 +1225,35 @@ public class LibvirtVmDef {
                 modeBuilder.append("<cpu>");
             }
 
+            // First process agent.properties cpuflags features
             if (features != null) {
                 for (final String feature : features) {
-                    modeBuilder.append("<feature policy='require' name='" + feature + "'/>");
+                    if (feature.startsWith("-")) {
+                        featureMap.put(feature.substring(1), Boolean.FALSE);
+                    } else {
+                        featureMap.put(feature, Boolean.TRUE);
+                    }
+                }
+            }
+
+            // Secondly process guest_os cpuflags which overrides the agent.properties flags
+            if (cpuflags != null && !cpuflags.isEmpty()) {
+                for (final String flag : cpuflags.split(" ")) {
+                    if (flag.startsWith("-")) {
+                        featureMap.put(flag.substring(1), Boolean.FALSE);
+                    } else {
+                        featureMap.put(flag, Boolean.TRUE);
+                    }
+                }
+            }
+
+            if (features != null || cpuflags !=null) {
+                for (final String feature : featureMap.keySet()) {
+                    if (featureMap.get(feature)) {
+                        modeBuilder.append("<feature policy='require' name='" + feature + "'/>");
+                    } else {
+                        modeBuilder.append("<feature policy='disable' name='" + feature + "'/>");
+                    }
                 }
             }
 

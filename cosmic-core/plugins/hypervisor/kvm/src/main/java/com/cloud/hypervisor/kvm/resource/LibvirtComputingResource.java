@@ -1621,6 +1621,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final CpuModeDef cmd = new CpuModeDef();
         cmd.setMode(getGuestCpuMode());
         cmd.setModel(getGuestCpuModel());
+        cmd.setCpuflags(vmTo.getCpuflags());
         if (vmTo.getType() == VirtualMachine.Type.User) {
             cmd.setFeatures(getCpuFeatures());
         }
