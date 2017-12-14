@@ -78,8 +78,6 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
-import com.cloud.api.response.PortableIpRangeResponse;
-import com.cloud.api.response.PortableIpResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
@@ -207,8 +205,6 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectInvitation;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -612,11 +608,11 @@ public class ApiResponseHelper implements ResponseGenerator {
                         vmResponse.setPublicNetmask(singleNicProfile.getIPv4Netmask());
                         vmResponse.setGateway(singleNicProfile.getIPv4Gateway());
                     } else if (network.getTrafficType() == TrafficType.Guest) {
-            /*
-             * In basic zone, public ip has TrafficType.Guest in case EIP service is not enabled.
-             * When EIP service is enabled in the basic zone, system VM by default get the public
-             * IP allocated for EIP. So return the guest/public IP accordingly.
-             * */
+                        /*
+                         * In basic zone, public ip has TrafficType.Guest in case EIP service is not enabled.
+                         * When EIP service is enabled in the basic zone, system VM by default get the public
+                         * IP allocated for EIP. So return the guest/public IP accordingly.
+                         * */
                         final NetworkOffering networkOffering = ApiDBUtils.findNetworkOfferingById(network.getNetworkOfferingId());
                         if (networkOffering.getElasticIp()) {
                             final IpAddress ip = ApiDBUtils.findIpByAssociatedVmId(vm.getId());
@@ -864,8 +860,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
 
         ipResponse.setForDisplay(ipAddr.isDisplay());
-
-        ipResponse.setPortable(ipAddr.isPortable());
 
         //set tag information
         final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.PublicIpAddress, ipAddr.getId());
@@ -2411,7 +2405,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setName(region.getName());
         response.setEndPoint(region.getEndPoint());
         response.setObjectName("region");
-        response.setPortableipServiceEnabled(region.checkIfServiceEnabled(Region.Service.PortableIp));
         return response;
     }
 
@@ -3263,71 +3256,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         } else {
             return ag.getId();
         }
-    }
-
-    @Override
-    public PortableIpRangeResponse createPortableIPRangeResponse(final PortableIpRange ipRange) {
-        final PortableIpRangeResponse response = new PortableIpRangeResponse();
-        response.setId(ipRange.getUuid());
-        final String ipRangeStr = ipRange.getIpRange();
-        if (ipRangeStr != null) {
-            final String[] range = ipRangeStr.split("-");
-            response.setStartIp(range[0]);
-            response.setEndIp(range[1]);
-        }
-        response.setVlan(ipRange.getVlanTag());
-        response.setGateway(ipRange.getGateway());
-        response.setNetmask(ipRange.getNetmask());
-        response.setRegionId(ipRange.getRegionId());
-        response.setObjectName("portableiprange");
-        return response;
-    }
-
-    @Override
-    public PortableIpResponse createPortableIPResponse(final PortableIp portableIp) {
-        final PortableIpResponse response = new PortableIpResponse();
-        response.setAddress(portableIp.getAddress());
-        final Long accountId = portableIp.getAllocatedInDomainId();
-        if (accountId != null) {
-            final Account account = ApiDBUtils.findAccountById(accountId);
-            response.setAllocatedToAccountId(account.getAccountName());
-            final Domain domain = ApiDBUtils.findDomainById(account.getDomainId());
-            response.setAllocatedInDomainId(domain.getUuid());
-        }
-
-        response.setAllocatedTime(portableIp.getAllocatedTime());
-
-        if (portableIp.getAssociatedDataCenterId() != null) {
-            final DataCenter zone = ApiDBUtils.findZoneById(portableIp.getAssociatedDataCenterId());
-            if (zone != null) {
-                response.setAssociatedDataCenterId(zone.getUuid());
-            }
-        }
-
-        if (portableIp.getPhysicalNetworkId() != null) {
-            final PhysicalNetwork pnw = ApiDBUtils.findPhysicalNetworkById(portableIp.getPhysicalNetworkId());
-            if (pnw != null) {
-                response.setPhysicalNetworkId(pnw.getUuid());
-            }
-        }
-
-        if (portableIp.getAssociatedWithNetworkId() != null) {
-            final Network ntwk = ApiDBUtils.findNetworkById(portableIp.getAssociatedWithNetworkId());
-            if (ntwk != null) {
-                response.setAssociatedWithNetworkId(ntwk.getUuid());
-            }
-        }
-
-        if (portableIp.getAssociatedWithVpcId() != null) {
-            final Vpc vpc = ApiDBUtils.findVpcById(portableIp.getAssociatedWithVpcId());
-            if (vpc != null) {
-                response.setAssociatedWithVpcId(vpc.getUuid());
-            }
-        }
-
-        response.setState(portableIp.getState().name());
-        response.setObjectName("portableip");
-        return response;
     }
 
     @Override

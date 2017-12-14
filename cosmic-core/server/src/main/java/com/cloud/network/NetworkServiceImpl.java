@@ -534,66 +534,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return releaseIpAddressInternal(ipAddressId);
     }
 
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_ASSIGN, eventDescription = "allocating portable public Ip", create = true)
-    public IpAddress allocatePortableIP(final Account ipOwner, final int regionId, final Long zoneId, final Long networkId, final Long vpcId) throws ResourceAllocationException,
-            InsufficientAddressCapacityException, ConcurrentOperationException {
-        final Account caller = CallContext.current().getCallingAccount();
-        final long callerUserId = CallContext.current().getCallingUserId();
-        final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
-
-        if (networkId == null && vpcId == null || networkId != null && vpcId != null) {
-            throw new InvalidParameterValueException("One of Network id or VPC is should be passed");
-        }
-
-        if (networkId != null) {
-            final Network network = _networksDao.findById(networkId);
-            if (network == null) {
-                throw new InvalidParameterValueException("Invalid network id is given");
-            }
-
-            if (network.getGuestType() == Network.GuestType.Shared) {
-                if (zone == null) {
-                    throw new InvalidParameterValueException("Invalid zone Id is given");
-                }
-                // if shared network in the advanced zone, then check the caller against the network for 'AccessType.UseNetwork'
-                if (zone.getNetworkType() == NetworkType.Advanced) {
-                    if (isSharedNetworkOfferingWithServices(network.getNetworkOfferingId())) {
-                        _accountMgr.checkAccess(caller, AccessType.UseEntry, false, network);
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Associate IP address called by the user " + callerUserId + " account " + ipOwner.getId());
-                        }
-                        return _ipAddrMgr.allocatePortableIp(ipOwner, caller, zoneId, networkId, null);
-                    } else {
-                        throw new InvalidParameterValueException("Associate IP address can only be called on the shared networks in the advanced zone"
-                                + " with Firewall/Source Nat/Static Nat/Port Forwarding/Load balancing services enabled");
-                    }
-                }
-            }
-        }
-
-        if (vpcId != null) {
-            final Vpc vpc = _vpcDao.findById(vpcId);
-            if (vpc == null) {
-                throw new InvalidParameterValueException("Invalid vpc id is given");
-            }
-        }
-
-        _accountMgr.checkAccess(caller, null, false, ipOwner);
-
-        return _ipAddrMgr.allocatePortableIp(ipOwner, caller, zoneId, null, null);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_RELEASE, eventDescription = "disassociating portable Ip", async = true)
-    public boolean releasePortableIpAddress(final long ipAddressId) {
-        try {
-            return releaseIpAddressInternal(ipAddressId);
-        } catch (final Exception e) {
-            return false;
-        }
-    }
-
     @DB
     private boolean releaseIpAddressInternal(final long ipAddressId) throws InsufficientAddressCapacityException {
         final Long userId = CallContext.current().getCallingUserId();
@@ -2226,13 +2166,13 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         networks.add(2, "there are networks associated to this physical network");
         tablesToCheck.add(networks);
 
-    /*
-     * List<String> privateIP = new ArrayList<String>();
-     * privateIP.add(0, "op_dc_ip_address_alloc");
-     * privateIP.add(1, "data_center_id");
-     * privateIP.add(2, "there are private IP addresses allocated for this zone");
-     * tablesToCheck.add(privateIP);
-     */
+        /*
+         * List<String> privateIP = new ArrayList<String>();
+         * privateIP.add(0, "op_dc_ip_address_alloc");
+         * privateIP.add(1, "data_center_id");
+         * privateIP.add(2, "there are private IP addresses allocated for this zone");
+         * tablesToCheck.add(privateIP);
+         */
 
         final List<String> publicIP = new ArrayList<>();
         publicIP.add(0, "user_ip_address");

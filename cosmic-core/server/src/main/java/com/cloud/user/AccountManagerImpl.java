@@ -1237,16 +1237,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             final int vlansReleased = _accountGuestVlanMapDao.removeByAccountId(accountId);
             s_logger.info("deleteAccount: Released " + vlansReleased + " dedicated guest vlan ranges from account " + accountId);
 
-            // release account specific acquired portable IP's. Since all the portable IP's must have been already
-            // disassociated with VPC/guest network (due to deletion), so just mark portable IP as free.
-            final List<? extends IpAddress> ipsToRelease = _ipAddressDao.listByAccount(accountId);
-            for (final IpAddress ip : ipsToRelease) {
-                if (ip.isPortable()) {
-                    s_logger.debug("Releasing portable ip " + ip + " as a part of account id=" + accountId + " cleanup");
-                    _ipAddrMgr.releasePortableIpAddress(ip.getId());
-                }
-            }
-
             // release dedication if any
             final List<DedicatedResourceVO> dedicatedResources = _dedicatedDao.listByAccountId(accountId);
             if (dedicatedResources != null && !dedicatedResources.isEmpty()) {

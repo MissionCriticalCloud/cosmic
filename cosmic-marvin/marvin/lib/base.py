@@ -1536,7 +1536,7 @@ class PublicIPAddress:
     @classmethod
     def create(cls, api_client, accountid=None, zoneid=None, domainid=None,
                services=None, networkid=None, projectid=None, vpcid=None,
-               isportable=False, vpc=None, data=None, network=None):
+               vpc=None, data=None, network=None):
         """Associate Public IP address"""
         if data:
             services = data
@@ -1556,9 +1556,6 @@ class PublicIPAddress:
             cmd.domainid = domainid
         elif services and "domainid" in services:
             cmd.domainid = services["domainid"]
-
-        if isportable:
-            cmd.isportable = isportable
 
         if networkid:
             cmd.networkid = networkid
@@ -3189,47 +3186,6 @@ class PublicIpRange:
         cmd = releasePublicIpRange.releasePublicIpRangeCmd()
         cmd.id = self.vlan.id
         return api_client.releasePublicIpRange(cmd)
-
-
-class PortablePublicIpRange:
-    """Manage portable public Ip Range"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, services):
-        """Create portable public Ip Range"""
-
-        cmd = createPortableIpRange.createPortableIpRangeCmd()
-        cmd.gateway = services["gateway"]
-        cmd.netmask = services["netmask"]
-        cmd.startip = services["startip"]
-        cmd.endip = services["endip"]
-        cmd.regionid = services["regionid"]
-
-        if "vlan" in services:
-            cmd.vlan = services["vlan"]
-
-        return PortablePublicIpRange(
-            api_client.createPortableIpRange(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete portable IpRange"""
-
-        cmd = deletePortableIpRange.deletePortableIpRangeCmd()
-        cmd.id = self.id
-        api_client.deletePortableIpRange(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """Lists all portable public IP ranges."""
-
-        cmd = listPortableIpRanges.listPortableIpRangesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listPortableIpRanges(cmd)
 
 
 class SecondaryStagingStore:

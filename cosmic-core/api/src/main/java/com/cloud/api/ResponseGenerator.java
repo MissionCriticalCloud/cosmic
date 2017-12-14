@@ -44,8 +44,6 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
-import com.cloud.api.response.PortableIpRangeResponse;
-import com.cloud.api.response.PortableIpResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
@@ -134,8 +132,6 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectInvitation;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
 import com.cloud.server.ResourceTag;
 import com.cloud.storage.GuestOS;
@@ -384,10 +380,6 @@ public interface ResponseGenerator {
     AffinityGroupResponse createAffinityGroupResponse(AffinityGroup group);
 
     Long getAffinityGroupId(String name, long entityOwnerId);
-
-    PortableIpRangeResponse createPortableIPRangeResponse(PortableIpRange range);
-
-    PortableIpResponse createPortableIPResponse(PortableIp portableIp);
 
     InternalLoadBalancerElementResponse createInternalLbElementResponse(VirtualRouterProvider result);
 

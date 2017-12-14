@@ -132,12 +132,10 @@ known_categories = {
     'InternalLoadBalancer': 'Internal LB',
     'DeploymentPlanners': 'Configuration',
     'ObjectStore': 'Image Store',
-    'PortableIp': 'Portable IP',
     'dedicateHost': 'Dedicate Resources',
     'releaseDedicatedHost': 'Dedicate Resources',
     'CacheStores': 'Cache Stores',
     'CacheStore': 'Cache Store',
-    'StratosphereSsp': ' Stratosphere SSP',
     'listHAWorkers': 'CloudOps',
     'listWhoHasThisIp': 'CloudOps',
     'listWhoHasThisMac': 'CloudOps'

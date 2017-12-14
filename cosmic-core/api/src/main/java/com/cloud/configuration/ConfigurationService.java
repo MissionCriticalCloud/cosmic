@@ -12,9 +12,6 @@ import com.cloud.api.command.admin.offering.UpdateDiskOfferingCmd;
 import com.cloud.api.command.admin.offering.UpdateServiceOfferingCmd;
 import com.cloud.api.command.admin.pod.DeletePodCmd;
 import com.cloud.api.command.admin.pod.UpdatePodCmd;
-import com.cloud.api.command.admin.region.CreatePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.DeletePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.ListPortableIpRangesCmd;
 import com.cloud.api.command.admin.vlan.CreateVlanIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DeleteVlanIpRangeCmd;
@@ -36,8 +33,6 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.InvalidParameterValueException;
@@ -66,13 +61,6 @@ public interface ConfigurationService {
     /**
      * Updates a service offering
      *
-     * @param serviceOfferingId
-     * @param userId
-     * @param name
-     * @param displayText
-     * @param offerHA
-     * @param useVirtualNetwork
-     * @param tags
      * @return updated service offering
      */
     ServiceOffering updateServiceOffering(UpdateServiceOfferingCmd cmd);
@@ -80,8 +68,6 @@ public interface ConfigurationService {
     /**
      * Deletes a service offering
      *
-     * @param userId
-     * @param serviceOfferingId
      */
     boolean deleteServiceOffering(DeleteServiceOfferingCmd cmd);
 
@@ -106,12 +92,6 @@ public interface ConfigurationService {
     /**
      * Creates a new disk offering
      *
-     * @param domainId
-     * @param name
-     * @param description
-     * @param numGibibytes
-     * @param mirrored
-     * @param size
      * @return ID
      */
     DiskOffering createDiskOffering(CreateDiskOfferingCmd cmd);
@@ -135,7 +115,6 @@ public interface ConfigurationService {
     /**
      * Edits a pod in the database. Will not allow you to edit pods that are being used anywhere in the system.
      *
-     * @param UpdatePodCmd api command
      */
     Pod editPod(UpdatePodCmd cmd);
 
@@ -161,7 +140,6 @@ public interface ConfigurationService {
     /**
      * Edits a zone in the database. Will not allow you to edit DNS values if there are VMs in the specified zone.
      *
-     * @param UpdateZoneCmd
      * @return Updated zone
      */
     DataCenter editZone(UpdateZoneCmd cmd);
@@ -169,8 +147,6 @@ public interface ConfigurationService {
     /**
      * Deletes a zone from the database. Will not allow you to delete zones that are being used anywhere in the system.
      *
-     * @param userId
-     * @param zoneId
      */
     boolean deleteZone(DeleteZoneCmd cmd);
 
@@ -179,18 +155,6 @@ public interface ConfigurationService {
      * the
      * virtual public network (2) pod-wide direct attached VLANs (3) account-specific direct attached VLANs
      *
-     * @param userId
-     * @param vlanType  - either "DomR" (VLAN for a virtual public network) or "DirectAttached" (VLAN for IPs that will be
-     *                  directly
-     *                  attached to UserVMs)
-     * @param zoneId
-     * @param accountId
-     * @param podId
-     * @param add
-     * @param vlanId
-     * @param gateway
-     * @param startIP
-     * @param endIP
      * @return The new Vlan object
      * @throws ResourceAllocationException TODO
      * @throws
@@ -203,7 +167,6 @@ public interface ConfigurationService {
      *
      * @param accountName
      * @param domainId
-     * @param zoneId
      * @return The new account object
      * @throws ,
      */
@@ -230,12 +193,4 @@ public interface ConfigurationService {
     List<? extends NetworkOffering> listNetworkOfferings(TrafficType trafficType, boolean systemOnly);
 
     Long getDefaultPageSize();
-
-    PortableIpRange createPortableIpRange(CreatePortableIpRangeCmd cmd) throws ConcurrentOperationException;
-
-    boolean deletePortableIpRange(DeletePortableIpRangeCmd cmd);
-
-    List<? extends PortableIpRange> listPortableIpRanges(ListPortableIpRangesCmd cmd);
-
-    List<? extends PortableIp> listPortableIps(long id);
 }

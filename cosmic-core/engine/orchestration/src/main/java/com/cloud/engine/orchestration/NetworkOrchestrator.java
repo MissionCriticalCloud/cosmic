@@ -127,7 +127,6 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.region.PortableIpDao;
 import com.cloud.user.Account;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.User;
@@ -301,8 +300,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     NetworkModel _networkModel;
     @Inject
     NicSecondaryIpDao _nicSecondaryIpDao;
-    @Inject
-    PortableIpDao _portableIpDao;
     @Inject
     ConfigDepot _configDepot;
     @Inject
@@ -3070,16 +3067,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedNetwork(networkId, null);
         for (final IPAddressVO ipToRelease : ipsToRelease) {
             if (ipToRelease.getVpcId() == null) {
-                if (!ipToRelease.isPortable()) {
-                    final IPAddressVO ip = _ipAddrMgr.markIpAsUnavailable(ipToRelease.getId());
-                    assert ip != null : "Unable to mark the ip address id=" + ipToRelease.getId() + " as unavailable.";
-                } else {
-                    // portable IP address are associated with owner, until explicitly requested to be disassociated
-                    // so as part of network clean up just break IP association with guest network
-                    ipToRelease.setAssociatedWithNetworkId(null);
-                    _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
-                    s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any network");
-                }
+                final IPAddressVO ip = _ipAddrMgr.markIpAsUnavailable(ipToRelease.getId());
+                assert ip != null : "Unable to mark the ip address id=" + ipToRelease.getId() + " as unavailable.";
             } else {
                 _vpcMgr.unassignIPFromVpcNetwork(ipToRelease.getId(), network.getId());
             }

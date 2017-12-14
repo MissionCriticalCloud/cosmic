@@ -151,17 +151,6 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
         return false;
     }
 
-    @Override
-    public IpAddress allocatePortableIP(final Account ipOwner, final int regionId, final Long zoneId, final Long networkId, final Long vpcId) throws ResourceAllocationException,
-            InsufficientAddressCapacityException, ConcurrentOperationException {
-        return null;
-    }
-
-    @Override
-    public boolean releasePortableIpAddress(final long ipAddressId) {
-        return false;// TODO Auto-generated method stub
-    }
-
     /* (non-Javadoc)
      * @see com.cloud.network.NetworkService#createGuestNetwork(com.cloud.api.commands.CreateNetworkCmd)
      */

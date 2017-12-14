@@ -152,15 +152,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             throw new InvalidParameterValueException("Unable to create ip forwarding rule, IP address " + ipAddress +
                     " owner is not the same as owner of virtual machine " + userVm.toString());
         }
-
-        // validate that userVM is in the same availability zone as the IP address
-        if (ipAddress.getDataCenterId() != userVm.getDataCenterId()) {
-            //make an exception for portable IP
-            if (!ipAddress.isPortable()) {
-                throw new InvalidParameterValueException("Unable to create ip forwarding rule, IP address " + ipAddress +
-                        " is not in the same availability zone as virtual machine " + userVm.toString());
-            }
-        }
     }
 
     private boolean enableStaticNat(final long ipId, final long vmId, final long networkId, final boolean isSystemVm, final String vmGuestIp) throws NetworkRuleConflictException,
@@ -219,48 +210,10 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                             s_logger.warn("Failed to associate ip id=" + ipId + " to VPC network id=" + networkId + " as " + "a part of enable static nat");
                             return false;
                         }
-                    } else if (ipAddress.isPortable()) {
-                        s_logger.info("Portable IP " + ipAddress.getUuid() + " is not associated with the network yet " + " so associate IP with the network " +
-                                networkId);
-                        try {
-                            // check if StaticNat service is enabled in the network
-                            _networkModel.checkIpForService(ipAddress, Service.StaticNat, networkId);
-
-                            // associate portable IP to vpc, if network is part of VPC
-                            if (network.getVpcId() != null) {
-                                _vpcSvc.associateIPToVpc(ipId, network.getVpcId());
-                            }
-
-                            // associate portable IP with guest network
-                            ipAddress = _ipAddrMgr.associatePortableIPToGuestNetwork(ipId, networkId, false);
-                        } catch (final Exception e) {
-                            s_logger.warn("Failed to associate portable id=" + ipId + " to network id=" + networkId + " as " + "a part of enable static nat");
-                            return false;
-                        }
                     }
                 } else if (ipAddress.getAssociatedWithNetworkId() != networkId) {
-                    if (ipAddress.isPortable()) {
-                        // check if destination network has StaticNat service enabled
-                        _networkModel.checkIpForService(ipAddress, Service.StaticNat, networkId);
-
-                        // check if portable IP can be transferred across the networks
-                        if (_ipAddrMgr.isPortableIpTransferableFromNetwork(ipId, ipAddress.getAssociatedWithNetworkId())) {
-                            try {
-                                // transfer the portable IP and refresh IP details
-                                _ipAddrMgr.transferPortableIP(ipId, ipAddress.getAssociatedWithNetworkId(), networkId);
-                                ipAddress = _ipAddressDao.findById(ipId);
-                            } catch (final Exception e) {
-                                s_logger.warn("Failed to associate portable id=" + ipId + " to network id=" + networkId + " as " + "a part of enable static nat");
-                                return false;
-                            }
-                        } else {
-                            throw new InvalidParameterValueException("Portable IP: " + ipId + " has associated services " + "in network " +
-                                    ipAddress.getAssociatedWithNetworkId() + " so can not be transferred to " + " network " + networkId);
-                        }
-                    } else {
-                        throw new InvalidParameterValueException("Invalid network Id=" + networkId + ". IP is associated with" +
-                                " a different network than passed network id");
-                    }
+                    throw new InvalidParameterValueException("Invalid network Id=" + networkId + ". IP is associated with" +
+                            " a different network than passed network id");
                 } else {
                     _networkModel.checkIpForService(ipAddress, Service.StaticNat, null);
                 }

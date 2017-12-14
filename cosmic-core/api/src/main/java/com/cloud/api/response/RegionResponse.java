@@ -22,10 +22,6 @@ public class RegionResponse extends BaseResponse {
     @Param(description = "the end point of the region")
     private String endPoint;
 
-    @SerializedName("portableipserviceenabled")
-    @Param(description = "true if security groups support is enabled, false otherwise")
-    private boolean portableipServiceEnabled;
-
     public Integer getId() {
         return id;
     }
@@ -48,9 +44,5 @@ public class RegionResponse extends BaseResponse {
 
     public void setEndPoint(final String endPoint) {
         this.endPoint = endPoint;
-    }
-
-    public void setPortableipServiceEnabled(final boolean portableipServiceEnabled) {
-        this.portableipServiceEnabled = portableipServiceEnabled;
     }
 }

@@ -47,11 +47,7 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
     public void execute() throws InsufficientAddressCapacityException {
         CallContext.current().setEventDetails("IP ID: " + getIpAddressId());
         boolean result = false;
-        if (!isPortable(id)) {
-            result = _networkService.releaseIpAddress(getIpAddressId());
-        } else {
-            result = _networkService.releasePortableIpAddress(getIpAddressId());
-        }
+        result = _networkService.releaseIpAddress(getIpAddressId());
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());
             this.setResponseObject(response);
@@ -66,11 +62,6 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
 
     public Long getIpAddressId() {
         return id;
-    }
-
-    private boolean isPortable(final long id) {
-        final IpAddress ip = getIpAddress(id);
-        return ip.isPortable();
     }
 
     private IpAddress getIpAddress(final long id) {
@@ -106,11 +97,7 @@ public class DisassociateIPAddrCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventType() {
-        if (!isPortable(id)) {
-            return EventTypes.EVENT_NET_IP_RELEASE;
-        } else {
-            return EventTypes.EVENT_PORTABLE_IP_RELEASE;
-        }
+        return EventTypes.EVENT_NET_IP_RELEASE;
     }
 
     @Override

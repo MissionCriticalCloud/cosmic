@@ -12,9 +12,6 @@ import com.cloud.api.command.admin.offering.UpdateDiskOfferingCmd;
 import com.cloud.api.command.admin.offering.UpdateServiceOfferingCmd;
 import com.cloud.api.command.admin.pod.DeletePodCmd;
 import com.cloud.api.command.admin.pod.UpdatePodCmd;
-import com.cloud.api.command.admin.region.CreatePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.DeletePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.ListPortableIpRangesCmd;
 import com.cloud.api.command.admin.vlan.CreateVlanIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DeleteVlanIpRangeCmd;
@@ -51,8 +48,6 @@ import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDaoImpl;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
@@ -294,26 +289,6 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     @Override
     public Long getDefaultPageSize() {
         return 500L;
-    }
-
-    @Override
-    public PortableIpRange createPortableIpRange(final CreatePortableIpRangeCmd cmd) throws ConcurrentOperationException {
-        return null;// TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean deletePortableIpRange(final DeletePortableIpRangeCmd cmd) {
-        return false;// TODO Auto-generated method stub
-    }
-
-    @Override
-    public List<? extends PortableIpRange> listPortableIpRanges(final ListPortableIpRangesCmd cmd) {
-        return null;// TODO Auto-generated method stub
-    }
-
-    @Override
-    public List<? extends PortableIp> listPortableIps(final long id) {
-        return null;// TODO Auto-generated method stub
     }
 
     /* (non-Javadoc)

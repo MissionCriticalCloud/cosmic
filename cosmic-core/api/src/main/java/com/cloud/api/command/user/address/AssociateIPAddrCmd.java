@@ -7,7 +7,6 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.BaseAsyncCreateCmd;
-import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -15,7 +14,6 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.ProjectResponse;
-import com.cloud.api.response.RegionResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
@@ -80,16 +78,6 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
             + "be associated with")
     private Long vpcId;
 
-    @Parameter(name = ApiConstants.IS_PORTABLE, type = BaseCmd.CommandType.BOOLEAN, description = "should be set to true "
-            + "if public IP is required to be transferable across zones, if not specified defaults to false")
-    private Boolean isPortable;
-
-    @Parameter(name = ApiConstants.REGION_ID,
-            type = CommandType.INTEGER,
-            entityType = RegionResponse.class,
-            description = "region ID from where portable IP is to be associated.")
-    private Integer regionId;
-
     @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the IP to the end user or not", since = "4" +
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
@@ -102,25 +90,9 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
         return "addressinfo";
     }
 
-    public Integer getRegionId() {
-        return regionId;
-    }
-
     @Override
     public String getEventType() {
-        if (isPortable()) {
-            return EventTypes.EVENT_PORTABLE_IP_ASSIGN;
-        } else {
-            return EventTypes.EVENT_NET_IP_ASSIGN;
-        }
-    }
-
-    public boolean isPortable() {
-        if (isPortable == null) {
-            return false;
-        } else {
-            return isPortable;
-        }
+        return EventTypes.EVENT_NET_IP_ASSIGN;
     }
 
     @Override
@@ -225,11 +197,7 @@ public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {
         try {
             IpAddress ip = null;
 
-            if (!isPortable()) {
-                ip = _networkService.allocateIP(_accountService.getAccount(getEntityOwnerId()), getZoneId(), getNetworkId(), getDisplayIp());
-            } else {
-                ip = _networkService.allocatePortableIP(_accountService.getAccount(getEntityOwnerId()), 1, getZoneId(), getNetworkId(), getVpcId());
-            }
+            ip = _networkService.allocateIP(_accountService.getAccount(getEntityOwnerId()), getZoneId(), getNetworkId(), getDisplayIp());
 
             if (ip != null) {
                 setEntityId(ip.getId());

@@ -19,9 +19,6 @@ public class RegionVO implements Region {
     @Column(name = "end_point")
     private String endPoint;
 
-    @Column(name = "portableip_service_enabled")
-    private boolean portableipEnabled;
-
     public RegionVO() {
     }
 
@@ -52,33 +49,5 @@ public class RegionVO implements Region {
 
     public void setEndPoint(final String endPoint) {
         this.endPoint = endPoint;
-    }
-
-    @Override
-    public boolean checkIfServiceEnabled(final Service service) {
-        if (Service.PortableIp.equals(service)) {
-            return portableipEnabled;
-        } else {
-            assert false : "Unknown Region level Service";
-            return false;
-        }
-    }
-
-    @Override
-    public void enableService(final Region.Service service) {
-        if (Service.PortableIp.equals(service)) {
-            this.portableipEnabled = true;
-        } else {
-            assert false : "Unknown Region level Service";
-            return;
-        }
-    }
-
-    public boolean getPortableipEnabled() {
-        return portableipEnabled;
-    }
-
-    public void setPortableipEnabled(final boolean portableipEnabled) {
-        this.portableipEnabled = portableipEnabled;
     }
 }
