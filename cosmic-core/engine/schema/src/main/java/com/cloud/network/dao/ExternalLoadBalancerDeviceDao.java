@@ -54,11 +54,4 @@ public interface ExternalLoadBalancerDeviceDao extends GenericDao<ExternalLoadBa
      */
     List<ExternalLoadBalancerDeviceVO> listByProviderAndManagedType(long physicalNetworkId, String providerName, boolean managed);
 
-    /**
-     * Find the external load balancer device that is provisioned as GSLB service provider in the pyshical network
-     *
-     * @param physicalNetworkId physical Network Id
-     * @return ExternalLoadBalancerDeviceVO for the device acting as GSLB provider in the physical network
-     */
-    ExternalLoadBalancerDeviceVO findGslbServiceProvider(long physicalNetworkId, String providerName);
 }

@@ -22,10 +22,6 @@ public class RegionResponse extends BaseResponse {
     @Param(description = "the end point of the region")
     private String endPoint;
 
-    @SerializedName("gslbserviceenabled")
-    @Param(description = "true if GSLB service is enabled in the region, false otherwise")
-    private boolean gslbServiceEnabled;
-
     @SerializedName("portableipserviceenabled")
     @Param(description = "true if security groups support is enabled, false otherwise")
     private boolean portableipServiceEnabled;
@@ -52,10 +48,6 @@ public class RegionResponse extends BaseResponse {
 
     public void setEndPoint(final String endPoint) {
         this.endPoint = endPoint;
-    }
-
-    public void setGslbServiceEnabled(final boolean gslbServiceEnabled) {
-        this.gslbServiceEnabled = gslbServiceEnabled;
     }
 
     public void setPortableipServiceEnabled(final boolean portableipServiceEnabled) {

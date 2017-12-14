@@ -8,17 +8,17 @@ import java.util.List;
  */
 public interface Region {
 
-    public int getId();
+    int getId();
 
-    public String getName();
+    String getName();
 
-    public void setName(String name);
+    void setName(String name);
 
-    public String getEndPoint();
+    String getEndPoint();
 
-    public boolean checkIfServiceEnabled(Service service);
+    boolean checkIfServiceEnabled(Service service);
 
-    public void enableService(Service service);
+    void enableService(Service service);
 
     /**
      * A region level service, is a service that constitute services across one or more zones in the region or a service
@@ -27,7 +27,6 @@ public interface Region {
     class Service {
         private static final List<Service> regionServices = new ArrayList<>();
 
-        public static final Service Gslb = new Service("Gslb");
         public static final Service PortableIp = new Service("PortableIp");
         private final String name;
 

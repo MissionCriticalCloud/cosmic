@@ -20,7 +20,6 @@ import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GlobalLoadBalancerResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
@@ -138,7 +137,6 @@ import com.cloud.projects.ProjectInvitation;
 import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
-import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.server.ResourceTag;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
@@ -205,8 +203,6 @@ public interface ResponseGenerator {
     IPAddressResponse createIPAddressResponse(ResponseView view, IpAddress ipAddress);
 
     GuestVlanRangeResponse createDedicatedGuestVlanRangeResponse(GuestVlan result);
-
-    GlobalLoadBalancerResponse createGlobalLoadBalancerResponse(GlobalLoadBalancerRule globalLoadBalancerRule);
 
     LoadBalancerResponse createLoadBalancerResponse(LoadBalancer loadBalancer);
 

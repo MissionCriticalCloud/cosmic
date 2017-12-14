@@ -681,17 +681,6 @@
                     privateinterface: {
                         label: 'label.private.interface'
                     },
-                    gslbprovider: {
-                        label: 'label.gslb.service',
-                        isBoolean: true,
-                        isChecked: false
-                    },
-                    gslbproviderpublicip: {
-                        label: 'label.gslb.service.public.ip'
-                    },
-                    gslbproviderprivateip: {
-                        label: 'label.gslb.service.private.ip'
-                    },
                     numretries: {
                         label: 'label.numretries',
                         defaultValue: '2'

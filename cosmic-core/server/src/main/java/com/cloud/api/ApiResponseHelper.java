@@ -52,7 +52,6 @@ import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GlobalLoadBalancerResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
@@ -211,7 +210,6 @@ import com.cloud.projects.ProjectInvitation;
 import com.cloud.region.PortableIp;
 import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
-import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.service.ServiceOfferingVO;
@@ -899,30 +897,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         guestVlanRangeResponse.setZoneId(physicalNetwork.getDataCenterId());
 
         return guestVlanRangeResponse;
-    }
-
-    @Override
-    public GlobalLoadBalancerResponse createGlobalLoadBalancerResponse(final GlobalLoadBalancerRule globalLoadBalancerRule) {
-        final GlobalLoadBalancerResponse response = new GlobalLoadBalancerResponse();
-        response.setAlgorithm(globalLoadBalancerRule.getAlgorithm());
-        response.setStickyMethod(globalLoadBalancerRule.getPersistence());
-        response.setServiceType(globalLoadBalancerRule.getServiceType());
-        response.setServiceDomainName(globalLoadBalancerRule.getGslbDomain() + "." + ApiDBUtils.getDnsNameConfiguredForGslb());
-        response.setName(globalLoadBalancerRule.getName());
-        response.setDescription(globalLoadBalancerRule.getDescription());
-        response.setRegionIdId(globalLoadBalancerRule.getRegion());
-        response.setId(globalLoadBalancerRule.getUuid());
-        populateOwner(response, globalLoadBalancerRule);
-        response.setObjectName("globalloadbalancer");
-
-        final List<LoadBalancerResponse> siteLbResponses = new ArrayList<>();
-        final List<? extends LoadBalancer> siteLoadBalaners = ApiDBUtils.listSiteLoadBalancers(globalLoadBalancerRule.getId());
-        for (final LoadBalancer siteLb : siteLoadBalaners) {
-            final LoadBalancerResponse siteLbResponse = createLoadBalancerResponse(siteLb);
-            siteLbResponses.add(siteLbResponse);
-        }
-        response.setSiteLoadBalancers(siteLbResponses);
-        return response;
     }
 
     @Override
@@ -2437,7 +2411,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setName(region.getName());
         response.setEndPoint(region.getEndPoint());
         response.setObjectName("region");
-        response.setGslbServiceEnabled(region.checkIfServiceEnabled(Region.Service.Gslb));
         response.setPortableipServiceEnabled(region.checkIfServiceEnabled(Region.Service.PortableIp));
         return response;
     }

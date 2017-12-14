@@ -96,11 +96,6 @@ public class ApiConstants {
     public static final String IP6_GATEWAY = "ip6gateway";
     public static final String GROUP = "group";
     public static final String GROUP_ID = "groupid";
-    public static final String GSLB_LB_METHOD = "gslblbmethod";
-    public static final String GSLB_SERVICE_DOMAIN_NAME = "gslbdomainname";
-    public static final String GSLB_SERVICE_TYPE = "gslbservicetype";
-    public static final String GSLB_STICKY_SESSION_METHOD = "gslbstickysessionmethodname";
-    public static final String GSLB_LBRULE_WEIGHT_MAP = "gslblbruleweightsmap";
     public static final String GUEST_CIDR_ADDRESS = "guestcidraddress";
     public static final String GUEST_VLAN_RANGE = "guestvlanrange";
     public static final String HA_ENABLE = "haenable";
@@ -517,10 +512,6 @@ public class ApiConstants {
     public static final String CONDITION_ID = "conditionid";
     public static final String CONDITION_IDS = "conditionids";
     public static final String COUNTERPARAM_LIST = "counterparam";
-    public static final String GSLB_PROVIDER = "gslbprovider";
-    public static final String EXCLUSIVE_GSLB_PROVIDER = "isexclusivegslbprovider";
-    public static final String GSLB_PROVIDER_PUBLIC_IP = "gslbproviderpublicip";
-    public static final String GSLB_PROVIDER_PRIVATE_IP = "gslbproviderprivateip";
     public static final String VM_SNAPSHOT_DESCRIPTION = "description";
     public static final String VM_SNAPSHOT_DISPLAYNAME = "name";
     public static final String VM_SNAPSHOT_ID = "vmsnapshotid";

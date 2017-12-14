@@ -235,11 +235,6 @@
         </property>
     </bean>
 
-    <bean id="gslbServiceProvidersRegistry"
-          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
-        <property name="excludeKey" value="gslb.service.provider.exclude" />
-    </bean>
-
     <bean id="affinityProcessorsRegistry"
           class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
         <property name="orderConfigKey" value="affinity.processors.order" />

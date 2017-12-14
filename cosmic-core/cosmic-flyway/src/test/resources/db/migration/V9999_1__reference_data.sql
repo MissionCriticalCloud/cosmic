@@ -19,7 +19,6 @@ VALUES
   ('Advanced', 'DEFAULT', 'management-server', 'api.throttling.interval', '1', 'Time interval (in seconds) to reset API count', '1', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'api.throttling.max', '25', 'Max allowed number of APIs within fixed interval', '25', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'VpcManager', 'blacklisted.routes', NULL, 'Routes that are blacklisted, can not be used for Static Routes creation for the VPC Private Gateway', NULL, NULL, 'Zone', 0),
-  ('Advanced', 'DEFAULT', 'management-server', 'cloud.dns.name', NULL, 'DNS name of the cloud for the GSLB service', NULL, NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'cluster.cpu.allocated.capacity.disablethreshold', '0.95', NULL, '0.95', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'cluster.memory.allocated.capacity.disablethreshold', '0.95', NULL, '0.95', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'CapacityManager', 'cluster.storage.operations.exclude', NULL, 'Exclude cluster from storage operations', 'false', '2017-07-20 20:46:06', 'Cluster', 1),
@@ -314,9 +313,9 @@ VALUES
   (3, 3, '0.0.0.0/0'),
   (4, 4, '0.0.0.0/0');
 
-INSERT INTO `region` (`id`, `name`, `end_point`, `portableip_service_enabled`, `gslb_service_enabled`)
+INSERT INTO `region` (`id`, `name`, `end_point`, `portableip_service_enabled`)
 VALUES
-  (1, 'Local', 'http://localhost:8080/client/', 0, 1);
+  (1, 'Local', 'http://localhost:8080/client/', 0);
 
 INSERT INTO `resource_count` (`id`, `account_id`, `domain_id`, `type`, `count`)
 VALUES

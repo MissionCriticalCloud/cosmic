@@ -73,8 +73,6 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleVO;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.server.auth.UserAuthenticator.ActionOnFailedAuthentication;
 import com.cloud.storage.VMTemplateVO;
@@ -149,8 +147,6 @@ import org.slf4j.LoggerFactory;
 public class AccountManagerImpl extends ManagerBase implements AccountManager, Manager {
     public static final Logger s_logger = LoggerFactory.getLogger(AccountManagerImpl.class);
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("AccountChecker"));
-    @Inject
-    public com.cloud.region.ha.GlobalLoadBalancingRulesService _gslbService;
     @Inject
     protected SnapshotDao _snapshotDao;
     @Inject
@@ -250,8 +246,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     private ResourceLimitDao _resourceLimitDao;
     @Inject
     private DedicatedResourceDao _dedicatedDao;
-    @Inject
-    private GlobalLoadBalancerRuleDao _gslbRuleDao;
     private List<UserAuthenticator> _userAuthenticators;
 
     public List<UserAuthenticator> getUserAuthenticators() {
@@ -1065,12 +1059,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                     s_logger.error("Unable to delete user: " + user + " as a part of account " + account + " cleanup");
                     accountCleanupNeeded = true;
                 }
-            }
-
-            // delete global load balancer rules for the account.
-            final List<GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
-            if (gslbRules != null && !gslbRules.isEmpty()) {
-                _gslbService.revokeAllGslbRulesForAccount(caller, accountId);
             }
 
             // delete the account from project accounts

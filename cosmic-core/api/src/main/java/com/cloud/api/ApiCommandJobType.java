@@ -24,7 +24,6 @@ public enum ApiCommandJobType {
     User,
     PrivateGateway,
     StaticRoute,
-    GlobalLoadBalancerRule,
     LoadBalancerRule,
     AffinityGroup,
     InternalLbVm,
