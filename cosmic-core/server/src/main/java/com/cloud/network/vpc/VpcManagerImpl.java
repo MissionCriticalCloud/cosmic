@@ -1009,6 +1009,27 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             return null;
         }
 
+        final Account callerAccount = CallContext.current().getCallingAccount();
+        final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
+        final ReservationContext context = new ReservationContextImpl(null, null, callerUser, callerAccount);
+
+        if (!vpc.isRedundant()) {
+            final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
+            for (final DomainRouterVO router : routers) {
+                // Delete any non-MASTER router since we are supposed to run a single setup according to the new VPC offering
+                if (router.getRedundantState() != VirtualRouter.RedundantState.MASTER) {
+                    try {
+                        s_logger.warn("Deleting router " + router.getInstanceName() + " as we don't need it any more");
+                        _routerMgr.destroyRouter(router.getId(), context.getAccount(), context.getCaller().getId());
+                    } catch (final ResourceUnavailableException ex) {
+                        s_logger.warn("Exception: ", ex);
+                        throw new ServerApiException(ApiErrorCode.RESOURCE_UNAVAILABLE_ERROR, ex.getMessage());
+                    }
+                }
+            }
+            return _vpcDao.findById(vpcId);
+        }
+
         // Restart the VPC when required
         if (restartWithCleanupRequired) {
             s_logger.debug("Will now restart+cleanup VPC id=" + vpcId);
