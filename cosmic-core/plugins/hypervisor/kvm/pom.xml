@@ -38,6 +38,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-engine-storage-datamotion</artifactId>
+            <version>5.3.11-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>

@@ -20,8 +20,12 @@ public class MigrateWithStorageReceiveAnswer extends Answer {
         token = null;
     }
 
-    public MigrateWithStorageReceiveAnswer(final MigrateWithStorageReceiveCommand cmd, final List<Pair<VolumeTO, Object>> volumeToSr, final List<Pair<NicTO, Object>> nicToNetwork,
-                                           final Map<String, String> token) {
+    public MigrateWithStorageReceiveAnswer(
+            final MigrateWithStorageReceiveCommand cmd,
+            final List<Pair<VolumeTO, Object>> volumeToSr,
+            final List<Pair<NicTO, Object>> nicToNetwork,
+            final Map<String, String> token
+    ) {
         super(cmd, true, null);
         this.volumeToSr = volumeToSr;
         this.nicToNetwork = nicToNetwork;

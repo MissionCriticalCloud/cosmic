@@ -3270,7 +3270,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     if (!vmVolumes.contains(volume)) {
                         throw new InvalidParameterValueException("There volume " + volume + " doesn't belong to " + "the virtual machine " + vm + " that has to be migrated");
                     }
-                    volToPoolObjectMap.put(Long.valueOf(volume.getId()), Long.valueOf(pool.getId()));
+                    volToPoolObjectMap.put(volume.getId(), pool.getId());
                 }
             }
         }

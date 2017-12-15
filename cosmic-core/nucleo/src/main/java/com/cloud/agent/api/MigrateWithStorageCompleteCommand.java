@@ -3,7 +3,8 @@ package com.cloud.agent.api;
 import com.cloud.agent.api.to.VirtualMachineTO;
 
 public class MigrateWithStorageCompleteCommand extends Command {
-    VirtualMachineTO vm;
+
+    private VirtualMachineTO vm;
 
     public MigrateWithStorageCompleteCommand(final VirtualMachineTO vm) {
         this.vm = vm;

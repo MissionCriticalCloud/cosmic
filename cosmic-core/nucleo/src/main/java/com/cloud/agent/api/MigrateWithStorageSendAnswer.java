@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class MigrateWithStorageSendAnswer extends Answer {
 
-    Set<VolumeTO> volumeToSet;
+    private Set<VolumeTO> volumeToSet;
 
     public MigrateWithStorageSendAnswer(final MigrateWithStorageSendCommand cmd, final Exception ex) {
         super(cmd, ex);
