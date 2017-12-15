@@ -7,7 +7,6 @@ import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.job.QueryAsyncJobResultCmd;
 import com.cloud.api.response.AccountResponse;
-import com.cloud.api.response.ApplicationLoadBalancerResponse;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.CapacityResponse;
 import com.cloud.api.response.ClusterResponse;
@@ -20,7 +19,6 @@ import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GlobalLoadBalancerResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
@@ -30,7 +28,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.InternalLoadBalancerElementResponse;
 import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
@@ -45,8 +42,6 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
-import com.cloud.api.response.PortableIpRangeResponse;
-import com.cloud.api.response.PortableIpResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
@@ -112,7 +107,6 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VpnUser;
-import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
@@ -135,10 +129,7 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectInvitation;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
-import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.server.ResourceTag;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
@@ -153,7 +144,6 @@ import com.cloud.user.SSHKeyPair;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.net.Ip;
 import com.cloud.vm.InstanceGroup;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
@@ -163,7 +153,6 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 
 public interface ResponseGenerator {
     UserResponse createUserResponse(UserAccount user);
@@ -205,8 +194,6 @@ public interface ResponseGenerator {
     IPAddressResponse createIPAddressResponse(ResponseView view, IpAddress ipAddress);
 
     GuestVlanRangeResponse createDedicatedGuestVlanRangeResponse(GuestVlan result);
-
-    GlobalLoadBalancerResponse createGlobalLoadBalancerResponse(GlobalLoadBalancerRule globalLoadBalancerRule);
 
     LoadBalancerResponse createLoadBalancerResponse(LoadBalancer loadBalancer);
 
@@ -383,17 +370,9 @@ public interface ResponseGenerator {
 
     public NicResponse createNicResponse(Nic result);
 
-    ApplicationLoadBalancerResponse createLoadBalancerContainerReponse(ApplicationLoadBalancerRule lb, Map<Ip, UserVm> lbInstances);
-
     AffinityGroupResponse createAffinityGroupResponse(AffinityGroup group);
 
     Long getAffinityGroupId(String name, long entityOwnerId);
-
-    PortableIpRangeResponse createPortableIPRangeResponse(PortableIpRange range);
-
-    PortableIpResponse createPortableIPResponse(PortableIp portableIp);
-
-    InternalLoadBalancerElementResponse createInternalLbElementResponse(VirtualRouterProvider result);
 
     IsolationMethodResponse createIsolationMethodResponse(IsolationType method);
 

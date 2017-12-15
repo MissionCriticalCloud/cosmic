@@ -221,8 +221,6 @@
                   value="#{storagePoolAllocatorsRegistry.registered}" />
     </bean>
 
-    <bean id="ApplicationLoadBalancerService" class="com.cloud.network.lb.ApplicationLoadBalancerManagerImpl" />
-
     <bean id="vMSnapshotManagerImpl" class="com.cloud.vm.snapshot.VMSnapshotManagerImpl" />
 
     <bean id="AffinityGroupServiceImpl"
@@ -245,10 +243,6 @@
 
     <bean id="PlannerHostReservationDaoImpl" class="com.cloud.deploy.dao.PlannerHostReservationDaoImpl" />
 
-    <bean id="GlobalLoadBalancingRulesServiceImpl"
-          class="com.cloud.region.gslb.GlobalLoadBalancingRulesServiceImpl">
-        <property name="gslbServiceProviders" value="#{gslbServiceProvidersRegistry.registered}" />
-    </bean>
     <bean id="certServiceImpl" class="com.cloud.network.lb.CertServiceImpl" />
     <bean id="imageStoreUploadMonitorImpl" class="com.cloud.storage.ImageStoreUploadMonitorImpl" />
 

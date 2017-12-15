@@ -145,7 +145,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("VpcChecker"));
     private final List<Service> nonSupportedServices = Arrays.asList(Service.SecurityGroup, Service.Firewall);
-    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp, Provider.InternalLbVm);
+    private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp);
     @Inject
     EntityManager _entityMgr;
     @Inject
@@ -291,7 +291,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
                     final Map<Service, Set<Provider>> svcProviderMap = getServiceSetMap(DEFAULT_SERVICES);
                     createVpcOffering(VpcOffering.redundantVPCOfferingName, VpcOffering.redundantVPCOfferingName, svcProviderMap,
-                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId,true);
+                            true, State.Enabled, serviceOfferingId, secondaryServiceOfferingId, true);
                 }
             }
         });
@@ -325,7 +325,6 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             if (svc == Service.Lb) {
                 final Set<Provider> lbProviders = new HashSet<>();
                 lbProviders.add(Provider.VPCVirtualRouter);
-                lbProviders.add(Provider.InternalLbVm);
                 svcProviderMap.put(svc, lbProviders);
             } else {
                 svcProviderMap.put(svc, defaultProviders);
@@ -954,7 +953,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             vpc.setDisplay(displayVpc);
         }
 
-        if (syslogServerList !=null) {
+        if (syslogServerList != null) {
             vpc.setSyslogServerList(syslogServerList);
         }
 
@@ -981,19 +980,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                 final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
                 s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
                 for (final IPAddressVO ipToRelease : ipsToRelease) {
-                    if (ipToRelease.isPortable()) {
-                        // portable IP address are associated with owner, until
-                        // explicitly requested to be disassociated.
-                        // so as part of VPC clean up just break IP association with VPC
-                        ipToRelease.setVpcId(null);
-                        ipToRelease.setAssociatedWithNetworkId(null);
-                        _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
-                        s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any VPC");
-                    } else {
-                        success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), CallContext.current().getCallingUserId(), caller);
-                        if (!success) {
-                            s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
-                        }
+                    success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), CallContext.current().getCallingUserId(), caller);
+                    if (!success) {
+                        s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
                     }
                 }
             }
@@ -2334,19 +2323,9 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
         s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
         for (final IPAddressVO ipToRelease : ipsToRelease) {
-            if (ipToRelease.isPortable()) {
-                // portable IP address are associated with owner, until
-                // explicitly requested to be disassociated.
-                // so as part of VPC clean up just break IP association with VPC
-                ipToRelease.setVpcId(null);
-                ipToRelease.setAssociatedWithNetworkId(null);
-                _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
-                s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any VPC");
-            } else {
-                success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), callerUserId, caller);
-                if (!success) {
-                    s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
-                }
+            success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), callerUserId, caller);
+            if (!success) {
+                s_logger.warn("Failed to cleanup ip " + ipToRelease + " as a part of vpc id=" + vpcId + " cleanup");
             }
         }
 

@@ -200,6 +200,7 @@ public class NetworkOverviewTO {
         public static class IPv4AddressTO {
             private String cidr;
             private String gateway;
+            private LoadBalancingRuleTO[] loadBalancingRules;
 
             public IPv4AddressTO() {
             }
@@ -225,6 +226,14 @@ public class NetworkOverviewTO {
                 this.gateway = gateway;
             }
 
+            public LoadBalancingRuleTO[] getLoadBalancingRules() {
+                return loadBalancingRules;
+            }
+
+            public void setLoadBalancingRules(final LoadBalancingRuleTO[] loadBalancingRules) {
+                this.loadBalancingRules = loadBalancingRules;
+            }
+
             @Override
             public boolean equals(final Object o) {
                 if (this == o) {
@@ -241,6 +250,101 @@ public class NetworkOverviewTO {
             @Override
             public int hashCode() {
                 return Objects.hash(getCidr(), getGateway());
+            }
+
+            public static class LoadBalancingRuleTO {
+                private String method;
+                private String protocol;
+                private String scheduler;
+                private long port;
+
+                private RealServerTO[] realServers;
+
+                public String getMethod() {
+                    return method;
+                }
+
+                public void setMethod(final String method) {
+                    this.method = method;
+                }
+
+                public String getProtocol() {
+                    return protocol;
+                }
+
+                public void setProtocol(final String protocol) {
+                    this.protocol = protocol;
+                }
+
+                public String getScheduler() {
+                    return scheduler;
+                }
+
+                public void setScheduler(final String scheduler) {
+                    this.scheduler = scheduler;
+                }
+
+                public long getPort() {
+                    return port;
+                }
+
+                public void setPort(final long port) {
+                    this.port = port;
+                }
+
+                public RealServerTO[] getRealServers() {
+                    return realServers;
+                }
+
+                public void setRealServers(final RealServerTO[] realServers) {
+                    this.realServers = realServers;
+                }
+
+                @Override
+                public boolean equals(final Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+                    final LoadBalancingRuleTO that = (LoadBalancingRuleTO) o;
+                    return Objects.equals(method, that.method) &&
+                            Objects.equals(protocol, that.protocol) &&
+                            Objects.equals(scheduler, that.scheduler) &&
+                            Objects.equals(port, that.port);
+                }
+
+                @Override
+                public int hashCode() {
+                    return Objects.hash(method, protocol, scheduler, port);
+                }
+
+                public static class RealServerTO {
+                    private String ipv4Address;
+                    private long weight;
+
+                    public RealServerTO(final String ipv4Address, final int weight) {
+                        this.ipv4Address = ipv4Address;
+                        this.weight = weight;
+                    }
+
+                    public String getIpv4Address() {
+                        return ipv4Address;
+                    }
+
+                    public void setIpv4Address(final String ipv4Address) {
+                        this.ipv4Address = ipv4Address;
+                    }
+
+                    public long getWeight() {
+                        return weight;
+                    }
+
+                    public void setWeight(final long weight) {
+                        this.weight = weight;
+                    }
+                }
             }
         }
     }

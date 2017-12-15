@@ -129,10 +129,6 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     @Param(description = "the list of resource tags associated with ip address", responseObject = ResourceTagResponse.class)
     private List<ResourceTagResponse> tags;
 
-    @SerializedName(ApiConstants.IS_PORTABLE)
-    @Param(description = "is public IP portable across the zones")
-    private Boolean isPortable;
-
     @SerializedName(ApiConstants.FOR_DISPLAY)
     @Param(description = "is public ip for display to the regular user", since = "4.4", authorized = {RoleType.Admin})
     private Boolean forDisplay;
@@ -271,10 +267,6 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
 
     public void setAssociatedNetworkName(final String associatedNetworkName) {
         this.associatedNetworkName = associatedNetworkName;
-    }
-
-    public void setPortable(final Boolean portable) {
-        this.isPortable = portable;
     }
 
     public void setForDisplay(final Boolean forDisplay) {

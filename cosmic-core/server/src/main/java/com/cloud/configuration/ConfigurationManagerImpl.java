@@ -18,9 +18,6 @@ import com.cloud.api.command.admin.offering.UpdateDiskOfferingCmd;
 import com.cloud.api.command.admin.offering.UpdateServiceOfferingCmd;
 import com.cloud.api.command.admin.pod.DeletePodCmd;
 import com.cloud.api.command.admin.pod.UpdatePodCmd;
-import com.cloud.api.command.admin.region.CreatePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.DeletePortableIpRangeCmd;
-import com.cloud.api.command.admin.region.ListPortableIpRangesCmd;
 import com.cloud.api.command.admin.vlan.CreateVlanIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
 import com.cloud.api.command.admin.vlan.DeleteVlanIpRangeCmd;
@@ -123,14 +120,6 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpDao;
-import com.cloud.region.PortableIpRange;
-import com.cloud.region.PortableIpRangeDao;
-import com.cloud.region.PortableIpRangeVO;
-import com.cloud.region.PortableIpVO;
-import com.cloud.region.Region;
-import com.cloud.region.RegionVO;
 import com.cloud.region.dao.RegionDao;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementService;
@@ -163,7 +152,6 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
-import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
@@ -291,11 +279,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @Inject
     UserDao _userDao;
     @Inject
-    PortableIpRangeDao _portableIpRangeDao;
-    @Inject
     RegionDao _regionDao;
-    @Inject
-    PortableIpDao _portableIpDao;
     @Inject
     ConfigurationServer _configServer;
     @Inject
@@ -788,8 +772,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 vmType = VirtualMachine.Type.ConsoleProxy;
             } else if (VirtualMachine.Type.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
                 vmType = VirtualMachine.Type.SecondaryStorageVm;
-            } else if (VirtualMachine.Type.InternalLoadBalancerVm.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.InternalLoadBalancerVm;
             } else {
                 throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachine.Type.DomainRouter + ", " + VirtualMachine.Type.ConsoleProxy
                         + ", " + VirtualMachine.Type.SecondaryStorageVm);
@@ -2105,25 +2087,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
     }
 
-    private void checkConflictsWithPortableIpRange(final long zoneId, final String vlanId, final String vlanGateway, final String vlanNetmask, final String startIP, final String
-            endIP) {
-        // check and throw exception if there is portable IP range that overlaps with public ip range being configured
-        if (checkOverlapPortableIpRange(_regionDao.getRegionId(), startIP, endIP)) {
-            throw new InvalidParameterValueException("Ip range: " + startIP + "-" + endIP + " overlaps with a portable" + " IP range already configured in the region "
-                    + _regionDao.getRegionId());
-        }
-
-        // verify and throw exception if the VLAN Id is used by any portable IP range
-        final List<PortableIpRangeVO> existingPortableIPRanges = _portableIpRangeDao.listByRegionId(_regionDao.getRegionId());
-        if (existingPortableIPRanges != null && !existingPortableIPRanges.isEmpty()) {
-            for (final PortableIpRangeVO portableIpRange : existingPortableIPRanges) {
-                if (NetUtils.isSameIsolationId(portableIpRange.getVlanTag(), vlanId)) {
-                    throw new InvalidParameterValueException("The VLAN tag " + vlanId + " is already being used for portable ip range in this region");
-                }
-            }
-        }
-    }
-
     private VlanVO commitVlanAndIpRange(final long zoneId, final long networkId, final long physicalNetworkId, final Long podId, final String startIP, final String endIP,
                                         final String vlanGateway, final String vlanNetmask, final String vlanId, final Domain domain, final Account vlanOwner, final String
                                                 vlanIp6Gateway, final String vlanIp6Cidr,
@@ -2170,33 +2133,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 return vlan;
             }
         });
-    }
-
-    private boolean checkOverlapPortableIpRange(final int regionId, final String newStartIpStr, final String newEndIpStr) {
-        final long newStartIp = NetUtils.ip2Long(newStartIpStr);
-        final long newEndIp = NetUtils.ip2Long(newEndIpStr);
-
-        final List<PortableIpRangeVO> existingPortableIPRanges = _portableIpRangeDao.listByRegionId(regionId);
-
-        if (existingPortableIPRanges == null || existingPortableIPRanges.isEmpty()) {
-            return false;
-        }
-
-        for (final PortableIpRangeVO portableIpRange : existingPortableIPRanges) {
-            final String ipRangeStr = portableIpRange.getIpRange();
-            final String[] range = ipRangeStr.split("-");
-            final long startip = NetUtils.ip2Long(range[0]);
-            final long endIp = NetUtils.ip2Long(range[1]);
-
-            if (newStartIp >= startip && newStartIp <= endIp || newEndIp >= startip && newEndIp <= endIp) {
-                return true;
-            }
-
-            if (startip >= newStartIp && startip <= newEndIp || endIp >= newStartIp && endIp <= newEndIp) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @DB
@@ -2753,9 +2689,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                         throw new InvalidParameterValueException("Unknown specified value for " + Capability.InlineMode.getName());
                     }
                 } else if (cap == Capability.LbSchemes) {
-                    final boolean internalLb = value.contains("internal");
                     final boolean publicLb = value.contains("public");
-                    if (!internalLb && !publicLb) {
+                    if (!publicLb) {
                         throw new InvalidParameterValueException("Unknown specified value for " + Capability.LbSchemes.getName());
                     }
                 } else {
@@ -2859,7 +2794,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         for (final Detail detail : details.keySet()) {
 
             Provider lbProvider = null;
-            if (detail == NetworkOffering.Detail.InternalLbProvider || detail == NetworkOffering.Detail.PublicLbProvider) {
+            if (detail == NetworkOffering.Detail.PublicLbProvider) {
                 // 1) Vaidate the detail values - have to match the lb provider
                 // name
                 final String providerStr = details.get(detail);
@@ -2883,9 +2818,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 // 2) validate if the provider supports the scheme
                 final Set<Provider> lbProviders = new HashSet<>();
                 lbProviders.add(lbProvider);
-                if (detail == NetworkOffering.Detail.InternalLbProvider) {
-                    _networkModel.checkCapabilityForProvider(lbProviders, Service.Lb, Capability.LbSchemes, Scheme.Internal.toString());
-                } else if (detail == NetworkOffering.Detail.PublicLbProvider) {
+                if (detail == NetworkOffering.Detail.PublicLbProvider) {
                     _networkModel.checkCapabilityForProvider(lbProviders, Service.Lb, Capability.LbSchemes, Scheme.Public.toString());
                 }
             }
@@ -3767,7 +3700,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         boolean associatePublicIp = false;
         boolean inline = false;
         boolean publicLb = false;
-        boolean internalLb = false;
         boolean strechedL2Subnet = false;
 
         if (serviceCapabilityMap != null && !serviceCapabilityMap.isEmpty()) {
@@ -3799,16 +3731,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 if (serviceProviderMap.containsKey(Service.Lb)) {
                     if (publicLbStr != null) {
                         _networkModel.checkCapabilityForProvider(serviceProviderMap.get(Service.Lb), Service.Lb, Capability.LbSchemes, publicLbStr);
-                        internalLb = publicLbStr.contains("internal");
                         publicLb = publicLbStr.contains("public");
                     }
                 }
-            }
-
-            // in the current version of the code, publicLb and specificLb can't
-            // both be set to true for the same network offering
-            if (publicLb && internalLb) {
-                throw new InvalidParameterValueException("Public lb and internal lb can't be enabled at the same time on the offering");
             }
 
             final Map<Capability, String> sourceNatServiceCapabilityMap = serviceCapabilityMap.get(Service.SourceNat);
@@ -3847,14 +3772,14 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
-        if (serviceProviderMap != null && serviceProviderMap.containsKey(Service.Lb) && !internalLb && !publicLb) {
+        if (serviceProviderMap != null && serviceProviderMap.containsKey(Service.Lb) && !publicLb) {
             //if not specified, default public lb to true
             publicLb = true;
         }
 
         final NetworkOfferingVO offeringFinal = new NetworkOfferingVO(name, displayText, trafficType, systemOnly, specifyVlan, networkRate, multicastRate, isDefault, availability,
                 tags, type, conserveMode, dedicatedLb, sharedSourceNat, redundantRouter, elasticIp, elasticLb, specifyIpRanges, inline, isPersistent, associatePublicIp, publicLb,
-                internalLb, egressDefaultPolicy, strechedL2Subnet);
+                egressDefaultPolicy, strechedL2Subnet);
 
         if (serviceOfferingId != null) {
             offeringFinal.setServiceOfferingId(serviceOfferingId);
@@ -4040,8 +3965,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
             // Check if there are any errors with the IP range
             checkPublicIpRangeErrors(zoneId, vlanId, vlanGateway, vlanNetmask, startIP, endIP);
-
-            checkConflictsWithPortableIpRange(zoneId, vlanId, vlanGateway, vlanNetmask, startIP, endIP);
 
             // Throw an exception if this subnet overlaps with subnet on other VLAN,
             // if this is ip range extension, gateway, network mask should be same and ip range should not overlap
@@ -4587,159 +4510,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         return _defaultPageSize;
     }
 
-    @Override
-    @DB
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_RANGE_CREATE, eventDescription = "creating portable ip range", async = false)
-    public PortableIpRange createPortableIpRange(final CreatePortableIpRangeCmd cmd) throws ConcurrentOperationException {
-        final Integer regionId = cmd.getRegionId();
-        final String startIP = cmd.getStartIp();
-        final String endIP = cmd.getEndIp();
-        final String gateway = cmd.getGateway();
-        final String netmask = cmd.getNetmask();
-        String vlanId = cmd.getVlan();
-
-        final RegionVO region = _regionDao.findById(regionId);
-        if (region == null) {
-            throw new InvalidParameterValueException("Invalid region ID: " + regionId);
-        }
-
-        if (!NetUtils.isValidIp4(startIP) || !NetUtils.isValidIp4(endIP) || !NetUtils.validIpRange(startIP, endIP)) {
-            throw new InvalidParameterValueException("Invalid portable ip  range: " + startIP + "-" + endIP);
-        }
-
-        if (!NetUtils.sameSubnet(startIP, gateway, netmask)) {
-            throw new InvalidParameterValueException("Please ensure that your start IP is in the same subnet as "
-                    + "your portable IP range's gateway and as per the IP range's netmask.");
-        }
-
-        if (!NetUtils.sameSubnet(endIP, gateway, netmask)) {
-            throw new InvalidParameterValueException("Please ensure that your end IP is in the same subnet as "
-                    + "your portable IP range's gateway and as per the IP range's netmask.");
-        }
-
-        if (checkOverlapPortableIpRange(regionId, startIP, endIP)) {
-            throw new InvalidParameterValueException("Ip  range: " + startIP + "-" + endIP + " overlaps with a portable" + " IP range already configured in the region " +
-                    regionId);
-        }
-
-        if (vlanId == null) {
-            vlanId = Vlan.UNTAGGED;
-        } else {
-            if (!NetUtils.isValidVlan(vlanId)) {
-                throw new InvalidParameterValueException("Invalid vlan id " + vlanId);
-            }
-
-            final List<DataCenterVO> zones = _zoneDao.listAllZones();
-            if (zones != null && !zones.isEmpty()) {
-                for (final DataCenterVO zone : zones) {
-                    // check if there is zone vlan with same id
-                    if (_vlanDao.findByZoneAndVlanId(zone.getId(), vlanId) != null) {
-                        throw new InvalidParameterValueException("Found a VLAN id " + vlanId + " already existing in" + " zone " + zone.getUuid()
-                                + " that conflicts with VLAN id of the portable ip range being configured");
-                    }
-                    //check if there is a public ip range that overlaps with portable ip range being created
-                    checkOverlapPublicIpRange(zone.getId(), startIP, endIP);
-                }
-            }
-        }
-        final GlobalLock portableIpLock = GlobalLock.getInternLock("PortablePublicIpRange");
-        portableIpLock.lock(5);
-        try {
-            final String vlanIdFinal = vlanId;
-            return Transaction.execute(new TransactionCallback<PortableIpRangeVO>() {
-                @Override
-                public PortableIpRangeVO doInTransaction(final TransactionStatus status) {
-                    PortableIpRangeVO portableIpRange = new PortableIpRangeVO(regionId, vlanIdFinal, gateway, netmask, startIP, endIP);
-                    portableIpRange = _portableIpRangeDao.persist(portableIpRange);
-
-                    long startIpLong = NetUtils.ip2Long(startIP);
-                    final long endIpLong = NetUtils.ip2Long(endIP);
-                    while (startIpLong <= endIpLong) {
-                        final PortableIpVO portableIP = new PortableIpVO(regionId, portableIpRange.getId(), vlanIdFinal, gateway, netmask, NetUtils.long2Ip(startIpLong));
-                        _portableIpDao.persist(portableIP);
-                        startIpLong++;
-                    }
-
-                    // implicitly enable portable IP service for the region
-                    region.setPortableipEnabled(true);
-                    _regionDao.update(region.getId(), region);
-
-                    return portableIpRange;
-                }
-            });
-        } finally {
-            portableIpLock.unlock();
-        }
-    }
-
-    @Override
-    @DB
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_RANGE_DELETE, eventDescription = "deleting portable ip range", async = false)
-    public boolean deletePortableIpRange(final DeletePortableIpRangeCmd cmd) {
-        final long rangeId = cmd.getId();
-
-        final PortableIpRangeVO portableIpRange = _portableIpRangeDao.findById(rangeId);
-        if (portableIpRange == null) {
-            throw new InvalidParameterValueException("Please specify a valid portable IP range id.");
-        }
-
-        final List<PortableIpVO> fullIpRange = _portableIpDao.listByRangeId(portableIpRange.getId());
-        final List<PortableIpVO> freeIpRange = _portableIpDao.listByRangeIdAndState(portableIpRange.getId(), PortableIp.State.Free);
-
-        if (fullIpRange != null && freeIpRange != null) {
-            if (fullIpRange.size() == freeIpRange.size()) {
-                _portableIpRangeDao.expunge(portableIpRange.getId());
-                final List<PortableIpRangeVO> pipranges = _portableIpRangeDao.listAll();
-                if (pipranges == null || pipranges.isEmpty()) {
-                    final RegionVO region = _regionDao.findById(portableIpRange.getRegionId());
-                    region.setPortableipEnabled(false);
-                    _regionDao.update(region.getId(), region);
-                }
-                return true;
-            } else {
-                throw new InvalidParameterValueException("Can't delete portable IP range as there are IP's assigned.");
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public List<? extends PortableIpRange> listPortableIpRanges(final ListPortableIpRangesCmd cmd) {
-        final Integer regionId = cmd.getRegionIdId();
-        final Long rangeId = cmd.getPortableIpRangeId();
-
-        final List<PortableIpRangeVO> ranges = new ArrayList<>();
-        if (regionId != null) {
-            final Region region = _regionDao.findById(regionId);
-            if (region == null) {
-                throw new InvalidParameterValueException("Invalid region ID: " + regionId);
-            }
-            return _portableIpRangeDao.listByRegionId(regionId);
-        }
-
-        if (rangeId != null) {
-            final PortableIpRangeVO range = _portableIpRangeDao.findById(rangeId);
-            if (range == null) {
-                throw new InvalidParameterValueException("Invalid portable IP range ID: " + regionId);
-            }
-            ranges.add(range);
-            return ranges;
-        }
-
-        return _portableIpRangeDao.listAll();
-    }
-
-    @Override
-    public List<? extends PortableIp> listPortableIps(final long id) {
-
-        final PortableIpRangeVO portableIpRange = _portableIpRangeDao.findById(id);
-        if (portableIpRange == null) {
-            throw new InvalidParameterValueException("Please specify a valid portable IP range id.");
-        }
-
-        return _portableIpDao.listByRangeId(portableIpRange.getId());
-    }
-
     private void checkZoneParameters(final String zoneName, final String dns1, final String dns2, final String internalDns1, final String internalDns2, final boolean
             checkForDuplicates, final Long domainId,
                                      final String allocationStateStr, final String ip6Dns1, final String ip6Dns2) {
@@ -4941,7 +4711,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (nums > 16 || nums <= 0) {
             throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "is wrong, should be 1~16");
         }
-    /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
+        /* local link ip address starts from 169.254.0.2 - 169.254.(nums) */
         final String[] ipRanges = NetUtils.getLinkLocalIPRange(nums);
         if (ipRanges == null) {
             throw new InvalidParameterValueException("The linkLocalIp.nums: " + nums + "may be wrong, should be 1~16");

@@ -32,7 +32,6 @@ import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.projects.ProjectManager;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.dao.SnapshotDao;
@@ -159,8 +158,6 @@ public class AccountManagerImplTest {
     ResourceLimitDao _resourceLimitDao;
     @Mock
     DedicatedResourceDao _dedicatedDao;
-    @Mock
-    GlobalLoadBalancerRuleDao _gslbRuleDao;
     @Mock
     MessageBus _messageBus;
 

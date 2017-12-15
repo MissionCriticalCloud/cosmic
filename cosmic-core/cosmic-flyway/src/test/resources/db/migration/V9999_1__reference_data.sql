@@ -1,15 +1,11 @@
 INSERT INTO `domain` (`id`, `parent`, `name`, `uuid`, `owner`, `path`, `level`, `child_count`, `next_child_seq`, `removed`, `state`, `network_domain`, `type`, `email`)
-VALUES
-  (1, NULL, 'ROOT', '9cd7f24a-6d7b-11e7-8f09-5254001daa61', 2, '/', 0, 0, 1, NULL, 'Active', NULL, 'Normal', NULL);
+VALUES (1, NULL, 'ROOT', '9cd7f24a-6d7b-11e7-8f09-5254001daa61', 2, '/', 0, 0, 1, NULL, 'Active', NULL, 'Normal', NULL);
 
 INSERT INTO `account` (`id`, `account_name`, `uuid`, `type`, `domain_id`, `state`, `removed`, `cleanup_needed`, `network_domain`, `default_zone_id`, `default`)
-VALUES
-  (1, 'system', '9cd80650-6d7b-11e7-8f09-5254001daa61', 1, 1, 'enabled', NULL, 0, NULL, NULL, 1),
-  (2, 'admin', '9cd811e2-6d7b-11e7-8f09-5254001daa61', 1, 1, 'enabled', NULL, 0, NULL, NULL, 1);
+VALUES (1, 'system', '9cd80650-6d7b-11e7-8f09-5254001daa61', 1, 1, 'enabled', NULL, 0, NULL, NULL, 1), (2, 'admin', '9cd811e2-6d7b-11e7-8f09-5254001daa61', 1, 1, 'enabled', NULL, 0, NULL, NULL, 1);
 
 INSERT INTO `configuration` (`category`, `instance`, `component`, `name`, `value`, `description`, `default_value`, `updated`, `scope`, `is_dynamic`)
-VALUES
-  ('Advanced', 'DEFAULT', 'management-server', 'account.cleanup.interval', '60', NULL, '60', NULL, NULL, 0),
+VALUES ('Advanced', 'DEFAULT', 'management-server', 'account.cleanup.interval', '60', NULL, '60', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'alert.purge.delay', '0', 'Alerts older than specified number days will be purged. Set this value to 0 to never delete alerts', '0', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'alert.purge.interval', '86400', 'The interval (in seconds) to wait before running the alert purge thread', '86400', NULL, NULL, 0),
   ('Alert', 'DEFAULT', 'management-server', 'alert.smtp.connectiontimeout', '30000', 'Socket connection timeout value in milliseconds. -1 for infinite timeout.', '30000', NULL, NULL, 0),
@@ -19,7 +15,6 @@ VALUES
   ('Advanced', 'DEFAULT', 'management-server', 'api.throttling.interval', '1', 'Time interval (in seconds) to reset API count', '1', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'api.throttling.max', '25', 'Max allowed number of APIs within fixed interval', '25', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'VpcManager', 'blacklisted.routes', NULL, 'Routes that are blacklisted, can not be used for Static Routes creation for the VPC Private Gateway', NULL, NULL, 'Zone', 0),
-  ('Advanced', 'DEFAULT', 'management-server', 'cloud.dns.name', NULL, 'DNS name of the cloud for the GSLB service', NULL, NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'cluster.cpu.allocated.capacity.disablethreshold', '0.95', NULL, '0.95', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'cluster.memory.allocated.capacity.disablethreshold', '0.95', NULL, '0.95', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'CapacityManager', 'cluster.storage.operations.exclude', NULL, 'Exclude cluster from storage operations', 'false', '2017-07-20 20:46:06', 'Cluster', 1),
@@ -33,15 +28,12 @@ VALUES
   ('Storage', 'DEFAULT', 'management-server', 'enable.ha.storage.migration', 'true', 'Enable/disable storage migration across primary storage during HA', 'true', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'execute.in.sequence.hypervisor.commands', 'false', 'If set to true, StartCommand, StopCommand, CopyCommand, MigrateCommand will be synchronized on the agent side. If set to false, these commands become asynchronous. Default value is true.', 'false', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'execute.in.sequence.network.element.commands', 'false', 'If set to true, DhcpEntryCommand, SavePasswordCommand, UserDataCommand, VmDataCommand will be synchronized on the agent side. If set to false, these commands become asynchronous. Default value is false.', 'false', NULL, NULL, 0),
-  ('Advanced', 'DEFAULT', 'management-server', 'expunge.delay', '60', NULL, '60', NULL, NULL, 0),
-  ('Advanced', 'DEFAULT', 'management-server', 'expunge.interval', '60', NULL, '60', NULL, NULL, 0),
+  ('Advanced', 'DEFAULT', 'management-server', 'expunge.delay', '60', NULL, '60', NULL, NULL, 0), ('Advanced', 'DEFAULT', 'management-server', 'expunge.interval', '60', NULL, '60', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'healthcheck.update.interval', '600', 'Time Interval to fetch the LB health check states (in sec)', '600', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'host', '192.168.22.61', NULL, '192.168.22.61', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'host.reservation.release.period', '300000', 'The interval in milliseconds between host reservation release checks', '300000', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'implicit.host.tags', 'GPU', 'Tag hosts at the time of host disovery based on the host properties/capabilities ', 'GPU', NULL, NULL, 0),
-  ('Hidden', 'DEFAULT', 'management-server', 'init', 'false', NULL, 'false', NULL, NULL, 0),
-  ('Advanced', 'DEFAULT', 'management-server', 'integration.api.port', '8096', NULL, '8096', NULL, NULL, 0),
-  ('Advanced', 'DEFAULT', 'NetworkManager', 'internallbvm.service.offering', NULL, 'Uuid of the service offering used by internal lb vm; if NULL - default system internal lb offering will be used', NULL, NULL, NULL, 0),
+  ('Hidden', 'DEFAULT', 'management-server', 'init', 'false', NULL, 'false', NULL, NULL, 0), ('Advanced', 'DEFAULT', 'management-server', 'integration.api.port', '8096', NULL, '8096', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'kvm.guest.network.device', 'cloudbr0', NULL, 'cloudbr0', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'kvm.private.network.device', 'cloudbr0', NULL, 'cloudbr0', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'kvm.public.network.device', 'pub0', NULL, 'pub0', NULL, NULL, 0),
@@ -138,8 +130,7 @@ VALUES
   ('Advanced', 'DEFAULT', 'AgentManager', 'xenserver.nics.max', '7', 'Maximum allowed nics for Vms created on XenServer', '7', NULL, NULL, 0);
 
 INSERT INTO `counter` (`id`, `uuid`, `source`, `name`, `value`, `removed`, `created`)
-VALUES
-  (1, 'ad0d8f56-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux User CPU - percentage', '1.3.6.1.4.1.2021.11.9.0', NULL, '2017-07-20 20:46:00'),
+VALUES (1, 'ad0d8f56-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux User CPU - percentage', '1.3.6.1.4.1.2021.11.9.0', NULL, '2017-07-20 20:46:00'),
   (2, 'ad0d98b3-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux System CPU - percentage', '1.3.6.1.4.1.2021.11.10.0', NULL, '2017-07-20 20:46:00'),
   (3, 'ad0da998-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux CPU Idle - percentage', '1.3.6.1.4.1.2021.11.11.0', NULL, '2017-07-20 20:46:00'),
   (4, 'ad0dbb35-6d7b-11e7-8f09-5254001daa61', 'cpu', 'Linux User CPU - percentage - native', '1.3.6.1.4.1.2021.11.9.1', NULL, '2017-07-20 20:46:00'),
@@ -147,22 +138,13 @@ VALUES
   (100, 'ad0db25d-6d7b-11e7-8f09-5254001daa61', 'netscaler', 'Response Time - microseconds', 'RESPTIME', NULL, '2017-07-20 20:46:00');
 
 INSERT INTO `guest_os_category` (`id`, `name`, `uuid`)
-VALUES
-  (1, 'CentOS', '9cc42fac-6d7b-11e7-8f09-5254001daa61'),
-  (2, 'Debian', '9cc438cd-6d7b-11e7-8f09-5254001daa61'),
-  (3, 'Oracle', '9cc441de-6d7b-11e7-8f09-5254001daa61'),
-  (4, 'RedHat', '9cc44be5-6d7b-11e7-8f09-5254001daa61'),
-  (5, 'SUSE', '9cc45476-6d7b-11e7-8f09-5254001daa61'),
-  (6, 'Windows', '9cc45cf1-6d7b-11e7-8f09-5254001daa61'),
-  (7, 'Other', '9cc464ff-6d7b-11e7-8f09-5254001daa61'),
-  (8, 'Novel', '9cc46d5b-6d7b-11e7-8f09-5254001daa61'),
-  (9, 'Unix', '9cc475aa-6d7b-11e7-8f09-5254001daa61'),
-  (10, 'Ubuntu', '9cc47e53-6d7b-11e7-8f09-5254001daa61'),
-  (11, 'None', '9cc488c9-6d7b-11e7-8f09-5254001daa61');
+VALUES (1, 'CentOS', '9cc42fac-6d7b-11e7-8f09-5254001daa61'), (2, 'Debian', '9cc438cd-6d7b-11e7-8f09-5254001daa61'), (3, 'Oracle', '9cc441de-6d7b-11e7-8f09-5254001daa61'),
+  (4, 'RedHat', '9cc44be5-6d7b-11e7-8f09-5254001daa61'), (5, 'SUSE', '9cc45476-6d7b-11e7-8f09-5254001daa61'), (6, 'Windows', '9cc45cf1-6d7b-11e7-8f09-5254001daa61'),
+  (7, 'Other', '9cc464ff-6d7b-11e7-8f09-5254001daa61'), (8, 'Novel', '9cc46d5b-6d7b-11e7-8f09-5254001daa61'), (9, 'Unix', '9cc475aa-6d7b-11e7-8f09-5254001daa61'),
+  (10, 'Ubuntu', '9cc47e53-6d7b-11e7-8f09-5254001daa61'), (11, 'None', '9cc488c9-6d7b-11e7-8f09-5254001daa61');
 
 INSERT INTO `guest_os` (`id`, `category_id`, `name`, `uuid`, `display_name`, `created`, `removed`, `is_user_defined`, `manufacturer_string`)
-VALUES
-  (12, 1, NULL, '9cc500aa-6d7b-11e7-8f09-5254001daa61', 'CentOS 5.3 (64-bit)', '2017-07-20 20:46:02', NULL, 0, 'Mission Critical Cloud'),
+VALUES (12, 1, NULL, '9cc500aa-6d7b-11e7-8f09-5254001daa61', 'CentOS 5.3 (64-bit)', '2017-07-20 20:46:02', NULL, 0, 'Mission Critical Cloud'),
   (15, 2, NULL, '9cc51a3b-6d7b-11e7-8f09-5254001daa61', 'Debian GNU/Linux 5.0 (64-bit)', '2017-07-20 20:46:02', NULL, 0, 'Mission Critical Cloud'),
   (140, 7, NULL, '9cc98be3-6d7b-11e7-8f09-5254001daa61', 'Other PV (64-bit)', '2017-07-20 20:46:02', NULL, 0, 'Mission Critical Cloud'),
   (142, 1, NULL, '9cc99fdb-6d7b-11e7-8f09-5254001daa61', 'CentOS 5.6 (64-bit)', '2017-07-20 20:46:02', NULL, 0, 'Mission Critical Cloud'),
@@ -188,8 +170,7 @@ VALUES
   (1023, 6, NULL, 'b0b657cf-6d7b-11e7-8f09-5254001daa61', 'Windows VirtIO-SCSI', '2017-07-20 18:46:07', NULL, 0, 'Mission Critical Cloud');
 
 INSERT INTO `guest_os_hypervisor` (`id`, `hypervisor_type`, `guest_os_name`, `guest_os_id`, `hypervisor_version`, `uuid`, `created`, `removed`, `is_user_defined`)
-VALUES
-  (12, 'XenServer', 'CentOS 5.3 (64-bit)', 12, 'default', 'add07eb2-6d7b-11e7-8f09-5254001daa61', '2017-07-20 20:46:02', NULL, 0),
+VALUES (12, 'XenServer', 'CentOS 5.3 (64-bit)', 12, 'default', 'add07eb2-6d7b-11e7-8f09-5254001daa61', '2017-07-20 20:46:02', NULL, 0),
   (18, 'XenServer', 'CentOS 5.6 (64-bit)', 142, 'default', 'add08314-6d7b-11e7-8f09-5254001daa61', '2017-07-20 20:46:02', NULL, 0),
   (34, 'XenServer', 'CentOS 6.4 (64-bit)', 182, 'default', 'add08fde-6d7b-11e7-8f09-5254001daa61', '2017-07-20 20:46:02', NULL, 0),
   (35, 'XenServer', 'Debian Lenny 5.0 (32-bit)', 15, 'default', 'add09067-6d7b-11e7-8f09-5254001daa61', '2017-07-20 20:46:02', NULL, 0),
@@ -271,237 +252,144 @@ VALUES
   (2488, 'KVM', 'Windows VirtIO-SCSI', 1023, 'default', 'b0b65d81-6d7b-11e7-8f09-5254001daa61', '2017-07-20 18:46:07', NULL, 0);
 
 INSERT INTO `hypervisor_capabilities` (`id`, `uuid`, `hypervisor_type`, `hypervisor_version`, `max_guests_limit`, `security_group_enabled`, `max_data_volumes_limit`, `max_hosts_per_cluster`, `storage_motion_supported`, `vm_snapshot_enabled`)
-VALUES
-  (1, '1', 'XenServer', 'default', 50, 1, 6, NULL, 0, 1),
-  (2, '2', 'XenServer', 'XCP 1.0', 50, 1, 6, NULL, 0, 1),
-  (3, '3', 'XenServer', '5.6', 50, 1, 6, NULL, 0, 1),
-  (4, '4', 'XenServer', '5.6 FP1', 50, 1, 6, NULL, 0, 1),
-  (5, '5', 'XenServer', '5.6 SP2', 50, 1, 6, NULL, 0, 1),
-  (6, '6', 'XenServer', '6.0', 50, 1, 13, NULL, 0, 1),
-  (7, '7', 'XenServer', '6.0.2', 50, 1, 13, NULL, 0, 1),
-  (13, '13', 'KVM', 'default', 50, 1, 32, NULL, 0, 1),
-  (14, '14', 'Ovm', 'default', 25, 1, 6, NULL, 0, 0),
-  (15, '15', 'Ovm', '2.3', 25, 1, 6, NULL, 0, 0),
-  (16, 'ad275d27-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.1.0', 150, 1, 13, NULL, 1, 1),
-  (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 1, 13, NULL, 1, 1),
-  (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 1, 13, NULL, 1, 0),
-  (23, NULL, 'Ovm3', '3.2', 25, 0, 6, NULL, 0, 0),
-  (24, NULL, 'Ovm3', '3.3', 50, 0, 6, NULL, 0, 0);
+VALUES (1, '1', 'XenServer', 'default', 50, 1, 6, NULL, 0, 1), (2, '2', 'XenServer', 'XCP 1.0', 50, 1, 6, NULL, 0, 1), (3, '3', 'XenServer', '5.6', 50, 1, 6, NULL, 0, 1),
+  (4, '4', 'XenServer', '5.6 FP1', 50, 1, 6, NULL, 0, 1), (5, '5', 'XenServer', '5.6 SP2', 50, 1, 6, NULL, 0, 1), (6, '6', 'XenServer', '6.0', 50, 1, 13, NULL, 0, 1),
+  (7, '7', 'XenServer', '6.0.2', 50, 1, 13, NULL, 0, 1), (13, '13', 'KVM', 'default', 50, 1, 32, NULL, 0, 1), (14, '14', 'Ovm', 'default', 25, 1, 6, NULL, 0, 0),
+  (15, '15', 'Ovm', '2.3', 25, 1, 6, NULL, 0, 0), (16, 'ad275d27-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.1.0', 150, 1, 13, NULL, 1, 1),
+  (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 1, 13, NULL, 1, 1), (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 1, 13, NULL, 1, 0),
+  (23, NULL, 'Ovm3', '3.2', 25, 0, 6, NULL, 0, 0), (24, NULL, 'Ovm3', '3.3', 50, 0, 6, NULL, 0, 0);
 
 INSERT INTO `monitoring_services` (`id`, `uuid`, `service`, `process_name`, `service_name`, `service_path`, `pidfile`, `isDefault`)
-VALUES
-  (1, 'ada793ee-6d7b-11e7-8f09-5254001daa61', 'ssh', 'sshd', 'ssh', '/etc/init.d/ssh', '/var/run/sshd.pid', 1),
+VALUES (1, 'ada793ee-6d7b-11e7-8f09-5254001daa61', 'ssh', 'sshd', 'ssh', '/etc/init.d/ssh', '/var/run/sshd.pid', 1),
   (2, 'ada79a40-6d7b-11e7-8f09-5254001daa61', 'dhcp', 'dnsmasq', 'dnsmasq', '/etc/init.d/dnsmasq', '/var/run/dnsmasq/dnsmasq.pid', 0),
   (3, 'ada7a003-6d7b-11e7-8f09-5254001daa61', 'loadbalancing', 'haproxy', 'haproxy', '/etc/init.d/haproxy', '/var/run/haproxy.pid', 0),
   (4, 'ada7a6b8-6d7b-11e7-8f09-5254001daa61', 'webserver', 'apache2', 'apache2', '/etc/init.d/apache2', '/var/run/apache2.pid', 1);
 
 INSERT INTO `network_acl` (`id`, `name`, `uuid`, `vpc_id`, `description`, `display`)
-VALUES
-  (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
+VALUES (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
   (2, 'default_allow', 'ad692983-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Allow All', 1);
 
 INSERT INTO `network_acl_item` (`id`, `uuid`, `acl_id`, `start_port`, `end_port`, `state`, `protocol`, `created`, `icmp_code`, `icmp_type`, `traffic_type`, `number`, `action`, `display`)
-VALUES
-  (1, 'ad691a30-6d7b-11e7-8f09-5254001daa61', 1, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Ingress', 1, 'Deny', 1),
+VALUES (1, 'ad691a30-6d7b-11e7-8f09-5254001daa61', 1, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Ingress', 1, 'Deny', 1),
   (2, 'ad692213-6d7b-11e7-8f09-5254001daa61', 1, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Egress', 2, 'Deny', 1),
   (3, 'ad692f9b-6d7b-11e7-8f09-5254001daa61', 2, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Ingress', 1, 'Allow', 1),
   (4, 'ad6935f8-6d7b-11e7-8f09-5254001daa61', 2, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Egress', 2, 'Allow', 1);
 
 INSERT INTO `network_acl_item_cidrs` (`id`, `network_acl_item_id`, `cidr`)
-VALUES
-  (1, 1, '0.0.0.0/0'),
-  (2, 2, '0.0.0.0/0'),
-  (3, 3, '0.0.0.0/0'),
-  (4, 4, '0.0.0.0/0');
+VALUES (1, 1, '0.0.0.0/0'), (2, 2, '0.0.0.0/0'), (3, 3, '0.0.0.0/0'), (4, 4, '0.0.0.0/0');
 
-INSERT INTO `region` (`id`, `name`, `end_point`, `portableip_service_enabled`, `gslb_service_enabled`)
-VALUES
-  (1, 'Local', 'http://localhost:8080/client/', 0, 1);
+INSERT INTO `region` (`id`, `name`, `end_point`)
+VALUES (1, 'Local', 'http://localhost:8080/client/');
 
 INSERT INTO `resource_count` (`id`, `account_id`, `domain_id`, `type`, `count`)
-VALUES
-  (1, 1, NULL, 'cpu', 0),
-  (2, 1, NULL, 'memory', 0),
-  (3, 1, NULL, 'primary_storage', 0),
-  (4, 1, NULL, 'secondary_storage', 0),
-  (5, 2, NULL, 'cpu', 0),
-  (6, 2, NULL, 'memory', 0),
-  (7, 2, NULL, 'primary_storage', 0),
-  (8, 2, NULL, 'secondary_storage', 0),
-  (9, NULL, 1, 'cpu', 0),
-  (10, NULL, 1, 'memory', 0),
-  (11, NULL, 1, 'primary_storage', 0),
+VALUES (1, 1, NULL, 'cpu', 0), (2, 1, NULL, 'memory', 0), (3, 1, NULL, 'primary_storage', 0), (4, 1, NULL, 'secondary_storage', 0), (5, 2, NULL, 'cpu', 0), (6, 2, NULL, 'memory', 0),
+  (7, 2, NULL, 'primary_storage', 0), (8, 2, NULL, 'secondary_storage', 0), (9, NULL, 1, 'cpu', 0), (10, NULL, 1, 'memory', 0), (11, NULL, 1, 'primary_storage', 0),
   (12, NULL, 1, 'secondary_storage', 0);
 
 INSERT INTO `sequence` (`name`, `value`)
-VALUES
-  ('checkpoint_seq', 1),
-  ('networks_seq', 200),
-  ('physical_networks_seq', 200),
-  ('private_mac_address_seq', 1),
-  ('public_mac_address_seq', 1),
-  ('storage_pool_seq', 200),
-  ('vm_instance_seq', 1),
-  ('vm_template_seq', 200),
-  ('volume_seq', 1);
+VALUES ('checkpoint_seq', 1), ('networks_seq', 200), ('physical_networks_seq', 200), ('private_mac_address_seq', 1), ('public_mac_address_seq', 1), ('storage_pool_seq', 200), ('vm_instance_seq', 1),
+  ('vm_template_seq', 200), ('volume_seq', 1);
 
 INSERT INTO `user` (`id`, `uuid`, `username`, `password`, `account_id`, `firstname`, `lastname`, `email`, `state`, `api_key`, `secret_key`, `created`, `removed`, `timezone`, `registration_token`, `is_registered`, `incorrect_login_attempts`, `default`, `source`, `external_entity`)
 VALUES
   (1, '9cd8238d-6d7b-11e7-8f09-5254001daa61', 'system', '0.23265509235919926', 1, 'system', 'cloud', NULL, 'enabled', NULL, NULL, '2017-07-20 20:45:33', NULL, NULL, NULL, 0, 0, 1, 'UNKNOWN', NULL),
-  (2, '9cd83247-6d7b-11e7-8f09-5254001daa61', 'admin', '5f4dcc3b5aa765d61d8327deb882cf99', 2, 'Admin', 'User', 'admin@mailprovider.com', 'disabled', NULL, NULL, '2017-07-20 20:45:33', NULL, NULL, NULL, 0, 0, 1, 'UNKNOWN', NULL);
+  (2, '9cd83247-6d7b-11e7-8f09-5254001daa61', 'admin', '5f4dcc3b5aa765d61d8327deb882cf99', 2, 'Admin', 'User', 'admin@mailprovider.com', 'disabled', NULL, NULL, '2017-07-20 20:45:33', NULL, NULL,
+   NULL, 0, 0, 1, 'UNKNOWN', NULL);
 
 INSERT INTO `version` (`id`, `version`, `updated`, `step`)
-VALUES
-  (1, '4.0.0', '2017-07-20 20:45:33', 'Complete'),
-  (2, '4.1.0', '2017-07-20 18:46:01', 'Complete'),
-  (3, '4.2.0', '2017-07-20 18:46:01', 'Complete'),
-  (4, '4.2.1', '2017-07-20 18:46:01', 'Complete'),
-  (5, '4.3.0', '2017-07-20 18:46:02', 'Complete'),
-  (6, '4.4.0', '2017-07-20 18:46:02', 'Complete'),
-  (7, '4.4.1', '2017-07-20 18:46:02', 'Complete'),
-  (8, '4.4.2', '2017-07-20 18:46:02', 'Complete'),
-  (9, '4.5.0', '2017-07-20 18:46:06', 'Complete'),
-  (10, '4.5.1', '2017-07-20 18:46:06', 'Complete'),
-  (11, '4.5.2', '2017-07-20 18:46:06', 'Complete'),
-  (12, '4.6.0', '2017-07-20 18:46:06', 'Complete'),
-  (13, '4.6.1', '2017-07-20 18:46:06', 'Complete'),
-  (14, '4.7.0', '2017-07-20 18:46:06', 'Complete'),
-  (15, '4.7.1', '2017-07-20 18:46:06', 'Complete'),
-  (16, '4.8.0', '2017-07-20 18:46:06', 'Complete'),
-  (17, '5.0.0', '2017-07-20 18:46:06', 'Complete'),
-  (18, '5.0.1', '2017-07-20 18:46:06', 'Complete'),
-  (19, '5.1.0', '2017-07-20 18:46:06', 'Complete'),
-  (20, '5.1.1', '2017-07-20 18:46:06', 'Complete'),
-  (21, '5.2.0', '2017-07-20 18:46:07', 'Complete'),
-  (22, '5.3.0', '2017-07-20 18:46:07', 'Complete'),
-  (23, '5.3.1', '2017-07-20 18:46:07', 'Complete'),
-  (24, '5.3.2', '2017-07-20 18:46:07', 'Complete'),
-  (25, '5.3.3', '2017-07-20 18:46:07', 'Complete'),
-  (26, '5.3.4', '2017-07-20 18:46:07', 'Complete'),
-  (27, '5.3.5', '2017-07-20 18:46:07', 'Complete'),
-  (28, '5.3.6', '2017-07-20 18:46:07', 'Complete'),
-  (29, '5.3.7', '2017-07-20 18:46:07', 'Complete');
+VALUES (1, '4.0.0', '2017-07-20 20:45:33', 'Complete'), (2, '4.1.0', '2017-07-20 18:46:01', 'Complete'), (3, '4.2.0', '2017-07-20 18:46:01', 'Complete'),
+  (4, '4.2.1', '2017-07-20 18:46:01', 'Complete'), (5, '4.3.0', '2017-07-20 18:46:02', 'Complete'), (6, '4.4.0', '2017-07-20 18:46:02', 'Complete'), (7, '4.4.1', '2017-07-20 18:46:02', 'Complete'),
+  (8, '4.4.2', '2017-07-20 18:46:02', 'Complete'), (9, '4.5.0', '2017-07-20 18:46:06', 'Complete'), (10, '4.5.1', '2017-07-20 18:46:06', 'Complete'), (11, '4.5.2', '2017-07-20 18:46:06', 'Complete'),
+  (12, '4.6.0', '2017-07-20 18:46:06', 'Complete'), (13, '4.6.1', '2017-07-20 18:46:06', 'Complete'), (14, '4.7.0', '2017-07-20 18:46:06', 'Complete'),
+  (15, '4.7.1', '2017-07-20 18:46:06', 'Complete'), (16, '4.8.0', '2017-07-20 18:46:06', 'Complete'), (17, '5.0.0', '2017-07-20 18:46:06', 'Complete'),
+  (18, '5.0.1', '2017-07-20 18:46:06', 'Complete'), (19, '5.1.0', '2017-07-20 18:46:06', 'Complete'), (20, '5.1.1', '2017-07-20 18:46:06', 'Complete'),
+  (21, '5.2.0', '2017-07-20 18:46:07', 'Complete'), (22, '5.3.0', '2017-07-20 18:46:07', 'Complete'), (23, '5.3.1', '2017-07-20 18:46:07', 'Complete'),
+  (24, '5.3.2', '2017-07-20 18:46:07', 'Complete'), (25, '5.3.3', '2017-07-20 18:46:07', 'Complete'), (26, '5.3.4', '2017-07-20 18:46:07', 'Complete'),
+  (27, '5.3.5', '2017-07-20 18:46:07', 'Complete'), (28, '5.3.6', '2017-07-20 18:46:07', 'Complete'), (29, '5.3.7', '2017-07-20 18:46:07', 'Complete');
 
 INSERT INTO `vm_template` (`id`, `unique_name`, `name`, `uuid`, `public`, `featured`, `type`, `hvm`, `bits`, `url`, `format`, `created`, `removed`, `account_id`, `checksum`, `display_text`, `enable_password`, `enable_sshkey`, `guest_os_id`, `bootable`, `prepopulate`, `cross_zones`, `extractable`, `hypervisor_type`, `source_template_id`, `template_tag`, `sort_key`, `size`, `state`, `update_count`, `updated`, `dynamically_scalable`)
-VALUES
-  (1, 'routing-1', 'SystemVM Template (XenServer)', '9cc3c107-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64, 'http://download.cloud.com/templates/4.3/systemvm64template-2014-01-14-master-xen.vhd.bz2', 'VHD', '2017-07-20 20:45:33', NULL, 1, '74b92f031cc5c2089ee89efb81344dcf', 'SystemVM Template (XenServer)', 0, 0, 184, 1, 0, 1, 0, 'XenServer', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (3, 'routing-3', 'SystemVM Template (KVM)', 'f327eecc-be53-4d80-9d43-adaf45467abd', 0, 0, 'SYSTEM', 0, 64, '', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, '85a1bed07bf43cbf022451cb2ecae4ff', 'SystemVM Template (KVM)', 0, 0, 1000, 1, 0, 1, 0, 'KVM', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 1, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-kvm.qcow2.bz2', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, 'ed0e788280ff2912ea40f7f91ca7a249', 'tiny linux kvm', 0, 0, 140, 1, 0, 1, 1, 'KVM', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (5, 'tiny linux xen', 'tiny linux xen', '9cc3f888-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 0, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2', 'VHD', '2017-07-20 20:45:33', NULL, 1, '905cec879afd9c9d22ecc8036131a180', 'tiny linux xen', 0, 0, 142, 1, 0, 1, 1, 'XenServer', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (12, 'routing-12', 'SystemVM Template (Ovm3)', 'b05dd2c9-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64, 'http://cloudstack.apt-get.eu/systemvm/4.6/systemvm64template-4.6.0-ovm.raw.bz2', 'RAW', '2017-07-20 20:46:06', NULL, 1, 'c8577d27b2daafb2d9a4ed307ce2f00f', 'SystemVM Template (Ovm3)', 0, 0, 183, 1, 0, 1, 0, 'Ovm3', NULL, NULL, 0, NULL, 'Active', NULL, NULL, 0);
+VALUES (1, 'routing-1', 'SystemVM Template (XenServer)', '9cc3c107-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64,
+           'http://download.cloud.com/templates/4.3/systemvm64template-2014-01-14-master-xen.vhd.bz2', 'VHD', '2017-07-20 20:45:33', NULL, 1, '74b92f031cc5c2089ee89efb81344dcf',
+                                                                                                              'SystemVM Template (XenServer)', 0, 0, 184, 1, 0, 1, 0, 'XenServer', NULL, NULL, 0, NULL,
+                                                                                                                                                                'Active', 0, NULL, 0),
+  (3, 'routing-3', 'SystemVM Template (KVM)', 'f327eecc-be53-4d80-9d43-adaf45467abd', 0, 0, 'SYSTEM', 0, 64, '', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, '85a1bed07bf43cbf022451cb2ecae4ff',
+                                                                                                                          'SystemVM Template (KVM)', 0, 0, 1000, 1, 0, 1, 0, 'KVM', NULL, NULL, 0, NULL,
+                                                                                                                                                                       'Active', 0, NULL, 0),
+  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 1, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-kvm.qcow2.bz2', 'QCOW2',
+    '2017-07-20 20:45:33', NULL, 1, 'ed0e788280ff2912ea40f7f91ca7a249', 'tiny linux kvm', 0, 0, 140, 1, 0, 1, 1, 'KVM', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
+  (5, 'tiny linux xen', 'tiny linux xen', '9cc3f888-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 0, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2', 'VHD',
+    '2017-07-20 20:45:33', NULL, 1, '905cec879afd9c9d22ecc8036131a180', 'tiny linux xen', 0, 0, 142, 1, 0, 1, 1, 'XenServer', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
+  (12, 'routing-12', 'SystemVM Template (Ovm3)', 'b05dd2c9-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64, 'http://cloudstack.apt-get.eu/systemvm/4.6/systemvm64template-4.6.0-ovm.raw.bz2', 'RAW',
+    '2017-07-20 20:46:06', NULL, 1, 'c8577d27b2daafb2d9a4ed307ce2f00f', 'SystemVM Template (Ovm3)', 0, 0, 183, 1, 0, 1, 0, 'Ovm3', NULL, NULL, 0, NULL, 'Active', NULL, NULL, 0);
 
-INSERT INTO `network_offerings` (`id`, `name`, `uuid`, `unique_name`, `display_text`, `nw_rate`, `mc_rate`, `traffic_type`, `tags`, `system_only`, `specify_vlan`, `service_offering_id`, `conserve_mode`, `created`, `removed`, `default`, `availability`, `dedicated_lb_service`, `shared_source_nat_service`, `sort_key`, `redundant_router_service`, `state`, `guest_type`, `elastic_ip_service`, `eip_associate_public_ip`, `elastic_lb_service`, `specify_ip_ranges`, `inline`, `is_persistent`, `internal_lb`, `public_lb`, `egress_default_policy`, `concurrent_connections`, `keep_alive_enabled`, `supports_streched_l2`, `secondary_service_offering_id`)
+INSERT INTO `network_offerings` (`id`, `name`, `uuid`, `unique_name`, `display_text`, `nw_rate`, `mc_rate`, `traffic_type`, `tags`, `system_only`, `specify_vlan`, `service_offering_id`, `conserve_mode`, `created`, `removed`, `default`, `availability`, `dedicated_lb_service`, `shared_source_nat_service`, `sort_key`, `redundant_router_service`, `state`, `guest_type`, `elastic_ip_service`, `eip_associate_public_ip`, `elastic_lb_service`, `specify_ip_ranges`, `inline`, `is_persistent`, `public_lb`, `egress_default_policy`, `concurrent_connections`, `keep_alive_enabled`, `supports_streched_l2`, `secondary_service_offering_id`)
 VALUES
-  (1, 'System-Public-Network', '7caa2b40-32eb-4a11-bbae-d8f1b7debe76', 'System-Public-Network', 'System Offering for System-Public-Network', 0, 0, 'Public', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 1, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
-  (2, 'System-Management-Network', 'a5c722a1-3ce9-43f0-9e1b-685e0ca65129', 'System-Management-Network', 'System Offering for System-Management-Network', 0, 0, 'Management', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
-  (3, 'System-Control-Network', 'e2677dc2-18a7-4929-a3c0-d894df9c9d35', 'System-Control-Network', 'System Offering for System-Control-Network', 0, 0, 'Control', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
-  (4, 'System-Storage-Network', '9efe64fe-353b-4ec4-b7b9-aa338a9353e8', 'System-Storage-Network', 'System Offering for System-Storage-Network', 0, 0, 'Storage', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 1, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
-  (5, 'DefaultPrivateGatewayNetworkOffering', 'bb2a0a01-2c7d-48bb-8afd-38ee08e1d4c9', 'DefaultPrivateGatewayNetworkOffering', 'DefaultPrivateGatewayNetworkOffering', 0, 0, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Private', 0, 1, 0, 0, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (6, 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', '0d020010-636f-4c1b-8821-243cfcbe3b67', 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', 0, 0, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Private', 0, 1, 0, 0, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (7, 'DefaultSharedNetworkOfferingWithSGService', 'a03b8597-88b0-4fe5-bca3-45461a72d8f7', 'DefaultSharedNetworkOfferingWithSGService', 'Offering for Shared Security group enabled networks', NULL, NULL, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Shared', 0, 1, 0, 1, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (8, 'DefaultSharedNetworkOffering', 'a1e592dc-1d5f-47cb-941e-c2098d6e97ec', 'DefaultSharedNetworkOffering', 'Offering for Shared networks', NULL, NULL, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Shared', 0, 1, 0, 1, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (9, 'DefaultIsolatedNetworkOfferingWithSourceNatService', 'aef2ee07-0158-4148-b5cd-4146ef4beb28', 'DefaultIsolatedNetworkOfferingWithSourceNatService', 'Offering for Isolated networks with Source Nat service enabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', 'Isolated', 0, 1, 0, 0, 0, 1, 0, 1, 0, NULL, 0, 0, NULL),
-  (10, 'DefaultIsolatedNetworkOffering', '2ad8729d-cbec-420c-b5ca-798b4aad8f06', 'DefaultIsolatedNetworkOffering', 'Offering for Isolated networks with Source Nat service', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 1, 0, NULL, 1, 0, NULL),
-  (11, 'DefaultIsolatedNetworkOfferingWithEgress', 'd454baaa-23f0-40f0-b47a-b7dfbadcdc98', 'DefaultIsolatedNetworkOfferingWithEgress', 'Offering for Isolated networks with egress and Source Nat service', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 1, 1, NULL, 1, 0, NULL),
-  (12, 'DefaultRedundantIsolatedNetworkOffering', '799fc7ff-9ca1-4e2c-9b66-aeac34973b57', 'DefaultRedundantIsolatedNetworkOffering', 'Offering for Isolated networks with Source Nat service (redundant)', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 1, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 1, 0, NULL, 1, 0, NULL),
-  (13, 'DefaultRedundantIsolatedNetworkOfferingWithEgress', '4be27e90-0f81-4267-9e10-462fcdf31e2b', 'DefaultRedundantIsolatedNetworkOfferingWithEgress', 'Offering for Isolated networks with egress and Source Nat service (redundant)', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 1, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 1, 1, NULL, 1, 0, NULL),
-  (14, 'DefaultIsolatedNetworkOfferingForVpcNetworks', '287f4ff4-de4a-4381-b8a5-114f23eb41f7', 'DefaultIsolatedNetworkOfferingForVpcNetworks', 'Offering for Isolated Vpc networks with Source Nat service enabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Isolated', 0, 1, 0, 0, 0, 1, 0, 1, 0, NULL, 0, 0, NULL),
-  (15, 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB', '0bb55772-5ee7-4376-b6d3-548ddb6376b7', 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB', 'Offering for Isolated Vpc networks with Source Nat service enabled and LB service Disabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Isolated', 0, 1, 0, 0, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (16, 'DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB', 'eb1f2015-9f3d-49ab-985f-0749d24de8e2', 'DefaultIsolatedNetworkOfferingForVpcNetworksWithInternalLB', 'Offering for Isolated Vpc networks with Internal LB support', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Isolated', 0, 1, 0, 0, 0, 1, 1, 0, 0, NULL, 0, 0, NULL),
-  (17, 'DefaultSyncNetworkOffering', '34485c72-2616-4514-9028-377c4aaf8634', 'DefaultSyncNetworkOffering', 'Offering for Sync networks', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Sync', 0, 1, 0, 0, 0, 1, 0, 0, 0, NULL, 0, 0, NULL),
-  (18, 'DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat', 'e08b291f-a437-4cc9-8e6e-b3c553423184', 'DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat', 'Offering for Isolated VPC networks without Source Nat service enabled and LB service disabled', NULL, 10, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:27', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 0, 0, NULL, 1, 0, NULL),
-  (19, 'DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC', '04c63817-9a2f-458b-b103-c06f76028d45', 'DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC', 'Offering for Isolated VPC networks for Internal VPC networks', NULL, 10, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:27', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 0, 0, NULL, 1, 0, NULL);
+  (1, 'System-Public-Network', '7caa2b40-32eb-4a11-bbae-d8f1b7debe76', 'System-Public-Network', 'System Offering for System-Public-Network', 0, 0, 'Public', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23',
+                                                                                                                                                                         NULL, 1, 'Required', 1, 0, 0,
+                                                                                                                                                                         0, 'Enabled', NULL, 0, 1, 0, 1,
+                                                                                                                                                                            0, 0, 0, 0, NULL, 0, 0,
+   NULL),
+  (2, 'System-Management-Network', 'a5c722a1-3ce9-43f0-9e1b-685e0ca65129', 'System-Management-Network', 'System Offering for System-Management-Network', 0, 0, 'Management', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
+  (3, 'System-Control-Network', 'e2677dc2-18a7-4929-a3c0-d894df9c9d35', 'System-Control-Network', 'System Offering for System-Control-Network', 0, 0, 'Control', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL),
+  (4, 'System-Storage-Network', '9efe64fe-353b-4ec4-b7b9-aa338a9353e8', 'System-Storage-Network', 'System Offering for System-Storage-Network', 0, 0, 'Storage', NULL, 1, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', NULL, 0, 1, 0, 1, 0, 0, 0, 0, NULL, 0, 0, NULL),
+  (5, 'DefaultPrivateGatewayNetworkOffering', 'bb2a0a01-2c7d-48bb-8afd-38ee08e1d4c9', 'DefaultPrivateGatewayNetworkOffering', 'DefaultPrivateGatewayNetworkOffering', 0, 0, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Private', 0, 1, 0, 0, 0, 1, 0, 0, NULL, 0, 0, NULL),
+  (6, 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', '0d020010-636f-4c1b-8821-243cfcbe3b67', 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', 'DefaultPrivateGatewayNetworkOfferingSpecifyVlan', 0, 0, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:23', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Private', 0, 1, 0, 0, 0, 1, 0, 0, NULL, 0, 0, NULL),
+  (7, 'DefaultSharedNetworkOfferingWithSGService', 'a03b8597-88b0-4fe5-bca3-45461a72d8f7', 'DefaultSharedNetworkOfferingWithSGService', 'Offering for Shared Security group enabled networks', NULL, NULL, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Shared', 0, 1, 0, 1, 0, 1, 0, 0, NULL, 0, 0, NULL),
+  (8, 'DefaultSharedNetworkOffering', 'a1e592dc-1d5f-47cb-941e-c2098d6e97ec', 'DefaultSharedNetworkOffering', 'Offering for Shared networks', NULL, NULL, 'Guest', NULL, 0, 1, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Shared', 0, 1, 0, 1, 0, 1, 0, 0, NULL, 0, 0, NULL),
+  (9, 'DefaultIsolatedNetworkOfferingWithSourceNatService', 'aef2ee07-0158-4148-b5cd-4146ef4beb28', 'DefaultIsolatedNetworkOfferingWithSourceNatService', 'Offering for Isolated networks with Source Nat service enabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Required', 1, 0, 0, 0, 'Enabled', 'Isolated', 0, 1, 0, 0, 0, 1, 1, 0, NULL, 0, 0, NULL),
+  (10, 'DefaultIsolatedNetworkOffering', '2ad8729d-cbec-420c-b5ca-798b4aad8f06', 'DefaultIsolatedNetworkOffering', 'Offering for Isolated networks with Source Nat service', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 1, 0, NULL, 1, 0, NULL),
+  (11, 'DefaultIsolatedNetworkOfferingWithEgress', 'd454baaa-23f0-40f0-b47a-b7dfbadcdc98', 'DefaultIsolatedNetworkOfferingWithEgress', 'Offering for Isolated networks with egress and Source Nat service', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 1, 1, NULL, 1, 0, NULL),
+  (12, 'DefaultRedundantIsolatedNetworkOffering', '799fc7ff-9ca1-4e2c-9b66-aeac34973b57', 'DefaultRedundantIsolatedNetworkOffering',
+       'Offering for Isolated networks with Source Nat service (redundant)', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 1, 'Enabled', 'Isolated', 0,
+                                                                                                                                                                             0, 0, 0, 0, 1, 1, 0, NULL,
+   1, 0, NULL), (13, 'DefaultRedundantIsolatedNetworkOfferingWithEgress', '4be27e90-0f81-4267-9e10-462fcdf31e2b', 'DefaultRedundantIsolatedNetworkOfferingWithEgress',
+                     'Offering for Isolated networks with egress and Source Nat service (redundant)', NULL, 10, 'Guest', NULL, 0, 0, NULL, 1, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 1,
+  'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 1, 1, NULL, 1, 0, NULL),
+  (14, 'DefaultIsolatedNetworkOfferingForVpcNetworks', '287f4ff4-de4a-4381-b8a5-114f23eb41f7', 'DefaultIsolatedNetworkOfferingForVpcNetworks',
+       'Offering for Isolated Vpc networks with Source Nat service enabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1, 'Optional', 1, 0, 0, 0, 'Enabled', 'Isolated', 0,
+                                                                                                                                                                               1, 0, 0, 0, 1, 1, 0,
+   NULL, 0, 0, NULL), (15, 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB', '0bb55772-5ee7-4376-b6d3-548ddb6376b7', 'DefaultIsolatedNetworkOfferingForVpcNetworksNoLB',
+                           'Offering for Isolated Vpc networks with Source Nat service enabled and LB service Disabled', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:24', NULL, 1,
+                                                                                                                                                          'Optional', 1, 0, 0, 0, 'Enabled', 'Isolated',
+                                                                                                                                                                                  0, 1, 0, 0, 0, 1, 0,
+                                                                                                                                                                                  0, NULL, 0, 0, NULL),
+  (17, 'DefaultSyncNetworkOffering', '34485c72-2616-4514-9028-377c4aaf8634', 'DefaultSyncNetworkOffering', 'Offering for Sync networks', NULL, NULL, 'Guest', NULL, 0, 0, NULL, 0,
+                                                                                                                                                                          '2017-12-12 14:16:24', NULL,
+                                                                                                                                                                          1, 'Optional', 1, 0, 0, 0,
+    'Enabled', 'Sync', 0, 1, 0, 0, 0, 1, 0, 0, NULL, 0, 0, NULL),
+  (18, 'DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat', 'e08b291f-a437-4cc9-8e6e-b3c553423184', 'DefaultIsolatedNetworkOfferingForVpcNetworksWithoutSourceNat',
+       'Offering for Isolated VPC networks without Source Nat service enabled and LB service disabled', NULL, 10, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:27', NULL, 1, 'Optional', 0, 0, 0, 0,
+    'Enabled', 'Isolated', 0, 0, 0, 0, 0, 1, 0, 0, NULL, 1, 0, NULL),
+  (19, 'DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC', '04c63817-9a2f-458b-b103-c06f76028d45', 'DefaultIsolatedNetworkOfferingForVpcNetworksInternalVPC',
+       'Offering for Isolated VPC networks for Internal VPC networks', NULL, 10, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:27', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0,
+                                                                                                                                                                       0, 0, 1, 0, 0, NULL, 1, 0, NULL);
 
 INSERT INTO `ntwk_offering_service_map` (`id`, `network_offering_id`, `service`, `provider`, `created`)
-VALUES
-  (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (2, 7, 'SecurityGroup', 'SecurityGroupProvider', '2017-12-12 14:16:24'),
-  (3, 7, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (4, 7, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (5, 8, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (6, 8, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (7, 8, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (8, 9, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (9, 9, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (10, 9, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (11, 9, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (12, 9, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (13, 9, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (14, 9, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (15, 9, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (16, 9, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (17, 9, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (18, 10, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (19, 10, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (20, 10, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (21, 10, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (22, 10, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (23, 10, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (24, 10, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (25, 10, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (26, 10, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (27, 10, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (28, 11, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (29, 11, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (30, 11, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (31, 11, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (32, 11, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (33, 11, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (34, 11, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (35, 11, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (36, 11, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (37, 11, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (38, 12, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (39, 12, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (40, 12, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (41, 12, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (42, 12, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (43, 12, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (44, 12, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (45, 12, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (46, 12, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (47, 12, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (48, 13, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (49, 13, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (50, 13, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (51, 13, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (52, 13, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (53, 13, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (54, 13, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (55, 13, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (56, 13, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (57, 13, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
-  (58, 14, 'SourceNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (59, 14, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (60, 14, 'Vpn', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (61, 14, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (62, 14, 'PortForwarding', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (63, 14, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (64, 14, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (65, 14, 'StaticNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (66, 14, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (67, 14, 'Lb', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (68, 15, 'SourceNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (69, 15, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (70, 15, 'Vpn', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (71, 15, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (72, 15, 'PortForwarding', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (73, 15, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (74, 15, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (75, 15, 'StaticNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (76, 15, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (77, 16, 'SourceNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (78, 16, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (79, 16, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (80, 16, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (81, 16, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (82, 16, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
-  (83, 16, 'Lb', 'InternalLbVm', '2017-12-12 14:16:24'),
-  (84, 18, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (85, 18, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (86, 18, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (87, 18, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (88, 19, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (89, 19, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (90, 19, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (91, 19, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27');
+VALUES (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (2, 7, 'SecurityGroup', 'SecurityGroupProvider', '2017-12-12 14:16:24'), (3, 7, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (4, 7, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (5, 8, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (6, 8, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (7, 8, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (8, 9, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'), (9, 9, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (10, 9, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'), (11, 9, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'), (12, 9, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (13, 9, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'), (14, 9, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'), (15, 9, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (16, 9, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (17, 9, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'), (18, 10, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (19, 10, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'), (20, 10, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'), (21, 10, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (22, 10, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (23, 10, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'), (24, 10, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (25, 10, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'), (26, 10, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (27, 10, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (28, 11, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'), (29, 11, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'), (30, 11, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (31, 11, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'), (32, 11, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (33, 11, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (34, 11, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'), (35, 11, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'), (36, 11, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (37, 11, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'), (38, 12, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'), (39, 12, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (40, 12, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'), (41, 12, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'), (42, 12, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (43, 12, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'), (44, 12, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'), (45, 12, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (46, 12, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (47, 12, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'), (48, 13, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (49, 13, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'), (50, 13, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'), (51, 13, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (52, 13, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (53, 13, 'PortForwarding', 'VirtualRouter', '2017-12-12 14:16:24'), (54, 13, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (55, 13, 'StaticNat', 'VirtualRouter', '2017-12-12 14:16:24'), (56, 13, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (57, 13, 'Lb', 'VirtualRouter', '2017-12-12 14:16:24'),
+  (58, 14, 'SourceNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (59, 14, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (60, 14, 'Vpn', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (61, 14, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (62, 14, 'PortForwarding', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (63, 14, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (64, 14, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (65, 14, 'StaticNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (66, 14, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (67, 14, 'Lb', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (68, 15, 'SourceNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (69, 15, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (70, 15, 'Vpn', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (71, 15, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (72, 15, 'PortForwarding', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (73, 15, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (74, 15, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (75, 15, 'StaticNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
+  (76, 15, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (85, 18, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (86, 18, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
+  (87, 18, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (88, 19, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (89, 19, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
+  (90, 19, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (91, 19, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27');

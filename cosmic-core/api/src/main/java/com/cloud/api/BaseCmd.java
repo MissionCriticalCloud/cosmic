@@ -19,10 +19,7 @@ import com.cloud.network.NetworkService;
 import com.cloud.network.NetworkUsageService;
 import com.cloud.network.StorageNetworkService;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
-import com.cloud.network.element.InternalLoadBalancerElementService;
 import com.cloud.network.firewall.FirewallService;
-import com.cloud.network.lb.ApplicationLoadBalancerService;
-import com.cloud.network.lb.InternalLoadBalancerVMService;
 import com.cloud.network.lb.LoadBalancingRulesService;
 import com.cloud.network.rules.RulesService;
 import com.cloud.network.security.SecurityGroupService;
@@ -141,15 +138,7 @@ public abstract class BaseCmd {
     @Inject
     public VpcProvisioningService _vpcProvSvc;
     @Inject
-    public ApplicationLoadBalancerService _newLbSvc;
-    @Inject
-    public ApplicationLoadBalancerService _appLbService;
-    @Inject
     public AffinityGroupService _affinityGroupService;
-    @Inject
-    public InternalLoadBalancerElementService _internalLbElementSvc;
-    @Inject
-    public InternalLoadBalancerVMService _internalLbSvc;
     @Inject
     public NetworkModel _ntwkModel;
     @Inject

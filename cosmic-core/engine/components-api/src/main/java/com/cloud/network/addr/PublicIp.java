@@ -157,11 +157,6 @@ public class PublicIp implements PublicIpAddress {
     }
 
     @Override
-    public boolean isPortable() {
-        return _addr.isPortable();
-    }
-
-    @Override
     public Long getNetworkId() {
         return _vlan.getNetworkId();
     }
@@ -179,10 +174,6 @@ public class PublicIp implements PublicIpAddress {
     @Override
     public Date getCreated() {
         return _addr.getCreated();
-    }
-
-    public void setPortable(final boolean portable) {
-        _addr.setPortable(portable);
     }
 
     @Override

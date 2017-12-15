@@ -85,7 +85,7 @@ public class CreatePrivateNetworkTest {
 
         final NetworkOfferingVO ntwkOff =
                 new NetworkOfferingVO("offer", "fakeOffer", TrafficType.Guest, true, true, null, null, false, null, null, GuestType.Isolated, false, false, false, false,
-                        false, false, false, false, false, false, false, false, false, false);
+                        false, false, false, false, false, false, false, false, false);
         when(networkService._networkOfferingDao.findById(anyLong())).thenReturn(ntwkOff);
         final List<NetworkOfferingVO> netofferlist = new ArrayList<>();
         netofferlist.add(ntwkOff);

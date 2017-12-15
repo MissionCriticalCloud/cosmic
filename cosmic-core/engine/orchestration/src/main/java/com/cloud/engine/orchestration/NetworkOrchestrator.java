@@ -127,7 +127,6 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.region.PortableIpDao;
 import com.cloud.user.Account;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.User;
@@ -301,8 +300,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     NetworkModel _networkModel;
     @Inject
     NicSecondaryIpDao _nicSecondaryIpDao;
-    @Inject
-    PortableIpDao _portableIpDao;
     @Inject
     ConfigDepot _configDepot;
     @Inject
@@ -870,12 +867,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             success = false;
         }
 
-        // apply internal load balancer rules
-        if (!_lbMgr.applyLoadBalancersForNetwork(networkId, Scheme.Internal)) {
-            s_logger.warn("Failed to reapply internal load balancer rules as a part of network id=" + networkId + " restart");
-            success = false;
-        }
-
         // apply vpn rules
         final List<? extends RemoteAccessVpn> vpnsToReapply = _vpnMgr.listRemoteAccessVpns(networkId);
         if (vpnsToReapply != null) {
@@ -964,16 +955,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         try {
             if (!_lbMgr.revokeLoadBalancersForNetwork(networkId, Scheme.Public)) {
                 s_logger.warn("Failed to cleanup public lb rules as a part of shutdownNetworkRules");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to cleanup public lb rules as a part of shutdownNetworkRules due to ", ex);
-            success = false;
-        }
-
-        try {
-            if (!_lbMgr.revokeLoadBalancersForNetwork(networkId, Scheme.Internal)) {
-                s_logger.warn("Failed to cleanup internal lb rules as a part of shutdownNetworkRules");
                 success = false;
             }
         } catch (final ResourceUnavailableException ex) {
@@ -2668,8 +2649,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final NetworkOffering off = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
             if (lbScheme == Scheme.Public) {
                 providerName = _ntwkOffDetailsDao.getDetail(off.getId(), NetworkOffering.Detail.PublicLbProvider);
-            } else {
-                providerName = _ntwkOffDetailsDao.getDetail(off.getId(), NetworkOffering.Detail.InternalLbProvider);
             }
             if (providerName == null) {
                 throw new InvalidParameterValueException("Can't find Lb provider supporting scheme " + lbScheme.toString() + " in network " + network);
@@ -3070,16 +3049,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedNetwork(networkId, null);
         for (final IPAddressVO ipToRelease : ipsToRelease) {
             if (ipToRelease.getVpcId() == null) {
-                if (!ipToRelease.isPortable()) {
-                    final IPAddressVO ip = _ipAddrMgr.markIpAsUnavailable(ipToRelease.getId());
-                    assert ip != null : "Unable to mark the ip address id=" + ipToRelease.getId() + " as unavailable.";
-                } else {
-                    // portable IP address are associated with owner, until explicitly requested to be disassociated
-                    // so as part of network clean up just break IP association with guest network
-                    ipToRelease.setAssociatedWithNetworkId(null);
-                    _ipAddressDao.update(ipToRelease.getId(), ipToRelease);
-                    s_logger.debug("Portable IP address " + ipToRelease + " is no longer associated with any network");
-                }
+                final IPAddressVO ip = _ipAddrMgr.markIpAsUnavailable(ipToRelease.getId());
+                assert ip != null : "Unable to mark the ip address id=" + ipToRelease.getId() + " as unavailable.";
             } else {
                 _vpcMgr.unassignIPFromVpcNetwork(ipToRelease.getId(), network.getId());
             }

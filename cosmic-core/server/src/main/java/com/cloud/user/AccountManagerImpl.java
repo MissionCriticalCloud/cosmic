@@ -73,8 +73,6 @@ import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleDao;
-import com.cloud.region.gslb.GlobalLoadBalancerRuleVO;
 import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.server.auth.UserAuthenticator.ActionOnFailedAuthentication;
 import com.cloud.storage.VMTemplateVO;
@@ -149,8 +147,6 @@ import org.slf4j.LoggerFactory;
 public class AccountManagerImpl extends ManagerBase implements AccountManager, Manager {
     public static final Logger s_logger = LoggerFactory.getLogger(AccountManagerImpl.class);
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("AccountChecker"));
-    @Inject
-    public com.cloud.region.ha.GlobalLoadBalancingRulesService _gslbService;
     @Inject
     protected SnapshotDao _snapshotDao;
     @Inject
@@ -250,8 +246,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     private ResourceLimitDao _resourceLimitDao;
     @Inject
     private DedicatedResourceDao _dedicatedDao;
-    @Inject
-    private GlobalLoadBalancerRuleDao _gslbRuleDao;
     private List<UserAuthenticator> _userAuthenticators;
 
     public List<UserAuthenticator> getUserAuthenticators() {
@@ -1067,12 +1061,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 }
             }
 
-            // delete global load balancer rules for the account.
-            final List<GlobalLoadBalancerRuleVO> gslbRules = _gslbRuleDao.listByAccount(accountId);
-            if (gslbRules != null && !gslbRules.isEmpty()) {
-                _gslbService.revokeAllGslbRulesForAccount(caller, accountId);
-            }
-
             // delete the account from project accounts
             _projectAccountDao.removeAccountFromProjects(accountId);
 
@@ -1248,16 +1236,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             }
             final int vlansReleased = _accountGuestVlanMapDao.removeByAccountId(accountId);
             s_logger.info("deleteAccount: Released " + vlansReleased + " dedicated guest vlan ranges from account " + accountId);
-
-            // release account specific acquired portable IP's. Since all the portable IP's must have been already
-            // disassociated with VPC/guest network (due to deletion), so just mark portable IP as free.
-            final List<? extends IpAddress> ipsToRelease = _ipAddressDao.listByAccount(accountId);
-            for (final IpAddress ip : ipsToRelease) {
-                if (ip.isPortable()) {
-                    s_logger.debug("Releasing portable ip " + ip + " as a part of account id=" + accountId + " cleanup");
-                    _ipAddrMgr.releasePortableIpAddress(ip.getId());
-                }
-            }
 
             // release dedication if any
             final List<DedicatedResourceVO> dedicatedResources = _dedicatedDao.listByAccountId(accountId);

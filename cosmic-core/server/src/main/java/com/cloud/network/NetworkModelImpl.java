@@ -20,7 +20,6 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.GuestType;
@@ -169,8 +168,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     UserIpv6AddressDao _ipv6Dao;
     @Inject
     NicSecondaryIpDao _nicSecondaryIpDao;
-    @Inject
-    ApplicationLoadBalancerRuleDao _appLbRuleDao;
     @Inject
     NetworkOfferingDetailsDao _ntwkOffDetailsDao;
     SearchBuilder<IPAddressVO> IpAddressSearch;
@@ -1825,9 +1822,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         //Get all secondary ips for nics
         final List<String> secondaryIps = _nicSecondaryIpDao.listSecondaryIpAddressInNetwork(network.getId());
         ips.addAll(secondaryIps);
-        //Get ips used by load balancers
-        final List<String> lbIps = _appLbRuleDao.listLbIpsBySourceIpNetworkId(network.getId());
-        ips.addAll(lbIps);
         return ips;
     }
 

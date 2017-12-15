@@ -35,7 +35,7 @@ public class CreateNetworkOfferingCmd extends BaseCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.DETAILS, type = CommandType.MAP, since = "4.2.0", description = "Network offering details in key/value pairs."
-            + " Supported keys are internallbprovider/publiclbprovider with service provider as a value")
+            + " Supported keys are publiclbprovider with service provider as a value")
     protected Map details;
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = true, description = "the name of the network offering")
     private String networkOfferingName;

@@ -76,8 +76,6 @@ public class IPAddressVO implements IpAddress {
     private Long vpcId;
     @Column(name = "dnat_vmip")
     private String vmIp;
-    @Column(name = "is_portable")
-    private boolean portable = false;
     @Column(name = GenericDao.REMOVED_COLUMN)
     private Date removed;
 
@@ -104,7 +102,7 @@ public class IPAddressVO implements IpAddress {
     }
 
     public IPAddressVO(final Ip address, final long dataCenterId, final Long networkId, final Long vpcId, final long physicalNetworkId, final long sourceNetworkId, final long
-            vlanDbId, final boolean portable) {
+            vlanDbId) {
         this.address = address;
         this.dataCenterId = dataCenterId;
         associatedWithNetworkId = networkId;
@@ -112,7 +110,6 @@ public class IPAddressVO implements IpAddress {
         this.physicalNetworkId = physicalNetworkId;
         this.sourceNetworkId = sourceNetworkId;
         vlanId = vlanDbId;
-        this.portable = portable;
         uuid = UUID.randomUUID().toString();
         ipACLId = 2L; // Default Allow ACL
     }
@@ -268,15 +265,6 @@ public class IPAddressVO implements IpAddress {
     @Override
     public String getVmIp() {
         return vmIp;
-    }
-
-    @Override
-    public boolean isPortable() {
-        return portable;
-    }
-
-    public void setPortable(final boolean portable) {
-        this.portable = portable;
     }
 
     @Override

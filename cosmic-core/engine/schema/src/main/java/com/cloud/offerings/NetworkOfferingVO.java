@@ -93,8 +93,6 @@ public class NetworkOfferingVO implements NetworkOffering {
     private boolean keepAliveEnabled = false;
     @Column(name = "supports_streched_l2")
     private boolean supportsStrechedL2 = false;
-    @Column(name = "internal_lb")
-    private boolean internalLb;
     @Column(name = "public_lb")
     private boolean publicLb;
     @Column(name = "unique_name")
@@ -104,7 +102,7 @@ public class NetworkOfferingVO implements NetworkOffering {
                              final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
                              final Network.GuestType guestType, final boolean conserveMode, final boolean dedicatedLb, final boolean sharedSourceNat, final boolean redundantRouter,
                              final boolean elasticIp, final boolean elasticLb, final boolean specifyIpRanges, final boolean inline, final boolean isPersistent,
-                             final boolean associatePublicIP, final boolean publicLb, final boolean internalLb, final boolean egressdefaultpolicy,
+                             final boolean associatePublicIP, final boolean publicLb, final boolean egressdefaultpolicy,
                              final boolean supportsStrechedL2) {
         this(
                 name,
@@ -121,7 +119,6 @@ public class NetworkOfferingVO implements NetworkOffering {
                 conserveMode,
                 specifyIpRanges,
                 isPersistent,
-                internalLb,
                 publicLb
         );
         this.dedicatedLB = dedicatedLb;
@@ -137,7 +134,7 @@ public class NetworkOfferingVO implements NetworkOffering {
 
     public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan,
                              final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
-                             final Network.GuestType guestType, final boolean conserveMode, final boolean specifyIpRanges, final boolean isPersistent, final boolean internalLb,
+                             final Network.GuestType guestType, final boolean conserveMode, final boolean specifyIpRanges, final boolean isPersistent,
                              final boolean publicLb) {
         this.name = name;
         this.displayText = displayText;
@@ -163,7 +160,6 @@ public class NetworkOfferingVO implements NetworkOffering {
         this.specifyIpRanges = specifyIpRanges;
         this.isPersistent = isPersistent;
         this.publicLb = publicLb;
-        this.internalLb = internalLb;
     }
 
     public NetworkOfferingVO() {
@@ -177,7 +173,7 @@ public class NetworkOfferingVO implements NetworkOffering {
      * @param specifyIpRanges TODO
      */
     public NetworkOfferingVO(final String name, final TrafficType trafficType, final boolean specifyIpRanges) {
-        this(name, "System Offering for " + name, trafficType, true, false, 0, 0, true, Availability.Required, null, null, true, specifyIpRanges, false, false, false);
+        this(name, "System Offering for " + name, trafficType, true, false, 0, 0, true, Availability.Required, null, null, true, specifyIpRanges, false, false);
         this.state = State.Enabled;
     }
 
@@ -197,7 +193,6 @@ public class NetworkOfferingVO implements NetworkOffering {
                 true,
                 false,
                 true,
-                false,
                 false
         );
         this.state = State.Enabled;
@@ -358,11 +353,6 @@ public class NetworkOfferingVO implements NetworkOffering {
     }
 
     @Override
-    public boolean getInternalLb() {
-        return internalLb;
-    }
-
-    @Override
     public boolean getPublicLb() {
         return publicLb;
     }
@@ -401,10 +391,6 @@ public class NetworkOfferingVO implements NetworkOffering {
 
     public void setPublicLb(final boolean publicLb) {
         this.publicLb = publicLb;
-    }
-
-    public void setInternalLb(final boolean internalLb) {
-        this.internalLb = internalLb;
     }
 
     public void setUniqueName(final String uniqueName) {

@@ -55,18 +55,6 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
     @Column(name = "is_dedicated")
     private boolean isDedicatedDevice;
 
-    @Column(name = "is_gslb_provider")
-    private boolean gslbProvider;
-
-    @Column(name = "is_exclusive_gslb_provider")
-    private boolean exclusiveGslbProvider;
-
-    @Column(name = "gslb_site_publicip")
-    private String gslbSitePublicIP;
-
-    @Column(name = "gslb_site_privateip")
-    private String gslbSitePrivateIP;
-
     @Column(name = "parent_host_id")
     private long parentHostId;
 
@@ -74,16 +62,14 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
     private long capacity;
 
     public ExternalLoadBalancerDeviceVO(final long hostId, final long physicalNetworkId, final String providerName, final String deviceName, final long capacity, final boolean
-            dedicated, final boolean managed,
-                                        final long parentHostId) {
-        this(hostId, physicalNetworkId, providerName, deviceName, capacity, dedicated, false);
+            dedicated, final boolean managed,                                        final long parentHostId) {
+        this(hostId, physicalNetworkId, providerName, deviceName, capacity, dedicated);
         this.isManagedDevice = managed;
         this.parentHostId = parentHostId;
     }
 
     public ExternalLoadBalancerDeviceVO(final long hostId, final long physicalNetworkId, final String providerName, final String deviceName, final long capacity, final boolean
-            dedicated,
-                                        final boolean gslbProvider) {
+            dedicated) {
         this.physicalNetworkId = physicalNetworkId;
         this.providerName = providerName;
         this.deviceName = deviceName;
@@ -95,9 +81,6 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
         this.isManagedDevice = false;
         this.state = LBDeviceState.Enabled;
         this.uuid = UUID.randomUUID().toString();
-        this.gslbProvider = gslbProvider;
-        this.gslbSitePublicIP = null;
-        this.gslbSitePrivateIP = null;
     }
 
     public ExternalLoadBalancerDeviceVO() {
@@ -171,38 +154,6 @@ public class ExternalLoadBalancerDeviceVO implements InternalIdentity, Identity 
 
     public void setIsDedicatedDevice(final boolean isDedicated) {
         isDedicatedDevice = isDedicated;
-    }
-
-    public boolean getGslbProvider() {
-        return gslbProvider;
-    }
-
-    public void setGslbProvider(final boolean gslbProvider) {
-        this.gslbProvider = gslbProvider;
-    }
-
-    public boolean getExclusiveGslbProvider() {
-        return exclusiveGslbProvider;
-    }
-
-    public void setExclusiveGslbProvider(final boolean exclusiveGslbProvider) {
-        this.exclusiveGslbProvider = exclusiveGslbProvider;
-    }
-
-    public String getGslbSitePublicIP() {
-        return gslbSitePublicIP;
-    }
-
-    public void setGslbSitePublicIP(final String gslbSitePublicIP) {
-        this.gslbSitePublicIP = gslbSitePublicIP;
-    }
-
-    public String getGslbSitePrivateIP() {
-        return gslbSitePrivateIP;
-    }
-
-    public void setGslbSitePrivateIP(final String gslbSitePrivateIP) {
-        this.gslbSitePrivateIP = gslbSitePrivateIP;
     }
 
     @Override

@@ -96,11 +96,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-network-internallb</artifactId>
-            <version>5.3.11-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-hypervisor-xenserver</artifactId>
             <version>5.3.11-SNAPSHOT</version>
         </dependency>

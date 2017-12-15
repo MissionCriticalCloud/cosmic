@@ -159,7 +159,6 @@
         <property name="preRegistered">
             <list>
                 <ref bean="VpcVirtualRouter" />
-                <ref bean="InternalLbVm" />
             </list>
         </property>
     </bean>
@@ -180,7 +179,6 @@
         <property name="preRegistered">
             <list>
                 <ref bean="VpcVirtualRouter" />
-                <ref bean="InternalLbVm" />
             </list>
         </property>
     </bean>
@@ -233,11 +231,6 @@
                 <ref bean="VpcVirtualRouter" />
             </list>
         </property>
-    </bean>
-
-    <bean id="gslbServiceProvidersRegistry"
-          class="com.cloud.spring.lifecycle.registry.ExtensionRegistry">
-        <property name="excludeKey" value="gslb.service.provider.exclude" />
     </bean>
 
     <bean id="affinityProcessorsRegistry"

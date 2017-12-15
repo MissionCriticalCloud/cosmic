@@ -33,9 +33,6 @@ import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.ApiResponseSerializer;
-import com.cloud.api.response.ApplicationLoadBalancerInstanceResponse;
-import com.cloud.api.response.ApplicationLoadBalancerResponse;
-import com.cloud.api.response.ApplicationLoadBalancerRuleResponse;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.CapabilityResponse;
 import com.cloud.api.response.CapacityResponse;
@@ -52,7 +49,6 @@ import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GlobalLoadBalancerResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
@@ -62,7 +58,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.InternalLoadBalancerElementResponse;
 import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckPolicyResponse;
@@ -79,8 +74,6 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
-import com.cloud.api.response.PortableIpRangeResponse;
-import com.cloud.api.response.PortableIpResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
@@ -179,12 +172,10 @@ import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.lb.ApplicationLoadBalancerRule;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNatRule;
@@ -208,10 +199,7 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectInvitation;
-import com.cloud.region.PortableIp;
-import com.cloud.region.PortableIpRange;
 import com.cloud.region.Region;
-import com.cloud.region.ha.GlobalLoadBalancerRule;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.service.ServiceOfferingVO;
@@ -249,7 +237,6 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.InstanceGroup;
@@ -614,11 +601,11 @@ public class ApiResponseHelper implements ResponseGenerator {
                         vmResponse.setPublicNetmask(singleNicProfile.getIPv4Netmask());
                         vmResponse.setGateway(singleNicProfile.getIPv4Gateway());
                     } else if (network.getTrafficType() == TrafficType.Guest) {
-            /*
-             * In basic zone, public ip has TrafficType.Guest in case EIP service is not enabled.
-             * When EIP service is enabled in the basic zone, system VM by default get the public
-             * IP allocated for EIP. So return the guest/public IP accordingly.
-             * */
+                        /*
+                         * In basic zone, public ip has TrafficType.Guest in case EIP service is not enabled.
+                         * When EIP service is enabled in the basic zone, system VM by default get the public
+                         * IP allocated for EIP. So return the guest/public IP accordingly.
+                         * */
                         final NetworkOffering networkOffering = ApiDBUtils.findNetworkOfferingById(network.getNetworkOfferingId());
                         if (networkOffering.getElasticIp()) {
                             final IpAddress ip = ApiDBUtils.findIpByAssociatedVmId(vm.getId());
@@ -867,8 +854,6 @@ public class ApiResponseHelper implements ResponseGenerator {
 
         ipResponse.setForDisplay(ipAddr.isDisplay());
 
-        ipResponse.setPortable(ipAddr.isPortable());
-
         //set tag information
         final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.PublicIpAddress, ipAddr.getId());
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
@@ -899,30 +884,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         guestVlanRangeResponse.setZoneId(physicalNetwork.getDataCenterId());
 
         return guestVlanRangeResponse;
-    }
-
-    @Override
-    public GlobalLoadBalancerResponse createGlobalLoadBalancerResponse(final GlobalLoadBalancerRule globalLoadBalancerRule) {
-        final GlobalLoadBalancerResponse response = new GlobalLoadBalancerResponse();
-        response.setAlgorithm(globalLoadBalancerRule.getAlgorithm());
-        response.setStickyMethod(globalLoadBalancerRule.getPersistence());
-        response.setServiceType(globalLoadBalancerRule.getServiceType());
-        response.setServiceDomainName(globalLoadBalancerRule.getGslbDomain() + "." + ApiDBUtils.getDnsNameConfiguredForGslb());
-        response.setName(globalLoadBalancerRule.getName());
-        response.setDescription(globalLoadBalancerRule.getDescription());
-        response.setRegionIdId(globalLoadBalancerRule.getRegion());
-        response.setId(globalLoadBalancerRule.getUuid());
-        populateOwner(response, globalLoadBalancerRule);
-        response.setObjectName("globalloadbalancer");
-
-        final List<LoadBalancerResponse> siteLbResponses = new ArrayList<>();
-        final List<? extends LoadBalancer> siteLoadBalaners = ApiDBUtils.listSiteLoadBalancers(globalLoadBalancerRule.getId());
-        for (final LoadBalancer siteLb : siteLoadBalaners) {
-            final LoadBalancerResponse siteLbResponse = createLoadBalancerResponse(siteLb);
-            siteLbResponses.add(siteLbResponse);
-        }
-        response.setSiteLoadBalancers(siteLbResponses);
-        return response;
     }
 
     @Override
@@ -2437,8 +2398,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setName(region.getName());
         response.setEndPoint(region.getEndPoint());
         response.setObjectName("region");
-        response.setGslbServiceEnabled(region.checkIfServiceEnabled(Region.Service.Gslb));
-        response.setPortableipServiceEnabled(region.checkIfServiceEnabled(Region.Service.PortableIp));
         return response;
     }
 
@@ -3194,74 +3153,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public ApplicationLoadBalancerResponse createLoadBalancerContainerReponse(final ApplicationLoadBalancerRule lb, final Map<Ip, UserVm> lbInstances) {
-
-        final ApplicationLoadBalancerResponse lbResponse = new ApplicationLoadBalancerResponse();
-        lbResponse.setId(lb.getUuid());
-        lbResponse.setName(lb.getName());
-        lbResponse.setDescription(lb.getDescription());
-        lbResponse.setAlgorithm(lb.getAlgorithm());
-        lbResponse.setForDisplay(lb.isDisplay());
-        final Network nw = ApiDBUtils.findNetworkById(lb.getNetworkId());
-        lbResponse.setNetworkId(nw.getUuid());
-        populateOwner(lbResponse, lb);
-
-        if (lb.getScheme() == Scheme.Internal) {
-            lbResponse.setSourceIp(lb.getSourceIp().addr());
-            //TODO - create the view for the load balancer rule to reflect the network uuid
-            final Network network = ApiDBUtils.findNetworkById(lb.getNetworkId());
-            lbResponse.setSourceIpNetworkId(network.getUuid());
-        } else {
-            //for public, populate the ip information from the ip address
-            final IpAddress publicIp = ApiDBUtils.findIpAddressById(lb.getSourceIpAddressId());
-            lbResponse.setSourceIp(publicIp.getAddress().addr());
-            final Network ntwk = ApiDBUtils.findNetworkById(publicIp.getNetworkId());
-            lbResponse.setSourceIpNetworkId(ntwk.getUuid());
-        }
-
-        //set load balancer rules information (only one rule per load balancer in this release)
-        final List<ApplicationLoadBalancerRuleResponse> ruleResponses = new ArrayList<>();
-        final ApplicationLoadBalancerRuleResponse ruleResponse = new ApplicationLoadBalancerRuleResponse();
-        ruleResponse.setInstancePort(lb.getDefaultPortStart());
-        ruleResponse.setSourcePort(lb.getSourcePortStart());
-        FirewallRule.State stateToSet = lb.getState();
-        if (stateToSet.equals(FirewallRule.State.Revoke)) {
-            stateToSet = FirewallRule.State.Deleting;
-        }
-        ruleResponse.setState(stateToSet.toString());
-        ruleResponse.setObjectName("loadbalancerrule");
-        ruleResponses.add(ruleResponse);
-        lbResponse.setLbRules(ruleResponses);
-
-        //set Lb instances information
-        final List<ApplicationLoadBalancerInstanceResponse> instanceResponses = new ArrayList<>();
-        for (final Map.Entry<Ip, UserVm> entry : lbInstances.entrySet()) {
-            final Ip ip = entry.getKey();
-            final UserVm vm = entry.getValue();
-            final ApplicationLoadBalancerInstanceResponse instanceResponse = new ApplicationLoadBalancerInstanceResponse();
-            instanceResponse.setIpAddress(ip.addr());
-            instanceResponse.setId(vm.getUuid());
-            instanceResponse.setName(vm.getInstanceName());
-            instanceResponse.setObjectName("loadbalancerinstance");
-            instanceResponses.add(instanceResponse);
-        }
-
-        lbResponse.setLbInstances(instanceResponses);
-
-        //set tag information
-        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.LoadBalancer, lb.getId());
-        final List<ResourceTagResponse> tagResponses = new ArrayList<>();
-        for (final ResourceTag tag : tags) {
-            final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
-        }
-        lbResponse.setTags(tagResponses);
-
-        lbResponse.setObjectName("loadbalancer");
-        return lbResponse;
-    }
-
-    @Override
     public AffinityGroupResponse createAffinityGroupResponse(final AffinityGroup group) {
 
         final AffinityGroupResponse response = new AffinityGroupResponse();
@@ -3290,88 +3181,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         } else {
             return ag.getId();
         }
-    }
-
-    @Override
-    public PortableIpRangeResponse createPortableIPRangeResponse(final PortableIpRange ipRange) {
-        final PortableIpRangeResponse response = new PortableIpRangeResponse();
-        response.setId(ipRange.getUuid());
-        final String ipRangeStr = ipRange.getIpRange();
-        if (ipRangeStr != null) {
-            final String[] range = ipRangeStr.split("-");
-            response.setStartIp(range[0]);
-            response.setEndIp(range[1]);
-        }
-        response.setVlan(ipRange.getVlanTag());
-        response.setGateway(ipRange.getGateway());
-        response.setNetmask(ipRange.getNetmask());
-        response.setRegionId(ipRange.getRegionId());
-        response.setObjectName("portableiprange");
-        return response;
-    }
-
-    @Override
-    public PortableIpResponse createPortableIPResponse(final PortableIp portableIp) {
-        final PortableIpResponse response = new PortableIpResponse();
-        response.setAddress(portableIp.getAddress());
-        final Long accountId = portableIp.getAllocatedInDomainId();
-        if (accountId != null) {
-            final Account account = ApiDBUtils.findAccountById(accountId);
-            response.setAllocatedToAccountId(account.getAccountName());
-            final Domain domain = ApiDBUtils.findDomainById(account.getDomainId());
-            response.setAllocatedInDomainId(domain.getUuid());
-        }
-
-        response.setAllocatedTime(portableIp.getAllocatedTime());
-
-        if (portableIp.getAssociatedDataCenterId() != null) {
-            final DataCenter zone = ApiDBUtils.findZoneById(portableIp.getAssociatedDataCenterId());
-            if (zone != null) {
-                response.setAssociatedDataCenterId(zone.getUuid());
-            }
-        }
-
-        if (portableIp.getPhysicalNetworkId() != null) {
-            final PhysicalNetwork pnw = ApiDBUtils.findPhysicalNetworkById(portableIp.getPhysicalNetworkId());
-            if (pnw != null) {
-                response.setPhysicalNetworkId(pnw.getUuid());
-            }
-        }
-
-        if (portableIp.getAssociatedWithNetworkId() != null) {
-            final Network ntwk = ApiDBUtils.findNetworkById(portableIp.getAssociatedWithNetworkId());
-            if (ntwk != null) {
-                response.setAssociatedWithNetworkId(ntwk.getUuid());
-            }
-        }
-
-        if (portableIp.getAssociatedWithVpcId() != null) {
-            final Vpc vpc = ApiDBUtils.findVpcById(portableIp.getAssociatedWithVpcId());
-            if (vpc != null) {
-                response.setAssociatedWithVpcId(vpc.getUuid());
-            }
-        }
-
-        response.setState(portableIp.getState().name());
-        response.setObjectName("portableip");
-        return response;
-    }
-
-    @Override
-    public InternalLoadBalancerElementResponse createInternalLbElementResponse(final VirtualRouterProvider result) {
-        if (result.getType() != VirtualRouterProvider.Type.InternalLbVm) {
-            return null;
-        }
-        final InternalLoadBalancerElementResponse response = new InternalLoadBalancerElementResponse();
-        response.setId(result.getUuid());
-        final PhysicalNetworkServiceProvider nsp = ApiDBUtils.findPhysicalNetworkServiceProviderById(result.getNspId());
-        if (nsp != null) {
-            response.setNspId(nsp.getUuid());
-        }
-        response.setEnabled(result.isEnabled());
-
-        response.setObjectName("internalloadbalancerelement");
-        return response;
     }
 
     @Override

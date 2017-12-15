@@ -34,6 +34,7 @@ var md5HashedLogin = false;
 
 //page size for API call (e.g."listXXXXXXX&pagesize=N" )
 var pageSize = 20;
+
 //var pageSize = 1; //for testing only
 
 function to_json_array(str) {
@@ -171,10 +172,6 @@ var lbProviderMap = {
     "publicLb": {
         "non-vpc": ["VirtualRouter"],
         "vpc": ["VpcVirtualRouter"]
-    },
-    "internalLb": {
-        "non-vpc": [],
-        "vpc": ["InternalLbVm"]
     }
 };
 
@@ -938,6 +935,7 @@ function ipFindNetworkServiceByName(pName, networkObj) {
     }
     return null;
 }
+
 //find capability object in service object in network object
 
 function ipFindCapabilityByName(pName, networkServiceObj) {

@@ -108,22 +108,6 @@ public interface IpAddressManager {
     IPAddressVO associateIPToGuestNetwork(long ipAddrId, long networkId, boolean releaseOnFailure) throws ResourceAllocationException, ResourceUnavailableException,
             InsufficientAddressCapacityException, ConcurrentOperationException;
 
-    IpAddress allocatePortableIp(Account ipOwner, Account caller, long dcId, Long networkId, Long vpcID) throws ConcurrentOperationException,
-            ResourceAllocationException, InsufficientAddressCapacityException;
-
-    boolean releasePortableIpAddress(long addrId);
-
-    IPAddressVO associatePortableIPToGuestNetwork(long ipAddrId, long networkId, boolean releaseOnFailure) throws ResourceAllocationException,
-            ResourceUnavailableException, InsufficientAddressCapacityException, ConcurrentOperationException;
-
-    IPAddressVO disassociatePortableIPToGuestNetwork(long ipAddrId, long networkId) throws ResourceAllocationException, ResourceUnavailableException,
-            InsufficientAddressCapacityException, ConcurrentOperationException;
-
-    boolean isPortableIpTransferableFromNetwork(long ipAddrId, long networkId);
-
-    void transferPortableIP(long ipAddrId, long currentNetworkId, long newNetworkId) throws ResourceAllocationException, ResourceUnavailableException,
-            InsufficientAddressCapacityException, ConcurrentOperationException;
-
     /**
      * @param addr
      */

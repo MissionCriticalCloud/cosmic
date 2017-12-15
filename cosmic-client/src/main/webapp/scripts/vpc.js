@@ -1,181 +1,4 @@
 (function ($, cloudStack) {
-    var assignVMAction = function () {
-        return {
-            label: 'label.assign.vms',
-            messages: {
-                notification: function (args) {
-                    return 'label.assign.vms';
-                }
-            },
-            needsRefresh: true,
-            listView: $.extend(true, {}, cloudStack.sections.instances.listView, {
-                type: 'checkbox',
-                filters: false,
-                multiSelect: false,
-                subselect: {
-                    isMultiple: true,
-                    label: 'label.use.vm.ip',
-                    dataProvider: function (args) {
-                        var instance = args.context.instances[0];
-                        var network = args.context.networks[0];
-
-                        $.ajax({
-                            url: createURL('listNics'),
-                            data: {
-                                virtualmachineid: instance.id,
-                                nicId: instance.nic[0].id
-                            },
-                            success: function (json) {
-                                var nic = json.listnicsresponse.nic[0];
-                                var primaryIp = nic.ipaddress;
-                                var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
-                                var ipSelection = [];
-                                var existingIps = $(args.context.subItemData).map(
-                                    function (index, item) {
-                                        return item.itemIp;
-                                    }
-                                );
-
-                                // Add primary IP as default
-                                if ($.inArray(primaryIp, existingIps) == -1) {
-                                    ipSelection.push({
-                                        id: primaryIp,
-                                        description: primaryIp + ' (Primary)'
-                                    });
-                                }
-
-                                // Add secondary IPs
-                                $(secondaryIps).map(function (index, secondaryIp) {
-                                    if ($.inArray(secondaryIp.ipaddress, existingIps) == -1) {
-                                        ipSelection.push({
-                                            id: secondaryIp.ipaddress,
-                                            description: secondaryIp.ipaddress
-                                        });
-                                    }
-                                });
-
-                                args.response.success({
-                                    data: ipSelection
-                                });
-                            }
-                        });
-                    }
-                },
-                dataProvider: function (args) {
-                    var assignedInstances;
-                    $.ajax({
-                        url: createURL('listLoadBalancers'),
-                        data: {
-                            id: args.context.internalLoadBalancers[0].id
-                        },
-                        async: false,
-                        success: function (json) {
-                            assignedInstances = json.listloadbalancersresponse.loadbalancer[0].loadbalancerinstance;
-                            if (assignedInstances == null)
-                                assignedInstances = [];
-                        }
-                    });
-
-                    $.ajax({
-                        url: createURL('listVirtualMachines'),
-                        data: {
-                            networkid: args.context.networks[0].id,
-                            listAll: true
-                        },
-                        success: function (json) {
-                            var instances = json.listvirtualmachinesresponse.virtualmachine;
-
-                            // Pre-select existing instances in LB rule
-                            $(instances).map(function (index, instance) {
-                                instance._isSelected = $.grep(assignedInstances,
-                                    function (assignedInstance) {
-                                        return assignedInstance.id == instance.id;
-                                    }
-                                ).length ? true : false;
-                            });
-
-                            //remove assigned VMs (i.e. instance._isSelected == true)
-                            var items = [];
-                            if (instances != null) {
-                                for (var i = 0; i < instances.length; i++) {
-                                    if (instances[i]._isSelected == true)
-                                        continue;
-                                    else
-                                        items.push(instances[i]);
-                                }
-                            }
-
-                            args.response.success({
-                                data: items
-                            });
-                        }
-                    });
-                }
-            }),
-            action: function (args) {
-                /*
-                 * path 1: Network > VPC (list) > click "Configure" > pick an internal LB tier > click "Internal LB" (list) > click on a grid row (Details tab) > click "Assign VMs" tab > click Assign VMs" button on top of list
-                 * path 2: Network > VPC (list) > click "Configure" > pick an internal LB tier > click "Internal LB" (list) > "QuickView" on a grid row > click "Assign VMs" button in QuickView
-                 */
-                var $rows = $(':ui-dialog .list-view tbody tr');
-                var vms = args.context.instances;
-
-                // Assign subselect values
-                $(vms).each(function () {
-                    var vm = this;
-                    var $vmRow = $rows.filter(function () {
-                        return $(this).data('json-obj') === vm;
-                    });
-                    $.extend(vm, {_subselect: $vmRow.find('.subselect select').val()});
-                });
-
-                var inputData = {
-                    id: args.context.internalLoadBalancers[0].id
-                };
-                /*
-                 * e.g. first VM(xxx) has two IPs(10.1.1.~), second VM(yyy) has three IPs(10.2.2.~):
-                 * vmidipmap[0].vmid=xxx  vmidipmap[0].vmip=10.1.1.11
-                 * vmidipmap[1].vmid=xxx  vmidipmap[1].vmip=10.1.1.12
-                 * vmidipmap[2].vmid=yyy  vmidipmap[2].vmip=10.2.2.77
-                 * vmidipmap[3].vmid=yyy  vmidipmap[3].vmip=10.2.2.78
-                 * vmidipmap[4].vmid=yyy  vmidipmap[4].vmip=10.2.2.79
-                 */
-                var selectedVMs = vms;
-                if (selectedVMs != null) {
-                    var vmidipmapIndex = 0;
-                    for (var vmIndex = 0; vmIndex < selectedVMs.length; vmIndex++) {
-                        var selectedIPs = selectedVMs[vmIndex]._subselect;
-                        for (var ipIndex = 0; ipIndex < selectedIPs.length; ipIndex++) {
-                            inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmIndex].id;
-
-                            inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
-
-                            vmidipmapIndex++;
-                        }
-                    }
-                }
-
-                $.ajax({
-                    url: createURL('assignToLoadBalancerRule'),
-                    data: inputData,
-                    dataType: 'json',
-                    async: true,
-                    success: function (data) {
-                        var jid = data.assigntoloadbalancerruleresponse.jobid;
-                        args.response.success({
-                            _custom: {
-                                jobId: jid
-                            }
-                        });
-                    }
-                });
-            },
-            notification: {
-                poll: pollAsyncJobResult
-            }
-        };
-    };
-
     var aclMultiEdit = {
         noSelect: true,
 
@@ -271,9 +94,9 @@
                                 var name = $(this).attr('rel');
 
                                 return $.inArray(name, [
-                                        'icmptype',
-                                        'icmpcode'
-                                    ]) > -1;
+                                    'icmptype',
+                                    'icmpcode'
+                                ]) > -1;
                             });
                             $otherFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
@@ -287,9 +110,9 @@
                             $portFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
                                 return $.inArray(name, [
-                                        'startport',
-                                        'endport'
-                                    ]) > -1;
+                                    'startport',
+                                    'endport'
+                                ]) > -1;
                             });
                             $protocolFields = $inputs.filter(function () {
                                 var name = $(this).attr('rel');
@@ -323,9 +146,9 @@
                                 var name = $(this).attr('name');
 
                                 return $.inArray(name, [
-                                        'icmptype',
-                                        'icmpcode'
-                                    ]) > -1;
+                                    'icmptype',
+                                    'icmpcode'
+                                ]) > -1;
                             });
                             $otherFields = $inputs.filter(function () {
                                 var name = $(this).attr('name');
@@ -339,9 +162,9 @@
                             $portFields = $inputs.filter(function () {
                                 var name = $(this).attr('name');
                                 return $.inArray(name, [
-                                        'startport',
-                                        'endport'
-                                    ]) > -1;
+                                    'startport',
+                                    'endport'
+                                ]) > -1;
                             });
 
                             $protocolinput = args.$form.find('td input');
@@ -708,378 +531,6 @@
                 return cloudStack.vpc.staticNatIpAddresses.listView();
             },
 
-            // Internal load balancers
-            internalLoadBalancers: {
-                title: 'label.internal.lb',
-                listView: {
-                    id: 'internalLoadBalancers',
-                    fields: {
-                        name: {
-                            label: 'label.name'
-                        },
-                        sourceipaddress: {
-                            label: 'label.source.ip.address'
-                        },
-                        sourceport: {
-                            label: 'label.source.port'
-                        },
-                        instanceport: {
-                            label: 'label.instance.port'
-                        },
-                        algorithm: {
-                            label: 'label.algorithm'
-                        }
-                    },
-                    dataProvider: function (args) {
-                        $.ajax({
-                            url: createURL('listLoadBalancers'),
-                            data: {
-                                networkid: args.context.networks[0].id,
-                                listAll: true
-                            },
-                            success: function (json) {
-                                var items = json.listloadbalancersresponse.loadbalancer;
-                                if (items != null) {
-                                    for (var i = 0; i < items.length; i++) {
-                                        var item = items[i];
-                                        //there is only one element in loadbalancerrul array property.
-                                        item.sourceport = item.loadbalancerrule[0].sourceport;
-                                        item.instanceport = item.loadbalancerrule[0].instanceport;
-                                    }
-                                }
-                                args.response.success({
-                                    data: items
-                                });
-                            }
-                        });
-                    },
-                    actions: {
-                        add: {
-                            label: 'label.add.internal.lb',
-                            createForm: {
-                                title: 'label.add.internal.lb',
-                                fields: {
-                                    name: {
-                                        label: 'label.name',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
-                                    description: {
-                                        label: 'label.description',
-                                        validation: {
-                                            required: false
-                                        }
-                                    },
-                                    sourceipaddress: {
-                                        label: 'label.source.ip.address',
-                                        validation: {
-                                            required: false
-                                        }
-                                    },
-                                    sourceport: {
-                                        label: 'label.source.port',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
-                                    instanceport: {
-                                        label: 'label.instance.port',
-                                        validation: {
-                                            required: true
-                                        }
-                                    },
-                                    algorithm: {
-                                        label: 'label.algorithm',
-                                        validation: {
-                                            required: true
-                                        },
-                                        select: function (args) {
-                                            args.response.success({
-                                                data: [{
-                                                    id: 'source',
-                                                    description: _l('label.lb.algorithm.source')
-                                                }, {
-                                                    id: 'roundrobin',
-                                                    description: _l('label.lb.algorithm.roundrobin')
-                                                }, {
-                                                    id: 'leastconn',
-                                                    description: _l('label.lb.algorithm.leastconn')
-                                                }]
-                                            });
-                                        }
-                                    }
-                                }
-                            },
-                            messages: {
-                                notification: function (args) {
-                                    return 'label.add.internal.lb';
-                                }
-                            },
-                            action: function (args) {
-                                var data = {
-                                    name: args.data.name,
-                                    sourceport: args.data.sourceport,
-                                    instanceport: args.data.instanceport,
-                                    algorithm: args.data.algorithm,
-                                    networkid: args.context.networks[0].id,
-                                    sourceipaddressnetworkid: args.context.networks[0].id,
-                                    scheme: 'Internal'
-                                };
-                                if (args.data.description != null && args.data.description.length > 0) {
-                                    $.extend(data, {
-                                        description: args.data.description
-                                    });
-                                }
-                                if (args.data.sourceipaddress != null && args.data.sourceipaddress.length > 0) {
-                                    $.extend(data, {
-                                        sourceipaddress: args.data.sourceipaddress
-                                    });
-                                }
-                                $.ajax({
-                                    url: createURL('createLoadBalancer'),
-                                    data: data,
-                                    success: function (json) {
-                                        var jid = json.createloadbalancerresponse.jobid;
-                                        args.response.success({
-                                            _custom: {
-                                                jobId: jid,
-                                                getUpdatedItem: function (json) {
-                                                    return json.queryasyncjobresultresponse.jobresult.loadbalancer;
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                            },
-                            notification: {
-                                poll: pollAsyncJobResult
-                            }
-                        }
-                    },
-
-                    detailView: {
-                        isMaximized: true,
-                        name: 'label.internal.lb.details',
-                        actions: {
-                            assignVMs: assignVMAction(),
-
-                            remove: {
-                                label: 'label.delete.internal.lb',
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.confirm.delete.internal.lb';
-                                    },
-                                    notification: function (args) {
-                                        return 'label.delete.internal.lb';
-                                    }
-                                },
-                                action: function (args) {
-                                    var data = {
-                                        id: args.context.internalLoadBalancers[0].id
-                                    };
-                                    $.ajax({
-                                        url: createURL('deleteLoadBalancer'),
-                                        data: data,
-                                        async: true,
-                                        success: function (json) {
-                                            var jid = json.deleteloadbalancerresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid
-                                                }
-                                            });
-                                        },
-                                        error: function (data) {
-                                            args.response.error(parseXMLHttpResponse(data));
-                                        }
-                                    });
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            }
-                        },
-                        tabs: {
-                            details: {
-                                title: 'label.details',
-                                fields: [{
-                                    name: {
-                                        label: 'label.name'
-                                    }
-                                }, {
-                                    id: {
-                                        label: 'label.id'
-                                    },
-                                    description: {
-                                        label: 'label.description'
-                                    },
-                                    sourceipaddress: {
-                                        label: 'label.source.ip.address'
-                                    },
-                                    sourceport: {
-                                        label: 'label.source.port'
-                                    },
-                                    instanceport: {
-                                        label: 'label.instance.port'
-                                    },
-                                    algorithm: {
-                                        label: 'label.algorithm'
-                                    },
-                                    loadbalancerinstance: {
-                                        label: 'label.assigned.vms',
-                                        converter: function (objArray) {
-                                            var s = '';
-                                            if (objArray != null) {
-                                                for (var i = 0; i < objArray.length; i++) {
-                                                    if (i > 0) {
-                                                        s += ', ';
-                                                    }
-                                                    s += objArray[i].name + ' (' + objArray[i].ipaddress + ')';
-                                                }
-                                            }
-                                            return s;
-                                        }
-                                    }
-                                }],
-                                dataProvider: function (args) {
-                                    $.ajax({
-                                        url: createURL('listLoadBalancers'),
-                                        data: {
-                                            id: args.context.internalLoadBalancers[0].id
-                                        },
-                                        success: function (json) {
-                                            var item = json.listloadbalancersresponse.loadbalancer[0];
-
-                                            //remove Rules tab and add sourceport, instanceport at Details tab because there is only one element in loadbalancerrul array property.
-                                            item.sourceport = item.loadbalancerrule[0].sourceport;
-                                            item.instanceport = item.loadbalancerrule[0].instanceport;
-
-                                            args.response.success({
-                                                data: item
-                                            });
-                                        }
-                                    });
-                                }
-                            },
-
-                            /*
-                             rules: {
-                             title: 'label.rules',
-                             multiple: true,
-                             fields: [
-                             {
-                             sourceport: { label: 'Source Port' },
-                             instanceport: { label: 'Instance Port' }
-                             }
-                             ],
-                             dataProvider: function(args) {
-                             $.ajax({
-                             url: createURL('listLoadBalancers'),
-                             data: {
-                             id: args.context.internalLoadBalancers[0].id
-                             },
-                             success: function(json) {
-                             var item = json.listloadbalancersresponse.loadbalancer[0];
-                             args.response.success({ data: item.loadbalancerrule });
-                             }
-                             });
-                             }
-                             },
-                             */
-
-                            assignedVms: {
-                                title: 'label.assigned.vms',
-                                listView: {
-                                    id: 'assignedVms',
-                                    fields: {
-                                        name: {
-                                            label: 'label.name'
-                                        },
-                                        ipaddress: {
-                                            label: 'label.ip.address'
-                                        }
-                                    },
-                                    dataProvider: function (args) {
-                                        $.ajax({
-                                            url: createURL('listLoadBalancers'),
-                                            data: {
-                                                id: args.context.internalLoadBalancers[0].id
-                                            },
-                                            success: function (json) {
-                                                var item = json.listloadbalancersresponse.loadbalancer[0];
-                                                args.response.success({
-                                                    data: item.loadbalancerinstance
-                                                });
-                                            }
-                                        });
-                                    },
-                                    actions: {
-                                        add: assignVMAction()
-                                    },
-                                    detailView: {
-                                        actions: {
-                                            remove: {
-                                                label: 'label.remove.vm.load.balancer',
-                                                addRow: 'false',
-                                                messages: {
-                                                    confirm: function (args) {
-                                                        return 'message.confirm.remove.load.balancer';
-                                                    },
-                                                    notification: function (args) {
-                                                        return 'label.remove.vm.load.balancer';
-                                                    }
-                                                },
-                                                action: function (args) {
-                                                    $.ajax({
-                                                        url: createURL('removeFromLoadBalancerRule'),
-                                                        data: {
-                                                            id: args.context.internalLoadBalancers[0].id,
-                                                            virtualmachineids: args.context.assignedVms[0].id
-                                                        },
-                                                        success: function (json) {
-                                                            var jid = json.removefromloadbalancerruleresponse.jobid;
-                                                            args.response.success({
-                                                                _custom: {
-                                                                    jobId: jid
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                },
-                                                notification: {
-                                                    poll: pollAsyncJobResult
-                                                }
-                                            }
-                                        },
-                                        tabs: {
-                                            details: {
-                                                title: 'label.details',
-                                                fields: [{
-                                                    name: {
-                                                        label: 'label.name'
-                                                    }
-                                                }, {
-                                                    ipaddress: {
-                                                        label: 'label.ip.address'
-                                                    }
-                                                }],
-                                                dataProvider: function (args) {
-                                                    setTimeout(function () {
-                                                        args.response.success({
-                                                            data: args.context.assignedVms[0]
-                                                        });
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
             publicLbIps: {
                 title: 'label.public.ip',
                 listView: {
@@ -3484,8 +2935,8 @@
                                                                 data.listvirtualmachinesresponse.virtualmachine : [],
                                                             function (instance) {
                                                                 return $.inArray(instance.state, [
-                                                                        'Destroyed'
-                                                                    ]) == -1;
+                                                                    'Destroyed'
+                                                                ]) == -1;
                                                             }
                                                         )
                                                     });
@@ -4099,22 +3550,7 @@
                                 total: networkACLLists.count
                             }],
                             tiers: $(networks).map(function (index, tier) {
-                                var internalLoadBalancers, publicLbIps, virtualMachines, staticNatIps;
-
-                                // Get internal load balancers
-                                $.ajax({
-                                    url: createURL('listLoadBalancers&listAll=true'),
-                                    async: false,
-                                    data: {
-                                        networkid: tier.id
-                                    },
-                                    success: function (json) {
-                                        internalLoadBalancers = json.listloadbalancersresponse;
-                                    },
-                                    error: function (json) {
-                                        error = true;
-                                    }
-                                });
+                                var publicLbIps, virtualMachines, staticNatIps;
 
                                 // Get Public LB IPs
                                 $.ajax({
@@ -4182,25 +3618,13 @@
                                         return service.name == 'Lb';
                                     }
                                 ).length ? $.grep($.grep(
-                                        tier.service,
-                                        function (service) {
-                                            return service.name == 'Lb';
-                                        }
-                                    )[0].capability, function (capability) {
-                                        return capability.name == 'LbSchemes';
-                                    }) : [];
-
-                                /*      var lbSchemes = $.grep(
-                                 $.grep(
-                                 tier.service,
-                                 function(service) {
-                                 return service.name == 'Lb';
-                                 }
-                                 )[0].capability,
-                                 function(capability) {
-                                 return capability.name == 'LbSchemes';
-                                 }
-                                 );*/
+                                    tier.service,
+                                    function (service) {
+                                        return service.name == 'Lb';
+                                    }
+                                )[0].capability, function (capability) {
+                                    return capability.name == 'LbSchemes';
+                                }) : [];
 
                                 var hasLbScheme = function (schemeVal) {
                                     return $.grep(
@@ -4213,11 +3637,6 @@
 
                                 return $.extend(tier, {
                                     _dashboardItems: [{
-                                        id: 'internalLoadBalancers',
-                                        name: 'Internal LB',
-                                        total: internalLoadBalancers.count,
-                                        _disabled: !hasLbScheme('Internal')
-                                    }, {
                                         id: 'publicLbIps',
                                         name: 'Public LB IP',
                                         total: publicLbIps.count,

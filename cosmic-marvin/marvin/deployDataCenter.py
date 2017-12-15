@@ -382,16 +382,6 @@ class DeployDataCenters(object):
                         vrconfig.id = vrprovid
                         self.__apiClient.configureVirtualRouterElement(vrconfig)
                         self.enableProvider(pnetprovres[0].id)
-                    elif provider.name == 'InternalLbVm':
-                        internallbprov = listInternalLoadBalancerElements.listInternalLoadBalancerElementsCmd()
-                        internallbprov.nspid = pnetprovres[0].id
-                        internallbresponse = self.__apiClient.listInternalLoadBalancerElements(internallbprov)
-                        internallbid = internallbresponse[0].id
-                        internallbconfig = configureInternalLoadBalancerElement.configureInternalLoadBalancerElementCmd()
-                        internallbconfig.enabled = "true"
-                        internallbconfig.id = internallbid
-                        self.__apiClient.configureInternalLoadBalancerElement(internallbconfig)
-                        self.enableProvider(pnetprovres[0].id)
                     elif provider.name == 'SecurityGroupProvider':
                         self.enableProvider(pnetprovres[0].id)
                 elif provider.name in ['NiciraNvp']:

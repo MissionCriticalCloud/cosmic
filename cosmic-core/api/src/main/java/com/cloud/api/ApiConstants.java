@@ -96,11 +96,6 @@ public class ApiConstants {
     public static final String IP6_GATEWAY = "ip6gateway";
     public static final String GROUP = "group";
     public static final String GROUP_ID = "groupid";
-    public static final String GSLB_LB_METHOD = "gslblbmethod";
-    public static final String GSLB_SERVICE_DOMAIN_NAME = "gslbdomainname";
-    public static final String GSLB_SERVICE_TYPE = "gslbservicetype";
-    public static final String GSLB_STICKY_SESSION_METHOD = "gslbstickysessionmethodname";
-    public static final String GSLB_LBRULE_WEIGHT_MAP = "gslblbruleweightsmap";
     public static final String GUEST_CIDR_ADDRESS = "guestcidraddress";
     public static final String GUEST_VLAN_RANGE = "guestvlanrange";
     public static final String HA_ENABLE = "haenable";
@@ -129,7 +124,6 @@ public class ApiConstants {
     public static final String IS_CLEANUP_REQUIRED = "iscleanuprequired";
     public static final String IS_EXTRACTABLE = "isextractable";
     public static final String IS_FEATURED = "isfeatured";
-    public static final String IS_PORTABLE = "isportable";
     public static final String IS_PUBLIC = "ispublic";
     public static final String IS_PERSISTENT = "ispersistent";
     public static final String EGRESS_DEFAULT_POLICY = "egressdefaultpolicy";
@@ -181,7 +175,6 @@ public class ApiConstants {
     public static final String POLICY_ID = "policyid";
     public static final String PORT = "port";
     public static final String PORTAL = "portal";
-    public static final String PORTABLE_IP_ADDRESS = "portableipaddress";
     public static final String PORT_FORWARDING_SERVICE_ID = "portforwardingserviceid";
     public static final String POST_URL = "postURL";
     public static final String PRIVATE_INTERFACE = "privateinterface";
@@ -517,10 +510,6 @@ public class ApiConstants {
     public static final String CONDITION_ID = "conditionid";
     public static final String CONDITION_IDS = "conditionids";
     public static final String COUNTERPARAM_LIST = "counterparam";
-    public static final String GSLB_PROVIDER = "gslbprovider";
-    public static final String EXCLUSIVE_GSLB_PROVIDER = "isexclusivegslbprovider";
-    public static final String GSLB_PROVIDER_PUBLIC_IP = "gslbproviderpublicip";
-    public static final String GSLB_PROVIDER_PRIVATE_IP = "gslbproviderprivateip";
     public static final String VM_SNAPSHOT_DESCRIPTION = "description";
     public static final String VM_SNAPSHOT_DISPLAYNAME = "name";
     public static final String VM_SNAPSHOT_ID = "vmsnapshotid";

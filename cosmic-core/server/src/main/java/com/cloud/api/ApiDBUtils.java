@@ -161,7 +161,6 @@ import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayVO;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupManager;
 import com.cloud.network.security.SecurityGroupVO;
@@ -186,7 +185,6 @@ import com.cloud.projects.Project;
 import com.cloud.projects.ProjectAccount;
 import com.cloud.projects.ProjectInvitation;
 import com.cloud.projects.ProjectService;
-import com.cloud.region.ha.GlobalLoadBalancingRulesService;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.ResourceMetaDataService;
@@ -373,7 +371,6 @@ public class ApiDBUtils {
     static VpcProvisioningService s_vpcProvSvc;
     static AffinityGroupDao s_affinityGroupDao;
     static AffinityGroupJoinDao s_affinityGroupJoinDao;
-    static GlobalLoadBalancingRulesService s_gslbService;
     static NetworkACLDao s_networkACLDao;
     static AccountService s_accountService;
     static ResourceMetaDataService s_resourceDetailsService;
@@ -577,8 +574,6 @@ public class ApiDBUtils {
     private AffinityGroupDao affinityGroupDao;
     @Inject
     private AffinityGroupJoinDao affinityGroupJoinDao;
-    @Inject
-    private GlobalLoadBalancingRulesService gslbService;
     @Inject
     private NetworkACLDao networkACLDao;
     @Inject
@@ -1632,15 +1627,6 @@ public class ApiDBUtils {
         return s_affinityGroupJoinDao.setAffinityGroupResponse(resp, group);
     }
 
-    public static List<? extends LoadBalancer> listSiteLoadBalancers(final long gslbRuleId) {
-        return s_gslbService.listSiteLoadBalancers(gslbRuleId);
-    }
-
-    public static String getDnsNameConfiguredForGslb() {
-        final String providerDnsName = s_configDao.getValue(Config.CloudDnsName.key());
-        return providerDnsName;
-    }
-
     public static Map<String, String> getResourceDetails(final long resourceId, final ResourceObjectType resourceType) {
         final Map<String, String> details;
         if (isAdmin(CallContext.current().getCallingAccount())) {
@@ -1758,7 +1744,6 @@ public class ApiDBUtils {
         s_vpcProvSvc = vpcProvSvc;
         s_affinityGroupDao = affinityGroupDao;
         s_affinityGroupJoinDao = affinityGroupJoinDao;
-        s_gslbService = gslbService;
         // Note: stats collector should already have been initialized by this time, otherwise a null instance is returned
         s_statsCollector = StatsCollector.getInstance();
         s_networkACLDao = networkACLDao;

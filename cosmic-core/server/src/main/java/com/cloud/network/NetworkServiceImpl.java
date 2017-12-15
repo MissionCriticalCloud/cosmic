@@ -76,7 +76,6 @@ import com.cloud.network.dao.PhysicalNetworkServiceProviderVO;
 import com.cloud.network.dao.PhysicalNetworkTrafficTypeDao;
 import com.cloud.network.dao.PhysicalNetworkTrafficTypeVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.element.InternalLoadBalancerElementService;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.VirtualRouterElement;
 import com.cloud.network.element.VpcVirtualRouterElement;
@@ -268,8 +267,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     HostDao _hostDao;
     @Inject
     HostPodDao _hostPodDao;
-    @Inject
-    InternalLoadBalancerElementService _internalLbElementSvc;
     @Inject
     DataCenterVnetDao _datacneterVnet;
     @Inject
@@ -532,66 +529,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @ActionEvent(eventType = EventTypes.EVENT_NET_IP_RELEASE, eventDescription = "disassociating Ip", async = true)
     public boolean releaseIpAddress(final long ipAddressId) throws InsufficientAddressCapacityException {
         return releaseIpAddressInternal(ipAddressId);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_ASSIGN, eventDescription = "allocating portable public Ip", create = true)
-    public IpAddress allocatePortableIP(final Account ipOwner, final int regionId, final Long zoneId, final Long networkId, final Long vpcId) throws ResourceAllocationException,
-            InsufficientAddressCapacityException, ConcurrentOperationException {
-        final Account caller = CallContext.current().getCallingAccount();
-        final long callerUserId = CallContext.current().getCallingUserId();
-        final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
-
-        if (networkId == null && vpcId == null || networkId != null && vpcId != null) {
-            throw new InvalidParameterValueException("One of Network id or VPC is should be passed");
-        }
-
-        if (networkId != null) {
-            final Network network = _networksDao.findById(networkId);
-            if (network == null) {
-                throw new InvalidParameterValueException("Invalid network id is given");
-            }
-
-            if (network.getGuestType() == Network.GuestType.Shared) {
-                if (zone == null) {
-                    throw new InvalidParameterValueException("Invalid zone Id is given");
-                }
-                // if shared network in the advanced zone, then check the caller against the network for 'AccessType.UseNetwork'
-                if (zone.getNetworkType() == NetworkType.Advanced) {
-                    if (isSharedNetworkOfferingWithServices(network.getNetworkOfferingId())) {
-                        _accountMgr.checkAccess(caller, AccessType.UseEntry, false, network);
-                        if (s_logger.isDebugEnabled()) {
-                            s_logger.debug("Associate IP address called by the user " + callerUserId + " account " + ipOwner.getId());
-                        }
-                        return _ipAddrMgr.allocatePortableIp(ipOwner, caller, zoneId, networkId, null);
-                    } else {
-                        throw new InvalidParameterValueException("Associate IP address can only be called on the shared networks in the advanced zone"
-                                + " with Firewall/Source Nat/Static Nat/Port Forwarding/Load balancing services enabled");
-                    }
-                }
-            }
-        }
-
-        if (vpcId != null) {
-            final Vpc vpc = _vpcDao.findById(vpcId);
-            if (vpc == null) {
-                throw new InvalidParameterValueException("Invalid vpc id is given");
-            }
-        }
-
-        _accountMgr.checkAccess(caller, null, false, ipOwner);
-
-        return _ipAddrMgr.allocatePortableIp(ipOwner, caller, zoneId, null, null);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_PORTABLE_IP_RELEASE, eventDescription = "disassociating portable Ip", async = true)
-    public boolean releasePortableIpAddress(final long ipAddressId) {
-        try {
-            return releaseIpAddressInternal(ipAddressId);
-        } catch (final Exception e) {
-            return false;
-        }
     }
 
     @DB
@@ -2058,9 +1995,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     // add VPCVirtualRouter as the default network service provider
                     addDefaultVpcVirtualRouterToPhysicalNetwork(pNetwork.getId());
 
-                    //Add Internal Load Balancer element as a default network service provider
-                    addDefaultInternalLbProviderToPhysicalNetwork(pNetwork.getId());
-
                     return pNetwork;
                 }
             });
@@ -2226,13 +2160,13 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         networks.add(2, "there are networks associated to this physical network");
         tablesToCheck.add(networks);
 
-    /*
-     * List<String> privateIP = new ArrayList<String>();
-     * privateIP.add(0, "op_dc_ip_address_alloc");
-     * privateIP.add(1, "data_center_id");
-     * privateIP.add(2, "there are private IP addresses allocated for this zone");
-     * tablesToCheck.add(privateIP);
-     */
+        /*
+         * List<String> privateIP = new ArrayList<String>();
+         * privateIP.add(0, "op_dc_ip_address_alloc");
+         * privateIP.add(1, "data_center_id");
+         * privateIP.add(2, "there are private IP addresses allocated for this zone");
+         * tablesToCheck.add(privateIP);
+         */
 
         final List<String> publicIP = new ArrayList<>();
         publicIP.add(0, "user_ip_address");
@@ -3662,20 +3596,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return nsp;
     }
 
-    protected PhysicalNetworkServiceProvider addDefaultInternalLbProviderToPhysicalNetwork(final long physicalNetworkId) {
-
-        final PhysicalNetworkServiceProvider nsp = addProviderToPhysicalNetwork(physicalNetworkId, Network.Provider.InternalLbVm.getName(), null, null);
-
-        final NetworkElement networkElement = _networkModel.getElementImplementingProvider(Network.Provider.InternalLbVm.getName());
-        if (networkElement == null) {
-            throw new CloudRuntimeException("Unable to find the Network Element implementing the " + Network.Provider.InternalLbVm.getName() + " Provider");
-        }
-
-        _internalLbElementSvc.addInternalLoadBalancerElement(nsp.getId());
-
-        return nsp;
-    }
-
     private List<Pair<Integer, Integer>> validateVlanRange(final PhysicalNetworkVO network, final String[] listOfRanges) {
         Integer StartVnet;
         Integer EndVnet;
@@ -3949,9 +3869,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                         if (_configMgr.isOfferingForVpc(ntwkOff)) {
                             throw new InvalidParameterValueException("Network offering can be used for VPC networks only");
                         }
-                        if (ntwkOff.getInternalLb()) {
-                            throw new InvalidParameterValueException("Internal Lb can be enabled on vpc networks only");
-                        }
 
                         network = _networkMgr.createGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
                                 aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2, ipExclusionList);
@@ -4084,13 +4001,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (oldNetworkOffering.isConserveMode() && !newNetworkOffering.isConserveMode()) {
             if (!canIpsUsedForNonConserve(publicIps)) {
                 return false;
-            }
-        }
-
-        //can't update from internal LB to public LB
-        if (areServicesSupportedByNetworkOffering(oldNetworkOfferingId, Service.Lb) && areServicesSupportedByNetworkOffering(newNetworkOfferingId, Service.Lb)) {
-            if (oldNetworkOffering.getPublicLb() != newNetworkOffering.getPublicLb() || oldNetworkOffering.getInternalLb() != newNetworkOffering.getInternalLb()) {
-                throw new InvalidParameterValueException("Original and new offerings support different types of LB - Internal vs Public," + " can't upgrade");
             }
         }
 

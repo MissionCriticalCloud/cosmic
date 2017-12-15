@@ -2269,7 +2269,7 @@
                                         var $optionsOfProviders = $providers.find('option');
                                         if ($useVpc.is(':visible') && $useVpcCb.is(':checked')) { //*** vpc ***
                                             $optionsOfProviders.each(function (index) {
-                                                if ($(this).val() == 'InternalLbVm' || $(this).val() == 'VpcVirtualRouter' || $(this).val() == 'NuageVsp' || $(this).val() == 'NuageVspVpc') {
+                                                if ($(this).val() == 'VpcVirtualRouter') {
                                                     $(this).attr('disabled', false);
                                                 } else {
                                                     $(this).attr('disabled', true);
@@ -2277,7 +2277,7 @@
                                             });
                                         } else { //*** non-vpc ***
                                             $optionsOfProviders.each(function (index) {
-                                                if ($(this).val() == 'InternalLbVm' || $(this).val() == 'VpcVirtualRouter') {
+                                                if ($(this).val() == 'VpcVirtualRouter') {
                                                     $(this).attr('disabled', true);
                                                 } else {
                                                     $(this).attr('disabled', false);
@@ -2312,23 +2312,6 @@
                                                 for (var i = 0; i < $lbProviderOptions.length; i++) {
                                                     var $option = $lbProviderOptions.eq(i);
                                                     var supportedProviders = lbProviderMap.publicLb.vpc;
-                                                    var thisOpionIsSupported = false;
-                                                    for (var k = 0; k < supportedProviders.length; k++) {
-                                                        if ($option.val() == supportedProviders[k]) {
-                                                            thisOpionIsSupported = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (thisOpionIsSupported == true) {
-                                                        $option.attr('disabled', false);
-                                                    } else {
-                                                        $option.attr('disabled', true);
-                                                    }
-                                                }
-                                            } else if ($lbType.find('select').val() == 'internalLb') { //disable all providers except the ones in lbProviderMap.internalLb.vpc => ["InternalLbVm"]
-                                                for (var i = 0; i < $lbProviderOptions.length; i++) {
-                                                    var $option = $lbProviderOptions.eq(i);
-                                                    var supportedProviders = lbProviderMap.internalLb.vpc;
                                                     var thisOpionIsSupported = false;
                                                     for (var k = 0; k < supportedProviders.length; k++) {
                                                         if ($option.val() == supportedProviders[k]) {
@@ -2611,9 +2594,6 @@
                                                 data: [{
                                                     id: 'publicLb',
                                                     description: 'Public LB'
-                                                }, {
-                                                    id: 'internalLb',
-                                                    description: 'Internal LB'
                                                 }]
                                             });
                                         }
@@ -2971,14 +2951,9 @@
                                             inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilitytype'] = 'associatePublicIP';
                                             inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilityvalue'] = true; //because this checkbox's value == "on"
                                             serviceCapabilityIndex++;
-                                        } else if ((key == 'service.Lb.provider') && ("Lb" in serviceProviderMap) && (serviceProviderMap.Lb == "InternalLbVm")) {
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].service'] = 'lb';
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilitytype'] = 'lbSchemes';
-                                            inputData['servicecapabilitylist[' + serviceCapabilityIndex + '].capabilityvalue'] = 'internal';
-                                            serviceCapabilityIndex++;
                                         }
                                     } else if (value != '') { // normal data (serviceData.length ==1), e.g. "name", "displayText", "networkRate", "guestIpType", "lbType" (unwanted), "availability" (unwated when value is "Optional"), "egressdefaultpolicy", "state" (unwanted), "status" (unwanted), "allocationstate" (unwanted)
-                                        if (!(key == "lbType" || (key == "availability" && value == "Optional") || key == "state" || key == "status" || key == "allocationstate" || key == "useVpc" )) {
+                                        if (!(key == "lbType" || (key == "availability" && value == "Optional") || key == "state" || key == "status" || key == "allocationstate" || key == "useVpc")) {
                                             inputData[key] = value;
                                         }
                                     }

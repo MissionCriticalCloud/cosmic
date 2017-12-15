@@ -143,8 +143,6 @@
     <bean id="firewallRulesDaoImpl" class="com.cloud.network.dao.FirewallRulesDaoImpl" />
     <bean id="MonitoringServiceDaoImpl" class="com.cloud.network.dao.MonitoringServiceDaoImpl" />
     <bean id="OpRouterMonitorServiceDaoImpl" class="com.cloud.network.dao.OpRouterMonitorServiceDaoImpl" />
-    <bean id="globalLoadBalancerDaoImpl" class="com.cloud.region.gslb.GlobalLoadBalancerDaoImpl" />
-    <bean id="globalLoadBalancerLbRuleMapDaoImpl" class="com.cloud.region.gslb.GlobalLoadBalancerLbRuleMapDaoImpl" />
     <bean id="guestOSCategoryDaoImpl" class="com.cloud.storage.dao.GuestOSCategoryDaoImpl" />
     <bean id="guestOSDaoImpl" class="com.cloud.storage.dao.GuestOSDaoImpl" />
     <bean id="guestOSHypervisorDaoImpl" class="com.cloud.storage.dao.GuestOSHypervisorDaoImpl" />
@@ -200,8 +198,6 @@
     <bean id="physicalNetworkTrafficTypeDaoImpl" class="com.cloud.network.dao.PhysicalNetworkTrafficTypeDaoImpl" />
     <bean id="podVlanDaoImpl" class="com.cloud.dc.dao.PodVlanDaoImpl" />
     <bean id="podVlanMapDaoImpl" class="com.cloud.dc.dao.PodVlanMapDaoImpl" />
-    <bean id="PortableIpDaoImpl" class="com.cloud.region.PortableIpDaoImpl" />
-    <bean id="PortableIpRangeDaoImpl" class="com.cloud.region.PortableIpRangeDaoImpl" />
     <bean id="portForwardingRulesDaoImpl" class="com.cloud.network.rules.dao.PortForwardingRulesDaoImpl" />
     <bean id="storagePoolHostDaoImpl" class="com.cloud.storage.dao.StoragePoolHostDaoImpl" />
     <bean id="primaryDataStoreDaoImpl" class="com.cloud.storage.datastore.db.PrimaryDataStoreDaoImpl" />
@@ -294,7 +290,6 @@
     <bean id="vpcOfferingServiceMapDaoImpl" class="com.cloud.network.vpc.dao.VpcOfferingServiceMapDaoImpl" />
     <bean id="vpcServiceMapDaoImpl" class="com.cloud.network.vpc.dao.VpcServiceMapDaoImpl" />
     <bean id="vpnUserDaoImpl" class="com.cloud.network.dao.VpnUserDaoImpl" />
-    <bean id="applicationLbRuleDaoImpl" class="com.cloud.lb.dao.ApplicationLoadBalancerRuleDaoImpl" />
     <bean id="networkOfferingDetailsDaoImpl" class="com.cloud.offerings.dao.NetworkOfferingDetailsDaoImpl" />
     <bean id="serviceOfferingDetailsDaoImpl" class="com.cloud.service.dao.ServiceOfferingDetailsDaoImpl" />
     <bean id="networkDetailsDaoImpl" class="com.cloud.network.dao.NetworkDetailsDaoImpl" />

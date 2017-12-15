@@ -26,7 +26,7 @@ public interface VirtualRouter extends VirtualMachine {
     String getTemplateVersion();
 
     public enum Role {
-        VIRTUAL_ROUTER, LB, INTERNAL_LB_VM
+        VIRTUAL_ROUTER, LB
     }
 
     public enum RedundantState {

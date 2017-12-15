@@ -28,8 +28,6 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.lb.ApplicationLoadBalancerRuleVO;
-import com.cloud.lb.dao.ApplicationLoadBalancerRuleDao;
 import com.cloud.network.ExternalDeviceUsageManager;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
@@ -197,8 +195,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
     @Inject
     UserDao _userDao;
     List<LoadBalancingServiceProvider> _lbProviders;
-    @Inject
-    ApplicationLoadBalancerRuleDao _appLbRuleDao;
     @Inject
     IpAddressManager _ipAddrMgr;
     @Inject
@@ -759,14 +755,10 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
             throw ex;
         }
 
-        //2) Check if the Scheme is supported\
+        //2) Check if the Scheme is supported
         final NetworkOffering off = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
         if (scheme == Scheme.Public) {
             if (!off.getPublicLb()) {
-                throw new InvalidParameterValueException("Scheme " + scheme + " is not supported by the network offering " + off);
-            }
-        } else {
-            if (!off.getInternalLb()) {
                 throw new InvalidParameterValueException("Scheme " + scheme + " is not supported by the network offering " + off);
             }
         }
@@ -1092,9 +1084,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
         Ip sourceIp = null;
         if (lb.getScheme() == Scheme.Public) {
             sourceIp = _networkModel.getPublicIpAddress(lb.getSourceIpAddressId()).getAddress();
-        } else if (lb.getScheme() == Scheme.Internal) {
-            final ApplicationLoadBalancerRuleVO appLbRule = _appLbRuleDao.findById(lb.getId());
-            sourceIp = appLbRule.getSourceIp();
         }
         return sourceIp;
     }

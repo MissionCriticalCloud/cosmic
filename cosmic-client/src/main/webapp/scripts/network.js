@@ -24,82 +24,38 @@
         var instance = args.context.instances[0];
         var network = args.context.networks[0];
 
-        if (args.context.ipAddresses[0].isportable) { //portable IP which has multiple NICs. Each NIC has a different network ID.
-            $.ajax({
-                url: createURL('listNics'),
-                data: {
-                    virtualmachineid: instance.id
-                },
-                success: function (json) {
-                    var nics = json.listnicsresponse.nic;
-                    var ipSelection = [];
+        // Get NIC IPs
+        $.ajax({
+            url: createURL('listNics'),
+            data: {
+                virtualmachineid: instance.id,
+                networkId: network.id
+            },
+            success: function (json) {
+                var nic = json.listnicsresponse.nic[0];
+                var primaryIp = nic.ipaddress;
+                var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
+                var ipSelection = [];
 
-                    $(nics).map(function (index, nic) {
-                        var primaryIp = nic.ipaddress;
-                        var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
-                        var prefix = '[NIC ' + (index + 1) + '] ';
+                // Add primary IP as default
+                ipSelection.push({
+                    id: primaryIp,
+                    description: primaryIp + ' (Primary)'
+                });
 
-                        // Add primary IP as default
-                        ipSelection.push({
-                            id: nic.networkid + ',-1',
-                            description: prefix + primaryIp + ' (Primary)'
-                        });
-
-                        // Add secondary IPs
-                        $(secondaryIps).map(function (index, secondaryIp) {
-                            ipSelection.push({
-                                id: nic.networkid + ',' + secondaryIp.ipaddress,
-                                description: prefix + secondaryIp.ipaddress
-                            });
-                        });
-                    });
-
-                    args.response.success({
-                        data: ipSelection
-                    });
-                }
-            });
-
-        } else { //non-portable IP which has only one NIC
-            /*
-             var nic = $.grep(instance.nic, function(nic) {
-             return nic.networkid == network.id;
-             })[0];
-             */
-
-            // Get NIC IPs
-            $.ajax({
-                url: createURL('listNics'),
-                data: {
-                    virtualmachineid: instance.id,
-                    networkId: network.id
-                },
-                success: function (json) {
-                    var nic = json.listnicsresponse.nic[0];
-                    var primaryIp = nic.ipaddress;
-                    var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
-                    var ipSelection = [];
-
-                    // Add primary IP as default
+                // Add secondary IPs
+                $(secondaryIps).map(function (index, secondaryIp) {
                     ipSelection.push({
-                        id: primaryIp,
-                        description: primaryIp + ' (Primary)'
+                        id: secondaryIp.ipaddress,
+                        description: secondaryIp.ipaddress
                     });
+                });
 
-                    // Add secondary IPs
-                    $(secondaryIps).map(function (index, secondaryIp) {
-                        ipSelection.push({
-                            id: secondaryIp.ipaddress,
-                            description: secondaryIp.ipaddress
-                        });
-                    });
-
-                    args.response.success({
-                        data: ipSelection
-                    });
-                }
-            });
-        }
+                args.response.success({
+                    data: ipSelection
+                });
+            }
+        });
     };
 
     //value of Primary IP in subselect dropdown is itself (not -1), for multiple VM selection (API parameter vmidipmap), e.g. assignToLoadBalancerRule API.
@@ -107,92 +63,53 @@
         var instance = args.context.instances[0];
         var network = args.context.networks[0];
 
-        if (args.context.ipAddresses[0].isportable) { //portable IP which has multiple NICs. Each NIC has a different network ID.
-            $.ajax({
-                url: createURL('listNics'),
-                data: {
-                    virtualmachineid: instance.id
-                },
-                success: function (json) {
-                    var nics = json.listnicsresponse.nic;
-                    var ipSelection = [];
+        /*
+         var nic = $.grep(instance.nic, function(nic) {
+         return nic.networkid == network.id;
+         })[0];
+         */
 
-                    //portable IP has multiple NICs. Each NIC has a different network ID.
-                    $(nics).map(function (index, nic) {
-                        var primaryIp = nic.ipaddress;
-                        var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
-                        var prefix = '[NIC ' + (index + 1) + '] ';
+        // Get NIC IPs
+        $.ajax({
+            url: createURL('listNics'),
+            data: {
+                virtualmachineid: instance.id,
+                networkid: network.id
+            },
+            success: function (json) {
+                var nic = json.listnicsresponse.nic[0];
+                var primaryIp = nic.ipaddress;
+                var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
+                var ipSelection = [];
+                var existingIps = $(args.context.subItemData).map(
+                    function (index, item) {
+                        return item.itemIp;
+                    }
+                );
 
-                        // Add primary IP as default
-                        ipSelection.push({
-                            id: nic.networkid + ',' + primaryIp,
-                            description: prefix + primaryIp + ' (Primary)'
-                        });
-
-                        // Add secondary IPs
-                        $(secondaryIps).map(function (index, secondaryIp) {
-                            ipSelection.push({
-                                id: nic.networkid + ',' + secondaryIp.ipaddress,
-                                description: prefix + secondaryIp.ipaddress
-                            });
-                        });
-                    });
-
-                    args.response.success({
-                        data: ipSelection
+                // Add primary IP as default
+                if ($.inArray(primaryIp, existingIps) == -1) {
+                    ipSelection.push({
+                        id: primaryIp,
+                        description: primaryIp + ' (Primary)'
                     });
                 }
-            });
 
-        } else { //non-portable IP which has only one NIC
-            /*
-             var nic = $.grep(instance.nic, function(nic) {
-             return nic.networkid == network.id;
-             })[0];
-             */
-
-            // Get NIC IPs
-            $.ajax({
-                url: createURL('listNics'),
-                data: {
-                    virtualmachineid: instance.id,
-                    networkid: network.id
-                },
-                success: function (json) {
-                    var nic = json.listnicsresponse.nic[0];
-                    var primaryIp = nic.ipaddress;
-                    var secondaryIps = nic.secondaryip ? nic.secondaryip : [];
-                    var ipSelection = [];
-                    var existingIps = $(args.context.subItemData).map(
-                        function (index, item) {
-                            return item.itemIp;
-                        }
-                    );
-
-                    // Add primary IP as default
-                    if ($.inArray(primaryIp, existingIps) == -1) {
+                // Add secondary IPs
+                $(secondaryIps).map(function (index, secondaryIp) {
+                    if ($.inArray(secondaryIp.ipaddress, existingIps) == -1) {
                         ipSelection.push({
-                            id: primaryIp,
-                            description: primaryIp + ' (Primary)'
+                            id: secondaryIp.ipaddress,
+                            description: secondaryIp.ipaddress
                         });
                     }
+                });
 
-                    // Add secondary IPs
-                    $(secondaryIps).map(function (index, secondaryIp) {
-                        if ($.inArray(secondaryIp.ipaddress, existingIps) == -1) {
-                            ipSelection.push({
-                                id: secondaryIp.ipaddress,
-                                description: secondaryIp.ipaddress
-                            });
-                        }
-                    });
-
-                    args.response.success({
-                        data: ipSelection
-                    });
-                }
-            });
-        }
+                args.response.success({
+                    data: ipSelection
+                });
+            }
+        });
     };
 
     var ipChangeNotice = function () {
@@ -3235,50 +3152,13 @@
                                             if (selectedRegionName == undefined || selectedRegionName.length == 0) {
                                                 selectedRegionName = "Local";
                                             }
-                                            var items = json.listregionsresponse.region;
-                                            if (items != null) {
-                                                for (var i = 0; i < items.length; i++) {
-                                                    if (items[i].name == selectedRegionName) {
-                                                        if (items[i].portableipserviceenabled == true) {
-                                                            args.$form.find('.form-item[rel=isportable]').css('display', 'inline-block');
-                                                        } else {
-                                                            args.$form.find('.form-item[rel=isportable]').hide();
-                                                        }
-                                                        break;
-                                                    }
-                                                }
-                                            }
                                         }
                                     });
                                 },
-                                fields: {
-                                    isportable: {
-                                        label: 'label.cross.zones',
-                                        select: function (args) {
-                                            var items = [];
-                                            items.push({
-                                                id: "false",
-                                                description: _l('label.no')
-                                            });
-                                            items.push({
-                                                id: "true",
-                                                description: _l('label.yes')
-                                            });
-                                            args.response.success({
-                                                data: items
-                                            });
-                                        },
-                                        isHidden: true
-                                    }
-                                }
+                                fields: {}
                             },
                             action: function (args) {
                                 var dataObj = {};
-                                if (args.$form.find('.form-item[rel=isportable]').css("display") != "none") {
-                                    $.extend(dataObj, {
-                                        isportable: args.data.isportable
-                                    });
-                                }
 
                                 if ('vpc' in args.context) { //from VPC section
                                     $.extend(dataObj, {
@@ -3619,7 +3499,7 @@
                                                             networkid: $tierSelect.val(),
                                                             vpcid: args.context.vpc[0].id
                                                         });
-                                                    } else if ('networks' in args.context && !args.context.ipAddresses[0].isportable) {
+                                                    } else if ('networks' in args.context) {
                                                         $.extend(data, {
                                                             networkid: args.context.networks[0].id
                                                         });
@@ -3663,17 +3543,7 @@
                                                 virtualmachineid: args.context.instances[0].id
                                             };
 
-                                            if (args.context.ipAddresses[0].isportable) {
-                                                var subselect = args._subselect.split(',');
-                                                var networkid = subselect[0];
-                                                var vmguestip = subselect[1];
-
-                                                data.networkid = subselect[0];
-
-                                                if (parseInt(vmguestip) !== -1) {
-                                                    data.vmguestip = vmguestip;
-                                                }
-                                            } else if (args._subselect && args._subselect != -1) {
+                                            if (args._subselect && args._subselect != -1) {
                                                 data.vmguestip = args._subselect;
                                             }
 
@@ -3934,12 +3804,6 @@
                                         label: 'label.ip'
                                     }
                                 }, {
-                                    isportable: {
-                                        label: 'label.cross.zones',
-                                        converter: function (data) {
-                                            return data ? _l('label.yes') : _l('label.no');
-                                        }
-                                    },
                                     id: {
                                         label: 'label.id'
                                     },
@@ -4686,12 +4550,7 @@
                                                                 var selectedIPs = selectedVMs[vmIndex]._subselect;
                                                                 for (var ipIndex = 0; ipIndex < selectedIPs.length; ipIndex++) {
                                                                     inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmIndex].id;
-
-                                                                    if (args.context.ipAddresses[0].isportable) {
-                                                                        inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex].split(',')[1];
-                                                                    } else {
-                                                                        inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
-                                                                    }
+                                                                    inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
 
                                                                     vmidipmapIndex++;
                                                                 }
@@ -4830,12 +4689,7 @@
                                                             var selectedIPs = selectedVMs[vmIndex]._subselect;
                                                             for (var ipIndex = 0; ipIndex < selectedIPs.length; ipIndex++) {
                                                                 inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmIndex].id;
-
-                                                                if (args.context.ipAddresses[0].isportable) {
-                                                                    inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex].split(',')[1];
-                                                                } else {
-                                                                    inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
-                                                                }
+                                                                inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
 
                                                                 vmidipmapIndex++;
                                                             }
@@ -5215,17 +5069,7 @@
                                                     openfirewall: false
                                                 };
 
-                                                if (args.context.ipAddresses[0].isportable) {
-                                                    var subselect = args.itemData[0]._subselect.split(',');
-                                                    //var networkid = subselect[0];
-                                                    var vmguestip = subselect[1];
-
-                                                    //data.networkid = networkid;
-
-                                                    if (parseInt(vmguestip) !== -1) {
-                                                        data.vmguestip = vmguestip;
-                                                    }
-                                                } else if (args.itemData[0]._subselect && args.itemData[0]._subselect != -1) {
+                                                if (args.itemData[0]._subselect && args.itemData[0]._subselect != -1) {
                                                     data.vmguestip = args.itemData[0]._subselect;
                                                 }
 

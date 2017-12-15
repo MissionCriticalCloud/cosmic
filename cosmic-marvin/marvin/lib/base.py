@@ -1536,7 +1536,7 @@ class PublicIPAddress:
     @classmethod
     def create(cls, api_client, accountid=None, zoneid=None, domainid=None,
                services=None, networkid=None, projectid=None, vpcid=None,
-               isportable=False, vpc=None, data=None, network=None):
+               vpc=None, data=None, network=None):
         """Associate Public IP address"""
         if data:
             services = data
@@ -1556,9 +1556,6 @@ class PublicIPAddress:
             cmd.domainid = domainid
         elif services and "domainid" in services:
             cmd.domainid = services["domainid"]
-
-        if isportable:
-            cmd.isportable = isportable
 
         if networkid:
             cmd.networkid = networkid
@@ -3191,47 +3188,6 @@ class PublicIpRange:
         return api_client.releasePublicIpRange(cmd)
 
 
-class PortablePublicIpRange:
-    """Manage portable public Ip Range"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, services):
-        """Create portable public Ip Range"""
-
-        cmd = createPortableIpRange.createPortableIpRangeCmd()
-        cmd.gateway = services["gateway"]
-        cmd.netmask = services["netmask"]
-        cmd.startip = services["startip"]
-        cmd.endip = services["endip"]
-        cmd.regionid = services["regionid"]
-
-        if "vlan" in services:
-            cmd.vlan = services["vlan"]
-
-        return PortablePublicIpRange(
-            api_client.createPortableIpRange(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete portable IpRange"""
-
-        cmd = deletePortableIpRange.deletePortableIpRangeCmd()
-        cmd.id = self.id
-        api_client.deletePortableIpRange(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """Lists all portable public IP ranges."""
-
-        cmd = listPortableIpRanges.listPortableIpRangesCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listPortableIpRanges(cmd)
-
-
 class SecondaryStagingStore:
     """Manage Staging Store"""
 
@@ -4583,95 +4539,6 @@ class Region:
         cmd.id = self.id
         region = api_client.removeRegion(cmd)
         return region
-
-
-class ApplicationLoadBalancer:
-    """Manage Application Load Balancers in VPC"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, services, name=None, sourceport=None,
-               instanceport=22, algorithm="roundrobin", scheme="internal",
-               sourcenetworkid=None, networkid=None):
-        """Create Application Load Balancer"""
-        cmd = createLoadBalancer.createLoadBalancerCmd()
-
-        if "name" in services:
-            cmd.name = services["name"]
-        elif name:
-            cmd.name = name
-
-        if "sourceport" in services:
-            cmd.sourceport = services["sourceport"]
-        elif sourceport:
-            cmd.sourceport = sourceport
-
-        if "instanceport" in services:
-            cmd.instanceport = services["instanceport"]
-        elif instanceport:
-            cmd.instanceport = instanceport
-
-        if "algorithm" in services:
-            cmd.algorithm = services["algorithm"]
-        elif algorithm:
-            cmd.algorithm = algorithm
-
-        if "scheme" in services:
-            cmd.scheme = services["scheme"]
-        elif scheme:
-            cmd.scheme = scheme
-
-        if "sourceipaddressnetworkid" in services:
-            cmd.sourceipaddressnetworkid = services["sourceipaddressnetworkid"]
-        elif sourcenetworkid:
-            cmd.sourceipaddressnetworkid = sourcenetworkid
-
-        if "networkid" in services:
-            cmd.networkid = services["networkid"]
-        elif networkid:
-            cmd.networkid = networkid
-
-        return LoadBalancerRule(api_client.createLoadBalancer(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete application load balancer"""
-        cmd = deleteLoadBalancer.deleteLoadBalancerCmd()
-        cmd.id = self.id
-        api_client.deleteLoadBalancerRule(cmd)
-        return
-
-    def assign(self, api_client, vms=None, vmidipmap=None):
-        """Assign virtual machines to load balancing rule"""
-        cmd = assignToLoadBalancerRule.assignToLoadBalancerRuleCmd()
-        cmd.id = self.id
-        if vmidipmap:
-            cmd.vmidipmap = vmidipmap
-        if vms:
-            cmd.virtualmachineids = [str(vm.id) for vm in vms]
-        api_client.assignToLoadBalancerRule(cmd)
-        return
-
-    def remove(self, api_client, vms=None, vmidipmap=None):
-        """Remove virtual machines from load balancing rule"""
-        cmd = removeFromLoadBalancerRule.removeFromLoadBalancerRuleCmd()
-        cmd.id = self.id
-        if vms:
-            cmd.virtualmachineids = [str(vm.id) for vm in vms]
-        if vmidipmap:
-            cmd.vmidipmap = vmidipmap
-        api_client.removeFromLoadBalancerRule(cmd)
-        return
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """List all appln load balancers"""
-        cmd = listLoadBalancers.listLoadBalancersCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listLoadBalancerRules(cmd)
 
 
 class Resources:

@@ -67,8 +67,6 @@ import com.cloud.network.vpn.RemoteAccessVpnService;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.ProjectManager;
-import com.cloud.region.PortableIpDaoImpl;
-import com.cloud.region.PortableIpRangeDaoImpl;
 import com.cloud.region.dao.RegionDaoImpl;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementService;
@@ -116,7 +114,7 @@ import org.springframework.core.type.filter.TypeFilter;
         NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
         FirewallRulesCidrsDaoImpl.class, PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class,
         PhysicalNetworkIsolationMethodDaoImpl.class, LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
-        PortableIpRangeDaoImpl.class, RegionDaoImpl.class, PortableIpDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
+        RegionDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
         includeFilters = {@Filter(value = ChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
         useDefaultFilters = false)
 public class
