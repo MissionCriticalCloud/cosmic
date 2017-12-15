@@ -170,7 +170,7 @@ class Tables(UserDict):
 
     def table_printout(self):
         """printout nonempty tabulars in fixed sequence"""
-        with open("/tmp/rules.save", 'w') as f:
+        with open("/etc/sysconfig/iptables", 'w') as f:
             for key in ["raw", "nat", "mangle", "filter"]:
                 len = self.data[key].length
                 if len > -1:

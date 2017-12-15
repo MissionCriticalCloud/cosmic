@@ -163,7 +163,7 @@ class CsNetfilters(object):
         chains.table_printout()
 
         # COMMIT all rules.
-        p = Popen("iptables-restore < /tmp/rules.save", shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen("iptables-restore < /etc/sysconfig/iptables", shell=True, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if not stderr:
             logging.info("iptables-restore result: success!")
