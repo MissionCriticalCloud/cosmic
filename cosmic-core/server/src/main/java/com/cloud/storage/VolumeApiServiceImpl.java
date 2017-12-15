@@ -1603,6 +1603,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     " as the storage pool is in maintenance mode.");
         }
 
+        if (vol.getPoolId() == destPool.getId()) {
+            throw new InvalidParameterValueException("Cannot migrate to the same storage pool the volume is already residing on.");
+        }
+
         if (_volumeMgr.volumeOnSharedStoragePool(vol)) {
             if (destPool.isLocal()) {
                 throw new InvalidParameterValueException("Migration of volume from shared to local storage pool is not supported");
@@ -1611,8 +1615,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // to make sure that the destination storage pool is in the same cluster as the vm.
                 if (liveMigrateVolume && destPool.getClusterId() != null && srcClusterId != null) {
                     if (!srcClusterId.equals(destPool.getClusterId())) {
-                        throw new InvalidParameterValueException("Cannot live migrate a volume of a virtual machine to a storage pool in a different cluster. Please stop VM and " +
-                                "try again.");
+                        throw new InvalidParameterValueException("Cannot live migrate a volume of a virtual machine to a storage pool in a different cluster." +
+                                "You can live migrate the virtual machine itself, rather than the volume.");
                     }
                 }
             }
