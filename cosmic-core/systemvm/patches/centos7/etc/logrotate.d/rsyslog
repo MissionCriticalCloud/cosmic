@@ -12,7 +12,6 @@
 	endscript
 }
 
-/var/log/iptables.log
 /var/log/mail.info
 /var/log/mail.warn
 /var/log/mail.err
