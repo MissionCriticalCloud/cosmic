@@ -40,11 +40,11 @@ public class ExceptionResponse extends BaseResponse {
     }
 
     public String getErrorText() {
-        return errorText;
+        return errorText.replaceAll("\\\\u002F", "/");
     }
 
     public void setErrorText(final String errorText) {
-        this.errorText = errorText;
+        this.errorText = errorText.replaceAll("/", "\\\\u002F");
     }
 
     public void addProxyObject(final ExceptionProxyObject id) {
