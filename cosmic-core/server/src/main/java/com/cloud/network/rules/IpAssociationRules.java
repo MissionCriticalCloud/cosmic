@@ -8,6 +8,7 @@ import com.cloud.network.topology.NetworkTopologyVisitor;
 
 import java.util.List;
 
+@Deprecated
 public class IpAssociationRules extends RuleApplier {
 
     private final List<? extends PublicIpAddress> _ipAddresses;

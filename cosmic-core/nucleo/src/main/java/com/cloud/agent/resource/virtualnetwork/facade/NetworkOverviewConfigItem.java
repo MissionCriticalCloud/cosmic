@@ -1,16 +1,22 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
+import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkOverviewConfigItem extends AbstractConfigItemFacade {
 
     @Override
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {
-        return generateConfigItems(cmd.getNetworkOverview());
+        if (cmd instanceof UpdateNetworkOverviewCommand) {
+            return generateConfigItems(((UpdateNetworkOverviewCommand) cmd).getNetworkOverview());
+        }
+
+        return new ArrayList<>();
     }
 
     @Override

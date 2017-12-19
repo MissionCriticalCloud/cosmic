@@ -12,7 +12,6 @@ import com.cloud.agent.api.PingRoutingCommand;
 import com.cloud.agent.api.PingRoutingWithNwGroupsCommand;
 import com.cloud.agent.api.RebootAnswer;
 import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.StartCommand;
 import com.cloud.agent.api.StartupCommand;
@@ -23,8 +22,6 @@ import com.cloud.agent.api.StopCommand;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.routing.IpAssocCommand;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetSourceNatCommand;
@@ -32,13 +29,11 @@ import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.host.Host.Type;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.CitrixRequestWrapper;
@@ -51,7 +46,6 @@ import com.cloud.resource.hypervisor.HypervisorResource;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.Volume;
-import com.cloud.storage.VolumeVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.storage.to.TemplateObjectTO;
@@ -62,7 +56,6 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
@@ -316,72 +309,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         return true;
     }
 
-    protected ExecutionResult cleanupNetworkElementCommand(final IpAssocCommand cmd) {
-        final Connection conn = getConnection();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        final String routerIp = cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-        try {
-            final IpAddressTO[] ips = cmd.getIpAddresses();
-            final int ipsCount = ips.length;
-            for (final IpAddressTO ip : ips) {
-
-                final VM router = getVM(conn, routerName);
-
-                final NicTO nic = new NicTO();
-                nic.setMac(ip.getMacAddress());
-                nic.setType(ip.getTrafficType());
-                if (ip.getBroadcastUri() == null) {
-                    nic.setBroadcastType(BroadcastDomainType.Native);
-                } else {
-                    final URI uri = BroadcastDomainType.fromString(ip.getBroadcastUri());
-                    nic.setBroadcastType(BroadcastDomainType.getSchemeValue(uri));
-                    nic.setBroadcastUri(uri);
-                }
-                nic.setDeviceId(0);
-                nic.setNetworkRateMbps(ip.getNetworkRate());
-                nic.setName(ip.getNetworkName());
-
-                Network network = getNetwork(conn, nic);
-
-                // If we are disassociating the last IP address in the VLAN, we
-                // need
-                // to remove a VIF
-                boolean removeVif = false;
-
-                // there is only one ip in this public vlan and removing it, so
-                // remove the nic
-                if (ipsCount == 1 && !ip.isAdd()) {
-                    removeVif = true;
-                }
-
-                if (removeVif) {
-
-                    // Determine the correct VIF on DomR to
-                    // associate/disassociate the
-                    // IP address with
-                    final VIF correctVif = getCorrectVif(conn, router, network);
-                    if (correctVif != null) {
-                        network = correctVif.getNetwork(conn);
-
-                        // Mark this vif to be removed from network usage
-                        networkUsage(conn, routerIp, "deleteVif", "eth" + correctVif.getDevice(conn));
-
-                        // Remove the VIF from DomR
-                        correctVif.unplug(conn);
-                        correctVif.destroy(conn);
-
-                        // Disable the VLAN network if necessary
-                        disableVlanNetwork(conn, network);
-                    }
-                }
-            }
-        } catch (final Exception e) {
-            s_logger.debug("Ip Assoc failure on applying one ip due to exception:  ", e);
-            return new ExecutionResult(false, e.getMessage());
-        }
-        return new ExecutionResult(true, null);
-    }
-
     public void cleanupTemplateSR(final Connection conn) {
         Set<PBD> pbds = null;
         try {
@@ -415,30 +342,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 } catch (final Exception e) {
                     s_logger.warn("forget SR catch Exception due to ", e);
                 }
-            }
-        }
-    }
-
-    public void cleanUpTmpDomVif(final Connection conn, final Network nw) throws XenAPIException, XmlRpcException {
-
-        final Pair<VM, VM.Record> vm = getControlDomain(conn);
-        final VM dom0 = vm.first();
-        final Set<VIF> dom0Vifs = dom0.getVIFs(conn);
-        for (final VIF v : dom0Vifs) {
-            String vifName = "unknown";
-            try {
-                final VIF.Record vifr = v.getRecord(conn);
-                if (v.getNetwork(conn).getUuid(conn).equals(nw.getUuid(conn))) {
-                    if (vifr != null) {
-                        final Map<String, String> config = vifr.otherConfig;
-                        vifName = config.get("nameLabel");
-                    }
-                    s_logger.debug("A VIF in dom0 for the network is found - so destroy the vif");
-                    v.destroy(conn);
-                    s_logger.debug("Destroy temp dom0 vif" + vifName + " success");
-                }
-            } catch (final Exception e) {
-                s_logger.warn("Destroy temp dom0 vif " + vifName + "failed", e);
             }
         }
     }
@@ -571,90 +474,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 Session.logout(conn);
             } catch (final Exception e) {
             }
-        }
-    }
-
-    /**
-     * This method creates a XenServer network and configures it for being used as a L2-in-L3 tunneled network
-     */
-    public synchronized Network configureTunnelNetwork(final Connection conn, final Long networkId, final long hostId,
-                                                       final String bridgeName) {
-        try {
-            final Network nw = findOrCreateTunnelNetwork(conn, bridgeName);
-            // Invoke plugin to setup the bridge which will be used by this
-            // network
-            final String bridge = nw.getBridge(conn);
-            final Map<String, String> nwOtherConfig = nw.getOtherConfig(conn);
-            final String configuredHosts = nwOtherConfig.get("ovs-host-setup");
-            boolean configured = false;
-            if (configuredHosts != null) {
-                final String hostIdsStr[] = configuredHosts.split(",");
-                for (final String hostIdStr : hostIdsStr) {
-                    if (hostIdStr.equals(((Long) hostId).toString())) {
-                        configured = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!configured) {
-                final String result;
-                if (bridgeName.startsWith("OVS-DR-VPC-Bridge")) {
-                    result = callHostPlugin(conn, "ovstunnel", "setup_ovs_bridge_for_distributed_routing", "bridge", bridge,
-                            "key", bridgeName, "xs_nw_uuid", nw.getUuid(conn),
-                            "cs_host_id", ((Long) hostId).toString());
-                } else {
-                    result = callHostPlugin(conn, "ovstunnel", "setup_ovs_bridge", "bridge", bridge, "key", bridgeName,
-                            "xs_nw_uuid", nw.getUuid(conn), "cs_host_id",
-                            ((Long) hostId).toString());
-                }
-
-                // Note down the fact that the ovs bridge has been setup
-                final String[] res = result.split(":");
-                if (res.length != 2 || !res[0].equalsIgnoreCase("SUCCESS")) {
-                    // TODO: Should make this error not fatal?
-                    throw new CloudRuntimeException("Unable to pre-configure OVS bridge " + bridge);
-                }
-            }
-            return nw;
-        } catch (final Exception e) {
-            s_logger.warn("createandConfigureTunnelNetwork failed", e);
-            return null;
-        }
-    }
-
-    /**
-     * This method just creates a XenServer network following the tunnel network naming convention
-     */
-    public synchronized Network findOrCreateTunnelNetwork(final Connection conn, final String nwName) {
-        try {
-            Network nw = null;
-            final Network.Record rec = new Network.Record();
-            final Set<Network> networks = Network.getByNameLabel(conn, nwName);
-
-            if (networks.size() == 0) {
-                rec.nameDescription = "tunnel network id# " + nwName;
-                rec.nameLabel = nwName;
-                // Initialize the ovs-host-setup to avoid error when doing
-                // get-param in plugin
-                final Map<String, String> otherConfig = new HashMap<>();
-                otherConfig.put("ovs-host-setup", "");
-                // Mark 'internal network' as shared so bridge gets
-                // automatically created on each host in the cluster
-                // when VM with vif connected to this internal network is
-                // started
-                otherConfig.put("assume_network_is_shared", "true");
-                rec.otherConfig = otherConfig;
-                nw = Network.create(conn, rec);
-                s_logger.debug("### XenServer network for tunnels created:" + nwName);
-            } else {
-                nw = networks.iterator().next();
-                s_logger.debug("XenServer network for tunnels found:" + nwName);
-            }
-            return nw;
-        } catch (final Exception e) {
-            s_logger.warn("createTunnelNetwork failed", e);
-            return null;
         }
     }
 
@@ -1072,30 +891,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         final String result = callHostPlugin(conn, "vmopsSnapshot", "create_secondary_storage_folder", "remoteMountPath",
                 remoteMountPath, "newFolder", newFolder);
         return result != null;
-    }
-
-    String createTemplateFromSnapshot(final Connection conn, final String templatePath, final String snapshotPath,
-                                      final int wait) {
-        final String tmpltLocalDir = UUID.randomUUID().toString();
-        final String results = callHostPluginAsync(conn, "vmopspremium", "create_privatetemplate_from_snapshot", wait,
-                "templatePath", templatePath, "snapshotPath", snapshotPath,
-                "tmpltLocalDir", tmpltLocalDir);
-        String errMsg = null;
-        if (results == null || results.isEmpty()) {
-            errMsg = "create_privatetemplate_from_snapshot return null";
-        } else {
-            final String[] tmp = results.split("#");
-            final String status = tmp[0];
-            if (status.equals("0")) {
-                return results;
-            } else {
-                errMsg = "create_privatetemplate_from_snapshot failed due to " + tmp[1];
-            }
-        }
-        final String source = "cloud_mount/" + tmpltLocalDir;
-        killCopyProcess(conn, source);
-        s_logger.warn(errMsg);
-        throw new CloudRuntimeException(errMsg);
     }
 
     protected String callHostPluginAsync(final Connection conn, final String plugin, final String cmd, final int wait,
@@ -1629,8 +1424,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     public VM createWorkingVM(final Connection conn, final String vmName, final String guestOSType,
                               final String platformEmulator, final List<VolumeObjectTO> listVolumeTo)
-            throws BadServerResponse, Types.VmBadPowerState, Types.SrFull, Types.OperationNotAllowed, XenAPIException,
-            XmlRpcException {
+            throws XenAPIException, XmlRpcException {
         // below is redundant but keeping for consistency and code readabilty
         final String guestOsTypeName = platformEmulator;
         if (guestOsTypeName == null) {
@@ -1705,19 +1499,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         return details != null && details.equals("1");
     }
 
-    protected String deleteSnapshotBackup(final Connection conn, final Long dcId, final Long accountId,
-                                          final Long volumeId, final String secondaryStorageMountPath,
-                                          final String backupUUID) {
-
-        // If anybody modifies the formatting below again, I'll skin them
-        final String result = callHostPlugin(conn, "vmopsSnapshot", "deleteSnapshotBackup", "backupUUID", backupUUID,
-                "dcId", dcId.toString(), "accountId", accountId.toString(),
-                "volumeId", volumeId.toString(), "secondaryStorageMountPath", secondaryStorageMountPath);
-
-        return result;
-    }
-
-    public void destroyPatchVbd(final Connection conn, final String vmName) throws XmlRpcException, XenAPIException {
+    public void destroyPatchVbd(final Connection conn, final String vmName) {
         try {
             if (!vmName.startsWith("r-") && !vmName.startsWith("s-") && !vmName.startsWith("v-")) {
                 return;
@@ -1735,26 +1517,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             }
         } catch (final Exception e) {
             s_logger.debug("Cannot destory CD-ROM device for VM " + vmName + " due to " + e.toString(), e);
-        }
-    }
-
-    public synchronized void destroyTunnelNetwork(final Connection conn, final Network nw, final long hostId) {
-        try {
-            final String bridge = nw.getBridge(conn);
-            final String result = callHostPlugin(conn, "ovstunnel", "destroy_ovs_bridge", "bridge", bridge, "cs_host_id",
-                    ((Long) hostId).toString());
-            final String[] res = result.split(":");
-            if (res.length != 2 || !res[0].equalsIgnoreCase("SUCCESS")) {
-                // TODO: Should make this error not fatal?
-                // Can Concurrent VM shutdown/migration/reboot events can cause
-                // this method
-                // to be executed on a bridge which has already been removed?
-                throw new CloudRuntimeException("Unable to remove OVS bridge " + bridge + ":" + result);
-            }
-            return;
-        } catch (final Exception e) {
-            s_logger.warn("destroyTunnelNetwork failed:", e);
-            return;
         }
     }
 
@@ -1978,13 +1740,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         cmd.setRouterAccessIp(cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP));
         assert cmd.getRouterAccessIp() != null;
 
-        if (cmd instanceof IpAssocVpcCommand) {
-            return prepareNetworkElementCommand((IpAssocVpcCommand) cmd);
-        } else if (cmd instanceof IpAssocCommand) {
-            return prepareNetworkElementCommand((IpAssocCommand) cmd);
-        } else if (cmd instanceof SetupGuestNetworkCommand) {
-            return prepareNetworkElementCommand((SetupGuestNetworkCommand) cmd);
-        } else if (cmd instanceof SetSourceNatCommand) {
+        if (cmd instanceof SetSourceNatCommand) {
             return prepareNetworkElementCommand((SetSourceNatCommand) cmd);
         } else if (cmd instanceof SetNetworkACLCommand) {
             return prepareNetworkElementCommand((SetNetworkACLCommand) cmd);
@@ -1999,53 +1755,12 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     @Override
     public ExecutionResult cleanupCommand(final NetworkElementCommand cmd) {
-        if (cmd instanceof IpAssocCommand && !(cmd instanceof IpAssocVpcCommand)) {
-            return cleanupNetworkElementCommand((IpAssocCommand) cmd);
-        }
         return new ExecutionResult(true, null);
     }
 
     protected String generateTimeStamp() {
         return new StringBuilder("CsCreateTime-").append(System.currentTimeMillis()).append("-").append(
                 Rand.nextInt(Integer.MAX_VALUE)).toString();
-    }
-
-    protected VIF getCorrectVif(final Connection conn, final VM router, final IpAddressTO ip)
-            throws XmlRpcException, XenAPIException {
-        final NicTO nic = new NicTO();
-        nic.setType(ip.getTrafficType());
-        nic.setName(ip.getNetworkName());
-        if (ip.getBroadcastUri() == null) {
-            nic.setBroadcastType(BroadcastDomainType.Native);
-        } else {
-            final URI uri = BroadcastDomainType.fromString(ip.getBroadcastUri());
-            nic.setBroadcastType(BroadcastDomainType.getSchemeValue(uri));
-            nic.setBroadcastUri(uri);
-        }
-        final Network network = getNetwork(conn, nic);
-        // Determine the correct VIF on DomR to associate/disassociate the
-        // IP address with
-        final Set<VIF> routerVIFs = router.getVIFs(conn);
-        for (final VIF vif : routerVIFs) {
-            final Network vifNetwork = vif.getNetwork(conn);
-            if (vifNetwork.getUuid(conn).equals(network.getUuid(conn))) {
-                return vif;
-            }
-        }
-        return null;
-    }
-
-    protected VIF getCorrectVif(final Connection conn, final VM router, final Network network)
-            throws XmlRpcException, XenAPIException {
-        final Set<VIF> routerVIFs = router.getVIFs(conn);
-        for (final VIF vif : routerVIFs) {
-            final Network vifNetwork = vif.getNetwork(conn);
-            if (vifNetwork.getUuid(conn).equals(network.getUuid(conn))) {
-                return vif;
-            }
-        }
-
-        return null;
     }
 
     public HashMap<String, HashMap<String, VgpuTypesInfo>> getGPUGroupDetails(final Connection conn)
@@ -2567,10 +2282,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             }
         }
         return null;
-    }
-
-    protected Storage.StorageResourceType getStorageResourceType() {
-        return Storage.StorageResourceType.STORAGE_POOL;
     }
 
     @Override
@@ -4267,86 +3978,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         }
     }
 
-    protected ExecutionResult prepareNetworkElementCommand(final IpAssocCommand cmd) {
-        final Connection conn = getConnection();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        final String routerIp = cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-
-        try {
-            final IpAddressTO[] ips = cmd.getIpAddresses();
-            for (final IpAddressTO ip : ips) {
-
-                final VM router = getVM(conn, routerName);
-
-                final NicTO nic = new NicTO();
-                nic.setMac(ip.getMacAddress());
-                nic.setType(ip.getTrafficType());
-                if (ip.getBroadcastUri() == null) {
-                    nic.setBroadcastType(BroadcastDomainType.Native);
-                } else {
-                    final URI uri = BroadcastDomainType.fromString(ip.getBroadcastUri());
-                    nic.setBroadcastType(BroadcastDomainType.getSchemeValue(uri));
-                    nic.setBroadcastUri(uri);
-                }
-                nic.setDeviceId(0);
-                nic.setNetworkRateMbps(ip.getNetworkRate());
-                nic.setName(ip.getNetworkName());
-
-                final Network network = getNetwork(conn, nic);
-
-                // Determine the correct VIF on DomR to associate/disassociate
-                // the
-                // IP address with
-                VIF correctVif = getCorrectVif(conn, router, network);
-
-                // If we are associating an IP address and DomR doesn't have a
-                // VIF
-                // for the specified vlan ID, we need to add a VIF
-                // If we are disassociating the last IP address in the VLAN, we
-                // need
-                // to remove a VIF
-                boolean addVif = false;
-                if (ip.isAdd() && correctVif == null) {
-                    addVif = true;
-                }
-
-                if (addVif) {
-                    // Add a new VIF to DomR
-                    final String vifDeviceNum = getLowestAvailableVIFDeviceNum(conn, router);
-
-                    if (vifDeviceNum == null) {
-                        throw new InternalErrorException(
-                                "There were no more available slots for a new VIF on router: " + router.getNameLabel(conn));
-                    }
-
-                    nic.setDeviceId(Integer.parseInt(vifDeviceNum));
-
-                    correctVif = createVif(conn, routerName, router, null, nic);
-                    correctVif.plug(conn);
-                    // Add iptables rule for network usage
-                    networkUsage(conn, routerIp, "addVif", "eth" + correctVif.getDevice(conn));
-                }
-
-                if (ip.isAdd() && correctVif == null) {
-                    throw new InternalErrorException("Failed to find DomR VIF to associate/disassociate IP with.");
-                }
-                if (correctVif != null) {
-                    ip.setNewNic(addVif);
-                }
-            }
-        } catch (final InternalErrorException e) {
-            s_logger.error("Ip Assoc failure on applying one ip due to exception:  ", e);
-            return new ExecutionResult(false, e.getMessage());
-        } catch (final Exception e) {
-            return new ExecutionResult(false, e.getMessage());
-        }
-        return new ExecutionResult(true, null);
-    }
-
-    protected ExecutionResult prepareNetworkElementCommand(final IpAssocVpcCommand cmd) {
-        return new ExecutionResult(true, null);
-    }
-
     protected ExecutionResult prepareNetworkElementCommand(final SetNetworkACLCommand cmd) {
         final Connection conn = getConnection();
         final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
@@ -4378,43 +4009,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     }
 
     protected ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
-        return new ExecutionResult(true, null);
-    }
-
-    /**
-     * @param cmd
-     * @return
-     */
-    private ExecutionResult prepareNetworkElementCommand(final SetupGuestNetworkCommand cmd) {
-        final Connection conn = getConnection();
-        final NicTO nic = cmd.getNic();
-        final String domrName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        try {
-            final Set<VM> vms = VM.getByNameLabel(conn, domrName);
-            if (vms == null || vms.isEmpty()) {
-                return new ExecutionResult(false, "Can not find VM " + domrName);
-            }
-            final VM vm = vms.iterator().next();
-            final String mac = nic.getMac();
-            VIF domrVif = null;
-            for (final VIF vif : vm.getVIFs(conn)) {
-                final String lmac = vif.getMAC(conn);
-                if (lmac.equals(mac)) {
-                    domrVif = vif;
-                    // Do not break it! We have 2 routers.
-                    // break;
-                }
-            }
-            if (domrVif == null) {
-                return new ExecutionResult(false, "Can not find vif with mac " + mac + " for VM " + domrName);
-            }
-
-            nic.setDeviceId(Integer.parseInt(domrVif.getDevice(conn)));
-        } catch (final Exception e) {
-            final String msg = "Creating guest network failed due to " + e.toString();
-            s_logger.warn(msg, e);
-            return new ExecutionResult(false, msg);
-        }
         return new ExecutionResult(true, null);
     }
 
@@ -4953,55 +4547,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 } catch (final Exception e1) {
                     s_logger.debug("unable to destroy task(" + task.toString() + ") on host(" + _host.getUuid() + ") due to "
                             + e1.toString());
-                }
-            }
-        }
-    }
-
-    protected void startvmfailhandle(final Connection conn, final VM vm, final List<Ternary<SR, VDI, VolumeVO>> mounts) {
-        if (vm != null) {
-            try {
-
-                if (vm.getPowerState(conn) == VmPowerState.RUNNING) {
-                    try {
-                        vm.hardShutdown(conn);
-                    } catch (final Exception e) {
-                        final String msg = "VM hardshutdown failed due to " + e.toString();
-                        s_logger.warn(msg, e);
-                    }
-                }
-                if (vm.getPowerState(conn) == VmPowerState.HALTED) {
-                    try {
-                        vm.destroy(conn);
-                    } catch (final Exception e) {
-                        final String msg = "VM destroy failed due to " + e.toString();
-                        s_logger.warn(msg, e);
-                    }
-                }
-            } catch (final Exception e) {
-                final String msg = "VM getPowerState failed due to " + e.toString();
-                s_logger.warn(msg, e);
-            }
-        }
-        if (mounts != null) {
-            for (final Ternary<SR, VDI, VolumeVO> mount : mounts) {
-                final VDI vdi = mount.second();
-                Set<VBD> vbds = null;
-                try {
-                    vbds = vdi.getVBDs(conn);
-                } catch (final Exception e) {
-                    final String msg = "VDI getVBDS failed due to " + e.toString();
-                    s_logger.warn(msg, e);
-                    continue;
-                }
-                for (final VBD vbd : vbds) {
-                    try {
-                        vbd.unplug(conn);
-                        vbd.destroy(conn);
-                    } catch (final Exception e) {
-                        final String msg = "VBD destroy failed due to " + e.toString();
-                        s_logger.warn(msg, e);
-                    }
                 }
             }
         }

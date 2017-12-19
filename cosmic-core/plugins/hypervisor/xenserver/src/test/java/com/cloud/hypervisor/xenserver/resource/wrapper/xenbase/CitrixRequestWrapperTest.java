@@ -58,8 +58,6 @@ import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.api.proxy.CheckConsoleProxyLoadCommand;
 import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
-import com.cloud.agent.api.routing.IpAssocCommand;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.storage.CreateAnswer;
 import com.cloud.agent.api.storage.CreateCommand;
 import com.cloud.agent.api.storage.DestroyCommand;
@@ -67,12 +65,10 @@ import com.cloud.agent.api.storage.PrimaryStorageDownloadCommand;
 import com.cloud.agent.api.storage.ResizeVolumeCommand;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
 import com.cloud.host.HostEnvironment;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
@@ -81,14 +77,14 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.resource.StorageSubsystemCommandHandler;
-import com.cloud.utils.Pair;
-import com.cloud.vm.DiskProfile;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
+import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.utils.Pair;
+import com.cloud.vm.DiskProfile;
+import com.cloud.vm.VirtualMachine;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -1398,46 +1394,6 @@ public class CitrixRequestWrapperTest {
         verify(citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
-    }
-
-    @Test
-    public void testIpAssocVpcCommand() {
-        final VirtualRoutingResource routingResource = Mockito.mock(VirtualRoutingResource.class);
-        final IpAddressTO[] ips = new IpAddressTO[0];
-
-        final IpAssocVpcCommand ipAssociation = new IpAssocVpcCommand(ips);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getVirtualRoutingResource()).thenReturn(routingResource);
-
-        final Answer answer = wrapper.execute(ipAssociation, citrixResourceBase);
-
-        verify(routingResource, times(1)).executeRequest(ipAssociation);
-
-        // Requires more testing, but the VirtualResourceRouting is quite big.
-        assertNull(answer);
-    }
-
-    @Test
-    public void testIpAssocCommand() {
-        final VirtualRoutingResource routingResource = Mockito.mock(VirtualRoutingResource.class);
-        final IpAddressTO[] ips = new IpAddressTO[0];
-
-        final IpAssocCommand ipAssociation = new IpAssocCommand(ips);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getVirtualRoutingResource()).thenReturn(routingResource);
-
-        final Answer answer = wrapper.execute(ipAssociation, citrixResourceBase);
-
-        verify(routingResource, times(1)).executeRequest(ipAssociation);
-
-        // Requires more testing, but the VirtualResourceRouting is quite big.
-        assertNull(answer);
     }
 
     @Test

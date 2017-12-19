@@ -25,14 +25,12 @@ import com.cloud.agent.api.HostVmStateReportEntry;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.PingRoutingCommand;
 import com.cloud.agent.api.PingRoutingWithNwGroupsCommand;
-import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.StartupStorageCommand;
+import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.routing.IpAssocCommand;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.to.DataStoreTO;
@@ -71,8 +69,6 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.SerialDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.TermPolicy;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.VideoDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogAction;
-import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogModel;
 import com.cloud.hypervisor.kvm.resource.wrapper.LibvirtRequestWrapper;
 import com.cloud.hypervisor.kvm.resource.wrapper.LibvirtUtilitiesHelper;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
@@ -246,8 +242,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     private long diskActivityInactiveThresholdMilliseconds = 30000; // 30s
     private final RngBackendModel rngBackendModel = RngBackendModel.RANDOM;
     private final String rngPath = "/dev/random";
-    private final WatchDogAction watchDogAction = WatchDogAction.NONE;
-    private final WatchDogModel watchDogModel = WatchDogModel.I6300ESB;
     private final CpuStat cpuStat = new CpuStat();
     private final MemStat memStat = new MemStat();
     private StorageSubsystemCommandHandler storageHandler;
@@ -333,12 +327,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         cmd.setRouterAccessIp(cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP));
         assert cmd.getRouterAccessIp() != null;
 
-        if (cmd instanceof IpAssocVpcCommand) {
-            return prepareNetworkElementCommand((IpAssocVpcCommand) cmd);
-        } else if (cmd instanceof IpAssocCommand) {
-            return prepareNetworkElementCommand((IpAssocCommand) cmd);
-        } else if (cmd instanceof SetupGuestNetworkCommand) {
-            return prepareNetworkElementCommand((SetupGuestNetworkCommand) cmd);
+        if (cmd instanceof UpdateNetworkOverviewCommand && ((UpdateNetworkOverviewCommand) cmd).isPlugNics()) {
+            return prepareNetworkElementCommand((UpdateNetworkOverviewCommand) cmd);
         } else if (cmd instanceof SetSourceNatCommand) {
             return prepareNetworkElementCommand((SetSourceNatCommand) cmd);
         }
@@ -347,63 +337,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public ExecutionResult cleanupCommand(final NetworkElementCommand cmd) {
-        if (cmd instanceof IpAssocCommand && !(cmd instanceof IpAssocVpcCommand)) {
-            return cleanupNetworkElementCommand((IpAssocCommand) cmd);
-        }
-        return new ExecutionResult(true, null);
-    }
-
-    protected ExecutionResult cleanupNetworkElementCommand(final IpAssocCommand cmd) {
-
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        final String routerIp = cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-        final Connect conn;
-
-        try {
-            conn = LibvirtConnection.getConnectionByVmName(routerName);
-            final List<InterfaceDef> nics = getInterfaces(conn, routerName, getGuestBridgeName());
-            final Map<String, Integer> broadcastUriAllocatedToVm = new HashMap<>();
-
-            Integer nicPos = 0;
-            for (final InterfaceDef nic : nics) {
-                if (nic.getBrName().equalsIgnoreCase(getLinkLocalBridgeName())) {
-                    broadcastUriAllocatedToVm.put("LinkLocal", nicPos);
-                } else {
-                    if (nic.getBrName().equalsIgnoreCase(getPublicBridgeName()) || nic.getBrName().equalsIgnoreCase(getPrivBridgeName())) {
-                        broadcastUriAllocatedToVm.put(BroadcastDomainType.Vlan.toUri(Vlan.UNTAGGED).toString(), nicPos);
-                    } else {
-                        final String broadcastUri = getBroadcastUriFromBridge(nic.getBrName());
-                        broadcastUriAllocatedToVm.put(broadcastUri, nicPos);
-                    }
-                }
-                nicPos++;
-            }
-
-            final IpAddressTO[] ips = cmd.getIpAddresses();
-            final int numOfIps = ips.length;
-            int nicNum = 0;
-            for (final IpAddressTO ip : ips) {
-
-                if (!broadcastUriAllocatedToVm.containsKey(ip.getBroadcastUri())) {
-          /* plug a vif into router */
-                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getMacAddress());
-                    broadcastUriAllocatedToVm.put(ip.getBroadcastUri(), nicPos++);
-                }
-                nicNum = broadcastUriAllocatedToVm.get(ip.getBroadcastUri());
-
-                if (numOfIps == 1 && !ip.isAdd()) {
-                    vifHotUnPlug(conn, routerName, ip.getMacAddress());
-                    networkUsage(routerIp, "deleteVif", "eth" + nicNum);
-                }
-            }
-        } catch (final LibvirtException e) {
-            logger.error("ipassoccmd failed", e);
-            return new ExecutionResult(false, e.getMessage());
-        } catch (final InternalErrorException e) {
-            logger.error("ipassoccmd failed", e);
-            return new ExecutionResult(false, e.getMessage());
-        }
-
         return new ExecutionResult(true, null);
     }
 
@@ -419,36 +352,16 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return interfacesToReturn;
     }
 
-    private void vifHotUnPlug(final Connect conn, final String vmName, final String macAddr)
-            throws InternalErrorException, LibvirtException {
-
-        Domain vm = null;
-        vm = getDomain(conn, vmName);
-        final List<InterfaceDef> pluggedNics = getInterfaces(conn, vmName);
-        for (final InterfaceDef pluggedNic : pluggedNics) {
-            if (pluggedNic.getMacAddress().equalsIgnoreCase(macAddr)) {
-                vm.detachDevice(pluggedNic.toString());
-                // We don't know which "traffic type" is associated with
-                // each interface at this point, so inform all vif drivers
-                for (final VifDriver vifDriver : getAllVifDrivers()) {
-                    vifDriver.unplug(pluggedNic);
-                }
-            }
-        }
-    }
-
     public List<VifDriver> getAllVifDrivers() {
         final Set<VifDriver> vifDrivers = new HashSet<>();
 
         vifDrivers.add(defaultVifDriver);
         vifDrivers.addAll(trafficTypeVifDrivers.values());
 
-        final ArrayList<VifDriver> vifDriverList = new ArrayList<>(vifDrivers);
-
-        return vifDriverList;
+        return new ArrayList<>(vifDrivers);
     }
 
-    protected ExecutionResult prepareNetworkElementCommand(final IpAssocVpcCommand cmd) {
+    protected ExecutionResult prepareNetworkElementCommand(final UpdateNetworkOverviewCommand cmd) {
         final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
 
         try {
@@ -465,70 +378,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
     }
 
-    public ExecutionResult prepareNetworkElementCommand(final IpAssocCommand cmd) {
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        final String routerIp = cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-
-        try {
-            final Connect conn = LibvirtConnection.getConnectionByVmName(routerName);
-            final IpAddressTO[] ips = cmd.getIpAddresses();
-            final Map<String, Integer> bridgeToNicNum = new HashMap<>();
-            final List<InterfaceDef> pluggedNics = getInterfaces(conn, routerName);
-
-            Integer devNum = buildBridgeToNicNumHashMap(bridgeToNicNum, pluggedNics);
-
-            for (final IpAddressTO ip : ips) {
-                boolean newNic = false;
-                if (!bridgeToNicNum.containsKey(getBridgeNameFromTrafficType(ip.getTrafficType()))) {
-                    /* plug a vif into router */
-                    vifHotPlug(conn, routerName, ip.getBroadcastUri(), ip.getMacAddress());
-                    bridgeToNicNum.put(getBridgeNameFromTrafficType(ip.getTrafficType()), devNum++);
-                    newNic = true;
-                }
-                // rewrite to mac address
-                //networkUsage(routerIp, "addVif", "eth" + nicNum);
-
-                ip.setNewNic(newNic);
-            }
-            return new ExecutionResult(true, null);
-        } catch (final LibvirtException e) {
-            logger.error("ipassoccmd failed", e);
-            return new ExecutionResult(false, e.getMessage());
-        } catch (final InternalErrorException e) {
-            logger.error("ipassoccmd failed", e);
-            return new ExecutionResult(false, e.getMessage());
-        }
-    }
-
-    private ExecutionResult prepareNetworkElementCommand(final SetupGuestNetworkCommand cmd) {
-        final Connect conn;
-        final NicTO nic = cmd.getNic();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-
-        try {
-            conn = LibvirtConnection.getConnectionByVmName(routerName);
-            final List<InterfaceDef> pluggedNics = getInterfaces(conn, routerName);
-            InterfaceDef routerNic = null;
-
-            for (final InterfaceDef pluggedNic : pluggedNics) {
-                if (pluggedNic.getMacAddress().equalsIgnoreCase(nic.getMac())) {
-                    routerNic = pluggedNic;
-                    break;
-                }
-            }
-
-            if (routerNic == null) {
-                return new ExecutionResult(false, "Can not find nic with mac " + nic.getMac() + " for VM " + routerName);
-            }
-
-            return new ExecutionResult(true, null);
-        } catch (final LibvirtException e) {
-            final String msg = "Creating guest network failed due to " + e.toString();
-            logger.warn(msg, e);
-            return new ExecutionResult(false, msg);
-        }
-    }
-
     protected ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
         final Connect conn;
         final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
@@ -537,7 +386,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         try {
             conn = LibvirtConnection.getConnectionByVmName(routerName);
-            Integer devNum = 0;
             final String pubVlan = pubIp.getBroadcastUri();
             final List<InterfaceDef> pluggedNics = getInterfaces(conn, routerName);
 
@@ -547,16 +395,15 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 if (pubVlan.equalsIgnoreCase(Vlan.UNTAGGED) && pluggedVlanBr.equalsIgnoreCase(getPublicBridgeName())) {
                     break;
                 } else if (pluggedVlanBr.equalsIgnoreCase(getLinkLocalBridgeName())) {
-          /* skip over, no physical bridge device exists */
+                    /* skip over, no physical bridge device exists */
                 } else if (pluggedVlanId == null) {
-          /* this should only be true in the case of link local bridge */
+                    /* this should only be true in the case of link local bridge */
                     return new ExecutionResult(false,
                             "unable to find the vlan id for bridge " + pluggedVlanBr + " when attempting to set up" + pubVlan
                                     + " on router " + routerName);
                 } else if (pluggedVlanId.equals(pubVlan)) {
                     break;
                 }
-                devNum++;
             }
             return new ExecutionResult(true, "success");
         } catch (final LibvirtException e) {
