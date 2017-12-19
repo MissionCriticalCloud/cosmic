@@ -32,6 +32,4 @@ public class VRScripts {
 
     // Present on the KVM hypervisor
     public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";
-
-    public static final String VR_CFG = "scripts/vr_cfg.sh";
 }

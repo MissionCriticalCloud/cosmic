@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,16 +44,12 @@ import org.slf4j.LoggerFactory;
 public class VirtualRoutingResource {
 
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualRoutingResource.class);
-    protected Map<String, Lock> _vrLockMap = new HashMap<>();
+    private Map<String, Lock> _vrLockMap = new HashMap<>();
     private final VirtualRouterDeployer _vrDeployer;
     private Map<String, Queue<NetworkElementCommand>> _vrAggregateCommandsSet;
-    private String _name;
     private int _sleep;
-    private int _retry;
     private int _port;
     private int _eachTimeout;
-
-    private final String _cfgVersion = "1.0";
 
     public VirtualRoutingResource(final VirtualRouterDeployer deployer) {
         _vrDeployer = deployer;
@@ -184,13 +179,12 @@ public class VirtualRoutingResource {
     }
 
     private CheckS2SVpnConnectionsAnswer execute(final CheckS2SVpnConnectionsCommand cmd) {
-
-        final StringBuffer buff = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
         for (final String ip : cmd.getVpnIps()) {
-            buff.append(ip);
-            buff.append(" ");
+            str.append(ip);
+            str.append(" ");
         }
-        final ExecutionResult result = _vrDeployer.executeInVR(cmd.getRouterAccessIp(), VRScripts.S2SVPN_CHECK, buff.toString());
+        final ExecutionResult result = _vrDeployer.executeInVR(cmd.getRouterAccessIp(), VRScripts.S2SVPN_CHECK, str.toString());
         return new CheckS2SVpnConnectionsAnswer(cmd, result.isSuccess(), result.getDetails());
     }
 
@@ -235,14 +229,9 @@ public class VirtualRoutingResource {
         return new GetDomRVersionAnswer(cmd, result.getDetails(), lines[0], lines[1]);
     }
 
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
-
+    public boolean configure(final Map<String, Object> params) throws ConfigurationException {
         String value = (String) params.get("ssh.sleep");
         _sleep = NumbersUtil.parseInt(value, 10) * 1000;
-
-        value = (String) params.get("ssh.retry");
-        _retry = NumbersUtil.parseInt(value, 36);
 
         value = (String) params.get("ssh.port");
         _port = NumbersUtil.parseInt(value, 3922);
@@ -287,13 +276,13 @@ public class VirtualRoutingResource {
                 if (sch != null) {
                     try {
                         sch.close();
-                    } catch (final IOException e) {
+                    } catch (final IOException ignored) {
                     }
                 }
             }
             try {
                 Thread.sleep(sleep);
-            } catch (final InterruptedException e) {
+            } catch (final InterruptedException ignored) {
             }
         }
 
@@ -310,64 +299,41 @@ public class VirtualRoutingResource {
         return configItemFacade.generateConfig(cmd);
     }
 
-    private Answer execute(final AggregationControlCommand cmd) {
-        final Action action = cmd.getAction();
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
+    private Answer execute(final AggregationControlCommand aggregationCommand) {
+        assert aggregationCommand.getRouterAccessIp() != null;
+
+        final String routerName = aggregationCommand.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
         assert routerName != null;
-        assert cmd.getRouterAccessIp() != null;
 
-        if (action == Action.Start) {
+        final Action action = aggregationCommand.getAction();
+        if (Action.Start.equals(action)) {
             assert (!_vrAggregateCommandsSet.containsKey(routerName));
+            _vrAggregateCommandsSet.put(routerName, new LinkedBlockingQueue<>());
+            return new Answer(aggregationCommand, true, "Command aggregation started");
 
-            final Queue<NetworkElementCommand> queue = new LinkedBlockingQueue<>();
-            _vrAggregateCommandsSet.put(routerName, queue);
-            return new Answer(cmd, true, "Command aggregation started");
-        } else if (action == Action.Finish) {
+        } else if (Action.Finish.equals(action)) {
             final Queue<NetworkElementCommand> queue = _vrAggregateCommandsSet.get(routerName);
-            int answerCounts = 0;
             try {
-                final StringBuilder sb = new StringBuilder();
-                sb.append("#Apache CloudStack Virtual Router Config File\n");
-                sb.append("<version>\n" + _cfgVersion + "\n</version>\n");
                 for (final NetworkElementCommand command : queue) {
-                    answerCounts += command.getAnswersCount();
                     final List<ConfigItem> cfg = generateCommandCfg(command);
                     if (cfg == null) {
-                        s_logger.warn("Unknown commands for VirtualRoutingResource, but continue: " + cmd.toString());
+                        s_logger.warn("Unknown commands for VirtualRoutingResource, but continue: " + aggregationCommand.toString());
                         continue;
                     }
 
-                    for (final ConfigItem c : cfg) {
-                        sb.append(c.getAggregateCommand());
+                    final Answer commandAnswer = applyConfig(command, cfg);
+                    if (!commandAnswer.getResult()) {
+                        return new Answer(aggregationCommand, false, "Aggregated command failed to execute " + commandAnswer.getDetails());
                     }
                 }
 
-                // TODO replace with applyConfig with a stop on fail
-                final String cfgFileName = "VR-" + UUID.randomUUID().toString() + ".cfg";
-                final FileConfigItem fileConfigItem = new FileConfigItem(VRScripts.CONFIG_CACHE_LOCATION, cfgFileName, sb.toString());
-                final ScriptConfigItem scriptConfigItem = new ScriptConfigItem(VRScripts.VR_CFG, "-c " + VRScripts.CONFIG_CACHE_LOCATION + cfgFileName);
-                // 120s is the minimal timeout
-                int timeout = answerCounts * _eachTimeout;
-                if (timeout < 120) {
-                    timeout = 120;
-                }
-
-                ExecutionResult result = applyConfigToVR(cmd.getRouterAccessIp(), fileConfigItem);
-                if (!result.isSuccess()) {
-                    return new Answer(cmd, false, result.getDetails());
-                }
-
-                result = applyConfigToVR(cmd.getRouterAccessIp(), scriptConfigItem, timeout);
-                if (!result.isSuccess()) {
-                    return new Answer(cmd, false, result.getDetails());
-                }
-
-                return new Answer(cmd, true, "Command aggregation finished");
+                return new Answer(aggregationCommand, true, "Command aggregation finished");
             } finally {
                 queue.clear();
                 _vrAggregateCommandsSet.remove(routerName);
             }
         }
-        return new Answer(cmd, false, "Fail to recongize aggregation action " + action.toString());
+
+        return new Answer(aggregationCommand, false, "Fail to recognize aggregation action " + action.toString());
     }
 }

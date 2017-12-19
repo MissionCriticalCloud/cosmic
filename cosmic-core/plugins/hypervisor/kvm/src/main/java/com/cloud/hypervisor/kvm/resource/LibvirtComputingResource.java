@@ -670,7 +670,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         initStorage(propertiesMap);
 
-        if (initVirtualRoutingResource(name, propertiesMap)) {
+        if (initVirtualRoutingResource(propertiesMap)) {
             return false;
         }
 
@@ -847,13 +847,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return libvirtComputingResourceProperties.getHypervisorUri();
     }
 
-    private boolean initVirtualRoutingResource(final String name, final Map<String, Object> propertiesMap) throws ConfigurationException {
+    private boolean initVirtualRoutingResource(final Map<String, Object> propertiesMap) throws ConfigurationException {
         virtRouterResource = new VirtualRoutingResource(this);
 
-        if (!virtRouterResource.configure(name, propertiesMap)) {
-            return true;
-        }
-        return false;
+        return !virtRouterResource.configure(propertiesMap);
     }
 
     private void initStorage(final Map<String, Object> propertiesMap) throws ConfigurationException {

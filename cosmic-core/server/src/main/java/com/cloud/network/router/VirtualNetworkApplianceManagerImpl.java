@@ -2057,12 +2057,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException, ResourceUnavailableException {
+    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
         return aggregationExecution(Action.Start, network, routers);
     }
 
-    protected boolean aggregationExecution(final AggregationControlCommand.Action action, final Network network, final List<DomainRouterVO> routers)
-            throws AgentUnavailableException, ResourceUnavailableException {
+    private boolean aggregationExecution(final AggregationControlCommand.Action action, final Network network, final List<DomainRouterVO> routers)
+            throws ResourceUnavailableException {
         int errors = 0;
         for (final DomainRouterVO router : routers) {
 
@@ -2090,7 +2090,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException, ResourceUnavailableException {
+    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
         return aggregationExecution(Action.Finish, network, routers);
     }
 
@@ -2119,16 +2119,13 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 if (state != VirtualMachine.State.Stopped && state != VirtualMachine.State.Destroyed) {
                     try {
                         stopRouter(router.getId(), false);
-                    } catch (final ResourceUnavailableException e) {
-                        s_logger.warn("Fail to stop router " + router.getInstanceName(), e);
-                        throw new ConnectionException(false, "Fail to stop router " + router.getInstanceName());
-                    } catch (final ConcurrentOperationException e) {
+                    } catch (final ResourceUnavailableException | ConcurrentOperationException e) {
                         s_logger.warn("Fail to stop router " + router.getInstanceName(), e);
                         throw new ConnectionException(false, "Fail to stop router " + router.getInstanceName());
                     }
                 }
                 router.setStopPending(false);
-                router = _routerDao.persist(router);
+                _routerDao.persist(router);
             }
         }
     }

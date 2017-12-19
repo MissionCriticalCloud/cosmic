@@ -704,7 +704,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         storageHandler = buildStorageHandler();
 
         _vrResource = new VirtualRoutingResource(this);
-        if (!_vrResource.configure(name, params)) {
+        if (!_vrResource.configure(params)) {
             throw new ConfigurationException("Unable to configure VirtualRoutingResource");
         }
         return true;
