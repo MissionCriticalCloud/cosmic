@@ -32,11 +32,9 @@ import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.VmDiskStatsEntry;
 import com.cloud.agent.api.VmStatsEntry;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.MetadataTO;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.agent.api.to.NicTO;
@@ -44,7 +42,6 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.dc.Vlan;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.host.Host.Type;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
@@ -329,8 +326,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         if (cmd instanceof UpdateNetworkOverviewCommand && ((UpdateNetworkOverviewCommand) cmd).isPlugNics()) {
             return prepareNetworkElementCommand((UpdateNetworkOverviewCommand) cmd);
-        } else if (cmd instanceof SetSourceNatCommand) {
-            return prepareNetworkElementCommand((SetSourceNatCommand) cmd);
         }
         return new ExecutionResult(true, null);
     }
@@ -375,41 +370,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         } catch (final LibvirtException e) {
             logger.error("Ip Assoc failure on applying one ip due to exception:  ", e);
             return new ExecutionResult(false, e.getMessage());
-        }
-    }
-
-    protected ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
-        final Connect conn;
-        final String routerName = cmd.getAccessDetail(NetworkElementCommand.ROUTER_NAME);
-        cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-        final IpAddressTO pubIp = cmd.getIpAddress();
-
-        try {
-            conn = LibvirtConnection.getConnectionByVmName(routerName);
-            final String pubVlan = pubIp.getBroadcastUri();
-            final List<InterfaceDef> pluggedNics = getInterfaces(conn, routerName);
-
-            for (final InterfaceDef pluggedNic : pluggedNics) {
-                final String pluggedVlanBr = pluggedNic.getBrName();
-                final String pluggedVlanId = getBroadcastUriFromBridge(pluggedVlanBr);
-                if (pubVlan.equalsIgnoreCase(Vlan.UNTAGGED) && pluggedVlanBr.equalsIgnoreCase(getPublicBridgeName())) {
-                    break;
-                } else if (pluggedVlanBr.equalsIgnoreCase(getLinkLocalBridgeName())) {
-                    /* skip over, no physical bridge device exists */
-                } else if (pluggedVlanId == null) {
-                    /* this should only be true in the case of link local bridge */
-                    return new ExecutionResult(false,
-                            "unable to find the vlan id for bridge " + pluggedVlanBr + " when attempting to set up" + pubVlan
-                                    + " on router " + routerName);
-                } else if (pluggedVlanId.equals(pubVlan)) {
-                    break;
-                }
-            }
-            return new ExecutionResult(true, "success");
-        } catch (final LibvirtException e) {
-            final String msg = "Ip SNAT failure due to " + e.toString();
-            logger.error(msg, e);
-            return new ExecutionResult(false, msg);
         }
     }
 

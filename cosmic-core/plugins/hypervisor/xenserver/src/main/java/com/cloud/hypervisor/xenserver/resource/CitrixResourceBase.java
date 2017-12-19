@@ -24,7 +24,6 @@ import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.VmStatsEntry;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
@@ -1740,9 +1739,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         cmd.setRouterAccessIp(cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP));
         assert cmd.getRouterAccessIp() != null;
 
-        if (cmd instanceof SetSourceNatCommand) {
-            return prepareNetworkElementCommand((SetSourceNatCommand) cmd);
-        } else if (cmd instanceof SetNetworkACLCommand) {
+        if (cmd instanceof SetNetworkACLCommand) {
             return prepareNetworkElementCommand((SetNetworkACLCommand) cmd);
         }
         return new ExecutionResult(true, null);
@@ -4005,10 +4002,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             s_logger.error(msg, e);
             return new ExecutionResult(false, msg);
         }
-        return new ExecutionResult(true, null);
-    }
-
-    protected ExecutionResult prepareNetworkElementCommand(final SetSourceNatCommand cmd) {
         return new ExecutionResult(true, null);
     }
 

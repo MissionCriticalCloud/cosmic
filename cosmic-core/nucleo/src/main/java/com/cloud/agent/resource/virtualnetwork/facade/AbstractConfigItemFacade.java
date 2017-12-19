@@ -16,7 +16,6 @@ import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
-import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.SetStaticRouteCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
@@ -70,7 +69,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem()); // Deprecated
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
-        flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem()); // Move to network overview
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
     }
 
