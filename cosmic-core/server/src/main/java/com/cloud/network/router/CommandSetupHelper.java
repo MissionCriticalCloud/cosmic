@@ -17,7 +17,6 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.routing.SetStaticRouteCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.api.to.DhcpTO;
@@ -420,18 +419,6 @@ public class CommandSetupHelper {
         return vlanIpMap;
     }
 
-    private String getMacAddressOfPluggedNic(final VirtualRouter router, final Long networkId) {
-        final List<NicVO> nics = _nicDao.listByVmId(router.getId());
-        String deviceMacAddress = null;
-        for (final NicVO nic : nics) {
-            if (nic.getNetworkId() == networkId) {
-                deviceMacAddress = nic.getMacAddress();
-                break;
-            }
-        }
-        return deviceMacAddress;
-    }
-
     public void createNetworkACLsCommands(final List<? extends NetworkACLItem> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId,
                                           final boolean privateGateway) {
         final List<NetworkACLTO> rulesTO = new ArrayList<>();
@@ -511,16 +498,6 @@ public class CommandSetupHelper {
         }
 
         final SetStaticNatRulesCommand cmd = new SetStaticNatRulesCommand(rulesTO, router.getVpcId());
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand(cmd);
-    }
-
-    public void createStaticRouteCommands(final List<StaticRouteProfile> staticRoutes, final VirtualRouter router, final Commands cmds) {
-        final SetStaticRouteCommand cmd = new SetStaticRouteCommand(staticRoutes);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
 

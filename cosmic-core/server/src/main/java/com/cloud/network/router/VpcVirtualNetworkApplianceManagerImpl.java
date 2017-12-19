@@ -39,7 +39,6 @@ import com.cloud.network.vpc.NetworkACLManager;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
-import com.cloud.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
@@ -347,26 +346,13 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 return false;
             }
 
-            // 4) RE-APPLY ALL STATIC ROUTE RULES
-            final List<? extends StaticRoute> routes = _staticRouteDao.listByVpcId(domainRouterVO.getVpcId());
-            final List<StaticRouteProfile> staticRouteProfiles = new ArrayList<>(routes.size());
-
-            for (final StaticRoute route : routes) {
-                staticRouteProfiles.add(new StaticRouteProfile(route));
-            }
-
-            s_logger.debug("Found " + staticRouteProfiles.size() + " static routes to apply as a part of vpc route " + domainRouterVO + " start");
-            if (!staticRouteProfiles.isEmpty()) {
-                _commandSetupHelper.createStaticRouteCommands(staticRouteProfiles, domainRouterVO, cmds);
-            }
-
-            // 5) RE-APPLY ALL REMOTE ACCESS VPNs
+            // 4) RE-APPLY ALL REMOTE ACCESS VPNs
             final RemoteAccessVpnVO vpn = _vpnDao.findByAccountAndVpc(domainRouterVO.getAccountId(), domainRouterVO.getVpcId());
             if (vpn != null) {
                 _commandSetupHelper.createApplyVpnCommands(true, vpn, domainRouterVO, cmds);
             }
 
-            // 6) REPROGRAM GUEST NETWORK
+            // 5) REPROGRAM GUEST NETWORK
             boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
 
             final VirtualRouterProvider vrProvider = _vrProviderDao.findById(domainRouterVO.getElementId());
@@ -418,7 +404,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(updateVmOverviewCommand);
             }
 
-            // 7) RE-APPLY VR Configuration
+            // 6) RE-APPLY VR Configuration
             final Vpc vpc = _vpcDao.findById(domainRouterVO.getVpcId());
             _commandSetupHelper.createVRConfigCommands(vpc, domainRouterVO, cmds);
 
