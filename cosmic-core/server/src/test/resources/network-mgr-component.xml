@@ -51,7 +51,6 @@
             -->
 
             <adapter name="StorageNetworkGuru" class="com.cloud.network.guru.StorageNetworkGuru" />
-            <adapter name="ExternalGuestNetworkGuru" class="com.cloud.network.guru.ExternalGuestNetworkGuru" />
             <adapter name="PublicNetworkGuru" class="com.cloud.network.guru.PublicNetworkGuru" />
             <adapter name="PodBasedNetworkGuru" class="com.cloud.network.guru.PodBasedNetworkGuru" />
             <adapter name="ControlNetworkGuru" class="com.cloud.network.guru.ControlNetworkGuru" />
@@ -60,12 +59,9 @@
             <adapter name="PrivateNetworkGuru" class="com.cloud.network.guru.PrivateNetworkGuru" />
             <!--<adapter name="NiciraNvpGuestNetworkGuru" class="com.cloud.network.guru.NiciraNvpGuestNetworkGuru"/> -->
         </adapters>
-        <adapters key="com.cloud.network.IpAddrAllocator">
-            <adapter name="Basic" class="com.cloud.network.ExternalIpAddressAllocator" />
-        </adapters>
+
         <adapters key="com.cloud.network.element.NetworkElement">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
-            <!--<adapter name="ExternalDhcpServer" class="com.cloud.network.element.ExternalDhcpElement"/>-->
             <adapter name="SecurityGroupProvider" class="com.cloud.network.element.SecurityGroupElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
             <!--<adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->

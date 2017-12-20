@@ -11,24 +11,18 @@ import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRulesCmd;
 import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.api.response.ServiceResponse;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.VlanDao;
-import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.EventDao;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.network.ExternalDeviceUsageManager;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.LBHealthCheckPolicyVO;
@@ -38,7 +32,6 @@ import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.addr.PublicIp;
-import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -52,7 +45,6 @@ import com.cloud.network.dao.LoadBalancerVMMapDao;
 import com.cloud.network.dao.LoadBalancerVMMapVO;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.SslCertVO;
 import com.cloud.network.element.LoadBalancingServiceProvider;
@@ -76,15 +68,10 @@ import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.DomainService;
-import com.cloud.user.dao.AccountDao;
-import com.cloud.user.dao.UserDao;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
@@ -128,7 +115,7 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements LoadBalancingRulesManager, LoadBalancingRulesService {
+public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBalancingRulesManager, LoadBalancingRulesService {
     private static final Logger s_logger = LoggerFactory.getLogger(LoadBalancingRulesManagerImpl.class);
 
     @Inject
@@ -146,8 +133,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
     @Inject
     VlanDao _vlanDao;
     @Inject
-    EventDao _eventDao;
-    @Inject
     LoadBalancerVMMapDao _lb2VmMapDao;
     @Inject
     LBStickinessPolicyDao _lb2stickinesspoliciesDao;
@@ -156,15 +141,7 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
     @Inject
     UserVmDao _vmDao;
     @Inject
-    AccountDao _accountDao;
-    @Inject
-    DomainDao _domainDao;
-    @Inject
     NicDao _nicDao;
-    @Inject
-    UsageEventDao _usageEventDao;
-    @Inject
-    FirewallRulesCidrsDao _firewallCidrsDao;
     @Inject
     FirewallManager _firewallMgr;
     @Inject
@@ -172,38 +149,21 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
     @Inject
     FirewallRulesDao _firewallDao;
     @Inject
-    DomainService _domainMgr;
-    @Inject
-    ConfigurationManager _configMgr;
-
-    @Inject
-    ExternalDeviceUsageManager _externalDeviceUsageMgr;
-    @Inject
-    NetworkServiceMapDao _ntwkSrvcDao;
-    @Inject
     ResourceTagDao _resourceTagDao;
     @Inject
     VpcManager _vpcMgr;
     @Inject
-    VMTemplateDao _templateDao;
-    @Inject
-    ServiceOfferingDao _offeringsDao;
-    @Inject
     ConfigurationDao _configDao;
-    @Inject
-    DataCenterDao _dcDao = null;
-    @Inject
-    UserDao _userDao;
-    List<LoadBalancingServiceProvider> _lbProviders;
     @Inject
     IpAddressManager _ipAddrMgr;
     @Inject
     EntityManager _entityMgr;
     @Inject
     LoadBalancerCertMapDao _lbCertMapDao;
-
     @Inject
     NicSecondaryIpDao _nicSecondaryIpDao;
+
+    List<LoadBalancingServiceProvider> _lbProviders;
 
     @DB
     public boolean deleteLoadBalancerRule(final long loadBalancerId, final boolean apply, final Account caller, final long callerUserId, final boolean rollBack) {
@@ -263,11 +223,6 @@ public class LoadBalancingRulesManagerImpl<Type> extends ManagerBase implements 
 
         // gather external network usage stats for this lb rule
         final NetworkVO network = _networkDao.findById(lb.getNetworkId());
-        if (network != null) {
-            if (_networkModel.networkIsConfiguredForExternalNetworking(network.getDataCenterId(), network.getId())) {
-                _externalDeviceUsageMgr.updateExternalLoadBalancerNetworkUsageStats(loadBalancerId);
-            }
-        }
 
         if (apply) {
             try {

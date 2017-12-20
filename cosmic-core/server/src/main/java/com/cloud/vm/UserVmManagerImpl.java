@@ -119,7 +119,6 @@ import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
@@ -2668,9 +2667,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_UPGRADE, eventDescription = "upgrading Vm")
-            /*
-             * TODO: cleanup eventually - Refactored API call
-             */
+    /*
+     * TODO: cleanup eventually - Refactored API call
+     */
     // This method will be deprecated as we use ScaleVMCmd for both stopped VMs and running VMs
     public UserVm upgradeVirtualMachine(final UpgradeVMCmd cmd) throws ResourceAllocationException {
         final Long vmId = cmd.getId();
@@ -5082,17 +5081,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (guestNic != null) {
                 guestNic.setIPv4Address(returnedIp);
                 ipChanged = true;
-            }
-        }
-        if (ipChanged) {
-            final UserVmVO userVm = _vmDao.findById(profile.getId());
-            // dc.getDhcpProvider().equalsIgnoreCase(Provider.ExternalDhcpServer.getName())
-            if (_ntwkSrvcDao.canProviderSupportServiceInNetwork(guestNetwork.getId(), Service.Dhcp, Provider.ExternalDhcpServer)) {
-                _nicDao.update(guestNic.getId(), guestNic);
-                userVm.setPrivateIpAddress(guestNic.getIPv4Address());
-                _vmDao.update(userVm.getId(), userVm);
-
-                s_logger.info("Detected that ip changed in the answer, updated nic in the db with new ip " + returnedIp);
             }
         }
 

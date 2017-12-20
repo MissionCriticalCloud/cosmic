@@ -11,6 +11,7 @@ import java.util.List;
  * ntwk_service_map table.
  */
 public interface NetworkServiceMapDao extends GenericDao<NetworkServiceMapVO, Long> {
+
     boolean areServicesSupportedInNetwork(long networkId, Service... services);
 
     boolean canProviderSupportServiceInNetwork(long networkId, Service service, Provider provider);
@@ -24,6 +25,4 @@ public interface NetworkServiceMapDao extends GenericDao<NetworkServiceMapVO, Lo
     List<String> getDistinctProviders(long networkId);
 
     String isProviderForNetwork(long networkId, Provider provider);
-
-    List<String> getProvidersForServiceInNetwork(long networkId, Service service);
 }
