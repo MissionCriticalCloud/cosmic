@@ -12,21 +12,16 @@ import com.cloud.agent.api.CheckS2SVpnConnectionsCommand;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.GetDomRVersionAnswer;
 import com.cloud.agent.api.GetDomRVersionCmd;
-import com.cloud.agent.api.GetRouterAlertsAnswer;
 import com.cloud.agent.api.NetworkUsageAnswer;
 import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.routing.GetRouterAlertsCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SetMonitorServiceCommand;
-import com.cloud.agent.api.to.MonitorServiceTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
 import com.cloud.alert.AlertService;
-import com.cloud.alert.AlertService.AlertType;
 import com.cloud.api.ApiAsyncJobDispatcher;
 import com.cloud.api.ApiGsonHelper;
 import com.cloud.api.command.admin.router.RebootRouterCmd;
@@ -68,7 +63,6 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.MonitoringService;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
@@ -88,12 +82,8 @@ import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVO;
-import com.cloud.network.dao.MonitoringServiceDao;
-import com.cloud.network.dao.MonitoringServiceVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
-import com.cloud.network.dao.OpRouterMonitorServiceDao;
-import com.cloud.network.dao.OpRouterMonitorServiceVO;
 import com.cloud.network.dao.RemoteAccessVpnDao;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnConnectionDao;
@@ -122,7 +112,6 @@ import com.cloud.network.topology.NetworkTopologyContext;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
-import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -179,8 +168,6 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -295,11 +282,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     Site2SiteVpnManager _s2sVpnMgr;
     @Inject
-    MonitoringServiceDao _monitorServiceDao;
-    @Inject
     AsyncJobManager _asyncMgr;
-    @Inject
-    OpRouterMonitorServiceDao _opRouterMonitorServiceDao;
     @Inject
     ZoneRepository zoneRepository;
 
@@ -482,13 +465,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
         } else {
             s_logger.debug("router.check.interval - " + _routerCheckInterval + " so not scheduling the redundant router checking thread");
-        }
-
-        final int routerAlertsCheckInterval = RouterAlertsCheckInterval.value();
-        if (routerAlertsCheckInterval > 0) {
-            _checkExecutor.scheduleAtFixedRate(new CheckRouterAlertsTask(), routerAlertsCheckInterval, routerAlertsCheckInterval, TimeUnit.SECONDS);
-        } else {
-            s_logger.debug("router.alerts.check.interval - " + routerAlertsCheckInterval + " so not scheduling the router alerts checking thread");
         }
 
         return true;
@@ -913,91 +889,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
         }
         return jobIds;
-    }
-
-    protected void getRouterAlerts() {
-        try {
-            final List<DomainRouterVO> routers = _routerDao.listByStateAndManagementServer(VirtualMachine.State.Running, mgmtSrvrId);
-
-            s_logger.debug("Found " + routers.size() + " running routers. ");
-
-            for (final DomainRouterVO router : routers) {
-                final String serviceMonitoringFlag = SetServiceMonitor.valueIn(router.getDataCenterId());
-                // Skip the routers in VPC network or skip the routers where
-                // Monitor service is not enabled in the corresponding Zone
-                if (!Boolean.parseBoolean(serviceMonitoringFlag) || router.getVpcId() != null) {
-                    continue;
-                }
-
-                final String privateIP = router.getPrivateIpAddress();
-
-                if (privateIP != null) {
-                    OpRouterMonitorServiceVO opRouterMonitorServiceVO = _opRouterMonitorServiceDao.findById(router.getId());
-
-                    GetRouterAlertsCommand command = null;
-                    if (opRouterMonitorServiceVO == null) {
-                        command = new GetRouterAlertsCommand(new String("1970-01-01 00:00:00")); // To
-                        // avoid
-                        // sending
-                        // null
-                        // value
-                    } else {
-                        command = new GetRouterAlertsCommand(opRouterMonitorServiceVO.getLastAlertTimestamp());
-                    }
-
-                    command.setAccessDetail(NetworkElementCommand.ROUTER_IP, router.getPrivateIpAddress());
-
-                    try {
-                        final Answer origAnswer = _agentMgr.easySend(router.getHostId(), command);
-                        GetRouterAlertsAnswer answer = null;
-
-                        if (origAnswer == null) {
-                            s_logger.warn("Unable to get alerts from router " + router.getHostName());
-                            continue;
-                        }
-                        if (origAnswer instanceof GetRouterAlertsAnswer) {
-                            answer = (GetRouterAlertsAnswer) origAnswer;
-                        } else {
-                            s_logger.warn("Unable to get alerts from router " + router.getHostName());
-                            continue;
-                        }
-                        if (!answer.getResult()) {
-                            s_logger.warn("Unable to get alerts from router " + router.getHostName() + " " + answer.getDetails());
-                            continue;
-                        }
-
-                        final String alerts[] = answer.getAlerts();
-                        if (alerts != null) {
-                            final String lastAlertTimeStamp = answer.getTimeStamp();
-                            final SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                            sdfrmt.setLenient(false);
-                            try {
-                                sdfrmt.parse(lastAlertTimeStamp);
-                            } catch (final ParseException e) {
-                                s_logger.warn("Invalid last alert timestamp received while collecting alerts from router: " + router.getInstanceName());
-                                continue;
-                            }
-                            for (final String alert : alerts) {
-                                _alertMgr.sendAlert(AlertType.ALERT_TYPE_DOMAIN_ROUTER, router.getDataCenterId(), router.getPodIdToDeployIn(), "Monitoring Service on VR "
-                                        + router.getInstanceName(), alert);
-                            }
-                            if (opRouterMonitorServiceVO == null) {
-                                opRouterMonitorServiceVO = new OpRouterMonitorServiceVO(router.getId(), router.getHostName(), lastAlertTimeStamp);
-                                _opRouterMonitorServiceDao.persist(opRouterMonitorServiceVO);
-                            } else {
-                                opRouterMonitorServiceVO.setLastAlertTimestamp(lastAlertTimeStamp);
-                                _opRouterMonitorServiceDao.update(opRouterMonitorServiceVO.getId(), opRouterMonitorServiceVO);
-                            }
-                        }
-                    } catch (final Exception e) {
-                        s_logger.warn("Error while collecting alerts from router: " + router.getInstanceName(), e);
-                        continue;
-                    }
-                }
-            }
-        } catch (final Exception e) {
-            s_logger.warn("Error while collecting alerts from router", e);
-        }
     }
 
     @Override
@@ -1437,52 +1328,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
     }
 
-    private void finalizeMonitorServiceOnStart(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final long networkId, final Boolean add) {
-
-        final NetworkVO network = _networkDao.findById(networkId);
-
-        s_logger.debug("Creating  monitoring services on " + router + " start...");
-
-        // get the list of sevices for this network to monitor
-        final List<MonitoringServiceVO> services = new ArrayList<>();
-        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dhcp, Provider.VirtualRouter)
-                || _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dns, Provider.VirtualRouter)) {
-            final MonitoringServiceVO dhcpService = _monitorServiceDao.getServiceByName(MonitoringService.Service.Dhcp.toString());
-            if (dhcpService != null) {
-                services.add(dhcpService);
-            }
-        }
-
-        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Lb, Provider.VirtualRouter)) {
-            final MonitoringServiceVO lbService = _monitorServiceDao.getServiceByName(MonitoringService.Service.LoadBalancing.toString());
-            if (lbService != null) {
-                services.add(lbService);
-            }
-        }
-        final List<MonitoringServiceVO> defaultServices = _monitorServiceDao.listDefaultServices(true);
-        services.addAll(defaultServices);
-
-        final List<MonitorServiceTO> servicesTO = new ArrayList<>();
-        for (final MonitoringServiceVO service : services) {
-            final MonitorServiceTO serviceTO = new MonitorServiceTO(service.getService(), service.getProcessName(), service.getServiceName(), service.getServicePath(),
-                    service.getServicePidFile(), service.isDefaultService());
-            servicesTO.add(serviceTO);
-        }
-
-        final NicProfile controlNic = getControlNic(profile);
-        if (controlNic == null) {
-            throw new CloudRuntimeException("VirtualMachine " + profile.getInstanceName() + " doesn't have a control interface");
-        }
-        final SetMonitorServiceCommand command = new SetMonitorServiceCommand(servicesTO);
-        command.setAccessDetail(NetworkElementCommand.ROUTER_IP, controlNic.getIPv4Address());
-        command.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-
-        if (!add) {
-            command.setAccessDetail(NetworkElementCommand.ROUTER_MONITORING_ENABLE, add.toString());
-        }
-        cmds.addCommand("monitor", command);
-    }
-
     protected ArrayList<? extends PublicIpAddress> getPublicIpsToApply(final VirtualRouter router, final Provider provider, final Long guestNetworkId,
                                                                        final com.cloud.network.IpAddress.State... skipInStates) {
         final long ownerId = router.getAccountId();
@@ -1639,18 +1484,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
             if (reprogramGuestNtwks) {
                 finalizeNetworkRulesForNetwork(cmds, router, provider, guestNetworkId);
-
-                final NetworkOffering offering = _networkOfferingDao.findById(_networkDao.findById(guestNetworkId).getNetworkOfferingId());
-                // service monitoring is currently not added in RVR
-                if (!offering.getRedundantRouter()) {
-                    final String serviceMonitringSet = _configDao.getValue(Config.EnableServiceMonitoring.key());
-
-                    if (serviceMonitringSet != null && serviceMonitringSet.equalsIgnoreCase("true")) {
-                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, true);
-                    } else {
-                        finalizeMonitorServiceOnStart(cmds, profile, router, guestNetworkId, false);
-                    }
-                }
             }
 
             final AggregationControlCommand finishCmd = new AggregationControlCommand(
@@ -2022,7 +1855,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[]{UseExternalDnsServers, routerVersionCheckEnabled, SetServiceMonitor, RouterAlertsCheckInterval};
+        return new ConfigKey<?>[]{UseExternalDnsServers, routerVersionCheckEnabled};
     }
 
     @Override
@@ -2238,28 +2071,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     protected class RvRStatusUpdateTask extends ManagedContextRunnable {
 
-        private void checkDuplicateMaster(final List<DomainRouterVO> routers) {
-            final Map<Long, DomainRouterVO> networkRouterMaps = new HashMap<>();
-            for (final DomainRouterVO router : routers) {
-                final List<Long> routerGuestNtwkIds = _routerDao.getRouterNetworks(router.getId());
-
-                for (final Long routerGuestNtwkId : routerGuestNtwkIds) {
-                    if (router.getRedundantState() == RedundantState.MASTER) {
-                        if (networkRouterMaps.containsKey(routerGuestNtwkId)) {
-                            final DomainRouterVO dupRouter = networkRouterMaps.get(routerGuestNtwkId);
-                            final String title = "More than one redundant virtual router is in MASTER state! Router " + router.getHostName() + " and router "
-                                    + dupRouter.getHostName();
-                            final String context = "Virtual router (name: " + router.getHostName() + ", id: " + router.getId() + " and router (name: " + dupRouter.getHostName()
-                                    + ", id: " + router.getId() + ") are both in MASTER state! If the problem persist, restart both of routers. ";
-                            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER, router.getDataCenterId(), router.getPodIdToDeployIn(), title, context);
-                            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER, dupRouter.getDataCenterId(), dupRouter.getPodIdToDeployIn(), title, context);
-                            s_logger.warn(context);
-                        } else {
-                            networkRouterMaps.put(routerGuestNtwkId, router);
-                        }
-                    }
-                }
-            }
+        public RvRStatusUpdateTask() {
         }
 
         @Override
@@ -2289,7 +2101,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 updateSite2SiteVpnConnectionState(routers);
 
                 final List<DomainRouterVO> vpcRouters = _routerDao.listAllRunning();
-
                 s_logger.debug("Found " + vpcRouters.size() + " routers to update RvR status. ");
                 pushToUpdateQueue(vpcRouters);
             } catch (final Exception ex) {
@@ -2297,45 +2108,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
         }
 
-        protected void pushToUpdateQueue(final List<DomainRouterVO> routers) throws InterruptedException {
+        private void pushToUpdateQueue(final List<DomainRouterVO> routers) throws InterruptedException {
             for (final DomainRouterVO router : routers) {
                 if (!_vrUpdateQueue.offer(router, 500, TimeUnit.MILLISECONDS)) {
                     s_logger.warn("Cannot insert into virtual router update queue! Adjustment of router.check.interval and router.check.poolsize maybe needed.");
                     break;
                 }
-            }
-        }
-    }
-
-    protected class CheckRouterAlertsTask extends ManagedContextRunnable {
-        public CheckRouterAlertsTask() {
-        }
-
-        @Override
-        protected void runInContext() {
-            try {
-                getRouterAlerts();
-            } catch (final Exception ex) {
-                s_logger.error("Fail to complete the CheckRouterAlertsTask! ", ex);
-            }
-        }
-    }
-
-    protected class RebootTask extends ManagedContextRunnable {
-
-        long _routerId;
-
-        public RebootTask(final long routerId) {
-            _routerId = routerId;
-        }
-
-        @Override
-        protected void runInContext() {
-            try {
-                s_logger.info("Reboot router " + _routerId + " to refresh network rules");
-                rebootRouter(_routerId, true);
-            } catch (final Exception e) {
-                s_logger.warn("Error while rebooting the router", e);
             }
         }
     }

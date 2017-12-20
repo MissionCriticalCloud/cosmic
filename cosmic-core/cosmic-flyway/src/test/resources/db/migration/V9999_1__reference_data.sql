@@ -259,12 +259,6 @@ VALUES (1, '1', 'XenServer', 'default', 50, 1, 6, NULL, 0, 1), (2, '2', 'XenServ
   (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 1, 13, NULL, 1, 1), (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 1, 13, NULL, 1, 0),
   (23, NULL, 'Ovm3', '3.2', 25, 0, 6, NULL, 0, 0), (24, NULL, 'Ovm3', '3.3', 50, 0, 6, NULL, 0, 0);
 
-INSERT INTO `monitoring_services` (`id`, `uuid`, `service`, `process_name`, `service_name`, `service_path`, `pidfile`, `isDefault`)
-VALUES (1, 'ada793ee-6d7b-11e7-8f09-5254001daa61', 'ssh', 'sshd', 'ssh', '/etc/init.d/ssh', '/var/run/sshd.pid', 1),
-  (2, 'ada79a40-6d7b-11e7-8f09-5254001daa61', 'dhcp', 'dnsmasq', 'dnsmasq', '/etc/init.d/dnsmasq', '/var/run/dnsmasq/dnsmasq.pid', 0),
-  (3, 'ada7a003-6d7b-11e7-8f09-5254001daa61', 'loadbalancing', 'haproxy', 'haproxy', '/etc/init.d/haproxy', '/var/run/haproxy.pid', 0),
-  (4, 'ada7a6b8-6d7b-11e7-8f09-5254001daa61', 'webserver', 'apache2', 'apache2', '/etc/init.d/apache2', '/var/run/apache2.pid', 1);
-
 INSERT INTO `network_acl` (`id`, `name`, `uuid`, `vpc_id`, `description`, `display`)
 VALUES (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
   (2, 'default_allow', 'ad692983-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Allow All', 1);

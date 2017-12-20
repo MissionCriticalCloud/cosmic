@@ -13,7 +13,6 @@ class Config:
         self.dbag_firewallrules = CsDatabag('firewallrules').dbag
         self.dbag_forwardingrules = CsDatabag('forwardingrules').dbag
         self.dbag_loadbalancer = CsDatabag('loadbalancer').dbag
-        self.dbag_monitorservice = CsDatabag('monitorservice').dbag
         self.dbag_network_acl = CsDatabag('networkacl').dbag
         self.dbag_network_overview = CsDatabag('network_overview').dbag
         self.dbag_vm_overview = CsDatabag('vm_overview').dbag

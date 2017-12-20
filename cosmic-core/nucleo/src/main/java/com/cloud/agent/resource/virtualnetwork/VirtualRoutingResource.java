@@ -7,10 +7,8 @@ import com.cloud.agent.api.CheckS2SVpnConnectionsAnswer;
 import com.cloud.agent.api.CheckS2SVpnConnectionsCommand;
 import com.cloud.agent.api.GetDomRVersionAnswer;
 import com.cloud.agent.api.GetDomRVersionCmd;
-import com.cloud.agent.api.GetRouterAlertsAnswer;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.routing.GetRouterAlertsCommand;
 import com.cloud.agent.api.routing.GroupAnswer;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
@@ -118,8 +116,6 @@ public class VirtualRoutingResource {
             return execute((GetDomRVersionCmd) cmd);
         } else if (cmd instanceof CheckS2SVpnConnectionsCommand) {
             return execute((CheckS2SVpnConnectionsCommand) cmd);
-        } else if (cmd instanceof GetRouterAlertsCommand) {
-            return execute((GetRouterAlertsCommand) cmd);
         } else {
             s_logger.error("Unknown query command in VirtualRoutingResource!");
             return Answer.createUnsupportedCommandAnswer(cmd);
@@ -186,27 +182,6 @@ public class VirtualRoutingResource {
         }
         final ExecutionResult result = _vrDeployer.executeInVR(cmd.getRouterAccessIp(), VRScripts.S2SVPN_CHECK, str.toString());
         return new CheckS2SVpnConnectionsAnswer(cmd, result.isSuccess(), result.getDetails());
-    }
-
-    private GetRouterAlertsAnswer execute(final GetRouterAlertsCommand cmd) {
-
-        final String routerIp = cmd.getAccessDetail(NetworkElementCommand.ROUTER_IP);
-        final String args = cmd.getPreviousAlertTimeStamp();
-
-        final ExecutionResult result = _vrDeployer.executeInVR(routerIp, VRScripts.ROUTER_ALERTS, args);
-        String alerts[] = null;
-        String lastAlertTimestamp = null;
-
-        if (result.isSuccess()) {
-            if (!result.getDetails().isEmpty() && !result.getDetails().trim().equals("No Alerts")) {
-                alerts = result.getDetails().trim().split("\\\\n");
-                final String[] lastAlert = alerts[alerts.length - 1].split(",");
-                lastAlertTimestamp = lastAlert[0];
-            }
-            return new GetRouterAlertsAnswer(cmd, alerts, lastAlertTimestamp);
-        } else {
-            return new GetRouterAlertsAnswer(cmd, result.getDetails());
-        }
     }
 
     private Answer execute(final CheckRouterCommand cmd) {

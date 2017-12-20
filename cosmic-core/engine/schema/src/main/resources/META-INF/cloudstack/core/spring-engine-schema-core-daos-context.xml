@@ -141,8 +141,6 @@
     <bean id="externalPublicIpStatisticsDaoImpl" class="com.cloud.usage.dao.ExternalPublicIpStatisticsDaoImpl" />
     <bean id="firewallRulesCidrsDaoImpl" class="com.cloud.network.dao.FirewallRulesCidrsDaoImpl" />
     <bean id="firewallRulesDaoImpl" class="com.cloud.network.dao.FirewallRulesDaoImpl" />
-    <bean id="MonitoringServiceDaoImpl" class="com.cloud.network.dao.MonitoringServiceDaoImpl" />
-    <bean id="OpRouterMonitorServiceDaoImpl" class="com.cloud.network.dao.OpRouterMonitorServiceDaoImpl" />
     <bean id="guestOSCategoryDaoImpl" class="com.cloud.storage.dao.GuestOSCategoryDaoImpl" />
     <bean id="guestOSDaoImpl" class="com.cloud.storage.dao.GuestOSDaoImpl" />
     <bean id="guestOSHypervisorDaoImpl" class="com.cloud.storage.dao.GuestOSHypervisorDaoImpl" />

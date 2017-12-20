@@ -11,7 +11,6 @@ public abstract class ConfigBase {
     public static final String STATICNAT_RULES = "staticnatrules";
     public static final String SITE2SITEVPN = "site2sitevpn";
     public static final String REMOTEACCESSVPN = "remoteaccessvpn";
-    public static final String MONITORSERVICE = "monitorservice";
     public static final String LOAD_BALANCER = "loadbalancer";
     public static final String VR = "virtualrouter";
 

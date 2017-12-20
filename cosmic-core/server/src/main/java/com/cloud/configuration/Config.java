@@ -400,11 +400,6 @@ public enum Config {
             "vm.network.nic.max.secondary.ipaddresses", "256",
             "Specify the number of secondary ip addresses per nic per vm. Default value 10 is used, if not specified.", null),
 
-    EnableServiceMonitoring(
-            "Network", ManagementServer.class, Boolean.class,
-            "network.router.enableserviceMonitoring", "false",
-            "service monitoring in router enable/disable option, default false", null),
-
     // Console Proxy
     ConsoleProxyCapacityStandby(
             "Console Proxy",

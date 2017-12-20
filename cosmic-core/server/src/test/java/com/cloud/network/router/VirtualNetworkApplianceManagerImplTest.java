@@ -11,9 +11,7 @@ import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVMMapDao;
-import com.cloud.network.dao.MonitoringServiceDao;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.OpRouterMonitorServiceDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.RemoteAccessVpnDao;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
@@ -73,9 +71,6 @@ public class VirtualNetworkApplianceManagerImplTest {
     private LoadBalancerVMMapDao _loadBalancerVMMapDao;
 
     @Mock
-    private MonitoringServiceDao _monitorServiceDao;
-
-    @Mock
     private ManagementServerHostDao _msHostDao;
 
     @Mock
@@ -86,9 +81,6 @@ public class VirtualNetworkApplianceManagerImplTest {
 
     @Mock
     private NicDao _nicDao;
-
-    @Mock
-    private OpRouterMonitorServiceDao _opRouterMonitorServiceDao;
 
     @Mock
     private PortForwardingRulesDao _pfRulesDao;
