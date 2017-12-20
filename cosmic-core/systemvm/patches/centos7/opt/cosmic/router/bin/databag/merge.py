@@ -11,7 +11,6 @@ import cs_dhcp
 import cs_firewallrules
 import cs_forwardingrules
 import cs_loadbalancer
-import cs_monitorservice
 import cs_network_acl
 import cs_public_ip_acl
 import cs_remoteaccessvpn
@@ -93,8 +92,6 @@ class updateDataBag:
             dbag = self.process_firewallrules(self.db.getDataBag())
         elif self.qFile.type == 'loadbalancer':
             dbag = self.process_loadbalancer(self.db.getDataBag())
-        elif self.qFile.type == 'monitorservice':
-            dbag = self.process_monitorservice(self.db.getDataBag())
         elif self.qFile.type == 'dhcpentry':
             dbag = self.process_dhcp_entry(self.db.getDataBag())
         elif self.qFile.type == 'staticnatrules' or self.qFile.type == 'forwardrules':
@@ -139,9 +136,6 @@ class updateDataBag:
 
     def process_loadbalancer(self, dbag):
         return cs_loadbalancer.merge(dbag, self.qFile.data)
-
-    def process_monitorservice(self, dbag):
-        return cs_monitorservice.merge(dbag, self.qFile.data)
 
     def process_staticroutes(self, dbag):
         return cs_staticroutes.merge(dbag, self.qFile.data)

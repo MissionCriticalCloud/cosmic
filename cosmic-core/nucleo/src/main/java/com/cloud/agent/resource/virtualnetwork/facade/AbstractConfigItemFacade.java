@@ -8,7 +8,6 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
-import com.cloud.agent.api.routing.SetMonitorServiceCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
@@ -58,7 +57,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
-        flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem()); // Deprecated
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
