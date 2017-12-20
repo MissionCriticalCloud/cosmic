@@ -20,7 +20,6 @@ import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand;
 import com.cloud.agent.api.routing.AggregationControlCommand.Action;
 import com.cloud.agent.api.routing.GetRouterAlertsCommand;
-import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetMonitorServiceCommand;
 import com.cloud.agent.api.to.MonitorServiceTO;
@@ -36,7 +35,6 @@ import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
 import com.cloud.cluster.ManagementServerHostVO;
 import com.cloud.cluster.dao.ManagementServerHostDao;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -45,7 +43,6 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
@@ -59,7 +56,6 @@ import com.cloud.exception.ConnectionException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -72,14 +68,12 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.IpAddressManager;
 import com.cloud.network.MonitoringService;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.NetworkService;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
@@ -93,7 +87,6 @@ import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerDao;
-import com.cloud.network.dao.LoadBalancerVMMapDao;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.MonitoringServiceDao;
 import com.cloud.network.dao.MonitoringServiceVO;
@@ -101,15 +94,11 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.OpRouterMonitorServiceDao;
 import com.cloud.network.dao.OpRouterMonitorServiceVO;
-import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.RemoteAccessVpnDao;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnConnectionDao;
 import com.cloud.network.dao.Site2SiteVpnConnectionVO;
-import com.cloud.network.dao.Site2SiteVpnGatewayDao;
-import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
-import com.cloud.network.dao.VpnUserDao;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
@@ -118,7 +107,6 @@ import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
@@ -138,14 +126,9 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
-import com.cloud.resource.ResourceManager;
-import com.cloud.server.ConfigurationServer;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.storage.dao.VMTemplateDao;
-import com.cloud.storage.dao.VolumeDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.User;
@@ -177,7 +160,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.usage.UsageUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
-import com.cloud.vm.NicIpAlias;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
@@ -189,11 +171,7 @@ import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
-import com.cloud.vm.dao.NicIpAliasVO;
-import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
-import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -251,8 +229,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     protected CommandSetupHelper _commandSetupHelper;
     @Inject
-    protected RouterDeploymentDefinitionBuilder _routerDeploymentManagerBuilder;
-    @Inject
     EntityManager _entityMgr;
     @Inject
     DataCenterDao _dcDao = null;
@@ -263,11 +239,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     LoadBalancerDao _loadBalancerDao = null;
     @Inject
-    LoadBalancerVMMapDao _loadBalancerVMMapDao = null;
-    @Inject
     IPAddressDao _ipAddressDao = null;
-    @Inject
-    VMTemplateDao _templateDao = null;
     @Inject
     DomainRouterDao _routerDao = null;
     @Inject
@@ -289,27 +261,15 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     AccountManager _accountMgr;
     @Inject
-    ConfigurationManager _configMgr;
-    @Inject
-    ConfigurationServer _configServer;
-    @Inject
     ServiceOfferingDao _serviceOfferingDao = null;
     @Inject
-    UserVmDao _userVmDao;
-    @Inject
-    VMInstanceDao _vmDao;
-    @Inject
     NetworkOfferingDao _networkOfferingDao = null;
-    @Inject
-    GuestOSDao _guestOSDao = null;
     @Inject
     NetworkOrchestrationService _networkMgr;
     @Inject
     NetworkModel _networkModel;
     @Inject
     VirtualMachineManager _itMgr;
-    @Inject
-    VpnUserDao _vpnUsersDao;
     @Inject
     RulesManager _rulesMgr;
     @Inject
@@ -323,17 +283,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     NicDao _nicDao;
     @Inject
-    NicIpAliasDao _nicIpAliasDao;
-    @Inject
-    VolumeDao _volumeDao = null;
-    @Inject
     UserVmDetailsDao _vmDetailsDao;
-    @Inject
-    ClusterDao _clusterDao;
-    @Inject
-    ResourceManager _resourceMgr;
-    @Inject
-    PhysicalNetworkServiceProviderDao _physicalProviderDao;
     @Inject
     VirtualRouterProviderDao _vrProviderDao;
     @Inject
@@ -341,19 +291,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Inject
     Site2SiteCustomerGatewayDao _s2sCustomerGatewayDao;
     @Inject
-    Site2SiteVpnGatewayDao _s2sVpnGatewayDao;
-    @Inject
     Site2SiteVpnConnectionDao _s2sVpnConnectionDao;
     @Inject
     Site2SiteVpnManager _s2sVpnMgr;
-    @Inject
-    UserIpv6AddressDao _ipv6Dao;
-    @Inject
-    NetworkService _networkSvc;
-    @Inject
-    IpAddressManager _ipAddrMgr;
-    @Inject
-    ConfigDepot _configDepot;
     @Inject
     MonitoringServiceDao _monitorServiceDao;
     @Inject
@@ -366,7 +306,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     int _routerRamSize;
     int _routerCpuMHz;
     int _retry = 2;
-    String _mgmtCidr;
     int _routerStatsInterval = 300;
     int _routerCheckInterval = 30;
     int _rvrStatusUpdatePoolSize = 10;
@@ -1496,29 +1435,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 _commandSetupHelper.createApplyLoadBalancingRulesCommands(lbRules, router, cmds, guestNetworkId);
             }
         }
-        // Reapply dhcp and dns configuration.
-        final Network guestNetwork = _networkDao.findById(guestNetworkId);
-        if (guestNetwork.getGuestType() == GuestType.Shared && _networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Dhcp, provider)) {
-            final Map<Network.Capability, String> dhcpCapabilities = _networkSvc.getNetworkOfferingServiceCapabilities(
-                    _networkOfferingDao.findById(_networkDao.findById(guestNetworkId).getNetworkOfferingId()), Service.Dhcp);
-            final String supportsMultipleSubnets = dhcpCapabilities.get(Network.Capability.DhcpAccrossMultipleSubnets);
-            if (supportsMultipleSubnets != null && Boolean.valueOf(supportsMultipleSubnets)) {
-                final List<NicIpAliasVO> revokedIpAliasVOs = _nicIpAliasDao.listByNetworkIdAndState(guestNetworkId, NicIpAlias.State.revoked);
-                s_logger.debug("Found" + revokedIpAliasVOs.size() + "ip Aliases to revoke on the router as a part of dhcp configuration");
-                removeRevokedIpAliasFromDb(revokedIpAliasVOs);
-
-                final List<NicIpAliasVO> aliasVOs = _nicIpAliasDao.listByNetworkIdAndState(guestNetworkId, NicIpAlias.State.active);
-                s_logger.debug("Found" + aliasVOs.size() + "ip Aliases to apply on the router as a part of dhcp configuration");
-                final List<IpAliasTO> activeIpAliasTOs = new ArrayList<>();
-                for (final NicIpAliasVO aliasVO : aliasVOs) {
-                    activeIpAliasTOs.add(new IpAliasTO(aliasVO.getIp4Address(), aliasVO.getNetmask(), aliasVO.getAliasCount().toString()));
-                }
-                if (activeIpAliasTOs.size() != 0) {
-                    _commandSetupHelper.createIpAlias(router, activeIpAliasTOs, guestNetworkId, cmds);
-                    _commandSetupHelper.configDnsMasq(router, _networkDao.findById(guestNetworkId), cmds);
-                }
-            }
-        }
     }
 
     private void finalizeMonitorServiceOnStart(final Commands cmds, final VirtualMachineProfile profile, final DomainRouterVO router, final long networkId, final Boolean add) {
@@ -1628,12 +1544,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             rules.add(rule);
         } else {
             s_logger.debug("Egress policy for the Network " + networkId + " is already defined as Deny. So, no need to default the rule to Allow. ");
-        }
-    }
-
-    private void removeRevokedIpAliasFromDb(final List<NicIpAliasVO> revokedIpAliasVOs) {
-        for (final NicIpAliasVO ipalias : revokedIpAliasVOs) {
-            _nicIpAliasDao.expunge(ipalias.getId());
         }
     }
 
@@ -2009,51 +1919,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Override
     public String getDnsBasicZoneUpdate() {
         return _dnsBasicZoneUpdates;
-    }
-
-    @Override
-    public boolean removeDhcpSupportForSubnet(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
-        if (routers == null || routers.isEmpty()) {
-            s_logger.warn("Failed to add/remove VPN users: no router found for account and zone");
-            throw new ResourceUnavailableException("Unable to assign ip addresses, domR doesn't exist for network " + network.getId(), DataCenter.class, network.getDataCenterId());
-        }
-
-        for (final DomainRouterVO router : routers) {
-            if (router.getState() != VirtualMachine.State.Running) {
-                s_logger.warn("Failed to add/remove VPN users: router not in running state");
-                throw new ResourceUnavailableException("Unable to assign ip addresses, domR is not in right state " + router.getState(), DataCenter.class,
-                        network.getDataCenterId());
-            }
-
-            final Commands cmds = new Commands(Command.OnError.Continue);
-            final List<NicIpAliasVO> revokedIpAliasVOs = _nicIpAliasDao.listByNetworkIdAndState(network.getId(), NicIpAlias.State.revoked);
-            s_logger.debug("Found" + revokedIpAliasVOs.size() + "ip Aliases to revoke on the router as a part of dhcp configuration");
-            final List<IpAliasTO> revokedIpAliasTOs = new ArrayList<>();
-            for (final NicIpAliasVO revokedAliasVO : revokedIpAliasVOs) {
-                revokedIpAliasTOs.add(new IpAliasTO(revokedAliasVO.getIp4Address(), revokedAliasVO.getNetmask(), revokedAliasVO.getAliasCount().toString()));
-            }
-            final List<NicIpAliasVO> aliasVOs = _nicIpAliasDao.listByNetworkIdAndState(network.getId(), NicIpAlias.State.active);
-            s_logger.debug("Found" + aliasVOs.size() + "ip Aliases to apply on the router as a part of dhcp configuration");
-            final List<IpAliasTO> activeIpAliasTOs = new ArrayList<>();
-            for (final NicIpAliasVO aliasVO : aliasVOs) {
-                activeIpAliasTOs.add(new IpAliasTO(aliasVO.getIp4Address(), aliasVO.getNetmask(), aliasVO.getAliasCount().toString()));
-            }
-            _commandSetupHelper.createDeleteIpAliasCommand(router, revokedIpAliasTOs, activeIpAliasTOs, network.getId(), cmds);
-            _commandSetupHelper.configDnsMasq(router, network, cmds);
-            final boolean result = _nwHelper.sendCommandsToRouter(router, cmds);
-            if (result) {
-                Transaction.execute(new TransactionCallbackNoReturn() {
-                    @Override
-                    public void doInTransactionWithoutResult(final TransactionStatus status) {
-                        for (final NicIpAliasVO revokedAliasVO : revokedIpAliasVOs) {
-                            _nicIpAliasDao.expunge(revokedAliasVO.getId());
-                        }
-                    }
-                });
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

@@ -15,6 +15,4 @@ public interface DhcpServiceProvider extends NetworkElement {
 
     boolean configDhcpSupportForSubnet(Network network, NicProfile nic, VirtualMachineProfile vm, DeployDestination dest, ReservationContext context)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException;
-
-    boolean removeDhcpSupportForSubnet(Network network) throws ResourceUnavailableException;
 }

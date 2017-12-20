@@ -6,17 +6,17 @@ import com.cloud.utils.db.GenericDao;
 import java.util.List;
 
 public interface DataCenterLinkLocalIpAddressDao extends GenericDao<DataCenterLinkLocalIpAddressVO, Long> {
-    public DataCenterLinkLocalIpAddressVO takeIpAddress(long dcId, long podId, long instanceId, String reservationId);
+    DataCenterLinkLocalIpAddressVO takeIpAddress(long dcId, long podId, long instanceId, String reservationId);
 
-    public boolean deleteIpAddressByPod(long podId);
+    boolean deleteIpAddressByPod(long podId);
 
-    public void addIpRange(long dcId, long podId, String start, String end);
+    void addIpRange(long dcId, long podId, String start, String end);
 
-    public void releaseIpAddress(String ipAddress, long dcId, long instanceId);
+    void releaseIpAddress(String ipAddress, long dcId, long instanceId);
 
-    public void releaseIpAddress(long nicId, String reservationId);
+    void releaseIpAddress(long nicId, String reservationId);
 
-    public List<DataCenterLinkLocalIpAddressVO> listByPodIdDcId(long podId, long dcId);
+    List<DataCenterLinkLocalIpAddressVO> listByPodIdDcId(long podId, long dcId);
 
-    public int countIPs(long podId, long dcId, boolean onlyCountAllocated);
+    int countIPs(long podId, long dcId, boolean onlyCountAllocated);
 }

@@ -3,9 +3,6 @@ package com.cloud.agent.resource.virtualnetwork.facade;
 import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.CreateIpAliasCommand;
-import com.cloud.agent.api.routing.DeleteIpAliasCommand;
-import com.cloud.agent.api.routing.DnsMasqConfigCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
@@ -57,9 +54,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());
         flyweight.put(UpdateNetworkOverviewCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(UpdateVmOverviewCommand.class, new VmOverviewConfigItem());
-        flyweight.put(CreateIpAliasCommand.class, new CreateIpAliasConfigItem()); // Deprecated
-        flyweight.put(DnsMasqConfigCommand.class, new DnsMasqConfigItem()); // Deprecated
-        flyweight.put(DeleteIpAliasCommand.class, new DeleteIpAliasConfigItem()); // Deprecated
         flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
         flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());

@@ -10,14 +10,10 @@ import com.cloud.utils.db.SearchCriteria.Op;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserIpv6AddressDaoImpl extends GenericDaoBase<UserIpv6AddressVO, Long> implements UserIpv6AddressDao {
-    private static final Logger s_logger = LoggerFactory.getLogger(IPAddressDaoImpl.class);
-
     protected final SearchBuilder<UserIpv6AddressVO> AllFieldsSearch;
     protected GenericSearchBuilder<UserIpv6AddressVO, Long> CountFreePublicIps;
 
@@ -73,20 +69,6 @@ public class UserIpv6AddressDaoImpl extends GenericDaoBase<UserIpv6AddressVO, Lo
         sc.setParameters("networkId", networkId);
         sc.setParameters("ipAddress", ipAddress);
         return findOneBy(sc);
-    }
-
-    @Override
-    public List<UserIpv6AddressVO> listByPhysicalNetworkId(final long physicalNetworkId) {
-        final SearchCriteria<UserIpv6AddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc);
-    }
-
-    @Override
-    public long countExistedIpsInNetwork(final long networkId) {
-        final SearchCriteria<Long> sc = CountFreePublicIps.create();
-        sc.setParameters("networkId", networkId);
-        return customSearch(sc, null).get(0);
     }
 
     @Override

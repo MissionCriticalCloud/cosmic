@@ -48,36 +48,19 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
 
     IPAddressVO findByIpAndSourceNetworkId(long networkId, String ipAddress);
 
-    public IPAddressVO findByIpAndDcId(long dcId, String ipAddress);
-
-    List<IPAddressVO> listByPhysicalNetworkId(long physicalNetworkId);
-
     List<IPAddressVO> listByAssociatedVpc(long vpcId, Boolean isSourceNat);
 
     long countFreePublicIPs();
 
     long countFreeIPsInNetwork(long networkId);
 
-    IPAddressVO findByVmIp(String vmIp);
-
     IPAddressVO findByAssociatedVmIdAndVmIp(long vmId, String vmIp);
 
     IPAddressVO findByIpAndNetworkId(long networkId, String ipAddress);
 
-    IPAddressVO findByIpAndVlanId(String ipAddress, long vlanid);
-
     long countFreeIpsInVlan(long vlanDbId);
-
-    void deletePublicIPRangeExceptAliasIP(long vlanDbId, String aliasIp);
 
     boolean deletePublicIPRange(long vlanDbId);
 
     void lockRange(long vlandbId);
-
-    List<IPAddressVO> listByAssociatedVmId(long vmId);
-
-    IPAddressVO findByVmIdAndNetworkId(long networkId, long vmId);
-
-    IPAddressVO findByIpAddress(final String ipAddress);
-
 }

@@ -860,11 +860,6 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     @Override
-    public void removeDhcpServiceInSubnet(final Nic nic) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public boolean resourceCountNeedsUpdate(final NetworkOffering ntwkOff, final ACLType aclType) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }

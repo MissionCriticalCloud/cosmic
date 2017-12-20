@@ -22,7 +22,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 
 import java.util.ArrayList;
@@ -34,15 +33,11 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * NetworkManagerImpl implements NetworkManager.
  */
 public class NetworkOrchestratorTest extends TestCase {
-    static final Logger s_logger = LoggerFactory.getLogger(NetworkOrchestratorTest.class);
-
     NetworkOrchestrator testOrchastrator = new NetworkOrchestrator();
 
     String guruName = "GuestNetworkGuru";
@@ -58,7 +53,6 @@ public class NetworkOrchestratorTest extends TestCase {
         testOrchastrator._networkModel = mock(NetworkModel.class);
         testOrchastrator._nicSecondaryIpDao = mock(NicSecondaryIpDao.class);
         testOrchastrator._ntwkSrvcDao = mock(NetworkServiceMapDao.class);
-        testOrchastrator._nicIpAliasDao = mock(NicIpAliasDao.class);
         final DhcpServiceProvider provider = mock(DhcpServiceProvider.class);
 
         final Map<Network.Capability, String> capabilities = new HashMap<>();

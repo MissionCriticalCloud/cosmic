@@ -220,8 +220,6 @@ public interface NetworkOrchestrationService {
 
     DhcpServiceProvider getDhcpServiceProvider(Network network);
 
-    void removeDhcpServiceInSubnet(Nic nic);
-
     boolean resourceCountNeedsUpdate(NetworkOffering ntwkOff, ACLType aclType);
 
     void prepareAllNicsForMigration(VirtualMachineProfile vm, DeployDestination dest);

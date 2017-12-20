@@ -14,11 +14,7 @@ public interface UserIpv6AddressDao extends GenericDao<UserIpv6AddressVO, Long> 
 
     List<UserIpv6AddressVO> listByNetwork(long networkId);
 
-    public UserIpv6AddressVO findByNetworkIdAndIp(long networkId, String ipAddress);
-
-    List<UserIpv6AddressVO> listByPhysicalNetworkId(long physicalNetworkId);
-
-    long countExistedIpsInNetwork(long networkId);
+    UserIpv6AddressVO findByNetworkIdAndIp(long networkId, String ipAddress);
 
     long countExistedIpsInVlan(long vlanId);
 }
