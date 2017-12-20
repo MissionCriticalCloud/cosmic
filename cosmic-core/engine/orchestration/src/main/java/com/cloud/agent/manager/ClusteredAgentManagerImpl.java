@@ -25,9 +25,7 @@ import com.cloud.cluster.dao.ManagementServerHostDao;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.UnsupportedVersionException;
-import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
@@ -80,7 +78,6 @@ import org.slf4j.LoggerFactory;
 
 public class ClusteredAgentManagerImpl extends AgentManagerImpl implements ClusterManagerListener, ClusteredAgentRebalanceService {
     public final static long STARTUP_DELAY = 5000;
-    public final static long SCAN_INTERVAL = 90000; // 90 seconds, it takes 60 sec for xenserver to fail login
     public final static int ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION = 5; // 5 seconds
     final static Logger s_logger = LoggerFactory.getLogger(ClusteredAgentManagerImpl.class);
     private static final ScheduledExecutorService s_transferExecutor = Executors.newScheduledThreadPool(2, new NamedThreadFactory("Cluster-AgentRebalancingExecutor"));
@@ -107,10 +104,6 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
     protected List<AgentLoadBalancerPlanner> _lbPlanners;
     Gson _gson;
     boolean _agentLbHappened = false;
-    @Inject
-    ConfigurationDao _configDao;
-    @Inject
-    ConfigDepot _configDepot;
 
     protected ClusteredAgentManagerImpl() {
         super();

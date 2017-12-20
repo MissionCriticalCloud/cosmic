@@ -28,7 +28,6 @@ import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
@@ -509,11 +508,6 @@ public class TemplateManagerImplTest {
         @Bean
         public StorageManager storageManager() {
             return Mockito.mock(StorageManager.class);
-        }
-
-        @Bean
-        public UsageEventDao usageEventDao() {
-            return Mockito.mock(UsageEventDao.class);
         }
 
         @Bean

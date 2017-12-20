@@ -19,9 +19,6 @@ import com.cloud.dc.dao.DomainVlanMapDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.AccountLimitException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
@@ -32,7 +29,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
-import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress.State;
@@ -123,8 +119,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     @Inject
     AccountDao _accountDao = null;
     @Inject
-    ConfigurationDao _configDao;
-    @Inject
     AccountManager _accountMgr;
     @Inject
     AccountVlanMapDao _accountVlanMapDao;
@@ -148,8 +142,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     FirewallRulesDao _firewallDao;
     @Inject
     ResourceLimitService _resourceLimitMgr;
-    @Inject
-    UsageEventDao _usageEventDao;
     @Inject
     NetworkModel _networkModel;
     @Inject
@@ -245,8 +237,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                 JoinType.INNER);
         AssignIpAddressFromPodVlanSearch.join("vlan", podVlanSearch, podVlanSearch.entity().getId(), AssignIpAddressFromPodVlanSearch.entity().getVlanId(), JoinType.INNER);
         AssignIpAddressFromPodVlanSearch.done();
-
-        Network.State.getStateMachine().registerListener(new NetworkStateListener(_usageEventDao, _networksDao, _configDao));
 
         s_logger.info("Network Manager is configured.");
 
@@ -702,13 +692,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                             _ipAddressDao.update(addr.getId(), addr);
                             // Save usage event
                             if (owner.getAccountId() != Account.ACCOUNT_ID_SYSTEM) {
-                                final VlanVO vlan = _vlanDao.findById(addr.getVlanId());
-                                final String guestType = vlan.getVlanType().toString();
-                                if (!isIpDedicated(addr)) {
-                                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_ASSIGN, owner.getId(), addr.getDataCenterId(), addr.getId(), addr.getAddress()
-                                                                                                                                                               .toString(),
-                                            addr.isSourceNat(), guestType, addr.getSystem(), addr.getClass().getName(), addr.getUuid());
-                                }
                                 if (updateIpResourceCount(addr)) {
                                     _resourceLimitMgr.incrementResourceCount(owner.getId(), ResourceType.public_ip);
                                 }
@@ -1152,17 +1135,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                 public IPAddressVO doInTransaction(final TransactionStatus status) {
                     if (updateIpResourceCount(ip)) {
                         _resourceLimitMgr.decrementResourceCount(_ipAddressDao.findById(addrId).getAllocatedToAccountId(), ResourceType.public_ip);
-                    }
-
-                    // Save usage event
-                    if (ip.getAllocatedToAccountId() != null && ip.getAllocatedToAccountId() != Account.ACCOUNT_ID_SYSTEM) {
-                        final VlanVO vlan = _vlanDao.findById(ip.getVlanId());
-
-                        final String guestType = vlan.getVlanType().toString();
-                        if (!isIpDedicated(ip)) {
-                            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_RELEASE, ip.getAllocatedToAccountId(), ip.getDataCenterId(), addrId, ip.getAddress().addr(), ip.isSourceNat(),
-                                    guestType, ip.getSystem(), ip.getClass().getName(), ip.getUuid());
-                        }
                     }
 
                     return _ipAddressDao.markAsUnavailable(addrId);

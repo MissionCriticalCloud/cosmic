@@ -17,7 +17,6 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.resource.ArchiveAlertsCmd;
 import com.cloud.api.command.admin.resource.DeleteAlertsCmd;
-import com.cloud.api.command.admin.usage.GetUsageRecordsCmd;
 import com.cloud.api.command.user.event.ArchiveEventsCmd;
 import com.cloud.api.command.user.event.DeleteEventsCmd;
 import com.cloud.api.command.user.event.ListEventsCmd;
@@ -158,14 +157,14 @@ public class ParamProcessWorker implements DispatchWorker {
                                             }
                                         }
                                         break;
-                                /*
-                                 * case STRING: List<String> listParam = new
-                                 * ArrayList<String>(); listParam =
-                                 * (List)field.get(cmd); for(String entityName:
-                                 * listParam){ ControlledEntity entityObj =
-                                 * (ControlledEntity )daoClassInstance(entityId);
-                                 * entitiesToAccess.add(entityObj); } break;
-                                 */
+                                    /*
+                                     * case STRING: List<String> listParam = new
+                                     * ArrayList<String>(); listParam =
+                                     * (List)field.get(cmd); for(String entityName:
+                                     * listParam){ ControlledEntity entityObj =
+                                     * (ControlledEntity )daoClassInstance(entityId);
+                                     * entitiesToAccess.add(entityObj); } break;
+                                     */
                                     default:
                                         break;
                                 }
@@ -211,7 +210,7 @@ public class ParamProcessWorker implements DispatchWorker {
                     // This piece of code is for maintaining backward compatibility
                     // and support both the date formats(Bug 9724)
                     if (cmdObj instanceof ListEventsCmd || cmdObj instanceof DeleteEventsCmd || cmdObj instanceof ArchiveEventsCmd ||
-                            cmdObj instanceof ArchiveAlertsCmd || cmdObj instanceof DeleteAlertsCmd || cmdObj instanceof GetUsageRecordsCmd) {
+                            cmdObj instanceof ArchiveAlertsCmd || cmdObj instanceof DeleteAlertsCmd) {
                         final boolean isObjInNewDateFormat = isObjInNewDateFormat(paramObj.toString());
                         if (isObjInNewDateFormat) {
                             final DateFormat newFormat = newInputFormat;

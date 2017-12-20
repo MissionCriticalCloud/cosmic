@@ -1,16 +1,11 @@
 package com.cloud.network.rules;
 
 import com.cloud.api.command.user.firewall.ListPortForwardingRulesCmd;
-import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.EventDao;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -19,7 +14,6 @@ import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -30,7 +24,6 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.network.vpc.VpcService;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -38,7 +31,6 @@ import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.DomainManager;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
@@ -90,8 +82,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     @Inject
     PortForwardingRulesDao _portForwardingDao;
     @Inject
-    FirewallRulesCidrsDao _firewallCidrsDao;
-    @Inject
     FirewallRulesDao _firewallDao;
     @Inject
     IPAddressDao _ipAddressDao;
@@ -106,17 +96,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     @Inject
     NetworkModel _networkModel;
     @Inject
-    EventDao _eventDao;
-    @Inject
-    UsageEventDao _usageEventDao;
-    @Inject
-    DomainDao _domainDao;
-    @Inject
     FirewallManager _firewallMgr;
-    @Inject
-    DomainManager _domainMgr;
-    @Inject
-    ConfigurationManager _configMgr;
     @Inject
     NicDao _nicDao;
     @Inject
@@ -127,8 +107,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     NicSecondaryIpDao _nicSecondaryDao;
     @Inject
     LoadBalancerVMMapDao _loadBalancerVMMapDao;
-    @Inject
-    VpcService _vpcSvc;
 
     protected void checkIpAndUserVm(final IpAddress ipAddress, final UserVm userVm, final Account caller, final Boolean ignoreVmState) {
         if (ipAddress == null || ipAddress.getAllocatedTime() == null || ipAddress.getAllocatedToAccountId() == null) {
@@ -551,8 +529,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                             throw new CloudRuntimeException("Unable to update the state to add for " + newRule);
                         }
                         CallContext.current().setEventDetails("Rule Id: " + newRule.getId());
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_RULE_ADD, newRule.getAccountId(), ipAddressFinal.getDataCenterId(), newRule.getId(), null,
-                                PortForwardingRule.class.getName(), newRule.getUuid());
+
                         return newRule;
                     } catch (final Exception e) {
                         if (newRule != null) {
@@ -792,8 +769,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                         throw new CloudRuntimeException("Unable to update the state to add for " + newRule);
                     }
                     CallContext.current().setEventDetails("Rule Id: " + newRule.getId());
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_RULE_ADD, newRule.getAccountId(), 0, newRule.getId(), null, FirewallRule.class.getName(),
-                            newRule.getUuid());
 
                     final StaticNatRule staticNatRule = new StaticNatRuleImpl(newRule, dstIp);
 

@@ -3,14 +3,12 @@ package com.cloud.storage.snapshot;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.DeleteSnapshotsDirCommand;
-import com.cloud.alert.AlertManager;
 import com.cloud.api.command.user.snapshot.ListSnapshotsCmd;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
-import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
@@ -27,7 +25,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -48,7 +45,6 @@ import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.SnapshotDao;
-import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
@@ -59,9 +55,7 @@ import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.DomainManager;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
@@ -98,13 +92,9 @@ import org.springframework.stereotype.Component;
 public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager, SnapshotApiService {
     private static final Logger s_logger = LoggerFactory.getLogger(SnapshotManagerImpl.class);
     @Inject
-    VMTemplateDao _templateDao;
-    @Inject
     UserVmDao _vmDao;
     @Inject
     VolumeDao _volsDao;
-    @Inject
-    AccountDao _accountDao;
     @Inject
     SnapshotDao _snapshotDao;
     @Inject
@@ -112,19 +102,13 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
     @Inject
     PrimaryDataStoreDao _storagePoolDao;
     @Inject
-    DomainDao _domainDao;
-    @Inject
     StorageManager _storageMgr;
     @Inject
     AccountManager _accountMgr;
     @Inject
-    AlertManager _alertMgr;
-    @Inject
     ClusterDao _clusterDao;
     @Inject
     ResourceLimitService _resourceLimitMgr;
-    @Inject
-    DomainManager _domainMgr;
     @Inject
     ResourceTagDao _resourceTagDao;
     @Inject
@@ -290,11 +274,6 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
             final boolean result = snapshotStrategy.deleteSnapshot(snapshotId);
 
             if (result) {
-                if (snapshotCheck.getState() == Snapshot.State.BackedUp) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SNAPSHOT_DELETE, snapshotCheck.getAccountId(), snapshotCheck.getDataCenterId(), snapshotId,
-                            snapshotCheck.getName(), null, null, 0L, snapshotCheck.getClass().getName(), snapshotCheck.getUuid());
-                }
-
                 if (snapshotCheck.getState() != Snapshot.State.Error && snapshotCheck.getState() != Snapshot.State.Destroyed) {
                     _resourceLimitMgr.decrementResourceCount(snapshotCheck.getAccountId(), ResourceType.snapshot);
                 }
@@ -398,12 +377,6 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
             throw new CloudRuntimeException("Failed to create snapshot");
         }
         try {
-            //Check if the snapshot was removed while backingUp. If yes, do not log snapshot create usage event
-            final SnapshotVO freshSnapshot = _snapshotDao.findById(snapshot.getId());
-            if (freshSnapshot != null) {
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SNAPSHOT_CREATE, snapshot.getAccountId(), snapshot.getDataCenterId(), snapshotId, snapshot.getName(),
-                        null, null, volume.getSize(), snapshot.getClass().getName(), snapshot.getUuid());
-            }
             _resourceLimitMgr.incrementResourceCount(snapshotOwner.getId(), ResourceType.snapshot);
         } catch (final Exception e) {
             s_logger.debug("Failed to create snapshot", e);
@@ -627,10 +600,6 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
                             _resourceLimitMgr.decrementResourceCount(accountId, ResourceType.secondary_storage, new Long(snapshotStoreRef.getPhysicalSize()));
                         }
                     }
-
-                    // Log event after successful deletion
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SNAPSHOT_DELETE, snapshot.getAccountId(), volume.getDataCenterId(), snapshot.getId(),
-                            snapshot.getName(), null, null, volume.getSize(), snapshot.getClass().getName(), snapshot.getUuid());
                 }
             }
         }
@@ -723,7 +692,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
         return snapshotSrv.backupSnapshot(snapshot);
     }
 
-     @Override
+    @Override
     public Snapshot backupSnapshotFromVmSnapshot(final Long snapshotId, final Long vmId, final Long volumeId, final Long vmSnapshotId) {
         final VMInstanceVO vm = _vmDao.findById(vmId);
         if (vm == null) {
@@ -783,8 +752,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
                 throw new CloudRuntimeException("Unable to find snaphot strategy to handle snapshot with id '" + snapshotId + "'");
             }
             snapshotInfo = snapshotStrategy.backupSnapshot(snapshotInfo);
-
-        } catch(final Exception e) {
+        } catch (final Exception e) {
             s_logger.debug("Failed to backup snapshot from vm snapshot", e);
             _resourceLimitMgr.decrementResourceCount(snapshotOwnerId, ResourceType.snapshot);
             _resourceLimitMgr.decrementResourceCount(snapshotOwnerId, ResourceType.secondary_storage, volume.getSize());
@@ -792,7 +760,6 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
         }
         return snapshotInfo;
     }
-
 
     @Override
     @DB
@@ -820,8 +787,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
                         throw new CloudRuntimeException("Could not find snapshot");
                     }
                 }
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SNAPSHOT_CREATE, snapshot.getAccountId(), snapshot.getDataCenterId(), snapshotId, snapshot.getName(),
-                        null, null, snapshotStoreRef.getPhysicalSize(), volume.getSize(), snapshot.getClass().getName(), snapshot.getUuid());
+
                 // Correct the resource count of snapshot in case of delta snapshots.
                 _resourceLimitMgr.decrementResourceCount(snapshotOwner.getId(), ResourceType.secondary_storage, new Long(volume.getSize() - snapshotStoreRef.getPhysicalSize()));
             } catch (final Exception e) {

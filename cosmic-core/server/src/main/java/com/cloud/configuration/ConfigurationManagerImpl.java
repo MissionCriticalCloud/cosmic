@@ -70,7 +70,6 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.PermissionDeniedException;
@@ -2102,13 +2101,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     final AccountVlanMapVO accountVlanMapVO = new AccountVlanMapVO(vlanOwner.getId(), vlan.getId());
                     _accountVlanMapDao.persist(accountVlanMapVO);
 
-                    // generate usage event for dedication of every ip address in the
-                    // range
                     final List<IPAddressVO> ips = _publicIpAddressDao.listByVlanId(vlan.getId());
-                    for (final IPAddressVO ip : ips) {
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_ASSIGN, vlanOwner.getId(), ip.getDataCenterId(), ip.getId(), ip.getAddress().toString(),
-                                ip.isSourceNat(), vlan.getVlanType().toString(), ip.getSystem(), ip.getClass().getName(), ip.getUuid());
-                    }
+
                     // increment resource count for dedicated public ip's
                     _resourceLimitMgr.incrementResourceCount(vlanOwner.getId(), ResourceType.public_ip, new Long(ips.size()));
                 } else if (domain != null) {
@@ -2277,12 +2271,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             // Create an AccountVlanMapVO entry
             final AccountVlanMapVO accountVlanMapVO = new AccountVlanMapVO(vlanOwner.getId(), vlan.getId());
             _accountVlanMapDao.persist(accountVlanMapVO);
-
-            // generate usage event for dedication of every ip address in the range
-            for (final IPAddressVO ip : ips) {
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_ASSIGN, vlanOwner.getId(), ip.getDataCenterId(), ip.getId(), ip.getAddress().toString(), ip.isSourceNat(),
-                        vlan.getVlanType().toString(), ip.getSystem(), ip.getClass().getName(), ip.getUuid());
-            }
         } else if (domain != null) {
             // Create an DomainVlanMapVO entry
             final DomainVlanMapVO domainVlanMapVO = new DomainVlanMapVO(domain.getId(), vlan.getId());
@@ -2368,13 +2356,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         // A Public IP range can only be dedicated to one account at a time
         if (isAccountSpecific && _accountVlanMapDao.remove(acctVln.get(0).getId())) {
-            // generate usage events to remove dedication for every ip in the range that has been disassociated
-            for (final IPAddressVO ip : ips) {
-                if (!ipsInUse.contains(ip)) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_RELEASE, acctVln.get(0).getAccountId(), ip.getDataCenterId(), ip.getId(), ip.getAddress().toString(),
-                            ip.isSourceNat(), vlan.getVlanType().toString(), ip.getSystem(), ip.getClass().getName(), ip.getUuid());
-                }
-            }
             // decrement resource count for dedicated public ip's
             _resourceLimitMgr.decrementResourceCount(acctVln.get(0).getAccountId(), ResourceType.public_ip, new Long(ips.size()));
             return true;
@@ -3559,8 +3540,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                         s_logger.warn("Some ip addresses failed to be released as a part of vlan " + vlanDbId + " removal");
                     } else {
                         resourceCountToBeDecrement++;
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_RELEASE, acctVln.get(0).getAccountId(), ip.getDataCenterId(), ip.getId(),
-                                ip.getAddress().toString(), ip.isSourceNat(), vlanRange.getVlanType().toString(), ip.getSystem(), ip.getClass().getName(), ip.getUuid());
                     }
                 }
             } finally {

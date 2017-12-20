@@ -17,14 +17,11 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
-import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.async.AsyncCallbackDispatcher;
@@ -34,7 +31,6 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.server.StatsCollector;
-import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.TemplateProfile;
@@ -210,34 +206,6 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
             }
             final long accountId = tmplt.getAccountId();
             if (template.getSize() != null) {
-                // publish usage event
-                String etype = EventTypes.EVENT_TEMPLATE_CREATE;
-                if (tmplt.getFormat() == ImageFormat.ISO) {
-                    etype = EventTypes.EVENT_ISO_CREATE;
-                }
-                // get physical size from template_store_ref table
-                long physicalSize = 0;
-                final DataStore ds = template.getDataStore();
-                final TemplateDataStoreVO tmpltStore = _tmpltStoreDao.findByStoreTemplate(ds.getId(), template.getId());
-                if (tmpltStore != null) {
-                    physicalSize = tmpltStore.getPhysicalSize();
-                } else {
-                    s_logger.warn("No entry found in template_store_ref for template id: " + template.getId() + " and image store id: " + ds.getId() +
-                            " at the end of registering template!");
-                }
-                final Scope dsScope = ds.getScope();
-                if (dsScope.getScopeType() == ScopeType.ZONE) {
-                    if (dsScope.getScopeId() != null) {
-                        UsageEventUtils.publishUsageEvent(etype, template.getAccountId(), dsScope.getScopeId(), template.getId(), template.getName(), null, null,
-                                physicalSize, template.getSize(), VirtualMachineTemplate.class.getName(), template.getUuid());
-                    } else {
-                        s_logger.warn("Zone scope image store " + ds.getId() + " has a null scope id");
-                    }
-                } else if (dsScope.getScopeType() == ScopeType.REGION) {
-                    // publish usage event for region-wide image store using a -1 zoneId for 4.2, need to revisit post-4.2
-                    UsageEventUtils.publishUsageEvent(etype, template.getAccountId(), -1, template.getId(), template.getName(), null, null, physicalSize,
-                            template.getSize(), VirtualMachineTemplate.class.getName(), template.getUuid());
-                }
                 _resourceLimitMgr.incrementResourceCount(accountId, ResourceType.secondary_storage, template.getSize());
             }
         }
@@ -301,20 +269,9 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
             }
 
-            final String eventType;
-            if (template.getFormat().equals(ImageFormat.ISO)) {
-                eventType = EventTypes.EVENT_ISO_DELETE;
-            } else {
-                eventType = EventTypes.EVENT_TEMPLATE_DELETE;
-            }
-
             for (final DataStore imageStore : imageStores) {
                 // publish zone-wide usage event
                 final Long sZoneId = ((ImageStoreEntity) imageStore).getDataCenterId();
-                if (sZoneId != null) {
-                    UsageEventUtils.publishUsageEvent(eventType, template.getAccountId(), sZoneId, template.getId(), null, VirtualMachineTemplate.class.getName(), template
-                            .getUuid());
-                }
 
                 s_logger.info("Delete template from image store: " + imageStore.getName());
                 final AsyncCallFuture<TemplateApiResult> future = imageService.deleteTemplateAsync(imageFactory.getTemplate(template.getId(), imageStore));
@@ -335,10 +292,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                     }
                     //mark all the occurrences of this template in the given store as destroyed.
                     templateDataStoreDao.removeByTemplateStore(template.getId(), imageStore.getId());
-                } catch (final InterruptedException e) {
-                    s_logger.debug("delete template Failed", e);
-                    throw new CloudRuntimeException("delete template Failed", e);
-                } catch (final ExecutionException e) {
+                } catch (final InterruptedException | ExecutionException e) {
                     s_logger.debug("delete template Failed", e);
                     throw new CloudRuntimeException("delete template Failed", e);
                 }

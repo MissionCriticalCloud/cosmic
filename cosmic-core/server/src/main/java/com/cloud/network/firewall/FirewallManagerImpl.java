@@ -3,13 +3,8 @@ package com.cloud.network.firewall;
 import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
-import com.cloud.domain.dao.DomainDao;
-import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.EventDao;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -46,7 +41,6 @@ import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.DomainManager;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
@@ -88,23 +82,13 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     @Inject
     IPAddressDao _ipAddressDao;
     @Inject
-    EventDao _eventDao;
-    @Inject
-    DomainDao _domainDao;
-    @Inject
     FirewallRulesCidrsDao _firewallCidrsDao;
     @Inject
     AccountManager _accountMgr;
     @Inject
-    NetworkOrchestrationService _networkMgr;
-    @Inject
     NetworkModel _networkModel;
     @Inject
-    UsageEventDao _usageEventDao;
-    @Inject
     ConfigurationDao _configDao;
-    @Inject
-    DomainManager _domainMgr;
     @Inject
     PortForwardingRulesDao _pfRulesDao;
     @Inject
@@ -474,7 +458,8 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
 
             final boolean oneOfRulesIsFirewall =
                     ((rule.getPurpose() == Purpose.Firewall || newRule.getPurpose() == Purpose.Firewall) && ((newRule.getPurpose() != rule.getPurpose()) || (!newRule.getProtocol()
-                                                                                                                                                                     .equalsIgnoreCase(rule.getProtocol()))));
+                                                                                                                                                                     .equalsIgnoreCase(rule
+                                                                                                                                                                             .getProtocol()))));
 
             // if both rules are firewall and their cidrs are different, we can skip port ranges verification
             final boolean bothRulesFirewall = (rule.getPurpose() == newRule.getPurpose() && rule.getPurpose() == Purpose.Firewall);
@@ -727,23 +712,15 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                boolean generateUsageEvent = false;
 
                 if (rule.getState() == State.Staged) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Found a rule that is still in stage state so just removing it: " + rule);
                     }
                     removeRule(rule);
-                    generateUsageEvent = true;
                 } else if (rule.getState() == State.Add || rule.getState() == State.Active) {
                     rule.setState(State.Revoke);
                     _firewallDao.update(rule.getId(), rule);
-                    generateUsageEvent = true;
-                }
-
-                if (generateUsageEvent && needUsageEvent) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_RULE_DELETE, rule.getAccountId(), 0, rule.getId(), null, rule.getClass().getName(),
-                            rule.getUuid());
                 }
             }
         });
@@ -941,7 +918,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     public boolean applyRules(final Network network, final Purpose purpose, final List<? extends FirewallRule> rules) throws ResourceUnavailableException {
         boolean handled = false;
         switch (purpose) {
-        /* StaticNatRule would be applied by Firewall provider, since the incompatible of two object */
+            /* StaticNatRule would be applied by Firewall provider, since the incompatible of two object */
             case StaticNat:
             case Firewall:
                 for (final FirewallServiceProvider fwElement : _firewallElements) {
@@ -989,17 +966,9 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         return handled;
     }
 
-    public List<FirewallServiceProvider> getFirewallElements() {
-        return _firewallElements;
-    }
-
     @Inject
     public void setFirewallElements(final List<FirewallServiceProvider> firewallElements) {
         _firewallElements = firewallElements;
-    }
-
-    public List<PortForwardingServiceProvider> getPfElements() {
-        return _pfElements;
     }
 
     @Inject
@@ -1007,17 +976,9 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         _pfElements = pfElements;
     }
 
-    public List<StaticNatServiceProvider> getStaticNatElements() {
-        return _staticNatElements;
-    }
-
     @Inject
     public void setStaticNatElements(final List<StaticNatServiceProvider> staticNatElements) {
         _staticNatElements = staticNatElements;
-    }
-
-    public List<NetworkACLServiceProvider> getNetworkAclElements() {
-        return _networkAclElements;
     }
 
     @Inject

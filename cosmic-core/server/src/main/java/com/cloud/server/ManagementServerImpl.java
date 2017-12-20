@@ -152,18 +152,9 @@ import com.cloud.api.command.admin.template.ListTemplatePermissionsCmdByAdmin;
 import com.cloud.api.command.admin.template.ListTemplatesCmdByAdmin;
 import com.cloud.api.command.admin.template.PrepareTemplateCmd;
 import com.cloud.api.command.admin.template.RegisterTemplateCmdByAdmin;
-import com.cloud.api.command.admin.usage.AddTrafficMonitorCmd;
 import com.cloud.api.command.admin.usage.AddTrafficTypeCmd;
-import com.cloud.api.command.admin.usage.DeleteTrafficMonitorCmd;
 import com.cloud.api.command.admin.usage.DeleteTrafficTypeCmd;
-import com.cloud.api.command.admin.usage.GenerateUsageRecordsCmd;
-import com.cloud.api.command.admin.usage.GetUsageRecordsCmd;
-import com.cloud.api.command.admin.usage.ListTrafficMonitorsCmd;
-import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
 import com.cloud.api.command.admin.usage.ListTrafficTypesCmd;
-import com.cloud.api.command.admin.usage.ListUsageTypesCmd;
-import com.cloud.api.command.admin.usage.RemoveRawUsageRecordsCmd;
-import com.cloud.api.command.admin.usage.UpdateTrafficTypeCmd;
 import com.cloud.api.command.admin.user.CreateUserCmd;
 import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.DisableUserCmd;
@@ -3377,22 +3368,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         // Check that the specified service offering ID is valid
         ServiceOfferingVO newServiceOffering = _offeringDao.findById(serviceOfferingId);
         final ServiceOfferingVO currentServiceOffering = _offeringDao.findById(systemVmId, systemVm.getServiceOfferingId());
-        if (newServiceOffering.isDynamic()) {
-            newServiceOffering.setDynamicFlag(true);
-            _userVmMgr.validateCustomParameters(newServiceOffering, customparameters);
-            newServiceOffering = _offeringDao.getcomputeOffering(newServiceOffering, customparameters);
-        }
         _itMgr.checkIfCanUpgrade(systemVm, newServiceOffering);
 
         final boolean result = _itMgr.upgradeVmDb(systemVmId, serviceOfferingId);
-
-        if (newServiceOffering.isDynamic()) {
-            //save the custom values to the database.
-            _userVmMgr.saveCustomOfferingDetails(systemVmId, newServiceOffering);
-        }
-        if (currentServiceOffering.isDynamic() && !newServiceOffering.isDynamic()) {
-            _userVmMgr.removeCustomOfferingDetails(systemVmId);
-        }
 
         if (result) {
             return _vmInstanceDao.findById(systemVmId);
@@ -3401,9 +3379,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
     }
 
-    /**
-     * @return
-     */
     protected Account getCaller() {
         final Account caller = CallContext.current().getCallingAccount();
         return caller;
@@ -3506,18 +3481,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(StopSystemVmCmd.class);
         cmdList.add(UpgradeSystemVMCmd.class);
         cmdList.add(PrepareTemplateCmd.class);
-        cmdList.add(AddTrafficMonitorCmd.class);
         cmdList.add(AddTrafficTypeCmd.class);
-        cmdList.add(DeleteTrafficMonitorCmd.class);
         cmdList.add(DeleteTrafficTypeCmd.class);
-        cmdList.add(GenerateUsageRecordsCmd.class);
-        cmdList.add(GetUsageRecordsCmd.class);
-        cmdList.add(RemoveRawUsageRecordsCmd.class);
-        cmdList.add(ListTrafficMonitorsCmd.class);
-        cmdList.add(ListTrafficTypeImplementorsCmd.class);
         cmdList.add(ListTrafficTypesCmd.class);
-        cmdList.add(ListUsageTypesCmd.class);
-        cmdList.add(UpdateTrafficTypeCmd.class);
         cmdList.add(CreateUserCmd.class);
         cmdList.add(DeleteUserCmd.class);
         cmdList.add(DisableUserCmd.class);

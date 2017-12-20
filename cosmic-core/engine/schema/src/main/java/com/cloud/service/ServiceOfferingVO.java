@@ -25,10 +25,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
     // Call service offering dao to load it.
     @Transient
     Map<String, String> details;
-    // This flag is required to tell if the offering is dynamic once the cpu, memory and speed are set.
-    // In some cases cpu, memory and speed are set to non-null values even if the offering is dynamic.
-    @Transient
-    boolean isDynamic;
     @Column(name = "cpu")
     private Integer cpu;
     @Column(name = "speed")
@@ -253,11 +249,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         return deploymentPlanner;
     }
 
-    @Override
-    public boolean isDynamic() {
-        return cpu == null || speed == null || ramSize == null || isDynamic;
-    }
-
     public void setHostTag(final String hostTag) {
         this.hostTag = hostTag;
     }
@@ -307,9 +298,5 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         assert (details != null) : "Did you forget to load the details?";
 
         details.put(name, value);
-    }
-
-    public void setDynamicFlag(final boolean isdynamic) {
-        isDynamic = isdynamic;
     }
 }

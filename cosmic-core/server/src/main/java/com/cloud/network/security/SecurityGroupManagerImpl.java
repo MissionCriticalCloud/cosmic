@@ -21,7 +21,6 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.PermissionDeniedException;
@@ -858,7 +857,7 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         _numWorkerThreads = NumbersUtil.parseInt(configs.get(Config.SecurityGroupWorkerThreads.key()), WORKER_THREAD_COUNT);
         _timeBetweenCleanups = NumbersUtil.parseInt(configs.get(Config.SecurityGroupWorkCleanupInterval.key()), TIME_BETWEEN_CLEANUPS);
         _globalWorkLockTimeout = NumbersUtil.parseInt(configs.get(Config.SecurityGroupWorkGlobalLockTimeout.key()), 300);
-    /* register state listener, no matter security group is enabled or not */
+        /* register state listener, no matter security group is enabled or not */
         VirtualMachine.State.getStateMachine().registerListener(this);
 
         _answerListener = new SecurityGroupListener(this, _agentMgr, _workDao);
@@ -1177,10 +1176,6 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         final List<SecurityGroupVMMapVO> groupsForVm = _securityGroupVMMapDao.listByInstanceId(vm.getId());
         // For each group, find the security rules that allow the group
         for (final SecurityGroupVMMapVO mapVO : groupsForVm) {// FIXME: use custom sql in the dao
-            //Add usage events for security group assign
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SECURITY_GROUP_ASSIGN, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), mapVO.getSecurityGroupId(), vm
-                    .getClass().getName(), vm.getUuid());
-
             final List<SecurityGroupRuleVO> allowingRules = _securityGroupRuleDao.listByAllowedSecurityGroupId(mapVO.getSecurityGroupId());
             // For each security rule that allows a group that the vm belongs to, find the group it belongs to
             affectedVms.addAll(getAffectedVmsForSecurityRules(allowingRules));
@@ -1193,10 +1188,6 @@ public class SecurityGroupManagerImpl extends ManagerBase implements SecurityGro
         final List<SecurityGroupVMMapVO> groupsForVm = _securityGroupVMMapDao.listByInstanceId(vm.getId());
         // For each group, find the security rules rules that allow the group
         for (final SecurityGroupVMMapVO mapVO : groupsForVm) {// FIXME: use custom sql in the dao
-            //Add usage events for security group remove
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_SECURITY_GROUP_REMOVE, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), mapVO.getSecurityGroupId(), vm
-                    .getClass().getName(), vm.getUuid());
-
             final List<SecurityGroupRuleVO> allowingRules = _securityGroupRuleDao.listByAllowedSecurityGroupId(mapVO.getSecurityGroupId());
             // For each security rule that allows a group that the vm belongs to, find the group it belongs to
             affectedVms.addAll(getAffectedVmsForSecurityRules(allowingRules));

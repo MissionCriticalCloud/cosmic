@@ -36,17 +36,6 @@ db.cloud.autoReconnect=true
 db.cloud.keyStorePassphrase=vmops.com
 db.cloud.encryption.type=none
 db.cloud.encrypt.secret=
-
-# Usage DB config
-db.usage.username=cloud
-db.usage.password=cloud
-db.usage.host=localhost
-db.usage.port=3306
-db.usage.name=cloud_usage
-db.usage.maxActive=100
-db.usage.maxIdle=30
-db.usage.maxWait=10000
-db.usage.autoReconnect=true
 ```
 
 The properties already filled in the example above are default values, the two mandatory property that is missing (and there is no default for) is:

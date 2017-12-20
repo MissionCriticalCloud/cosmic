@@ -2,14 +2,10 @@ package com.cloud.vm;
 
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
 import com.cloud.server.ManagementService;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.utils.component.ComponentContext;
@@ -24,7 +20,6 @@ import javax.inject.Inject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -35,8 +30,6 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
 
     private static final Logger s_logger = LoggerFactory.getLogger(UserVmStateListener.class);
     protected static EventBus s_eventBus = null;
-    @Inject
-    protected UsageEventDao _usageEventDao;
     @Inject
     protected NetworkDao _networkDao;
     @Inject
@@ -50,10 +43,9 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
     @Inject
     protected ConfigurationDao _configDao;
 
-    public UserVmStateListener(final UsageEventDao usageEventDao, final NetworkDao networkDao, final NicDao nicDao, final ServiceOfferingDao offeringDao, final UserVmDao
+    public UserVmStateListener(final NetworkDao networkDao, final NicDao nicDao, final ServiceOfferingDao offeringDao, final UserVmDao
             userVmDao, final UserVmManager userVmMgr,
                                final ConfigurationDao configDao) {
-        this._usageEventDao = usageEventDao;
         this._networkDao = networkDao;
         this._nicDao = nicDao;
         this._offeringDao = offeringDao;
@@ -82,34 +74,7 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
             return true;
         }
 
-        if (transition.isImpacted(StateMachine2.Transition.Impact.USAGE)) {
-            if (oldState == State.Destroyed && newState == State.Stopped) {
-                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_CREATE);
-            } else if (newState == State.Running) {
-                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_START);
-            } else if (newState == State.Stopped) {
-                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_STOP);
-                final List<NicVO> nics = _nicDao.listByVmId(vo.getId());
-                for (final NicVO nic : nics) {
-                    final NetworkVO network = _networkDao.findById(nic.getNetworkId());
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vo.getAccountId(), vo.getDataCenterId(), vo.getId(),
-                            Long.toString(nic.getId()), network.getNetworkOfferingId(), null, 0L, vo.getClass().getName(), vo.getUuid(), vo.isDisplay());
-                }
-            } else if (newState == State.Destroyed || newState == State.Error || newState == State.Expunging) {
-                generateUsageEvent(vo.getServiceOfferingId(), vo, EventTypes.EVENT_VM_DESTROY);
-            }
-        }
         return true;
-    }
-
-    private void generateUsageEvent(final Long serviceOfferingId, final VirtualMachine vm, final String eventType) {
-        boolean displayVm = true;
-        if (vm.getType() == VirtualMachine.Type.User) {
-            final UserVmVO uservm = _userVmDao.findById(vm.getId());
-            displayVm = uservm.isDisplayVm();
-        }
-
-        _userVmMgr.generateUsageEvent(vm, displayVm, eventType);
     }
 
     private void pubishOnEventBus(final String event, final String status, final VirtualMachine vo, final VirtualMachine.State oldState, final VirtualMachine.State newState) {

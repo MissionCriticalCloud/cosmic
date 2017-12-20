@@ -19,7 +19,6 @@ import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.vm.AssignVMCmd;
-import com.cloud.api.command.user.vm.RestoreVMCmd;
 import com.cloud.api.command.user.vm.ScaleVMCmd;
 import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.capacity.CapacityManager;
@@ -31,13 +30,11 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
@@ -116,8 +113,6 @@ public class UserVmManagerTest {
     @Mock
     AccountDao _accountDao;
     @Mock
-    ConfigurationDao _configDao;
-    @Mock
     UserDao _userDao;
     @Mock
     UserVmDao _vmDao;
@@ -129,8 +124,6 @@ public class UserVmManagerTest {
     TemplateDataStoreDao _templateStoreDao;
     @Mock
     VolumeDao _volsDao;
-    @Mock
-    RestoreVMCmd _restoreVMCmd;
     @Mock
     AccountVO _accountMock;
     @Mock
@@ -148,8 +141,6 @@ public class UserVmManagerTest {
     @Mock
     List<VolumeVO> _rootVols;
     @Mock
-    Account _accountMock2;
-    @Mock
     ServiceOfferingDao _offeringDao;
     @Mock
     ServiceOfferingVO _offeringVo;
@@ -160,15 +151,9 @@ public class UserVmManagerTest {
     @Mock
     PrimaryDataStoreDao _storagePoolDao;
     @Mock
-    UsageEventDao _usageEventDao;
-    @Mock
     VMSnapshotDao _vmSnapshotDao;
     @Mock
-    UpdateVmNicIpCmd _updateVmNicIpCmd;
-    @Mock
     NicDao _nicDao;
-    @Mock
-    NicVO _nicMock;
     @Mock
     NetworkModel _networkModel;
     @Mock
@@ -199,7 +184,6 @@ public class UserVmManagerTest {
         _userVmMgr._templateDao = _templateDao;
         _userVmMgr._templateStoreDao = _templateStoreDao;
         _userVmMgr._volsDao = _volsDao;
-        _userVmMgr._usageEventDao = _usageEventDao;
         _userVmMgr._itMgr = _itMgr;
         _userVmMgr.volumeMgr = _storageMgr;
         _userVmMgr._accountDao = _accountDao;

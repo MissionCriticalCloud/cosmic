@@ -227,21 +227,6 @@
     <bean id="storagePoolWorkDaoImpl" class="com.cloud.storage.dao.StoragePoolWorkDaoImpl" />
     <bean id="templatePrimaryDataStoreDaoImpl" class="com.cloud.storage.volume.db.TemplatePrimaryDataStoreDaoImpl" />
     <bean id="uploadDaoImpl" class="com.cloud.storage.dao.UploadDaoImpl" />
-    <bean id="usageDaoImpl" class="com.cloud.usage.dao.UsageDaoImpl" />
-    <bean id="usageEventDaoImpl" class="com.cloud.event.dao.UsageEventDaoImpl" />
-    <bean id="usageEventDetailsDaoImpl" class="com.cloud.event.dao.UsageEventDetailsDaoImpl" />
-    <bean id="usageIPAddressDaoImpl" class="com.cloud.usage.dao.UsageIPAddressDaoImpl" />
-    <bean id="usageJobDaoImpl" class="com.cloud.usage.dao.UsageJobDaoImpl" />
-    <bean id="usageLoadBalancerPolicyDaoImpl" class="com.cloud.usage.dao.UsageLoadBalancerPolicyDaoImpl" />
-    <bean id="usageNetworkDaoImpl" class="com.cloud.usage.dao.UsageNetworkDaoImpl" />
-    <bean id="usageNetworkOfferingDaoImpl" class="com.cloud.usage.dao.UsageNetworkOfferingDaoImpl" />
-    <bean id="usagePortForwardingRuleDaoImpl" class="com.cloud.usage.dao.UsagePortForwardingRuleDaoImpl" />
-    <bean id="usageSecurityGroupDaoImpl" class="com.cloud.usage.dao.UsageSecurityGroupDaoImpl" />
-    <bean id="usageStorageDaoImpl" class="com.cloud.usage.dao.UsageStorageDaoImpl" />
-    <bean id="usageVMInstanceDaoImpl" class="com.cloud.usage.dao.UsageVMInstanceDaoImpl" />
-    <bean id="usageVPNUserDaoImpl" class="com.cloud.usage.dao.UsageVPNUserDaoImpl" />
-    <bean id="usageVolumeDaoImpl" class="com.cloud.usage.dao.UsageVolumeDaoImpl" />
-    <bean id="usageVmDiskDaoImpl" class="com.cloud.usage.dao.UsageVmDiskDaoImpl" />
     <bean id="userAccountDaoImpl" class="com.cloud.user.dao.UserAccountDaoImpl" />
     <bean id="userAccountJoinDaoImpl" class="com.cloud.api.query.dao.UserAccountJoinDaoImpl" />
     <bean id="userIpv6AddressDaoImpl" class="com.cloud.network.dao.UserIpv6AddressDaoImpl" />

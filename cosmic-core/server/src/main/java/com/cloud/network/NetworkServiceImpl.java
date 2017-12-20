@@ -5,7 +5,6 @@ import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
 import com.cloud.api.command.user.network.CreateNetworkCmd;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.command.user.network.RestartNetworkCmd;
@@ -32,7 +31,6 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -1456,11 +1454,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     }
 
     @Override
-    public int getActiveNicsInNetwork(final long networkId) {
-        return _networksDao.getActiveNicsIn(networkId);
-    }
-
-    @Override
     @DB
     public Network getNetwork(final long id) {
         return _networksDao.findById(id);
@@ -1823,10 +1816,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                             }
                             final long isDefault = nic.isDefaultNic() ? 1 : 0;
                             final String nicIdString = Long.toString(nic.getId());
-                            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), nicIdString,
-                                    oldNetworkOfferingId, null, isDefault, VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplay());
-                            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_ASSIGN, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), nicIdString,
-                                    networkOfferingId, null, isDefault, VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplay());
                         }
                     }
                 });
@@ -2584,6 +2573,34 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
     }
 
+    @Override
+    @ActionEvent(eventType = EventTypes.EVENT_TRAFFIC_TYPE_CREATE, eventDescription = "Creating Physical Network TrafficType", async = true)
+    public PhysicalNetworkTrafficType getPhysicalNetworkTrafficType(final Long id) {
+        return _pNTrafficTypeDao.findById(id);
+    }
+
+    public boolean deletePhysicalNetworkTrafficType(final Long id) {
+        final PhysicalNetworkTrafficTypeVO trafficType = _pNTrafficTypeDao.findById(id);
+
+        if (trafficType == null) {
+            throw new InvalidParameterValueException("Traffic Type with id=" + id + "doesn't exist in the system");
+        }
+
+        // check if there are any networks associated to this physical network with this traffic type
+        if (TrafficType.Guest.equals(trafficType.getTrafficType())) {
+            if (!_networksDao.listByPhysicalNetworkTrafficType(trafficType.getPhysicalNetworkId(), trafficType.getTrafficType()).isEmpty()) {
+                throw new CloudRuntimeException("The Traffic Type is not deletable because there are existing networks with this traffic type:" + trafficType.getTrafficType());
+            }
+        } else if (TrafficType.Storage.equals(trafficType.getTrafficType())) {
+            final PhysicalNetworkVO pn = _physicalNetworkDao.findById(trafficType.getPhysicalNetworkId());
+            if (_stnwMgr.isAnyStorageIpInUseInZone(pn.getDataCenterId())) {
+                throw new CloudRuntimeException("The Traffic Type is not deletable because there are still some storage network ip addresses in use:"
+                        + trafficType.getTrafficType());
+            }
+        }
+        return _pNTrafficTypeDao.remove(id);
+    }
+
     private String getDefaultXenNetworkLabel(final TrafficType trafficType) {
         String xenLabel = null;
         switch (trafficType) {
@@ -2607,63 +2624,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 break;
         }
         return xenLabel;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_TRAFFIC_TYPE_CREATE, eventDescription = "Creating Physical Network TrafficType", async = true)
-    public PhysicalNetworkTrafficType getPhysicalNetworkTrafficType(final Long id) {
-        return _pNTrafficTypeDao.findById(id);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_TRAFFIC_TYPE_UPDATE, eventDescription = "Updating physical network TrafficType", async = true)
-    public PhysicalNetworkTrafficType updatePhysicalNetworkTrafficType(final Long id, String xenLabel, String kvmLabel) {
-
-        final PhysicalNetworkTrafficTypeVO trafficType = _pNTrafficTypeDao.findById(id);
-
-        if (trafficType == null) {
-            throw new InvalidParameterValueException("Traffic Type with id=" + id + "doesn't exist in the system");
-        }
-
-        if (xenLabel != null) {
-            if ("".equals(xenLabel)) {
-                xenLabel = null;
-            }
-            trafficType.setXenNetworkLabel(xenLabel);
-        }
-        if (kvmLabel != null) {
-            if ("".equals(kvmLabel)) {
-                kvmLabel = null;
-            }
-            trafficType.setKvmNetworkLabel(kvmLabel);
-        }
-
-        _pNTrafficTypeDao.update(id, trafficType);
-        return trafficType;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_TRAFFIC_TYPE_DELETE, eventDescription = "Deleting physical network TrafficType", async = true)
-    public boolean deletePhysicalNetworkTrafficType(final Long id) {
-        final PhysicalNetworkTrafficTypeVO trafficType = _pNTrafficTypeDao.findById(id);
-
-        if (trafficType == null) {
-            throw new InvalidParameterValueException("Traffic Type with id=" + id + "doesn't exist in the system");
-        }
-
-        // check if there are any networks associated to this physical network with this traffic type
-        if (TrafficType.Guest.equals(trafficType.getTrafficType())) {
-            if (!_networksDao.listByPhysicalNetworkTrafficType(trafficType.getPhysicalNetworkId(), trafficType.getTrafficType()).isEmpty()) {
-                throw new CloudRuntimeException("The Traffic Type is not deletable because there are existing networks with this traffic type:" + trafficType.getTrafficType());
-            }
-        } else if (TrafficType.Storage.equals(trafficType.getTrafficType())) {
-            final PhysicalNetworkVO pn = _physicalNetworkDao.findById(trafficType.getPhysicalNetworkId());
-            if (_stnwMgr.isAnyStorageIpInUseInZone(pn.getDataCenterId())) {
-                throw new CloudRuntimeException("The Traffic Type is not deletable because there are still some storage network ip addresses in use:"
-                        + trafficType.getTrafficType());
-            }
-        }
-        return _pNTrafficTypeDao.remove(id);
     }
 
     @Override
@@ -2967,35 +2927,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         return networks.get(0);
-    }
-
-    @Override
-    public List<Pair<TrafficType, String>> listTrafficTypeImplementor(final ListTrafficTypeImplementorsCmd cmd) {
-        final String type = cmd.getTrafficType();
-        final List<Pair<TrafficType, String>> results = new ArrayList<>();
-        if (type != null) {
-            for (final NetworkGuru guru : _networkGurus) {
-                if (guru.isMyTrafficType(TrafficType.getTrafficType(type))) {
-                    results.add(new Pair<>(TrafficType.getTrafficType(type), guru.getName()));
-                    break;
-                }
-            }
-        } else {
-            for (final NetworkGuru guru : _networkGurus) {
-                final TrafficType[] allTypes = guru.getSupportedTrafficType();
-                for (final TrafficType t : allTypes) {
-                    results.add(new Pair<>(t, guru.getName()));
-                }
-            }
-        }
-
-        return results;
-    }
-
-    @Override
-    public List<? extends Network> getIsolatedNetworksWithSourceNATOwnedByAccountInZone(final long zoneId, final Account owner) {
-
-        return _networksDao.listSourceNATEnabledNetworks(owner.getId(), zoneId, Network.GuestType.Isolated);
     }
 
     @Override

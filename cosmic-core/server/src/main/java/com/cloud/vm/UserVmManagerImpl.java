@@ -83,9 +83,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.UsageEventVO;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
@@ -401,8 +398,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     private TemplateManager _templateMgr;
     @Inject
-    UsageEventDao _usageEventDao;
-    @Inject
     private VmDiskStatisticsDao _vmDiskStatsDao;
     @Inject
     private AffinityGroupVMMapDao _affinityGroupVMMapDao;
@@ -447,11 +442,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     private int capacityReleaseInterval;
 
     UserVmManagerImpl() {
-    }
-
-    @Override
-    public List<? extends UserVm> getVirtualMachines(final long hostId) {
-        return _vmDao.listByHostId(hostId);
     }
 
     @Override
@@ -1113,89 +1103,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @Override
-    public void validateCustomParameters(final ServiceOfferingVO serviceOffering, final Map<String, String> customParameters) {
-        if (customParameters.size() != 0) {
-            if (serviceOffering.getCpu() == null) {
-                final String cpuNumber = customParameters.get(UsageEventVO.DynamicParameters.cpuNumber.name());
-                if (cpuNumber == null || NumbersUtil.parseInt(cpuNumber, -1) <= 0) {
-                    throw new InvalidParameterValueException("Invalid cpu cores value, specify a value between 1 and " + Integer.MAX_VALUE);
-                }
-            } else if (customParameters.containsKey(UsageEventVO.DynamicParameters.cpuNumber.name())) {
-                throw new InvalidParameterValueException("The cpu cores of this offering id:" + serviceOffering.getId()
-                        + " is not customizable. This is predefined in the template.");
-            }
-
-            if (serviceOffering.getSpeed() == null) {
-                final String cpuSpeed = customParameters.get(UsageEventVO.DynamicParameters.cpuSpeed.name());
-                if (cpuSpeed == null || NumbersUtil.parseInt(cpuSpeed, -1) <= 0) {
-                    throw new InvalidParameterValueException("Invalid cpu speed value, specify a value between 1 and " + Integer.MAX_VALUE);
-                }
-            } else if (customParameters.containsKey(UsageEventVO.DynamicParameters.cpuSpeed.name())) {
-                throw new InvalidParameterValueException("The cpu speed of this offering id:" + serviceOffering.getId()
-                        + " is not customizable. This is predefined in the template.");
-            }
-
-            if (serviceOffering.getRamSize() == null) {
-                final String memory = customParameters.get(UsageEventVO.DynamicParameters.memory.name());
-                if (memory == null || NumbersUtil.parseInt(memory, -1) < 32) {
-                    throw new InvalidParameterValueException("Invalid memory value, specify a value between 32 and " + Integer.MAX_VALUE + " MB");
-                }
-            } else if (customParameters.containsKey(UsageEventVO.DynamicParameters.memory.name())) {
-                throw new InvalidParameterValueException("The memory of this offering id:" + serviceOffering.getId() + " is not customizable. This is predefined in the template.");
-            }
-        } else {
-            throw new InvalidParameterValueException("Need to specify custom parameter values cpu, cpu speed and memory when using custom offering");
-        }
-    }
-
-    @Override
-    public void saveCustomOfferingDetails(final long vmId, final ServiceOffering serviceOffering) {
-        //save the custom values to the database.
-        final Map<String, String> details = _uservmDetailsDao.listDetailsKeyPairs(vmId);
-        details.put(UsageEventVO.DynamicParameters.cpuNumber.name(), serviceOffering.getCpu().toString());
-        details.put(UsageEventVO.DynamicParameters.cpuSpeed.name(), serviceOffering.getSpeed().toString());
-        details.put(UsageEventVO.DynamicParameters.memory.name(), serviceOffering.getRamSize().toString());
-        final List<UserVmDetailVO> detailList = new ArrayList<>();
-        for (final Map.Entry<String, String> entry : details.entrySet()) {
-            final UserVmDetailVO detailVO = new UserVmDetailVO(vmId, entry.getKey(), entry.getValue(), true);
-            detailList.add(detailVO);
-        }
-        _uservmDetailsDao.saveDetails(detailList);
-    }
-
-    @Override
-    public void removeCustomOfferingDetails(final long vmId) {
-        final Map<String, String> details = _uservmDetailsDao.listDetailsKeyPairs(vmId);
-        details.remove(UsageEventVO.DynamicParameters.cpuNumber.name());
-        details.remove(UsageEventVO.DynamicParameters.cpuSpeed.name());
-        details.remove(UsageEventVO.DynamicParameters.memory.name());
-        final List<UserVmDetailVO> detailList = new ArrayList<>();
-        for (final Map.Entry<String, String> entry : details.entrySet()) {
-            final UserVmDetailVO detailVO = new UserVmDetailVO(vmId, entry.getKey(), entry.getValue(), true);
-            detailList.add(detailVO);
-        }
-        _uservmDetailsDao.saveDetails(detailList);
-    }
-
-    @Override
-    public void generateUsageEvent(final VirtualMachine vm, final boolean isDisplay, final String eventType) {
-        final ServiceOfferingVO serviceOffering = _offeringDao.findById(vm.getId(), vm.getServiceOfferingId());
-        if (!serviceOffering.isDynamic()) {
-            UsageEventUtils.publishUsageEvent(eventType, vm.getAccountId(), vm.getDataCenterId(), vm.getId(),
-                    vm.getHostName(), serviceOffering.getId(), vm.getTemplateId(), vm.getHypervisorType().toString(),
-                    VirtualMachine.class.getName(), vm.getUuid(), isDisplay);
-        } else {
-            final Map<String, String> customParameters = new HashMap<>();
-            customParameters.put(UsageEventVO.DynamicParameters.cpuNumber.name(), serviceOffering.getCpu().toString());
-            customParameters.put(UsageEventVO.DynamicParameters.cpuSpeed.name(), serviceOffering.getSpeed().toString());
-            customParameters.put(UsageEventVO.DynamicParameters.memory.name(), serviceOffering.getRamSize().toString());
-            UsageEventUtils.publishUsageEvent(eventType, vm.getAccountId(), vm.getDataCenterId(), vm.getId(),
-                    vm.getHostName(), serviceOffering.getId(), vm.getTemplateId(), vm.getHypervisorType().toString(),
-                    VirtualMachine.class.getName(), vm.getUuid(), customParameters, isDisplay);
-        }
-    }
-
-    @Override
     public String getName() {
         return _name;
     }
@@ -1240,7 +1147,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         _itMgr.registerGuru(VirtualMachine.Type.User, this);
 
-        VirtualMachine.State.getStateMachine().registerListener(new UserVmStateListener(_usageEventDao, _networkDao, _nicDao, _offeringDao, _vmDao, this, _configDao));
+        VirtualMachine.State.getStateMachine().registerListener(new UserVmStateListener(_networkDao, _nicDao, _offeringDao, _vmDao, this, _configDao));
 
         final String value = _configDao.getValue(Config.SetVmInternalNameUsingDisplayName.key());
 
@@ -1410,12 +1317,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (status) {
             // Mark the account's volumes as destroyed
             final List<VolumeVO> volumes = _volsDao.findByInstance(vmId);
-            for (final VolumeVO volume : volumes) {
-                if (volume.getVolumeType().equals(Volume.Type.ROOT)) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_DELETE, volume.getAccountId(), volume.getDataCenterId(), volume.getId(), volume.getName(),
-                            Volume.class.getName(), volume.getUuid(), volume.isDisplayVolume());
-                }
-            }
 
             if (vmState != State.Error) {
                 // Get serviceOffering for Virtual Machine
@@ -1761,9 +1662,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _resourceLimitMgr.changeResourceCount(vmInstance.getAccountId(), ResourceType.cpu, isDisplayVm, new Long(offering.getCpu()));
             _resourceLimitMgr.changeResourceCount(vmInstance.getAccountId(), ResourceType.memory, isDisplayVm, new Long(offering.getRamSize()));
 
-            // Usage
-            saveUsageEvent(vmInstance);
-
             // take care of the root volume as well.
             final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(id, Volume.Type.ROOT);
             if (!rootVols.isEmpty()) {
@@ -2080,16 +1978,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new CloudRuntimeException("Failed to change default nic to " + nic + " and now we have no default");
         } else if (newdefault.getId() == nic.getNetworkId()) {
             s_logger.debug("successfully set default network to " + network + " for " + vmInstance);
-            final String nicIdString = Long.toString(nic.getId());
-            final long newNetworkOfferingId = network.getNetworkOfferingId();
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vmInstance.getAccountId(), vmInstance.getDataCenterId(), vmInstance.getId(),
-                    oldNicIdString, oldNetworkOfferingId, null, 1L, VirtualMachine.class.getName(), vmInstance.getUuid(), vmInstance.isDisplay());
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_ASSIGN, vmInstance.getAccountId(), vmInstance.getDataCenterId(), vmInstance.getId(), nicIdString,
-                    newNetworkOfferingId, null, 1L, VirtualMachine.class.getName(), vmInstance.getUuid(), vmInstance.isDisplay());
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_REMOVE, vmInstance.getAccountId(), vmInstance.getDataCenterId(), vmInstance.getId(), nicIdString,
-                    newNetworkOfferingId, null, 0L, VirtualMachine.class.getName(), vmInstance.getUuid(), vmInstance.isDisplay());
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_ASSIGN, vmInstance.getAccountId(), vmInstance.getDataCenterId(), vmInstance.getId(),
-                    oldNicIdString, oldNetworkOfferingId, null, 0L, VirtualMachine.class.getName(), vmInstance.getUuid(), vmInstance.isDisplay());
             return _vmDao.findById(vmInstance.getId());
         }
 
@@ -2316,8 +2204,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                 offeringId = offering.getId();
                             }
                         }
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_CREATE, volume.getAccountId(), volume.getDataCenterId(), volume.getId(), volume.getName(),
-                                offeringId, templateId, volume.getSize(), Volume.class.getName(), volume.getUuid(), volume.isDisplayVolume());
                     }
                 }
 
@@ -2660,11 +2546,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         // Check resource limits for CPU and Memory.
         final Map<String, String> customParameters = cmd.getDetails();
         ServiceOfferingVO newServiceOffering = _offeringDao.findById(svcOffId);
-        if (newServiceOffering.isDynamic()) {
-            newServiceOffering.setDynamicFlag(true);
-            validateCustomParameters(newServiceOffering, cmd.getDetails());
-            newServiceOffering = _offeringDao.getcomputeOffering(newServiceOffering, customParameters);
-        }
+
         final ServiceOfferingVO currentServiceOffering = _offeringDao.findByIdIncludingRemoved(vmInstance.getId(), vmInstance.getServiceOfferingId());
 
         final int newCpu = newServiceOffering.getCpu();
@@ -2683,13 +2565,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _itMgr.checkIfCanUpgrade(vmInstance, newServiceOffering);
 
         _itMgr.upgradeVmDb(vmId, svcOffId);
-        if (newServiceOffering.isDynamic()) {
-            //save the custom values to the database.
-            saveCustomOfferingDetails(vmId, newServiceOffering);
-        }
-        if (currentServiceOffering.isDynamic() && !newServiceOffering.isDynamic()) {
-            removeCustomOfferingDetails(vmId);
-        }
 
         // Increment or decrement CPU and Memory count accordingly.
         if (newCpu > currentCpu) {
@@ -2703,11 +2578,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _resourceLimitMgr.decrementResourceCount(caller.getAccountId(), ResourceType.memory, new Long(currentMemory - newMemory));
         }
 
-        // Generate usage event for VM upgrade
-        final UserVmVO userVm = _vmDao.findById(vmId);
-        generateUsageEvent(userVm, userVm.isDisplayVm(), EventTypes.EVENT_VM_UPGRADE);
-
-        return userVm;
+        return _vmDao.findById(vmId);
     }
 
     @Override
@@ -3374,10 +3245,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         Transaction.execute(new TransactionCallbackNoReturn() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
-                //generate destroy vm event for usage
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VM_DESTROY, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), vm.getHostName(), vm.getServiceOfferingId(),
-                        vm.getTemplateId(), vm.getHypervisorType().toString(), VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplayVm());
-
                 // update resource counts for old account
                 resourceCountDecrement(oldAccount.getAccountId(), vm.isDisplayVm(), new Long(offering.getCpu()), new Long(offering.getRamSize()));
 
@@ -3388,8 +3255,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                 // OS 2: update volume
                 for (final VolumeVO volume : volumes) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_DELETE, volume.getAccountId(), volume.getDataCenterId(), volume.getId(), volume.getName(),
-                            Volume.class.getName(), volume.getUuid(), volume.isDisplayVolume());
                     _resourceLimitMgr.decrementResourceCount(oldAccount.getAccountId(), ResourceType.volume);
                     _resourceLimitMgr.decrementResourceCount(oldAccount.getAccountId(), ResourceType.primary_storage, new Long(volume.getSize()));
                     volume.setAccountId(newAccount.getAccountId());
@@ -3397,8 +3262,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     _volsDao.persist(volume);
                     _resourceLimitMgr.incrementResourceCount(newAccount.getAccountId(), ResourceType.volume);
                     _resourceLimitMgr.incrementResourceCount(newAccount.getAccountId(), ResourceType.primary_storage, new Long(volume.getSize()));
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_CREATE, volume.getAccountId(), volume.getDataCenterId(), volume.getId(), volume.getName(),
-                            volume.getDiskOfferingId(), volume.getTemplateId(), volume.getSize(), Volume.class.getName(), volume.getUuid(), volume.isDisplayVolume());
                     //snapshots: mark these removed in db
                     final List<SnapshotVO> snapshots = _snapshotDao.listByVolumeIdIncludingRemoved(volume.getId());
                     for (final SnapshotVO snapshot : snapshots) {
@@ -3408,10 +3271,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                 //update resource count of new account
                 resourceCountIncrement(newAccount.getAccountId(), vm.isDisplayVm(), new Long(offering.getCpu()), new Long(offering.getRamSize()));
-
-                //generate usage events to account for this change
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VM_CREATE, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), vm.getHostName(), vm.getServiceOfferingId(),
-                        vm.getTemplateId(), vm.getHypervisorType().toString(), VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplayVm());
             }
         });
 
@@ -3688,16 +3547,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         final boolean result = upgradeVirtualMachine(vmId, newServiceOfferingId, cmd.getDetails());
         if (result) {
-            final UserVmVO vmInstance = _vmDao.findById(vmId);
-            if (vmInstance.getState().equals(State.Stopped)) {
-                // Generate usage event for VM upgrade
-                generateUsageEvent(vmInstance, vmInstance.isDisplayVm(), EventTypes.EVENT_VM_UPGRADE);
-            }
-            if (vmInstance.getState().equals(State.Running)) {
-                // Generate usage event for Dynamic scaling of VM
-                generateUsageEvent(vmInstance, vmInstance.isDisplayVm(), EventTypes.EVENT_VM_DYNAMIC_SCALE);
-            }
-            return vmInstance;
+            return _vmDao.findById(vmId);
         } else {
             throw new CloudRuntimeException("Failed to scale the VM");
         }
@@ -3717,11 +3567,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Check resource limits for CPU and Memory.
         ServiceOfferingVO newServiceOffering = _offeringDao.findById(svcOffId);
-        if (newServiceOffering.isDynamic()) {
-            newServiceOffering.setDynamicFlag(true);
-            validateCustomParameters(newServiceOffering, customParameters);
-            newServiceOffering = _offeringDao.getcomputeOffering(newServiceOffering, customParameters);
-        }
+
         final ServiceOfferingVO currentServiceOffering = _offeringDao.findByIdIncludingRemoved(vmInstance.getId(), vmInstance.getServiceOfferingId());
 
         final int newCpu = newServiceOffering.getCpu();
@@ -3745,13 +3591,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(owner, newSvcOffering);
 
         _itMgr.upgradeVmDb(vmId, svcOffId);
-        if (newServiceOffering.isDynamic()) {
-            //save the custom values to the database.
-            saveCustomOfferingDetails(vmId, newServiceOffering);
-        }
-        if (currentServiceOffering.isDynamic() && !newServiceOffering.isDynamic()) {
-            removeCustomOfferingDetails(vmId);
-        }
 
         // Increment or decrement CPU and Memory count accordingly.
         if (newCpu > currentCpu) {
@@ -3782,11 +3621,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         //Check if its a scale "up"
         ServiceOfferingVO newServiceOffering = _offeringDao.findById(newServiceOfferingId);
-        if (newServiceOffering.isDynamic()) {
-            newServiceOffering.setDynamicFlag(true);
-            validateCustomParameters(newServiceOffering, customParameters);
-            newServiceOffering = _offeringDao.getcomputeOffering(newServiceOffering, customParameters);
-        }
 
         // Check that the specified service offering ID is valid
         _itMgr.checkIfCanUpgrade(vmInstance, newServiceOffering);
@@ -3868,16 +3702,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                     // #3 scale the vm now
                     _itMgr.upgradeVmDb(vmId, newServiceOfferingId);
-                    if (newServiceOffering.isDynamic()) {
-                        //save the custom values to the database.
-                        saveCustomOfferingDetails(vmId, newServiceOffering);
-                    }
+
                     vmInstance = _vmInstanceDao.findById(vmId);
                     _itMgr.reConfigureVm(vmInstance.getUuid(), currentServiceOffering, existingHostHasCapacity);
                     success = true;
-                    if (currentServiceOffering.isDynamic() && !newServiceOffering.isDynamic()) {
-                        removeCustomOfferingDetails(vmId);
-                    }
+
                     return success;
                 } catch (final InsufficientCapacityException e) {
                     s_logger.warn("Received exception while scaling ", e);
@@ -3890,9 +3719,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 } finally {
                     if (!success) {
                         _itMgr.upgradeVmDb(vmId, currentServiceOffering.getId()); // rollback
-                        if (newServiceOffering.isDynamic()) {
-                            removeCustomOfferingDetails(vmId);
-                        }
+
                         // Decrement CPU and Memory count accordingly.
                         if (newCpu > currentCpu) {
                             _resourceLimitMgr.decrementResourceCount(caller.getAccountId(), ResourceType.cpu, new Long(newCpu - currentCpu));
@@ -4088,10 +3915,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             // 1. Save usage event and update resource count for user vm volumes
             _resourceLimitMgr.incrementResourceCount(newVol.getAccountId(), ResourceType.volume, newVol.isDisplay());
             _resourceLimitMgr.incrementResourceCount(newVol.getAccountId(), ResourceType.primary_storage, newVol.isDisplay(), new Long(newVol.getSize()));
-            // 2. Create Usage event for the newly created volume
-            final UsageEventVO usageEvent = new UsageEventVO(EventTypes.EVENT_VOLUME_CREATE, newVol.getAccountId(), newVol.getDataCenterId(), newVol.getId(), newVol.getName(),
-                    newVol.getDiskOfferingId(), template.getId(), newVol.getSize());
-            _usageEventDao.persist(usageEvent);
 
             handleManagedStorage(vm, root);
 
@@ -4329,11 +4152,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         ServiceOfferingVO offering = _serviceOfferingDao.findById(serviceOffering.getId());
-        if (offering.isDynamic()) {
-            offering.setDynamicFlag(true);
-            validateCustomParameters(offering, customParameters);
-            offering = _offeringDao.getcomputeOffering(offering, customParameters);
-        }
+
         // check if account/domain is with in resource limits to create a new vm
         final boolean isIso = Storage.ImageFormat.ISO == template.getFormat();
         long size = 0;
@@ -4738,61 +4557,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 }
                 CallContext.current().setEventDetails("Vm Id: " + vm.getId());
 
-                if (!offering.isDynamic()) {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VM_CREATE, accountId, zone.getId(), vm.getId(), vm.getHostName(), offering.getId(), template.getId(),
-                            hypervisorType.toString(), VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplayVm());
-                } else {
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VM_CREATE, accountId, zone.getId(), vm.getId(), vm.getHostName(), offering.getId(), template.getId(),
-                            hypervisorType.toString(), VirtualMachine.class.getName(), vm.getUuid(), customParameters, vm.isDisplayVm());
-                }
-
                 //Update Resource Count for the given account
                 resourceCountIncrement(accountId, isDisplayVm, new Long(offering.getCpu()), new Long(offering.getRamSize()));
                 return vm;
             }
         });
-    }
-
-    private void saveUsageEvent(final UserVmVO vm) {
-
-        // If vm not destroyed
-        if (vm.getState() != State.Destroyed && vm.getState() != State.Expunging && vm.getState() != State.Error) {
-
-            if (vm.isDisplayVm()) {
-                //1. Allocated VM Usage Event
-                generateUsageEvent(vm, true, EventTypes.EVENT_VM_CREATE);
-
-                if (vm.getState() == State.Running || vm.getState() == State.Stopping) {
-                    //2. Running VM Usage Event
-                    generateUsageEvent(vm, true, EventTypes.EVENT_VM_START);
-
-                    // 3. Network offering usage
-                    generateNetworkUsageForVm(vm, true, EventTypes.EVENT_NETWORK_OFFERING_ASSIGN);
-                }
-            } else {
-                //1. Allocated VM Usage Event
-                generateUsageEvent(vm, true, EventTypes.EVENT_VM_DESTROY);
-
-                if (vm.getState() == State.Running || vm.getState() == State.Stopping) {
-                    //2. Running VM Usage Event
-                    generateUsageEvent(vm, true, EventTypes.EVENT_VM_STOP);
-
-                    // 3. Network offering usage
-                    generateNetworkUsageForVm(vm, true, EventTypes.EVENT_NETWORK_OFFERING_REMOVE);
-                }
-            }
-        }
-    }
-
-    private void generateNetworkUsageForVm(final VirtualMachine vm, final boolean isDisplay, final String eventType) {
-
-        final List<NicVO> nics = _nicDao.listByVmId(vm.getId());
-        for (final NicVO nic : nics) {
-            final NetworkVO network = _networkDao.findById(nic.getNetworkId());
-            final long isDefault = nic.isDefaultNic() ? 1 : 0;
-            UsageEventUtils.publishUsageEvent(eventType, vm.getAccountId(), vm.getDataCenterId(), vm.getId(),
-                    Long.toString(nic.getId()), network.getNetworkOfferingId(), null, isDefault, vm.getClass().getName(), vm.getUuid(), isDisplay);
-        }
     }
 
     private void validateUserData(final String userData, final HTTPMethod httpmethod) {
@@ -5019,8 +4788,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         for (final NicVO nic : nics) {
             final NetworkVO network = _networkDao.findById(nic.getNetworkId());
             final long isDefault = nic.isDefaultNic() ? 1 : 0;
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NETWORK_OFFERING_ASSIGN, vm.getAccountId(), vm.getDataCenterId(), vm.getId(), Long.toString(nic.getId()),
-                    network.getNetworkOfferingId(), null, isDefault, VirtualMachine.class.getName(), vm.getUuid(), vm.isDisplay());
+
             if (network.getTrafficType() == TrafficType.Guest) {
                 originalIp = nic.getIPv4Address();
                 guestNic = nic;

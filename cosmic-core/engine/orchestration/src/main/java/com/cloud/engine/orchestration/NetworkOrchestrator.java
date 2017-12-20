@@ -34,7 +34,6 @@ import com.cloud.domain.Domain;
 import com.cloud.engine.cloud.entity.api.db.VMNetworkMapVO;
 import com.cloud.engine.cloud.entity.api.db.dao.VMNetworkMapDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.IllegalVirtualMachineException;
@@ -67,7 +66,6 @@ import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkMigrationResponder;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.NetworkStateListener;
 import com.cloud.network.Networks;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
@@ -199,8 +197,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             "Seconds to wait before checking for networks to shutdown", true, Scope.Global, null);
     static final Logger s_logger = LoggerFactory.getLogger(NetworkOrchestrator.class);
     @Inject
-    protected IPAddressDao _publicIpAddressDao;
-    @Inject
     protected IpAddressManager _ipAddrMgr;
     protected StateMachine2<Network.State, Network.Event, Network> _stateMachine;
     @Inject
@@ -285,8 +281,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     PrivateIpDao _privateIpDao;
     @Inject
     NetworkACLManager _networkACLMgr;
-    @Inject
-    UsageEventDao _usageEventDao;
     @Inject
     NetworkModel _networkModel;
     @Inject
@@ -373,8 +367,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         _executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("Network-Scavenger"));
 
         _agentMgr.registerForHostEvents(this, true, false, true);
-
-        Network.State.getStateMachine().registerListener(new NetworkStateListener(_usageEventDao, _networksDao, _configDao));
 
         s_logger.info("Network Manager is configured.");
 

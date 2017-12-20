@@ -17,7 +17,6 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.PermissionDeniedException;
@@ -182,17 +181,14 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
         final List<LoadBalancerVMMapVO> backupMaps = Transaction.execute(new TransactionCallback<List<LoadBalancerVMMapVO>>() {
             @Override
             public List<LoadBalancerVMMapVO> doInTransaction(final TransactionStatus status) {
-                boolean generateUsageEvent = false;
 
                 if (lb.getState() == FirewallRule.State.Staged) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Found a rule that is still in stage state so just removing it: " + lb);
                     }
-                    generateUsageEvent = true;
                 } else if (lb.getState() == FirewallRule.State.Add || lb.getState() == FirewallRule.State.Active) {
                     lb.setState(FirewallRule.State.Revoke);
                     _lbDao.persist(lb);
-                    generateUsageEvent = true;
                 }
                 final List<LoadBalancerVMMapVO> backupMaps = _lb2VmMapDao.listByLoadBalancerId(loadBalancerId);
                 final List<LoadBalancerVMMapVO> maps = _lb2VmMapDao.listByLoadBalancerId(loadBalancerId);
@@ -208,13 +204,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                 for (final LBHealthCheckPolicyVO lbHealthCheck : hcPolicies) {
                     lbHealthCheck.setRevoke(true);
                     _lb2healthcheckDao.persist(lbHealthCheck);
-                }
-
-                if (generateUsageEvent) {
-                    // Generate usage event right after all rules were marked for revoke
-                    final Network network = _networkModel.getNetwork(lb.getNetworkId());
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_LOAD_BALANCER_DELETE, lb.getAccountId(), network.getDataCenterId(), lb.getId(),
-                            null, LoadBalancingRule.class.getName(), lb.getUuid());
                 }
 
                 return backupMaps;
@@ -462,8 +451,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     s_logger.debug("Load balancer " + newRule.getId() + " for Ip address id=" + sourceIpId + ", public port " + srcPort + ", private port " + destPort +
                             " is added successfully.");
                     CallContext.current().setEventDetails("Load balancer Id: " + newRule.getId());
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_LOAD_BALANCER_CREATE, ipAddr.getAllocatedToAccountId(), ipAddr.getDataCenterId(), newRule.getId(),
-                            null, LoadBalancingRule.class.getName(), newRule.getUuid());
 
                     return newRule;
                 } catch (final Exception e) {
