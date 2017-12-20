@@ -2,7 +2,6 @@ package com.cloud.network.topology;
 
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
@@ -43,10 +42,8 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachineProfile;
-import com.cloud.vm.dao.NicIpAliasVO;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -258,23 +255,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final DhcpSubNetRules subnet) throws ResourceUnavailableException {
-        final VirtualRouter router = subnet.getRouter();
-        final Network network = subnet.getNetwork();
-        final NicIpAliasVO nicAlias = subnet.getNicAlias();
-        final String routerAliasIp = subnet.getRouterAliasIp();
-
-        final Commands cmds = new Commands(Command.OnError.Stop);
-
-        final List<IpAliasTO> ipaliasTo = new ArrayList<>();
-        ipaliasTo.add(new IpAliasTO(routerAliasIp, nicAlias.getNetmask(), nicAlias.getAliasCount().toString()));
-
-        _commandSetupHelper.createIpAlias(router, ipaliasTo, nicAlias.getNetworkId(), cmds);
-
-        // also add the required configuration to the dnsmasq for supporting
-        // dhcp and dns on the new ip.
-        _commandSetupHelper.configDnsMasq(router, network, cmds);
-
-        return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
+        throw new CloudRuntimeException("DhcpSubNetRules not implemented in Basic Network Topology.");
     }
 
     @Override

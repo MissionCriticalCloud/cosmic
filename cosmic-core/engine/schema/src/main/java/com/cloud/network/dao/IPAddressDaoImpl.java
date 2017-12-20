@@ -187,13 +187,6 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public IPAddressVO findByIpAddress(final String ipAddress) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ipAddress", ipAddress);
-        return findOneBy(sc);
-    }
-
-    @Override
     public List<IPAddressVO> listByVlanId(final long vlanId) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vlan", vlanId);
@@ -351,21 +344,6 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public IPAddressVO findByIpAndDcId(final long dcId, final String ipAddress) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("dataCenterId", dcId);
-        sc.setParameters("ipAddress", ipAddress);
-        return findOneBy(sc);
-    }
-
-    @Override
-    public List<IPAddressVO> listByPhysicalNetworkId(final long physicalNetworkId) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc);
-    }
-
-    @Override
     public List<IPAddressVO> listByAssociatedVpc(final long vpcId, final Boolean isSourceNat) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
@@ -394,13 +372,6 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public IPAddressVO findByVmIp(final String vmIp) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("associatedVmIp", vmIp);
-        return findOneBy(sc);
-    }
-
-    @Override
     public IPAddressVO findByAssociatedVmIdAndVmIp(final long vmId, final String vmIp) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("associatedWithVmId", vmId);
@@ -417,26 +388,10 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public IPAddressVO findByIpAndVlanId(final String ipAddress, final long vlanid) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("ipAddress", ipAddress);
-        sc.setParameters("vlan", vlanid);
-        return findOneBy(sc);
-    }
-
-    @Override
     public long countFreeIpsInVlan(final long vlanDbId) {
         final SearchCriteria<IPAddressVO> sc = VlanDbIdSearchUnallocated.create();
         sc.setParameters("vlanDbId", vlanDbId);
         return listBy(sc).size();
-    }
-
-    @Override
-    public void deletePublicIPRangeExceptAliasIP(final long vlanDbId, final String aliasIp) {
-        final SearchCriteria<IPAddressVO> sc = DeleteAllExceptGivenIp.create();
-        sc.setParameters("vlan", vlanDbId);
-        sc.setParameters("ip", aliasIp);
-        remove(sc);
     }
 
     @Override
@@ -452,21 +407,6 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vlan", vlandbId);
         lockRows(sc, null, true);
-    }
-
-    @Override
-    public List<IPAddressVO> listByAssociatedVmId(final long vmId) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("associatedWithVmId", vmId);
-        return listBy(sc);
-    }
-
-    @Override
-    public IPAddressVO findByVmIdAndNetworkId(final long networkId, final long vmId) {
-        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
-        sc.setParameters("network", networkId);
-        sc.setParameters("associatedWithVmId", vmId);
-        return findOneBy(sc);
     }
 
     @Override

@@ -3,10 +3,6 @@ package com.cloud.network.router;
 import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.CreateIpAliasCommand;
-import com.cloud.agent.api.routing.DeleteIpAliasCommand;
-import com.cloud.agent.api.routing.DnsMasqConfigCommand;
-import com.cloud.agent.api.routing.IpAliasTO;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
@@ -19,7 +15,6 @@ import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
-import com.cloud.agent.api.to.DhcpTO;
 import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
@@ -81,7 +76,6 @@ import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
-import com.cloud.vm.NicIpAlias;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
@@ -90,8 +84,6 @@ import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
-import com.cloud.vm.dao.NicIpAliasVO;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -102,16 +94,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 public class CommandSetupHelper {
 
-    private static final Logger s_logger = LoggerFactory.getLogger(CommandSetupHelper.class);
     @Inject
     @Qualifier("networkHelper")
-    protected NetworkHelper _networkHelper;
+    private NetworkHelper _networkHelper;
     @Inject
     private NicDao _nicDao;
     @Inject
@@ -122,8 +111,6 @@ public class CommandSetupHelper {
     private NetworkModel _networkModel;
     @Inject
     private VirtualMachineManager _itMgr;
-    @Inject
-    private NicIpAliasDao _nicIpAliasDao;
     @Inject
     private FirewallRulesDao _rulesDao;
     @Inject
@@ -152,47 +139,6 @@ public class CommandSetupHelper {
     private RouterControlHelper _routerControlHelper;
     @Inject
     private ZoneRepository zoneRepository;
-
-    public void createIpAlias(final VirtualRouter router, final List<IpAliasTO> ipAliasTOs, final Long networkid, final Commands cmds) {
-
-        final String routerip = _routerControlHelper.getRouterIpInNetwork(networkid, router.getId());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        final CreateIpAliasCommand ipaliasCmd = new CreateIpAliasCommand(routerip, ipAliasTOs);
-        ipaliasCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        ipaliasCmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        ipaliasCmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("ipalias", ipaliasCmd);
-    }
-
-    public void configDnsMasq(final VirtualRouter router, final Network network, final Commands cmds) {
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        final List<NicIpAliasVO> ipAliasVOList = _nicIpAliasDao.listByNetworkIdAndState(network.getId(), NicIpAlias.State.active);
-        final List<DhcpTO> ipList = new ArrayList<>();
-
-        final NicVO router_guest_nic = _nicDao.findByNtwkIdAndInstanceId(network.getId(), router.getId());
-        final String cidr = NetUtils.getCidrFromGatewayAndNetmask(router_guest_nic.getIPv4Gateway(), router_guest_nic.getIPv4Netmask());
-        final String[] cidrPair = cidr.split("\\/");
-        final String cidrAddress = cidrPair[0];
-        final long cidrSize = Long.parseLong(cidrPair[1]);
-        final String startIpOfSubnet = NetUtils.getIpRangeStartIpFromCidr(cidrAddress, cidrSize);
-
-        ipList.add(new DhcpTO(router_guest_nic.getIPv4Address(), router_guest_nic.getIPv4Gateway(), router_guest_nic.getIPv4Netmask(), startIpOfSubnet));
-        for (final NicIpAliasVO ipAliasVO : ipAliasVOList) {
-            final DhcpTO DhcpTO = new DhcpTO(ipAliasVO.getIp4Address(), ipAliasVO.getGateway(), ipAliasVO.getNetmask(), ipAliasVO.getStartIpOfSubnet());
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("configDnsMasq : adding ip {" + DhcpTO.getGateway() + ", " + DhcpTO.getNetmask() + ", " + DhcpTO.getRouterIp() + ", " + DhcpTO.getStartIpOfSubnet()
-                        + "}");
-            }
-            ipList.add(DhcpTO);
-            ipAliasVO.setVmId(router.getId());
-        }
-        final DnsMasqConfigCommand dnsMasqConfigCmd = new DnsMasqConfigCommand(ipList);
-        dnsMasqConfigCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        dnsMasqConfigCmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        dnsMasqConfigCmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand("dnsMasqConfig", dnsMasqConfigCmd);
-    }
 
     public void createApplyLoadBalancingRulesCommands(final List<LoadBalancingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
         final LoadBalancerTO[] lbs = new LoadBalancerTO[rules.size()];
@@ -564,18 +510,6 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         cmds.addCommand("users", cmd);
-    }
-
-    public void createDeleteIpAliasCommand(final DomainRouterVO router, final List<IpAliasTO> deleteIpAliasTOs, final List<IpAliasTO> createIpAliasTos, final long networkId,
-                                           final Commands cmds) {
-        final String routerip = _routerControlHelper.getRouterIpInNetwork(networkId, router.getId());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        final DeleteIpAliasCommand deleteIpaliasCmd = new DeleteIpAliasCommand(routerip, deleteIpAliasTOs, createIpAliasTos);
-        deleteIpaliasCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        deleteIpaliasCmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        deleteIpaliasCmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("deleteIpalias", deleteIpaliasCmd);
     }
 
     public void findIpsToExclude(final List<? extends PublicIpAddress> ips, final List<Ip> ipsToExclude) {

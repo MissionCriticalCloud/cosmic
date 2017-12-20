@@ -19,7 +19,6 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.user.dao.UserStatisticsDao;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -52,8 +51,6 @@ public class VirtualNetworkApplianceFactory {
     private VMTemplateDao _templateDao;
     @Inject
     private NetworkDao _networkDao;
-    @Inject
-    private NicIpAliasDao _nicIpAliasDao;
     @Inject
     private HostPodDao _podDao;
     @Inject
@@ -120,10 +117,6 @@ public class VirtualNetworkApplianceFactory {
 
     public NetworkDao getNetworkDao() {
         return _networkDao;
-    }
-
-    public NicIpAliasDao getNicIpAliasDao() {
-        return _nicIpAliasDao;
     }
 
     public HostPodDao getPodDao() {

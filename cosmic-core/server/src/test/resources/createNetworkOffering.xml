@@ -20,7 +20,6 @@
         </property>
     </bean>
 
-    <bean id="nicIpAliasDaoImpl" class="com.cloud.vm.dao.NicIpAliasDaoImpl" />
     <bean id="ConfigurationManager" class="com.cloud.configuration.ConfigurationManagerImpl">
         <property name="name" value="ConfigurationManager" />
     </bean>

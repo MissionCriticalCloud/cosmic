@@ -34,7 +34,6 @@ import com.cloud.user.dao.UserStatsLogDao;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -87,9 +86,6 @@ public class VirtualNetworkApplianceManagerImplTest {
 
     @Mock
     private NicDao _nicDao;
-
-    @Mock
-    private NicIpAliasDao _nicIpAliasDao;
 
     @Mock
     private OpRouterMonitorServiceDao _opRouterMonitorServiceDao;

@@ -34,16 +34,9 @@ public interface VirtualNetworkApplianceManager extends Manager, VirtualNetworkA
 
     ConfigKey<Integer> RouterAlertsCheckInterval = new ConfigKey<>(Integer.class, RouterAlertsCheckIntervalCK, "Advanced", "1800",
             "Interval (in seconds) to check for alerts in Virtual Router.", false, ConfigKey.Scope.Global, null);
-    ConfigKey<Boolean> routerVersionCheckEnabled = new ConfigKey<>("Advanced", Boolean.class, "router.version.check", "true",
-            "If true, router minimum required version is checked before sending command", false);
-    ConfigKey<Boolean> UseExternalDnsServers = new ConfigKey<>(Boolean.class, "use.external.dns", "Advanced", "false",
-            "Bypass internal dns, use external dns1 and dns2", true, ConfigKey.Scope.Zone, null);
 
     int DEFAULT_ROUTER_VM_RAMSIZE = 256;            // 256M
-    int DEFAULT_ROUTER_CPU_MHZ = 500;                // 500 MHz
-    boolean USE_POD_VLAN = false;
-    int DEFAULT_PRIORITY = 100;
-    int DEFAULT_DELTA = 2;
+    int DEFAULT_ROUTER_CPU_MHZ = 500;               // 500 MHz
 
     boolean startRemoteAccessVpn(Network network, RemoteAccessVpn vpn, List<? extends VirtualRouter> routers) throws ResourceUnavailableException;
 
@@ -54,8 +47,6 @@ public interface VirtualNetworkApplianceManager extends Manager, VirtualNetworkA
     VirtualRouter stop(VirtualRouter router, boolean forced, User callingUser, Account callingAccount) throws ConcurrentOperationException, ResourceUnavailableException;
 
     String getDnsBasicZoneUpdate();
-
-    boolean removeDhcpSupportForSubnet(Network network, List<DomainRouterVO> routers) throws ResourceUnavailableException;
 
     boolean prepareAggregatedExecution(Network network, List<DomainRouterVO> routers) throws ResourceUnavailableException;
 

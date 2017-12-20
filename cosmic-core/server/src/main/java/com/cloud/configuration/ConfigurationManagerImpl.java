@@ -161,11 +161,8 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.NicIpAlias;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.NicIpAliasDao;
-import com.cloud.vm.dao.NicIpAliasVO;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -197,7 +194,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{1,63}$";
     @Inject
     public ManagementService _mgr;
-    // FIXME - why don't we have interface for DataCenterLinkLocalIpAddressDao?
     @Inject
     protected DataCenterLinkLocalIpAddressDao _linkLocalIpAllocDao;
     protected Set<String> configValuesForValidation;
@@ -294,8 +290,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     PrimaryDataStoreDao _storagePoolDao;
     @Inject
     NicSecondaryIpDao _nicSecondaryIpDao;
-    @Inject
-    NicIpAliasDao _nicIpAliasDao;
     @Inject
     DedicatedResourceDao _dedicatedDao;
     @Inject
@@ -3581,12 +3575,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 }
             }
         } else {   // !isAccountSpecific
-            final NicIpAliasVO ipAlias = _nicIpAliasDao.findByGatewayAndNetworkIdAndState(vlanRange.getVlanGateway(), vlanRange.getNetworkId(), NicIpAlias.State.active);
-            //check if the ipalias belongs to the vlan range being deleted.
-            if (ipAlias != null && vlanDbId == _publicIpAddressDao.findByIpAndSourceNetworkId(vlanRange.getNetworkId(), ipAlias.getIp4Address()).getVlanId()) {
-                throw new InvalidParameterValueException("Cannot delete vlan range " + vlanDbId + " as " + ipAlias.getIp4Address()
-                        + "is being used for providing dhcp service in this subnet. Delete all VMs in this subnet and try again");
-            }
             final long allocIpCount = _publicIpAddressDao.countIPs(vlanRange.getDataCenterId(), vlanDbId, true);
             if (allocIpCount > 0) {
                 throw new InvalidParameterValueException(allocIpCount + "  Ips are in use. Cannot delete this vlan");

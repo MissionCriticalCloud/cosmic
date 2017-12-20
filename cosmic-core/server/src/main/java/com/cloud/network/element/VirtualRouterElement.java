@@ -889,22 +889,6 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         return false;
     }
 
-    @Override
-    public boolean removeDhcpSupportForSubnet(final Network network) throws ResourceUnavailableException {
-        if (canHandle(network, Service.Dhcp)) {
-            final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
-            if (routers == null || routers.size() == 0) {
-                throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
-            }
-            try {
-                return _routerMgr.removeDhcpSupportForSubnet(network, routers);
-            } catch (final ResourceUnavailableException e) {
-                s_logger.debug("Router resource unavailable ");
-            }
-        }
-        return false;
-    }
-
     protected List<DomainRouterVO> getRouters(final Network network, final DeployDestination dest) {
         boolean publicNetwork = false;
         if (_networkMdl.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, getProvider())) {
