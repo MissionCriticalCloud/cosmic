@@ -12,7 +12,6 @@ public class AggregationControlCommand extends NetworkElementCommand {
         this.action = action;
         this.setAccessDetail(NetworkElementCommand.ROUTER_NAME, name);
         this.setAccessDetail(NetworkElementCommand.ROUTER_IP, ip);
-        this.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, guestIp);
     }
 
     public Action getAction() {

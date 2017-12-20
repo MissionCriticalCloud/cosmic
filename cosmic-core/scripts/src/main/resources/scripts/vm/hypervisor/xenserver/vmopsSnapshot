@@ -570,38 +570,6 @@ def backupSnapshot(session, args):
 
 
 @echo
-def deleteSnapshotBackup(session, args):
-    logging.debug("Calling deleteSnapshotBackup with " + str(args))
-    secondaryStorageMountPath = args['secondaryStorageMountPath']
-    backupUUID = args['backupUUID']
-    path = args['path']
-    localMountPoint = args['localMountPoint']
-
-    backupsDir = mountSnapshotsDir(secondaryStorageMountPath, localMountPoint, path)
-    # chdir to the backupsDir for convenience
-    chdir(backupsDir)
-
-    backupVHD = getBackupVHD(backupUUID)
-    logging.debug("checking existence of " + backupVHD)
-
-    # The backupVHD is on secondary which is NFS and not ISCSI.
-    if not os.path.isfile(backupVHD):
-        logging.debug("backupVHD " + backupVHD + "does not exist. Not trying to delete it")
-        return "1"
-    logging.debug("backupVHD " + backupVHD + " exists.")
-
-    # Just delete the backupVHD
-    try:
-        os.remove(backupVHD)
-    except OSError, (errno, strerror):
-        errMsg = "OSError while removing " + backupVHD + " with errno: " + str(errno) + " and strerr: " + strerror
-        logging.debug(errMsg)
-        raise xs_errors.XenError(errMsg)
-
-    return "1"
-
-
-@echo
 def revert_memory_snapshot(session, args):
     logging.debug("Calling revert_memory_snapshot with " + str(args))
     vmName = args['vmName']

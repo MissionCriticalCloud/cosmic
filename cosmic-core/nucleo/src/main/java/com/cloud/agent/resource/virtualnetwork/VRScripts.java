@@ -4,8 +4,6 @@ public class VRScripts {
     public final static String CONFIG_PERSIST_LOCATION = "/var/cache/cloud/";
     public static final String NETWORK_OVERVIEW_CONFIG = "network_overview.json";
     public static final String VM_OVERVIEW_CONFIG = "vm_overview.json";
-    public final static String IP_ASSOCIATION_CONFIG = "ip_associations.json";
-    public final static String PRIVATE_GATEWAY_CONFIG = "private_gateway.json";
     public final static String NETWORK_ACL_CONFIG = "network_acl.json";
     public final static String PUBLIC_IP_ACL_CONFIG = "public_ip_acl.json";
     public final static String VM_PASSWORD_CONFIG = "vm_password.json";
@@ -34,6 +32,4 @@ public class VRScripts {
 
     // Present on the KVM hypervisor
     public static final String UPDATE_HOST_PASSWD = "update_host_passwd.sh";
-
-    public static final String VR_CFG = "scripts/vr_cfg.sh";
 }

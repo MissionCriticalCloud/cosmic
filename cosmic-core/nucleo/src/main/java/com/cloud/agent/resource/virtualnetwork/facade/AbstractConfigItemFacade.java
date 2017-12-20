@@ -1,13 +1,11 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.SetupGuestNetworkCommand;
 import com.cloud.agent.api.SetupVRCommand;
+import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.CreateIpAliasCommand;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
-import com.cloud.agent.api.routing.IpAssocCommand;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
@@ -18,10 +16,7 @@ import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
-import com.cloud.agent.api.routing.SetSourceNatCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.routing.SetStaticRouteCommand;
-import com.cloud.agent.api.routing.SetupPrivateGatewayCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
 import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
@@ -57,10 +52,10 @@ public abstract class AbstractConfigItemFacade {
 
         flyweight.put(SetPortForwardingRulesVpcCommand.class, new SetPortForwardingRulesVpcConfigItem());
         flyweight.put(SetPortForwardingRulesCommand.class, new SetPortForwardingRulesConfigItem());
-        flyweight.put(SetStaticRouteCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetStaticNatRulesCommand.class, new SetStaticNatRulesConfigItem());
         flyweight.put(LoadBalancerConfigCommand.class, new LoadBalancerConfigItem());
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());
+        flyweight.put(UpdateNetworkOverviewCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(UpdateVmOverviewCommand.class, new VmOverviewConfigItem());
         flyweight.put(CreateIpAliasCommand.class, new CreateIpAliasConfigItem()); // Deprecated
         flyweight.put(DnsMasqConfigCommand.class, new DnsMasqConfigItem()); // Deprecated
@@ -70,13 +65,8 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
         flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
         flyweight.put(SetMonitorServiceCommand.class, new SetMonitorServiceConfigItem()); // Deprecated
-        flyweight.put(SetupGuestNetworkCommand.class, new NetworkOverviewConfigItem());
-        flyweight.put(SetupPrivateGatewayCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
-        flyweight.put(SetSourceNatCommand.class, new SetSourceNatConfigItem()); // Move to network overview
-        flyweight.put(IpAssocCommand.class, new NetworkOverviewConfigItem());
-        flyweight.put(IpAssocVpcCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
     }
 

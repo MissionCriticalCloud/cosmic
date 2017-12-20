@@ -1,9 +1,5 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import static com.cloud.utils.ReflectUtil.flattenProperties;
-
-import static com.google.common.collect.Lists.newArrayList;
-
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
@@ -17,11 +13,6 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase.SRType;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.resource.StorageProcessor;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.storage.encoding.DecodedDataObject;
-import com.cloud.utils.storage.encoding.DecodedDataStore;
-import com.cloud.utils.storage.encoding.Decoder;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.AttachPrimaryDataStoreAnswer;
@@ -39,16 +30,19 @@ import com.cloud.storage.command.IntroduceObjectCmd;
 import com.cloud.storage.command.SnapshotAndCopyAnswer;
 import com.cloud.storage.command.SnapshotAndCopyCommand;
 import com.cloud.storage.datastore.protocol.DataStoreProtocol;
+import com.cloud.storage.resource.StorageProcessor;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.storage.encoding.DecodedDataObject;
+import com.cloud.utils.storage.encoding.DecodedDataStore;
+import com.cloud.utils.storage.encoding.Decoder;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -1509,16 +1503,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
         } else {
             return Long.parseLong(physicalSize);
         }
-    }
-
-    protected String deleteSnapshotBackup(final Connection conn, final String localMountPoint, final String path, final String secondaryStorageMountPath, final String backupUUID) {
-
-        // If anybody modifies the formatting below again, I'll skin them
-        final String result =
-                hypervisorResource.callHostPlugin(conn, "vmopsSnapshot", "deleteSnapshotBackup", "backupUUID", backupUUID, "path", path, "secondaryStorageMountPath",
-                        secondaryStorageMountPath, "localMountPoint", localMountPoint);
-
-        return result;
     }
 
     protected String backupSnapshot(final Connection conn, final String primaryStorageSRUuid, final String localMountPoint, final String path, final String

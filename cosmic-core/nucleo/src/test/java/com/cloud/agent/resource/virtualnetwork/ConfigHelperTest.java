@@ -7,16 +7,11 @@ import static org.junit.Assert.assertTrue;
 import com.cloud.agent.api.routing.DeleteIpAliasCommand;
 import com.cloud.agent.api.routing.DnsMasqConfigCommand;
 import com.cloud.agent.api.routing.IpAliasTO;
-import com.cloud.agent.api.routing.IpAssocVpcCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.to.DhcpTO;
-import com.cloud.agent.api.to.IpAddressTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO.InterfaceTO.IPv4AddressTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
@@ -28,7 +23,6 @@ import com.cloud.agent.resource.virtualnetwork.model.IpAddressAlias;
 import com.cloud.agent.resource.virtualnetwork.model.IpAliases;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRule;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRules;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 
 import java.util.ArrayList;
@@ -134,80 +128,6 @@ public class ConfigHelperTest {
         final SetPortForwardingRulesVpcCommand cmd = new SetPortForwardingRulesVpcCommand(pfRules);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
         assertEquals(cmd.getAnswersCount(), 2);
-
-        return cmd;
-    }
-
-    @Test
-    public void testIpAssocVpc() {
-
-        final IpAssocVpcCommand command = generateIpAssocVpcCommand();
-
-        final NetworkOverviewTO networkOverview = new NetworkOverviewTO();
-
-        final InterfaceTO eth0 = new InterfaceTO();
-        eth0.setMacAddress("00:00:00:00:00:00");
-
-        final IPv4AddressTO ip = new IPv4AddressTO();
-        ip.setCidr("1.1.1.1/24");
-        ip.setGateway("1.1.1.254");
-
-        eth0.setIpv4Addresses(new IPv4AddressTO[] { ip });
-        networkOverview.setInterfaces(new InterfaceTO[] { eth0 });
-
-        command.setNetworkOverview(networkOverview);
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final NetworkOverviewTO networkOverviewDeserialized = gson.fromJson(fileContents, NetworkOverviewTO.class);
-        assertNotNull(networkOverviewDeserialized);
-        assertEquals(networkOverview, networkOverviewDeserialized);
-
-        final InterfaceTO[] interfaces = networkOverviewDeserialized.getInterfaces();
-        assertNotNull(interfaces);
-        assertEquals(1, interfaces.length);
-        assertEquals(eth0, interfaces[0]);
-        assertEquals("00:00:00:00:00:00", interfaces[0].getMacAddress());
-
-        final IPv4AddressTO[] ips = interfaces[0].getIpv4Addresses();
-        assertNotNull(ips);
-        assertEquals(1, ips.length);
-        assertEquals(ip, ips[0]);
-        assertEquals("1.1.1.1/24", ips[0].getCidr());
-        assertEquals("1.1.1.254", ips[0].getGateway());
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    protected IpAssocVpcCommand generateIpAssocVpcCommand() {
-        final List<IpAddressTO> ips = new ArrayList<>();
-
-        final IpAddressTO ip1 = new IpAddressTO(1, "64.1.1.10", true, true, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
-        final IpAddressTO ip2 = new IpAddressTO(2, "64.1.1.11", false, false, true, "vlan://64", "64.1.1.1", "255.255.255.0", "01:23:45:67:89:AB", 1000, false);
-        final IpAddressTO ip3 = new IpAddressTO(3, "65.1.1.11", true, false, false, "vlan://65", "65.1.1.1", "255.255.255.0", "11:23:45:67:89:AB", 1000, false);
-        ip1.setTrafficType(TrafficType.Public);
-        ip2.setTrafficType(TrafficType.Public);
-        ip3.setTrafficType(TrafficType.Public);
-        ips.add(ip1);
-        ips.add(ip2);
-        ips.add(ip3);
-
-        final IpAddressTO[] ipArray = ips.toArray(new IpAddressTO[ips.size()]);
-        final IpAssocVpcCommand cmd = new IpAssocVpcCommand(ipArray);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
-        assertEquals(6, cmd.getAnswersCount()); // AnswersCount is clearly wrong as it doesn't know enough to tell
 
         return cmd;
     }

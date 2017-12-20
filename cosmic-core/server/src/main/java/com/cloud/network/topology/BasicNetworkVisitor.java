@@ -8,7 +8,6 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
-import com.cloud.network.PublicIpAddress;
 import com.cloud.network.VpnUser;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.router.CommandSetupHelper;
@@ -43,7 +42,6 @@ import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicIpAliasVO;
 
@@ -78,12 +76,11 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final StaticNatRules nat) throws ResourceUnavailableException {
-        final Network network = nat.getNetwork();
         final VirtualRouter router = nat.getRouter();
         final List<? extends StaticNat> rules = nat.getRules();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createApplyStaticNatCommands(rules, router, cmds, network.getId());
+        _commandSetupHelper.createApplyStaticNatCommands(rules, router, cmds);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }
@@ -138,13 +135,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final IpAssociationRules ipRules) throws ResourceUnavailableException {
-        final VirtualRouter router = ipRules.getRouter();
-
-        final Commands commands = new Commands(Command.OnError.Continue);
-        final List<? extends PublicIpAddress> ips = ipRules.getIpAddresses();
-
-        _commandSetupHelper.createAssociateIPCommands(router, ips, commands);
-        return _networkGeneralHelper.sendCommandsToRouter(router, commands);
+        throw new CloudRuntimeException("NetworkAclsRules not implemented in Basic Network Topology.");
     }
 
     @Override
@@ -174,14 +165,9 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
         final VirtualRouter router = dhcp.getRouter();
 
         final Commands commands = new Commands(Command.OnError.Stop);
-        final NicVO nicVo = dhcp.getNicVo();
-        final UserVmVO userVM = dhcp.getUserVM();
         final DeployDestination destination = dhcp.getDestination();
 
-        if (router.getPodIdToDeployIn().longValue() == destination.getPod().getId()) {
-            return _networkGeneralHelper.sendCommandsToRouter(router, commands);
-        }
-        return true;
+        return router.getPodIdToDeployIn() != destination.getPod().getId() || _networkGeneralHelper.sendCommandsToRouter(router, commands);
     }
 
     @Override

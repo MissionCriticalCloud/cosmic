@@ -2,7 +2,9 @@ package com.cloud.network.topology;
 
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PvlanSetupCommand;
+import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
+import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dc.DataCenter;
@@ -24,13 +26,14 @@ import com.cloud.network.rules.VpcIpAssociationRules;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
-import com.cloud.network.vpc.StaticRouteProfile;
+import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -102,8 +105,14 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final List<PublicIpAddress> ipsToSend = vpcip.getIpsToSend();
 
         if (!ipsToSend.isEmpty()) {
-            s_logger.debug("DEBUG::in AdvancedNetworkTopology --> will createVpcAssociatePublicIPCommands and send to router --> " + router.getId());
-            _commandSetupHelper.createVpcAssociatePublicIPCommands(router, ipsToSend, cmds);
+            final List<Ip> ipsToExclude = new ArrayList<>();
+            _commandSetupHelper.findIpsToExclude(ipsToSend, ipsToExclude);
+
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+            final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+            updateNetworkOverviewCommand.setPlugNics(true);
+            cmds.addCommand(updateNetworkOverviewCommand);
+
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
         } else {
             return true;
@@ -129,7 +138,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
         final VirtualRouter router = privateGW.getRouter();
         final NicProfile nicProfile = privateGW.getNicProfile();
 
-        final boolean isAddOperation = privateGW.isAddOperation();
+        final boolean add = privateGW.isAddOperation();
 
         if (router.getState() == State.Running) {
 
@@ -140,7 +149,15 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
             final PrivateIpAddress ip = new PrivateIpAddress(ipVO, network.getBroadcastUri().toString(), network.getGateway(), netmask, nicProfile.getMacAddress());
 
             final Commands cmds = new Commands(Command.OnError.Stop);
-            _commandSetupHelper.createSetupPrivateGatewayCommand(router, ip, cmds, nicProfile, isAddOperation);
+
+            final List<Ip> ipsToExclude = new ArrayList<>();
+            if (!add) {
+                ipsToExclude.add(new Ip(ip.getIpAddress()));
+            }
+
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+            final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+            cmds.addCommand(updateNetworkOverviewCommand);
 
             try {
                 if (_networkGeneralHelper.sendCommandsToRouter(router, cmds)) {
@@ -151,7 +168,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                     return false;
                 }
             } catch (final Exception ex) {
-                s_logger.warn("Failed to send  " + (isAddOperation ? "add " : "delete ") + " private network " + network + " commands to rotuer ");
+                s_logger.warn("Failed to send  " + (add ? "add " : "delete ") + " private network " + network + " commands to rotuer ");
                 return false;
             }
         } else if (router.getState() == State.Stopped || router.getState() == State.Stopping) {
@@ -198,10 +215,12 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
     @Override
     public boolean visit(final StaticRoutesRules staticRoutesRules) throws ResourceUnavailableException {
         final VirtualRouter router = staticRoutesRules.getRouter();
-        final List<StaticRouteProfile> staticRoutes = staticRoutesRules.getStaticRoutes();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createStaticRouteCommands(staticRoutes, router, cmds);
+
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
 
         return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }

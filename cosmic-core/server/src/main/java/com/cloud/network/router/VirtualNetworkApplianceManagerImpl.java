@@ -1147,14 +1147,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
 
         final String rpValue = _configDao.getValue(Config.NetworkRouterRpFilter.key());
-        if (rpValue != null && rpValue.equalsIgnoreCase("true")) {
-            _disableRpFilter = true;
-        } else {
-            _disableRpFilter = false;
-        }
+        _disableRpFilter = rpValue != null && rpValue.equalsIgnoreCase("true");
 
         String rpFilter = " ";
-        String type = null;
+        String type;
         if (router.getVpcId() != null) {
             type = "vpcrouter";
             if (_disableRpFilter) {
@@ -1173,7 +1169,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             rpFilter = " disable_rp_filter=true";
         }
 
-        buf.append(" type=" + type + rpFilter);
+        buf.append(" type=").append(type).append(rpFilter);
 
         final String domain_suffix = dc.getDetail(ZoneConfig.DnsSearchOrder.getName());
         if (domain_suffix != null) {
@@ -1200,7 +1196,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
 
             boolean useExtDns = !dnsProvided;
-      /* For backward compatibility */
+            /* For backward compatibility */
             useExtDns = useExtDns || UseExternalDnsServers.valueIn(dc.getId());
 
             if (useExtDns) {
@@ -1388,20 +1384,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
     }
 
-    protected void finalizeIpAssocForNetwork(final Commands cmds, final VirtualRouter router, final Provider provider, final Long guestNetworkId,
-                                             final Map<String, String> vlanMacAddress) {
-
-        final ArrayList<? extends PublicIpAddress> publicIps = getPublicIpsToApply(router, provider, guestNetworkId);
-
-        if (publicIps != null && !publicIps.isEmpty()) {
-            s_logger.debug("Found " + publicIps.size() + " ip(s) to apply as a part of domR " + router + " start.");
-            // Re-apply public ip addresses - should come before PF/LB/VPN
-            if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
-                _commandSetupHelper.createAssociateIPCommands(router, publicIps, cmds);
-            }
-        }
-    }
-
     protected void finalizeNetworkRulesForNetwork(final Commands cmds, final DomainRouterVO router, final Provider provider, final Long guestNetworkId) {
         s_logger.debug("Resending ipAssoc, port forwarding, load balancing rules as a part of Virtual router start");
 
@@ -1461,7 +1443,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             // Re-apply static nats
             s_logger.debug("Found " + staticNats.size() + " static nat(s) to apply as a part of domR " + router + " start.");
             if (!staticNats.isEmpty()) {
-                _commandSetupHelper.createApplyStaticNatCommands(staticNats, router, cmds, guestNetworkId);
+                _commandSetupHelper.createApplyStaticNatCommands(staticNats, router, cmds);
             }
 
             // Re-apply firewall Ingress rules
@@ -1577,7 +1559,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
         final SetMonitorServiceCommand command = new SetMonitorServiceCommand(servicesTO);
         command.setAccessDetail(NetworkElementCommand.ROUTER_IP, controlNic.getIPv4Address());
-        command.setAccessDetail(NetworkElementCommand.ROUTER_GUEST_IP, _routerControlHelper.getRouterIpInNetwork(networkId, router.getId()));
         command.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
 
         if (!add) {
@@ -1725,10 +1706,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         // restart network if restartNetwork = false is not specified in profile
         // parameters
-        boolean reprogramGuestNtwks = true;
-        if (profile.getParameter(Param.ReProgramGuestNetworks) != null && (Boolean) profile.getParameter(Param.ReProgramGuestNetworks) == false) {
-            reprogramGuestNtwks = false;
-        }
+        boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
 
         final VirtualRouterProvider vrProvider = _vrProviderDao.findById(router.getElementId());
         if (vrProvider == null) {
@@ -1750,7 +1728,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             cmds.addCommand(startCmd);
 
             if (reprogramGuestNtwks) {
-                finalizeIpAssocForNetwork(cmds, router, provider, guestNetworkId, null);
                 finalizeNetworkRulesForNetwork(cmds, router, provider, guestNetworkId);
 
                 final NetworkOffering offering = _networkOfferingDao.findById(_networkDao.findById(guestNetworkId).getNetworkOfferingId());
@@ -2080,12 +2057,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException, ResourceUnavailableException {
+    public boolean prepareAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
         return aggregationExecution(Action.Start, network, routers);
     }
 
-    protected boolean aggregationExecution(final AggregationControlCommand.Action action, final Network network, final List<DomainRouterVO> routers)
-            throws AgentUnavailableException, ResourceUnavailableException {
+    private boolean aggregationExecution(final AggregationControlCommand.Action action, final Network network, final List<DomainRouterVO> routers)
+            throws ResourceUnavailableException {
         int errors = 0;
         for (final DomainRouterVO router : routers) {
 
@@ -2113,7 +2090,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws AgentUnavailableException, ResourceUnavailableException {
+    public boolean completeAggregatedExecution(final Network network, final List<DomainRouterVO> routers) throws ResourceUnavailableException {
         return aggregationExecution(Action.Finish, network, routers);
     }
 
@@ -2142,16 +2119,13 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 if (state != VirtualMachine.State.Stopped && state != VirtualMachine.State.Destroyed) {
                     try {
                         stopRouter(router.getId(), false);
-                    } catch (final ResourceUnavailableException e) {
-                        s_logger.warn("Fail to stop router " + router.getInstanceName(), e);
-                        throw new ConnectionException(false, "Fail to stop router " + router.getInstanceName());
-                    } catch (final ConcurrentOperationException e) {
+                    } catch (final ResourceUnavailableException | ConcurrentOperationException e) {
                         s_logger.warn("Fail to stop router " + router.getInstanceName(), e);
                         throw new ConnectionException(false, "Fail to stop router " + router.getInstanceName());
                     }
                 }
                 router.setStopPending(false);
-                router = _routerDao.persist(router);
+                _routerDao.persist(router);
             }
         }
     }

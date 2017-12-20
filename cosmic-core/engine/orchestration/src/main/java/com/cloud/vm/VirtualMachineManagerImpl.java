@@ -1307,12 +1307,14 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @DB
-    protected Ternary<VMInstanceVO, ReservationContext, ItWorkVO> changeToStartState(final VirtualMachineGuru vmGuru, final VMInstanceVO vm, final User caller,
-                                                                                     final Account account) throws ConcurrentOperationException {
+    private Ternary<VMInstanceVO, ReservationContext, ItWorkVO> changeToStartState(final VMInstanceVO vm, final User caller, final Account account)
+            throws ConcurrentOperationException {
+
         final long vmId = vm.getId();
 
         ItWorkVO work = new ItWorkVO(UUID.randomUUID().toString(), _nodeId, State.Starting, vm.getType(), vm.getId());
         int retry = VmOpLockStateRetry.value();
+
         while (retry-- != 0) {
             try {
                 final ItWorkVO workFinal = work;
@@ -1701,10 +1703,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final User caller = cctxt.getCallingUser();
 
         VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
-
-        final VirtualMachineGuru vmGuru = getVmGuru(vm);
-
-        final Ternary<VMInstanceVO, ReservationContext, ItWorkVO> start = changeToStartState(vmGuru, vm, caller, account);
+        final Ternary<VMInstanceVO, ReservationContext, ItWorkVO> start = changeToStartState(vm, caller, account);
         if (start == null) {
             return;
         }
@@ -1722,12 +1721,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         if (planToDeploy != null && planToDeploy.getDataCenterId() != 0) {
             s_logger.debug("advanceStart: DeploymentPlan is provided, using dcId:" + planToDeploy.getDataCenterId() + ", podId: " + planToDeploy.getPodId()
                     + ", clusterId: " + planToDeploy.getClusterId() + ", hostId: " + planToDeploy.getHostId() + ", poolId: " + planToDeploy.getPoolId());
-            plan =
-                    new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
-                            planToDeploy.getPoolId(), planToDeploy.getPhysicalNetworkId(), ctx);
+            plan = new DataCenterDeployment(planToDeploy.getDataCenterId(), planToDeploy.getPodId(), planToDeploy.getClusterId(), planToDeploy.getHostId(),
+                    planToDeploy.getPoolId(), planToDeploy.getPhysicalNetworkId(), ctx);
         }
 
         final HypervisorGuru hvGuru = _hvGuruMgr.getGuru(vm.getHypervisorType());
+        final VirtualMachineGuru vmGuru = getVmGuru(vm);
 
         boolean canRetry = true;
         ExcludeList avoids = null;
@@ -1757,7 +1756,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         // let planner
                         // reassign pool for the volume even if it ready.
                         final Long volTemplateId = vol.getTemplateId();
-                        if (volTemplateId != null && volTemplateId.longValue() != template.getId()) {
+                        if (volTemplateId != null && volTemplateId != template.getId()) {
                             s_logger.debug(vol + " of " + vm + " is READY, but template ids don't match, let the planner reassign a new pool");
                             continue;
                         }
@@ -1788,7 +1787,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 final Account owner = _entityMgr.findById(Account.class, vm.getAccountId());
                 final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vm, template, offering, owner, params);
-                DeployDestination dest = null;
+                DeployDestination dest;
                 try {
                     dest = _dpMgr.planDeployment(vmProfile, plan, avoids, planner);
                 } catch (final AffinityConflictException e2) {
@@ -1849,15 +1848,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         reuseVolume = true;
                     }
 
-                    Commands cmds = null;
                     vmGuru.finalizeVirtualMachineProfile(vmProfile, dest, ctx);
 
                     final VirtualMachineTO vmTO = hvGuru.implement(vmProfile);
 
                     handlePath(vmTO.getDisks(), vm.getHypervisorType());
 
-                    cmds = new Commands(Command.OnError.Stop);
-
+                    final Commands cmds = new Commands(Command.OnError.Stop);
                     cmds.addCommand(new StartCommand(vmTO, dest.getHost(), getExecuteInSequence(vm.getHypervisorType())));
 
                     vmGuru.finalizeDeployment(cmds, vmProfile, dest, ctx);
@@ -1958,10 +1955,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             s_logger.warn("unexpected InsufficientCapacityException : " + e.getScope().getName(), e);
                         }
                     }
-                } catch (final ExecutionException e) {
-                    s_logger.error("Failed to start instance " + vm, e);
-                    throw new AgentUnavailableException("Unable to start instance due to " + e.getMessage(), destHostId, e);
-                } catch (final NoTransitionException e) {
+                } catch (final ExecutionException | NoTransitionException e) {
                     s_logger.error("Failed to start instance " + vm, e);
                     throw new AgentUnavailableException("Unable to start instance due to " + e.getMessage(), destHostId, e);
                 } finally {
