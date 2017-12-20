@@ -22,10 +22,8 @@ import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
-import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.DataCenterVnetDao;
-import com.cloud.dc.dao.HostPodDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.domain.Domain;
@@ -35,8 +33,6 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.EventDao;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -45,8 +41,6 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.framework.messagebus.MessageBus;
-import com.cloud.host.dao.HostDao;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress.State;
@@ -64,7 +58,6 @@ import com.cloud.network.dao.AccountGuestVlanMapVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.LoadBalancerVMMapDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDomainDao;
 import com.cloud.network.dao.NetworkDomainVO;
@@ -94,7 +87,6 @@ import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.NetworkACLDao;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.StaticRouteDao;
-import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -189,113 +181,128 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     // MAX_VXLAN_VNI should be 16777215L (2^24-1), but Linux vxlan interface doesn't accept VNI:2^24-1 now.
     // It seems a bug.
     @Inject
-    public SecurityGroupService _securityGroupService;
+    private SecurityGroupService _securityGroupService;
     @Inject
     DataCenterDao _dcDao = null;
     @Inject
+    private
     VlanDao _vlanDao = null;
     @Inject
+    private
     IPAddressDao _ipAddressDao = null;
     @Inject
     AccountDao _accountDao = null;
     @Inject
+    private
     DomainDao _domainDao = null;
     @Inject
+    private
     UserDao _userDao = null;
     @Inject
-    EventDao _eventDao = null;
-    @Inject
+    private
     ConfigurationDao _configDao;
     @Inject
+    private
     UserVmDao _userVmDao = null;
     @Inject
     AccountManager _accountMgr;
     @Inject
+    private
     ConfigurationManager _configMgr;
-    @Inject
-    AccountVlanMapDao _accountVlanMapDao;
     @Inject
     NetworkOfferingDao _networkOfferingDao = null;
     @Inject
     NetworkDao _networksDao = null;
     @Inject
+    private
     NicDao _nicDao = null;
     @Inject
+    private
     RulesManager _rulesMgr;
     @Inject
-    UsageEventDao _usageEventDao;
-    List<NetworkGuru> _networkGurus;
-    @Inject
+    private
     NetworkDomainDao _networkDomainDao;
     @Inject
+    private
     VMInstanceDao _vmDao;
     @Inject
+    private
     FirewallRulesDao _firewallDao;
     @Inject
+    private
     ResourceLimitService _resourceLimitMgr;
     @Inject
+    private
     DomainManager _domainMgr;
     @Inject
     ProjectManager _projectMgr;
     @Inject
+    private
     NetworkOfferingServiceMapDao _ntwkOfferingSrvcDao;
     @Inject
     PhysicalNetworkDao _physicalNetworkDao;
     @Inject
+    private
     PhysicalNetworkServiceProviderDao _pNSPDao;
     @Inject
+    private
     PhysicalNetworkTrafficTypeDao _pNTrafficTypeDao;
     @Inject
+    private
     NetworkServiceMapDao _ntwkSrvcDao;
     @Inject
+    private
     StorageNetworkManager _stnwMgr;
     @Inject
+    private
     VpcManager _vpcMgr;
     @Inject
     PrivateIpDao _privateIpDao;
     @Inject
+    private
     ResourceTagDao _resourceTagDao;
     @Inject
     NetworkOrchestrationService _networkMgr;
     @Inject
+    private
     NetworkModel _networkModel;
     @Inject
+    private
     NicSecondaryIpDao _nicSecondaryIpDao;
     @Inject
+    private
     PortForwardingRulesDao _portForwardingDao;
-    @Inject
-    HostDao _hostDao;
-    @Inject
-    HostPodDao _hostPodDao;
     @Inject
     DataCenterVnetDao _datacneterVnet;
     @Inject
     AccountGuestVlanMapDao _accountGuestVlanMapDao;
     @Inject
-    VpcDao _vpcDao;
-    @Inject
+    private
     NetworkACLDao _networkACLDao;
     @Inject
+    private
     IpAddressManager _ipAddrMgr;
     @Inject
+    private
     EntityManager _entityMgr;
     @Inject
-    LoadBalancerVMMapDao _lbVmMapDao;
-    @Inject
+    private
     StaticRouteDao _staticRouteDao;
     @Inject
+    private
     LoadBalancingRulesService _lbService;
     @Inject
-    MessageBus _messageBus;
-    @Inject
+    private
     ZoneRepository zoneRepository;
 
-    int _cidrLimit;
-    boolean _allowSubdomainNetworkAccess;
+    private int _cidrLimit;
+    private boolean _allowSubdomainNetworkAccess;
+
+    private List<NetworkGuru> _networkGurus;
 
     private Map<String, String> _configs;
 
-    protected NetworkServiceImpl() {
+    NetworkServiceImpl() {
     }
 
     /* Get a list of IPs, classify them by service */
@@ -395,7 +402,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return ipToServices;
     }
 
-    protected boolean canIpUsedForNonConserveService(final PublicIp ip, final Service service) {
+    private boolean canIpUsedForNonConserveService(final PublicIp ip, final Service service) {
         // If it's non-conserve mode, then the new ip should not be used by any other services
         final List<PublicIp> ipList = new ArrayList<>();
         ipList.add(ip);
@@ -408,7 +415,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return true;
     }
 
-    protected boolean canIpsUsedForNonConserve(final List<PublicIp> publicIps) {
+    private boolean canIpsUsedForNonConserve(final List<PublicIp> publicIps) {
         boolean result = true;
         for (final PublicIp ip : publicIps) {
             result = canIpUsedForNonConserveService(ip, null);
@@ -856,29 +863,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
 
-        final Collection<String> ntwkProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(ntwkOff, physicalNetworkId).values();
-        if (ipv6 && providersConfiguredForExternalNetworking(ntwkProviders)) {
-            throw new InvalidParameterValueException("Cannot support IPv6 on network offering with external devices!");
-        }
-
-        if (isolatedPvlan != null && providersConfiguredForExternalNetworking(ntwkProviders)) {
-            throw new InvalidParameterValueException("Cannot support private vlan on network offering with external devices!");
-        }
-
-        if (cidr != null && providersConfiguredForExternalNetworking(ntwkProviders)) {
-            if (ntwkOff.getGuestType() == GuestType.Shared && zone.getNetworkType() == NetworkType.Advanced && isSharedNetworkOfferingWithServices(networkOfferingId)) {
-                // validate if CIDR specified overlaps with any of the CIDR's allocated for isolated networks and shared networks in the zone
-                checkSharedNetworkCidrOverlap(zoneId, pNtwk.getId(), cidr);
-            } else {
-                // if the guest network is for the VPC, if any External Provider are supported in VPC
-                // cidr will not be null as it is generated from the super cidr of vpc.
-                // if cidr is not null and network is not part of vpc then throw the exception
-                if (vpcId == null) {
-                    throw new InvalidParameterValueException("Cannot specify CIDR when using network offering with external devices!");
-                }
-            }
-        }
-
         // Vlan is created in 1 cases - works in Advance zone only:
         // 1) GuestType is Shared
         boolean createVlan = startIP != null && endIP != null && zone.getNetworkType() == NetworkType.Advanced
@@ -937,7 +921,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return network;
     }
 
-    public void checkIpExclusionList(final String ipExclusionList, final String cidr, final List<NicVO> nicsPresent) {
+    private void checkIpExclusionList(final String ipExclusionList, final String cidr, final List<NicVO> nicsPresent) {
         if (StringUtils.isNotBlank(ipExclusionList)) {
             // validate ipExclusionList
             // Perform a "syntax" check on the list
@@ -1614,9 +1598,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 final Collection<String> newProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(networkOffering, network.getPhysicalNetworkId()).values();
                 final Collection<String> oldProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(oldNtwkOff, network.getPhysicalNetworkId()).values();
 
-                if (providersConfiguredForExternalNetworking(newProviders) != providersConfiguredForExternalNetworking(oldProviders) && !changeCidr) {
-                    throw new InvalidParameterValueException("Updating network failed since guest CIDR needs to be changed!");
-                }
                 if (changeCidr) {
                     if (!checkForNonStoppedVmInNetwork(network.getId())) {
                         final InvalidParameterValueException ex = new InvalidParameterValueException("All user vm of network of specified id should be stopped before changing " +
@@ -2145,7 +2126,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     }
 
     @DB
-    protected void checkIfPhysicalNetworkIsDeletable(final Long physicalNetworkId) {
+    private void checkIfPhysicalNetworkIsDeletable(final Long physicalNetworkId) {
         final List<List<String>> tablesToCheck = new ArrayList<>();
 
         final List<String> vnet = new ArrayList<>();
@@ -3355,7 +3336,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return success;
     }
 
-    boolean removeNicSecondaryIP(final NicSecondaryIpVO ipVO, final boolean lastIp) {
+    private boolean removeNicSecondaryIP(final NicSecondaryIpVO ipVO, final boolean lastIp) {
         final long nicId = ipVO.getNicId();
         final NicVO nic = _nicDao.findById(nicId);
 
@@ -3475,7 +3456,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return success;
     }
 
-    NicSecondaryIp getNicSecondaryIp(final long id) {
+    private NicSecondaryIp getNicSecondaryIp(final long id) {
         final NicSecondaryIp nicSecIp = _nicSecondaryIpDao.findById(id);
         if (nicSecIp == null) {
             return null;
@@ -3494,7 +3475,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     }
 
     @DB
-    public void addOrRemoveVnets(final String[] listOfRanges, final PhysicalNetworkVO network) {
+    private void addOrRemoveVnets(final String[] listOfRanges, final PhysicalNetworkVO network) {
         List<String> addVnets = null;
         List<String> removeVnets = null;
         final HashSet<String> tempVnets = new HashSet<>();
@@ -3562,7 +3543,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
     }
 
-    protected PhysicalNetworkServiceProvider addDefaultVirtualRouterToPhysicalNetwork(final long physicalNetworkId) {
+    private PhysicalNetworkServiceProvider addDefaultVirtualRouterToPhysicalNetwork(final long physicalNetworkId) {
 
         final PhysicalNetworkServiceProvider nsp = addProviderToPhysicalNetwork(physicalNetworkId, Network.Provider.VirtualRouter.getName(), null, null);
         // add instance of the provider
@@ -3577,11 +3558,11 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return nsp;
     }
 
-    protected PhysicalNetworkServiceProvider addDefaultSecurityGroupProviderToPhysicalNetwork(final long physicalNetworkId) {
+    private PhysicalNetworkServiceProvider addDefaultSecurityGroupProviderToPhysicalNetwork(final long physicalNetworkId) {
         return addProviderToPhysicalNetwork(physicalNetworkId, Provider.SecurityGroupProvider.getName(), null, null);
     }
 
-    protected PhysicalNetworkServiceProvider addDefaultVpcVirtualRouterToPhysicalNetwork(final long physicalNetworkId) {
+    private PhysicalNetworkServiceProvider addDefaultVpcVirtualRouterToPhysicalNetwork(final long physicalNetworkId) {
 
         final PhysicalNetworkServiceProvider nsp = addProviderToPhysicalNetwork(physicalNetworkId, Network.Provider.VPCVirtualRouter.getName(), null, null);
 
@@ -3719,7 +3700,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return removeVnets;
     }
 
-    public String generateVnetString(final List<String> vnetList) {
+    private String generateVnetString(final List<String> vnetList) {
         Collections.sort(vnetList, new Comparator<String>() {
             @Override
             public int compare(final String s1, final String s2) {
@@ -3744,72 +3725,12 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return vnetRange;
     }
 
-    protected boolean isNetworkSystem(final Network network) {
+    private boolean isNetworkSystem(final Network network) {
         final NetworkOffering no = _networkOfferingDao.findByIdIncludingRemoved(network.getNetworkOfferingId());
         if (no.isSystemOnly()) {
             return true;
         } else {
             return false;
-        }
-    }
-
-    protected boolean providersConfiguredForExternalNetworking(final Collection<String> providers) {
-        for (final String providerStr : providers) {
-            final Provider provider = Network.Provider.getProvider(providerStr);
-            if (provider.isExternal()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void checkSharedNetworkCidrOverlap(final Long zoneId, final long physicalNetworkId, final String cidr) {
-        if (zoneId == null || cidr == null) {
-            return;
-        }
-
-        final DataCenter zone = _dcDao.findById(zoneId);
-        final List<NetworkVO> networks = _networksDao.listByZone(zoneId);
-        final Map<Long, String> networkToCidr = new HashMap<>();
-
-        // check for CIDR overlap with all possible CIDR for isolated guest networks
-        // in the zone when using external networking
-        final PhysicalNetworkVO pNetwork = _physicalNetworkDao.findById(physicalNetworkId);
-        if (pNetwork.getVnet() != null) {
-            final List<Pair<Integer, Integer>> vlanList = pNetwork.getVnet();
-            for (final Pair<Integer, Integer> vlanRange : vlanList) {
-                final Integer lowestVlanTag = vlanRange.first();
-                final Integer highestVlanTag = vlanRange.second();
-                for (int vlan = lowestVlanTag; vlan <= highestVlanTag; ++vlan) {
-                    final int offset = vlan - lowestVlanTag;
-                    final String globalVlanBits = _configDao.getValue(Config.GuestVlanBits.key());
-                    final int cidrSize = 8 + Integer.parseInt(globalVlanBits);
-                    final String guestNetworkCidr = zone.getGuestNetworkCidr();
-                    final String[] cidrTuple = guestNetworkCidr.split("\\/");
-                    final long newCidrAddress = NetUtils.ip2Long(cidrTuple[0]) & 0xff000000 | offset << 32 - cidrSize;
-                    if (NetUtils.isNetworksOverlap(NetUtils.long2Ip(newCidrAddress), cidr)) {
-                        throw new InvalidParameterValueException("Specified CIDR for shared network conflict with CIDR that is reserved for zone vlan " + vlan);
-                    }
-                }
-            }
-        }
-
-        // check for CIDR overlap with all CIDR's of the shared networks in the zone
-        for (final NetworkVO network : networks) {
-            if (network.getGuestType() == GuestType.Isolated) {
-                continue;
-            }
-            if (network.getCidr() != null) {
-                networkToCidr.put(network.getId(), network.getCidr());
-            }
-        }
-        if (networkToCidr != null && !networkToCidr.isEmpty()) {
-            for (final long networkId : networkToCidr.keySet()) {
-                final String ntwkCidr = networkToCidr.get(networkId);
-                if (NetUtils.isNetworksOverlap(ntwkCidr, cidr)) {
-                    throw new InvalidParameterValueException("Specified CIDR for shared network conflict with CIDR of a shared network in the zone.");
-                }
-            }
         }
     }
 
@@ -3891,7 +3812,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
     }
 
-    protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
+    private boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
         final NetworkOfferingVO networkOffering = _networkOfferingDao.findById(networkOfferingId);
         if (networkOffering.getGuestType() == Network.GuestType.Shared
                 && (areServicesSupportedByNetworkOffering(networkOfferingId, Service.SourceNat) || areServicesSupportedByNetworkOffering(networkOfferingId, Service.StaticNat)
@@ -3936,7 +3857,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         return vms.isEmpty();
     }
 
-    protected boolean canUpgrade(final Network network, final long oldNetworkOfferingId, final long newNetworkOfferingId) {
+    private boolean canUpgrade(final Network network, final long oldNetworkOfferingId, final long newNetworkOfferingId) {
         final NetworkOffering oldNetworkOffering = _networkOfferingDao.findByIdIncludingRemoved(oldNetworkOfferingId);
         final NetworkOffering newNetworkOffering = _networkOfferingDao.findById(newNetworkOfferingId);
 
@@ -4005,10 +3926,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         return canIpsUseOffering(publicIps, newNetworkOfferingId);
-    }
-
-    public List<NetworkGuru> getNetworkGurus() {
-        return _networkGurus;
     }
 
     @Inject

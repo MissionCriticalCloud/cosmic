@@ -93,10 +93,6 @@
         <property name="secChecker" value="#{securityCheckersRegistry.registered}" />
     </bean>
 
-    <bean id="externalDeviceUsageManagerImpl" class="com.cloud.network.ExternalDeviceUsageManagerImpl" />
-
-    <bean id="externalNetworkDeviceManagerImpl" class="com.cloud.network.ExternalNetworkDeviceManagerImpl" />
-
     <bean id="firewallManagerImpl" class="com.cloud.network.firewall.FirewallManagerImpl">
         <property name="firewallElements" value="#{firewallServiceProvidersRegistry.registered}" />
         <property name="networkAclElements" value="#{networkACLServiceProvidersRegistry.registered}" />
