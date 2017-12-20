@@ -2,7 +2,6 @@ package com.cloud.dc;
 
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network.Provider;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
@@ -59,28 +58,12 @@ public class DataCenterVO implements DataCenter {
     private String internalDns1 = null;
     @Column(name = "internal_dns2")
     private String internalDns2 = null;
-    @Column(name = "router_mac_address", updatable = false, nullable = false)
-    private String routerMacAddress = "02:00:00:00:00:01";
     @Column(name = "guest_network_cidr")
     private String guestNetworkCidr = null;
     @Column(name = "domain_id")
     private Long domainId = null;
     @Column(name = "domain")
     private String domain;
-    @Column(name = "dns_provider")
-    private String dnsProvider;
-    @Column(name = "dhcp_provider")
-    private String dhcpProvider;
-    @Column(name = "gateway_provider")
-    private String gatewayProvider;
-    @Column(name = "vpn_provider")
-    private String vpnProvider;
-    @Column(name = "userdata_provider")
-    private String userDataProvider;
-    @Column(name = "lb_provider")
-    private String loadBalancerProvider;
-    @Column(name = "firewall_provider")
-    private String firewallProvider;
     @Column(name = "mac_address", nullable = false)
     @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
     private long macAddress = 1;
@@ -91,9 +74,8 @@ public class DataCenterVO implements DataCenter {
     @Column(name = "uuid")
     private String uuid;
 
-    public DataCenterVO(final long id, final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String
-            guestCidr, final String domain, final Long domainId,
-                        final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
+    public DataCenterVO(final long id, final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr, final String
+            domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
         this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, false, null, null);
         this.id = id;
         this.allocationState = AllocationState.Enabled;
@@ -120,35 +102,12 @@ public class DataCenterVO implements DataCenter {
         this.securityGroupEnabled = securityGroupEnabled;
         this.localStorageEnabled = localStorageEnabled;
 
-        if (zoneType == NetworkType.Advanced) {
-            loadBalancerProvider = Provider.VirtualRouter.getName();
-            firewallProvider = Provider.VirtualRouter.getName();
-            dhcpProvider = Provider.VirtualRouter.getName();
-            dnsProvider = Provider.VirtualRouter.getName();
-            gatewayProvider = Provider.VirtualRouter.getName();
-            vpnProvider = Provider.VirtualRouter.getName();
-            userDataProvider = Provider.VirtualRouter.getName();
-        } else if (zoneType == NetworkType.Basic) {
-            dhcpProvider = Provider.VirtualRouter.getName();
-            dnsProvider = Provider.VirtualRouter.getName();
-            userDataProvider = Provider.VirtualRouter.getName();
-            loadBalancerProvider = Provider.ElasticLoadBalancerVm.getName();
-        }
-
         this.zoneToken = zoneToken;
         this.domain = domainSuffix;
         this.uuid = UUID.randomUUID().toString();
     }
 
     public DataCenterVO() {
-    }
-
-    public String getRouterMacAddress() {
-        return routerMacAddress;
-    }
-
-    public void setRouterMacAddress(final String routerMacAddress) {
-        this.routerMacAddress = routerMacAddress;
     }
 
     @Override
@@ -232,61 +191,6 @@ public class DataCenterVO implements DataCenter {
     }
 
     @Override
-    public String getDnsProvider() {
-        return dnsProvider;
-    }
-
-    public void setDnsProvider(final String dnsProvider) {
-        this.dnsProvider = dnsProvider;
-    }
-
-    @Override
-    public String getGatewayProvider() {
-        return gatewayProvider;
-    }
-
-    public void setGatewayProvider(final String gatewayProvider) {
-        this.gatewayProvider = gatewayProvider;
-    }
-
-    @Override
-    public String getFirewallProvider() {
-        return firewallProvider;
-    }
-
-    @Override
-    public String getDhcpProvider() {
-        return dhcpProvider;
-    }
-
-    public void setDhcpProvider(final String dhcpProvider) {
-        this.dhcpProvider = dhcpProvider;
-    }
-
-    @Override
-    public String getLoadBalancerProvider() {
-        return loadBalancerProvider;
-    }
-
-    public void setLoadBalancerProvider(final String loadBalancerProvider) {
-        this.loadBalancerProvider = loadBalancerProvider;
-    }
-
-    @Override
-    public String getUserDataProvider() {
-        return userDataProvider;
-    }
-
-    @Override
-    public String getVpnProvider() {
-        return vpnProvider;
-    }
-
-    public void setVpnProvider(final String vpnProvider) {
-        this.vpnProvider = vpnProvider;
-    }
-
-    @Override
     public boolean isSecurityGroupEnabled() {
         return securityGroupEnabled;
     }
@@ -326,18 +230,6 @@ public class DataCenterVO implements DataCenter {
 
     public void setLocalStorageEnabled(final boolean enabled) {
         this.localStorageEnabled = enabled;
-    }
-
-    public void setZoneToken(final String zoneToken) {
-        this.zoneToken = zoneToken;
-    }
-
-    public void setUserDataProvider(final String userDataProvider) {
-        this.userDataProvider = userDataProvider;
-    }
-
-    public void setFirewallProvider(final String firewallProvider) {
-        this.firewallProvider = firewallProvider;
     }
 
     public void setInternalDns2(final String dns4) {

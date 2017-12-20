@@ -46,7 +46,6 @@ import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.command.user.vmgroup.CreateVMGroupCmd;
 import com.cloud.api.command.user.vmgroup.DeleteVMGroupCmd;
-import com.cloud.api.query.dao.UserVmJoinDao;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.Config;
@@ -79,10 +78,8 @@ import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.service.api.OrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
-import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
@@ -104,7 +101,6 @@ import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
@@ -119,7 +115,6 @@ import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
@@ -145,7 +140,6 @@ import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.security.SecurityGroupManager;
 import com.cloud.network.security.dao.SecurityGroupDao;
-import com.cloud.network.security.dao.SecurityGroupVMMapDao;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
@@ -157,7 +151,6 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.ProjectManager;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
-import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingVO;
@@ -185,15 +178,12 @@ import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
-import com.cloud.storage.dao.VMTemplateDetailsDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
-import com.cloud.storage.snapshot.SnapshotManager;
-import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.template.TemplateManager;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.user.Account;
@@ -236,7 +226,6 @@ import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.InstanceGroupVMMapDao;
 import com.cloud.vm.dao.NicDao;
-import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -268,18 +257,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserVmManagerImpl extends ManagerBase implements UserVmManager, VirtualMachineGuru, UserVmService, Configurable {
-    static final ConfigKey<Integer> VmIpFetchWaitInterval = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.retrieval.interval", "180",
+    private static final ConfigKey<Integer> VmIpFetchWaitInterval = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.retrieval.interval", "180",
             "Wait Interval (in seconds) for shared network vm dhcp ip addr fetch for next iteration ", true);
-    static final ConfigKey<Integer> VmIpFetchTrialMax = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.max.retry", "10",
+    private static final ConfigKey<Integer> VmIpFetchTrialMax = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.max.retry", "10",
             "The max number of retrieval times for shared entwork vm dhcp ip fetch, in case of failures", true);
 
     // seconds
-    static final ConfigKey<Integer> VmIpFetchThreadPoolMax = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmipFetch.threadPool.max", "10",
+    private static final ConfigKey<Integer> VmIpFetchThreadPoolMax = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmipFetch.threadPool.max", "10",
             "number of threads for fetching vms ip address", true);
     private static final Logger s_logger = LoggerFactory.getLogger(UserVmManagerImpl.class);
     private static final int ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_COOPERATION = 3; // 3 seconds
     private static final long GB_TO_BYTES = 1024 * 1024 * 1024;
-    private static final int MAX_VM_NAME_LEN = 80;
     private static final int MAX_HTTP_GET_LENGTH = 2 * MAX_USER_DATA_LENGTH_BYTES;
     private static final int MAX_HTTP_POST_LENGTH = 16 * MAX_USER_DATA_LENGTH_BYTES;
     @Inject
@@ -291,9 +279,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected VMTemplateDao _templateDao = null;
     @Inject
-    protected VMTemplateDetailsDao _templateDetailsDao = null;
-    @Inject
-    protected VMTemplateZoneDao _templateZoneDao = null;
+    private VMTemplateZoneDao _templateZoneDao = null;
     @Inject
     protected TemplateDataStoreDao _templateStoreDao;
     @Inject
@@ -301,13 +287,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected UserVmDao _vmDao = null;
     @Inject
-    protected UserVmJoinDao _vmJoinDao = null;
-    @Inject
     protected VolumeDao _volsDao = null;
     @Inject
-    protected FirewallRulesDao _rulesDao = null;
+    private FirewallRulesDao _rulesDao = null;
     @Inject
-    protected LoadBalancerVMMapDao _loadBalancerVMMapDao = null;
+    private LoadBalancerVMMapDao _loadBalancerVMMapDao = null;
     @Inject
     protected PortForwardingRulesDao _portForwardingDao;
     @Inject
@@ -320,8 +304,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     protected NetworkOrchestrationService _networkMgr = null;
     @Inject
     protected StorageManager _storageMgr = null;
-    @Inject
-    protected SnapshotManager _snapshotMgr = null;
     @Inject
     protected AgentManager _agentMgr = null;
     @Inject
@@ -343,13 +325,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected AccountService _accountService;
     @Inject
-    protected AsyncJobManager _asyncMgr;
-    @Inject
     protected ClusterDao _clusterDao;
     @Inject
     protected PrimaryDataStoreDao _storagePoolDao;
     @Inject
-    protected SecurityGroupManager _securityGroupMgr;
+    private SecurityGroupManager _securityGroupMgr;
     @Inject
     protected ServiceOfferingDao _serviceOfferingDao;
     @Inject
@@ -357,7 +337,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected InstanceGroupDao _vmGroupDao;
     @Inject
-    protected InstanceGroupVMMapDao _groupVMMapDao;
+    private InstanceGroupVMMapDao _groupVMMapDao;
     @Inject
     protected VirtualMachineManager _itMgr;
     @Inject
@@ -365,21 +345,19 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected NicDao _nicDao;
     @Inject
-    protected ServiceOfferingDao _offerringDao;
-    @Inject
     protected VpcDao _vpcDao;
     @Inject
     protected RulesManager _rulesMgr;
     @Inject
     protected LoadBalancingRulesManager _lbMgr;
     @Inject
-    protected SSHKeyPairDao _sshKeyPairDao;
+    private SSHKeyPairDao _sshKeyPairDao;
     @Inject
     protected UserVmDetailsDao _vmDetailsDao;
     @Inject
     protected HypervisorCapabilitiesDao _hypervisorCapabilitiesDao;
     @Inject
-    protected SecurityGroupDao _securityGroupDao;
+    private SecurityGroupDao _securityGroupDao;
     @Inject
     protected CapacityManager _capacityMgr;
     @Inject
@@ -395,87 +373,72 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected NetworkServiceMapDao _ntwkSrvcDao;
     @Inject
-    protected ItWorkDao _workDao;
-    @Inject
     protected GuestOSCategoryDao _guestOSCategoryDao;
     @Inject
     protected VMSnapshotDao _vmSnapshotDao;
     @Inject
-    protected VMSnapshotManager _vmSnapshotMgr;
+    private VMSnapshotManager _vmSnapshotMgr;
     @Inject
-    protected VMNetworkMapDao _vmNetworkMapDao;
+    private VMNetworkMapDao _vmNetworkMapDao;
     @Inject
     protected IpAddressManager _ipAddrMgr;
     protected ScheduledExecutorService _executor = null;
-    protected int _expungeInterval;
-    protected int _expungeDelay;
-    protected boolean _dailyOrHourly = false;
+    private int _expungeInterval;
+    private int _expungeDelay;
+    private boolean _dailyOrHourly = false;
     protected String _instance;
     protected String _zone;
-    protected boolean _instanceNameFlag;
     protected int _scaleRetry;
-    protected Map<Long, VmAndCountDetails> vmIdCountMap = new ConcurrentHashMap<>();
+    private Map<Long, VmAndCountDetails> vmIdCountMap = new ConcurrentHashMap<>();
     @Inject
-    protected OrchestrationService _orchSrvc;
+    private OrchestrationService _orchSrvc;
     @Inject
     EntityManager _entityMgr;
     @Inject
-    SecurityGroupVMMapDao _securityGroupVMMapDao;
+    private PhysicalNetworkDao _physicalNetworkDao;
     @Inject
-    ResourceTagDao _resourceTagDao;
+    private VpcManager _vpcMgr;
     @Inject
-    PhysicalNetworkDao _physicalNetworkDao;
-    @Inject
-    VpcManager _vpcMgr;
-    @Inject
-    TemplateManager _templateMgr;
+    private TemplateManager _templateMgr;
     @Inject
     UsageEventDao _usageEventDao;
     @Inject
-    SecondaryStorageVmDao _secondaryDao;
+    private VmDiskStatisticsDao _vmDiskStatsDao;
     @Inject
-    VmDiskStatisticsDao _vmDiskStatsDao;
+    private AffinityGroupVMMapDao _affinityGroupVMMapDao;
     @Inject
-    AffinityGroupVMMapDao _affinityGroupVMMapDao;
+    private AffinityGroupDao _affinityGroupDao;
     @Inject
-    AffinityGroupDao _affinityGroupDao;
+    private DedicatedResourceDao _dedicatedDao;
     @Inject
-    TemplateDataFactory templateFactory;
+    private AffinityGroupService _affinityGroupService;
     @Inject
-    DedicatedResourceDao _dedicatedDao;
+    private PlannerHostReservationDao _plannerHostReservationDao;
     @Inject
-    ConfigurationServer _configServer;
+    private VolumeDataFactory volFactory;
     @Inject
-    AffinityGroupService _affinityGroupService;
+    private UserVmDetailsDao _uservmDetailsDao;
     @Inject
-    PlannerHostReservationDao _plannerHostReservationDao;
+    private UUIDManager _uuidMgr;
     @Inject
-    VolumeService _volService;
+    private DeploymentPlanningManager _planningMgr;
     @Inject
-    VolumeDataFactory volFactory;
+    private VolumeApiService _volumeService;
     @Inject
-    UserVmDetailsDao _uservmDetailsDao;
+    private DataStoreManager _dataStoreMgr;
     @Inject
-    UUIDManager _uuidMgr;
+    private VpcVirtualNetworkApplianceManager _virtualNetAppliance;
     @Inject
-    DeploymentPlanningManager _planningMgr;
+    private DomainRouterDao _routerDao;
+    private ExecutorService _vmIpFetchThreadExecutor;
     @Inject
-    VolumeApiService _volumeService;
-    @Inject
-    DataStoreManager _dataStoreMgr;
-    @Inject
-    VpcVirtualNetworkApplianceManager _virtualNetAppliance;
-    @Inject
-    DomainRouterDao _routerDao;
-    ExecutorService _vmIpFetchThreadExecutor;
-    @Inject
-    ConfigurationDao _configDao;
+    private ConfigurationDao _configDao;
     @Inject
     VolumeOrchestrationService volumeMgr;
     @Inject
-    ManagementService _mgr;
+    private ManagementService _mgr;
     @Inject
-    ManagementServer _mgtserver;
+    private ManagementServer _mgtserver;
     @Inject
     private ServiceOfferingDetailsDao serviceOfferingDetailsDao;
     @Inject
@@ -483,7 +446,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     private int capacityReleaseInterval;
 
-    protected UserVmManagerImpl() {
+    UserVmManagerImpl() {
     }
 
     @Override
@@ -1280,7 +1243,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         VirtualMachine.State.getStateMachine().registerListener(new UserVmStateListener(_usageEventDao, _networkDao, _nicDao, _offeringDao, _vmDao, this, _configDao));
 
         final String value = _configDao.getValue(Config.SetVmInternalNameUsingDisplayName.key());
-        _instanceNameFlag = value == null ? false : Boolean.parseBoolean(value);
 
         _scaleRetry = NumbersUtil.parseInt(configs.get(Config.ScaleRetry.key()), 2);
 
@@ -1356,7 +1318,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return destroyedVm;
     }
 
-    protected void resourceCountDecrement(final long accountId, final Boolean displayVm, final Long cpu, final Long memory) {
+    private void resourceCountDecrement(final long accountId, final Boolean displayVm, final Long cpu, final Long memory) {
         _resourceLimitMgr.decrementResourceCount(accountId, ResourceType.user_vm, displayVm);
         _resourceLimitMgr.decrementResourceCount(accountId, ResourceType.cpu, displayVm, cpu);
         _resourceLimitMgr.decrementResourceCount(accountId, ResourceType.memory, displayVm, memory);
@@ -2367,13 +2329,13 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return _vmDao.findById(vmId);
     }
 
-    protected void resourceLimitCheck(final Account owner, final Boolean displayVm, final Long cpu, final Long memory) throws ResourceAllocationException {
+    private void resourceLimitCheck(final Account owner, final Boolean displayVm, final Long cpu, final Long memory) throws ResourceAllocationException {
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.user_vm, displayVm);
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.cpu, displayVm, cpu);
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.memory, displayVm, memory);
     }
 
-    protected void resourceCountIncrement(final long accountId, final Boolean displayVm, final Long cpu, final Long memory) {
+    private void resourceCountIncrement(final long accountId, final Boolean displayVm, final Long cpu, final Long memory) {
         _resourceLimitMgr.incrementResourceCount(accountId, ResourceType.user_vm, displayVm);
         _resourceLimitMgr.incrementResourceCount(accountId, ResourceType.cpu, displayVm, cpu);
         _resourceLimitMgr.incrementResourceCount(accountId, ResourceType.memory, displayVm, memory);
@@ -2668,9 +2630,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_UPGRADE, eventDescription = "upgrading Vm")
-            /*
-             * TODO: cleanup eventually - Refactored API call
-             */
+    /*
+     * TODO: cleanup eventually - Refactored API call
+     */
     // This method will be deprecated as we use ScaleVMCmd for both stopped VMs and running VMs
     public UserVm upgradeVirtualMachine(final UpgradeVMCmd cmd) throws ResourceAllocationException {
         final Long vmId = cmd.getId();
@@ -2938,7 +2900,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return usesLocalStorage;
     }
 
-    public void checkHostsDedication(final VMInstanceVO vm, final long srcHostId, final long destHostId) {
+    private void checkHostsDedication(final VMInstanceVO vm, final long srcHostId, final long destHostId) {
         final HostVO srcHost = _hostDao.findById(srcHostId);
         final HostVO destHost = _hostDao.findById(destHostId);
         final boolean srcExplDedicated = checkIfHostIsDedicated(srcHost);
@@ -4321,13 +4283,13 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @DB
-    protected UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String
+    private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String
             displayName, final Account owner,
-                                          final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final List<Long> securityGroupIdList, final String
-                                                  group, final HTTPMethod httpmethod, final String userData,
-                                          final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final
-                                          IpAddresses defaultIps, final Boolean isDisplayVm, final String keyboard,
-                                          final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId) throws
+                                        final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final List<Long> securityGroupIdList, final String
+                                                group, final HTTPMethod httpmethod, final String userData,
+                                        final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final
+                                        IpAddresses defaultIps, final Boolean isDisplayVm, final String keyboard,
+                                        final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId) throws
             InsufficientCapacityException, ResourceUnavailableException,
             ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
 
@@ -4864,7 +4826,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
     }
 
-    public void checkNameForRFCCompliance(final String name) {
+    private void checkNameForRFCCompliance(final String name) {
         if (!NetUtils.verifyDomainNameLabel(name, true)) {
             throw new InvalidParameterValueException("Invalid name. Vm name can contain ASCII letters 'a' through 'z', the digits '0' through '9', "
                     + "and the hyphen ('-'), must be between 1 and 63 characters long, and can't start or end with \"-\" and can't start with digit");
@@ -4930,7 +4892,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @DB
-    protected InstanceGroupVO createVmGroup(final String groupName, final long accountId) {
+    private InstanceGroupVO createVmGroup(final String groupName, final long accountId) {
         Account account = null;
         try {
             account = _accountDao.acquireInLockTable(accountId); // to ensure
@@ -4956,7 +4918,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
     }
 
-    protected boolean validPassword(final String password) {
+    private boolean validPassword(final String password) {
         if (password == null || password.length() == 0) {
             return false;
         }
@@ -5084,17 +5046,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 ipChanged = true;
             }
         }
-        if (ipChanged) {
-            final UserVmVO userVm = _vmDao.findById(profile.getId());
-            // dc.getDhcpProvider().equalsIgnoreCase(Provider.ExternalDhcpServer.getName())
-            if (_ntwkSrvcDao.canProviderSupportServiceInNetwork(guestNetwork.getId(), Service.Dhcp, Provider.ExternalDhcpServer)) {
-                _nicDao.update(guestNic.getId(), guestNic);
-                userVm.setPrivateIpAddress(guestNic.getIPv4Address());
-                _vmDao.update(userVm.getId(), userVm);
-
-                s_logger.info("Detected that ip changed in the answer, updated nic in the db with new ip " + returnedIp);
-            }
-        }
 
         // get system ip and create static nat rule for the vm
         try {
@@ -5190,7 +5141,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         public VmAndCountDetails() {
         }
 
-        public VmAndCountDetails(final long vmId, final int retrievalCount) {
+        VmAndCountDetails(final long vmId, final int retrievalCount) {
             this.vmId = vmId;
             this.retrievalCount = retrievalCount;
         }
@@ -5232,7 +5183,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         public VmIpAddrFetchThread() {
         }
 
-        public VmIpAddrFetchThread(final long vmId, final long nicId, final String instanceName, final boolean windows, final Long hostId, final String networkCidr) {
+        VmIpAddrFetchThread(final long vmId, final long nicId, final String instanceName, final boolean windows, final Long hostId, final String networkCidr) {
             this.vmId = vmId;
             this.nicId = nicId;
             vmName = instanceName;
@@ -5294,7 +5245,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     protected class VmIpFetchTask extends ManagedContextRunnable {
 
-        public VmIpFetchTask() {
+        VmIpFetchTask() {
             GlobalLock.getInternLock("vmIpFetch");
         }
 
@@ -5347,7 +5298,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     protected class ExpungeTask extends ManagedContextRunnable {
-        public ExpungeTask() {
+        ExpungeTask() {
         }
 
         @Override

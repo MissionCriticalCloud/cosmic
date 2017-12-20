@@ -9,7 +9,6 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.Resource.ResourceType;
-import com.cloud.engine.cloud.entity.api.VolumeEntity;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.CreateCmdResult;
@@ -627,17 +626,6 @@ public class VolumeServiceImpl implements VolumeService {
             s_logger.debug("ignore delete volume status update failure, it will be picked up by storage clean up thread later", e);
         }
         context.getFuture().complete(apiResult);
-        return null;
-    }
-
-    @Override
-    public boolean cloneVolume(final long volumeId, final long baseVolId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public VolumeEntity getVolumeEntity(final long volumeId) {
         return null;
     }
 

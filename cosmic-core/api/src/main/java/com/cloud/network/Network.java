@@ -28,7 +28,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
     TrafficType getTrafficType();
 
-    public void setTrafficType(TrafficType type);
+    void setTrafficType(TrafficType type);
 
     String getGateway();
 
@@ -90,9 +90,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
     String getGuruName();
 
-    /**
-     * @return
-     */
     Long getVpcId();
 
     Long getNetworkACLId();
@@ -130,7 +127,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
         String _description;
 
-        private State(final String description) {
+        State(final String description) {
             _description = description;
         }
 
@@ -186,21 +183,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
         public Capability[] getCapabilities() {
             return caps;
         }
-
-        public boolean containsCapability(final Capability cap) {
-            boolean success = false;
-            if (caps != null) {
-                final int length = caps.length;
-                for (int i = 0; i < length; i++) {
-                    if (caps[i].getName().equalsIgnoreCase(cap.getName())) {
-                        success = true;
-                        break;
-                    }
-                }
-            }
-
-            return success;
-        }
     }
 
     /**
@@ -209,32 +191,26 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
     class Provider {
         private static final List<Provider> supportedProviders = new ArrayList<>();
 
-        public static final Provider VirtualRouter = new Provider("VirtualRouter", false, false);
-        public static final Provider ExternalDhcpServer = new Provider("ExternalDhcpServer", true);
-        public static final Provider ExternalGateWay = new Provider("ExternalGateWay", true);
-        public static final Provider ElasticLoadBalancerVm = new Provider("ElasticLoadBalancerVm", false);
-        public static final Provider SecurityGroupProvider = new Provider("SecurityGroupProvider", false);
-        public static final Provider VPCVirtualRouter = new Provider("VpcVirtualRouter", false);
-        public static final Provider None = new Provider("None", false);
-        // NiciraNvp is not an "External" provider, otherwise we get in trouble with NetworkServiceImpl.providersConfiguredForExternalNetworking
-        public static final Provider NiciraNvp = new Provider("NiciraNvp", false);
+        public static final Provider VirtualRouter = new Provider("VirtualRouter", false);
+        public static final Provider ElasticLoadBalancerVm = new Provider("ElasticLoadBalancerVm");
+        public static final Provider SecurityGroupProvider = new Provider("SecurityGroupProvider");
+        public static final Provider VPCVirtualRouter = new Provider("VpcVirtualRouter");
+        public static final Provider NiciraNvp = new Provider("NiciraNvp");
+        public static final Provider None = new Provider("None");
         private final String name;
-        private final boolean isExternal;
 
         // set to true, if on network shutdown resources (acquired/configured at implemented phase) needed to cleaned up. set to false
         // if no clean-up is required ( for e.g appliance based providers like VirtualRouter, VM is destroyed so there is no need to cleanup).
         private final boolean needCleanupOnShutdown;
 
-        public Provider(final String name, final boolean isExternal) {
+        public Provider(final String name) {
             this.name = name;
-            this.isExternal = isExternal;
             needCleanupOnShutdown = true;
             supportedProviders.add(this);
         }
 
-        public Provider(final String name, final boolean isExternal, final boolean needCleanupOnShutdown) {
+        public Provider(final String name, final boolean needCleanupOnShutdown) {
             this.name = name;
-            this.isExternal = isExternal;
             this.needCleanupOnShutdown = needCleanupOnShutdown;
             supportedProviders.add(this);
         }
@@ -250,10 +226,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
         public String getName() {
             return name;
-        }
-
-        public boolean isExternal() {
-            return isExternal;
         }
 
         public boolean cleanupNeededOnShutdown() {

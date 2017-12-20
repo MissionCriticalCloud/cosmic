@@ -58,10 +58,7 @@
 
     <bean id="clusteredAgentManagerImpl" class="com.cloud.agent.manager.ClusteredAgentManagerImpl" />
 
-    <bean id="cloudOrchestrator"
-          class="com.cloud.engine.orchestration.CloudOrchestrator" />
-    <bean id="dataCenterResourceManagerImpl"
-          class="com.cloud.engine.datacenter.entity.api.DataCenterResourceManagerImpl" />
+    <bean id="cloudOrchestrator" class="com.cloud.engine.orchestration.CloudOrchestrator" />
 
     <bean id="vMEntityManagerImpl" class="com.cloud.engine.cloud.entity.api.VMEntityManagerImpl">
         <property name="planners" value="#{deploymentPlannersRegistry.registered}" />

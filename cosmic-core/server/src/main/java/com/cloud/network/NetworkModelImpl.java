@@ -96,7 +96,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -570,20 +569,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public List<IPAddressVO> listPublicIpsAssignedToAccount(final long accountId, final long dcId, final Boolean sourceNat) {
-        final SearchCriteria<IPAddressVO> sc = IpAddressSearch.create();
-        sc.setParameters("accountId", accountId);
-        sc.setParameters("dataCenterId", dcId);
-
-        if (sourceNat != null) {
-            sc.addAnd("sourceNat", SearchCriteria.Op.EQ, sourceNat);
-        }
-        sc.setJoinParameters("virtualNetworkVlanSB", "vlanType", VlanType.VirtualNetwork);
-
-        return _ipAddressDao.search(sc, null);
-    }
-
-    @Override
     public List<? extends Nic> getNics(final long vmId) {
         return _nicDao.listByVmId(vmId);
     }
@@ -826,40 +811,8 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public List<NetworkVO> listNetworksUsedByVm(final long vmId, final boolean isSystem) {
-        final List<NetworkVO> networks = new ArrayList<>();
-
-        final List<NicVO> nics = _nicDao.listByVmId(vmId);
-        if (nics != null) {
-            for (final Nic nic : nics) {
-                final NetworkVO network = _networksDao.findByIdIncludingRemoved(nic.getNetworkId());
-
-                if (isNetworkSystem(network) == isSystem) {
-                    networks.add(network);
-                }
-            }
-        }
-
-        return networks;
-    }
-
-    @Override
     public Nic getNicInNetwork(final long vmId, final long networkId) {
         return _nicDao.findByNtwkIdAndInstanceId(networkId, vmId);
-    }
-
-    @Override
-    public String getIpInNetwork(final long vmId, final long networkId) {
-        final Nic guestNic = getNicInNetwork(vmId, networkId);
-        assert guestNic != null && guestNic.getIPv4Address() != null : "Vm doesn't belong to network associated with " + "ipAddress or ip4 address is null";
-        return guestNic.getIPv4Address();
-    }
-
-    @Override
-    public String getIpInNetworkIncludingRemoved(final long vmId, final long networkId) {
-        final Nic guestNic = getNicInNetworkIncludingRemoved(vmId, networkId);
-        assert guestNic != null && guestNic.getIPv4Address() != null : "Vm doesn't belong to network associated with " + "ipAddress or ip4 address is null";
-        return guestNic.getIPv4Address();
     }
 
     @Override
@@ -950,28 +903,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public String getIpOfNetworkElementInVirtualNetwork(final long accountId, final long dataCenterId) {
-
-        final List<NetworkVO> virtualNetworks = _networksDao.listByZoneAndGuestType(accountId, dataCenterId, Network.GuestType.Isolated, false);
-
-        if (virtualNetworks.isEmpty()) {
-            s_logger.trace("Unable to find default Virtual network account id=" + accountId);
-            return null;
-        }
-
-        final NetworkVO virtualNetwork = virtualNetworks.get(0);
-
-        final NicVO networkElementNic = _nicDao.findByNetworkIdAndType(virtualNetwork.getId(), Type.DomainRouter);
-
-        if (networkElementNic != null) {
-            return networkElementNic.getIPv4Address();
-        } else {
-            s_logger.warn("Unable to set find network element for the network id=" + virtualNetwork.getId());
-            return null;
-        }
-    }
-
-    @Override
     public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final Network.GuestType type) {
         final List<NetworkVO> accountNetworks = new ArrayList<>();
         final List<NetworkVO> zoneNetworks = _networksDao.listByZone(zoneId);
@@ -986,17 +917,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             }
         }
         return accountNetworks;
-    }
-
-    @Override
-    public List<NetworkVO> listAllNetworksInAllZonesByType(final Network.GuestType type) {
-        final List<NetworkVO> networks = new ArrayList<>();
-        for (final NetworkVO network : _networksDao.listAll()) {
-            if (!isNetworkSystem(network)) {
-                networks.add(network);
-            }
-        }
-        return networks;
     }
 
     @Override
@@ -1435,15 +1355,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public boolean isProviderForNetworkOffering(final Provider provider, final long networkOfferingId) {
-        if (_ntwkOfferingSrvcDao.isProviderForNetworkOffering(networkOfferingId, provider)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public void canProviderSupportServices(final Map<Provider, Set<Service>> providersMap) {
         for (final Provider provider : providersMap.keySet()) {
             // check if services can be turned off
@@ -1633,60 +1544,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public String getDefaultPublicTrafficLabel(final long dcId, final HypervisorType hypervisorType) {
-        try {
-            final PhysicalNetwork publicPhyNetwork = getOnePhysicalNetworkByZoneAndTrafficType(dcId, TrafficType.Public);
-            final PhysicalNetworkTrafficTypeVO publicTraffic = _pNTrafficTypeDao.findBy(publicPhyNetwork.getId(), TrafficType.Public);
-            if (publicTraffic != null) {
-                String label = null;
-                switch (hypervisorType) {
-                    case XenServer:
-                        label = publicTraffic.getXenNetworkLabel();
-                        break;
-                    case KVM:
-                        label = publicTraffic.getKvmNetworkLabel();
-                        break;
-                }
-                return label;
-            }
-        } catch (final Exception ex) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Failed to retrieve the default label for public traffic." + "zone: " + dcId + " hypervisor: " + hypervisorType + " due to: " +
-                        ex.getMessage());
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public String getDefaultGuestTrafficLabel(final long dcId, final HypervisorType hypervisorType) {
-        try {
-            final PhysicalNetwork guestPhyNetwork = getOnePhysicalNetworkByZoneAndTrafficType(dcId, TrafficType.Guest);
-            final PhysicalNetworkTrafficTypeVO guestTraffic = _pNTrafficTypeDao.findBy(guestPhyNetwork.getId(), TrafficType.Guest);
-            if (guestTraffic != null) {
-                String label = null;
-                switch (hypervisorType) {
-                    case XenServer:
-                        label = guestTraffic.getXenNetworkLabel();
-                        break;
-                    case KVM:
-                        label = guestTraffic.getKvmNetworkLabel();
-                        break;
-                    default:
-                        break;
-                }
-                return label;
-            }
-        } catch (final Exception ex) {
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Failed to retrive the default label for management traffic:" + "zone: " + dcId + " hypervisor: " + hypervisorType + " due to:" +
-                        ex.getMessage());
-            }
-        }
-        return null;
-    }
-
-    @Override
     public List<? extends Network> listNetworksByVpc(final long vpcId) {
         return _networksDao.listByVpc(vpcId);
     }
@@ -1708,21 +1565,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public List<? extends PhysicalNetwork> getPhysicalNtwksSupportingTrafficType(final long zoneId, final TrafficType trafficType) {
-
-        final List<? extends PhysicalNetwork> pNtwks = _physicalNetworkDao.listByZone(zoneId);
-
-        final Iterator<? extends PhysicalNetwork> it = pNtwks.iterator();
-        while (it.hasNext()) {
-            final PhysicalNetwork pNtwk = it.next();
-            if (!_pNTrafficTypeDao.isTrafficTypeSupported(pNtwk.getId(), trafficType)) {
-                it.remove();
-            }
-        }
-        return pNtwks;
     }
 
     @Override
@@ -1960,17 +1802,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         return profile;
     }
 
-    @Override
-    public boolean networkIsConfiguredForExternalNetworking(final long zoneId, final long networkId) {
-        final List<Provider> networkProviders = getNetworkProviders(networkId);
-        for (final Provider provider : networkProviders) {
-            if (provider.isExternal()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private List<Provider> getNetworkProviders(final long networkId) {
         final List<String> providerNames = _ntwkSrvcDao.getDistinctProviders(networkId);
         final Map<String, Provider> providers = new HashMap<>();
@@ -2000,12 +1831,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         }
 
         return null;
-    }
-
-    @Override
-    public boolean isNetworkInlineMode(final Network network) {
-        final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-        return offering.isInline();
     }
 
     @Override
@@ -2164,15 +1989,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         final List<Long> networkIds = _networksDao.findNetworksToGarbageCollect();
         final List<String> secondaryIps = _nicSecondaryIpDao.listSecondaryIpAddressInNetwork(networkId);
         if (!networkIds.contains(networkId)) {
-            return false;
-        }
-
-        // add an exception for networks that use external networking devices and has secondary guest IP's allocated.
-        // On network GC, when network goes through implement phase a new vlan is allocated, based on the acquired VLAN
-        // id cidr of the network is decided in case of external networking case. While NIC uses reservation strategy 'Start'
-        // which ensures that new primary ip is allocated for the NiC from the new CIDR. Secondary IP's have hardcoded IP's in
-        // network rules. So prevent network GC.
-        if (secondaryIps != null && !secondaryIps.isEmpty() && networkIsConfiguredForExternalNetworking(network.getDataCenterId(), networkId)) {
             return false;
         }
 

@@ -9,7 +9,6 @@ import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -132,26 +131,5 @@ public class NetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO
         } else {
             return results.get(0);
         }
-    }
-
-    @Override
-    public List<String> getProvidersForServiceInNetwork(final long networkId, final Service service) {
-        final SearchCriteria<String> sc = DistinctProvidersSearch.create();
-        sc.setParameters("networkId", networkId);
-        sc.setParameters("service", service.getName());
-        return customSearch(sc, null);
-    }
-
-    protected List<String> getServicesForProviderInNetwork(final long networkId, final Provider provider) {
-        final List<String> services = new ArrayList<>();
-        final SearchCriteria<NetworkServiceMapVO> sc = AllFieldsSearch.create();
-        sc.setParameters("networkId", networkId);
-        sc.setParameters("provider", provider.getName());
-        final List<NetworkServiceMapVO> map = listBy(sc);
-        for (final NetworkServiceMapVO instance : map) {
-            services.add(instance.getService());
-        }
-
-        return services;
     }
 }
