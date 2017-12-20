@@ -34,20 +34,6 @@ public interface DataCenter extends InfrastructureEntity, Identity, InternalIden
 
     String getInternalDns2();
 
-    String getDnsProvider();
-
-    String getGatewayProvider();
-
-    String getFirewallProvider();
-
-    String getDhcpProvider();
-
-    String getLoadBalancerProvider();
-
-    String getUserDataProvider();
-
-    String getVpnProvider();
-
     boolean isSecurityGroupEnabled();
 
     Map<String, String> getDetails();

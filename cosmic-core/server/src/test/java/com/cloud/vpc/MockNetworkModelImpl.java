@@ -141,15 +141,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#listNetworksUsedByVm(long, boolean)
-     */
-    @Override
-    public List<NetworkVO> listNetworksUsedByVm(final long vmId, final boolean isSystem) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#getNicInNetwork(long, long)
      */
     @Override
@@ -195,15 +186,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#networkIsConfiguredForExternalNetworking(long, long)
-     */
-    @Override
-    public boolean networkIsConfiguredForExternalNetworking(final long zoneId, final long networkId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#getNetworkServiceCapabilities(long, com.cloud.network.Network.Service)
      */
     @Override
@@ -244,15 +226,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getIpOfNetworkElementInVirtualNetwork(long, long)
-     */
-    @Override
-    public String getIpOfNetworkElementInVirtualNetwork(final long accountId, final long dataCenterId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#listNetworksForAccount(long, long, com.cloud.network.Network.GuestType)
      */
     @Override
@@ -262,37 +235,10 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#listAllNetworksInAllZonesByType(com.cloud.network.Network.GuestType)
-     */
-    @Override
-    public List<NetworkVO> listAllNetworksInAllZonesByType(final GuestType type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#getStartIpAddress(long)
      */
     @Override
     public String getStartIpAddress(final long networkId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getIpInNetwork(long, long)
-     */
-    @Override
-    public String getIpInNetwork(final long vmId, final long networkId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getIpInNetworkIncludingRemoved(long, long)
-     */
-    @Override
-    public String getIpInNetworkIncludingRemoved(final long vmId, final long networkId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -424,15 +370,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isProviderForNetworkOffering(com.cloud.network.Network.Provider, long)
-     */
-    @Override
-    public boolean isProviderForNetworkOffering(final Provider provider, final long networkOfferingId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#canProviderSupportServices(java.util.Map)
      */
     @Override
@@ -555,24 +492,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getDefaultPublicTrafficLabel(long, com.cloud.hypervisor.Hypervisor.HypervisorType)
-     */
-    @Override
-    public String getDefaultPublicTrafficLabel(final long dcId, final HypervisorType hypervisor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getDefaultGuestTrafficLabel(long, com.cloud.hypervisor.Hypervisor.HypervisorType)
-     */
-    @Override
-    public String getDefaultGuestTrafficLabel(final long dcId, final HypervisorType hypervisor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#getElementImplementingProvider(java.lang.String)
      */
     @Override
@@ -596,24 +515,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     @Override
     public List<Provider> getNtwkOffDistinctProviders(final long ntwkOffId) {
         return new ArrayList<>();
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#listPublicIpsAssignedToAccount(long, long, java.lang.Boolean)
-     */
-    @Override
-    public List<IPAddressVO> listPublicIpsAssignedToAccount(final long accountId, final long dcId, final Boolean sourceNat) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getPhysicalNtwksSupportingTrafficType(long, com.cloud.network.Networks.TrafficType)
-     */
-    @Override
-    public List<? extends PhysicalNetwork> getPhysicalNtwksSupportingTrafficType(final long zoneId, final TrafficType trafficType) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /* (non-Javadoc)
@@ -794,15 +695,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     public PublicIpAddress getSourceNatIpAddressForGuestNetwork(final Account owner, final Network guestNetwork) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isNetworkInlineMode(com.cloud.network.Network)
-     */
-    @Override
-    public boolean isNetworkInlineMode(final Network network) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

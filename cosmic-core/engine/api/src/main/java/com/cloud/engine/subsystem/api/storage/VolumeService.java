@@ -1,7 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.engine.cloud.entity.api.VolumeEntity;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.host.Host;
@@ -19,34 +18,11 @@ public interface VolumeService {
 
     void revokeAccess(DataObject dataObject, Host host, DataStore dataStore);
 
-    /**
-     * Creates the volume based on the given criteria
-     *
-     * @param cmd
-     * @return the volume object
-     */
     AsyncCallFuture<VolumeApiResult> createVolumeAsync(VolumeInfo volume, DataStore store);
 
-    /**
-     * Delete volume
-     *
-     * @param volumeId
-     * @return
-     * @throws ConcurrentOperationException
-     */
     AsyncCallFuture<VolumeApiResult> expungeVolumeAsync(VolumeInfo volume);
 
-    /**
-     *
-     */
-    boolean cloneVolume(long volumeId, long baseVolId);
-
-    /**
-     *
-     */
     AsyncCallFuture<VolumeApiResult> createVolumeFromSnapshot(VolumeInfo volume, DataStore store, SnapshotInfo snapshot);
-
-    VolumeEntity getVolumeEntity(long volumeId);
 
     AsyncCallFuture<VolumeApiResult> createManagedStorageAndVolumeFromTemplateAsync(VolumeInfo volumeInfo, long destDataStoreId,
                                                                                     TemplateInfo srcTemplateInfo, long destHostId);
@@ -64,7 +40,7 @@ public interface VolumeService {
 
     AsyncCallFuture<VolumeApiResult> registerVolume(VolumeInfo volume, DataStore store);
 
-    public Pair<EndPoint, DataObject> registerVolumeForPostUpload(VolumeInfo volume, DataStore store);
+    Pair<EndPoint, DataObject> registerVolumeForPostUpload(VolumeInfo volume, DataStore store);
 
     AsyncCallFuture<VolumeApiResult> resize(VolumeInfo volume);
 

@@ -32,14 +32,6 @@ import java.util.SortedSet;
  */
 public interface NetworkModel {
 
-    /**
-     * Lists IP addresses that belong to VirtualNetwork VLANs
-     *
-     * @param accountId           - account that the IP address should belong to
-     * @param associatedNetworkId TODO
-     * @param sourceNat           - (optional) true if the IP address should be a source NAT address
-     * @return - list of IP addresses
-     */
     List<? extends IpAddress> listPublicIpsAssignedToGuestNtwk(long accountId, long associatedNetworkId, Boolean sourceNat);
 
     List<? extends IpAddress> listPublicIpsAssignedToGuestNtwk(long associatedNetworkId, Boolean sourceNat);
@@ -54,8 +46,6 @@ public interface NetworkModel {
 
     List<? extends Vlan> listPodVlans(long podId);
 
-    List<? extends Network> listNetworksUsedByVm(long vmId, boolean isSystem);
-
     Nic getNicInNetwork(long vmId, long networkId);
 
     List<? extends Nic> getNicsForTraffic(long vmId, TrafficType type);
@@ -65,8 +55,6 @@ public interface NetworkModel {
     Nic getDefaultNic(long vmId);
 
     UserDataServiceProvider getUserDataUpdateProvider(Network network);
-
-    boolean networkIsConfiguredForExternalNetworking(long zoneId, long networkId);
 
     Map<Capability, String> getNetworkServiceCapabilities(long networkId, Service service);
 
@@ -78,17 +66,9 @@ public interface NetworkModel {
 
     Network getNetworkWithSecurityGroupEnabled(Long zoneId);
 
-    String getIpOfNetworkElementInVirtualNetwork(long accountId, long dataCenterId);
-
     List<? extends Network> listNetworksForAccount(long accountId, long zoneId, Network.GuestType type);
 
-    List<? extends Network> listAllNetworksInAllZonesByType(Network.GuestType type);
-
     String getStartIpAddress(long networkId);
-
-    String getIpInNetwork(long vmId, long networkId);
-
-    String getIpInNetworkIncludingRemoved(long vmId, long networkId);
 
     Long getPodIdForVlan(long vlanDbId);
 
@@ -118,8 +98,6 @@ public interface NetworkModel {
 
     boolean isProviderForNetwork(Provider provider, long networkId);
 
-    boolean isProviderForNetworkOffering(Provider provider, long networkOfferingId);
-
     void canProviderSupportServices(Map<Provider, Set<Service>> providersMap);
 
     List<PhysicalNetworkSetupInfo> getPhysicalNetworkInfo(long dcId, HypervisorType hypervisorType);
@@ -146,48 +124,12 @@ public interface NetworkModel {
 
     String getDefaultStorageTrafficLabel(long zoneId, HypervisorType hypervisorType);
 
-    String getDefaultPublicTrafficLabel(long dcId, HypervisorType hypervisorType);
-
-    String getDefaultGuestTrafficLabel(long dcId, HypervisorType hypervisorType);
-
-    /**
-     * @param providerName
-     * @return
-     */
     NetworkElement getElementImplementingProvider(String providerName);
 
-    /**
-     * @param accountId
-     * @param zoneId
-     * @return
-     */
     String getAccountNetworkDomain(long accountId, long zoneId);
 
-    /**
-     * @param ntwkOffId
-     * @return
-     */
     List<Provider> getNtwkOffDistinctProviders(long ntwkOffId);
 
-    /**
-     * @param accountId
-     * @param dcId
-     * @param sourceNat
-     * @return
-     */
-    List<? extends IpAddress> listPublicIpsAssignedToAccount(long accountId, long dcId, Boolean sourceNat);
-
-    /**
-     * @param zoneId
-     * @param trafficType
-     * @return
-     */
-    List<? extends PhysicalNetwork> getPhysicalNtwksSupportingTrafficType(long zoneId, TrafficType trafficType);
-
-    /**
-     * @param ntwkId
-     * @return
-     */
     boolean isPrivateGateway(long ntwkId);
 
     Map<Service, Map<Capability, String>> getNetworkCapabilities(long networkId);
@@ -227,8 +169,6 @@ public interface NetworkModel {
     String getDomainNetworkDomain(long domainId, long zoneId);
 
     PublicIpAddress getSourceNatIpAddressForGuestNetwork(Account owner, Network guestNetwork);
-
-    boolean isNetworkInlineMode(Network network);
 
     boolean isIP6AddressAvailableInNetwork(long networkId);
 

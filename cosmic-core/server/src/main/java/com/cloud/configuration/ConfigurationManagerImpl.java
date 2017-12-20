@@ -1524,10 +1524,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     zone.setAllocationState(allocationState);
                 }
 
-                if (dhcpProvider != null) {
-                    zone.setDhcpProvider(dhcpProvider);
-                }
-
                 // update a private zone to public; not vice versa
                 if (isPublic != null && isPublic) {
                     zone.setDomainId(null);

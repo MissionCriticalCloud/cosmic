@@ -1,16 +1,12 @@
 package com.cloud.engine.orchestration;
 
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.engine.cloud.entity.api.NetworkEntity;
-import com.cloud.engine.cloud.entity.api.TemplateEntity;
 import com.cloud.engine.cloud.entity.api.VMEntityManager;
 import com.cloud.engine.cloud.entity.api.VirtualMachineEntity;
 import com.cloud.engine.cloud.entity.api.VirtualMachineEntityImpl;
-import com.cloud.engine.cloud.entity.api.VolumeEntity;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.service.api.OrchestrationService;
 import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.network.Network;
 import com.cloud.network.dao.NetworkDao;
@@ -32,7 +28,6 @@ import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,7 +46,7 @@ public class CloudOrchestrator implements OrchestrationService {
     @Inject
     protected UserVmDao _userVmDao = null;
     @Inject
-    protected UserVmDetailsDao _userVmDetailsDao = null;
+    private UserVmDetailsDao _userVmDetailsDao = null;
     @Inject
     protected ServiceOfferingDao _serviceOfferingDao;
     @Inject
@@ -61,7 +56,7 @@ public class CloudOrchestrator implements OrchestrationService {
     @Inject
     protected AccountDao _accountDao = null;
     @Inject
-    VolumeOrchestrationService _volumeMgr;
+    private VolumeOrchestrationService _volumeMgr;
     @Inject
     private VMEntityManager vmEntityManager;
     @Inject
@@ -70,44 +65,13 @@ public class CloudOrchestrator implements OrchestrationService {
     public CloudOrchestrator() {
     }
 
-    public VirtualMachineEntity createFromScratch(final String uuid, final String iso, final String os, final String hypervisor, final String hostName, final int cpu, final int
-            speed, final long memory,
-                                                  final List<String> networks, final List<String> computeTags, final Map<String, String> details, final String owner) {
-        return null;
-    }
-
-    public String reserve(final String vm, final String planner, final Long until) throws InsufficientCapacityException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String deploy(final String reservationId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void joinNetwork(final String network1, final String network2) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void createNetwork() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void destroyNetwork() {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
-    public VirtualMachineEntity createVirtualMachine(final String id, final String owner, final String templateId, final String hostName, final String displayName, final String
+    public void createVirtualMachine(final String id, final String owner, final String templateId, final String hostName, final String displayName, final String
             hypervisor, final int cpu,
-                                                     final int speed, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags,
-                                                     final Map<String, NicProfile>
-                                                             networkNicMap, final DeploymentPlan plan,
-                                                     final Long rootDiskSize) throws InsufficientCapacityException {
+                                     final int speed, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags,
+                                     final Map<String, NicProfile>
+                                             networkNicMap, final DeploymentPlan plan,
+                                     final Long rootDiskSize) throws InsufficientCapacityException {
 
         // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
         // vmEntityManager);
@@ -187,15 +151,13 @@ public class CloudOrchestrator implements OrchestrationService {
 
         _itMgr.allocate(vm.getInstanceName(), _templateDao.findById(new Long(templateId)), computeOffering, rootDiskOfferingInfo, dataDiskOfferings, networkIpMap, plan,
                 hypervisorType);
-
-        return vmEntity;
     }
 
     @Override
-    public VirtualMachineEntity createVirtualMachineFromScratch(final String id, final String owner, final String isoId, final String hostName, final String displayName, final
+    public void createVirtualMachineFromScratch(final String id, final String owner, final String isoId, final String hostName, final String displayName, final
     String hypervisor, final String os,
-                                                                final int cpu, final int speed, final long memory, final Long diskSize, final List<String> computeTags, final
-                                                                List<String> rootDiskTags, final Map<String,
+                                                final int cpu, final int speed, final long memory, final Long diskSize, final List<String> computeTags, final
+                                                List<String> rootDiskTags, final Map<String,
             NicProfile> networkNicMap, final DeploymentPlan plan)
             throws InsufficientCapacityException {
 
@@ -257,42 +219,10 @@ public class CloudOrchestrator implements OrchestrationService {
 
         _itMgr.allocate(vm.getInstanceName(), _templateDao.findById(new Long(isoId)), computeOffering, rootDiskOfferingInfo, new ArrayList<>(), networkIpMap,
                 plan, hypervisorType);
-
-        return vmEntity;
-    }
-
-    @Override
-    public NetworkEntity createNetwork(final String id, final String name, final String domainName, final String cidr, final String gateway) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void destroyNetwork(final String networkUuid) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public VolumeEntity createVolume() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void destroyVolume(final String volumeEntity) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public TemplateEntity registerTemplate(final String name, final URL path, final String os, final Hypervisor hypervisor) {
-        return null;
     }
 
     @Override
     public VirtualMachineEntity getVirtualMachine(final String id) {
-        final VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, vmEntityManager);
-        return vmEntity;
+        return new VirtualMachineEntityImpl(id, vmEntityManager);
     }
 }
