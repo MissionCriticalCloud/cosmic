@@ -67,6 +67,9 @@ class App:
     def start_app(self):
         Utils(self.cmdline).bootstrap()
 
+        logging.info("Disabling RPC services")
+        disable_rpc()
+
         if self.cmdline["type"] == "secstorage":
             logging.info("Starting app %s" % self.cmdline["type"])
 
@@ -85,6 +88,10 @@ class App:
         else:
             logging.error("Unknown type %s" % self.cmdline["type"])
             sys.exit(1)
+
+
+def disable_rpc():
+    os.system("for s in \"rpcbind.socket rpc-gssd rpcidmapd rpc-rquotad rpc-statd rpc-statd-notify\"; do systemctl stop $s; systemctl disable $s; done")
 
 
 def full_start(application):
