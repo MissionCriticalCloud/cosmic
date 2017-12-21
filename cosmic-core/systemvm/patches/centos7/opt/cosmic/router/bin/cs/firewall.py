@@ -19,6 +19,8 @@ class Firewall:
 
     def sync(self):
         logging.info("Running firewall sync")
+        public_device = None
+        public_ip = None
 
         self.add_default_vpc_rules()
 
@@ -33,10 +35,22 @@ class Firewall:
                 pass
             elif interface['metadata']['type'] == 'public':
                 self.add_public_vpc_rules(device)
+                public_device = device
+                public_ip = interface['ipv4_addresses'][0]['cidr']
             elif interface['metadata']['type'] == 'guesttier':
                 self.add_tier_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
             elif interface['metadata']['type'] == 'private':
                 self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
+
+        if public_device is not None and 'vpn' in self.config.dbag_network_overview:
+            if 'site2site' in self.config.dbag_network_overview['vpn']:
+                for site2site in self.config.dbag_network_overview['vpn']['site2site']:
+                    self.add_site2site_vpn_rules(public_device, site2site)
+            if 'remote_access' in self.config.dbag_network_overview['vpn']:
+                if public_ip is not None:
+                    self.add_remote_access_vpn_rules(
+                        public_device, public_ip, self.config.dbag_network_overview['vpn']['remote_access']
+                    )
 
     def add_default_vpc_rules(self):
         logging.info("Configuring default VPC rules")
@@ -162,3 +176,49 @@ class Firewall:
         self.fw.append(["filter", "", "-N ACL_INBOUND_%s" % device])
         # jump to ingress chain
         self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
+
+    def add_site2site_vpn_rules(self, device, site2site):
+        logging.info("Configuring Site2Site VPN rules")
+
+        self.config.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 500 -s %s -d %s -j ACCEPT" % (
+        device, site2site['right'], site2site['left'])])
+        self.config.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 4500 -s %s -d %s -j ACCEPT" % (
+        device, site2site['right'], site2site['left'])])
+        self.config.fw.append(["", "front", "-A INPUT -i %s -p esp -s %s -d %s -j ACCEPT" % (
+        device, site2site['right'], site2site['left'])])
+        self.config.fw.append(["nat", "front", "-A POSTROUTING -o %s -m mark --mark 0x525 -j ACCEPT" % device])
+        for net in site2site['peer_list'].lstrip().rstrip().split(','):
+            self.config.fw.append(["mangle", "front",
+                                   "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (
+                                   site2site['left_subnet'], net)])
+            self.config.fw.append(["mangle", "",
+                                   "-A OUTPUT -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (
+                                   site2site['left_subnet'], net)])
+            self.config.fw.append(["mangle", "front",
+                                   "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
+                                   net, site2site['left_subnet'])])
+            self.config.fw.append(["mangle", "",
+                                   "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
+                                   net, site2site['left_subnet'])])
+
+    def add_remote_access_vpn_rules(self, device, publicip, remote_access):
+        logging.info("Configuring RemoteAccess VPN rules")
+
+        localcidr = remote_access['local_cidr']
+        local_ip = remote_access['local_ip']
+
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p ah -j ACCEPT" % device])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j ACCEPT" % device])
+        self.config.fw.append(["", "", " -N VPN_FORWARD"])
+        self.config.fw.append(["", "", "-I FORWARD -i ppp+ -j VPN_FORWARD"])
+        self.config.fw.append(["", "", "-I FORWARD -o ppp+ -j VPN_FORWARD"])
+        self.config.fw.append(["", "", "-I FORWARD -o ppp+ -j VPN_FORWARD"])
+        self.config.fw.append(["", "", "-A VPN_FORWARD -s  %s -j RETURN" % localcidr])
+        self.config.fw.append(["", "", "-A VPN_FORWARD -i ppp+ -d %s -j RETURN" % localcidr])
+        self.config.fw.append(["", "", "-A VPN_FORWARD -i ppp+  -o ppp+ -j RETURN"])
+        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
+        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
+        self.config.fw.append(["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
