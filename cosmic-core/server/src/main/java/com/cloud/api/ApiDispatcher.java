@@ -120,10 +120,6 @@ public class ApiDispatcher {
             ((BaseCustomIdCmd) cmd).checkUuid();
         }
 
-        try {
-            cmd.execute();
-        } catch (ResourceUnavailableException | InsufficientCapacityException | ResourceAllocationException | NetworkRuleConflictException e) {
-            throw new CloudException("Caught exception while executing command", e);
-        }
+        cmd.execute();
     }
 }

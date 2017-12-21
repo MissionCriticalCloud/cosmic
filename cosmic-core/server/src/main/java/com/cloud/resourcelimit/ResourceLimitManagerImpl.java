@@ -695,7 +695,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
     public void checkResourceLimit(final Account account, final ResourceType type, final long... count) throws ResourceAllocationException {
         final long numResources = ((count.length == 0) ? 1 : count[0]);
         Project project = null;
-
+        String domainUuid = _domainDao.findById(account.getDomainId()).getUuid();
         // Don't place any limits on system or root admin accounts
         if (_accountMgr.isRootAdmin(account.getId())) {
             return;
@@ -720,12 +720,12 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
                 final long potentialCount = _resourceCountDao.getResourceCount(account.getId(), ResourceOwnerType.Account, type) + numResources;
                 if (accountLimit != Resource.RESOURCE_UNLIMITED && potentialCount > accountLimit) {
                     String message =
-                            "Maximum number of resources of type '" + type + "' for account name=" + account.getAccountName() + " in domain id=" + account.getDomainId() +
-                                    " has been exceeded.";
+                            "Maximum number of resources of type '" + type + "' for account '" + account.getAccountName() + "' in domain with uuid '" + domainUuid +
+                                    "' has been exceeded.";
                     if (projectFinal != null) {
                         message =
-                                "Maximum number of resources of type '" + type + "' for project name=" + projectFinal.getName() + " in domain id=" + account.getDomainId() +
-                                        " has been exceeded.";
+                                "Maximum number of resources of type '" + type + "' for project '" + projectFinal.getName() + "' in domain with  uuid '" + domainUuid +
+                                        "' has been exceeded.";
                     }
                     final ResourceAllocationException e = new ResourceAllocationException(message, type);
                     s_logger.error(message, e);
@@ -747,7 +747,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
                         final long domainLimit = findCorrectResourceLimitForDomain(domain, type);
                         final long domainCount = _resourceCountDao.getResourceCount(domainId, ResourceOwnerType.Domain, type) + numResources;
                         if (domainLimit != Resource.RESOURCE_UNLIMITED && domainCount > domainLimit) {
-                            throw new ResourceAllocationException("Maximum number of resources of type '" + type + "' for domain id=" + domainId + " has been exceeded.", type);
+                            throw new ResourceAllocationException("Maximum number of resources of type '" + type + "' for domain with uuid '" + domainUuid + "' has been exceeded.", type);
                         }
                     }
                     domainId = domain.getParent();
