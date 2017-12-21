@@ -47,6 +47,7 @@ def execute2(command, log=True):
     """ Execute command """
     logging.debug("Executing: %s" % command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    buffer = p.stdout.read()
     p.wait()
     if log:
         out, err = p.communicate()
