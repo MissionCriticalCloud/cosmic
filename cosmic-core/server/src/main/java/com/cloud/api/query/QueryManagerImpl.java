@@ -3541,25 +3541,29 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             response.setState(ipAddress.getState().toString());
 
             final Domain domain = _domainDao.findById(ipAddress.getDomainId());
-
             if (domain != null) {
                 response.setDomainName(domain.getName());
                 response.setDomainUuid(domain.getUuid());
             }
+
             final Network network = _networkDao.findById(ipAddress.getNetworkId());
+            if (network != null) {
+                response.setNetworkUuid(network.getUuid());
+                response.setCreated(ipAddress.getAllocatedTime());
+                response.setMode(network.getMode());
+            }
 
             if (ipAddress.getVpcId() != null) {
                 final Vpc vpc = _vpcDao.findById(ipAddress.getVpcId());
-                response.setNetworkName(vpc.getName());
-                response.setVpcName(vpc.getName());
-                response.setVpcUuid(vpc.getUuid());
-            } else if (!StringUtils.isEmpty(network.getName())) {
+                if (vpc != null) {
+                    response.setNetworkName(vpc.getName());
+                    response.setVpcName(vpc.getName());
+                    response.setVpcUuid(vpc.getUuid());
+                }
+            } else if (network != null && !StringUtils.isEmpty(network.getName())) {
                 response.setNetworkName(network.getName());
             }
 
-            response.setNetworkUuid(network.getUuid());
-            response.setCreated(ipAddress.getAllocatedTime());
-            response.setMode(network.getMode());
 
             final Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
 
