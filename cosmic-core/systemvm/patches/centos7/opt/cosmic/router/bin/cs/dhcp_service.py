@@ -81,8 +81,8 @@ class DhcpService:
         with open(self.dnsmasq_config_path + filename, 'w') as f:
             f.write(content)
 
-
-    def restart_dnsmasq(self):
+    @staticmethod
+    def restart_dnsmasq():
         logging.debug("Reloading dnsmasq with new config")
 
         try:
