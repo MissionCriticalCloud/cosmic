@@ -12,18 +12,14 @@ import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VMSnapshotOptions;
 import com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -70,8 +66,6 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
     AgentManager agentMgr;
     @Inject
     VolumeDao volumeDao;
-    @Inject
-    DiskOfferingDao diskOfferingDao;
     @Inject
     HostDao hostDao;
 
@@ -136,9 +130,6 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
                 s_logger.debug("Create vm snapshot " + vmSnapshot.getName() + " succeeded for vm: " + userVm.getInstanceName());
                 result = true;
 
-                for (final VolumeObjectTO volumeTo : answer.getVolumeTOs()) {
-                    publishUsageEvent(EventTypes.EVENT_VM_SNAPSHOT_CREATE, vmSnapshot, userVm, volumeTo);
-                }
                 return vmSnapshot;
             } else {
                 String errMsg = "Creating VM snapshot: " + vmSnapshot.getName() + " failed";
@@ -192,20 +183,14 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
             final Answer answer = agentMgr.send(hostId, deleteSnapshotCommand);
 
             if (answer != null && answer.getResult()) {
-                final DeleteVMSnapshotAnswer deleteVMSnapshotAnswer = (DeleteVMSnapshotAnswer) answer;
                 processAnswer(vmSnapshotVO, userVm, answer, hostId);
-                for (final VolumeObjectTO volumeTo : deleteVMSnapshotAnswer.getVolumeTOs()) {
-                    publishUsageEvent(EventTypes.EVENT_VM_SNAPSHOT_DELETE, vmSnapshot, userVm, volumeTo);
-                }
                 return true;
             } else {
                 final String errMsg = (answer == null) ? null : answer.getDetails();
                 s_logger.error("Delete vm snapshot " + vmSnapshot.getName() + " of vm " + userVm.getInstanceName() + " failed due to " + errMsg);
                 throw new CloudRuntimeException("Delete vm snapshot " + vmSnapshot.getName() + " of vm " + userVm.getInstanceName() + " failed due to " + errMsg);
             }
-        } catch (final OperationTimedoutException e) {
-            throw new CloudRuntimeException("Delete vm snapshot " + vmSnapshot.getName() + " of vm " + userVm.getInstanceName() + " failed due to " + e.getMessage());
-        } catch (final AgentUnavailableException e) {
+        } catch (final OperationTimedoutException | AgentUnavailableException e) {
             throw new CloudRuntimeException("Delete vm snapshot " + vmSnapshot.getName() + " of vm " + userVm.getInstanceName() + " failed due to " + e.getMessage());
         }
     }
@@ -304,21 +289,6 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
             s_logger.error(errMsg, e);
             throw new CloudRuntimeException(errMsg);
         }
-    }
-
-    private void publishUsageEvent(final String type, final VMSnapshot vmSnapshot, final UserVm userVm, final VolumeObjectTO volumeTo) {
-        final VolumeVO volume = volumeDao.findById(volumeTo.getId());
-        final Long diskOfferingId = volume.getDiskOfferingId();
-        Long offeringId = null;
-        if (diskOfferingId != null) {
-            final DiskOfferingVO offering = diskOfferingDao.findById(diskOfferingId);
-            if (offering != null && (offering.getType() == DiskOfferingVO.Type.Disk)) {
-                offeringId = offering.getId();
-            }
-        }
-        UsageEventUtils.publishUsageEvent(type, vmSnapshot.getAccountId(), userVm.getDataCenterId(), userVm.getId(), vmSnapshot.getName(), offeringId, volume.getId(), // save
-                // volume's id into templateId field
-                volumeTo.getSize(), VMSnapshot.class.getName(), vmSnapshot.getUuid());
     }
 
     protected void finalizeCreate(final VMSnapshotVO vmSnapshot, final List<VolumeObjectTO> volumeTOs) {

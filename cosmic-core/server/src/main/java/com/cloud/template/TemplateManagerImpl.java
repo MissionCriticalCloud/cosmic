@@ -61,9 +61,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.UsageEventVO;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
@@ -222,8 +219,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     @Inject
     private StorageManager _storageMgr;
     @Inject
-    private UsageEventDao _usageEventDao;
-    @Inject
     private AccountService _accountService;
     @Inject
     private ResourceLimitService _resourceLimitMgr;
@@ -257,8 +252,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     private List<TemplateAdapter> _adapters;
     @Inject
     private StorageCacheManager cacheMgr;
-    @Inject
-    private EndPointSelector selector;
 
     protected TemplateManagerImpl() {
     }
@@ -299,10 +292,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         if (CollectionUtils.isNotEmpty(payload)) {
             final GetUploadParamsResponse response = new GetUploadParamsResponse();
 
-      /*
-       * There can be one or more commands depending on the number of secondary stores the template needs to go to. Taking the first one to do the url upload. The
-       * template will be propagated to the rest through copy by management server commands.
-       */
+            /*
+             * There can be one or more commands depending on the number of secondary stores the template needs to go to. Taking the first one to do the url upload. The
+             * template will be propagated to the rest through copy by management server commands.
+             */
             final TemplateOrVolumePostUploadCommand firstCommand = payload.get(0);
 
             final String ssvmUrlDomain = _configDao.getValue(Config.SecStorageSecureCopyCert.key());
@@ -325,16 +318,16 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             response.setTimeout(expires);
 
             final String key = _configDao.getValue(Config.SSVMPSK.key());
-      /*
-       * encoded metadata using the post upload config ssh key
-       */
+            /*
+             * encoded metadata using the post upload config ssh key
+             */
             final Gson gson = new GsonBuilder().create();
             final String metadata = EncryptionUtil.encodeData(gson.toJson(firstCommand), key);
             response.setMetadata(metadata);
 
-      /*
-       * signature calculated on the url, expiry, metadata.
-       */
+            /*
+             * signature calculated on the url, expiry, metadata.
+             */
             response.setSignature(EncryptionUtil.generateSignature(metadata + url + expires, key));
 
             return response;
@@ -615,10 +608,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
                 _tmpltDao.addTemplateToZone(template, dstZoneId);
 
-                if (account.getId() != Account.ACCOUNT_ID_SYSTEM) {
-                    UsageEventUtils.publishUsageEvent(copyEventType, account.getId(), dstZoneId, tmpltId, null, null, null, srcTmpltStore.getPhysicalSize(),
-                            srcTmpltStore.getSize(), template.getClass().getName(), template.getUuid());
-                }
                 return true;
             } catch (final Exception ex) {
                 s_logger.debug("failed to copy template to image store:" + dstSecStore.getName() + " ,will try next one");
@@ -1401,14 +1390,14 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         " state yet and can't be used for template creation");
             }
 
-      /*
-       * // bug #11428. Operation not supported if vmware and snapshots
-       * parent volume = ROOT if(snapshot.getHypervisorType() ==
-       * HypervisorType.VMware && snapshotVolume.getVolumeType() ==
-       * Type.DATADISK){ throw new UnsupportedServiceException(
-       * "operation not supported, snapshot with id " + snapshotId +
-       * " is created from Data Disk"); }
-       */
+            /*
+             * // bug #11428. Operation not supported if vmware and snapshots
+             * parent volume = ROOT if(snapshot.getHypervisorType() ==
+             * HypervisorType.VMware && snapshotVolume.getVolumeType() ==
+             * Type.DATADISK){ throw new UnsupportedServiceException(
+             * "operation not supported, snapshot with id " + snapshotId +
+             * " is created from Data Disk"); }
+             */
 
             hyperType = snapshot.getHypervisorType();
         }
@@ -1586,15 +1575,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 }
 
                 privateTemplate = _tmpltDao.findById(templateId);
-                final TemplateDataStoreVO srcTmpltStore = _tmplStoreDao.findByStoreTemplate(store.getId(), templateId);
-                final UsageEventVO usageEvent =
-                        new UsageEventVO(EventTypes.EVENT_TEMPLATE_CREATE, privateTemplate.getAccountId(), zoneId, privateTemplate.getId(), privateTemplate.getName(), null,
-                                privateTemplate.getSourceTemplateId(), srcTmpltStore.getPhysicalSize(), privateTemplate.getSize());
-                _usageEventDao.persist(usageEvent);
-            } catch (final InterruptedException e) {
-                s_logger.debug("Failed to create template", e);
-                throw new CloudRuntimeException("Failed to create template", e);
-            } catch (final ExecutionException e) {
+            } catch (final InterruptedException | ExecutionException e) {
                 s_logger.debug("Failed to create template", e);
                 throw new CloudRuntimeException("Failed to create template", e);
             }
@@ -1956,10 +1937,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     @Override
     public ConfigKey<?>[] getConfigKeys() {
         return new ConfigKey<?>[]{AllowPublicUserTemplates};
-    }
-
-    public List<TemplateAdapter> getTemplateAdapters() {
-        return _adapters;
     }
 
     @Inject

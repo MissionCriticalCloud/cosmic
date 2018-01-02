@@ -2,27 +2,22 @@ package com.cloud.networkoffering;
 
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
-import com.cloud.event.dao.UsageEventDao;
-import com.cloud.event.dao.UsageEventDetailsDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.dao.UserVmDetailsDao;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -58,21 +53,6 @@ public class CreateNetworkOfferingTest extends TestCase {
 
     @Inject
     AccountManager accountMgr;
-
-    @Inject
-    VpcManager vpcMgr;
-
-    @Inject
-    UserVmDetailsDao userVmDetailsDao;
-
-    @Inject
-    UsageEventDao UsageEventDao;
-
-    @Inject
-    UsageEventDetailsDao usageEventDetailsDao;
-
-    @Inject
-    UserIpAddressDetailsDao userIpAddressDetailsDao;
 
     @Override
     @Before
@@ -110,7 +90,7 @@ public class CreateNetworkOfferingTest extends TestCase {
     public void createSharedNtwkOffWithNoVlan() {
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, false, Availability.Optional, 200, null, false, Network.GuestType.Shared,
-                        false, null, null,  false, null, true, false, null, false, null, true);
+                        false, null, null, false, null, true, false, null, false, null, true);
         assertNull("Shared network offering with specifyVlan=false was created", off);
     }
 

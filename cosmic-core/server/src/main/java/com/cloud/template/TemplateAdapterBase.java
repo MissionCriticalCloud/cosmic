@@ -14,7 +14,6 @@ import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -23,15 +22,12 @@ import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.projects.ProjectManager;
-import com.cloud.server.ConfigurationServer;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VMTemplateDao;
-import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
@@ -84,29 +80,16 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
     TemplateDataStoreDao _tmpltStoreDao;
     protected
     @Inject
-    VMTemplateZoneDao _tmpltZoneDao;
-    protected
-    @Inject
-    UsageEventDao _usageEventDao;
-    protected
-    @Inject
     HostDao _hostDao;
     protected
     @Inject
     UserVmDao _userVmDao;
     protected
     @Inject
-    GuestOSHypervisorDao _osHyperDao;
-    protected
-    @Inject
     ResourceLimitService _resourceLimitMgr;
     protected
     @Inject
     ImageStoreDao _imgStoreDao;
-    @Inject
-    TemplateManager templateMgr;
-    @Inject
-    ConfigurationServer _configServer;
     @Inject
     ProjectManager _projectMgr;
 

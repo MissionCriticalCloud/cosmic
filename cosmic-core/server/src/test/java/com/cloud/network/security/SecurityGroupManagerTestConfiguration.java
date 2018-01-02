@@ -13,7 +13,6 @@ import com.cloud.dc.dao.HostPodDaoImpl;
 import com.cloud.dc.dao.PodVlanDaoImpl;
 import com.cloud.domain.dao.DomainDaoImpl;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.event.dao.UsageEventDaoImpl;
 import com.cloud.framework.config.dao.ConfigurationDaoImpl;
 import com.cloud.host.dao.HostDaoImpl;
 import com.cloud.host.dao.HostDetailsDaoImpl;
@@ -39,8 +38,6 @@ import com.cloud.vm.dao.UserVmDaoImpl;
 import com.cloud.vm.dao.UserVmDetailsDaoImpl;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
 
-import java.io.IOException;
-
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -53,7 +50,7 @@ import org.springframework.core.type.filter.TypeFilter;
 
 @Configuration
 @ComponentScan(basePackageClasses = {SecurityGroupRulesDaoImpl.class, UserVmDaoImpl.class, AccountDaoImpl.class, ConfigurationDaoImpl.class,
-        SecurityGroupWorkDaoImpl.class, VmRulesetLogDaoImpl.class, VMInstanceDaoImpl.class, DomainDaoImpl.class, UsageEventDaoImpl.class,
+        SecurityGroupWorkDaoImpl.class, VmRulesetLogDaoImpl.class, VMInstanceDaoImpl.class, DomainDaoImpl.class,
         ResourceTagsDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class,
         DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, HostTransferMapDaoImpl.class, SecurityGroupManagerImpl2.class, SecurityGroupDaoImpl.class,
         SecurityGroupVMMapDaoImpl.class, UserVmDetailsDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterLinkLocalIpAddressDaoImpl.class,
@@ -106,7 +103,7 @@ public class SecurityGroupManagerTestConfiguration {
     public static class Library implements TypeFilter {
 
         @Override
-        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) {
             mdr.getClassMetadata().getClassName();
             final ComponentScan cs = SecurityGroupManagerTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);

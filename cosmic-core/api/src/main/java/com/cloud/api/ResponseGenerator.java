@@ -15,7 +15,6 @@ import com.cloud.api.response.CreateCmdResponse;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
-import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
@@ -43,8 +42,6 @@ import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
-import com.cloud.api.response.ProjectAccountResponse;
-import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ProviderResponse;
 import com.cloud.api.response.RegionResponse;
@@ -63,14 +60,11 @@ import com.cloud.api.response.SnapshotResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
 import com.cloud.api.response.StoragePoolResponse;
-import com.cloud.api.response.SystemVmInstanceResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.api.response.TemplatePermissionsResponse;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.api.response.TrafficMonitorResponse;
 import com.cloud.api.response.TrafficTypeResponse;
 import com.cloud.api.response.UpgradeRouterTemplateResponse;
-import com.cloud.api.response.UsageRecordResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VMSnapshotResponse;
@@ -90,7 +84,6 @@ import com.cloud.dc.Pod;
 import com.cloud.dc.StorageNetworkIpRange;
 import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
-import com.cloud.event.Event;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.network.GuestVlan;
@@ -127,8 +120,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
-import com.cloud.projects.ProjectAccount;
-import com.cloud.projects.ProjectInvitation;
 import com.cloud.region.Region;
 import com.cloud.server.ResourceTag;
 import com.cloud.storage.GuestOS;
@@ -138,7 +129,6 @@ import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.usage.Usage;
 import com.cloud.user.Account;
 import com.cloud.user.SSHKeyPair;
 import com.cloud.user.User;
@@ -233,8 +223,6 @@ public interface ResponseGenerator {
 
     VirtualMachineTemplate findTemplateById(Long templateId);
 
-    Host findHostById(Long hostId);
-
     VpnUsersResponse createVpnUserResponse(VpnUser user);
 
     RemoteAccessVpnResponse createRemoteAccessVpnResponse(RemoteAccessVpn vpn);
@@ -247,13 +235,9 @@ public interface ResponseGenerator {
 
     SecurityGroupResponse createSecurityGroupResponse(SecurityGroup group);
 
-    ExtractResponse createExtractResponse(Long uploadId, Long id, Long zoneId, Long accountId, String mode, String url);
-
     ExtractResponse createExtractResponse(Long id, Long zoneId, Long accountId, String mode, String url);
 
     String toSerializedString(CreateCmdResponse response, String responseType);
-
-    EventResponse createEventResponse(Event event);
 
     TemplateResponse createTemplateUpdateResponse(ResponseView view, VirtualMachineTemplate result);
 
@@ -279,17 +263,9 @@ public interface ResponseGenerator {
 
     ProjectResponse createProjectResponse(Project project);
 
-    List<TemplateResponse> createTemplateResponses(ResponseView view, long templateId, Long vmId);
-
     FirewallResponse createFirewallResponse(FirewallRule fwRule);
 
     HypervisorCapabilitiesResponse createHypervisorCapabilitiesResponse(HypervisorCapabilities hpvCapabilities);
-
-    ProjectAccountResponse createProjectAccountResponse(ProjectAccount projectAccount);
-
-    ProjectInvitationResponse createProjectInvitationResponse(ProjectInvitation invite);
-
-    SystemVmInstanceResponse createSystemVmInstanceResponse(VirtualMachine systemVM);
 
     PhysicalNetworkResponse createPhysicalNetworkResponse(PhysicalNetwork result);
 
@@ -307,49 +283,20 @@ public interface ResponseGenerator {
 
     ImageStoreResponse createImageStoreResponse(ImageStore os);
 
-    /**
-     * @param resourceTag
-     * @param keyValueOnly TODO
-     * @return
-     */
     ResourceTagResponse createResourceTagResponse(ResourceTag resourceTag, boolean keyValueOnly);
 
     Site2SiteVpnGatewayResponse createSite2SiteVpnGatewayResponse(Site2SiteVpnGateway result);
 
-    /**
-     * @param offering
-     * @return
-     */
     VpcOfferingResponse createVpcOfferingResponse(VpcOffering offering);
 
-    /**
-     * @param vpc
-     * @return
-     */
     VpcResponse createVpcResponse(ResponseView view, Vpc vpc);
 
-    /**
-     * @param networkACLItem
-     * @return
-     */
     NetworkACLItemResponse createNetworkACLItemResponse(NetworkACLItem networkACLItem);
 
-    /**
-     * @param networkACL
-     * @return
-     */
     NetworkACLResponse createNetworkACLResponse(NetworkACL networkACL);
 
-    /**
-     * @param result
-     * @return
-     */
     PrivateGatewayResponse createPrivateGatewayResponse(PrivateGateway result);
 
-    /**
-     * @param result
-     * @return
-     */
     StaticRouteResponse createStaticRouteResponse(StaticRoute result);
 
     Site2SiteCustomerGatewayResponse createSite2SiteCustomerGatewayResponse(Site2SiteCustomerGateway result);
@@ -360,15 +307,11 @@ public interface ResponseGenerator {
 
     GuestOsMappingResponse createGuestOSMappingResponse(GuestOSHypervisor osHypervisor);
 
-    UsageRecordResponse createUsageResponse(Usage usageRecord);
-
-    TrafficMonitorResponse createTrafficMonitorResponse(Host trafficMonitor);
-
     VMSnapshotResponse createVMSnapshotResponse(VMSnapshot vmSnapshot);
 
     NicSecondaryIpResponse createSecondaryIPToNicResponse(NicSecondaryIp result);
 
-    public NicResponse createNicResponse(Nic result);
+    NicResponse createNicResponse(Nic result);
 
     AffinityGroupResponse createAffinityGroupResponse(AffinityGroup group);
 

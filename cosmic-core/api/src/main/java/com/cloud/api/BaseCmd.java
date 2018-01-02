@@ -16,7 +16,6 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
-import com.cloud.network.NetworkUsageService;
 import com.cloud.network.StorageNetworkService;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.firewall.FirewallService;
@@ -39,7 +38,6 @@ import com.cloud.storage.StorageService;
 import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.snapshot.SnapshotApiService;
 import com.cloud.template.TemplateApiService;
-import com.cloud.usage.UsageService;
 import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.user.DomainService;
@@ -127,10 +125,6 @@ public abstract class BaseCmd {
     public Site2SiteVpnService _s2sVpnService;
     @Inject
     public QueryService _queryService;
-    @Inject
-    public UsageService _usageService;
-    @Inject
-    public NetworkUsageService _networkUsageService;
     @Inject
     public VMSnapshotService _vmSnapshotService;
     @Inject

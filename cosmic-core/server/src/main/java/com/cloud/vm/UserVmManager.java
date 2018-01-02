@@ -9,8 +9,6 @@ import com.cloud.exception.ManagementServerException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.offering.ServiceOffering;
-import com.cloud.service.ServiceOfferingVO;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
@@ -24,20 +22,14 @@ import java.util.Map;
  *
  */
 public interface UserVmManager extends UserVmService {
-    static final String EnableDynamicallyScaleVmCK = "enable.dynamic.scale.vm";
-    static final String AllowUserExpungeRecoverVmCK = "allow.user.expunge.recover.vm";
-    static final ConfigKey<Boolean> EnableDynamicallyScaleVm = new ConfigKey<>("Advanced", Boolean.class, EnableDynamicallyScaleVmCK, "false",
+    String EnableDynamicallyScaleVmCK = "enable.dynamic.scale.vm";
+    String AllowUserExpungeRecoverVmCK = "allow.user.expunge.recover.vm";
+    ConfigKey<Boolean> EnableDynamicallyScaleVm = new ConfigKey<>("Advanced", Boolean.class, EnableDynamicallyScaleVmCK, "false",
             "Enables/Disables dynamically scaling a vm", true, ConfigKey.Scope.Zone);
-    static final ConfigKey<Boolean> AllowUserExpungeRecoverVm = new ConfigKey<>("Advanced", Boolean.class, AllowUserExpungeRecoverVmCK, "false",
+    ConfigKey<Boolean> AllowUserExpungeRecoverVm = new ConfigKey<>("Advanced", Boolean.class, AllowUserExpungeRecoverVmCK, "false",
             "Determines whether users can expunge or recover their vm", true, ConfigKey.Scope.Account);
 
-    static final int MAX_USER_DATA_LENGTH_BYTES = 2048;
-
-    /**
-     * @param hostId get all of the virtual machines that belong to one host.
-     * @return collection of VirtualMachine.
-     */
-    List<? extends UserVm> getVirtualMachines(long hostId);
+    int MAX_USER_DATA_LENGTH_BYTES = 2048;
 
     /**
      * @param vmId id of the virtual machine.
@@ -57,9 +49,6 @@ public interface UserVmManager extends UserVmService {
     /**
      * Obtains statistics for a list of host or VMs; CPU and network utilization
      *
-     * @param host ID
-     * @param host name
-     * @param list of VM IDs or host id
      * @return GetVmStatsAnswer
      */
     HashMap<Long, VmStatsEntry> getVirtualMachineStatistics(long hostId, String hostName, List<Long> vmIds);
@@ -91,14 +80,4 @@ public interface UserVmManager extends UserVmService {
     UserVm updateVirtualMachine(long id, String displayName, String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                 Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName) throws ResourceUnavailableException,
             InsufficientCapacityException;
-
-    //the validateCustomParameters, save and remove CustomOfferingDetils functions can be removed from the interface once we can
-    //find a common place for all the scaling and upgrading code of both user and systemvms.
-    void validateCustomParameters(ServiceOfferingVO serviceOffering, Map<String, String> customParameters);
-
-    public void saveCustomOfferingDetails(long vmId, ServiceOffering serviceOffering);
-
-    public void removeCustomOfferingDetails(long vmId);
-
-    void generateUsageEvent(VirtualMachine vm, boolean isDisplay, String eventType);
 }

@@ -2,7 +2,6 @@ package com.cloud.network;
 
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
 import com.cloud.api.command.user.network.CreateNetworkCmd;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.command.user.network.RestartNetworkCmd;
@@ -44,8 +43,6 @@ public interface NetworkService {
     boolean deleteNetwork(long networkId, boolean forced);
 
     boolean restartNetwork(RestartNetworkCmd cmd, boolean cleanup) throws ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;
-
-    int getActiveNicsInNetwork(long networkId);
 
     Network getNetwork(long networkId);
 
@@ -91,8 +88,6 @@ public interface NetworkService {
 
     PhysicalNetworkTrafficType getPhysicalNetworkTrafficType(Long id);
 
-    PhysicalNetworkTrafficType updatePhysicalNetworkTrafficType(Long id, String xenLabel, String kvmLabel);
-
     boolean deletePhysicalNetworkTrafficType(Long id);
 
     GuestVlan dedicateGuestVlanRange(DedicateGuestVlanRangeCmd cmd);
@@ -105,13 +100,8 @@ public interface NetworkService {
 
     Network getExclusiveGuestNetwork(long zoneId);
 
-    List<Pair<TrafficType, String>> listTrafficTypeImplementor(ListTrafficTypeImplementorsCmd cmd);
-
-    List<? extends Network> getIsolatedNetworksWithSourceNATOwnedByAccountInZone(long zoneId, Account owner);
-
     /**
      * @param networkId
-     * @param entityId
      * @return
      * @throws ConcurrentOperationException
      * @throws ResourceUnavailableException

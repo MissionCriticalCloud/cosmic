@@ -2,8 +2,6 @@ package com.cloud.storage.listener;
 
 import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
@@ -14,8 +12,6 @@ import com.cloud.storage.Volume.State;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import java.text.SimpleDateFormat;
@@ -48,32 +44,7 @@ public class VolumeStateListener implements StateListener<State, Event, Volume> 
     @Override
     public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final Volume vol, final boolean status, final Object opaque) {
         pubishOnEventBus(transition.getEvent().name(), "postStateTransitionEvent", vol, transition.getCurrentState(), transition.getToState());
-        if (transition.isImpacted(StateMachine2.Transition.Impact.USAGE)) {
-            final Long instanceId = vol.getInstanceId();
-            VMInstanceVO vmInstanceVO = null;
-            if (instanceId != null) {
-                vmInstanceVO = _vmInstanceDao.findById(instanceId);
-            }
-            if (instanceId == null || vmInstanceVO.getType() == VirtualMachine.Type.User) {
-                if (transition.getToState() == State.Ready) {
-                    if (transition.getCurrentState() == State.Resizing) {
-                        // Log usage event for volumes belonging user VM's only
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_RESIZE, vol.getAccountId(), vol.getDataCenterId(), vol.getId(), vol.getName(),
-                                vol.getDiskOfferingId(), vol.getTemplateId(), vol.getSize(), Volume.class.getName(), vol.getUuid());
-                    } else {
-                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_CREATE, vol.getAccountId(), vol.getDataCenterId(), vol.getId(), vol.getName(), vol
-                                        .getDiskOfferingId(), null, vol.getSize(),
-                                Volume.class.getName(), vol.getUuid(), vol.isDisplayVolume());
-                    }
-                } else if (transition.getToState() == State.Destroy && vol.getVolumeType() != Volume.Type.ROOT) { //Do not Publish Usage Event for ROOT Disk as it would have
-                    // been published already while destroying a VM
-                    UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_DELETE, vol.getAccountId(), vol.getDataCenterId(), vol.getId(), vol.getName(),
-                            Volume.class.getName(), vol.getUuid(), vol.isDisplayVolume());
-                } else if (transition.getToState() == State.Uploaded) {
-                    //Currently we are not capturing Usage for Secondary Storage so Usage for this operation will be captured when it is moved to primary storage
-                }
-            }
-        }
+
         return true;
     }
 

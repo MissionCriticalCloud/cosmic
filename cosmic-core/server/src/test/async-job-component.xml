@@ -60,15 +60,12 @@
         <dao name="IP Addresses" class="com.cloud.network.dao.IPAddressDaoImpl" />
         <dao name="Datacenter IP Addresses" class="com.cloud.dc.dao.DataCenterIpAddressDaoImpl" />
         <dao name="Pricing" class="com.cloud.pricing.dao.PricingDaoImpl" />
-        <dao name="Usage" class="com.cloud.usage.dao.UsageDaoImpl" />
-        <dao name="UsageJob" class="com.cloud.usage.dao.UsageJobDaoImpl" />
         <dao name="Alert" class="com.cloud.alert.dao.AlertDaoImpl" />
         <dao name="Capacity" class="com.cloud.capacity.dao.CapacityDaoImpl" />
         <dao name="Domain" class="com.cloud.domain.dao.DomainDaoImpl" />
         <dao name="Account" class="com.cloud.user.dao.AccountDaoImpl" />
         <dao name="Limit" class="com.cloud.configuration.dao.LimitDaoImpl" />
         <dao name="UserAccount" class="com.cloud.user.dao.UserAccountDaoImpl" />
-        <dao name="Usage IPAddress" class="com.cloud.usage.dao.UsageIPAddressDaoImpl" />
         <dao name="VM Template Host" class="com.cloud.storage.dao.VMTemplateHostDaoImpl" />
         <dao name="Upload" class="com.cloud.storage.dao.UploadDaoImpl" />
         <dao name="VM Template Pool" class="com.cloud.storage.dao.VMTemplatePoolDaoImpl" />
@@ -148,7 +145,7 @@
         </manager>
         <manager name="StorageManager" class="com.cloud.storage.StorageManagerImpl">
         </manager>
-        <manager name="HA Manager" class="com.cloud.ha.HighAvailabilityManagerExtImpl">
+        <manager name="HA Manager" class="com.cloud.ha.HighAvailabilityManagerImpl">
         </manager>
         <manager name="Cluster Manager" class="com.cloud.cluster.ClusterManagerImpl">
         </manager>

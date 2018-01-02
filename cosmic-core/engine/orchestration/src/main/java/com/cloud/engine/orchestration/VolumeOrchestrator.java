@@ -4,7 +4,6 @@ import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.allocator.PodAllocator;
-import com.cloud.cluster.ClusterManager;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
@@ -33,13 +32,10 @@ import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeService;
-import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientStorageCapacityException;
 import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCallFuture;
-import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.jobs.AsyncJobManager;
@@ -64,7 +60,6 @@ import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.storage.dao.VolumeDetailsDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
@@ -149,8 +144,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     @Inject
     EntityManager _entityMgr;
     @Inject
-    VolumeDetailsDao _volDetailDao;
-    @Inject
     DataStoreManager dataStoreMgr;
     @Inject
     VolumeService volService;
@@ -161,13 +154,9 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     @Inject
     SnapshotDataFactory snapshotFactory;
     @Inject
-    ConfigDepot _configDepot;
-    @Inject
     HostDao _hostDao;
     @Inject
     SnapshotService _snapshotSrv;
-    @Inject
-    ClusterManager clusterManager;
 
     @Inject
     StorageStrategyFactory _storageStrategyFactory;
@@ -182,10 +171,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
     public void setStoragePoolAllocators(final List<StoragePoolAllocator> storagePoolAllocators) {
         _storagePoolAllocators = storagePoolAllocators;
-    }
-
-    public List<PodAllocator> getPodAllocators() {
-        return _podAllocators;
     }
 
     public void setPodAllocators(final List<PodAllocator> podAllocators) {
@@ -562,10 +547,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             } else {
                 volService.destroyVolume(volume.getId());
             }
-            // FIXME - All this is boiler plate code and should be done as part of state transition. This shouldn't be part of orchestrator.
-            // publish usage event for the volume
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_DELETE, volume.getAccountId(), volume.getDataCenterId(), volume.getId(), volume.getName(),
-                    Volume.class.getName(), volume.getUuid(), volume.isDisplayVolume());
             _resourceLimitMgr.decrementResourceCount(volume.getAccountId(), ResourceType.volume, volume.isDisplay());
             //FIXME - why recalculate and not decrement
             _resourceLimitMgr.recalculateResourceCount(volume.getAccountId(), volume.getDomainId(), ResourceType.primary_storage.getOrdinal());
@@ -621,9 +602,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         // Save usage event and update resource count for user vm volumes
         if (vm.getType() == VirtualMachine.Type.User) {
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_CREATE, vol.getAccountId(), vol.getDataCenterId(), vol.getId(), vol.getName(), offering.getId(), null, size,
-                    Volume.class.getName(), vol.getUuid(), vol.isDisplayVolume());
-
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.volume, vol.isDisplayVolume());
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
@@ -1349,10 +1327,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             if (offering.getType() == DiskOffering.Type.Disk) {
                 offeringId = offering.getId();
             }
-
-            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VOLUME_CREATE, vol.getAccountId(), vol.getDataCenterId(), vol.getId(), vol.getName(), offeringId, vol
-                            .getTemplateId(), size,
-                    Volume.class.getName(), vol.getUuid(), vol.isDisplayVolume());
 
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.volume, vol.isDisplayVolume());
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));

@@ -1129,7 +1129,6 @@ public enum Config {
             "00:15",
             "The time at which the usage statistics aggregation job will run as an HH24:MM time, e.g. 00:30 to run at 12:30am.",
             null),
-    EnableUsageServer("Usage", ManagementServer.class, Boolean.class, "enable.usage.server", "true", "Flag for enabling usage", null),
     DirectNetworkStatsInterval(
             "Usage",
             ManagementServer.class,
@@ -1713,7 +1712,6 @@ public enum Config {
         Configs.put("Storage", new ArrayList<>());
         Configs.put("Snapshots", new ArrayList<>());
         Configs.put("Network", new ArrayList<>());
-        Configs.put("Usage", new ArrayList<>());
         Configs.put("Console Proxy", new ArrayList<>());
         Configs.put("Advanced", new ArrayList<>());
         Configs.put("Usage", new ArrayList<>());

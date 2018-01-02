@@ -3,7 +3,6 @@ package com.cloud.vpc;
 import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
-import com.cloud.api.command.admin.usage.ListTrafficTypeImplementorsCmd;
 import com.cloud.api.command.user.network.CreateNetworkCmd;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.command.user.network.RestartNetworkCmd;
@@ -189,15 +188,6 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#getActiveNicsInNetwork(long)
-     */
-    @Override
-    public int getActiveNicsInNetwork(final long networkId) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkService#getNetwork(long)
      */
     @Override
@@ -380,27 +370,12 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#getPhysicalNetworkTrafficType(java.lang.Long)
-     */
     @Override
     public PhysicalNetworkTrafficType getPhysicalNetworkTrafficType(final Long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#updatePhysicalNetworkTrafficType(java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
-     */
-    @Override
-    public PhysicalNetworkTrafficType updatePhysicalNetworkTrafficType(final Long id, final String xenLabel, final String kvmLabel) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#deletePhysicalNetworkTrafficType(java.lang.Long)
-     */
     @Override
     public boolean deletePhysicalNetworkTrafficType(final Long id) {
         // TODO Auto-generated method stub
@@ -439,24 +414,6 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
      */
     @Override
     public Network getExclusiveGuestNetwork(final long zoneId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#listTrafficTypeImplementor(com.cloud.api.commands.ListTrafficTypeImplementorsCmd)
-     */
-    @Override
-    public List<Pair<TrafficType, String>> listTrafficTypeImplementor(final ListTrafficTypeImplementorsCmd cmd) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#getIsolatedNetworksWithSourceNATOwnedByAccountInZone(long, com.cloud.user.Account)
-     */
-    @Override
-    public List<? extends Network> getIsolatedNetworksWithSourceNATOwnedByAccountInZone(final long zoneId, final Account owner) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -666,7 +623,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
 
     /* (non-Javadoc)
      * @see com.cloud.network.NetworkManager#createGuestNetwork(long, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String,
-      * com.cloud.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
+     * com.cloud.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,

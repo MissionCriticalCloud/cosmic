@@ -28,7 +28,6 @@ import com.cloud.dc.dao.VlanDaoImpl;
 import com.cloud.domain.dao.DomainDaoImpl;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
-import com.cloud.event.dao.UsageEventDaoImpl;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDaoImpl;
@@ -91,8 +90,6 @@ import com.cloud.vm.dao.NicSecondaryIpDaoImpl;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDaoImpl;
 
-import java.io.IOException;
-
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -108,7 +105,7 @@ import org.springframework.core.type.filter.TypeFilter;
         ServiceOfferingDaoImpl.class,
         ServiceOfferingDetailsDaoImpl.class, VlanDaoImpl.class, IPAddressDaoImpl.class, ResourceTagsDaoImpl.class, AccountDaoImpl.class,
         InstanceGroupDaoImpl.class, UserAccountJoinDaoImpl.class, CapacityDaoImpl.class, SnapshotDaoImpl.class, HostDaoImpl.class, VMInstanceDaoImpl.class,
-        HostTransferMapDaoImpl.class, PortForwardingRulesDaoImpl.class, PrivateIpDaoImpl.class, UsageEventDaoImpl.class, PodVlanMapDaoImpl.class,
+        HostTransferMapDaoImpl.class, PortForwardingRulesDaoImpl.class, PrivateIpDaoImpl.class, PodVlanMapDaoImpl.class,
         DiskOfferingDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class,
         DataCenterDetailsDaoImpl.class, NicSecondaryIpDaoImpl.class, UserIpv6AddressDaoImpl.class, UserDaoImpl.class, NicDaoImpl.class,
         NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
@@ -328,7 +325,7 @@ ChildTestConfiguration {
     public static class Library implements TypeFilter {
 
         @Override
-        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) throws IOException {
+        public boolean match(final MetadataReader mdr, final MetadataReaderFactory arg1) {
             mdr.getClassMetadata().getClassName();
             final ComponentScan cs = ChildTestConfiguration.class.getAnnotation(ComponentScan.class);
             return SpringUtils.includedInBasePackageClasses(mdr.getClassMetadata().getClassName(), cs);

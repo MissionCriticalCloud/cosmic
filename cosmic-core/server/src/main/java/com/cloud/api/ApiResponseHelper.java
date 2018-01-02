@@ -16,12 +16,9 @@ import com.cloud.api.query.vo.ControlledViewEntity;
 import com.cloud.api.query.vo.DataCenterJoinVO;
 import com.cloud.api.query.vo.DiskOfferingJoinVO;
 import com.cloud.api.query.vo.DomainRouterJoinVO;
-import com.cloud.api.query.vo.EventJoinVO;
 import com.cloud.api.query.vo.HostJoinVO;
 import com.cloud.api.query.vo.ImageStoreJoinVO;
 import com.cloud.api.query.vo.InstanceGroupJoinVO;
-import com.cloud.api.query.vo.ProjectAccountJoinVO;
-import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.SecurityGroupJoinVO;
@@ -45,7 +42,6 @@ import com.cloud.api.response.CreateSSHKeyPairResponse;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
-import com.cloud.api.response.EventResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
@@ -75,8 +71,6 @@ import com.cloud.api.response.NicSecondaryIpResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
-import com.cloud.api.response.ProjectAccountResponse;
-import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ProviderResponse;
 import com.cloud.api.response.RegionResponse;
@@ -96,14 +90,11 @@ import com.cloud.api.response.SnapshotResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
 import com.cloud.api.response.StoragePoolResponse;
-import com.cloud.api.response.SystemVmInstanceResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.api.response.TemplatePermissionsResponse;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.api.response.TrafficMonitorResponse;
 import com.cloud.api.response.TrafficTypeResponse;
 import com.cloud.api.response.UpgradeRouterTemplateResponse;
-import com.cloud.api.response.UsageRecordResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VMSnapshotResponse;
@@ -139,13 +130,11 @@ import com.cloud.engine.subsystem.api.storage.DataStoreCapabilities;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
-import com.cloud.event.Event;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.gpu.GPU;
 import com.cloud.host.Host;
-import com.cloud.host.HostVO;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.network.GuestVlan;
 import com.cloud.network.IpAddress;
@@ -167,9 +156,7 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VpnUser;
-import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.router.VirtualRouter;
@@ -177,11 +164,9 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityGroupVO;
 import com.cloud.network.security.SecurityRule;
 import com.cloud.network.security.SecurityRule.SecurityRuleType;
 import com.cloud.network.vpc.NetworkACL;
@@ -194,27 +179,20 @@ import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
-import com.cloud.projects.ProjectAccount;
-import com.cloud.projects.ProjectInvitation;
 import com.cloud.region.Region;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Upload;
-import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
@@ -224,9 +202,6 @@ import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.usage.Usage;
-import com.cloud.usage.UsageService;
-import com.cloud.usage.UsageTypes;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.SSHKeyPair;
@@ -253,15 +228,12 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import javax.inject.Inject;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -283,8 +255,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     SnapshotDataFactory snapshotfactory;
     @Inject
     private EntityManager _entityMgr;
-    @Inject
-    private UsageService _usageSvc;
     @Inject
     private VolumeDao _volumeDao;
     @Inject
@@ -1314,11 +1284,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public Host findHostById(final Long hostId) {
-        return ApiDBUtils.findHostById(hostId);
-    }
-
-    @Override
     public VpnUsersResponse createVpnUserResponse(final VpnUser vpnUser) {
         final VpnUsersResponse vpnResponse = new VpnUsersResponse();
         vpnResponse.setId(vpnUser.getUuid());
@@ -1462,36 +1427,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         return listSgs.get(0);
     }
 
-    @Override
-    public ExtractResponse createExtractResponse(final Long uploadId, final Long id, final Long zoneId, final Long accountId, final String mode, final String url) {
-
-        final ExtractResponse response = new ExtractResponse();
-        response.setObjectName("template");
-        final VMTemplateVO template = ApiDBUtils.findTemplateById(id);
-        response.setId(template.getUuid());
-        response.setName(template.getName());
-        if (zoneId != null) {
-            final DataCenter zone = ApiDBUtils.findZoneById(zoneId);
-            response.setZoneId(zone.getUuid());
-            response.setZoneName(zone.getName());
-        }
-        response.setMode(mode);
-        if (uploadId == null) {
-            // region-wide image store
-            response.setUrl(url);
-            response.setState(Upload.Status.DOWNLOAD_URL_CREATED.toString());
-        } else {
-            final UploadVO uploadInfo = ApiDBUtils.findUploadById(uploadId);
-            response.setUploadId(uploadInfo.getUuid());
-            response.setState(uploadInfo.getUploadState().toString());
-            response.setUrl(uploadInfo.getUploadUrl());
-        }
-        final Account account = ApiDBUtils.findAccountById(accountId);
-        response.setAccountId(account.getUuid());
-
-        return response;
-    }
-
     //TODO: we need to deprecate uploadVO, since extract is done in a synchronous fashion
     @Override
     public ExtractResponse createExtractResponse(final Long id, final Long zoneId, final Long accountId, final String mode, final String url) {
@@ -1518,12 +1453,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     @Override
     public String toSerializedString(final CreateCmdResponse response, final String responseType) {
         return ApiResponseSerializer.toSerializedString(response, responseType);
-    }
-
-    @Override
-    public EventResponse createEventResponse(final Event event) {
-        final EventJoinVO vEvent = ApiDBUtils.newEventView(event);
-        return ApiDBUtils.newEventResponse(vEvent);
     }
 
     @Override
@@ -2118,14 +2047,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public List<TemplateResponse> createTemplateResponses(final ResponseView view, final long templateId, final Long vmId) {
-        final UserVm vm = findUserVmById(vmId);
-        final Long hostId = vm.getHostId() == null ? vm.getLastHostId() : vm.getHostId();
-        final Host host = findHostById(hostId);
-        return createTemplateResponses(view, templateId, host.getDataCenterId(), true);
-    }
-
-    @Override
     public FirewallResponse createFirewallResponse(final FirewallRule fwRule) {
         final FirewallResponse response = new FirewallResponse();
 
@@ -2187,45 +2108,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         hpvCapabilitiesResponse.setMaxHostsPerCluster(hpvCapabilities.getMaxHostsPerCluster());
         hpvCapabilitiesResponse.setIsStorageMotionSupported(hpvCapabilities.isStorageMotionSupported());
         return hpvCapabilitiesResponse;
-    }
-
-    @Override
-    public ProjectAccountResponse createProjectAccountResponse(final ProjectAccount projectAccount) {
-        final ProjectAccountJoinVO vProj = ApiDBUtils.newProjectAccountView(projectAccount);
-        final List<ProjectAccountResponse> listProjs = ViewResponseHelper.createProjectAccountResponse(vProj);
-        assert listProjs != null && listProjs.size() == 1 : "There should be one project account returned";
-        return listProjs.get(0);
-    }
-
-    @Override
-    public ProjectInvitationResponse createProjectInvitationResponse(final ProjectInvitation invite) {
-        final ProjectInvitationJoinVO vInvite = ApiDBUtils.newProjectInvitationView(invite);
-        return ApiDBUtils.newProjectInvitationResponse(vInvite);
-    }
-
-    @Override
-    public SystemVmInstanceResponse createSystemVmInstanceResponse(final VirtualMachine vm) {
-        final SystemVmInstanceResponse vmResponse = new SystemVmInstanceResponse();
-        vmResponse.setId(vm.getUuid());
-        vmResponse.setSystemVmType(vm.getType().toString().toLowerCase());
-        vmResponse.setName(vm.getHostName());
-        if (vm.getHostId() != null) {
-            final Host host = ApiDBUtils.findHostById(vm.getHostId());
-            if (host != null) {
-                vmResponse.setHostId(host.getUuid());
-            }
-        }
-        if (vm.getState() != null) {
-            vmResponse.setState(vm.getState().toString());
-        }
-        if (vm.getType() == Type.DomainRouter) {
-            final VirtualRouter router = (VirtualRouter) vm;
-            if (router.getRole() != null) {
-                vmResponse.setRole(router.getRole().toString());
-            }
-        }
-        vmResponse.setObjectName("systemvminstance");
-        return vmResponse;
     }
 
     @Override
@@ -2767,300 +2649,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
 
         response.setObjectName("guestosmapping");
-        return response;
-    }
-
-    @Override
-    public UsageRecordResponse createUsageResponse(final Usage usageRecord) {
-        final UsageRecordResponse usageRecResponse = new UsageRecordResponse();
-
-        final Account account = ApiDBUtils.findAccountById(usageRecord.getAccountId());
-        if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
-            //find the project
-            final Project project = ApiDBUtils.findProjectByProjectAccountIdIncludingRemoved(account.getId());
-            if (project != null) {
-                usageRecResponse.setProjectId(project.getUuid());
-                usageRecResponse.setProjectName(project.getName());
-            }
-        } else {
-            usageRecResponse.setAccountId(account.getUuid());
-            usageRecResponse.setAccountName(account.getAccountName());
-        }
-
-        final Domain domain = ApiDBUtils.findDomainById(usageRecord.getDomainId());
-        if (domain != null) {
-            usageRecResponse.setDomainId(domain.getUuid());
-        }
-
-        if (usageRecord.getZoneId() != null) {
-            final DataCenter zone = ApiDBUtils.findZoneById(usageRecord.getZoneId());
-            if (zone != null) {
-                usageRecResponse.setZoneId(zone.getUuid());
-            }
-        }
-        usageRecResponse.setDescription(usageRecord.getDescription());
-        usageRecResponse.setUsage(usageRecord.getUsageDisplay());
-        usageRecResponse.setUsageType(usageRecord.getUsageType());
-        if (usageRecord.getVmInstanceId() != null) {
-            final VMInstanceVO vm = _entityMgr.findByIdIncludingRemoved(VMInstanceVO.class, usageRecord.getVmInstanceId());
-            if (vm != null) {
-                usageRecResponse.setVirtualMachineId(vm.getUuid());
-            }
-        }
-        usageRecResponse.setVmName(usageRecord.getVmName());
-        if (usageRecord.getTemplateId() != null) {
-            final VMTemplateVO template = ApiDBUtils.findTemplateById(usageRecord.getTemplateId());
-            if (template != null) {
-                usageRecResponse.setTemplateId(template.getUuid());
-            }
-        }
-
-        if (usageRecord.getUsageType() == UsageTypes.RUNNING_VM || usageRecord.getUsageType() == UsageTypes.ALLOCATED_VM) {
-            final ServiceOfferingVO svcOffering = _entityMgr.findByIdIncludingRemoved(ServiceOfferingVO.class, usageRecord.getOfferingId().toString());
-            //Service Offering Id
-            usageRecResponse.setOfferingId(svcOffering.getUuid());
-            //VM Instance ID
-            final VMInstanceVO vm = _entityMgr.findByIdIncludingRemoved(VMInstanceVO.class, usageRecord.getUsageId().toString());
-            if (vm != null) {
-                usageRecResponse.setUsageId(vm.getUuid());
-            }
-            //Hypervisor Type
-            usageRecResponse.setType(usageRecord.getType());
-            //Dynamic compute offerings details
-            usageRecResponse.setCpuNumber(usageRecord.getCpuCores());
-            usageRecResponse.setCpuSpeed(usageRecord.getCpuSpeed());
-            usageRecResponse.setMemory(usageRecord.getMemory());
-        } else if (usageRecord.getUsageType() == UsageTypes.IP_ADDRESS) {
-            //isSourceNAT
-            usageRecResponse.setSourceNat(usageRecord.getType().equals("SourceNat") ? true : false);
-            //isSystem
-            usageRecResponse.setSystem(usageRecord.getSize() == 1 ? true : false);
-            //IP Address ID
-            final IPAddressVO ip = _entityMgr.findByIdIncludingRemoved(IPAddressVO.class, usageRecord.getUsageId().toString());
-            if (ip != null) {
-                usageRecResponse.setUsageId(ip.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.NETWORK_BYTES_SENT || usageRecord.getUsageType() == UsageTypes.NETWORK_BYTES_RECEIVED) {
-            //Device Type
-            usageRecResponse.setType(usageRecord.getType());
-            if (usageRecord.getType().equals("DomainRouter")) {
-                //Domain Router Id
-                final VMInstanceVO vm = _entityMgr.findByIdIncludingRemoved(VMInstanceVO.class, usageRecord.getUsageId().toString());
-                if (vm != null) {
-                    usageRecResponse.setUsageId(vm.getUuid());
-                }
-            } else {
-                //External Device Host Id
-                final HostVO host = _entityMgr.findByIdIncludingRemoved(HostVO.class, usageRecord.getUsageId().toString());
-                if (host != null) {
-                    usageRecResponse.setUsageId(host.getUuid());
-                }
-            }
-            //Network ID
-            if (usageRecord.getNetworkId() != null && usageRecord.getNetworkId() != 0) {
-                final NetworkVO network = _entityMgr.findByIdIncludingRemoved(NetworkVO.class, usageRecord.getNetworkId().toString());
-                if (network != null) {
-                    usageRecResponse.setNetworkId(network.getUuid());
-                }
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.VM_DISK_IO_READ || usageRecord.getUsageType() == UsageTypes.VM_DISK_IO_WRITE
-                || usageRecord.getUsageType() == UsageTypes.VM_DISK_BYTES_READ || usageRecord.getUsageType() == UsageTypes.VM_DISK_BYTES_WRITE) {
-            //Device Type
-            usageRecResponse.setType(usageRecord.getType());
-            //VM Instance Id
-            final VMInstanceVO vm = _entityMgr.findByIdIncludingRemoved(VMInstanceVO.class, usageRecord.getVmInstanceId().toString());
-            if (vm != null) {
-                usageRecResponse.setVirtualMachineId(vm.getUuid());
-            }
-            //Volume ID
-            final VolumeVO volume = _entityMgr.findByIdIncludingRemoved(VolumeVO.class, usageRecord.getUsageId().toString());
-            if (volume != null) {
-                usageRecResponse.setUsageId(volume.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.VOLUME) {
-            //Volume ID
-            final VolumeVO volume = _entityMgr.findByIdIncludingRemoved(VolumeVO.class, usageRecord.getUsageId().toString());
-            if (volume != null) {
-                usageRecResponse.setUsageId(volume.getUuid());
-            }
-            //Volume Size
-            usageRecResponse.setSize(usageRecord.getSize());
-            //Disk Offering Id
-            if (usageRecord.getOfferingId() != null) {
-                final DiskOfferingVO diskOff = _entityMgr.findByIdIncludingRemoved(DiskOfferingVO.class, usageRecord.getOfferingId().toString());
-                usageRecResponse.setOfferingId(diskOff.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.TEMPLATE || usageRecord.getUsageType() == UsageTypes.ISO) {
-            //Template/ISO ID
-            final VMTemplateVO tmpl = _entityMgr.findByIdIncludingRemoved(VMTemplateVO.class, usageRecord.getUsageId().toString());
-            if (tmpl != null) {
-                usageRecResponse.setUsageId(tmpl.getUuid());
-            }
-            //Template/ISO Size
-            usageRecResponse.setSize(usageRecord.getSize());
-            if (usageRecord.getUsageType() == UsageTypes.ISO) {
-                usageRecResponse.setVirtualSize(usageRecord.getSize());
-            } else {
-                usageRecResponse.setVirtualSize(usageRecord.getVirtualSize());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.SNAPSHOT) {
-            //Snapshot ID
-            final SnapshotVO snap = _entityMgr.findByIdIncludingRemoved(SnapshotVO.class, usageRecord.getUsageId().toString());
-            if (snap != null) {
-                usageRecResponse.setUsageId(snap.getUuid());
-            }
-            //Snapshot Size
-            usageRecResponse.setSize(usageRecord.getSize());
-        } else if (usageRecord.getUsageType() == UsageTypes.LOAD_BALANCER_POLICY) {
-            //Load Balancer Policy ID
-            final LoadBalancerVO lb = _entityMgr.findByIdIncludingRemoved(LoadBalancerVO.class, usageRecord.getUsageId().toString());
-            if (lb != null) {
-                usageRecResponse.setUsageId(lb.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.PORT_FORWARDING_RULE) {
-            //Port Forwarding Rule ID
-            final PortForwardingRuleVO pf = _entityMgr.findByIdIncludingRemoved(PortForwardingRuleVO.class, usageRecord.getUsageId().toString());
-            if (pf != null) {
-                usageRecResponse.setUsageId(pf.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.NETWORK_OFFERING) {
-            //Network Offering Id
-            final NetworkOfferingVO netOff = _entityMgr.findByIdIncludingRemoved(NetworkOfferingVO.class, usageRecord.getOfferingId().toString());
-            usageRecResponse.setOfferingId(netOff.getUuid());
-            //is Default
-            usageRecResponse.setDefault(usageRecord.getUsageId() == 1 ? true : false);
-        } else if (usageRecord.getUsageType() == UsageTypes.VPN_USERS) {
-            //VPN User ID
-            final VpnUserVO vpnUser = _entityMgr.findByIdIncludingRemoved(VpnUserVO.class, usageRecord.getUsageId().toString());
-            if (vpnUser != null) {
-                usageRecResponse.setUsageId(vpnUser.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.SECURITY_GROUP) {
-            //Security Group Id
-            final SecurityGroupVO sg = _entityMgr.findByIdIncludingRemoved(SecurityGroupVO.class, usageRecord.getUsageId().toString());
-            if (sg != null) {
-                usageRecResponse.setUsageId(sg.getUuid());
-            }
-        } else if (usageRecord.getUsageType() == UsageTypes.VM_SNAPSHOT) {
-            final VMInstanceVO vm = _entityMgr.findByIdIncludingRemoved(VMInstanceVO.class, usageRecord.getVmInstanceId().toString());
-            if (vm != null) {
-                usageRecResponse.setVmName(vm.getInstanceName());
-                usageRecResponse.setUsageId(vm.getUuid());
-            }
-            usageRecResponse.setSize(usageRecord.getSize());
-            if (usageRecord.getOfferingId() != null) {
-                usageRecResponse.setOfferingId(usageRecord.getOfferingId().toString());
-            }
-        }
-
-        if (usageRecord.getRawUsage() != null) {
-            final DecimalFormat decimalFormat = new DecimalFormat("###########.######");
-            usageRecResponse.setRawUsage(decimalFormat.format(usageRecord.getRawUsage()));
-        }
-
-        if (usageRecord.getStartDate() != null) {
-            usageRecResponse.setStartDate(getDateStringInternal(usageRecord.getStartDate()));
-        }
-        if (usageRecord.getEndDate() != null) {
-            usageRecResponse.setEndDate(getDateStringInternal(usageRecord.getEndDate()));
-        }
-
-        return usageRecResponse;
-    }
-
-    public String getDateStringInternal(final Date inputDate) {
-        if (inputDate == null) {
-            return null;
-        }
-
-        final TimeZone tz = _usageSvc.getUsageTimezone();
-        final Calendar cal = Calendar.getInstance(tz);
-        cal.setTime(inputDate);
-
-        final StringBuilder sb = new StringBuilder(32);
-        sb.append(cal.get(Calendar.YEAR)).append('-');
-
-        final int month = cal.get(Calendar.MONTH) + 1;
-        if (month < 10) {
-            sb.append('0');
-        }
-        sb.append(month).append('-');
-
-        final int day = cal.get(Calendar.DAY_OF_MONTH);
-        if (day < 10) {
-            sb.append('0');
-        }
-        sb.append(day);
-
-        sb.append("'T'");
-
-        final int hour = cal.get(Calendar.HOUR_OF_DAY);
-        if (hour < 10) {
-            sb.append('0');
-        }
-        sb.append(hour).append(':');
-
-        final int minute = cal.get(Calendar.MINUTE);
-        if (minute < 10) {
-            sb.append('0');
-        }
-        sb.append(minute).append(':');
-
-        final int seconds = cal.get(Calendar.SECOND);
-        if (seconds < 10) {
-            sb.append('0');
-        }
-        sb.append(seconds);
-
-        double offset = cal.get(Calendar.ZONE_OFFSET);
-        if (tz.inDaylightTime(inputDate)) {
-            offset += 1.0 * tz.getDSTSavings(); // add the timezone's DST
-            // value (typically 1 hour
-            // expressed in milliseconds)
-        }
-
-        offset = offset / (1000d * 60d * 60d);
-        final int hourOffset = (int) offset;
-        final double decimalVal = Math.abs(offset) - Math.abs(hourOffset);
-        final int minuteOffset = (int) (decimalVal * 60);
-
-        if (hourOffset < 0) {
-            if (hourOffset > -10) {
-                sb.append("-0");
-            } else {
-                sb.append('-');
-            }
-            sb.append(Math.abs(hourOffset));
-        } else {
-            if (hourOffset < 10) {
-                sb.append("+0");
-            } else {
-                sb.append("+");
-            }
-            sb.append(hourOffset);
-        }
-
-        sb.append(':');
-
-        if (minuteOffset == 0) {
-            sb.append("00");
-        } else if (minuteOffset < 10) {
-            sb.append('0').append(minuteOffset);
-        } else {
-            sb.append(minuteOffset);
-        }
-
-        return sb.toString();
-    }
-
-    @Override
-    public TrafficMonitorResponse createTrafficMonitorResponse(final Host trafficMonitor) {
-        final Map<String, String> tmDetails = ApiDBUtils.findHostDetailsById(trafficMonitor.getId());
-        final TrafficMonitorResponse response = new TrafficMonitorResponse();
-        response.setId(trafficMonitor.getUuid());
-        response.setIpAddress(trafficMonitor.getPrivateIpAddress());
-        response.setNumRetries(tmDetails.get("numRetries"));
-        response.setTimeout(tmDetails.get("timeout"));
         return response;
     }
 

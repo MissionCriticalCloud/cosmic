@@ -18,7 +18,6 @@ import com.cloud.dc.dao.PodVlanDaoImpl;
 import com.cloud.dc.dao.PodVlanMapDaoImpl;
 import com.cloud.dc.dao.VlanDaoImpl;
 import com.cloud.domain.dao.DomainDaoImpl;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.framework.config.dao.ConfigurationDaoImpl;
 import com.cloud.host.dao.HostDaoImpl;
 import com.cloud.host.dao.HostDetailsDaoImpl;
@@ -151,19 +150,9 @@ public class VpcTestConfiguration {
     }
 
     @Bean
-    public UsageEventDao usageEventDao() {
-        return Mockito.mock(UsageEventDao.class);
-    }
-
-    @Bean
     public RemoteAccessVpnService remoteAccessVpnService() {
         return Mockito.mock(RemoteAccessVpnService.class);
     }
-
-    //    @Bean
-    //    public VpcDao vpcDao() {
-    //        return Mockito.mock(VpcDao.class);
-    //    }
 
     @Bean
     public NetworkDao networkDao() {

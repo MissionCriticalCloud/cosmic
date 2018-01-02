@@ -40,7 +40,6 @@ import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.usage.Usage;
 import com.cloud.user.Account;
 import com.cloud.user.User;
 import com.cloud.vm.Nic;
@@ -709,9 +708,6 @@ public class EventTypes {
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_ASSIGN, NicSecondaryIp.class);
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_UNASSIGN, NicSecondaryIp.class);
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_CONFIGURE, NicSecondaryIp.class);
-
-        //Usage
-        entityEventDetails.put(EVENT_USAGE_REMOVE_USAGE_RECORDS, Usage.class);
     }
 
     public static String getEntityForEvent(final String eventName) {

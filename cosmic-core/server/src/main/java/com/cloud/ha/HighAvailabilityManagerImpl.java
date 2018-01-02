@@ -1,13 +1,11 @@
 package com.cloud.ha;
 
-import com.cloud.agent.AgentManager;
 import com.cloud.alert.AlertManager;
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeploymentPlanner;
@@ -32,11 +30,6 @@ import com.cloud.managed.context.ManagedContext;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
-import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.StorageManager;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.user.AccountManager;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -100,25 +93,11 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     @Inject
     HostPodDao _podDao;
     @Inject
-    ClusterDetailsDao _clusterDetailsDao;
-    @Inject
-    ServiceOfferingDao _serviceOfferingDao;
-    @Inject
     ManagedContext _managedContext;
-    @Inject
-    AgentManager _agentMgr;
     @Inject
     AlertManager _alertMgr;
     @Inject
-    StorageManager _storageMgr;
-    @Inject
-    GuestOSDao _guestOSDao;
-    @Inject
-    GuestOSCategoryDao _guestOSCategoryDao;
-    @Inject
     VirtualMachineManager _itMgr;
-    @Inject
-    AccountManager _accountMgr;
     @Inject
     ResourceManager _resourceMgr;
     @Inject

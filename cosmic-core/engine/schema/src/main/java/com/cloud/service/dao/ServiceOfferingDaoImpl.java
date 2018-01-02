@@ -1,6 +1,5 @@
 package com.cloud.service.dao;
 
-import com.cloud.event.UsageEventVO;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.Storage.ProvisioningType;
@@ -10,7 +9,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.dao.UserVmDetailsDao;
 
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
@@ -34,8 +32,6 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
     protected final SearchBuilder<ServiceOfferingVO> PublicServiceOfferingSearch;
     @Inject
     protected ServiceOfferingDetailsDao detailsDao;
-    @Inject
-    protected UserVmDetailsDao userVmDetailsDao;
 
     public ServiceOfferingDaoImpl() {
         super();
@@ -179,30 +175,12 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
 
     @Override
     public ServiceOfferingVO findById(final Long vmId, final long serviceOfferingId) {
-        final ServiceOfferingVO offering = super.findById(serviceOfferingId);
-        if (offering.isDynamic()) {
-            offering.setDynamicFlag(true);
-            if (vmId == null) {
-                throw new CloudRuntimeException("missing argument vmId");
-            }
-            final Map<String, String> dynamicOffering = userVmDetailsDao.listDetailsKeyPairs(vmId);
-            return getcomputeOffering(offering, dynamicOffering);
-        }
-        return offering;
+        return super.findById(serviceOfferingId);
     }
 
     @Override
     public ServiceOfferingVO findByIdIncludingRemoved(final Long vmId, final long serviceOfferingId) {
-        final ServiceOfferingVO offering = super.findByIdIncludingRemoved(serviceOfferingId);
-        if (offering.isDynamic()) {
-            offering.setDynamicFlag(true);
-            if (vmId == null) {
-                throw new CloudRuntimeException("missing argument vmId");
-            }
-            final Map<String, String> dynamicOffering = userVmDetailsDao.listDetailsKeyPairs(vmId);
-            return getcomputeOffering(offering, dynamicOffering);
-        }
-        return offering;
+        return super.findByIdIncludingRemoved(serviceOfferingId);
     }
 
     @Override
@@ -213,19 +191,7 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
 
     @Override
     public ServiceOfferingVO getcomputeOffering(final ServiceOfferingVO serviceOffering, final Map<String, String> customParameters) {
-        final ServiceOfferingVO dummyoffering = new ServiceOfferingVO(serviceOffering);
-        dummyoffering.setDynamicFlag(true);
-        if (customParameters.containsKey(UsageEventVO.DynamicParameters.cpuNumber.name())) {
-            dummyoffering.setCpu(Integer.parseInt(customParameters.get(UsageEventVO.DynamicParameters.cpuNumber.name())));
-        }
-        if (customParameters.containsKey(UsageEventVO.DynamicParameters.cpuSpeed.name())) {
-            dummyoffering.setSpeed(Integer.parseInt(customParameters.get(UsageEventVO.DynamicParameters.cpuSpeed.name())));
-        }
-        if (customParameters.containsKey(UsageEventVO.DynamicParameters.memory.name())) {
-            dummyoffering.setRamSize(Integer.parseInt(customParameters.get(UsageEventVO.DynamicParameters.memory.name())));
-        }
-
-        return dummyoffering;
+        return new ServiceOfferingVO(serviceOffering);
     }
 
     @Override

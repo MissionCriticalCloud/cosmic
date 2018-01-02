@@ -20,7 +20,6 @@ import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
 import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
-import com.cloud.event.UsageEventVO;
 import com.cloud.exception.ConnectionException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
@@ -167,8 +166,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
         if (!status) {
             return false;
         }
-        final
-        Pair<Long, Long> hosts = (Pair<Long, Long>) opaque;
+        final Pair<Long, Long> hosts = (Pair<Long, Long>) opaque;
         final Long oldHostId = hosts.first();
 
         final State oldState = transition.getCurrentState();
@@ -588,18 +586,8 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                 ramOvercommitRatio = Float.parseFloat(vmDetailRam);
             }
             final ServiceOffering so = offeringsMap.get(vm.getServiceOfferingId());
-            if (so.isDynamic()) {
-                usedMemory +=
-                        ((Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters.memory.name())) * 1024L * 1024L) / ramOvercommitRatio) *
-                                clusterRamOvercommitRatio;
-                usedCpu +=
-                        ((Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters.cpuNumber.name())) * Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters
-                                .cpuSpeed.name()))) / cpuOvercommitRatio) *
-                                clusterCpuOvercommitRatio;
-            } else {
-                usedMemory += ((so.getRamSize() * 1024L * 1024L) / ramOvercommitRatio) * clusterRamOvercommitRatio;
-                usedCpu += ((so.getCpu() * so.getSpeed()) / cpuOvercommitRatio) * clusterCpuOvercommitRatio;
-            }
+            usedMemory += ((so.getRamSize() * 1024L * 1024L) / ramOvercommitRatio) * clusterRamOvercommitRatio;
+            usedCpu += ((so.getCpu() * so.getSpeed()) / cpuOvercommitRatio) * clusterCpuOvercommitRatio;
         }
 
         final List<VMInstanceVO> vmsByLastHostId = _vmDao.listByLastHostId(host.getId());
@@ -617,19 +605,9 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     ramOvercommitRatio = Float.parseFloat(vmDetailRam.getValue());
                 }
                 final ServiceOffering so = offeringsMap.get(vm.getServiceOfferingId());
-                final Map<String, String> vmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
-                if (so.isDynamic()) {
-                    reservedMemory +=
-                            ((Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters.memory.name())) * 1024L * 1024L) / ramOvercommitRatio) *
-                                    clusterRamOvercommitRatio;
-                    reservedCpu +=
-                            ((Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters.cpuNumber.name())) * Integer.parseInt(vmDetails.get(UsageEventVO.DynamicParameters
-                                    .cpuSpeed.name()))) / cpuOvercommitRatio) *
-                                    clusterCpuOvercommitRatio;
-                } else {
-                    reservedMemory += ((so.getRamSize() * 1024L * 1024L) / ramOvercommitRatio) * clusterRamOvercommitRatio;
-                    reservedCpu += (so.getCpu() * so.getSpeed() / cpuOvercommitRatio) * clusterCpuOvercommitRatio;
-                }
+
+                reservedMemory += ((so.getRamSize() * 1024L * 1024L) / ramOvercommitRatio) * clusterRamOvercommitRatio;
+                reservedCpu += (so.getCpu() * so.getSpeed() / cpuOvercommitRatio) * clusterCpuOvercommitRatio;
             } else {
                 // signal if not done already, that the VM has been stopped for skip.counting.hours,
                 // hence capacity will not be reserved anymore.

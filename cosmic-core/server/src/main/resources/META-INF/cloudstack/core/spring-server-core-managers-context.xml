@@ -59,7 +59,7 @@
                   value="#{resourceDiscoverersRegistry.registered}" />
     </bean>
 
-    <bean id="highAvailabilityManagerExtImpl" class="com.cloud.ha.HighAvailabilityManagerExtImpl">
+    <bean id="highAvailabilityManagerImpl" class="com.cloud.ha.HighAvailabilityManagerImpl">
         <property name="investigators" value="#{haInvestigatorsRegistry.registered}" />
         <property name="fenceBuilders" value="#{haFenceBuildersRegistry.registered}" />
         <property name="haPlanners" value="#{haPlannersRegistry.registered}" />
@@ -120,8 +120,6 @@
         <property name="networkGurus" value="#{networkGurusRegistry.registered}" />
     </bean>
 
-    <bean id="networkUsageManagerImpl" class="com.cloud.network.NetworkUsageManagerImpl" />
-
     <bean id="oCFS2ManagerImpl" class="com.cloud.storage.OCFS2ManagerImpl" />
 
     <bean id="projectManagerImpl" class="com.cloud.projects.ProjectManagerImpl" />
@@ -155,7 +153,6 @@
     </bean>
 
     <bean id="uploadMonitorImpl" class="com.cloud.storage.upload.UploadMonitorImpl" />
-    <bean id="usageServiceImpl" class="com.cloud.usage.UsageServiceImpl" />
 
     <bean id="virtualNetworkApplianceManagerImpl"
           class="com.cloud.network.router.VirtualNetworkApplianceManagerImpl" />

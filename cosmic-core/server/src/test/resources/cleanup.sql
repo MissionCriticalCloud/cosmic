@@ -1,2 +1,0 @@
-DROP DATABASE IF EXISTS `cloud`;
-DROP DATABASE IF EXISTS `cloud_usage`;

@@ -9,8 +9,6 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.event.UsageEventUtils;
-import com.cloud.event.dao.UsageEventDao;
 import com.cloud.exception.AccountLimitException;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
@@ -40,10 +38,8 @@ import com.cloud.network.rules.RulesManager;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
-import com.cloud.server.ConfigurationServer;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.DomainManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
@@ -89,8 +85,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
     @Inject
     AccountManager _accountMgr;
     @Inject
-    DomainManager _domainMgr;
-    @Inject
     NetworkModel _networkMgr;
     @Inject
     RulesManager _rulesMgr;
@@ -101,16 +95,11 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
     @Inject
     FirewallManager _firewallMgr;
     @Inject
-    UsageEventDao _usageEventDao;
-    @Inject
     ConfigurationDao _configDao;
-    List<RemoteAccessVPNServiceProvider> _vpnServiceProviders;
-
-    @Inject
-    ConfigurationServer _configServer;
     @Inject
     VpcDao _vpcDao;
 
+    List<RemoteAccessVPNServiceProvider> _vpnServiceProviders;
     int _userLimit;
     int _pskLength;
     SearchBuilder<RemoteAccessVpnVO> VpnSearch;
@@ -304,14 +293,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                             public void doInTransactionWithoutResult(final TransactionStatus status) {
                                 _remoteAccessVpnDao.remove(vpn.getId());
                                 // Stop billing of VPN users when VPN is removed. VPN_User_ADD events will be generated when VPN is created again
-                                final List<VpnUserVO> vpnUsers = _vpnUsersDao.listByAccount(vpn.getAccountId());
-                                for (final VpnUserVO user : vpnUsers) {
-                                    // VPN_USER_REMOVE event is already generated for users in Revoke state
-                                    if (user.getState() != VpnUser.State.Revoke) {
-                                        UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VPN_USER_REMOVE, user.getAccountId(), 0, user.getId(), user.getUsername(),
-                                                user.getClass().getName(), user.getUuid());
-                                    }
-                                }
                                 if (vpnFwRules != null) {
                                     for (final FirewallRule vpnFwRule : vpnFwRules) {
                                         _rulesDao.remove(vpnFwRule.getId());
@@ -371,15 +352,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         vpn.setState(RemoteAccessVpn.State.Running);
                         _remoteAccessVpnDao.update(vpn.getId(), vpn);
-
-                        // Start billing of existing VPN users in ADD and Active state
-                        final List<VpnUserVO> vpnUsers = _vpnUsersDao.listByAccount(vpn.getAccountId());
-                        for (final VpnUserVO user : vpnUsers) {
-                            if (user.getState() != VpnUser.State.Revoke) {
-                                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VPN_USER_ADD, user.getAccountId(), 0, user.getId(), user.getUsername(),
-                                        user.getClass().getName(), user.getUuid());
-                            }
-                        }
                     }
                 });
             }
@@ -418,11 +390,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                     throw new AccountLimitException("Cannot add more than " + _userLimit + " remote access vpn users");
                 }
 
-                final VpnUser user = _vpnUsersDao.persist(new VpnUserVO(vpnOwnerId, owner.getDomainId(), username, password));
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VPN_USER_ADD, user.getAccountId(), 0, user.getId(), user.getUsername(), user.getClass().getName(),
-                        user.getUuid());
-
-                return user;
+                return _vpnUsersDao.persist(new VpnUserVO(vpnOwnerId, owner.getDomainId(), username, password));
             }
         });
     }
@@ -441,8 +409,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             public void doInTransactionWithoutResult(final TransactionStatus status) {
                 user.setState(State.Revoke);
                 _vpnUsersDao.update(user.getId(), user);
-                UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VPN_USER_REMOVE, user.getAccountId(), 0, user.getId(), user.getUsername(), user.getClass().getName(),
-                        user.getUuid());
             }
         });
 
@@ -535,9 +501,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                         @Override
                         public void doInTransactionWithoutResult(final TransactionStatus status) {
                             _vpnUsersDao.remove(user.getId());
-                            UsageEventUtils.publishUsageEvent(EventTypes.EVENT_VPN_USER_REMOVE, user.getAccountId(), 0, user.getId(), user.getUsername(), user.getClass()
-                                                                                                                                                              .getName(), user
-                                    .getUuid());
                         }
                     });
                 }
