@@ -9,12 +9,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = ("remote_access_vpn"))
 public class RemoteAccessVpnVO implements RemoteAccessVpn {
-    @Column(name = "display", updatable = true, nullable = false)
+    @Column(name = "display", nullable = false)
     protected boolean display = true;
     @Column(name = "account_id")
     private long accountId;
@@ -143,5 +144,24 @@ public class RemoteAccessVpnVO implements RemoteAccessVpn {
     @Override
     public Class<?> getEntityType() {
         return RemoteAccessVpn.class;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof RemoteAccessVpnVO)) {
+            return false;
+        }
+
+        final RemoteAccessVpnVO that = (RemoteAccessVpnVO) o;
+        return getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

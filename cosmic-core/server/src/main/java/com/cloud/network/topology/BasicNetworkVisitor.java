@@ -7,7 +7,6 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.Network;
-import com.cloud.network.VpnUser;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.router.CommandSetupHelper;
 import com.cloud.network.router.NetworkHelper;
@@ -229,13 +228,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final BasicVpnRules vpnRules) throws ResourceUnavailableException {
-        final VirtualRouter router = vpnRules.getRouter();
-        final List<? extends VpnUser> users = vpnRules.getUsers();
-
-        final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createApplyVpnUsersCommand(users, router, cmds);
-
-        return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
+        throw new CloudRuntimeException("BasicVpnRules not implemented in Basic Network Topology.");
     }
 
     @Override

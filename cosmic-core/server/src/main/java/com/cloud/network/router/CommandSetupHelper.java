@@ -5,7 +5,6 @@ import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
@@ -14,7 +13,6 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
@@ -39,12 +37,13 @@ import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpnUser;
-import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.dao.RemoteAccessVpnDao;
+import com.cloud.network.dao.RemoteAccessVpnVO;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
 import com.cloud.network.dao.Site2SiteCustomerGatewayVO;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
@@ -121,6 +120,8 @@ public class CommandSetupHelper {
     private ServiceOfferingDao _serviceOfferingDao;
     @Inject
     private UserVmDao _userVmDao;
+    @Inject
+    private RemoteAccessVpnDao _vpnDao;
     @Inject
     private VpnUserDao _vpnUsersDao;
     @Inject
@@ -461,57 +462,6 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createApplyVpnCommands(final boolean isCreate, final RemoteAccessVpn vpn, final VirtualRouter router, final Commands cmds) {
-        final List<VpnUserVO> vpnUsers = _vpnUsersDao.listByAccount(vpn.getAccountId());
-
-        createApplyVpnUsersCommand(vpnUsers, router, cmds);
-
-        final IpAddress ip = _networkModel.getIp(vpn.getServerAddressId());
-
-        // This block is needed due to the line 206 of the
-        // RemoteAccessVpnManagenerImpl:
-        // TODO: assumes one virtual network / domr per account per zone
-        final String cidr;
-        final Network network = _networkDao.findById(vpn.getNetworkId());
-        if (network == null) {
-            final Vpc vpc = _vpcDao.findById(vpn.getVpcId());
-            cidr = vpc.getCidr();
-        } else {
-            cidr = network.getCidr();
-        }
-
-        final RemoteAccessVpnCfgCommand startVpnCmd = new RemoteAccessVpnCfgCommand(isCreate, ip.getAddress().addr(), vpn.getLocalIp(), vpn.getIpRange(),
-                vpn.getIpsecPresharedKey(), vpn.getVpcId() != null);
-        startVpnCmd.setLocalCidr(cidr);
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("startVpn", startVpnCmd);
-    }
-
-    public void createApplyVpnUsersCommand(final List<? extends VpnUser> users, final VirtualRouter router, final Commands cmds) {
-        final List<VpnUser> addUsers = new ArrayList<>();
-        final List<VpnUser> removeUsers = new ArrayList<>();
-        for (final VpnUser user : users) {
-            if (user.getState() == VpnUser.State.Add || user.getState() == VpnUser.State.Active) {
-                addUsers.add(user);
-            } else if (user.getState() == VpnUser.State.Revoke) {
-                removeUsers.add(user);
-            }
-        }
-
-        final VpnUsersCfgCommand cmd = new VpnUsersCfgCommand(addUsers, removeUsers);
-        cmd.setAccessDetail(NetworkElementCommand.ACCOUNT_ID, String.valueOf(router.getAccountId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("users", cmd);
-    }
-
     public void findIpsToExclude(final List<? extends PublicIpAddress> ips, final List<Ip> ipsToExclude) {
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
@@ -561,7 +511,8 @@ public class CommandSetupHelper {
             final VirtualRouter router,
             final List<Nic> nicsToExclude,
             final List<Ip> ipsToExclude,
-            final List<StaticRouteProfile> staticRoutesToExclude
+            final List<StaticRouteProfile> staticRoutesToExclude,
+            final RemoteAccessVpn vpnToExclude
     ) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<NetworkOverviewTO.InterfaceTO> interfacesTO = new ArrayList<>();
@@ -634,6 +585,35 @@ public class CommandSetupHelper {
 
         servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
         networkOverviewTO.setServices(servicesTO);
+
+        final NetworkOverviewTO.VPNTO vpnTO = new NetworkOverviewTO.VPNTO();
+
+        final RemoteAccessVpnVO vpn = _vpnDao.findByAccountAndVpc(router.getAccountId(), router.getVpcId());
+        if (vpn != null && !vpn.equals(vpnToExclude)) {
+            final NetworkOverviewTO.VPNTO.RemoteAccessTO remoteAccessTO = new NetworkOverviewTO.VPNTO.RemoteAccessTO();
+
+            final IpAddress serverIp = _networkModel.getIp(vpn.getServerAddressId());
+            remoteAccessTO.setVpnServerIp(serverIp.getAddress().addr());
+            remoteAccessTO.setPreSharedKey(vpn.getIpsecPresharedKey());
+
+            remoteAccessTO.setIpRange(vpn.getIpRange());
+            remoteAccessTO.setLocalIp(vpn.getLocalIp());
+
+            final Vpc vpc = _vpcDao.findById(vpn.getVpcId());
+            remoteAccessTO.setLocalCidr(vpc.getCidr());
+
+            remoteAccessTO.setVpnUsers(
+                    _vpnUsersDao.listByAccount(vpn.getAccountId())
+                                .stream()
+                                .filter(vpnUser -> VpnUser.State.Add.equals(vpnUser.getState()) || VpnUser.State.Active.equals(vpnUser.getState()))
+                                .map(vpnUser -> new NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO(vpnUser.getUsername(), vpnUser.getPassword()))
+                                .toArray(NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO[]::new)
+            );
+
+            vpnTO.setRemoteAccess(remoteAccessTO);
+        }
+
+        networkOverviewTO.setVpn(vpnTO);
 
         return networkOverviewTO;
     }

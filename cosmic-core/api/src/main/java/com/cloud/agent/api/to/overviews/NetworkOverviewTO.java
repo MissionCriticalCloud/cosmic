@@ -12,6 +12,7 @@ public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
     private ServiceTO services;
     private RouteTO[] routes;
+    private VPNTO vpn;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -35,6 +36,14 @@ public class NetworkOverviewTO {
 
     public void setRoutes(final RouteTO[] routes) {
         this.routes = routes;
+    }
+
+    public VPNTO getVpn() {
+        return vpn;
+    }
+
+    public void setVpn(final VPNTO vpn) {
+        this.vpn = vpn;
     }
 
     @Override
@@ -480,6 +489,104 @@ public class NetworkOverviewTO {
         @Override
         public int hashCode() {
             return Objects.hash(getCidr(), getNextHop(), getMetric());
+        }
+    }
+
+    public static class VPNTO {
+        private RemoteAccessTO remoteAccess;
+
+        public RemoteAccessTO getRemoteAccess() {
+            return remoteAccess;
+        }
+
+        public void setRemoteAccess(final RemoteAccessTO remoteAccess) {
+            this.remoteAccess = remoteAccess;
+        }
+
+        public static class RemoteAccessTO {
+            private String ipRange;
+            private String localCidr;
+            private String localIp;
+            private String preSharedKey;
+            private String vpnServerIp;
+            private VPNUserTO[] vpnUsers;
+
+            public String getIpRange() {
+                return ipRange;
+            }
+
+            public void setIpRange(final String ipRange) {
+                this.ipRange = ipRange;
+            }
+
+            public String getLocalCidr() {
+                return localCidr;
+            }
+
+            public void setLocalCidr(final String localCidr) {
+                this.localCidr = localCidr;
+            }
+
+            public String getLocalIp() {
+                return localIp;
+            }
+
+            public void setLocalIp(final String localIp) {
+                this.localIp = localIp;
+            }
+
+            public String getPreSharedKey() {
+                return preSharedKey;
+            }
+
+            public void setPreSharedKey(final String preSharedKey) {
+                this.preSharedKey = preSharedKey;
+            }
+
+            public String getVpnServerIp() {
+                return vpnServerIp;
+            }
+
+            public void setVpnServerIp(final String vpnServerIp) {
+                this.vpnServerIp = vpnServerIp;
+            }
+
+            public VPNUserTO[] getVpnUsers() {
+                return vpnUsers;
+            }
+
+            public void setVpnUsers(final VPNUserTO[] vpnUsers) {
+                this.vpnUsers = vpnUsers;
+            }
+
+            public static class VPNUserTO {
+                private String username;
+                private String password;
+
+                public VPNUserTO() {
+                }
+
+                public VPNUserTO(final String username, final String password) {
+                    this.username = username;
+                    this.password = password;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setUsername(final String username) {
+                    this.username = username;
+                }
+
+                public String getPassword() {
+                    return password;
+                }
+
+                public void setPassword(final String password) {
+                    this.password = password;
+                }
+            }
         }
     }
 }

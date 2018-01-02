@@ -45,7 +45,6 @@ import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -1236,7 +1235,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         }
 
         if (publicIps != null && !publicIps.isEmpty()) {
-            final List<RemoteAccessVpn> vpns = new ArrayList<>();
             final List<PortForwardingRule> pfRules = new ArrayList<>();
             final List<FirewallRule> staticNatFirewallRules = new ArrayList<>();
             final List<StaticNat> staticNats = new ArrayList<>();
@@ -1253,13 +1251,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 }
                 if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
                     firewallRulesIngress.addAll(_rulesDao.listByIpAndPurpose(ip.getId(), Purpose.Firewall));
-                }
-
-                if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Vpn, provider)) {
-                    final RemoteAccessVpn vpn = _vpnDao.findByPublicIpAddress(ip.getId());
-                    if (vpn != null) {
-                        vpns.add(vpn);
-                    }
                 }
 
                 if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.StaticNat, provider)) {
@@ -1296,14 +1287,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     staticNatRules.add(_rulesMgr.buildStaticNatRule(rule, false));
                 }
                 _commandSetupHelper.createApplyStaticNatRulesCommands(staticNatRules, router, cmds, guestNetworkId);
-            }
-
-            // Re-apply vpn rules
-            s_logger.debug("Found " + vpns.size() + " vpn(s) to apply as a part of domR " + router + " start.");
-            if (!vpns.isEmpty()) {
-                for (final RemoteAccessVpn vpn : vpns) {
-                    _commandSetupHelper.createApplyVpnCommands(true, vpn, router, cmds);
-                }
             }
 
             final List<LoadBalancerVO> lbs = _loadBalancerDao.listByNetworkIdAndScheme(guestNetworkId, Scheme.Public);
@@ -1669,35 +1652,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             throw new ResourceUnavailableException("Failed to start remote access VPN: no router found for account and zone", DataCenter.class, network.getDataCenterId());
         }
 
-        for (final VirtualRouter router : routers) {
-            if (router.getState() != VirtualMachine.State.Running) {
-                s_logger.warn("Failed to start remote access VPN: router not in right state " + router.getState());
-                throw new ResourceUnavailableException("Failed to start remote access VPN: router not in right state " + router.getState(), DataCenter.class,
-                        network.getDataCenterId());
-            }
-
-            final Commands cmds = new Commands(Command.OnError.Stop);
-            _commandSetupHelper.createApplyVpnCommands(true, vpn, router, cmds);
-
-            if (!_nwHelper.sendCommandsToRouter(router, cmds)) {
-                throw new AgentUnavailableException("Unable to send commands to virtual router ", router.getHostId());
-            }
-
-            Answer answer = cmds.getAnswer("users");
-            if (!answer.getResult()) {
-                s_logger.error("Unable to start vpn: unable add users to vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: "
-                        + router.getInstanceName() + " due to " + answer.getDetails());
-                throw new ResourceUnavailableException("Unable to start vpn: Unable to add users to vpn in zone " + router.getDataCenterId() + " for account "
-                        + vpn.getAccountId() + " on domR: " + router.getInstanceName() + " due to " + answer.getDetails(), DataCenter.class, router.getDataCenterId());
-            }
-            answer = cmds.getAnswer("startVpn");
-            if (!answer.getResult()) {
-                s_logger.error("Unable to start vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: " + router.getInstanceName()
-                        + " due to " + answer.getDetails());
-                throw new ResourceUnavailableException("Unable to start vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: "
-                        + router.getInstanceName() + " due to " + answer.getDetails(), DataCenter.class, router.getDataCenterId());
-            }
-        }
         return true;
     }
 
@@ -1708,33 +1662,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             throw new ResourceUnavailableException("Failed to delete remote access VPN", DataCenter.class, network.getDataCenterId());
         }
 
-        boolean result = true;
-        for (final VirtualRouter router : routers) {
-            if (router.getState() == VirtualMachine.State.Running) {
-                final Commands cmds = new Commands(Command.OnError.Continue);
-                _commandSetupHelper.createApplyVpnCommands(false, vpn, router, cmds);
-                result = result && _nwHelper.sendCommandsToRouter(router, cmds);
-            } else if (router.getState() == VirtualMachine.State.Stopped) {
-                s_logger.debug("Router " + router + " is in Stopped state, not sending deleteRemoteAccessVpn command to it");
-                continue;
-            } else {
-                s_logger.warn("Failed to delete remote access VPN: domR " + router + " is not in right state " + router.getState());
-                throw new ResourceUnavailableException("Failed to delete remote access VPN: domR is not in right state " + router.getState(), DataCenter.class,
-                        network.getDataCenterId());
-            }
-        }
-
-        return result;
+        return true;
     }
 
     @Override
     public List<VirtualRouter> getRoutersForNetwork(final long networkId) {
-        final List<DomainRouterVO> routers = _routerDao.findByNetwork(networkId);
-        final List<VirtualRouter> vrs = new ArrayList<>(routers.size());
-        for (final DomainRouterVO router : routers) {
-            vrs.add(router);
-        }
-        return vrs;
+        return new ArrayList<>(_routerDao.findByNetwork(networkId));
     }
 
     @Override
