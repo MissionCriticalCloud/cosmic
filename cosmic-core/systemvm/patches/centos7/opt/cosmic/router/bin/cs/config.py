@@ -18,9 +18,6 @@ class Config:
         self.dbag_vm_overview = CsDatabag('vm_overview').dbag
         self.dbag_network_virtualrouter = CsDatabag('virtualrouter').dbag
         self.dbag_publicip_acl = CsDatabag('publicipacl').dbag
-        self.dbag_remoteaccessvpn = CsDatabag('remoteaccessvpn').dbag
-        self.dbag_site2sitevpn = CsDatabag('site2sitevpn').dbag
-        self.dbag_vpnuserlist = CsDatabag('vpnuserlist').dbag
 
     def cmdline(self):
         return self.dbag_cmdline

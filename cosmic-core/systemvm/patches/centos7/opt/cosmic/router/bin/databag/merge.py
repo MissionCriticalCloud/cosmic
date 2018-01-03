@@ -13,11 +13,8 @@ import cs_forwardingrules
 import cs_loadbalancer
 import cs_network_acl
 import cs_public_ip_acl
-import cs_remoteaccessvpn
-import cs_site2sitevpn
 import cs_staticroutes
 import cs_virtualrouter
-import cs_vpnusers
 
 
 class DataBag:
@@ -96,12 +93,6 @@ class updateDataBag:
             dbag = self.process_dhcp_entry(self.db.getDataBag())
         elif self.qFile.type == 'staticnatrules' or self.qFile.type == 'forwardrules':
             dbag = self.processForwardingRules(self.db.getDataBag())
-        elif self.qFile.type == 'site2sitevpn':
-            dbag = self.process_site2sitevpn(self.db.getDataBag())
-        elif self.qFile.type == 'remoteaccessvpn':
-            dbag = self.process_remoteaccessvpn(self.db.getDataBag())
-        elif self.qFile.type == 'vpnuserlist':
-            dbag = self.process_vpnusers(self.db.getDataBag())
         elif self.qFile.type == 'staticroutes':
             dbag = self.process_staticroutes(self.db.getDataBag())
         elif self.qFile.type == 'virtualrouter':
@@ -113,15 +104,6 @@ class updateDataBag:
 
     def process_dhcp_entry(self, dbag):
         return cs_dhcp.merge(dbag, self.qFile.data)
-
-    def process_site2sitevpn(self, dbag):
-        return cs_site2sitevpn.merge(dbag, self.qFile.data)
-
-    def process_remoteaccessvpn(self, dbag):
-        return cs_remoteaccessvpn.merge(dbag, self.qFile.data)
-
-    def process_vpnusers(self, dbag):
-        return cs_vpnusers.merge(dbag, self.qFile.data)
 
     def process_network_acl(self, dbag):
         d_to_merge = self.validate_device_based_on_mac_address()

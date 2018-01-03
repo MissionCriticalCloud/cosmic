@@ -383,7 +383,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(finishCmd);
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(domainRouterVO, nicsToExclude, ipsToExclude, staticRoutesToExclude, null);
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    domainRouterVO,
+                    nicsToExclude,
+                    ipsToExclude,
+                    staticRoutesToExclude,
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(domainRouterVO, networkOverview);
             updateNetworkOverviewCommand.setPlugNics(true);
             cmds.addCommand(updateNetworkOverviewCommand);
@@ -516,7 +523,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 nicsToExclude.add(nic);
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, nicsToExclude, new ArrayList<>(), new ArrayList<>(), null);
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    nicsToExclude,
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand("networkoverview", updateNetworkOverviewCommand);
             _nwHelper.sendCommandsToRouter(router, cmds);
@@ -612,7 +626,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 ipsToExclude.add(new Ip(ip.getIpAddress()));
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>(), null);
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    ipsToExclude,
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand(updateNetworkOverviewCommand);
 
@@ -681,7 +702,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
         final Commands cmds = new Commands(Command.OnError.Stop);
 
-        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
         cmds.addCommand(updateNetworkOverviewCommand);
 
@@ -698,7 +726,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         if (router.getState() == State.Running) {
             final Commands cmds = new Commands(Command.OnError.Continue);
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), vpn);
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    vpn,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand(updateNetworkOverviewCommand);
 
@@ -718,9 +753,19 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         return true;
     }
 
-    protected boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    private  boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createSite2SiteVpnCfgCommands(conn, isCreate, router, cmds);
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                isCreate ? null : conn
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
+
         return _nwHelper.sendCommandsToRouter(router, cmds);
     }
 }

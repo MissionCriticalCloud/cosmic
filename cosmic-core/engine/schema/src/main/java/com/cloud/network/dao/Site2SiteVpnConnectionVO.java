@@ -13,12 +13,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = ("s2s_vpn_connection"))
 public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, InternalIdentity {
-    @Column(name = "display", updatable = true, nullable = false)
+    @Column(name = "display", nullable = false)
     protected boolean display = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -147,5 +148,24 @@ public class Site2SiteVpnConnectionVO implements Site2SiteVpnConnection, Interna
     @Override
     public Class<?> getEntityType() {
         return Site2SiteVpnConnection.class;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Site2SiteVpnConnectionVO)) {
+            return false;
+        }
+
+        final Site2SiteVpnConnectionVO that = (Site2SiteVpnConnectionVO) o;
+        return getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }
