@@ -51,6 +51,15 @@ class Vpn:
             try:
                 if os.path.isfile(file_path):
                     logging.debug("Removing file %s" % file_path)
+                    with open(file_path, 'r') as f:
+                        current_content = f.readlines()
+                        logging.debug("Looking for connections in file %s" % file_path)
+                        for line in current_content:
+                            logging.debug("Processing line %s" % line)
+                            if "conn vpn" in line:
+                                connection_name = line.replace("conn ", "")
+                                logging.debug("Connection name to stop is %s" % connection_name)
+                                self.stop_strongswan_connection(connection_name=connection_name)
                     os.unlink(file_path)
             except Exception as e:
                 logging.error("Failed to remove file: %s" % e)
@@ -233,6 +242,15 @@ class Vpn:
             logging.error("Failed to reload strongswan with error: %s" % e)
 
     @staticmethod
+    def stop_strongswan_connection(connection_name):
+        logging.error("Stopping strongswan connection %s" % connection_name)
+        try:
+            subprocess.call(['strongswan', 'down', connection_name])
+        except Exception as e:
+            logging.error("Failed to stop strongswan with error: %s" % e)
+
+
+    @staticmethod
     def update_strongswan():
         try:
             subprocess.call(['strongswan', 'update'])
@@ -258,13 +276,8 @@ class Vpn:
         except Exception as e:
             logging.error("Failed to reload xl2tpd with error: %s" % e)
 
-    @staticmethod
-    def stop_remote_access():
-        try:
-            subprocess.call(['strongswan', 'down', 'L2TP-PSK'])
-        except Exception as e:
-            logging.error("Failed to put down strongswan L2TP-PSK with error: %s" % e)
-
+    def stop_remote_access(self):
+        self.stop_strongswan_connection(connection_name="L2TP-PSK")
         try:
             subprocess.call(['systemctl', 'stop', 'xl2tpd'])
         except Exception as e:
