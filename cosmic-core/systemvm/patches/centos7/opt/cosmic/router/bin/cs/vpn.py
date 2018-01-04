@@ -37,9 +37,8 @@ class Vpn:
                 self.check_connected_users(self.config.dbag_network_overview['vpn']['remote_access'])
                 self.write_remote_access_secret(self.config.dbag_network_overview['vpn']['remote_access'])
                 self.write_strokefile()
+                self.reload_xl2tpd()
                 self.reload_strongswan_connection("L2TP-PSK")
-            else:
-                self.stop_remote_access()
 
     def cleanup_strongswan_config(self):
         logging.debug("Zapping directory %s" % self.config_path_ipsec)
@@ -275,10 +274,3 @@ class Vpn:
             subprocess.call(['strongswan', 'reload', 'xl2tpd'])
         except Exception as e:
             logging.error("Failed to reload xl2tpd with error: %s" % e)
-
-    def stop_remote_access(self):
-        self.stop_strongswan_connection(connection_name="L2TP-PSK")
-        try:
-            subprocess.call(['systemctl', 'stop', 'xl2tpd'])
-        except Exception as e:
-            logging.error("Failed to stop xl2tpd with error: %s" % e)
