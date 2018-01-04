@@ -29,7 +29,6 @@ class Vpn:
                 self.write_ipsec_config()
                 self.write_strokefile()
                 self.cleanup_strongswan_config()
-                self.reload_strongswan()
             if 'remote_access' in self.config.dbag_network_overview['vpn']:
                 self.write_xl2tpd_config(self.config.dbag_network_overview['vpn']['remote_access'])
                 self.write_l2tp(self.config.dbag_network_overview['vpn']['remote_access'])
@@ -38,7 +37,7 @@ class Vpn:
                 self.check_connected_users(self.config.dbag_network_overview['vpn']['remote_access'])
                 self.write_remote_access_secret(self.config.dbag_network_overview['vpn']['remote_access'])
                 self.write_strokefile()
-                self.reload_strongswan()
+                self.reload_strongswan_connection("L2TP-PSK")
             else:
                 self.stop_remote_access()
 
@@ -62,6 +61,8 @@ class Vpn:
             filename = "ipsec.vpn-%s.conf" % config['right']
             self.filenames.append(filename)
 
+            self.write_secrets(site2site['left'], site2site['right'], site2site['psk'])
+
             if 'dpd' in site2site and site2site['dpd']:
                 config['dpddelay'] = 30
                 config['dpdtimeout'] = 120
@@ -84,12 +85,31 @@ class Vpn:
                 identifier=config['right'],
                 site2site=config
             )
-            logging.debug("Writing ipsec config file %s with content \n%s" % (self.config_path_ipsec + filename, content))
 
-            with open(self.config_path_ipsec + filename, 'w') as f:
+            config_file = "%s%s" % (self.config_path_ipsec, filename)
+
+            current_content = ""
+            if os.path.isfile(config_file):
+                with open(config_file, 'r') as f:
+                    current_content = f.read()
+
+            if current_content == content:
+                logging.debug("Not reloading config as current_content is the same as the new content"
+                              " of file %s" % config_file)
+                continue
+
+            logging.debug("Writing ipsec config file %s with content \n%s"
+                          % (self.config_path_ipsec + filename, content))
+            with open(config_file, 'w') as f:
                 f.write(content)
 
-            self.write_secrets(site2site['left'], site2site['right'], site2site['psk'])
+            index = 0
+            logging.debug("Peer list to connection %s is %s" % (config['right'], peer_list))
+            for connection in peer_list:
+                logging.debug("Reloading connection %s to %s" % (config['right'], connection))
+                index += 1
+                self.reload_strongswan_connection(connection_name="vpn-%s-%s" % (config['right'], index))
+
         self.reread_secrets()
 
     def write_secrets(self, left, right, psk):
@@ -200,14 +220,15 @@ class Vpn:
         os.system("kill -9 %s" % pid)
 
     @staticmethod
-    def reload_strongswan():
+    def reload_strongswan_connection(connection_name):
+        logging.error("Reload strongswan connection %s" % connection_name)
         try:
             subprocess.call(['systemctl', 'start', 'strongswan'])
         except Exception as e:
             logging.error("Failed to start strongswan with error: %s" % e)
 
         try:
-            subprocess.call(['strongswan', 'reload'])
+            subprocess.call(['strongswan', 'reload', connection_name])
         except Exception as e:
             logging.error("Failed to reload strongswan with error: %s" % e)
 
