@@ -187,6 +187,41 @@ class Firewall:
         self.config.fw.append(["", "front", "-A INPUT -i %s -p esp -s %s -d %s -j ACCEPT" % (
         device, site2site['right'], site2site['left'])])
         self.config.fw.append(["nat", "front", "-A POSTROUTING -o %s -m mark --mark 0x525 -j ACCEPT" % device])
+
+        # Make it possible to tcpdump on ipsec tunnels
+        # https://wiki.strongswan.org/projects/strongswan/wiki/CorrectTrafficDump
+
+        # ingress IPsec and IKE Traffic rule
+        self.config.fw.append(["filter", "front", "-I INPUT -p esp -j NFLOG --nflog-group 5"])
+        self.config.fw.append(["filter", "front", "-I INPUT -p ah -j NFLOG --nflog-group 5"])
+        self.config.fw.append(["filter", "front",
+                               "-I INPUT -p udp -m multiport --dports 500,4500 -j NFLOG --nflog-group 5"])
+
+        # egress IPsec and IKE traffic
+        self.config.fw.append(["filter", "front", "-I OUTPUT -p esp -j NFLOG --nflog-group 5"])
+        self.config.fw.append(["filter", "front", "-I OUTPUT -p ah -j NFLOG --nflog-group 5"])
+        self.config.fw.append(["filter", "front",
+                               "-I OUTPUT -p udp -m multiport --dports 500,4500 -j NFLOG --nflog-group 5"])
+
+        # decapsulated IPsec traffic
+        self.config.fw.append(["mangle", "front",
+                               "-I PREROUTING -m policy --pol ipsec --dir in -j NFLOG --nflog-group 5"])
+        self.config.fw.append(["mangle", "front",
+                               "-I POSTROUTING -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5"])
+
+        # IPsec traffic that is destinated for the local host (iptables INPUT chain)
+        self.config.fw.append(["filter", "front",
+                               "-I INPUT -m addrtype --dst-type LOCAL -m policy --pol ipsec --dir in"
+                               " -j NFLOG --nflog-group 5"])
+
+        # IPsec traffic that is destinated for a remote host (iptables FORWARD chain)
+        self.config.fw.append(["filter", "front",
+                               "-I INPUT -m addrtype ! --dst-type LOCAL -m policy --pol ipsec --dir in"
+                               " -j NFLOG --nflog-group 5"])
+
+        # IPsec traffic that is outgoing (iptables OUTPUT chain)
+        self.config.fw.append(["filter", "front", "-I OUTPUT -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5"])
+
         for net in site2site['peer_list'].lstrip().rstrip().split(','):
             self.config.fw.append(["mangle", "front",
                                    "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (
