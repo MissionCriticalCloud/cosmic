@@ -5,7 +5,6 @@ import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
@@ -13,8 +12,6 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
@@ -54,9 +51,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(UpdateNetworkOverviewCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(UpdateVmOverviewCommand.class, new VmOverviewConfigItem());
         flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
-        flyweight.put(RemoteAccessVpnCfgCommand.class, new RemoteAccessVpnConfigItem());
-        flyweight.put(VpnUsersCfgCommand.class, new VpnUsersConfigItem());
-        flyweight.put(Site2SiteVpnCfgCommand.class, new Site2SiteVpnConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());

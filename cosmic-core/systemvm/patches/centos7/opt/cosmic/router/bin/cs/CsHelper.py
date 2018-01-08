@@ -16,10 +16,6 @@ from netaddr import *
 import cs.utils as utils
 
 
-def rm(name):
-    os.remove(name) if os.path.isfile(name) else None
-
-
 def mkdir(name, mode, fatal):
     try:
         os.makedirs(name, mode)
@@ -28,12 +24,6 @@ def mkdir(name, mode, fatal):
             print("failed to make directories " + name + " due to :" + e.strerror)
             if fatal:
                 sys.exit(1)
-
-def bool_to_yn(val):
-    if val:
-        return "yes"
-    return "no"
-
 
 def execute(command, wait=True):
     """ Execute command """

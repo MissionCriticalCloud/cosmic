@@ -8,6 +8,7 @@ from keepalived import Keepalived
 from metadata_service import MetadataService
 from metadata_vm import MetadataVm
 from password_service import PasswordService
+from vpn import Vpn
 
 
 class Network:
@@ -23,6 +24,7 @@ class Network:
         self.metadata_vm = MetadataVm(self.config)
         self.dhcp_service = DhcpService(self.config)
         self.dhcp_vm = DhcpVm(self.config)
+        self.vpn = Vpn(self.config)
 
     def sync(self):
         logging.debug("Starting sync of network!")
@@ -36,3 +38,4 @@ class Network:
         self.metadata_vm.sync()
         self.dhcp_service.sync()
         self.dhcp_vm.sync()
+        self.vpn.sync()

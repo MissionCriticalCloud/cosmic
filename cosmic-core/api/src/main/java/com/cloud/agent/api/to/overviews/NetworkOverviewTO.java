@@ -12,6 +12,7 @@ public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
     private ServiceTO services;
     private RouteTO[] routes;
+    private VPNTO vpn;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -35,6 +36,14 @@ public class NetworkOverviewTO {
 
     public void setRoutes(final RouteTO[] routes) {
         this.routes = routes;
+    }
+
+    public VPNTO getVpn() {
+        return vpn;
+    }
+
+    public void setVpn(final VPNTO vpn) {
+        this.vpn = vpn;
     }
 
     @Override
@@ -480,6 +489,227 @@ public class NetworkOverviewTO {
         @Override
         public int hashCode() {
             return Objects.hash(getCidr(), getNextHop(), getMetric());
+        }
+    }
+
+    public static class VPNTO {
+        private RemoteAccessTO remoteAccess;
+        private Site2SiteTO[] site2site;
+
+        public RemoteAccessTO getRemoteAccess() {
+            return remoteAccess;
+        }
+
+        public void setRemoteAccess(final RemoteAccessTO remoteAccess) {
+            this.remoteAccess = remoteAccess;
+        }
+
+        public Site2SiteTO[] getSite2site() {
+            return site2site;
+        }
+
+        public void setSite2site(final Site2SiteTO[] site2site) {
+            this.site2site = site2site;
+        }
+
+        public static class RemoteAccessTO {
+            private String ipRange;
+            private String localCidr;
+            private String localIp;
+            private String preSharedKey;
+            private String vpnServerIp;
+            private VPNUserTO[] vpnUsers;
+
+            public String getIpRange() {
+                return ipRange;
+            }
+
+            public void setIpRange(final String ipRange) {
+                this.ipRange = ipRange;
+            }
+
+            public String getLocalCidr() {
+                return localCidr;
+            }
+
+            public void setLocalCidr(final String localCidr) {
+                this.localCidr = localCidr;
+            }
+
+            public String getLocalIp() {
+                return localIp;
+            }
+
+            public void setLocalIp(final String localIp) {
+                this.localIp = localIp;
+            }
+
+            public String getPreSharedKey() {
+                return preSharedKey;
+            }
+
+            public void setPreSharedKey(final String preSharedKey) {
+                this.preSharedKey = preSharedKey;
+            }
+
+            public String getVpnServerIp() {
+                return vpnServerIp;
+            }
+
+            public void setVpnServerIp(final String vpnServerIp) {
+                this.vpnServerIp = vpnServerIp;
+            }
+
+            public VPNUserTO[] getVpnUsers() {
+                return vpnUsers;
+            }
+
+            public void setVpnUsers(final VPNUserTO[] vpnUsers) {
+                this.vpnUsers = vpnUsers;
+            }
+
+            public static class VPNUserTO {
+                private String username;
+                private String password;
+
+                public VPNUserTO() {
+                }
+
+                public VPNUserTO(final String username, final String password) {
+                    this.username = username;
+                    this.password = password;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setUsername(final String username) {
+                    this.username = username;
+                }
+
+                public String getPassword() {
+                    return password;
+                }
+
+                public void setPassword(final String password) {
+                    this.password = password;
+                }
+            }
+        }
+
+        public static class Site2SiteTO {
+            private Boolean dpd;
+            private Boolean forceEncaps;
+            private Long lifetime;
+            private String esp;
+            private Long ikeLifetime;
+            private String ike;
+            private String psk;
+
+            private String left;
+            private String leftSubnet;
+
+            private Boolean passive;
+
+            private String right;
+            private String peerList;
+
+            public Boolean getDpd() {
+                return dpd;
+            }
+
+            public void setDpd(final Boolean dpd) {
+                this.dpd = dpd;
+            }
+
+            public Boolean getForceEncaps() {
+                return forceEncaps;
+            }
+
+            public void setForceEncaps(final Boolean forceEncaps) {
+                this.forceEncaps = forceEncaps;
+            }
+
+            public Long getLifetime() {
+                return lifetime;
+            }
+
+            public void setLifetime(final Long lifetime) {
+                this.lifetime = lifetime;
+            }
+
+            public String getEsp() {
+                return esp;
+            }
+
+            public void setEsp(final String esp) {
+                this.esp = esp;
+            }
+
+            public Long getIkeLifetime() {
+                return ikeLifetime;
+            }
+
+            public void setIkeLifetime(final Long ikeLifetime) {
+                this.ikeLifetime = ikeLifetime;
+            }
+
+            public String getIke() {
+                return ike;
+            }
+
+            public void setIke(final String ike) {
+                this.ike = ike;
+            }
+
+            public String getPsk() {
+                return psk;
+            }
+
+            public void setPsk(final String psk) {
+                this.psk = psk;
+            }
+
+            public String getLeft() {
+                return left;
+            }
+
+            public void setLeft(final String left) {
+                this.left = left;
+            }
+
+            public String getLeftSubnet() {
+                return leftSubnet;
+            }
+
+            public void setLeftSubnet(final String leftSubnet) {
+                this.leftSubnet = leftSubnet;
+            }
+
+            public Boolean getPassive() {
+                return passive;
+            }
+
+            public void setPassive(final Boolean passive) {
+                this.passive = passive;
+            }
+
+            public String getRight() {
+                return right;
+            }
+
+            public void setRight(final String right) {
+                this.right = right;
+            }
+
+            public String getPeerList() {
+                return peerList;
+            }
+
+            public void setPeerList(final String peerList) {
+                this.peerList = peerList;
+            }
         }
     }
 }

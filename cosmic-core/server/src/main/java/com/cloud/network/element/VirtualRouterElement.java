@@ -4,7 +4,6 @@ import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.api.command.admin.router.ConfigureVirtualRouterElementCmd;
 import com.cloud.api.command.admin.router.CreateVirtualRouterElementCmd;
 import com.cloud.api.command.admin.router.ListVirtualRouterElementsCmd;
-import com.cloud.configuration.ConfigurationManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenter;
@@ -13,8 +12,6 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.dao.HostDao;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -30,13 +27,10 @@ import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.VpnUser;
-import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
-import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
@@ -47,7 +41,6 @@ import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
 import com.cloud.network.rules.LoadBalancerContainer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.topology.NetworkTopology;
 import com.cloud.network.topology.NetworkTopologyContext;
@@ -97,15 +90,9 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
     @Inject
     NetworkModel _networkMdl;
     @Inject
-    LoadBalancingRulesManager _lbMgr;
-    @Inject
     NetworkOfferingDao _networkOfferingDao;
     @Inject
     VpcVirtualNetworkApplianceManager _routerMgr;
-    @Inject
-    ConfigurationManager _configMgr;
-    @Inject
-    RulesManager _rulesMgr;
     @Inject
     UserVmManager _userVmMgr;
     @Inject
@@ -113,17 +100,9 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
     @Inject
     DomainRouterDao _routerDao;
     @Inject
-    LoadBalancerDao _lbDao;
-    @Inject
-    HostDao _hostDao;
-    @Inject
     AccountManager _accountMgr;
     @Inject
-    ConfigurationDao _configDao;
-    @Inject
     VirtualRouterProviderDao _vrProviderDao;
-    @Inject
-    IPAddressDao _ipAddressDao;
     @Inject
     NetworkModel _networkModel;
     @Inject
@@ -659,42 +638,12 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
     @Override
     public boolean startVpn(final RemoteAccessVpn vpn) throws ResourceUnavailableException {
-        if (vpn.getNetworkId() == null) {
-            return false;
-        }
-
-        final Network network = _networksDao.findById(vpn.getNetworkId());
-        if (canHandle(network, Service.Vpn)) {
-            final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
-            if (routers == null || routers.isEmpty()) {
-                s_logger.debug("Virtual router elemnt doesn't need stop vpn on the backend; virtual router doesn't" + " exist in the network " + network.getId());
-                return true;
-            }
-            return _routerMgr.startRemoteAccessVpn(network, vpn, routers);
-        } else {
-            s_logger.debug("Element " + getName() + " doesn't handle createVpn command");
-            return false;
-        }
+        return true;
     }
 
     @Override
     public boolean stopVpn(final RemoteAccessVpn vpn) throws ResourceUnavailableException {
-        if (vpn.getNetworkId() == null) {
-            return false;
-        }
-
-        final Network network = _networksDao.findById(vpn.getNetworkId());
-        if (canHandle(network, Service.Vpn)) {
-            final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
-            if (routers == null || routers.isEmpty()) {
-                s_logger.debug("Virtual router elemnt doesn't need stop vpn on the backend; virtual router doesn't " + "exist in the network " + network.getId());
-                return true;
-            }
-            return _routerMgr.deleteRemoteAccessVpn(network, vpn, routers);
-        } else {
-            s_logger.debug("Element " + getName() + " doesn't handle removeVpn command");
-            return false;
-        }
+        return true;
     }
 
     @Override

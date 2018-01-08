@@ -5,7 +5,6 @@ import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.RemoteAccessVpnCfgCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
@@ -13,8 +12,6 @@ import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.routing.Site2SiteVpnCfgCommand;
-import com.cloud.agent.api.routing.VpnUsersCfgCommand;
 import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
@@ -28,7 +25,6 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
@@ -39,14 +35,17 @@ import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpnUser;
-import com.cloud.network.VpnUserVO;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.dao.RemoteAccessVpnDao;
+import com.cloud.network.dao.RemoteAccessVpnVO;
 import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
 import com.cloud.network.dao.Site2SiteCustomerGatewayVO;
+import com.cloud.network.dao.Site2SiteVpnConnectionDao;
+import com.cloud.network.dao.Site2SiteVpnConnectionVO;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayVO;
 import com.cloud.network.dao.VpnUserDao;
@@ -122,7 +121,11 @@ public class CommandSetupHelper {
     @Inject
     private UserVmDao _userVmDao;
     @Inject
+    private RemoteAccessVpnDao _remoteAccessVpnDao;
+    @Inject
     private VpnUserDao _vpnUsersDao;
+    @Inject
+    private Site2SiteVpnConnectionDao _s2sVpnDao;
     @Inject
     private Site2SiteCustomerGatewayDao _s2sCustomerGatewayDao;
     @Inject
@@ -131,8 +134,6 @@ public class CommandSetupHelper {
     private StaticRouteDao _staticRouteDao;
     @Inject
     private VpcDao _vpcDao;
-    @Inject
-    private VlanDao _vlanDao;
     @Inject
     private IPAddressDao _ipAddressDao;
     @Inject
@@ -461,57 +462,6 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createApplyVpnCommands(final boolean isCreate, final RemoteAccessVpn vpn, final VirtualRouter router, final Commands cmds) {
-        final List<VpnUserVO> vpnUsers = _vpnUsersDao.listByAccount(vpn.getAccountId());
-
-        createApplyVpnUsersCommand(vpnUsers, router, cmds);
-
-        final IpAddress ip = _networkModel.getIp(vpn.getServerAddressId());
-
-        // This block is needed due to the line 206 of the
-        // RemoteAccessVpnManagenerImpl:
-        // TODO: assumes one virtual network / domr per account per zone
-        final String cidr;
-        final Network network = _networkDao.findById(vpn.getNetworkId());
-        if (network == null) {
-            final Vpc vpc = _vpcDao.findById(vpn.getVpcId());
-            cidr = vpc.getCidr();
-        } else {
-            cidr = network.getCidr();
-        }
-
-        final RemoteAccessVpnCfgCommand startVpnCmd = new RemoteAccessVpnCfgCommand(isCreate, ip.getAddress().addr(), vpn.getLocalIp(), vpn.getIpRange(),
-                vpn.getIpsecPresharedKey(), vpn.getVpcId() != null);
-        startVpnCmd.setLocalCidr(cidr);
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        startVpnCmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("startVpn", startVpnCmd);
-    }
-
-    public void createApplyVpnUsersCommand(final List<? extends VpnUser> users, final VirtualRouter router, final Commands cmds) {
-        final List<VpnUser> addUsers = new ArrayList<>();
-        final List<VpnUser> removeUsers = new ArrayList<>();
-        for (final VpnUser user : users) {
-            if (user.getState() == VpnUser.State.Add || user.getState() == VpnUser.State.Active) {
-                addUsers.add(user);
-            } else if (user.getState() == VpnUser.State.Revoke) {
-                removeUsers.add(user);
-            }
-        }
-
-        final VpnUsersCfgCommand cmd = new VpnUsersCfgCommand(addUsers, removeUsers);
-        cmd.setAccessDetail(NetworkElementCommand.ACCOUNT_ID, String.valueOf(router.getAccountId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
-        cmds.addCommand("users", cmd);
-    }
-
     public void findIpsToExclude(final List<? extends PublicIpAddress> ips, final List<Ip> ipsToExclude) {
         // Ensure that in multiple vlans case we first send all ip addresses of
         // vlan1, then all ip addresses of vlan2, etc..
@@ -529,39 +479,13 @@ public class CommandSetupHelper {
         }
     }
 
-    public void createSite2SiteVpnCfgCommands(final Site2SiteVpnConnection conn, final boolean isCreate, final VirtualRouter router, final Commands cmds) {
-        final Site2SiteCustomerGatewayVO gw = _s2sCustomerGatewayDao.findById(conn.getCustomerGatewayId());
-        final Site2SiteVpnGatewayVO vpnGw = _s2sVpnGatewayDao.findById(conn.getVpnGatewayId());
-        final IpAddress ip = _ipAddressDao.findById(vpnGw.getAddrId());
-        final Vpc vpc = _vpcDao.findById(ip.getVpcId());
-        final String localPublicIp = ip.getAddress().toString();
-        final String localGuestCidr = vpc.getCidr();
-        final String localPublicGateway = _vlanDao.findById(ip.getVlanId()).getVlanGateway();
-        final String peerGatewayIp = gw.getGatewayIp();
-        final String peerGuestCidrList = gw.getGuestCidrList();
-        final String ipsecPsk = gw.getIpsecPsk();
-        final String ikePolicy = gw.getIkePolicy();
-        final String espPolicy = gw.getEspPolicy();
-        final Long ikeLifetime = gw.getIkeLifetime();
-        final Long espLifetime = gw.getEspLifetime();
-        final Boolean dpd = gw.getDpd();
-        final Boolean encap = gw.getEncap();
-
-        final Site2SiteVpnCfgCommand cmd = new Site2SiteVpnCfgCommand(isCreate, localPublicIp, localPublicGateway, localGuestCidr, peerGatewayIp, peerGuestCidrList, ikePolicy,
-                espPolicy, ipsecPsk, ikeLifetime, espLifetime, dpd, conn.isPassive(), encap);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand("applyS2SVpn", cmd);
-    }
-
     public NetworkOverviewTO createNetworkOverviewFromRouter(
             final VirtualRouter router,
             final List<Nic> nicsToExclude,
             final List<Ip> ipsToExclude,
-            final List<StaticRouteProfile> staticRoutesToExclude
+            final List<StaticRouteProfile> staticRoutesToExclude,
+            final RemoteAccessVpn remoteAccessVpnToExclude,
+            final Site2SiteVpnConnection site2siteVpnToExclude
     ) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<NetworkOverviewTO.InterfaceTO> interfacesTO = new ArrayList<>();
@@ -569,17 +493,22 @@ public class CommandSetupHelper {
         final NetworkOverviewTO.ServiceTO servicesTO = new NetworkOverviewTO.ServiceTO();
         final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
-        final List<NetworkOverviewTO.RouteTO> routesTO = new ArrayList<>();
-        if (router.getVpcId() != null) {
-            routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
-                                           .stream()
-                                           .map(StaticRouteProfile::new)
-                                           .filter(route -> !staticRoutesToExclude.contains(route))
-                                           .map(route -> new NetworkOverviewTO.RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
-                                           .collect(Collectors.toList()));
-        }
-        networkOverviewTO.setRoutes(routesTO.toArray(new NetworkOverviewTO.RouteTO[routesTO.size()]));
+        configureInterfacesAndIps(router, nicsToExclude, ipsToExclude, networkOverviewTO, interfacesTO, serviceSourceNatsTO);
+        configureStaticRoutes(router, staticRoutesToExclude, networkOverviewTO);
 
+        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
+        networkOverviewTO.setServices(servicesTO);
+
+        final NetworkOverviewTO.VPNTO vpnTO = new NetworkOverviewTO.VPNTO();
+        configureRemoteAccessVpn(router, remoteAccessVpnToExclude, vpnTO);
+        configureSite2SiteVpn(router, site2siteVpnToExclude, vpnTO);
+        networkOverviewTO.setVpn(vpnTO);
+
+        return networkOverviewTO;
+    }
+
+    private void configureInterfacesAndIps(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude, final NetworkOverviewTO networkOverviewTO,
+                                           final List<NetworkOverviewTO.InterfaceTO> interfacesTO, final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO) {
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
             .filter(nic -> !nicsToExclude.contains(nic))
@@ -589,7 +518,10 @@ public class CommandSetupHelper {
 
                 final List<NetworkOverviewTO.InterfaceTO.IPv4AddressTO> ipv4Addresses = new ArrayList<>();
                 if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                    ipv4Addresses.add(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()), nic.getIPv4Gateway()));
+                    ipv4Addresses.add(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                            NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()),
+                            nic.getIPv4Gateway())
+                    );
                 }
 
                 final NetworkVO network = _networkDao.findById(nic.getNetworkId());
@@ -602,7 +534,10 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
+                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                                                                      NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()),
+                                                                      nic.getIPv4Gateway())
+                                                              )
                                                               .collect(Collectors.toList()));
 
                             serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
@@ -618,7 +553,10 @@ public class CommandSetupHelper {
                                                               .map(IPAddressVO::getAddress)
                                                               .filter(ip -> !ipsToExclude.contains(ip))
                                                               .map(Ip::addr)
-                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()), nic.getIPv4Gateway()))
+                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                                                                      NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()),
+                                                                      nic.getIPv4Gateway())
+                                                              )
                                                               .collect(Collectors.toList()));
                         }
                     }
@@ -631,11 +569,79 @@ public class CommandSetupHelper {
             });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new NetworkOverviewTO.InterfaceTO[interfacesTO.size()]));
+    }
 
-        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
-        networkOverviewTO.setServices(servicesTO);
+    private void configureStaticRoutes(final VirtualRouter router, final List<StaticRouteProfile> staticRoutesToExclude, final NetworkOverviewTO networkOverviewTO) {
+        final List<NetworkOverviewTO.RouteTO> routesTO = new ArrayList<>();
+        if (router.getVpcId() != null) {
+            routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
+                                           .stream()
+                                           .map(StaticRouteProfile::new)
+                                           .filter(route -> !staticRoutesToExclude.contains(route))
+                                           .map(route -> new NetworkOverviewTO.RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
+                                           .collect(Collectors.toList()));
+        }
+        networkOverviewTO.setRoutes(routesTO.toArray(new NetworkOverviewTO.RouteTO[routesTO.size()]));
+    }
 
-        return networkOverviewTO;
+    private void configureRemoteAccessVpn(final VirtualRouter router, final RemoteAccessVpn remoteAccessVpnToExclude, final NetworkOverviewTO.VPNTO vpnTO) {
+        final RemoteAccessVpnVO vpn = _remoteAccessVpnDao.findByAccountAndVpc(router.getAccountId(), router.getVpcId());
+        if (vpn != null && !vpn.equals(remoteAccessVpnToExclude)) {
+            final NetworkOverviewTO.VPNTO.RemoteAccessTO remoteAccessTO = new NetworkOverviewTO.VPNTO.RemoteAccessTO();
+
+            final IpAddress serverIp = _networkModel.getIp(vpn.getServerAddressId());
+            remoteAccessTO.setVpnServerIp(serverIp.getAddress().addr());
+            remoteAccessTO.setPreSharedKey(vpn.getIpsecPresharedKey());
+
+            remoteAccessTO.setIpRange(vpn.getIpRange());
+            remoteAccessTO.setLocalIp(vpn.getLocalIp());
+
+            final Vpc vpc = _vpcDao.findById(vpn.getVpcId());
+            remoteAccessTO.setLocalCidr(vpc.getCidr());
+
+            remoteAccessTO.setVpnUsers(
+                    _vpnUsersDao.listByAccount(vpn.getAccountId())
+                                .stream()
+                                .filter(vpnUser -> VpnUser.State.Add.equals(vpnUser.getState()) || VpnUser.State.Active.equals(vpnUser.getState()))
+                                .map(vpnUser -> new NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO(vpnUser.getUsername(), vpnUser.getPassword()))
+                                .toArray(NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO[]::new)
+            );
+
+            vpnTO.setRemoteAccess(remoteAccessTO);
+        }
+    }
+
+    private void configureSite2SiteVpn(final VirtualRouter router, final Site2SiteVpnConnection site2siteVpnToExclude, final NetworkOverviewTO.VPNTO vpnTO) {
+        vpnTO.setSite2site(_s2sVpnDao.listByVpcId(router.getVpcId())
+                                     .stream()
+                                     .filter(vpnConnection -> !vpnConnection.equals(site2siteVpnToExclude))
+                                     .map(this::toSite2SiteTO)
+                                     .toArray(NetworkOverviewTO.VPNTO.Site2SiteTO[]::new));
+    }
+
+    private NetworkOverviewTO.VPNTO.Site2SiteTO toSite2SiteTO(Site2SiteVpnConnectionVO vpnConnection) {
+        final NetworkOverviewTO.VPNTO.Site2SiteTO site2SiteTO = new NetworkOverviewTO.VPNTO.Site2SiteTO();
+
+        final Site2SiteCustomerGatewayVO customerGateway = _s2sCustomerGatewayDao.findById(vpnConnection.getCustomerGatewayId());
+        site2SiteTO.setDpd(customerGateway.getDpd());
+        site2SiteTO.setForceEncaps(customerGateway.getEncap());
+        site2SiteTO.setLifetime(customerGateway.getEspLifetime());
+        site2SiteTO.setEsp(customerGateway.getEspPolicy());
+        site2SiteTO.setIkeLifetime(customerGateway.getIkeLifetime());
+        site2SiteTO.setIke(customerGateway.getIkePolicy());
+        site2SiteTO.setPsk(customerGateway.getIpsecPsk());
+
+        final Site2SiteVpnGatewayVO vpnGateway = _s2sVpnGatewayDao.findById(vpnConnection.getVpnGatewayId());
+        final IpAddress ipAddress = _ipAddressDao.findById(vpnGateway.getAddrId());
+        site2SiteTO.setLeft(ipAddress.getAddress().addr());
+        site2SiteTO.setLeftSubnet(_vpcDao.findById(ipAddress.getVpcId()).getCidr());
+
+        site2SiteTO.setPassive(vpnConnection.isPassive());
+
+        site2SiteTO.setRight(customerGateway.getGatewayIp());
+        site2SiteTO.setPeerList(customerGateway.getGuestCidrList());
+
+        return site2SiteTO;
     }
 
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {

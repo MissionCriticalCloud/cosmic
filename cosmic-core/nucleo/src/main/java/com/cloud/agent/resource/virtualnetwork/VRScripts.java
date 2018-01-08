@@ -9,10 +9,7 @@ public class VRScripts {
     public final static String VM_PASSWORD_CONFIG = "vm_password.json";
     public static final String FORWARDING_RULES_CONFIG = "forwarding_rules.json";
     public static final String FIREWALL_RULES_CONFIG = "firewall_rules.json";
-    public static final String VPN_USER_LIST_CONFIG = "vpn_user_list.json";
     public static final String STATICNAT_RULES_CONFIG = "staticnat_rules.json";
-    public static final String SITE_2_SITE_VPN_CONFIG = "site_2_site_vpn.json";
-    public static final String REMOTE_ACCESS_VPN_CONFIG = "remote_access_vpn.json";
     public static final String LOAD_BALANCER_CONFIG = "load_balancer.json";
     public static final String VR_CONFIG = "vr.json";
 

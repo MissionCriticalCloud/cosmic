@@ -108,7 +108,14 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
             final List<Ip> ipsToExclude = new ArrayList<>();
             _commandSetupHelper.findIpsToExclude(ipsToSend, ipsToExclude);
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    ipsToExclude,
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             updateNetworkOverviewCommand.setPlugNics(true);
             cmds.addCommand(updateNetworkOverviewCommand);
@@ -122,10 +129,19 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
     @Override
     public boolean visit(final AdvancedVpnRules vpnRules) throws ResourceUnavailableException {
         final VirtualRouter router = vpnRules.getRouter();
-        final List<? extends VpnUser> users = vpnRules.getUsers();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createApplyVpnUsersCommand(users, router, cmds);
+
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
 
         // Currently we receive just one answer from the agent. In the future we
         // have to parse individual answers and set
@@ -155,7 +171,14 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                 ipsToExclude.add(new Ip(ip.getIpAddress()));
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    ipsToExclude,
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand(updateNetworkOverviewCommand);
 
@@ -218,7 +241,14 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
 
         final Commands cmds = new Commands(Command.OnError.Continue);
 
-        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
         cmds.addCommand(updateNetworkOverviewCommand);
 

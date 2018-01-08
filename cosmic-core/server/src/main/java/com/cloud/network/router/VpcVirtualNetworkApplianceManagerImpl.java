@@ -15,10 +15,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
 import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
@@ -32,7 +29,6 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.RemoteAccessVpnVO;
 import com.cloud.network.vpc.NetworkACLItemDao;
 import com.cloud.network.vpc.NetworkACLItemVO;
 import com.cloud.network.vpc.NetworkACLManager;
@@ -346,13 +342,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 return false;
             }
 
-            // 4) RE-APPLY ALL REMOTE ACCESS VPNs
-            final RemoteAccessVpnVO vpn = _vpnDao.findByAccountAndVpc(domainRouterVO.getAccountId(), domainRouterVO.getVpcId());
-            if (vpn != null) {
-                _commandSetupHelper.createApplyVpnCommands(true, vpn, domainRouterVO, cmds);
-            }
-
-            // 5) REPROGRAM GUEST NETWORK
+            // 4) REPROGRAM GUEST NETWORK
             boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
 
             final VirtualRouterProvider vrProvider = _vrProviderDao.findById(domainRouterVO.getElementId());
@@ -393,7 +383,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(finishCmd);
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(domainRouterVO, nicsToExclude, ipsToExclude, staticRoutesToExclude);
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    domainRouterVO,
+                    nicsToExclude,
+                    ipsToExclude,
+                    staticRoutesToExclude,
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(domainRouterVO, networkOverview);
             updateNetworkOverviewCommand.setPlugNics(true);
             cmds.addCommand(updateNetworkOverviewCommand);
@@ -404,7 +401,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(updateVmOverviewCommand);
             }
 
-            // 6) RE-APPLY VR Configuration
+            // 5) RE-APPLY VR Configuration
             final Vpc vpc = _vpcDao.findById(domainRouterVO.getVpcId());
             _commandSetupHelper.createVRConfigCommands(vpc, domainRouterVO, cmds);
 
@@ -526,7 +523,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 nicsToExclude.add(nic);
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, nicsToExclude, new ArrayList<>(), new ArrayList<>());
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    nicsToExclude,
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand("networkoverview", updateNetworkOverviewCommand);
             _nwHelper.sendCommandsToRouter(router, cmds);
@@ -622,7 +626,14 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 ipsToExclude.add(new Ip(ip.getIpAddress()));
             }
 
-            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(router, new ArrayList<>(), ipsToExclude, new ArrayList<>());
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    ipsToExclude,
+                    new ArrayList<>(),
+                    null,
+                    null
+            );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
             cmds.addCommand(updateNetworkOverviewCommand);
 
@@ -690,40 +701,47 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         }
 
         final Commands cmds = new Commands(Command.OnError.Stop);
-        _commandSetupHelper.createApplyVpnCommands(true, vpn, router, cmds);
+
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
 
         try {
-            _agentMgr.send(router.getHostId(), cmds);
-        } catch (final OperationTimedoutException e) {
-            s_logger.debug("Failed to start remote access VPN: ", e);
-            throw new AgentUnavailableException("Unable to send commands to virtual router ", router.getHostId(), e);
+            return _nwHelper.sendCommandsToRouter(router, cmds);
+        } catch (final Exception ex) {
+            s_logger.warn("Failed to delete remote access VPN: domR " + router + " is not in right state " + router.getState());
+            return false;
         }
-        Answer answer = cmds.getAnswer("users");
-        if (!answer.getResult()) {
-            s_logger.error("Unable to start vpn: unable add users to vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: "
-                    + router.getInstanceName() + " due to " + answer.getDetails());
-            throw new ResourceUnavailableException("Unable to start vpn: Unable to add users to vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId()
-                    + " on domR: " + router.getInstanceName() + " due to " + answer.getDetails(), DataCenter.class, router.getDataCenterId());
-        }
-        answer = cmds.getAnswer("startVpn");
-        if (!answer.getResult()) {
-            s_logger.error("Unable to start vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: " + router.getInstanceName() + " due to "
-                    + answer.getDetails());
-            throw new ResourceUnavailableException("Unable to start vpn in zone " + router.getDataCenterId() + " for account " + vpn.getAccountId() + " on domR: "
-                    + router.getInstanceName() + " due to " + answer.getDetails(), DataCenter.class, router.getDataCenterId());
-        }
-
-        return true;
     }
 
     @Override
     public boolean stopRemoteAccessVpn(final RemoteAccessVpn vpn, final VirtualRouter router) throws ResourceUnavailableException {
-        boolean result = true;
-
         if (router.getState() == State.Running) {
             final Commands cmds = new Commands(Command.OnError.Continue);
-            _commandSetupHelper.createApplyVpnCommands(false, vpn, router, cmds);
-            result = result && _nwHelper.sendCommandsToRouter(router, cmds);
+
+            final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                    router,
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    vpn,
+                    null
+            );
+            final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+            cmds.addCommand(updateNetworkOverviewCommand);
+
+            try {
+                return _nwHelper.sendCommandsToRouter(router, cmds);
+            } catch (final Exception ex) {
+                return false;
+            }
         } else if (router.getState() == State.Stopped) {
             s_logger.debug("Router " + router + " is in Stopped state, not sending deleteRemoteAccessVpn command to it");
         } else {
@@ -731,12 +749,23 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
             throw new ResourceUnavailableException("Failed to delete remote access VPN: domR is not in right state " + router.getState(), DataCenter.class,
                     router.getDataCenterId());
         }
+
         return true;
     }
 
-    protected boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    private  boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         final Commands cmds = new Commands(Command.OnError.Continue);
-        _commandSetupHelper.createSite2SiteVpnCfgCommands(conn, isCreate, router, cmds);
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                isCreate ? null : conn
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
+
         return _nwHelper.sendCommandsToRouter(router, cmds);
     }
 }
