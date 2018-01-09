@@ -33,13 +33,11 @@ import com.cloud.network.dao.Site2SiteVpnConnectionVO;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayVO;
 import com.cloud.network.element.Site2SiteVpnServiceProvider;
-import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
@@ -70,29 +68,24 @@ import org.springframework.stereotype.Component;
 public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpnManager {
     private static final Logger s_logger = LoggerFactory.getLogger(Site2SiteVpnManagerImpl.class);
 
-    List<Site2SiteVpnServiceProvider> _s2sProviders;
+    private List<Site2SiteVpnServiceProvider> _s2sProviders;
     @Inject
-    Site2SiteCustomerGatewayDao _customerGatewayDao;
+    private Site2SiteCustomerGatewayDao _customerGatewayDao;
     @Inject
-    Site2SiteVpnGatewayDao _vpnGatewayDao;
+    private Site2SiteVpnGatewayDao _vpnGatewayDao;
     @Inject
-    Site2SiteVpnConnectionDao _vpnConnectionDao;
+    private Site2SiteVpnConnectionDao _vpnConnectionDao;
     @Inject
-    VpcDao _vpcDao;
+    private VpcDao _vpcDao;
     @Inject
-    IPAddressDao _ipAddressDao;
+    private IPAddressDao _ipAddressDao;
     @Inject
-    AccountDao _accountDao;
+    private ConfigurationDao _configDao;
     @Inject
-    ConfigurationDao _configDao;
-    @Inject
-    VpcManager _vpcMgr;
-    @Inject
-    AccountManager _accountMgr;
+    private AccountManager _accountMgr;
 
-    String _name;
-    int _connLimit;
-    int _subnetsLimit;
+    private int _connLimit;
+    private int _subnetsLimit;
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -709,6 +702,20 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         gw.setDpd(dpd);
         gw.setEncap(encap);
         _customerGatewayDao.persist(gw);
+
+        final List<Site2SiteVpnConnectionVO> conns = _vpnConnectionDao.listByCustomerGatewayId(gw.getId());
+        conns.forEach(conn -> {
+            for (final Site2SiteVpnServiceProvider element : _s2sProviders) {
+                try {
+                    element.refreshSite2SiteVpn(conn);
+                } catch (ResourceUnavailableException e) {
+                    s_logger.warn("Unable to refresh site-to-site VPN connection: " + conn.getUuid());
+                    return;
+                }
+            }
+
+        });
+
         return gw;
     }
 
