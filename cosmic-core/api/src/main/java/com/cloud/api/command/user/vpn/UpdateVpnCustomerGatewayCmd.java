@@ -35,7 +35,7 @@ public class UpdateVpnCustomerGatewayCmd extends BaseAsyncCmd {
             description = "id of customer gateway")
     private Long id;
 
-    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = false, description = "name of this customer gateway")
+    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "name of this customer gateway")
     private String name;
 
     @Parameter(name = ApiConstants.GATEWAY, type = CommandType.STRING, required = true, description = "public ip address id of the customer gateway")
@@ -67,10 +67,10 @@ public class UpdateVpnCustomerGatewayCmd extends BaseAsyncCmd {
             description = "Lifetime of phase 2 VPN connection to the customer gateway, in seconds")
     private Long espLifetime;
 
-    @Parameter(name = ApiConstants.DPD, type = CommandType.BOOLEAN, required = false, description = "If DPD is enabled for VPN connection")
+    @Parameter(name = ApiConstants.DPD, type = CommandType.BOOLEAN, description = "If DPD is enabled for VPN connection")
     private Boolean dpd;
 
-    @Parameter(name = ApiConstants.FORCE_ENCAP, type = CommandType.BOOLEAN, required = false, description = "Force encapsulation for Nat Traversal")
+    @Parameter(name = ApiConstants.FORCE_ENCAP, type = CommandType.BOOLEAN, description = "Force encapsulation for Nat Traversal")
     private Boolean encap;
 
     @Parameter(name = ApiConstants.ACCOUNT, type = CommandType.STRING, description = "the account associated with the gateway. Must be used with the domainId parameter.")

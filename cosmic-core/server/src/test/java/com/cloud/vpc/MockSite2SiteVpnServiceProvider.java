@@ -59,6 +59,15 @@ public class MockSite2SiteVpnServiceProvider extends ManagerBase implements Site
     }
 
     /* (non-Javadoc)
+     * @see com.cloud.network.element.Site2SiteVpnServiceProvider#refreshSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection)
+     */
+    @Override
+    public boolean refreshSite2SiteVpn(final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    /* (non-Javadoc)
      * @see com.cloud.network.element.Site2SiteVpnServiceProvider#stopSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection)
      */
     @Override

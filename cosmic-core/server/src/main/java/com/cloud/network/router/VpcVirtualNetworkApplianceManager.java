@@ -35,6 +35,14 @@ public interface VpcVirtualNetworkApplianceManager extends VirtualNetworkApplian
      * @return
      * @throws ResourceUnavailableException
      */
+    boolean refreshSite2SiteVpn(Site2SiteVpnConnection conn, VirtualRouter router) throws ResourceUnavailableException;
+
+    /**
+     * @param conn
+     * @param routers
+     * @return
+     * @throws ResourceUnavailableException
+     */
     boolean stopSite2SiteVpn(Site2SiteVpnConnection conn, VirtualRouter router) throws ResourceUnavailableException;
 
     /**

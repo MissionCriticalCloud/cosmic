@@ -9,7 +9,6 @@ import com.cloud.exception.IllegalVirtualMachineException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
-import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
@@ -27,7 +26,6 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.network.router.VpcNetworkHelperImpl;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
@@ -40,15 +38,12 @@ import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.network.vpc.dao.VpcDao;
-import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -61,7 +56,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 public class VpcVirtualRouterElement extends VirtualRouterElement implements VpcProvider, Site2SiteVpnServiceProvider, NetworkACLServiceProvider {
 
@@ -82,22 +76,11 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
     @Inject
     NetworkDao _networkDao;
     @Inject
-    VpcGatewayDao _vpcGatewayDao;
-    @Inject
     NetworkACLItemDao _networkACLItemDao;
     @Inject
     EntityManager _entityMgr;
     @Inject
-    VirtualMachineManager _itMgr;
-    @Inject
-    IpAddressManager _ipAddrMgr;
-    @Inject
-    VpcDao _vpcDao;
-    @Inject
     RouterDeploymentDefinitionBuilder routerDeploymentDefinitionBuilder;
-    @Inject
-    @Qualifier("vpcNetworkHelper")
-    private VpcNetworkHelperImpl _vpcNetWprkHelper;
 
     private static Map<Service, Map<Capability, String>> setCapabilities() {
         final Map<Service, Map<Capability, String>> capabilities = new HashMap<>();
@@ -345,6 +328,37 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         boolean result = true;
         for (final DomainRouterVO domainRouterVO : routers) {
             result = result && _vpcRouterMgr.startSite2SiteVpn(conn, domainRouterVO);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean refreshSite2SiteVpn(final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+        final Site2SiteVpnGateway vpnGw = _vpnGatewayDao.findById(conn.getVpnGatewayId());
+        final IpAddress ip = _ipAddressDao.findById(vpnGw.getAddrId());
+
+        final Map<Capability, String> vpnCapabilities = capabilities.get(Service.Vpn);
+        if (!vpnCapabilities.get(Capability.VpnTypes).contains("s2svpn")) {
+            s_logger.error("try to refresh site-to-site VPN on unsupported network element?");
+            return false;
+        }
+
+        final Long vpcId = ip.getVpcId();
+        final Vpc vpc = _entityMgr.findById(Vpc.class, vpcId);
+
+        if (!_ntwkModel.isProviderEnabledInZone(vpc.getZoneId(), Provider.VPCVirtualRouter.getName())) {
+            throw new ResourceUnavailableException("VPC provider is not enabled in zone " + vpc.getZoneId(), DataCenter.class, vpc.getZoneId());
+        }
+
+        final List<DomainRouterVO> routers = _vpcRouterMgr.getVpcRouters(ip.getVpcId());
+        if (routers == null) {
+            throw new ResourceUnavailableException("Cannot enable site-to-site VPN on the backend; virtual router doesn't exist in the VPC " + ip.getVpcId(), DataCenter.class,
+                    vpc.getZoneId());
+        }
+
+        boolean result = true;
+        for (final DomainRouterVO domainRouterVO : routers) {
+            result = result && _vpcRouterMgr.refreshSite2SiteVpn(conn, domainRouterVO);
         }
         return result;
     }

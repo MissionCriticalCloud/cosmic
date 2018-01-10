@@ -39,7 +39,6 @@ import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.PrivateIpDao;
-import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.user.UserStatisticsVO;
@@ -56,7 +55,6 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfile.Param;
-import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -75,10 +73,6 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
     @Inject
     private NetworkACLManager _networkACLMgr;
-    @Inject
-    private VMInstanceDao _vmDao;
-    @Inject
-    private StaticRouteDao _staticRouteDao;
     @Inject
     private PrivateIpDao _privateIpDao;
     @Inject
@@ -156,7 +150,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         return super.finalizeVirtualMachineProfile(profile, dest, context);
     }
 
-    protected void finalizeIpAssocForNetwork(final Commands cmds, final VirtualRouter domainRouterVO, final Provider provider, final Long guestNetworkId,
+    protected void finalizeIpAssocForNetwork(final VirtualRouter domainRouterVO, final Provider provider, final Long guestNetworkId,
                                              final List<Ip> ipsToExclude) {
         if (domainRouterVO.getState() == State.Starting || domainRouterVO.getState() == State.Running) {
             final ArrayList<? extends PublicIpAddress> publicIps = getPublicIpsToApply(domainRouterVO, provider, guestNetworkId, IpAddress.State.Releasing);
@@ -368,7 +362,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 cmds.addCommand(startCmd);
 
                 if (reprogramGuestNtwks) {
-                    finalizeIpAssocForNetwork(cmds, domainRouterVO, provider, guestNic.getNetworkId(), ipsToExclude);
+                    finalizeIpAssocForNetwork(domainRouterVO, provider, guestNic.getNetworkId(), ipsToExclude);
                     finalizeNetworkRulesForNetwork(cmds, domainRouterVO, provider, guestNic.getNetworkId());
                 }
 
@@ -674,6 +668,29 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         }
 
         return applySite2SiteVpn(true, router, conn);
+    }
+
+    @Override
+    public boolean refreshSite2SiteVpn(final Site2SiteVpnConnection conn, final VirtualRouter router) throws ResourceUnavailableException {
+        if (router.getState() != State.Running) {
+            s_logger.warn("Unable to apply site-to-site VPN configuration, virtual router is not in the right state " + router.getState());
+            throw new ResourceUnavailableException("Unable to apply site-to-site VPN configuration," + " virtual router is not in the right state", DataCenter.class,
+                    router.getDataCenterId());
+        }
+
+        final Commands cmds = new Commands(Command.OnError.Continue);
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        cmds.addCommand(updateNetworkOverviewCommand);
+
+        return _nwHelper.sendCommandsToRouter(router, cmds);
     }
 
     @Override
