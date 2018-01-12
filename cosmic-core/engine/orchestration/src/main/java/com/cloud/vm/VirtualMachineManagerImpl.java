@@ -1037,7 +1037,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     private List<Long> listStalledVMInTransitionStateOnUpHost(final long hostId, final Date cutTime) {
         final String sql = "SELECT i.* FROM vm_instance as i, host as h WHERE h.status = 'UP' " +
                 "AND h.id = ? AND i.power_state_update_time < ? AND i.host_id = h.id " +
-                "AND (i.state ='Starting' OR i.state='Stopping' OR i.state='Migrating') " +
+                "AND i.state IN ('Starting', 'Stopping', 'Migrating', 'Paused') " +
                 "AND i.id NOT IN (SELECT w.vm_instance_id FROM vm_work_job AS w JOIN async_job AS j ON w.id = j.id WHERE j.job_status = ?)" +
                 "AND i.removed IS NULL";
 
@@ -1140,7 +1140,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     private List<Long> listVMInTransitionStateWithRecentReportOnUpHost(final long hostId, final Date cutTime) {
         final String sql = "SELECT i.* FROM vm_instance as i, host as h WHERE h.status = 'UP' " +
                 "AND h.id = ? AND i.power_state_update_time > ? AND i.host_id = h.id " +
-                "AND (i.state ='Starting' OR i.state='Stopping' OR i.state='Migrating') " +
+                "AND i.state IN ('Starting', 'Stopping', 'Migrating', 'Paused') " +
                 "AND i.id NOT IN (SELECT w.vm_instance_id FROM vm_work_job AS w JOIN async_job AS j ON w.id = j.id WHERE j.job_status = ?)" +
                 "AND i.removed IS NULL";
 
@@ -1247,6 +1247,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                 + ") state is sync-ed (Starting -> Running) from out-of-context transition. VM network environment may need to be reset");
                 break;
 
+            case Paused:
             case Running:
                 try {
                     if (vm.getHostId() != null && vm.getHostId().longValue() != vm.getPowerHostId().longValue()) {
@@ -1476,7 +1477,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     private List<Long> listStalledVMInTransitionStateOnDisconnectedHosts(final Date cutTime) {
         final String sql = "SELECT i.* FROM vm_instance as i, host as h WHERE h.status != 'UP' " +
                 "AND i.power_state_update_time < ? AND i.host_id = h.id " +
-                "AND (i.state ='Starting' OR i.state='Stopping' OR i.state='Migrating') " +
+                "AND i.state IN ('Starting', 'Stopping', 'Migrating', 'Paused') " +
                 "AND i.id NOT IN (SELECT w.vm_instance_id FROM vm_work_job AS w JOIN async_job AS j ON w.id = j.id WHERE j.job_status = ?)" +
                 "AND i.removed IS NULL";
 
