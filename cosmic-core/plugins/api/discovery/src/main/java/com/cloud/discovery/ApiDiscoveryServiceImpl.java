@@ -159,6 +159,8 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
         final String apiName = apiCmdAnnotation.name();
         final ApiDiscoveryResponse response = new ApiDiscoveryResponse();
         response.setName(apiName);
+        response.setGroupName(apiCmdAnnotation.group().name());
+        response.setGroupDescription(apiCmdAnnotation.group().toString());
         response.setDescription(apiCmdAnnotation.description());
         if (!apiCmdAnnotation.since().isEmpty()) {
             response.setSince(apiCmdAnnotation.since());

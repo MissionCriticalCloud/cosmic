@@ -28,7 +28,7 @@ public class BaseCmdTest {
     }
 }
 
-@APICommand(name = BaseCmdTest.CMD1_NAME, responseObject = BaseResponse.class)
+@APICommand(name = BaseCmdTest.CMD1_NAME, group = APICommandGroup.BaseCmdTestService, responseObject = BaseResponse.class)
 class Cmd1 extends BaseCmd {
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException, ResourceAllocationException,
@@ -46,7 +46,7 @@ class Cmd1 extends BaseCmd {
     }
 }
 
-@APICommand(name = BaseCmdTest.CMD2_NAME, responseObject = BaseResponse.class)
+@APICommand(name = BaseCmdTest.CMD2_NAME, group = APICommandGroup.BaseCmdTestService, responseObject = BaseResponse.class)
 class Cmd2 extends Cmd1 {
     @Override
     public String getCommandName() {

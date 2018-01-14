@@ -14,6 +14,14 @@ public class ApiDiscoveryResponse extends BaseResponse {
     @Param(description = "the name of the api command")
     private String name;
 
+    @SerializedName(ApiConstants.GROUP_NAME)
+    @Param(description = "the name of the group this api command belongs to")
+    private String groupName;
+
+    @SerializedName(ApiConstants.GROUP_DESCRIPTION)
+    @Param(description = "the description of the group this api command belongs to")
+    private String groupDescription;
+
     @SerializedName(ApiConstants.DESCRIPTION)
     @Param(description = "description of the api")
     private String description;
@@ -54,6 +62,22 @@ public class ApiDiscoveryResponse extends BaseResponse {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupDescription() {
+        return groupDescription;
+    }
+
+    public void setGroupDescription(String groupDescription) {
+        this.groupDescription = groupDescription;
     }
 
     public String getDescription() {

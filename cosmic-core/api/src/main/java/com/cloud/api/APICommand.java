@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
 public @interface APICommand {
     Class<? extends BaseResponse> responseObject();
 
-    String name() default "";
+    String name();
+
+    APICommandGroup group();
 
     String description() default "";
 
