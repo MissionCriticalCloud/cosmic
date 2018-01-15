@@ -361,6 +361,12 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             return false;
         }
 
+        // When the lswitch is used in another network in the zone, simply return without deleting the lswitch
+        if (networkDao.countByZoneAndUri(network.getDataCenterId(), network.getBroadcastUri().toString()) > 1) {
+            s_logger.error("There are other networks using this lswitch, so not deleting lswitch!");
+            return true;
+        }
+
         final DeleteLogicalSwitchPortCommand cmd = new DeleteLogicalSwitchPortCommand(nicMap.getLogicalSwitchUuid(), nicMap.getLogicalSwitchPortUuid());
         final DeleteLogicalSwitchPortAnswer answer = (DeleteLogicalSwitchPortAnswer) agentMgr.easySend(niciraNvpHost.getId(), cmd);
 
