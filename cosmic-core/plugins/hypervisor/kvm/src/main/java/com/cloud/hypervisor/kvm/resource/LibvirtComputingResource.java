@@ -1492,13 +1492,16 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final ClockDef clock = new ClockDef();
         if (vmTo.getOs().startsWith("Windows")) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
-            clock.setTimer("rtc", "catchup", null);
         } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
                 clock.setTimer("kvmclock", null, null, isKvmclockDisabled());
             }
         }
 
+        // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
+        clock.setTimer("rtc", "catchup", null);
+        clock.setTimer("pit", "delay", null);
+        
         vm.addComponent(clock);
 
         final DevicesDef devices = new DevicesDef();
