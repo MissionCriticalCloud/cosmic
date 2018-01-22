@@ -3,6 +3,7 @@ package com.cloud.api.command.user.securitygroup;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -20,7 +21,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteSecurityGroup", description = "Deletes security group", responseObject = SuccessResponse.class, entityType = {SecurityGroup.class},
+@APICommand(name = "deleteSecurityGroup", group = APICommandGroup.SecurityGroupService, description = "Deletes security group", responseObject = SuccessResponse.class, entityType = {SecurityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteSecurityGroupCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteSecurityGroupCmd.class.getName());

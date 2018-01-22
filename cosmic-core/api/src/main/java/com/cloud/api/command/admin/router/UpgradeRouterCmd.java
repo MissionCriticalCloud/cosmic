@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.router;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "changeServiceForRouter", description = "Upgrades domain router to a new service offering", responseObject = DomainRouterResponse.class, entityType =
+@APICommand(name = "changeServiceForRouter", group = APICommandGroup.RouterService, description = "Upgrades domain router to a new service offering", responseObject = DomainRouterResponse.class, entityType =
         {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpgradeRouterCmd extends BaseCmd {

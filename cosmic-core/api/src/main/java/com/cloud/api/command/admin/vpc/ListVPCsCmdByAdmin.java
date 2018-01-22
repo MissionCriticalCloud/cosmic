@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.vpc.ListVPCsCmd;
 import com.cloud.api.response.ListResponse;
@@ -14,7 +15,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVPCs", description = "Lists VPCs", responseObject = VpcResponse.class, responseView = ResponseView.Full, entityType = {Vpc.class},
+@APICommand(name = "listVPCs", group = APICommandGroup.VPCService, description = "Lists VPCs", responseObject = VpcResponse.class, responseView = ResponseView.Full, entityType = {Vpc.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVPCsCmdByAdmin extends ListVPCsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVPCsCmdByAdmin.class.getName());

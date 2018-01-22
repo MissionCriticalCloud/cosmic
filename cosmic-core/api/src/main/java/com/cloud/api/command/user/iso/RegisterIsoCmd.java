@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -22,7 +23,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerIso", responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView = ResponseView
+@APICommand(name = "registerIso", group = APICommandGroup.ISOService, responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView = ResponseView
         .Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterIsoCmd extends BaseCmd {

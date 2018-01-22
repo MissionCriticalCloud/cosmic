@@ -2,6 +2,7 @@ package com.cloud.api.command.user.firewall;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCustomIdCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateEgressFirewallRule", description = "Updates egress firewall rule ", responseObject = FirewallResponse.class, since = "4.4",
+@APICommand(name = "updateEgressFirewallRule", group = APICommandGroup.FirewallService, description = "Updates egress firewall rule ", responseObject = FirewallResponse.class, since = "4.4",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateEgressFirewallRuleCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateEgressFirewallRuleCmd.class.getName());

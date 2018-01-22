@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseUpdateTemplateOrIsoCmd;
 import com.cloud.api.ResponseObject.ResponseView;
@@ -12,7 +13,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateIso", description = "Updates an ISO file.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "updateIso", group = APICommandGroup.ISOService, description = "Updates an ISO file.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateIsoCmd extends BaseUpdateTemplateOrIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateIsoCmd.class.getName());

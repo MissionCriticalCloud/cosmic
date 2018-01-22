@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.account;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -20,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createAccount", description = "Creates an account", responseObject = AccountResponse.class, entityType = {Account.class},
+@APICommand(name = "createAccount", group = APICommandGroup.AccountService, description = "Creates an account", responseObject = AccountResponse.class, entityType = {Account.class},
         requestHasSensitiveInfo = true, responseHasSensitiveInfo = true)
 public class CreateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateAccountCmd.class.getName());

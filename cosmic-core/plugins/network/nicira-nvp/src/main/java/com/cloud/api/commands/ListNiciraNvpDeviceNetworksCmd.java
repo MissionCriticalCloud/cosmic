@@ -1,6 +1,7 @@
 package com.cloud.api.commands;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseListCmd;
@@ -26,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNiciraNvpDeviceNetworks", responseObject = NetworkResponse.class, description = "lists network that are using a nicira nvp device",
+@APICommand(name = "listNiciraNvpDeviceNetworks", group = APICommandGroup.NetworkService, responseObject = NetworkResponse.class, description = "lists network that are using a nicira nvp device",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNiciraNvpDeviceNetworksCmd extends BaseListCmd {
 

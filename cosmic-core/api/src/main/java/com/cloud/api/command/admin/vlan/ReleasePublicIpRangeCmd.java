@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vlan;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -13,7 +14,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releasePublicIpRange", description = "Releases a Public IP range back to the system pool", responseObject = SuccessResponse.class,
+@APICommand(name = "releasePublicIpRange", group = APICommandGroup.NetworkService, description = "Releases a Public IP range back to the system pool", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ReleasePublicIpRangeCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ReleasePublicIpRangeCmd.class.getName());

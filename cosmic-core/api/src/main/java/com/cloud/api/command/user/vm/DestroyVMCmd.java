@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -24,7 +25,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "destroyVirtualMachine", description = "Destroys a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "destroyVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Destroys a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = true)

@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiConstants.VMDetails;
@@ -31,7 +32,7 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateVmNicIp", description = "Update the default Ip of a VM Nic", responseObject = UserVmResponse.class)
+@APICommand(name = "updateVmNicIp", group = APICommandGroup.NicService, description = "Update the default Ip of a VM Nic", responseObject = UserVmResponse.class)
 public class UpdateVmNicIpCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddIpToVmNicCmd.class.getName());
     private static final String s_name = "updatevmnicipresponse";

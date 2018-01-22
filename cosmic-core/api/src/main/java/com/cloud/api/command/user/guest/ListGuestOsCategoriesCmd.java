@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.guest;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listOsCategories", description = "Lists all supported OS categories for this cloud.", responseObject = GuestOSCategoryResponse.class,
+@APICommand(name = "listOsCategories", group = APICommandGroup.GuestOSService, description = "Lists all supported OS categories for this cloud.", responseObject = GuestOSCategoryResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListGuestOsCategoriesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListIsosCmd.class.getName());

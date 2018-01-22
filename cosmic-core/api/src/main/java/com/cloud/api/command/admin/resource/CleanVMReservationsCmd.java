@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.ServerApiException;
@@ -12,7 +13,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "cleanVMReservations", description = "Cleanups VM reservations in the database.", responseObject = SuccessResponse.class,
+@APICommand(name = "cleanVMReservations", group = APICommandGroup.VirtualMachineService, description = "Cleanups VM reservations in the database.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CleanVMReservationsCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CleanVMReservationsCmd.class.getName());

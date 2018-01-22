@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.loadbalancer;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -21,7 +22,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteSslCert", description = "Delete a certificate to CloudStack", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteSslCert", group = APICommandGroup.LoadBalancerService, description = "Delete a certificate to CloudStack", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteSslCertCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteSslCertCmd.class.getName());

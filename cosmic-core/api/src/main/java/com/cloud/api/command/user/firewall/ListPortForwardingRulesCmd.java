@@ -2,6 +2,7 @@ package com.cloud.api.command.user.firewall;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listPortForwardingRules", description = "Lists all port forwarding rules for an IP address.", responseObject = FirewallRuleResponse.class, entityType =
+@APICommand(name = "listPortForwardingRules", group = APICommandGroup.FirewallService, description = "Lists all port forwarding rules for an IP address.", responseObject = FirewallRuleResponse.class, entityType =
         {PortForwardingRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListPortForwardingRulesCmd extends BaseListTaggedResourcesCmd {

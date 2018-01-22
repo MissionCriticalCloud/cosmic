@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.usage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -15,7 +16,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteTrafficType", description = "Deletes traffic type of a physical network", responseObject = SuccessResponse.class, since = "3.0.0",
+@APICommand(name = "deleteTrafficType", group = APICommandGroup.UsageService, description = "Deletes traffic type of a physical network", responseObject = SuccessResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteTrafficTypeCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteTrafficTypeCmd.class.getName());

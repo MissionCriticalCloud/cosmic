@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "copyTemplate", description = "Copies a template from one zone to another.", responseObject = TemplateResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "copyTemplate", group = APICommandGroup.TemplateService, description = "Copies a template from one zone to another.", responseObject = TemplateResponse.class, responseView = ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CopyTemplateCmdByAdmin extends CopyTemplateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CopyTemplateCmdByAdmin.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.volume;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -11,7 +12,7 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.storage.Volume;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
-@APICommand(name = "resizeVolume", description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "resizeVolume", group = APICommandGroup.VolumeService, description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ResizeVolumeCmdByAdmin extends ResizeVolumeCmd {
 

@@ -2,6 +2,7 @@ package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -21,7 +22,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createRemoteAccessVpn", description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn
+@APICommand(name = "createRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn
         .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {

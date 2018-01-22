@@ -2,6 +2,7 @@ package com.cloud.api.commands;
 
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseListCmd;
@@ -23,7 +24,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDedicatedHosts", description = "Lists dedicated hosts.", responseObject = DedicateHostResponse.class,
+@APICommand(name = "listDedicatedHosts", group = APICommandGroup.HostService, description = "Lists dedicated hosts.", responseObject = DedicateHostResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDedicatedHostsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDedicatedHostsCmd.class.getName());

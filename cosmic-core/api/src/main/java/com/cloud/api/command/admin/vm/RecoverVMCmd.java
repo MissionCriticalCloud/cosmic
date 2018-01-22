@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -16,7 +17,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "recoverVirtualMachine", description = "Recovers a virtual machine.", responseObject = UserVmResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "recoverVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Recovers a virtual machine.", responseObject = UserVmResponse.class, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RecoverVMCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RecoverVMCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.offering;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createDiskOffering", description = "Creates a disk offering.", responseObject = DiskOfferingResponse.class,
+@APICommand(name = "createDiskOffering", group = APICommandGroup.DiskOfferingService, description = "Creates a disk offering.", responseObject = DiskOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateDiskOfferingCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateDiskOfferingCmd.class.getName());

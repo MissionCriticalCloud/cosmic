@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.affinitygroup;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
@@ -19,7 +20,7 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateVMAffinityGroup", description = "Updates the affinity/anti-affinity group associations of a virtual machine. The VM has to be stopped and restarted for" +
+@APICommand(name = "updateVMAffinityGroup", group = APICommandGroup.AffinityGroupService, description = "Updates the affinity/anti-affinity group associations of a virtual machine. The VM has to be stopped and restarted for" +
         " the "
         + "new properties to take effect.", responseObject = UserVmResponse.class, responseView = ResponseView.Full,
         entityType = {VirtualMachine.class},

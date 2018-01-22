@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.zone;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -17,7 +18,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "markDefaultZoneForAccount", description = "Marks a default zone for this account", responseObject = AccountResponse.class, since = "4.0",
+@APICommand(name = "markDefaultZoneForAccount", group = APICommandGroup.AccountService, description = "Marks a default zone for this account", responseObject = AccountResponse.class, since = "4.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class MarkDefaultZoneForAccountCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(MarkDefaultZoneForAccountCmd.class.getName());

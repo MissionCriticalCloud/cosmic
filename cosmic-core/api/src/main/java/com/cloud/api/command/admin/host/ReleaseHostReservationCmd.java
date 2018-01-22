@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseHostReservation", description = "Releases host reservation.", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseHostReservation", group = APICommandGroup.HostService, description = "Releases host reservation.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ReleaseHostReservationCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ReleaseHostReservationCmd.class.getName());

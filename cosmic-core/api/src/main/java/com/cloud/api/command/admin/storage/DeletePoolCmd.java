@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.storage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteStoragePool", description = "Deletes a storage pool.", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteStoragePool", group = APICommandGroup.StoragePoolService, description = "Deletes a storage pool.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeletePoolCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeletePoolCmd.class.getName());

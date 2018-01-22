@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.user;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -16,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createUser", description = "Creates a user for an account that already exists", responseObject = UserResponse.class,
+@APICommand(name = "createUser", group = APICommandGroup.UserService, description = "Creates a user for an account that already exists", responseObject = UserResponse.class,
         requestHasSensitiveInfo = true, responseHasSensitiveInfo = true)
 public class CreateUserCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateUserCmd.class.getName());

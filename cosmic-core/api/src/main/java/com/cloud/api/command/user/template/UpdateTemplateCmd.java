@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseUpdateTemplateOrIsoCmd;
 import com.cloud.api.ResponseObject.ResponseView;
@@ -12,7 +13,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateTemplate", description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "updateTemplate", group = APICommandGroup.TemplateService, description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateTemplateCmd extends BaseUpdateTemplateOrIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateTemplateCmd.class.getName());

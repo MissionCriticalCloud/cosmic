@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.loadbalancer;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -29,7 +30,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "assignToLoadBalancerRule",
+@APICommand(name = "assignToLoadBalancerRule", group = APICommandGroup.LoadBalancerService,
         description = "Assigns virtual machine or a list of virtual machines to a load balancer rule.",
         responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false,

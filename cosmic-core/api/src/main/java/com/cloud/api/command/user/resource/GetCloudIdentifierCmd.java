@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getCloudIdentifier", description = "Retrieves a cloud identifier.", responseObject = CloudIdentifierResponse.class,
+@APICommand(name = "getCloudIdentifier", group = APICommandGroup.SystemService, description = "Retrieves a cloud identifier.", responseObject = CloudIdentifierResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetCloudIdentifierCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetCloudIdentifierCmd.class.getName());

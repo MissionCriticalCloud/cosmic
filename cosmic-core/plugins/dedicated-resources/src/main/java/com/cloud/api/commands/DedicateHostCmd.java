@@ -1,6 +1,7 @@
 package com.cloud.api.commands;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -22,7 +23,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "dedicateHost", description = "Dedicates a host.", responseObject = DedicateHostResponse.class,
+@APICommand(name = "dedicateHost", group = APICommandGroup.HostService, description = "Dedicates a host.", responseObject = DedicateHostResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DedicateHostCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DedicateHostCmd.class.getName());

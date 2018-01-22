@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.pod;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -13,7 +14,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deletePod", description = "Deletes a Pod.", responseObject = SuccessResponse.class,
+@APICommand(name = "deletePod", group = APICommandGroup.PodService, description = "Deletes a Pod.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeletePodCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeletePodCmd.class.getName());

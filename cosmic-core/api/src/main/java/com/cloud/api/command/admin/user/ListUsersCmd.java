@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.user;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -13,7 +14,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listUsers", description = "Lists user accounts", responseObject = UserResponse.class,
+@APICommand(name = "listUsers", group = APICommandGroup.UserService, description = "Lists user accounts", responseObject = UserResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ListUsersCmd extends BaseListAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListUsersCmd.class.getName());

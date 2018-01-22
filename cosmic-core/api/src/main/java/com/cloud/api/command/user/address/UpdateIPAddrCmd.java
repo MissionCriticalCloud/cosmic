@@ -2,6 +2,7 @@ package com.cloud.api.command.user.address;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCustomIdCmd;
 import com.cloud.api.Parameter;
@@ -22,7 +23,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateIpAddress", description = "Updates an IP address", responseObject = IPAddressResponse.class,
+@APICommand(name = "updateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Updates an IP address", responseObject = IPAddressResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = {IpAddress.class})
 public class UpdateIPAddrCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateIPAddrCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -15,7 +16,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteVpnGateway", description = "Delete site to site vpn gateway", responseObject = SuccessResponse.class, entityType = {Site2SiteVpnGateway.class},
+@APICommand(name = "deleteVpnGateway", group = APICommandGroup.VPNService, description = "Delete site to site vpn gateway", responseObject = SuccessResponse.class, entityType = {Site2SiteVpnGateway.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteVpnGatewayCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteVpnGatewayCmd.class.getName());

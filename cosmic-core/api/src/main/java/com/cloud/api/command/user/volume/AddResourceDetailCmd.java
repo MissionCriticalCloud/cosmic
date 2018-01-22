@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.volume;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addResourceDetail", description = "Adds detail for the Resource.", responseObject = SuccessResponse.class,
+@APICommand(name = "addResourceDetail", group = APICommandGroup.ResourcemetadataService, description = "Adds detail for the Resource.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AddResourceDetailCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddResourceDetailCmd.class.getName());

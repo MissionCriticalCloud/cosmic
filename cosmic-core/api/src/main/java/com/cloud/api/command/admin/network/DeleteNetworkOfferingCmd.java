@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -13,7 +14,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteNetworkOffering", description = "Deletes a network offering.", responseObject = SuccessResponse.class, since = "3.0.0",
+@APICommand(name = "deleteNetworkOffering", group = APICommandGroup.NetworkOfferingService, description = "Deletes a network offering.", responseObject = SuccessResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteNetworkOfferingCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteNetworkOfferingCmd.class.getName());

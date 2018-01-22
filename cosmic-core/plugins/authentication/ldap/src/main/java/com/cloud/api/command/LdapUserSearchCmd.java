@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.LdapUserResponse;
@@ -17,7 +18,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "searchLdap", responseObject = LdapUserResponse.class, description = "Searches LDAP based on the username attribute", since = "4.2.0",
+@APICommand(name = "searchLdap", group = APICommandGroup.AuthenticationService, responseObject = LdapUserResponse.class, description = "Searches LDAP based on the username attribute", since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LdapUserSearchCmd extends BaseListCmd {
 

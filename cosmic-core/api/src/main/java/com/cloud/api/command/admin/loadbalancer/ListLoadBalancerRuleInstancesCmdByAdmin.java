@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.loadbalancer;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.loadbalancer.ListLoadBalancerRuleInstancesCmd;
 import com.cloud.api.response.ListResponse;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLoadBalancerRuleInstances", description = "List all virtual machine instances that are assigned to a load balancer rule.", responseObject =
+@APICommand(name = "listLoadBalancerRuleInstances", group = APICommandGroup.LoadBalancerService, description = "List all virtual machine instances that are assigned to a load balancer rule.", responseObject =
         LoadBalancerRuleVmMapResponse.class, responseView = ResponseView.Full,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = true)

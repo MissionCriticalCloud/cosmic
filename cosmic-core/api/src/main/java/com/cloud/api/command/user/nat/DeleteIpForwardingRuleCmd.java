@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.nat;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -18,7 +19,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteIpForwardingRule", description = "Deletes an IP forwarding rule", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteIpForwardingRule", group = APICommandGroup.NATService, description = "Deletes an IP forwarding rule", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteIpForwardingRuleCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteIpForwardingRuleCmd.class.getName());

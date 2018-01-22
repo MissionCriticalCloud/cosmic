@@ -17,6 +17,7 @@
 package com.cloud.api.command.user.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.TemplatePermissionsResponse;
@@ -26,7 +27,7 @@ import com.cloud.template.VirtualMachineTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listIsoPermissions", description = "List ISO visibility and all accounts that have permissions to view this ISO.", responseObject =
+@APICommand(name = "listIsoPermissions", group = APICommandGroup.ISOService, description = "List ISO visibility and all accounts that have permissions to view this ISO.", responseObject =
         TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = false)

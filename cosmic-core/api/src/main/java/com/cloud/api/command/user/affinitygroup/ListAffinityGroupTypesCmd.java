@@ -2,6 +2,7 @@ package com.cloud.api.command.user.affinitygroup;
 
 import com.cloud.affinity.AffinityGroupTypeResponse;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.user.Account;
@@ -12,7 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listAffinityGroupTypes", description = "Lists affinity group types available", responseObject = AffinityGroupTypeResponse.class,
+@APICommand(name = "listAffinityGroupTypes", group = APICommandGroup.AffinityGroupService, description = "Lists affinity group types available", responseObject = AffinityGroupTypeResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListAffinityGroupTypesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListAffinityGroupTypesCmd.class.getName());

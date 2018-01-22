@@ -5,6 +5,7 @@ import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -21,7 +22,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteAffinityGroup", description = "Deletes affinity group", responseObject = SuccessResponse.class, entityType = {AffinityGroup.class},
+@APICommand(name = "deleteAffinityGroup", group = APICommandGroup.AffinityGroupService, description = "Deletes affinity group", responseObject = SuccessResponse.class, entityType = {AffinityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteAffinityGroupCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteAffinityGroupCmd.class.getName());

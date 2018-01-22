@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -19,7 +20,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "extractTemplate", description = "Extracts a template", responseObject = ExtractResponse.class,
+@APICommand(name = "extractTemplate", group = APICommandGroup.TemplateService, description = "Extracts a template", responseObject = ExtractResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ExtractTemplateCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ExtractTemplateCmd.class.getName());

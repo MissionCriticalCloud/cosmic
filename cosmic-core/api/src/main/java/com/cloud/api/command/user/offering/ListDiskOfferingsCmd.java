@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.offering;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListDomainResourcesCmd;
 import com.cloud.api.Parameter;
@@ -10,7 +11,7 @@ import com.cloud.api.response.ListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDiskOfferings", description = "Lists all available disk offerings.", responseObject = DiskOfferingResponse.class,
+@APICommand(name = "listDiskOfferings", group = APICommandGroup.DiskOfferingService, description = "Lists all available disk offerings.", responseObject = DiskOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDiskOfferingsCmd extends BaseListDomainResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDiskOfferingsCmd.class.getName());

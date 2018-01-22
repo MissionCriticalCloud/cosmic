@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vmsnapshot;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
 import com.cloud.api.Parameter;
@@ -12,7 +13,7 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-@APICommand(name = "listVMSnapshot", description = "List virtual machine snapshot by conditions", responseObject = VMSnapshotResponse.class, since = "4.2.0", entityType =
+@APICommand(name = "listVMSnapshot", group = APICommandGroup.SnapshotService, description = "List virtual machine snapshot by conditions", responseObject = VMSnapshotResponse.class, since = "4.2.0", entityType =
         {VMSnapshot.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVMSnapshotCmd extends BaseListTaggedResourcesCmd {

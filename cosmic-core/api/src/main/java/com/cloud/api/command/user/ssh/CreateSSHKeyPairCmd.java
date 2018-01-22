@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.ssh;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -13,7 +14,7 @@ import com.cloud.user.SSHKeyPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createSSHKeyPair", description = "Create a new keypair and returns the private key", responseObject = CreateSSHKeyPairResponse.class, entityType =
+@APICommand(name = "createSSHKeyPair", group = APICommandGroup.SSHService, description = "Create a new keypair and returns the private key", responseObject = CreateSSHKeyPairResponse.class, entityType =
         {SSHKeyPair.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class CreateSSHKeyPairCmd extends BaseCmd {

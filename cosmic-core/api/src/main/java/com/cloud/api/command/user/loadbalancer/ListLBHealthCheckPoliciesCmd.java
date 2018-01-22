@@ -2,6 +2,7 @@ package com.cloud.api.command.user.loadbalancer;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLBHealthCheckPolicies", description = "Lists load balancer health check policies.", responseObject = LBHealthCheckResponse.class, since = "4.2.0",
+@APICommand(name = "listLBHealthCheckPolicies", group = APICommandGroup.LoadBalancerService, description = "Lists load balancer health check policies.", responseObject = LBHealthCheckResponse.class, since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListLBHealthCheckPoliciesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListLBHealthCheckPoliciesCmd.class.getName());

@@ -2,6 +2,7 @@ package com.cloud.api.command.user.loadbalancer;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCreateCmd;
@@ -21,7 +22,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createLBHealthCheckPolicy",
+@APICommand(name = "createLBHealthCheckPolicy", group = APICommandGroup.LoadBalancerService,
         description = "Creates a load balancer health check policy",
         responseObject = LBHealthCheckResponse.class,
         since = "4.2.0",

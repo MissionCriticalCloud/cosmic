@@ -3,6 +3,7 @@ package com.cloud.api.command.user.securitygroup;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -29,7 +30,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "authorizeSecurityGroupIngress", responseObject = SecurityGroupRuleResponse.class, description = "Authorizes a particular ingress rule for this security " +
+@APICommand(name = "authorizeSecurityGroupIngress", group = APICommandGroup.SecurityGroupService, responseObject = SecurityGroupRuleResponse.class, description = "Authorizes a particular ingress rule for this security " +
         "group", entityType = {SecurityGroup.class},
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = false)

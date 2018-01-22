@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vlan;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -24,7 +25,7 @@ import com.cloud.utils.net.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVlanIpRange", description = "Creates a VLAN IP range.", responseObject = VlanIpRangeResponse.class,
+@APICommand(name = "createVlanIpRange", group = APICommandGroup.VLANService, description = "Creates a VLAN IP range.", responseObject = VlanIpRangeResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVlanIpRangeCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateVlanIpRangeCmd.class.getName());

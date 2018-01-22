@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.zone;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -18,7 +19,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateZone", description = "Updates a Zone.", responseObject = ZoneResponse.class,
+@APICommand(name = "updateZone", group = APICommandGroup.ZoneService, description = "Updates a Zone.", responseObject = ZoneResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateZoneCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateZoneCmd.class.getName());

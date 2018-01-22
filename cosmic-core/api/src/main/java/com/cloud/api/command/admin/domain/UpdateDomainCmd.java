@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.domain;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateDomain", description = "Updates a domain with a new name", responseObject = DomainResponse.class,
+@APICommand(name = "updateDomain", group = APICommandGroup.DomainService, description = "Updates a domain with a new name", responseObject = DomainResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateDomainCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateDomainCmd.class.getName());

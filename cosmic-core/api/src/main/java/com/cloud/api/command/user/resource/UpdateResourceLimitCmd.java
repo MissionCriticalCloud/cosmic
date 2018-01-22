@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.context.CallContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateResourceLimit", description = "Updates resource limits for an account or domain.", responseObject = ResourceLimitResponse.class,
+@APICommand(name = "updateResourceLimit", group = APICommandGroup.LimitService, description = "Updates resource limits for an account or domain.", responseObject = ResourceLimitResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateResourceLimitCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateResourceLimitCmd.class.getName());

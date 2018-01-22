@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vmgroup;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.vm.InstanceGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createInstanceGroup", description = "Creates a vm group", responseObject = InstanceGroupResponse.class, entityType = {InstanceGroup.class},
+@APICommand(name = "createInstanceGroup", group = APICommandGroup.VMGroupService, description = "Creates a vm group", responseObject = InstanceGroupResponse.class, entityType = {InstanceGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVMGroupCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateVMGroupCmd.class.getName());

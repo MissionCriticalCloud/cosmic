@@ -3,6 +3,7 @@ package com.cloud.api.command.user.affinitygroup;
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
@@ -13,7 +14,7 @@ import com.cloud.api.response.UserVmResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listAffinityGroups", description = "Lists affinity groups", responseObject = AffinityGroupResponse.class, entityType = {AffinityGroup.class},
+@APICommand(name = "listAffinityGroups", group = APICommandGroup.AffinityGroupService, description = "Lists affinity groups", responseObject = AffinityGroupResponse.class, entityType = {AffinityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListAffinityGroupsCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListAffinityGroupsCmd.class.getName());

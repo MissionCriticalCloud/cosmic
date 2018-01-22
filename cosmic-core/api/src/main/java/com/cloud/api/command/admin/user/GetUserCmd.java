@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.user;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -12,7 +13,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getUser", description = "Find user account by API key", responseObject = UserResponse.class,
+@APICommand(name = "getUser", group = APICommandGroup.UserService, description = "Find user account by API key", responseObject = UserResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class GetUserCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUserCmd.class.getName());

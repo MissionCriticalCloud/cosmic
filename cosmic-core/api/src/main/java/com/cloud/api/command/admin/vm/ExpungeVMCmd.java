@@ -3,6 +3,7 @@ package com.cloud.api.command.admin.vm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -24,7 +25,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "expungeVirtualMachine", description = "Expunge a virtual machine. Once expunged, it cannot be recoverd.", responseObject = SuccessResponse.class, entityType
+@APICommand(name = "expungeVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Expunge a virtual machine. Once expunged, it cannot be recoverd.", responseObject = SuccessResponse.class, entityType
         = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ExpungeVMCmd extends BaseAsyncCmd {

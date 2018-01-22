@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.snapshot;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -25,7 +26,7 @@ import com.cloud.vm.snapshot.VMSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createSnapshotFromVMSnapshot", description = "Creates an instant snapshot of a volume from existing vm snapshot.", responseObject = SnapshotResponse.class,
+@APICommand(name = "createSnapshotFromVMSnapshot", group = APICommandGroup.SnapshotService, description = "Creates an instant snapshot of a volume from existing vm snapshot.", responseObject = SnapshotResponse.class,
         entityType = {Snapshot.class}, requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateSnapshotFromVMSnapshotCmd extends BaseAsyncCreateCmd {
 

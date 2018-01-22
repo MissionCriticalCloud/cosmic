@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomainLdapLink", description = "list link of domain to group or OU in ldap", responseObject = LinkDomainToLdapResponse.class, since = "5.3.6",
+@APICommand(name = "listDomainLdapLink", group = APICommandGroup.AuthenticationService, description = "list link of domain to group or OU in ldap", responseObject = LinkDomainToLdapResponse.class, since = "5.3.6",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainLdapLinkCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDomainLdapLinkCmd.class.getName());

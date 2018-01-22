@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.user;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -12,7 +13,7 @@ import com.cloud.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerUserKeys",
+@APICommand(name = "registerUserKeys", group = APICommandGroup.UserService,
         responseObject = RegisterResponse.class,
         description = "This command allows a user to register for the developer API, returning a secret key and an API key. This request is made through the integration API " +
                 "port, so it is a privileged command and must be made on behalf of a user. It is up to the implementer just how the username and password are entered, and then " +

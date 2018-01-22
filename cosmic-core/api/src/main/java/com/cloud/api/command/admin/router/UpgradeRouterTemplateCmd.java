@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.router;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -26,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "upgradeRouterTemplate", description = "Upgrades router to use newer template", responseObject = BaseResponse.class,
+@APICommand(name = "upgradeRouterTemplate", group = APICommandGroup.TemplateService, description = "Upgrades router to use newer template", responseObject = BaseResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpgradeRouterTemplateCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeRouterTemplateCmd.class.getName());

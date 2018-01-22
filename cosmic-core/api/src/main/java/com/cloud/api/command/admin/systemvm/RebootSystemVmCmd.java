@@ -3,6 +3,7 @@ package com.cloud.api.command.admin.systemvm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -18,7 +19,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "rebootSystemVm", description = "Reboots a system VM.", responseObject = SystemVmResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "rebootSystemVm", group = APICommandGroup.SystemVMService, description = "Reboots a system VM.", responseObject = SystemVmResponse.class, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RebootSystemVmCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RebootSystemVmCmd.class.getName());

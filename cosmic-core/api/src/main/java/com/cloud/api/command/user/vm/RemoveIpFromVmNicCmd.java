@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -21,7 +22,7 @@ import com.cloud.vm.NicSecondaryIp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeIpFromNic", description = "Removes secondary IP from the NIC.", responseObject = SuccessResponse.class,
+@APICommand(name = "removeIpFromNic", group = APICommandGroup.NicService, description = "Removes secondary IP from the NIC.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RemoveIpFromVmNicCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RemoveIpFromVmNicCmd.class.getName());

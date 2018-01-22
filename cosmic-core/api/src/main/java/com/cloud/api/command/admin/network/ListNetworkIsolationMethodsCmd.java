@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.ListResponse;
@@ -9,7 +10,7 @@ import com.cloud.network.Networks;
 import java.util.ArrayList;
 import java.util.List;
 
-@APICommand(name = "listNetworkIsolationMethods",
+@APICommand(name = "listNetworkIsolationMethods", group = APICommandGroup.NetworkService,
         description = "Lists supported methods of network isolation",
         responseObject = IsolationMethodResponse.class,
         since = "4.2.0",

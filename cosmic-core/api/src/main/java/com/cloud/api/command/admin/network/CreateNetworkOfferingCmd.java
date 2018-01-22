@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -25,7 +26,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createNetworkOffering", description = "Creates a network offering.", responseObject = NetworkOfferingResponse.class, since = "3.0.0",
+@APICommand(name = "createNetworkOffering", group = APICommandGroup.NetworkOfferingService, description = "Creates a network offering.", responseObject = NetworkOfferingResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateNetworkOfferingCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkOfferingCmd.class.getName());

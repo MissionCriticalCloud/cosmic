@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.project;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listProjects",
+@APICommand(name = "listProjects", group = APICommandGroup.ProjectService,
         description = "Lists projects and provides detailed information for listed projects",
         responseObject = ProjectResponse.class,
         since = "3.0.0",

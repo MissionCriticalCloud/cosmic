@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addSecondaryStorage", description = "Adds secondary storage.", responseObject = ImageStoreResponse.class,
+@APICommand(name = "addSecondaryStorage", group = APICommandGroup.HostService, description = "Adds secondary storage.", responseObject = ImageStoreResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AddSecondaryStorageCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddSecondaryStorageCmd.class.getName());

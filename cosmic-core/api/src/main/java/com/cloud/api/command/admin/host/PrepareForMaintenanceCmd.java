@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "prepareHostForMaintenance", description = "Prepares a host for maintenance.", responseObject = HostResponse.class,
+@APICommand(name = "prepareHostForMaintenance", group = APICommandGroup.HostService, description = "Prepares a host for maintenance.", responseObject = HostResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class PrepareForMaintenanceCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(PrepareForMaintenanceCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.project;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -15,7 +16,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteProjectInvitation", description = "Deletes project invitation", responseObject = SuccessResponse.class, since = "3.0.0",
+@APICommand(name = "deleteProjectInvitation", group = APICommandGroup.ProjectService, description = "Deletes project invitation", responseObject = SuccessResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteProjectInvitationCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteProjectInvitationCmd.class.getName());

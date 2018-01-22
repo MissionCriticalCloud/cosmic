@@ -2,6 +2,7 @@ package com.cloud.api.command.admin.volume;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
@@ -14,7 +15,7 @@ import com.cloud.storage.Volume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVolumes", description = "Lists all volumes.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "listVolumes", group = APICommandGroup.VolumeService, description = "Lists all volumes.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVolumesCmdByAdmin extends ListVolumesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVolumesCmdByAdmin.class.getName());
