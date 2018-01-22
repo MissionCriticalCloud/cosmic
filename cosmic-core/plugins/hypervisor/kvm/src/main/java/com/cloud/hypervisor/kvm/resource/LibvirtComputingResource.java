@@ -1674,7 +1674,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
         } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
-                clock.setTimer("kvmclock", null, null, isKvmclockDisabled());
+                clock.addTimer("kvmclock", null, null, isKvmclockDisabled());
             }
         }
 
