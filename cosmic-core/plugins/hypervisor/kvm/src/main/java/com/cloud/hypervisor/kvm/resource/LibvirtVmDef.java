@@ -369,10 +369,55 @@ public class LibvirtVmDef {
 
     public static class ClockDef {
         private ClockOffset offset;
-        private String timerName;
-        private String tickPolicy;
-        private String track;
-        private boolean noKvmClock;
+        private List<Timer> timers = new ArrayList<>();
+
+        public static class Timer {
+            private String name;
+            private String tickPolicy;
+            private String track;
+            private boolean noKvmClock;
+
+            public Timer() {
+            }
+
+            private Timer(final String name, final String tickPolicy, final String track, final boolean noKvmClock) {
+                this.name = name;
+                this.tickPolicy = tickPolicy;
+                this.track = track;
+                this.noKvmClock = noKvmClock;
+            }
+
+            @Override
+            public String toString() {
+                final StringBuilder timerBuilder = new StringBuilder();
+                if (name != null) {
+                    timerBuilder.append("<timer name='");
+                    timerBuilder.append(name);
+                    timerBuilder.append("' ");
+
+                    if (name.equals("kvmclock") && noKvmClock) {
+                        timerBuilder.append("present='no' />");
+                    } else {
+                        if (tickPolicy != null) {
+                            timerBuilder.append("tickpolicy='");
+                            timerBuilder.append(tickPolicy);
+                            timerBuilder.append("' ");
+                        }
+
+                        if (track != null) {
+                            timerBuilder.append("track='");
+                            timerBuilder.append(track);
+                            timerBuilder.append("' ");
+                        }
+
+                        timerBuilder.append(">\n");
+                        timerBuilder.append("</timer>\n");
+                    }
+                }
+
+                return timerBuilder.toString();
+            }
+        }
 
         public ClockDef() {
             offset = ClockOffset.UTC;
@@ -382,15 +427,12 @@ public class LibvirtVmDef {
             this.offset = offset;
         }
 
-        public void setTimer(final String timerName, final String tickPolicy, final String track, final boolean noKvmClock) {
-            this.noKvmClock = noKvmClock;
-            setTimer(timerName, tickPolicy, track);
+        public void addTimer(final String timerName, final String tickPolicy, final String track, final boolean noKvmClock) {
+            timers.add(new Timer(timerName, tickPolicy, track, noKvmClock));
         }
 
-        public void setTimer(final String timerName, final String tickPolicy, final String track) {
-            this.timerName = timerName;
-            this.tickPolicy = tickPolicy;
-            this.track = track;
+        public void addTimer(final String timerName, final String tickPolicy, final String track) {
+            timers.add(new Timer(timerName, tickPolicy, track, false));
         }
 
         public enum ClockOffset {
@@ -398,7 +440,7 @@ public class LibvirtVmDef {
 
             private final String offset;
 
-            private ClockOffset(final String offset) {
+            ClockOffset(final String offset) {
                 this.offset = offset;
             }
 
@@ -414,30 +456,7 @@ public class LibvirtVmDef {
             clockBuilder.append("<clock offset='");
             clockBuilder.append(offset.toString());
             clockBuilder.append("'>\n");
-            if (timerName != null) {
-                clockBuilder.append("<timer name='");
-                clockBuilder.append(timerName);
-                clockBuilder.append("' ");
-
-                if (timerName.equals("kvmclock") && noKvmClock) {
-                    clockBuilder.append("present='no' />");
-                } else {
-                    if (tickPolicy != null) {
-                        clockBuilder.append("tickpolicy='");
-                        clockBuilder.append(tickPolicy);
-                        clockBuilder.append("' ");
-                    }
-
-                    if (track != null) {
-                        clockBuilder.append("track='");
-                        clockBuilder.append(track);
-                        clockBuilder.append("' ");
-                    }
-
-                    clockBuilder.append(">\n");
-                    clockBuilder.append("</timer>\n");
-                }
-            }
+            timers.forEach(timer -> clockBuilder.append(timer.toString()));
             clockBuilder.append("</clock>\n");
             return clockBuilder.toString();
         }
