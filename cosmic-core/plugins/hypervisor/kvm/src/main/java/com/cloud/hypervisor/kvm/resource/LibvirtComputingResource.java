@@ -54,6 +54,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.FeaturesDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GraphicDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GuestDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.GuestResourceDef;
+import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.HyperVEnlightenmentFeatureDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InputDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef.GuestNetType;
@@ -1478,9 +1479,17 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         final FeaturesDef features = new FeaturesDef();
-        features.addFeatures("pae");
-        features.addFeatures("apic");
-        features.addFeatures("acpi");
+        features.addFeature("pae");
+        features.addFeature("apic");
+        features.addFeature("acpi");
+
+        final HyperVEnlightenmentFeatureDef hyperVFeatures = new HyperVEnlightenmentFeatureDef();
+        hyperVFeatures.addFeature("relaxed", true);
+        hyperVFeatures.addFeature("vapic", true);
+        hyperVFeatures.addFeature("spinlocks", true);
+        hyperVFeatures.setRetries(8191);
+        features.addHyperVFeature(hyperVFeatures);
+
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
@@ -1494,13 +1503,15 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
         } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
-                clock.addTimer("kvmclock", null, null, isKvmclockDisabled());
+                clock.addTimer("kvmclock", null, !isKvmClockDisabled());
             }
         }
 
         // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
-        clock.addTimer("rtc", "catchup", null);
-        clock.addTimer("pit", "delay", null);
+        clock.addTimer("rtc", "catchup");
+        clock.addTimer("pit", "delay");
+        clock.addTimer("hpet", null, false);
+        clock.addTimer("hypervclock", null, true);
 
         vm.addComponent(clock);
 
@@ -1553,8 +1564,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return vm;
     }
 
-    private boolean isKvmclockDisabled() {
-        return libvirtComputingResourceProperties.isKvmclockDisable();
+    private boolean isKvmClockDisabled() {
+        return libvirtComputingResourceProperties.isKvmClockDisable();
     }
 
     private String getGuestCpuModel() {

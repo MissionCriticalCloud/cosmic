@@ -107,7 +107,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private String hypervisorUri;
     private String instance;
     private String kvmScriptsDir;
-    private boolean kvmclockDisable;
+    private boolean kvmClockDisable;
     private String localStoragePath = DEFAULT_LOCAL_STORAGE_PATH;
     private String localStorageUuid;
     private String mountPath = DEFAULT_MOUNT_PATH;
@@ -156,7 +156,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         hypervisorUri = parse(properties, PROPERTY_KEY_HYPERVISOR_URI, hypervisorUri);
         instance = parse(properties, PROPERTY_KEY_INSTANCE, instance);
         kvmScriptsDir = parse(properties, PROPERTY_KEY_KVM_SCRIPTS_DIR, kvmScriptsDir);
-        kvmclockDisable = parse(properties, PROPERTY_KEY_KVMCLOCK_DISABLE, kvmclockDisable);
+        kvmClockDisable = parse(properties, PROPERTY_KEY_KVMCLOCK_DISABLE, kvmClockDisable);
         localStoragePath = parse(properties, PROPERTY_KEY_LOCAL_STORAGE_PATH, localStoragePath);
         localStorageUuid = parse(properties, PROPERTY_KEY_LOCAL_STORAGE_UUID, localStorageUuid);
         mountPath = parse(properties, PROPERTY_KEY_MOUNT_PATH, mountPath);
@@ -221,7 +221,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_URI, hypervisorUri);
         propertiesMap.put(PROPERTY_KEY_INSTANCE, instance);
         propertiesMap.put(PROPERTY_KEY_KVM_SCRIPTS_DIR, kvmScriptsDir);
-        propertiesMap.put(PROPERTY_KEY_KVMCLOCK_DISABLE, kvmclockDisable);
+        propertiesMap.put(PROPERTY_KEY_KVMCLOCK_DISABLE, kvmClockDisable);
         propertiesMap.put(PROPERTY_KEY_LOCAL_STORAGE_PATH, localStoragePath);
         propertiesMap.put(PROPERTY_KEY_LOCAL_STORAGE_UUID, localStorageUuid);
         propertiesMap.put(PROPERTY_KEY_MOUNT_PATH, mountPath);
@@ -296,8 +296,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return hypervisorUri;
     }
 
-    public boolean isKvmclockDisable() {
-        return kvmclockDisable;
+    public boolean isKvmClockDisable() {
+        return kvmClockDisable;
     }
 
     public String getLocalStoragePath() {
