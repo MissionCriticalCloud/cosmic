@@ -2,38 +2,38 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
     <name>Cosmic Plugin - Hypervisor KVM</name>
-    <version>5.3.10.3-SNAPSHOT</version>
+    <version>5.3.10.3</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>5.3.10.3-SNAPSHOT</version>
+        <version>5.3.10.3</version>
         <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>5.3.10.3-SNAPSHOT</version>
+            <version>5.3.10.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>5.3.10.3-SNAPSHOT</version>
+            <version>5.3.10.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>5.3.10.3-SNAPSHOT</version>
+            <version>5.3.10.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>5.3.10.3-SNAPSHOT</version>
+            <version>5.3.10.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>5.3.10.3-SNAPSHOT</version>
+            <version>5.3.10.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
