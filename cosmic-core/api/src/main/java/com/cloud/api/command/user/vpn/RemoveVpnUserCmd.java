@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -17,7 +18,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeVpnUser", description = "Removes vpn user", responseObject = SuccessResponse.class, entityType = {VpnUser.class},
+@APICommand(name = "removeVpnUser", group = APICommandGroup.VPNService, description = "Removes vpn user", responseObject = SuccessResponse.class, entityType = {VpnUser.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RemoveVpnUserCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RemoveVpnUserCmd.class.getName());

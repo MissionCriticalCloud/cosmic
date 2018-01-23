@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.response.LDAPConfigResponse;
 import com.cloud.api.response.LDAPRemoveResponse;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @deprecated as of 4.3 use the new api {@link LdapDeleteConfigurationCmd}
  */
 @Deprecated
-@APICommand(name = "ldapRemove", description = "Remove the LDAP context for this site.", responseObject = LDAPConfigResponse.class, since = "3.0.1",
+@APICommand(name = "ldapRemove", group = APICommandGroup.AuthenticationService, description = "Remove the LDAP context for this site.", responseObject = LDAPConfigResponse.class, since = "3.0.1",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LDAPRemoveCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LDAPRemoveCmd.class.getName());

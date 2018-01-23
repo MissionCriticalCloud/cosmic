@@ -2,6 +2,7 @@ package com.cloud.api.command.user.volume;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -27,7 +28,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVolume", responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a" +
+@APICommand(name = "createVolume", group = APICommandGroup.VolumeService, responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a" +
         " virtual machine to make use of it.", responseView = ResponseView.Restricted, entityType = {
         Volume.class, VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

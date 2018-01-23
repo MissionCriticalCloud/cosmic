@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.job;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -9,7 +10,7 @@ import com.cloud.api.response.ListResponse;
 
 import java.util.Date;
 
-@APICommand(name = "listAsyncJobs", description = "Lists all pending asynchronous jobs for the account.", responseObject = AsyncJobResponse.class,
+@APICommand(name = "listAsyncJobs", group = APICommandGroup.AsyncjobService, description = "Lists all pending asynchronous jobs for the account.", responseObject = AsyncJobResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListAsyncJobsCmd extends BaseListAccountResourcesCmd {
     private static final String s_name = "listasyncjobsresponse";

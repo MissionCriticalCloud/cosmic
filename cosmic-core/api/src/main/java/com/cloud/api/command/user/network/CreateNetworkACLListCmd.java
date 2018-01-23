@@ -2,6 +2,7 @@ package com.cloud.api.command.user.network;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCreateCmd;
@@ -19,7 +20,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createNetworkACLList", description = "Creates a network ACL for the given VPC", responseObject = NetworkACLResponse.class,
+@APICommand(name = "createNetworkACLList", group = APICommandGroup.NetworkACLService, description = "Creates a network ACL for the given VPC", responseObject = NetworkACLResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateNetworkACLListCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkACLListCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCreateCmd;
@@ -23,7 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVPCOffering", description = "Creates VPC offering", responseObject = VpcOfferingResponse.class,
+@APICommand(name = "createVPCOffering", group = APICommandGroup.VPCService, description = "Creates VPC offering", responseObject = VpcOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVPCOfferingCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateVPCOfferingCmd.class.getName());

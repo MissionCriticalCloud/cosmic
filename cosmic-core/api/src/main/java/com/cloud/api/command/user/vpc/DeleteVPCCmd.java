@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vpc;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -19,7 +20,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteVPC", description = "Deletes a VPC", responseObject = SuccessResponse.class, entityType = {Vpc.class},
+@APICommand(name = "deleteVPC", group = APICommandGroup.VPCService, description = "Deletes a VPC", responseObject = SuccessResponse.class, entityType = {Vpc.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteVPCCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteVPCCmd.class.getName());

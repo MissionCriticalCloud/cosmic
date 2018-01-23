@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -22,7 +23,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "resetPasswordForVirtualMachine", responseObject = UserVmResponse.class, description = "Resets the password for virtual machine. " +
+@APICommand(name = "resetPasswordForVirtualMachine", group = APICommandGroup.VirtualMachineService, responseObject = UserVmResponse.class, description = "Resets the password for virtual machine. " +
         "The virtual machine must be in a \"Stopped\" state and the template must already " +
         "support this feature for this command to take effect. [async]", responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)

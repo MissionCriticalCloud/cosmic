@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseDedicatedGuestVlanRange", description = "Releases a dedicated guest vlan range to the system", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseDedicatedGuestVlanRange", group = APICommandGroup.VLANService, description = "Releases a dedicated guest vlan range to the system", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ReleaseDedicatedGuestVlanRangeCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedGuestVlanRangeCmd.class.getName());

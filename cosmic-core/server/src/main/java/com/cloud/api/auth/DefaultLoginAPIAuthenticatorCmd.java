@@ -1,6 +1,7 @@
 package com.cloud.api.auth;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ApiServerService;
@@ -23,7 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "login", description = "Logs a user into the CloudStack. A successful login attempt will generate a JSESSIONID cookie value that can be passed in subsequent " +
+@APICommand(name = "login", group = APICommandGroup.AuthenticationService, description = "Logs a user into the CloudStack. A successful login attempt will generate a JSESSIONID cookie value that can be passed in subsequent " +
         "Query command calls until the \"logout\" command has been issued or the session has expired.", requestHasSensitiveInfo = true, responseObject = LoginCmdResponse.class,
         entityType = {})
 public class DefaultLoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthenticator {

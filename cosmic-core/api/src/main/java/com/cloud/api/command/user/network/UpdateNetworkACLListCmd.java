@@ -2,6 +2,7 @@ package com.cloud.api.command.user.network;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCustomIdCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateNetworkACLList", description = "Updates network ACL list", responseObject = SuccessResponse.class, since = "4.4",
+@APICommand(name = "updateNetworkACLList", group = APICommandGroup.NetworkACLService, description = "Updates network ACL list", responseObject = SuccessResponse.class, since = "4.4",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateNetworkACLListCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateNetworkACLListCmd.class.getName());

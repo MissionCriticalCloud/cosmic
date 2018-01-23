@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.usage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listTrafficTypes", description = "Lists traffic types of a given physical network.", responseObject = ProviderResponse.class, since = "3.0.0",
+@APICommand(name = "listTrafficTypes", group = APICommandGroup.UsageService, description = "Lists traffic types of a given physical network.", responseObject = ProviderResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListTrafficTypesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListTrafficTypesCmd.class.getName());

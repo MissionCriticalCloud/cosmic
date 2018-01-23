@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "findHostsForMigration", description = "Find hosts suitable for migrating a virtual machine.", responseObject = HostForMigrationResponse.class,
+@APICommand(name = "findHostsForMigration", group = APICommandGroup.HostService, description = "Find hosts suitable for migrating a virtual machine.", responseObject = HostForMigrationResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class FindHostsForMigrationCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(FindHostsForMigrationCmd.class.getName());

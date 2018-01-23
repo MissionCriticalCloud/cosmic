@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vmgroup;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -16,7 +17,7 @@ import com.cloud.vm.InstanceGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteInstanceGroup", description = "Deletes a vm group", responseObject = SuccessResponse.class, entityType = {InstanceGroup.class},
+@APICommand(name = "deleteInstanceGroup", group = APICommandGroup.VMGroupService, description = "Deletes a vm group", responseObject = SuccessResponse.class, entityType = {InstanceGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteVMGroupCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteVMGroupCmd.class.getName());

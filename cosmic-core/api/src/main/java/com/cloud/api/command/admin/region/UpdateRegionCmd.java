@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.region;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -16,7 +17,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateRegion", description = "Updates a region", responseObject = RegionResponse.class,
+@APICommand(name = "updateRegion", group = APICommandGroup.RegionService, description = "Updates a region", responseObject = RegionResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateRegionCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateRegionCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.commands;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -22,7 +23,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "dedicatePod", description = "Dedicates a Pod.", responseObject = DedicatePodResponse.class,
+@APICommand(name = "dedicatePod", group = APICommandGroup.PodService, description = "Dedicates a Pod.", responseObject = DedicatePodResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DedicatePodCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DedicatePodCmd.class.getName());

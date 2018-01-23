@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.event;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.response.EventTypeResponse;
 import com.cloud.api.response.ListResponse;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listEventTypes", description = "List Event Types", responseObject = EventTypeResponse.class,
+@APICommand(name = "listEventTypes", group = APICommandGroup.EventService, description = "List Event Types", responseObject = EventTypeResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListEventTypesCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListEventTypesCmd.class.getName());

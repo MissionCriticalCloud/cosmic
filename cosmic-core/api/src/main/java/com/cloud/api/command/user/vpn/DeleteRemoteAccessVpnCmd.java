@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vpn;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -18,7 +19,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteRemoteAccessVpn", description = "Destroys a l2tp/ipsec remote access vpn", responseObject = SuccessResponse.class, entityType = {RemoteAccessVpn.class},
+@APICommand(name = "deleteRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Destroys a l2tp/ipsec remote access vpn", responseObject = SuccessResponse.class, entityType = {RemoteAccessVpn.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteRemoteAccessVpnCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteRemoteAccessVpnCmd.class.getName());

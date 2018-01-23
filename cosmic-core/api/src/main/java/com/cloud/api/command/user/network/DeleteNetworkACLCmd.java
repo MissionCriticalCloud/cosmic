@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteNetworkACL", description = "Deletes a network ACL", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteNetworkACL", group = APICommandGroup.NetworkACLService, description = "Deletes a network ACL", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteNetworkACLCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteNetworkACLCmd.class.getName());

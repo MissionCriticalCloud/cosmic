@@ -3,6 +3,7 @@ package com.cloud.api.command.user.network;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -22,7 +23,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "restartNetwork",
+@APICommand(name = "restartNetwork", group = APICommandGroup.NetworkService,
         description = "Restarts the network; includes 1) restarting network elements - virtual routers, DHCP servers 2) reapplying all public IPs 3) reapplying " +
                 "loadBalancing/portForwarding rules",
         responseObject = IPAddressResponse.class, entityType = {Network.class},

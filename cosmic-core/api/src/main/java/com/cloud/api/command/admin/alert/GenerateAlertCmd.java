@@ -3,6 +3,7 @@ package com.cloud.api.command.admin.alert;
 import com.cloud.alert.AlertService;
 import com.cloud.alert.AlertService.AlertType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -16,7 +17,7 @@ import com.cloud.event.EventTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "generateAlert", description = "Generates an alert", responseObject = SuccessResponse.class, since = "4.3",
+@APICommand(name = "generateAlert", group = APICommandGroup.AlertService, description = "Generates an alert", responseObject = SuccessResponse.class, since = "4.3",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GenerateAlertCmd extends BaseAsyncCmd {
 

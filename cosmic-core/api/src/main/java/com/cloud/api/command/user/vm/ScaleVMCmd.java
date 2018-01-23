@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -31,7 +32,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "scaleVirtualMachine", description = "Scales the virtual machine to a new service offering.", responseObject = SuccessResponse.class, responseView =
+@APICommand(name = "scaleVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Scales the virtual machine to a new service offering.", responseObject = SuccessResponse.class, responseView =
         ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ScaleVMCmd extends BaseAsyncCmd {

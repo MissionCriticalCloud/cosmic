@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import com.cloud.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createNetwork", description = "Creates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Full, entityType = {Network.class},
+@APICommand(name = "createNetwork", group = APICommandGroup.NetworkService, description = "Creates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Full, entityType = {Network.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateNetworkCmdByAdmin extends CreateNetworkCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkCmdByAdmin.class.getName());

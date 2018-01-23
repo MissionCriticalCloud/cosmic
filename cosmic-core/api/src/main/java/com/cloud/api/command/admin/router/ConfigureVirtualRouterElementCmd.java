@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.router;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -23,7 +24,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "configureVirtualRouterElement", responseObject = VirtualRouterProviderResponse.class, description = "Configures a virtual router element.",
+@APICommand(name = "configureVirtualRouterElement", group = APICommandGroup.RouterService, responseObject = VirtualRouterProviderResponse.class, description = "Configures a virtual router element.",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ConfigureVirtualRouterElementCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ConfigureVirtualRouterElementCmd.class.getName());

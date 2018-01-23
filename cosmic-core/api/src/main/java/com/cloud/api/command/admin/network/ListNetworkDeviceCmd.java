@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseListCmd;
@@ -25,7 +26,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNetworkDevice", description = "List network devices", responseObject = NetworkDeviceResponse.class,
+@APICommand(name = "listNetworkDevice", group = APICommandGroup.NetworkDeviceService, description = "List network devices", responseObject = NetworkDeviceResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNetworkDeviceCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListNetworkDeviceCmd.class);

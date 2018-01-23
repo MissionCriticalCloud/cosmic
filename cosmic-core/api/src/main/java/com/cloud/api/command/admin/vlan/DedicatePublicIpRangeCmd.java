@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vlan;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -17,7 +18,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "dedicatePublicIpRange", description = "Dedicates a Public IP range to an account", responseObject = VlanIpRangeResponse.class,
+@APICommand(name = "dedicatePublicIpRange", group = APICommandGroup.NetworkService, description = "Dedicates a Public IP range to an account", responseObject = VlanIpRangeResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DedicatePublicIpRangeCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DedicatePublicIpRangeCmd.class.getName());

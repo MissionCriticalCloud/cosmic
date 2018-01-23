@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vmgroup;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import com.cloud.vm.InstanceGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateInstanceGroup", description = "Updates a vm group", responseObject = InstanceGroupResponse.class, entityType = {InstanceGroup.class},
+@APICommand(name = "updateInstanceGroup", group = APICommandGroup.VMGroupService, description = "Updates a vm group", responseObject = InstanceGroupResponse.class, entityType = {InstanceGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateVMGroupCmd extends BaseCmd {
 

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.storage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -17,7 +18,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "cancelStorageMaintenance", description = "Cancels maintenance for primary storage", responseObject = StoragePoolResponse.class,
+@APICommand(name = "cancelStorageMaintenance", group = APICommandGroup.StoragePoolService, description = "Cancels maintenance for primary storage", responseObject = StoragePoolResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CancelPrimaryStorageMaintenanceCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CancelPrimaryStorageMaintenanceCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
@@ -21,7 +22,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLdapUsers", responseObject = LdapUserResponse.class, description = "Lists all LDAP Users", since = "4.2.0",
+@APICommand(name = "listLdapUsers", group = APICommandGroup.AuthenticationService, responseObject = LdapUserResponse.class, description = "Lists all LDAP Users", since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LdapListUsersCmd extends BaseListCmd {
 

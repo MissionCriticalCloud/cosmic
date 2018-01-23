@@ -2,6 +2,7 @@ package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -17,7 +18,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVpnConnections", description = "Lists site to site vpn connection gateways", responseObject = Site2SiteVpnConnectionResponse.class, entityType =
+@APICommand(name = "listVpnConnections", group = APICommandGroup.VPNService, description = "Lists site to site vpn connection gateways", responseObject = Site2SiteVpnConnectionResponse.class, entityType =
         {Site2SiteVpnConnection.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVpnConnectionsCmd extends BaseListProjectAndAccountResourcesCmd {

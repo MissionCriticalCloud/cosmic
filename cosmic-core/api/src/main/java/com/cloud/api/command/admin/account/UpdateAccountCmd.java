@@ -3,6 +3,7 @@ package com.cloud.api.command.admin.account;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -21,7 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateAccount", description = "Updates account information for the authenticated user", responseObject = AccountResponse.class, entityType = {Account.class},
+@APICommand(name = "updateAccount", group = APICommandGroup.AccountService, description = "Updates account information for the authenticated user", responseObject = AccountResponse.class, entityType = {Account.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class UpdateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateAccountCmd.class.getName());

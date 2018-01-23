@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -28,7 +29,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addIpToNic", description = "Assigns secondary IP to NIC", responseObject = NicSecondaryIpResponse.class,
+@APICommand(name = "addIpToNic", group = APICommandGroup.NicService, description = "Assigns secondary IP to NIC", responseObject = NicSecondaryIpResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AddIpToVmNicCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddIpToVmNicCmd.class.getName());

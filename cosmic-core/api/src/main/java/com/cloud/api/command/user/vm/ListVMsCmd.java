@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vm;
 import com.cloud.acl.RoleType;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiConstants.VMDetails;
@@ -32,7 +33,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVirtualMachines", description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class, responseView = ResponseView
+@APICommand(name = "listVirtualMachines", group = APICommandGroup.VirtualMachineService, description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class, responseView = ResponseView
         .Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ListVMsCmd extends BaseListTaggedResourcesCmd {

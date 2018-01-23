@@ -17,11 +17,12 @@
 package com.cloud.api.command.admin.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.template.ListTemplatePermissionsCmd;
 import com.cloud.api.response.TemplatePermissionsResponse;
 
-@APICommand(name = "listTemplatePermissions", description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
+@APICommand(name = "listTemplatePermissions", group = APICommandGroup.TemplateService, description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
         TemplatePermissionsResponse.class, responseView = ResponseView.Full,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = false)

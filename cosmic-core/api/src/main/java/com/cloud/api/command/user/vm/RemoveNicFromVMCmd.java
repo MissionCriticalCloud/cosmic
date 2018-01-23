@@ -3,6 +3,7 @@ package com.cloud.api.command.user.vm;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ApiErrorCode;
@@ -24,7 +25,7 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeNicFromVirtualMachine", description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView =
+@APICommand(name = "removeNicFromVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView =
         ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RemoveNicFromVMCmd extends BaseAsyncCmd {

@@ -17,6 +17,7 @@
 package com.cloud.api.command.user.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.TemplatePermissionsResponse;
@@ -26,7 +27,7 @@ import com.cloud.template.VirtualMachineTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listTemplatePermissions", description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
+@APICommand(name = "listTemplatePermissions", group = APICommandGroup.TemplateService, description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
         TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = false)

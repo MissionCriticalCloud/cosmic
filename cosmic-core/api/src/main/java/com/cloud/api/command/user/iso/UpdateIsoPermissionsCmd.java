@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.template.VirtualMachineTemplate;
@@ -9,7 +10,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateIsoPermissions", description = "Updates ISO permissions", responseObject = SuccessResponse.class,
+@APICommand(name = "updateIsoPermissions", group = APICommandGroup.ISOService, description = "Updates ISO permissions", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateIsoPermissionsCmd extends BaseUpdateTemplateOrIsoPermissionsCmd {
     @Override

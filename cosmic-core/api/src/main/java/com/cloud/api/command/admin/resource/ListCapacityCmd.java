@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listCapacity", description = "Lists all the system wide capacities.", responseObject = CapacityResponse.class,
+@APICommand(name = "listCapacity", group = APICommandGroup.SystemService, description = "Lists all the system wide capacities.", responseObject = CapacityResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListCapacityCmd extends BaseListCmd {
 

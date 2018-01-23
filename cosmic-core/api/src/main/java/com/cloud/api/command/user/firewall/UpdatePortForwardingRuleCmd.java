@@ -2,6 +2,7 @@ package com.cloud.api.command.user.firewall;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.BaseAsyncCustomIdCmd;
@@ -18,7 +19,7 @@ import com.cloud.utils.net.Ip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updatePortForwardingRule",
+@APICommand(name = "updatePortForwardingRule", group = APICommandGroup.FirewallService,
         responseObject = FirewallRuleResponse.class,
         description = "Updates a port forwarding rule. Only the private port and the virtual machine can be updated.", entityType = {PortForwardingRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

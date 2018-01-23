@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.storage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateStoragePool", description = "Updates a storage pool.", responseObject = StoragePoolResponse.class, since = "3.0.0",
+@APICommand(name = "updateStoragePool", group = APICommandGroup.StoragePoolService, description = "Updates a storage pool.", responseObject = StoragePoolResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateStoragePoolCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateStoragePoolCmd.class.getName());

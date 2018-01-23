@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.volume;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -9,7 +10,7 @@ import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.storage.Volume;
 
-@APICommand(name = "updateVolume", description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateVolumeCmdByAdmin extends UpdateVolumeCmd {
 

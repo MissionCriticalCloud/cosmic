@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.volume;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCmd;
@@ -12,7 +13,7 @@ import com.cloud.server.ResourceTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeResourceDetail", description = "Removes detail for the Resource.", responseObject = SuccessResponse.class,
+@APICommand(name = "removeResourceDetail", group = APICommandGroup.ResourcemetadataService, description = "Removes detail for the Resource.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RemoveResourceDetailCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RemoveResourceDetailCmd.class.getName());

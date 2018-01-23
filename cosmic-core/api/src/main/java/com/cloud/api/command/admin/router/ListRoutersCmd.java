@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.router;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
@@ -20,7 +21,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listRouters", description = "List routers.", responseObject = DomainRouterResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "listRouters", group = APICommandGroup.RouterService, description = "List routers.", responseObject = DomainRouterResponse.class, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListRoutersCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListRoutersCmd.class.getName());

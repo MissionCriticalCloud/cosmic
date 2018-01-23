@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -18,7 +19,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteTemplate",
+@APICommand(name = "deleteTemplate", group = APICommandGroup.TemplateService,
         responseObject = SuccessResponse.class,
         description = "Deletes a template from the system. All virtual machines using the deleted template will not be affected.",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

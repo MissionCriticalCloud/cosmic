@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.user;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -18,7 +19,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "enableUser", description = "Enables a user account", responseObject = UserResponse.class,
+@APICommand(name = "enableUser", group = APICommandGroup.UserService, description = "Enables a user account", responseObject = UserResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class EnableUserCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(EnableUserCmd.class.getName());

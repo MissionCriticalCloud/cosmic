@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -19,7 +20,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "replaceNetworkACLList", description = "Replaces ACL associated with a network or private gateway", responseObject = SuccessResponse.class,
+@APICommand(name = "replaceNetworkACLList", group = APICommandGroup.NetworkACLService, description = "Replaces ACL associated with a network or private gateway", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ReplaceNetworkACLListCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ReplaceNetworkACLListCmd.class.getName());

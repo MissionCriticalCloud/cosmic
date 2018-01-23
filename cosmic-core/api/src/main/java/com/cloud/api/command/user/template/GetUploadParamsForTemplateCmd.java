@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.AbstractGetUploadParamsCmd;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -18,7 +19,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getUploadParamsForTemplate", description = "upload an existing template into the CloudStack cloud. ", responseObject = GetUploadParamsResponse.class, since =
+@APICommand(name = "getUploadParamsForTemplate", group = APICommandGroup.TemplateService, description = "upload an existing template into the CloudStack cloud. ", responseObject = GetUploadParamsResponse.class, since =
         "4.6.0", requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUploadParamsForTemplateCmd.class.getName());

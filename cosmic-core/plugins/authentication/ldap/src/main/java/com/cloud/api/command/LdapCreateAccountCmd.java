@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -29,7 +30,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "ldapCreateAccount", description = "Creates an account from an LDAP user", responseObject = AccountResponse.class, since = "4.2.0", requestHasSensitiveInfo =
+@APICommand(name = "ldapCreateAccount", group = APICommandGroup.AuthenticationService, description = "Creates an account from an LDAP user", responseObject = AccountResponse.class, since = "4.2.0", requestHasSensitiveInfo =
         false, responseHasSensitiveInfo = false)
 public class LdapCreateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LdapCreateAccountCmd.class.getName());

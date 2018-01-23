@@ -95,6 +95,8 @@ public class ApiConstants {
     public static final String GATEWAY = "gateway";
     public static final String IP6_GATEWAY = "ip6gateway";
     public static final String GROUP = "group";
+    public static final String GROUP_NAME = "groupname";
+    public static final String GROUP_DESCRIPTION = "groupdescription";
     public static final String GROUP_ID = "groupid";
     public static final String GUEST_CIDR_ADDRESS = "guestcidraddress";
     public static final String GUEST_VLAN_RANGE = "guestvlanrange";

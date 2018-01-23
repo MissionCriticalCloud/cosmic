@@ -2,6 +2,7 @@ package com.cloud.api.command.user.firewall;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
 import com.cloud.api.Parameter;
@@ -19,7 +20,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listFirewallRules", description = "Lists all firewall rules for an IP address.", responseObject = FirewallResponse.class, entityType = {FirewallRule.class},
+@APICommand(name = "listFirewallRules", group = APICommandGroup.FirewallService, description = "Lists all firewall rules for an IP address.", responseObject = FirewallResponse.class, entityType = {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListFirewallRulesCmd extends BaseListTaggedResourcesCmd implements IListFirewallRulesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListFirewallRulesCmd.class.getName());

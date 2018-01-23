@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -16,7 +17,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "detachIso", description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class, responseView =
+@APICommand(name = "detachIso", group = APICommandGroup.ISOService, description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class, responseView =
         ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DetachIsoCmd extends BaseAsyncCmd {

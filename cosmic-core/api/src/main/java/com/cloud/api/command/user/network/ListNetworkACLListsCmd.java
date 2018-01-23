@@ -2,6 +2,7 @@ package com.cloud.api.command.user.network;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNetworkACLLists", description = "Lists all network ACLs", responseObject = NetworkACLResponse.class,
+@APICommand(name = "listNetworkACLLists", group = APICommandGroup.NetworkACLService, description = "Lists all network ACLs", responseObject = NetworkACLResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNetworkACLListsCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListNetworkACLListsCmd.class.getName());

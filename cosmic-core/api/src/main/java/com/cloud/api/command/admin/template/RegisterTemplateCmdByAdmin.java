@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.template;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerTemplate", description = "Registers an existing template into the CloudStack cloud.", responseObject = TemplateResponse.class, responseView =
+@APICommand(name = "registerTemplate", group = APICommandGroup.TemplateService, description = "Registers an existing template into the CloudStack cloud.", responseObject = TemplateResponse.class, responseView =
         ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterTemplateCmdByAdmin extends RegisterTemplateCmd {

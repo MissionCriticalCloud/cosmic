@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
@@ -17,7 +18,7 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addNicToVirtualMachine", description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class, responseView = ResponseView
+@APICommand(name = "addNicToVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class, responseView = ResponseView
         .Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class AddNicToVMCmdByAdmin extends AddNicToVMCmd {

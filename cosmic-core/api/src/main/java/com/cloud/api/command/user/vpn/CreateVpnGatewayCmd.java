@@ -2,6 +2,7 @@ package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -19,7 +20,7 @@ import com.cloud.network.vpc.Vpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVpnGateway", description = "Creates site to site vpn local gateway", responseObject = Site2SiteVpnGatewayResponse.class, entityType =
+@APICommand(name = "createVpnGateway", group = APICommandGroup.VPNService, description = "Creates site to site vpn local gateway", responseObject = Site2SiteVpnGatewayResponse.class, entityType =
         {Site2SiteVpnGateway.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVpnGatewayCmd extends BaseAsyncCreateCmd {

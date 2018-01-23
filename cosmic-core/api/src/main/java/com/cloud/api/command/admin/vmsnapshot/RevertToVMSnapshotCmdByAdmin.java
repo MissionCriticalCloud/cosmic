@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vmsnapshot;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -16,7 +17,7 @@ import com.cloud.uservm.UserVm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "revertToVMSnapshot", description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView = ResponseView.Full,
+@APICommand(name = "revertToVMSnapshot", group = APICommandGroup.SnapshotService, description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView = ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RevertToVMSnapshotCmdByAdmin extends RevertToVMSnapshotCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RevertToVMSnapshotCmdByAdmin.class.getName());

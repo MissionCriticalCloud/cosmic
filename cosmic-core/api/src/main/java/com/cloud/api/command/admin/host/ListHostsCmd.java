@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiConstants.HostDetails;
@@ -26,7 +27,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listHosts", description = "Lists hosts.", responseObject = HostResponse.class,
+@APICommand(name = "listHosts", group = APICommandGroup.HostService, description = "Lists hosts.", responseObject = HostResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListHostsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListHostsCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -12,7 +13,7 @@ import com.cloud.uservm.UserVm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "detachIso", description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class, responseView =
+@APICommand(name = "detachIso", group = APICommandGroup.ISOService, description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class, responseView =
         ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DetachIsoCmdByAdmin extends DetachIsoCmd {

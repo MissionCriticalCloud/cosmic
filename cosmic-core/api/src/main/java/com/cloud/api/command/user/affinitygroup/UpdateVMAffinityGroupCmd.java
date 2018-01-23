@@ -4,6 +4,7 @@ import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiConstants.VMDetails;
@@ -29,7 +30,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateVMAffinityGroup",
+@APICommand(name = "updateVMAffinityGroup", group = APICommandGroup.AffinityGroupService,
         description = "Updates the affinity/anti-affinity group associations of a virtual machine. The VM has to be stopped and restarted for the "
                 + "new properties to take effect.",
         responseObject = UserVmResponse.class,

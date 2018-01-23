@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.account;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -12,7 +13,7 @@ import com.cloud.utils.exception.CloudRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "lockAccount",
+@APICommand(name = "lockAccount", group = APICommandGroup.AccountService,
         description = "This deprecated function used to locks an account. Look for the API DisableAccount instead",
         responseObject = AccountResponse.class,
         entityType = {Account.class},

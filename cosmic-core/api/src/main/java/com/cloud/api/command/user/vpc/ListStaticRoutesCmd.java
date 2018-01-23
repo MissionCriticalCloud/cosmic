@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
 import com.cloud.api.Parameter;
@@ -15,7 +16,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import java.util.ArrayList;
 import java.util.List;
 
-@APICommand(name = "listStaticRoutes", description = "Lists all static routes", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
+@APICommand(name = "listStaticRoutes", group = APICommandGroup.VPCService, description = "Lists all static routes", responseObject = StaticRouteResponse.class, entityType = {StaticRoute.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
     private static final String s_name = "liststaticroutesresponse";

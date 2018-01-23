@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.guest;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listGuestOsMapping", description = "Lists all available OS mappings for given hypervisor", responseObject = GuestOsMappingResponse.class,
+@APICommand(name = "listGuestOsMapping", group = APICommandGroup.GuestOSService, description = "Lists all available OS mappings for given hypervisor", responseObject = GuestOsMappingResponse.class,
         since = "4.4.0", requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListGuestOsMappingCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListGuestOsMappingCmd.class.getName());

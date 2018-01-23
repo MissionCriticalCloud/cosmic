@@ -2,6 +2,7 @@ package com.cloud.api.command.user.network;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCreateCmd;
@@ -25,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createNetworkACL",
+@APICommand(name = "createNetworkACL", group = APICommandGroup.NetworkACLService,
         description = "Creates a ACL rule in the given network (the network has to belong to VPC)",
         responseObject = NetworkACLItemResponse.class,
         requestHasSensitiveInfo = false,

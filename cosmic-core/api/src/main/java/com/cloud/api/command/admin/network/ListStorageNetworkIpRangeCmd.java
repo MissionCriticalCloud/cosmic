@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseListCmd;
@@ -23,7 +24,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listStorageNetworkIpRange", description = "List a storage network IP range.", responseObject = StorageNetworkIpRangeResponse.class, since = "3.0.0",
+@APICommand(name = "listStorageNetworkIpRange", group = APICommandGroup.NetworkService, description = "List a storage network IP range.", responseObject = StorageNetworkIpRangeResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListStorageNetworkIpRangeCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListStorageNetworkIpRangeCmd.class);

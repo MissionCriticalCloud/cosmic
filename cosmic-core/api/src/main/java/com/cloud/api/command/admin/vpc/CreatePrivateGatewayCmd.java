@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -27,7 +28,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createPrivateGateway", description = "Creates a private gateway", responseObject = PrivateGatewayResponse.class, entityType = {VpcGateway.class},
+@APICommand(name = "createPrivateGateway", group = APICommandGroup.VPCService, description = "Creates a private gateway", responseObject = PrivateGatewayResponse.class, entityType = {VpcGateway.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreatePrivateGatewayCmd.class.getName());

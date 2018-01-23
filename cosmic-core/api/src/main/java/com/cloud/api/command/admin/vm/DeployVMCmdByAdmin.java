@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vm;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -17,7 +18,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deployVirtualMachine", description = "Creates and automatically starts a virtual machine based on a service offering, disk offering, and template.",
+@APICommand(name = "deployVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Creates and automatically starts a virtual machine based on a service offering, disk offering, and template.",
         responseObject = UserVmResponse.class, responseView = ResponseView.Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DeployVMCmdByAdmin extends DeployVMCmd {

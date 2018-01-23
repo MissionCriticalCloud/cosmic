@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.ssh;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listSSHKeyPairs", description = "List registered keypairs", responseObject = SSHKeyPairResponse.class, entityType = {SSHKeyPair.class},
+@APICommand(name = "listSSHKeyPairs", group = APICommandGroup.SSHService, description = "List registered keypairs", responseObject = SSHKeyPairResponse.class, entityType = {SSHKeyPair.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListSSHKeyPairsCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListSSHKeyPairsCmd.class.getName());

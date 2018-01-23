@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.region;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -15,7 +16,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeRegion", description = "Removes specified region", responseObject = SuccessResponse.class,
+@APICommand(name = "removeRegion", group = APICommandGroup.RegionService, description = "Removes specified region", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RemoveRegionCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RemoveRegionCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.router;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -21,7 +22,7 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "stopRouter", description = "Stops a router.", responseObject = DomainRouterResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "stopRouter", group = APICommandGroup.RouterService, description = "Stops a router.", responseObject = DomainRouterResponse.class, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class StopRouterCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(StopRouterCmd.class.getName());

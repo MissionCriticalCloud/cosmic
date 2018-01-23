@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deletePhysicalNetwork", description = "Deletes a Physical Network.", responseObject = SuccessResponse.class, since = "3.0.0",
+@APICommand(name = "deletePhysicalNetwork", group = APICommandGroup.NetworkService, description = "Deletes a Physical Network.", responseObject = SuccessResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeletePhysicalNetworkCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeletePhysicalNetworkCmd.class.getName());

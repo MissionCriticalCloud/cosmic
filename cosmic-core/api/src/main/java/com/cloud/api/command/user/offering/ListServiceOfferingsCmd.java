@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.offering;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListDomainResourcesCmd;
 import com.cloud.api.Parameter;
@@ -11,7 +12,7 @@ import com.cloud.api.response.UserVmResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listServiceOfferings", description = "Lists all available service offerings.", responseObject = ServiceOfferingResponse.class,
+@APICommand(name = "listServiceOfferings", group = APICommandGroup.ServiceOfferingService, description = "Lists all available service offerings.", responseObject = ServiceOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListServiceOfferingsCmd extends BaseListDomainResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListServiceOfferingsCmd.class.getName());

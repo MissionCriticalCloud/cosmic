@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.host;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -13,7 +14,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteHost", description = "Deletes a host.", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteHost", group = APICommandGroup.HostService, description = "Deletes a host.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteHostCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteHostCmd.class.getName());

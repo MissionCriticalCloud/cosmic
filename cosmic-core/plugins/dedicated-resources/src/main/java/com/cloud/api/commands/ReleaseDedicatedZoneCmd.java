@@ -1,6 +1,7 @@
 package com.cloud.api.commands;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "releaseDedicatedZone", description = "Release dedication of zone", responseObject = SuccessResponse.class,
+@APICommand(name = "releaseDedicatedZone", group = APICommandGroup.ZoneService, description = "Release dedication of zone", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ReleaseDedicatedZoneCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ReleaseDedicatedZoneCmd.class.getName());

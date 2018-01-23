@@ -2,6 +2,7 @@ package com.cloud.api.command.user.address;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -39,7 +40,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "associateIpAddress", description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
+@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
         ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {

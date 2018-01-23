@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.address;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -16,7 +17,7 @@ import com.cloud.network.IpAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "associateIpAddress", description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
+@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
         ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AssociateIPAddrCmdByAdmin extends AssociateIPAddrCmd {

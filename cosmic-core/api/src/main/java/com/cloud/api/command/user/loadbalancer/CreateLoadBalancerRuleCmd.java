@@ -2,6 +2,7 @@ package com.cloud.api.command.user.loadbalancer;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -34,7 +35,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createLoadBalancerRule", description = "Creates a load balancer rule", responseObject = LoadBalancerResponse.class,
+@APICommand(name = "createLoadBalancerRule", group = APICommandGroup.LoadBalancerService, description = "Creates a load balancer rule", responseObject = LoadBalancerResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements LoadBalancer */ {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateLoadBalancerRuleCmd.class.getName());

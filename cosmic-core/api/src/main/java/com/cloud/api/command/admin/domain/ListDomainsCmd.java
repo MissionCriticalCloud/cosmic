@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.domain;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -12,7 +13,7 @@ import com.cloud.domain.Domain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomains", description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView =
+@APICommand(name = "listDomains", group = APICommandGroup.DomainService, description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView =
         ResponseView.Restricted, entityType = {Domain.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainsCmd extends BaseListCmd {

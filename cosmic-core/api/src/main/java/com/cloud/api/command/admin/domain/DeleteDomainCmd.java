@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.domain;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -19,7 +20,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteDomain", description = "Deletes a specified domain", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteDomain", group = APICommandGroup.DomainService, description = "Deletes a specified domain", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteDomainCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteDomainCmd.class.getName());

@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.usage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -18,7 +19,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addTrafficType", description = "Adds traffic type to a physical network", responseObject = TrafficTypeResponse.class, since = "3.0.0",
+@APICommand(name = "addTrafficType", group = APICommandGroup.UsageService, description = "Adds traffic type to a physical network", responseObject = TrafficTypeResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AddTrafficTypeCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddTrafficTypeCmd.class.getName());

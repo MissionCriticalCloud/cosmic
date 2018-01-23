@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.project;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -16,7 +17,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateProject", description = "Updates a project", responseObject = ProjectResponse.class, since = "3.0.0",
+@APICommand(name = "updateProject", group = APICommandGroup.ProjectService, description = "Updates a project", responseObject = ProjectResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateProjectCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateProjectCmd.class.getName());

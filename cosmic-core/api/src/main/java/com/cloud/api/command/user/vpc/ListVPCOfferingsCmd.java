@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVPCOfferings", description = "Lists VPC offerings", responseObject = VpcOfferingResponse.class,
+@APICommand(name = "listVPCOfferings", group = APICommandGroup.VPCService, description = "Lists VPC offerings", responseObject = VpcOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVPCOfferingsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVPCOfferingsCmd.class.getName());

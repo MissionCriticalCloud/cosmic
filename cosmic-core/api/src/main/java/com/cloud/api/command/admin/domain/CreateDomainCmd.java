@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.domain;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -14,7 +15,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createDomain", description = "Creates a domain", responseObject = DomainResponse.class,
+@APICommand(name = "createDomain", group = APICommandGroup.DomainService, description = "Creates a domain", responseObject = DomainResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateDomainCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateDomainCmd.class.getName());

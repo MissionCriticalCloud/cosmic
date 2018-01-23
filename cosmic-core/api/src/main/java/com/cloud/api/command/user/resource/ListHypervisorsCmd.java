@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -16,7 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listHypervisors", description = "List hypervisors", responseObject = HypervisorResponse.class,
+@APICommand(name = "listHypervisors", group = APICommandGroup.HypervisorService, description = "List hypervisors", responseObject = HypervisorResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListHypervisorsCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeRouterCmd.class.getName());

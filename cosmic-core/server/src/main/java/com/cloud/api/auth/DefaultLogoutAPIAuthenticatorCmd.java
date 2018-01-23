@@ -1,6 +1,7 @@
 package com.cloud.api.auth;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.ServerApiException;
@@ -18,7 +19,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "logout", description = "Logs out the user", responseObject = LogoutCmdResponse.class, entityType = {})
+@APICommand(name = "logout", group = APICommandGroup.AuthenticationService, description = "Logs out the user", responseObject = LogoutCmdResponse.class, entityType = {})
 public class DefaultLogoutAPIAuthenticatorCmd extends BaseCmd implements APIAuthenticator {
 
     public static final Logger s_logger = LoggerFactory.getLogger(DefaultLoginAPIAuthenticatorCmd.class.getName());

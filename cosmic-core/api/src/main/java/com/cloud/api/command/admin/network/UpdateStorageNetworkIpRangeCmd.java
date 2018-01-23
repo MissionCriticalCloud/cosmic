@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -18,7 +19,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateStorageNetworkIpRange",
+@APICommand(name = "updateStorageNetworkIpRange", group = APICommandGroup.NetworkService,
         description = "Update a Storage network IP range, only allowed when no IPs in this range have been allocated.",
         responseObject = StorageNetworkIpRangeResponse.class,
         since = "3.0.0",

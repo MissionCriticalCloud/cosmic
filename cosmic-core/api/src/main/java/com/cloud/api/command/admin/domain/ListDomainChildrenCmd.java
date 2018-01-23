@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.domain;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomainChildren", description = "Lists all children domains belonging to a specified domain", responseObject = DomainResponse.class,
+@APICommand(name = "listDomainChildren", group = APICommandGroup.DomainService, description = "Lists all children domains belonging to a specified domain", responseObject = DomainResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainChildrenCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDomainChildrenCmd.class.getName());

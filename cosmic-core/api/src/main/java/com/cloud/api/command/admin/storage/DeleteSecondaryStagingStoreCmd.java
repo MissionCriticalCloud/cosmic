@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.storage;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -13,7 +14,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteSecondaryStagingStore", description = "Deletes a secondary staging store .", responseObject = SuccessResponse.class, since = "4.2.0",
+@APICommand(name = "deleteSecondaryStagingStore", group = APICommandGroup.ImageStoreService, description = "Deletes a secondary staging store .", responseObject = SuccessResponse.class, since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteSecondaryStagingStoreCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteSecondaryStagingStoreCmd.class.getName());

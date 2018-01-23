@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.vpc;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseAsyncCmd;
@@ -14,7 +15,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteVPCOffering", description = "Deletes VPC offering", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteVPCOffering", group = APICommandGroup.VPCService, description = "Deletes VPC offering", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteVPCOfferingCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteVPCOfferingCmd.class.getName());

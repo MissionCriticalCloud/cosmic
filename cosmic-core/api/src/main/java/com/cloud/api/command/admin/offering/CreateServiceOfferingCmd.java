@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.offering;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -20,7 +21,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createServiceOffering", description = "Creates a service offering.", responseObject = ServiceOfferingResponse.class,
+@APICommand(name = "createServiceOffering", group = APICommandGroup.ServiceOfferingService, description = "Creates a service offering.", responseObject = ServiceOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateServiceOfferingCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateServiceOfferingCmd.class.getName());

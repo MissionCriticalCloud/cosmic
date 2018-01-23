@@ -2,6 +2,7 @@ package com.cloud.api.command.user.vpn;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
@@ -18,7 +19,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listRemoteAccessVpns", description = "Lists remote access vpns", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn.class},
+@APICommand(name = "listRemoteAccessVpns", group = APICommandGroup.VPNService, description = "Lists remote access vpns", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListRemoteAccessVpnsCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListRemoteAccessVpnsCmd.class.getName());

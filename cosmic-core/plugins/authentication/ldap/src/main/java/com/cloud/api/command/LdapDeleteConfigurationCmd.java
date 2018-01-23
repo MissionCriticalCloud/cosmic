@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -15,7 +16,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteLdapConfiguration", description = "Remove an Ldap Configuration", responseObject = LdapConfigurationResponse.class, since = "4.2.0",
+@APICommand(name = "deleteLdapConfiguration", group = APICommandGroup.AuthenticationService, description = "Remove an Ldap Configuration", responseObject = LdapConfigurationResponse.class, since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LdapDeleteConfigurationCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LdapDeleteConfigurationCmd.class.getName());

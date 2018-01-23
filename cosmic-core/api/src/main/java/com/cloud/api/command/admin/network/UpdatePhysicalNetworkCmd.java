@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.network;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseAsyncCmd;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updatePhysicalNetwork", description = "Updates a physical network", responseObject = PhysicalNetworkResponse.class, since = "3.0.0",
+@APICommand(name = "updatePhysicalNetwork", group = APICommandGroup.NetworkService, description = "Updates a physical network", responseObject = PhysicalNetworkResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdatePhysicalNetworkCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdatePhysicalNetworkCmd.class.getName());

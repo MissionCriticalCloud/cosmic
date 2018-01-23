@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.guest;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeGuestOsMapping", description = "Removes a Guest OS Mapping.", responseObject = SuccessResponse.class, since = "4.4.0",
+@APICommand(name = "removeGuestOsMapping", group = APICommandGroup.GuestOSService, description = "Removes a Guest OS Mapping.", responseObject = SuccessResponse.class, since = "4.4.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RemoveGuestOsMappingCmd extends BaseAsyncCmd {
 

@@ -2,6 +2,7 @@ package com.cloud.api.command.user.network;
 
 import com.cloud.acl.RoleType;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
 import com.cloud.api.Parameter;
@@ -20,7 +21,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNetworks", description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView.Restricted, entityType =
+@APICommand(name = "listNetworks", group = APICommandGroup.NetworkService, description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView.Restricted, entityType =
         {Network.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNetworksCmd extends BaseListTaggedResourcesCmd {

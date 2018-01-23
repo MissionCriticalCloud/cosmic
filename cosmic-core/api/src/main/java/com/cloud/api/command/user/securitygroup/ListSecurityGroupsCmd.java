@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.securitygroup;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseListTaggedResourcesCmd;
@@ -13,7 +14,7 @@ import com.cloud.network.security.SecurityGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listSecurityGroups", description = "Lists security groups", responseObject = SecurityGroupResponse.class, entityType = {SecurityGroup.class},
+@APICommand(name = "listSecurityGroups", group = APICommandGroup.SecurityGroupService, description = "Lists security groups", responseObject = SecurityGroupResponse.class, entityType = {SecurityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListSecurityGroupsCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListSecurityGroupsCmd.class.getName());

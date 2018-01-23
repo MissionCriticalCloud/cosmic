@@ -1,6 +1,7 @@
 package com.cloud.api.command.user.volume;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.AbstractGetUploadParamsCmd;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -16,7 +17,7 @@ import java.net.MalformedURLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getUploadParamsForVolume", description = "Upload a data disk to the cloudstack cloud.", responseObject = GetUploadParamsResponse.class, since = "4.6.0",
+@APICommand(name = "getUploadParamsForVolume", group = APICommandGroup.VolumeService, description = "Upload a data disk to the cloudstack cloud.", responseObject = GetUploadParamsResponse.class, since = "4.6.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetUploadParamsForVolumeCmd extends AbstractGetUploadParamsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUploadParamsForVolumeCmd.class.getName());

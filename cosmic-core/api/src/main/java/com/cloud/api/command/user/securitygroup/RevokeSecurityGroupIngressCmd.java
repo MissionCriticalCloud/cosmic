@@ -3,6 +3,7 @@ package com.cloud.api.command.user.securitygroup;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -19,7 +20,7 @@ import com.cloud.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "revokeSecurityGroupIngress", responseObject = SuccessResponse.class, description = "Deletes a particular ingress rule from this security group", entityType =
+@APICommand(name = "revokeSecurityGroupIngress", group = APICommandGroup.SecurityGroupService, responseObject = SuccessResponse.class, description = "Deletes a particular ingress rule from this security group", entityType =
         {SecurityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RevokeSecurityGroupIngressCmd extends BaseAsyncCmd {

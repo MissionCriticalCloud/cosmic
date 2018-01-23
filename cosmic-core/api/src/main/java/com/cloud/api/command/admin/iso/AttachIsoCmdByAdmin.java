@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.iso;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
@@ -13,7 +14,7 @@ import com.cloud.uservm.UserVm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "attachIso", description = "Attaches an ISO to a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "attachIso", group = APICommandGroup.ISOService, description = "Attaches an ISO to a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class AttachIsoCmdByAdmin extends AttachIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AttachIsoCmdByAdmin.class.getName());

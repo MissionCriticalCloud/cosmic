@@ -3,6 +3,7 @@ package com.cloud.api.command.user.firewall;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiCommandJobType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
@@ -21,7 +22,7 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteEgressFirewallRule", description = "Deletes an egress firewall rule", responseObject = SuccessResponse.class, entityType = {FirewallRule.class},
+@APICommand(name = "deleteEgressFirewallRule", group = APICommandGroup.FirewallService, description = "Deletes an egress firewall rule", responseObject = SuccessResponse.class, entityType = {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteEgressFirewallRuleCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteEgressFirewallRuleCmd.class.getName());

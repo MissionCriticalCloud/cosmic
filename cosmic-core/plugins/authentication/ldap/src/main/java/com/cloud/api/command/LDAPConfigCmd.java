@@ -1,6 +1,7 @@
 package com.cloud.api.command;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @deprecated as of 4.3 use the new api {@link LdapAddConfigurationCmd}
  */
 @Deprecated
-@APICommand(name = "ldapConfig", description = "Configure the LDAP context for this site.", responseObject = LDAPConfigResponse.class, since = "3.0.0",
+@APICommand(name = "ldapConfig", group = APICommandGroup.AuthenticationService, description = "Configure the LDAP context for this site.", responseObject = LDAPConfigResponse.class, since = "3.0.0",
         requestHasSensitiveInfo = true, responseHasSensitiveInfo = false)
 
 public class LDAPConfigCmd extends BaseCmd {

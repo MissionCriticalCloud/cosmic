@@ -1,6 +1,7 @@
 package com.cloud.api.command.admin.resource;
 
 import com.cloud.api.APICommand;
+import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
@@ -17,7 +18,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteAlerts", description = "Delete one or more alerts.", responseObject = SuccessResponse.class,
+@APICommand(name = "deleteAlerts", group = APICommandGroup.AlertService, description = "Delete one or more alerts.", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteAlertsCmd extends BaseCmd {
 
