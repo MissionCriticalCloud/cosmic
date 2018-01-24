@@ -1663,12 +1663,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeature("apic");
         features.addFeature("acpi");
 
-        final HyperVEnlightenmentFeatureDef hyperVFeatures = new HyperVEnlightenmentFeatureDef();
-        hyperVFeatures.addFeature("relaxed", true);
-        hyperVFeatures.addFeature("vapic", true);
-        hyperVFeatures.addFeature("spinlocks", true);
-        hyperVFeatures.setRetries(8191);
-        features.addHyperVFeature(hyperVFeatures);
+//        final HyperVEnlightenmentFeatureDef hyperVFeatures = new HyperVEnlightenmentFeatureDef();
+//        hyperVFeatures.addFeature("relaxed", true);
+//        hyperVFeatures.addFeature("vapic", true);
+//        hyperVFeatures.addFeature("spinlocks", true);
+//        hyperVFeatures.setRetries(8191);
+//        features.addHyperVFeature(hyperVFeatures);
 
         vm.addComp(features);
 
@@ -1691,7 +1691,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         clock.addTimer("rtc", "catchup");
         clock.addTimer("pit", "delay");
         clock.addTimer("hpet", null, false);
-        clock.addTimer("hypervclock", null, true);
+        clock.addTimer("hypervclock", null, false);
 
         vm.addComp(clock);
 
