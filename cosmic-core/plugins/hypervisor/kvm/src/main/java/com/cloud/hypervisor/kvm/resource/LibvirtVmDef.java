@@ -393,10 +393,8 @@ public class LibvirtVmDef {
                     timerBuilder.append(name);
                     timerBuilder.append("' ");
 
-                    if (name.equals("kvmclock") && !present) {
-                        timerBuilder.append("present='no' />");
-                    } else if (name.equals("hypervclock") && present) {
-                        timerBuilder.append("present='yes' />");
+                    if ("hpet".equals(name) || "kvmclock".equals(name) || "hypervclock".equals(name)) {
+                        timerBuilder.append("present='").append(present ? "yes" : "no").append("' />");
                     } else {
                         if (tickPolicy != null) {
                             timerBuilder.append("tickpolicy='");
