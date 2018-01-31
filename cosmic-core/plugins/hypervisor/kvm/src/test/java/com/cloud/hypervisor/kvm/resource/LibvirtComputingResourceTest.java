@@ -216,7 +216,7 @@ public class LibvirtComputingResourceTest {
         assertNodeExists(domainDoc, "/domain/os/boot[@dev='cdrom']");
         assertNodeExists(domainDoc, "/domain/os/boot[@dev='hd']");
 
-        assertXpath(domainDoc, "/domain/on_reboot/text()", "restart");
+        assertXpath(domainDoc, "/domain/on_reboot/text()", "destroy");
         assertXpath(domainDoc, "/domain/on_poweroff/text()", "destroy");
         assertXpath(domainDoc, "/domain/on_crash/text()", "destroy");
 
