@@ -309,12 +309,23 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         logger.debug("Creating file in VR " + filename);
 
-        try {
-            SshHelper.scpTo(routerIp, 3922, "root", permKey, null, path, content.getBytes(), filename, null);
-        } catch (final Exception e) {
-            logger.warn("Fail to create file " + path + filename + " in VR " + routerIp, e);
-            error = e.getMessage();
+        for (int i = 0; i < 5; i++) {
+            try {
+                SshHelper.scpTo(routerIp, 3922, "root", permKey, null, path, content.getBytes(), filename, null);
+                error = null;
+                break;
+            } catch (final Exception e) {
+                logger.warn("Fail to create file " + path + filename + " in VR " + routerIp, e);
+                error = e.getMessage();
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted during sleep(1000) -> createFileInVR");
+            }
         }
+
         return new ExecutionResult(error == null, error);
     }
 
@@ -1252,7 +1263,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         KvmStoragePool secondaryPool = null;
         try {
             secondaryPool = storagePoolMgr.getStoragePoolByUri(mountpoint);
-      /* Get template vol */
+            /* Get template vol */
             if (templateName == null) {
                 secondaryPool.refresh();
                 final List<KvmPhysicalDisk> disks = secondaryPool.listPhysicalDisks();
@@ -1274,7 +1285,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 templateVol = secondaryPool.getPhysicalDisk(templateName);
             }
 
-      /* Copy volume to primary storage */
+            /* Copy volume to primary storage */
 
             final KvmPhysicalDisk primaryVol = storagePoolMgr.copyPhysicalDisk(templateVol, volUuid, primaryPool, 0);
             return primaryVol;
@@ -1498,7 +1509,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
         }
 
-        // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
+        // Recommended default clock/timer settings - https://bugzilla.r313edhat.com/show_bug.cgi?id=1053847
         clock.addTimer("rtc", "catchup", null);
         clock.addTimer("pit", "delay", null);
 
@@ -1706,7 +1717,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             final LibvirtDiskDef disk = new LibvirtDiskDef();
             if (volume.getType() == Volume.Type.ISO) {
                 if (volPath == null) {
-          /* Add iso as placeholder */
+                    /* Add iso as placeholder */
                     disk.defIsoDisk(null);
                 } else {
                     disk.defIsoDisk(volPath);
@@ -1720,10 +1731,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
 
                 if (pool.getType() == StoragePoolType.RBD) {
-          /*
-           * For RBD pools we use the secret mechanism in libvirt. We store the secret under the UUID of the pool,
-           * that's why we pass the pool's UUID as the authSecret
-           */
+                    /*
+                     * For RBD pools we use the secret mechanism in libvirt. We store the secret under the UUID of the pool,
+                     * that's why we pass the pool's UUID as the authSecret
+                     */
                     disk.defNetworkBasedDisk(physicalDisk.getPath().replace("rbd:", ""), pool.getSourceHost(),
                             pool.getSourcePort(), pool.getAuthUserName(),
                             pool.getUuid(), devId, diskBusType, DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
@@ -2122,10 +2133,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             final NodeInfo hosts = conn.nodeInfo();
             speed = getCpuSpeed(hosts);
 
-      /*
-       * Some CPUs report a single socket and multiple NUMA cells.
-       * We need to multiply them to get the correct socket count.
-       */
+            /*
+             * Some CPUs report a single socket and multiple NUMA cells.
+             * We need to multiply them to get the correct socket count.
+             */
             cpuSockets = hosts.sockets;
             if (hosts.nodes > 0) {
                 cpuSockets = hosts.sockets * hosts.nodes;
@@ -2136,9 +2147,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             parser.parseCapabilitiesXml(conn.getCapabilities());
             final ArrayList<String> oss = parser.getGuestOsType();
             for (final String s : oss) {
-        /*
-         * Even host supports guest os type more than hvm, we only report hvm to management server
-         */
+                /*
+                 * Even host supports guest os type more than hvm, we only report hvm to management server
+                 */
                 if (s.equalsIgnoreCase("hvm")) {
                     cap = "hvm";
                 }
@@ -2248,11 +2259,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         if (ret == Script.ERR_TIMEOUT) {
             ret = stopVmInternal(conn, vmName, true);
         } else if (ret != null) {
-      /*
-       * There is a race condition between libvirt and qemu: libvirt listens on qemu's monitor fd. If qemu is shutdown,
-       * while libvirt is reading on the fd, then libvirt will report an error.
-       */
-      /* Retry 3 times, to make sure we can get the vm's status */
+            /*
+             * There is a race condition between libvirt and qemu: libvirt listens on qemu's monitor fd. If qemu is shutdown,
+             * while libvirt is reading on the fd, then libvirt will report an error.
+             */
+            /* Retry 3 times, to make sure we can get the vm's status */
             for (int i = 0; i < 3; i++) {
                 try {
                     dm = conn.domainLookupByName(vmName);
@@ -2291,12 +2302,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     public String startVm(final Connect conn, final String vmName, final String domainXml)
             throws LibvirtException, InternalErrorException {
         try {
-      /*
-       * We create a transient domain here. When this method gets called we receive a full XML specification of the
-       * guest, so no need to define it persistent.
-       *
-       * This also makes sure we never have any old "garbage" defined in libvirt which might haunt us.
-       */
+            /*
+             * We create a transient domain here. When this method gets called we receive a full XML specification of the
+             * guest, so no need to define it persistent.
+             *
+             * This also makes sure we never have any old "garbage" defined in libvirt which might haunt us.
+             */
 
             // check for existing inactive vm definition and remove it
             // this can sometimes happen during crashes, etc
@@ -2340,10 +2351,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
                 dm.shutdown();
                 int retry = getStopScriptTimeout() / 2000;
-        /*
-         * Wait for the domain gets into shutoff state. When it does the dm object will no longer work, so we need to
-         * catch it.
-         */
+                /*
+                 * Wait for the domain gets into shutoff state. When it does the dm object will no longer work, so we need to
+                 * catch it.
+                 */
                 try {
                     while (dm.isActive() == 1 && retry >= 0) {
                         Thread.sleep(2000);
@@ -2523,7 +2534,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             stats.setNumCPUs(info.nrVirtCpu);
             stats.setEntityType("vm");
 
-      /* get cpu utilization */
+            /* get cpu utilization */
             VmStats oldStats = null;
 
             final Calendar now = Calendar.getInstance();
@@ -2542,7 +2553,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
 
-      /* get network stats */
+            /* get network stats */
 
             final List<InterfaceDef> vifs = getInterfaces(conn, vmName);
             long rx = 0;
@@ -2564,7 +2575,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
 
-      /* get disk stats */
+            /* get disk stats */
             final List<LibvirtDiskDef> disks = getDisks(conn, vmName);
             long ioRd = 0;
             long ioWr = 0;
@@ -2600,7 +2611,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
 
-      /* save to Hashmap */
+            /* save to Hashmap */
             final VmStats newStat = new VmStats();
             newStat.usedTime = info.cpuTime;
             newStat.rx = rx;
