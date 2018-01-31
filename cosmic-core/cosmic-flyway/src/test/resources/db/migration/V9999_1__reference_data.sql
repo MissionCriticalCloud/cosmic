@@ -259,8 +259,7 @@ VALUES (1, '1', 'XenServer', 'default', 50, 1, 6, NULL, 0, 1), (2, '2', 'XenServ
   (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 1, 13, NULL, 1, 1), (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 1, 13, NULL, 1, 0),
   (23, NULL, 'Ovm3', '3.2', 25, 0, 6, NULL, 0, 0), (24, NULL, 'Ovm3', '3.3', 50, 0, 6, NULL, 0, 0);
 
-INSERT INTO `network_acl` (`id`, `name`, `uuid`, `vpc_id`, `description`, `display`)
-VALUES (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
+INSERT INTO `network_acl` (`id`, `name`, `uuid`, `vpc_id`, `description`, `display`) VALUES (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
   (2, 'default_allow', 'ad692983-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Allow All', 1);
 
 INSERT INTO `network_acl_item` (`id`, `uuid`, `acl_id`, `start_port`, `end_port`, `state`, `protocol`, `created`, `icmp_code`, `icmp_type`, `traffic_type`, `number`, `action`, `display`)
@@ -269,11 +268,9 @@ VALUES (1, 'ad691a30-6d7b-11e7-8f09-5254001daa61', 1, NULL, NULL, 'Active', 'all
   (3, 'ad692f9b-6d7b-11e7-8f09-5254001daa61', 2, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Ingress', 1, 'Allow', 1),
   (4, 'ad6935f8-6d7b-11e7-8f09-5254001daa61', 2, NULL, NULL, 'Active', 'all', '2017-07-20 20:46:01', NULL, NULL, 'Egress', 2, 'Allow', 1);
 
-INSERT INTO `network_acl_item_cidrs` (`id`, `network_acl_item_id`, `cidr`)
-VALUES (1, 1, '0.0.0.0/0'), (2, 2, '0.0.0.0/0'), (3, 3, '0.0.0.0/0'), (4, 4, '0.0.0.0/0');
+INSERT INTO `network_acl_item_cidrs` (`id`, `network_acl_item_id`, `cidr`) VALUES (1, 1, '0.0.0.0/0'), (2, 2, '0.0.0.0/0'), (3, 3, '0.0.0.0/0'), (4, 4, '0.0.0.0/0');
 
-INSERT INTO `region` (`id`, `name`, `end_point`)
-VALUES (1, 'Local', 'http://localhost:8080/client/');
+INSERT INTO `region` (`id`, `name`, `end_point`) VALUES (1, 'Local', 'http://localhost:8080/client/');
 
 INSERT INTO `resource_count` (`id`, `account_id`, `domain_id`, `type`, `count`)
 VALUES (1, 1, NULL, 'cpu', 0), (2, 1, NULL, 'memory', 0), (3, 1, NULL, 'primary_storage', 0), (4, 1, NULL, 'secondary_storage', 0), (5, 2, NULL, 'cpu', 0), (6, 2, NULL, 'memory', 0),
@@ -358,7 +355,7 @@ VALUES
        'Offering for Isolated VPC networks for Internal VPC networks', NULL, 10, 'Guest', NULL, 0, 0, NULL, 0, '2017-12-12 14:16:27', NULL, 1, 'Optional', 0, 0, 0, 0, 'Enabled', 'Isolated', 0, 0, 0,
                                                                                                                                                                        0, 0, 1, 0, 0, NULL, 1, 0, NULL);
 
-INSERT INTO `ntwk_offering_service_map` (`id`, `network_offering_id`, `service`, `provider`, `created`)
+INSERT INTO `network_offering_service_map` (`id`, `network_offering_id`, `service`, `provider`, `created`)
 VALUES (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (2, 7, 'SecurityGroup', 'SecurityGroupProvider', '2017-12-12 14:16:24'), (3, 7, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
   (4, 7, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (5, 8, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (6, 8, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
   (7, 8, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (8, 9, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'), (9, 9, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
