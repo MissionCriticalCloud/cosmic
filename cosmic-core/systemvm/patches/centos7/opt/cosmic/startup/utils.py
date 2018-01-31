@@ -122,6 +122,8 @@ ChallengeResponseAuthentication no
 
 PrintMotd yes
 
+Subsystem sftp /usr/libexec/openssh/sftp-server
+
 AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
 AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
 AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
