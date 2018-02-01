@@ -5346,7 +5346,7 @@
                                     label: 'label.hypervisor'
                                 },
                                 linklocalip: {
-                                    label: 'label.linklocal.ip'
+                                    label: 'label.ipaddress'
                                 },
                                 redundantstate: {
                                     label: 'label.redundant.state'
