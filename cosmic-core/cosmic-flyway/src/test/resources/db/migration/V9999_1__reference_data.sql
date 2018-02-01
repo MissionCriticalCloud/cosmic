@@ -306,7 +306,7 @@ VALUES (1, 'routing-1', 'SystemVM Template (XenServer)', '9cc3c107-6d7b-11e7-8f0
   (3, 'routing-3', 'SystemVM Template (KVM)', 'f327eecc-be53-4d80-9d43-adaf45467abd', 0, 0, 'SYSTEM', 0, 64, '', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, '85a1bed07bf43cbf022451cb2ecae4ff',
                                                                                                                           'SystemVM Template (KVM)', 0, 0, 1000, 1, 0, 1, 0, 'KVM', NULL, NULL, 0, NULL,
                                                                                                                                                                        'Active', 0, NULL, 0),
-  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 1, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-kvm.qcow2.bz2', 'QCOW2',
+  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 1, 64, 'https://s3-eu-west-1.amazonaws.com/mccmacchina/macchinina-kvm.qcow2.bz2', 'QCOW2',
     '2017-07-20 20:45:33', NULL, 1, 'ed0e788280ff2912ea40f7f91ca7a249', 'tiny linux kvm', 0, 0, 140, 1, 0, 1, 1, 'KVM', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
   (5, 'tiny linux xen', 'tiny linux xen', '9cc3f888-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 0, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2', 'VHD',
     '2017-07-20 20:45:33', NULL, 1, '905cec879afd9c9d22ecc8036131a180', 'tiny linux xen', 0, 0, 142, 1, 0, 1, 1, 'XenServer', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
