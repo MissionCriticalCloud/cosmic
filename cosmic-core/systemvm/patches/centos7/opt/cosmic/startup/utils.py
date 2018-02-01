@@ -20,7 +20,15 @@ class Utils:
         self.setup_banner()
         self.setup_default_gw()
         self.enable_keepalived()
+        self.set_root_password()
         self.restart_watchdog()
+
+    def set_root_password(self):
+        if 'vmpassword' in self.cmdline and len(self.cmdline['vmpassword']) > 0:
+            print("Changed root password")
+            os.system("echo \"root:%s\" | chpasswd" % self.cmdline['vmpassword'])
+        else:
+            print("No need to change the root password")
 
     def setup_private_nic(self):
 
