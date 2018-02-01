@@ -80,7 +80,17 @@ class Keepalived:
 
             ipv4addresses = []
             for i in interface['ipv4_addresses']:
-                ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
+                # For now we figure out what the default gateway is using the NAT service
+                # So, no NAT service means no public internet connectivity!
+                if 'source_nat' in self.config.dbag_network_overview['services'] and \
+                        self.config.dbag_network_overview['services']['source_nat']:
+                    if self.config.dbag_network_overview['services']['source_nat'][0]['to'] in i['cidr'].split('/'):
+                        ip = i['cidr']
+                    else:
+                        # Only the NAT address gets the actual subnet.
+                        ip = i['cidr'].split('/')[0] + '/32'
+
+                    ipv4addresses.append('%s dev %s' % (ip, interface_name))
 
             self.write_vrrp_instance(
                 name=name,
