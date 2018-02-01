@@ -240,7 +240,6 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.user.dao.UserStatisticsDao;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.EnumUtils;
-import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.ConsoleProxyVO;
@@ -1006,10 +1005,8 @@ public class ApiDBUtils {
         return s_networkModel.getDedicatedNetworkDomain(networkId);
     }
 
-    public static float getCpuOverprovisioningFactor() {
-        final String opFactor = s_configDao.getValue(CapacityManager.CpuOverprovisioningFactorCK);
-        final float cpuOverprovisioningFactor = NumbersUtil.parseFloat(opFactor, 1);
-        return cpuOverprovisioningFactor;
+    public static float getCpuOverprovisioningFactor(final long clusterId) {
+        return CapacityManager.CpuOverprovisioningFactor.valueIn(clusterId);
     }
 
     public static boolean isExtractionDisabled() {

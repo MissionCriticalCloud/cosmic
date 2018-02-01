@@ -186,7 +186,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 final String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 
@@ -354,7 +354,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 final String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 
