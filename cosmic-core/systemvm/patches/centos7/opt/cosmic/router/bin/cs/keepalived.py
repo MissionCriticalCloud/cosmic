@@ -80,6 +80,11 @@ class Keepalived:
 
             ipv4addresses = []
             for i in interface['ipv4_addresses']:
+                # Non public ip's have the CIDR as specified in the config
+                if interface['metadata']['type'] != 'public':
+                    ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
+                    continue
+
                 # For now we figure out what the default gateway is using the NAT service
                 # So, no NAT service means no public internet connectivity!
                 if 'source_nat' in self.config.dbag_network_overview['services'] and \
