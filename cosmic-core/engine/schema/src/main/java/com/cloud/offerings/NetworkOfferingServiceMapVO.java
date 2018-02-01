@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
-@Table(name = "ntwk_offering_service_map")
+@Table(name = "network_offering_service_map")
 public class NetworkOfferingServiceMapVO implements InternalIdentity {
 
     @Id
