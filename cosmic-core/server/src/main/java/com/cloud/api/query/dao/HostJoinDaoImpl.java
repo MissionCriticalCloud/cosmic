@@ -9,6 +9,7 @@ import com.cloud.api.response.GpuResponse;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.VgpuResponse;
+import com.cloud.capacity.CapacityManager;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.domain.DomainVO;
@@ -184,9 +185,9 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 hostResponse.setHypervisorVersion(host.getHypervisorVersion());
 
-                final String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
+                final String cpuAlloc = Float.toString(((float) cpu / (host.getCpus() * host.getSpeed() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()))) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 
@@ -354,7 +355,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 final String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = new Float(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor()).toString();
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 

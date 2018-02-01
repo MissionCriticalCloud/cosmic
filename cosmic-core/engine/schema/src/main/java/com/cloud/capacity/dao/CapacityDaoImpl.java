@@ -922,7 +922,7 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
         public long sumUsed;
         public long sumReserved;
         public long sumTotal;
-        public Float percentUsed;
+        public Float percentageAllocated;
         public short capacityType;
         public Long clusterId;
         public Long podId;
@@ -947,18 +947,18 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             this.podId = podId;
         }
 
-        public SummedCapacity(final long sumUsed, final long sumReserved, final long sumTotal, final float percentUsed, final short capacityType, final Long zoneId, final Long
+        public SummedCapacity(final long sumUsed, final long sumReserved, final long sumTotal, final float percentageAllocated, final short capacityType, final Long zoneId, final Long
                 podId, final Long clusterId) {
-            this(sumUsed, sumTotal, percentUsed, capacityType, zoneId, podId, clusterId);
+            this(sumUsed, sumTotal, percentageAllocated, capacityType, zoneId, podId, clusterId);
             this.sumReserved = sumReserved;
         }
 
-        public SummedCapacity(final long sumUsed, final long sumTotal, final float percentUsed, final short capacityType, final Long zoneId, final Long podId, final Long
+        public SummedCapacity(final long sumUsed, final long sumTotal, final float percentageAllocated, final short capacityType, final Long zoneId, final Long podId, final Long
                 clusterId) {
             super();
             this.sumUsed = sumUsed;
             this.sumTotal = sumTotal;
-            this.percentUsed = percentUsed;
+            this.percentageAllocated = percentageAllocated;
             this.capacityType = capacityType;
             this.clusterId = clusterId;
             this.podId = podId;
@@ -1009,8 +1009,8 @@ public class CapacityDaoImpl extends GenericDaoBase<CapacityVO, Long> implements
             this.podId = podId;
         }
 
-        public Float getPercentUsed() {
-            return percentUsed;
+        public Float getPercentageAllocated() {
+            return percentageAllocated;
         }
 
         public void setSumTotal(final long sumTotal) {

@@ -654,7 +654,7 @@
                                 } else {
                                     items[idx].cpuusedavg = '';
                                 }
-                                items[idx].cpuallocated = (parseFloat(host.cpuallocated) * items[idx].cputotal / 100.0).toFixed(2) + ' Ghz';
+                                items[idx].cpuallocated = (parseFloat(host.cpuallocated) * host.cpuwithoverprovisioning / 100.0 / 1000.0).toFixed(2) + ' Ghz';
                                 items[idx].memtotal = (parseFloat(host.memorytotal) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB';
                                 items[idx].memallocated = (parseFloat(host.memoryallocated) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB';
                                 if (host.memoryused) {
@@ -988,8 +988,8 @@
                                 items[idx].vmname = volume.vmname;
                                 items[idx].disksize = parseFloat(volume.size) / (1024.0 * 1024.0 * 1024.0) + ' GB';
                                 items[idx].storagetype = volume.storagetype.replace(/\w\S*/g, function (txt) {
-                                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                                    }) + ' (' + volume.type + ')';
+                                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                                }) + ' (' + volume.type + ')';
                                 if (volume.storage) {
                                     items[idx].storagepool = volume.storage;
                                 }

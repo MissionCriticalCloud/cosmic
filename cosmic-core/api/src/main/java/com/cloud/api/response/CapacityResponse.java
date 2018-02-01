@@ -43,9 +43,9 @@ public class CapacityResponse extends BaseResponse {
     @Param(description = "the total capacity available")
     private Long capacityTotal;
 
-    @SerializedName("percentused")
-    @Param(description = "the percentage of capacity currently in use")
-    private String percentUsed;
+    @SerializedName("percentageallocated")
+    @Param(description = "the percentage of capacity currently allocated")
+    private String percentageAllocated;
 
     public Short getCapacityType() {
         return capacityType;
@@ -119,11 +119,11 @@ public class CapacityResponse extends BaseResponse {
         this.capacityTotal = capacityTotal;
     }
 
-    public String getPercentUsed() {
-        return percentUsed;
+    public String getPercentageAllocated() {
+        return percentageAllocated;
     }
 
-    public void setPercentUsed(final String percentUsed) {
-        this.percentUsed = percentUsed;
+    public void setPercentageAllocated(final String percentageAllocated) {
+        this.percentageAllocated = percentageAllocated;
     }
 }

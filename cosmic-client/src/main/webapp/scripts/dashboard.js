@@ -256,7 +256,7 @@ dashboardItemsToDisplay = 3;
                                             zoneID: capacity.zoneid, // Temporary fix for dashboard
                                             zoneName: capacity.zonename,
                                             type: cloudStack.converters.toCapacityCountType(capacity.type),
-                                            percent: parseInt(capacity.percentused),
+                                            percent: parseInt(capacity.percentageallocated),
                                             used: cloudStack.converters.convertByType(capacity.type, capacity.capacityused),
                                             total: cloudStack.converters.convertByType(capacity.type, capacity.capacitytotal)
                                         };

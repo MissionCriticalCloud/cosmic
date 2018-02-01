@@ -282,9 +282,9 @@ public class ApiResponseHelper implements ResponseGenerator {
                 capacityResponse.setCapacityTotal(capacity.getTotalCapacity());
             }
             if (capacityResponse.getCapacityTotal() != 0) {
-                capacityResponse.setPercentUsed(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
+                capacityResponse.setPercentageAllocated(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
             } else {
-                capacityResponse.setPercentUsed(s_percentFormat.format(0L));
+                capacityResponse.setPercentageAllocated(s_percentFormat.format(0L));
             }
             capacityResponses.add(capacityResponse);
         }
@@ -308,9 +308,9 @@ public class ApiResponseHelper implements ResponseGenerator {
             capacityResponse.setCapacityUsed(capacity.getUsedCapacity());
             capacityResponse.setCapacityTotal(capacity.getTotalCapacity());
             if (capacityResponse.getCapacityTotal() != 0) {
-                capacityResponse.setPercentUsed(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
+                capacityResponse.setPercentageAllocated(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
             } else {
-                capacityResponse.setPercentUsed(s_percentFormat.format(0L));
+                capacityResponse.setPercentageAllocated(s_percentFormat.format(0L));
             }
             capacityResponses.add(capacityResponse);
         }
@@ -1047,9 +1047,9 @@ public class ApiResponseHelper implements ResponseGenerator {
                     capacityResponse.setCapacityTotal(capacity.getTotalCapacity());
                 }
                 if (capacityResponse.getCapacityTotal() != 0) {
-                    capacityResponse.setPercentUsed(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
+                    capacityResponse.setPercentageAllocated(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
                 } else {
-                    capacityResponse.setPercentUsed(s_percentFormat.format(0L));
+                    capacityResponse.setPercentageAllocated(s_percentFormat.format(0L));
                 }
                 capacityResponses.add(capacityResponse);
             }
@@ -1150,9 +1150,9 @@ public class ApiResponseHelper implements ResponseGenerator {
                     capacityResponse.setCapacityTotal(capacity.getTotalCapacity());
                 }
                 if (capacityResponse.getCapacityTotal() != 0) {
-                    capacityResponse.setPercentUsed(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
+                    capacityResponse.setPercentageAllocated(s_percentFormat.format((float) capacityResponse.getCapacityUsed() / (float) capacityResponse.getCapacityTotal() * 100f));
                 } else {
-                    capacityResponse.setPercentUsed(s_percentFormat.format(0L));
+                    capacityResponse.setPercentageAllocated(s_percentFormat.format(0L));
                 }
                 capacityResponses.add(capacityResponse);
             }
@@ -1509,11 +1509,11 @@ public class ApiResponseHelper implements ResponseGenerator {
                 capacityResponse.setZoneName(zone.getName());
             }
             if (summedCapacity.getUsedPercentage() != null) {
-                capacityResponse.setPercentUsed(format.format(summedCapacity.getUsedPercentage() * 100f));
+                capacityResponse.setPercentageAllocated(format.format(summedCapacity.getUsedPercentage() * 100f));
             } else if (summedCapacity.getTotalCapacity() != 0) {
-                capacityResponse.setPercentUsed(format.format((float) summedCapacity.getUsedCapacity() / (float) summedCapacity.getTotalCapacity() * 100f));
+                capacityResponse.setPercentageAllocated(format.format((float) summedCapacity.getUsedCapacity() / (float) summedCapacity.getTotalCapacity() * 100f));
             } else {
-                capacityResponse.setPercentUsed(format.format(0L));
+                capacityResponse.setPercentageAllocated(format.format(0L));
             }
 
             capacityResponse.setObjectName("capacity");
@@ -1555,9 +1555,9 @@ public class ApiResponseHelper implements ResponseGenerator {
             capacityResponse.setCapacityUsed((long) Math.ceil(capacityUsed));
             capacityResponse.setCapacityTotal(capacityMax);
             if (capacityMax > 0) {
-                capacityResponse.setPercentUsed(format.format(capacityUsed / capacityMax * 100f));
+                capacityResponse.setPercentageAllocated(format.format(capacityUsed / capacityMax * 100f));
             } else {
-                capacityResponse.setPercentUsed(format.format(0));
+                capacityResponse.setPercentageAllocated(format.format(0));
             }
             capacityResponse.setObjectName("capacity");
             capacityResponses.add(capacityResponse);
