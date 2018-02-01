@@ -518,7 +518,7 @@
                         data[capacity.type] = {
                             used: cloudStack.converters.convertByType(capacity.type, capacity.capacityused),
                             total: cloudStack.converters.convertByType(capacity.type, capacity.capacitytotal),
-                            percent: parseInt(capacity.percentused)
+                            percent: parseInt(capacity.percentageallocated)
                         };
                     });
 

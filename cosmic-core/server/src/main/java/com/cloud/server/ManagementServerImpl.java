@@ -3152,9 +3152,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         Collections.sort(summedCapacities, new Comparator<SummedCapacity>() {
             @Override
             public int compare(final SummedCapacity arg0, final SummedCapacity arg1) {
-                if (arg0.getPercentUsed() < arg1.getPercentUsed()) {
+                if (arg0.getPercentageAllocated() < arg1.getPercentageAllocated()) {
                     return 1;
-                } else if (arg0.getPercentUsed().equals(arg1.getPercentUsed())) {
+                } else if (arg0.getPercentageAllocated().equals(arg1.getPercentageAllocated())) {
                     return 0;
                 }
                 return -1;
@@ -3173,7 +3173,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         summedCapacities = summedCapacities.subList(0, summedCapacities.size() < cmd.getPageSizeVal() ? summedCapacities.size() : pageSize);
         for (final SummedCapacity summedCapacity : summedCapacities) {
             final CapacityVO capacity = new CapacityVO(summedCapacity.getDataCenterId(), summedCapacity.getPodId(), summedCapacity.getClusterId(), summedCapacity.getCapacityType(),
-                    summedCapacity.getPercentUsed());
+                    summedCapacity.getPercentageAllocated());
             capacity.setUsedCapacity(summedCapacity.getUsedCapacity() + summedCapacity.getReservedCapacity());
             capacity.setTotalCapacity(summedCapacity.getTotalCapacity());
             capacities.add(capacity);
