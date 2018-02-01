@@ -29,6 +29,7 @@ class Utils:
                 ifcfg = """
 DEVICE="eth%s"
 IPV6INIT="no"
+NOZEROCONF="yes"
 BOOTPROTO="none"
 ONBOOT="yes"
 HWADDR="%s"
