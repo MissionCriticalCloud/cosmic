@@ -202,7 +202,7 @@ Cosmic sytemvm powered by %s
             f.write(motd)
 
     def setup_default_gw(self):
-        if "gateway" in  self.cmdline:
+        if "gateway" in self.cmdline:
             with open("/etc/sysconfig/network", "w") as f:
                 f.write("GATEWAY=%s" % self.cmdline["gateway"])
 
@@ -220,3 +220,8 @@ Cosmic sytemvm powered by %s
 
     def restart_watchdog(self):
         os.system("systemctl restart watchdog")
+
+    def set_rfc1918_routes(self):
+        os.system("ip route add 10.0.0.0/8 via %s" % self.cmdline["localgw"])
+        os.system("ip route add 172.16.0.0/12 via %s" % self.cmdline["localgw"])
+        os.system("ip route add 192.168.0.0/16 via %s" % self.cmdline["localgw"])

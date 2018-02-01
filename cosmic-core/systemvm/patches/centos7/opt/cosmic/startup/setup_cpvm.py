@@ -20,6 +20,7 @@ class ConsoleProxyVM:
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
         setup_iptable_rules()
+        Utils(self.cmdline).set_rfc1918_routes()
 
         os.system("systemctl start cosmic-agent")
 
