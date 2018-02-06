@@ -40,7 +40,7 @@ public class VpcOfferingVO implements VpcOffering {
     Long serviceOfferingId;
     @Column(name = "secondary_service_offering_id")
     Long secondaryServiceOfferingId;
-    @Column(name = "supports_distributed_router")
+    @Column(name = "redundant_router_service")
     boolean redundantRouter = false;
     @Column(name = "uuid")
     private String uuid;
