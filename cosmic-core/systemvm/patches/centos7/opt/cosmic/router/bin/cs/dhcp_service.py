@@ -44,6 +44,7 @@ class DhcpService:
 
         filename = 'dnsmasq_global.conf'
         content = self.jinja_env.get_template('dnsmasq_global.conf').render(
+            domain_name=self.config.dbag_cmdline['config']['domain'],
             interfaces=interfaces
         )
 
