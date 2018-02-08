@@ -25,6 +25,8 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
+import com.cloud.dc.VlanVO;
+import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
@@ -134,6 +136,8 @@ public class CommandSetupHelper {
     private StaticRouteDao _staticRouteDao;
     @Inject
     private VpcDao _vpcDao;
+    @Inject
+    private VlanDao _vlanDao;
     @Inject
     private IPAddressDao _ipAddressDao;
     @Inject
@@ -528,37 +532,25 @@ public class CommandSetupHelper {
                 if (network != null) {
                     final TrafficType trafficType = network.getTrafficType();
                     if (TrafficType.Public.equals(trafficType)) {
-                        if (router.getVpcId() != null) {
-                            ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
-                                                              .stream()
-                                                              .map(IPAddressVO::getAddress)
-                                                              .filter(ip -> !ipsToExclude.contains(ip))
-                                                              .map(Ip::addr)
-                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
-                                                                      NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()),
-                                                                      nic.getIPv4Gateway())
-                                                              )
-                                                              .collect(Collectors.toList()));
+                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
+                                                          .stream()
+                                                          .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()))
+                                                          .map(ipAddressVO -> {
+                                                              final Ip ip = ipAddressVO.getAddress();
+                                                              final VlanVO vlanVO = _vlanDao.findById(ipAddressVO.getVlanId());
+                                                              return new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                                                                      NetUtils.getIpv4AddressWithCidrSize(ip.addr(), vlanVO.getVlanNetmask()),
+                                                                      nic.getIPv4Gateway());
+                                                          })
+                                                          .collect(Collectors.toList()));
 
-                            serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
-                                                                    .stream()
-                                                                    .map(IPAddressVO::getAddress)
-                                                                    .filter(ip -> !ipsToExclude.contains(ip))
-                                                                    .map(Ip::addr)
-                                                                    .map(ip -> new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
-                                                                    .collect(Collectors.toList()));
-                        } else {
-                            ipv4Addresses.addAll(_ipAddressDao.listByAssociatedNetwork(network.getId(), false)
-                                                              .stream()
-                                                              .map(IPAddressVO::getAddress)
-                                                              .filter(ip -> !ipsToExclude.contains(ip))
-                                                              .map(Ip::addr)
-                                                              .map(ip -> new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
-                                                                      NetUtils.getIpv4AddressWithCidrSize(ip, nic.getIPv4Netmask()),
-                                                                      nic.getIPv4Gateway())
-                                                              )
-                                                              .collect(Collectors.toList()));
-                        }
+                        serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
+                                                                .stream()
+                                                                .map(IPAddressVO::getAddress)
+                                                                .filter(ip -> !ipsToExclude.contains(ip))
+                                                                .map(Ip::addr)
+                                                                .map(ip -> new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
+                                                                .collect(Collectors.toList()));
                     }
 
                     interfaceTO.setMetadata(new NetworkOverviewTO.InterfaceTO.MetadataTO(network));
