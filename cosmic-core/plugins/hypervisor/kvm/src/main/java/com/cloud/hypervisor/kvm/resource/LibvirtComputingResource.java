@@ -1484,9 +1484,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
-        term.setCrashPolicy("destroy");
-        term.setPowerOffPolicy("destroy");
-        term.setRebootPolicy("destroy");
+        if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
+            term.setCrashPolicy("restart");
+            term.setPowerOffPolicy("restart");
+            term.setRebootPolicy("restart");
+        }
         vm.addComponent(term);
 
         final ClockDef clock = new ClockDef();
