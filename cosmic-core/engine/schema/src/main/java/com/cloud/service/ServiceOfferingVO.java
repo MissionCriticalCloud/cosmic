@@ -27,8 +27,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
     Map<String, String> details;
     @Column(name = "cpu")
     private Integer cpu;
-    @Column(name = "speed")
-    private Integer speed;
     @Column(name = "ram_size")
     private Integer ramSize;
     @Column(name = "nw_rate")
@@ -54,7 +52,7 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         super();
     }
 
-    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer speed, final Integer rateMbps, final Integer multicastRateMbps, final
+    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA, final String displayText,
                              final ProvisioningType provisioningType, final boolean useLocalStorage, final boolean recreatable, final String tags, final boolean systemUse, final
                              VirtualMachine.Type vmType, final boolean
@@ -62,7 +60,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         super(name, displayText, provisioningType, false, tags, recreatable, useLocalStorage, systemUse, true);
         this.cpu = cpu;
         this.ramSize = ramSize;
-        this.speed = speed;
         this.rateMbps = rateMbps;
         this.multicastRateMbps = multicastRateMbps;
         this.offerHA = offerHA;
@@ -72,7 +69,7 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         this.vmType = vmType == null ? null : vmType.toString().toLowerCase();
     }
 
-    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer speed, final Integer rateMbps, final Integer multicastRateMbps, final
+    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA,
                              final boolean limitResourceUse, final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean
                                      useLocalStorage, final boolean recreatable,
@@ -81,7 +78,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         this(name,
                 cpu,
                 ramSize,
-                speed,
                 rateMbps,
                 multicastRateMbps,
                 offerHA,
@@ -99,7 +95,7 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         this.deploymentPlanner = deploymentPlanner;
     }
 
-    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer speed, final Integer rateMbps, final Integer multicastRateMbps, final
+    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA,
                              final boolean limitResourceUse, final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean
                                      useLocalStorage, final boolean recreatable,
@@ -108,7 +104,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         this(name,
                 cpu,
                 ramSize,
-                speed,
                 rateMbps,
                 multicastRateMbps,
                 offerHA,
@@ -125,7 +120,7 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         this.hostTag = hostTag;
     }
 
-    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer speed, final Integer rateMbps, final Integer multicastRateMbps, final
+    public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA, final boolean limitCpuUse,
                              final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean useLocalStorage, final boolean
                                      recreatable, final String tags, final boolean
@@ -133,7 +128,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
         super(name, displayText, provisioningType, false, tags, recreatable, useLocalStorage, systemUse, true, domainId);
         this.cpu = cpu;
         this.ramSize = ramSize;
-        this.speed = speed;
         this.rateMbps = rateMbps;
         this.multicastRateMbps = multicastRateMbps;
         this.offerHA = offerHA;
@@ -159,7 +153,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
                 offering.getMaxIops());
         cpu = offering.getCpu();
         ramSize = offering.getRamSize();
-        speed = offering.getSpeed();
         rateMbps = offering.getRateMbps();
         multicastRateMbps = offering.getMulticastRateMbps();
         offerHA = offering.getOfferHA();
@@ -176,15 +169,6 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
 
     public void setCpu(final int cpu) {
         this.cpu = cpu;
-    }
-
-    @Override
-    public Integer getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(final int speed) {
-        this.speed = speed;
     }
 
     @Override

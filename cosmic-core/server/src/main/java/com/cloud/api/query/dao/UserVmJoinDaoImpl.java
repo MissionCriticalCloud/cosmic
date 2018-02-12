@@ -142,7 +142,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         }
         if (details.contains(VMDetails.all) || details.contains(VMDetails.servoff) || details.contains(VMDetails.stats)) {
             userVmResponse.setCpuNumber(userVm.getCpu());
-            userVmResponse.setCpuSpeed(userVm.getSpeed());
             userVmResponse.setMemory(userVm.getRamSize());
             final ServiceOfferingDetailsVO serviceOfferingDetail = ApiDBUtils.findServiceOfferingDetail(userVm.getServiceOfferingId(), GPU.Keys.vgpuType.toString());
             if (serviceOfferingDetail != null) {

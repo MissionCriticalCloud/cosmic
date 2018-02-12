@@ -10,11 +10,11 @@ import java.util.Map;
 
 public interface OrchestrationService {
 
-    void createVirtualMachine(String id, String owner, String templateId, String hostName, String displayName, String hypervisor, int cpu, int speed, long memory, Long diskSize,
+    void createVirtualMachine(String id, String owner, String templateId, String hostName, String displayName, String hypervisor, int cpu, long memory, Long diskSize,
                               List<String> computeTags, List<String> rootDiskTags, Map<String, NicProfile> networkNicMap, DeploymentPlan plan, Long rootDiskSize) throws
             InsufficientCapacityException;
 
-    void createVirtualMachineFromScratch(String id, String owner, String isoId, String hostName, String displayName, String hypervisor, String os, int cpu, int speed, long memory,
+    void createVirtualMachineFromScratch(String id, String owner, String isoId, String hostName, String displayName, String hypervisor, String os, int cpu, long memory,
                                          Long diskSize, List<String> computeTags, List<String> rootDiskTags, Map<String, NicProfile> networkNicMap, DeploymentPlan plan) throws
             InsufficientCapacityException;
 

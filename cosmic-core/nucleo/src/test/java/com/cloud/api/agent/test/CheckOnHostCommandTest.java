@@ -94,11 +94,6 @@ public class CheckOnHostCommandTest {
         }
 
         @Override
-        public Long getSpeed() {
-            return 2000000000L;
-        }
-
-        @Override
         public Integer getProxyPort() {
             return 22;
         }
@@ -324,12 +319,6 @@ public class CheckOnHostCommandTest {
     public void testGetCpus() {
         final int cpus = host.getCpus();
         assertTrue(cpus == 16);
-    }
-
-    @Test
-    public void testGetSpeed() {
-        final Long spped = host.getSpeed();
-        assertTrue(spped == 2000000000L);
     }
 
     @Test

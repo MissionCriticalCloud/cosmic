@@ -1,6 +1,8 @@
 package com.cloud.hypervisor.kvm.resource;
 
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_CMDS_TIMEOUT;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_CPU_SHARES;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_CPU_SHARES_ROUTER;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_DOMR_SCRIPTS_DIR;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_HOST_RESERVED_MEM_MB;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_HYPERVISOR_SCRIPTS_DIR;
@@ -30,6 +32,8 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_CPU_FEATURES;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_CPU_MODE;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_CPU_MODEL;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_CPU_SHARES;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_CPU_SHARES_ROUTER;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_GUEST_NETWORK_DEVICE;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_HOST_RESERVED_MEM_MB;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR;
@@ -99,6 +103,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private List<String> guestCpuFeatures;
     private String guestCpuModel;
     private String guestCpuMode;
+    private int guestCpuShares = DEFAULT_CPU_SHARES;
+    private int guestCpuSharesRouter = DEFAULT_CPU_SHARES_ROUTER;
     private String guestNetworkDevice;
     private String host = DEFAULT_HOST;
     private long hostReservedMemMb = DEFAULT_HOST_RESERVED_MEM_MB;
@@ -149,6 +155,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         guestCpuFeatures = parse(properties, PROPERTY_KEY_GUEST_CPU_FEATURES, guestCpuFeatures, stringSplitDecomposer(" ", String.class));
         guestCpuModel = parse(properties, PROPERTY_KEY_GUEST_CPU_MODEL, guestCpuModel);
         guestCpuMode = parse(properties, PROPERTY_KEY_GUEST_CPU_MODE, guestCpuMode);
+        guestCpuShares = parse(properties, PROPERTY_KEY_GUEST_CPU_SHARES, guestCpuShares);
+        guestCpuSharesRouter = parse(properties, PROPERTY_KEY_GUEST_CPU_SHARES_ROUTER, guestCpuSharesRouter);
         guestNetworkDevice = parse(properties, PROPERTY_KEY_GUEST_NETWORK_DEVICE, guestNetworkDevice);
         host = parse(properties, PROPERTY_KEY_HOST, host);
         hostReservedMemMb = parse(properties, PROPERTY_KEY_HOST_RESERVED_MEM_MB, hostReservedMemMb);
@@ -213,6 +221,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         propertiesMap.put(PROPERTY_KEY_GUEST_CPU_FEATURES, guestCpuFeatures);
         propertiesMap.put(PROPERTY_KEY_GUEST_CPU_MODEL, guestCpuModel);
         propertiesMap.put(PROPERTY_KEY_GUEST_CPU_MODE, guestCpuMode);
+        propertiesMap.put(PROPERTY_KEY_GUEST_CPU_SHARES, guestCpuShares);
+        propertiesMap.put(PROPERTY_KEY_GUEST_CPU_SHARES_ROUTER, guestCpuSharesRouter);
         propertiesMap.put(PROPERTY_KEY_GUEST_NETWORK_DEVICE, guestNetworkDevice);
         propertiesMap.put(PROPERTY_KEY_HOST, host);
         propertiesMap.put(PROPERTY_KEY_HOST_RESERVED_MEM_MB, hostReservedMemMb);
@@ -270,6 +280,14 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
 
     public String getGuestCpuMode() {
         return guestCpuMode;
+    }
+
+    public int getGuestCpuShares() {
+        return guestCpuShares;
+    }
+
+    public int getGuestCpuSharesRouter() {
+        return guestCpuSharesRouter;
     }
 
     public String getGuestNetworkDevice() {
@@ -460,12 +478,16 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String PROPERTY_KEY_GUEST_CPU_FEATURES = "guest.cpu.features";
         public static final String PROPERTY_KEY_GUEST_CPU_MODEL = "guest.cpu.model";
         public static final String PROPERTY_KEY_GUEST_CPU_MODE = "guest.cpu.mode";
+        public static final String PROPERTY_KEY_GUEST_CPU_SHARES = "guest.cpu.shares";
+        public static final String PROPERTY_KEY_GUEST_CPU_SHARES_ROUTER = "guest.cpu.shares.router";
         public static final String PROPERTY_KEY_SYSTEMVM_ISO_PATH = "systemvm.iso.path";
         public static final String PROPERTY_KEY_MOUNT_PATH = "mount.path";
         public static final String PROPERTY_KEY_VM_MIGRATE_DOWNTIME = "vm.migrate.downtime";
         public static final String PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER = "vm.migrate.pauseafter";
         public static final String PROPERTY_KEY_VM_MIGRATE_SPEED = "vm.migrate.speed";
 
+        public static final int DEFAULT_CPU_SHARES = 1024;
+        public static final int DEFAULT_CPU_SHARES_ROUTER = 1024;
         public static final int DEFAULT_CMDS_TIMEOUT = 7200;
         public static final String DEFAULT_DOMR_SCRIPTS_DIR = "scripts/network/domr";
         public static final long DEFAULT_HOST_RESERVED_MEM_MB = 1047L;

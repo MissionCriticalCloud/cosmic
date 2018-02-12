@@ -48,7 +48,6 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
         SystemServiceOffering = createSearchBuilder();
         SystemServiceOffering.and("domainId", SystemServiceOffering.entity().getDomainId(), SearchCriteria.Op.EQ);
         SystemServiceOffering.and("system", SystemServiceOffering.entity().getSystemUse(), SearchCriteria.Op.EQ);
-        SystemServiceOffering.and("vm_type", SystemServiceOffering.entity().getSpeed(), SearchCriteria.Op.EQ);
         SystemServiceOffering.and("removed", SystemServiceOffering.entity().getRemoved(), SearchCriteria.Op.NULL);
         SystemServiceOffering.done();
 
@@ -91,11 +90,6 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
         assert offering.getUniqueName() != null : "how are you going to find this later if you don't set it?";
         final ServiceOfferingVO vo = findByName(offering.getUniqueName());
         if (vo != null) {
-            // check invalid CPU speed in system service offering, set it to default value of 500 Mhz if 0 CPU speed is found
-            if (vo.getSpeed() <= 0) {
-                vo.setSpeed(500);
-                update(vo.getId(), vo);
-            }
             if (!vo.getUniqueName().endsWith("-Local")) {
                 if (vo.getUseLocalStorage()) {
                     vo.setUniqueName(vo.getUniqueName() + "-Local");
@@ -186,7 +180,7 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
     @Override
     public boolean isDynamic(final long serviceOfferingId) {
         final ServiceOfferingVO offering = super.findById(serviceOfferingId);
-        return offering.getCpu() == null || offering.getSpeed() == null || offering.getRamSize() == null;
+        return offering.getCpu() == null || offering.getRamSize() == null;
     }
 
     @Override
@@ -195,13 +189,13 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
     }
 
     @Override
-    public List<ServiceOfferingVO> createSystemServiceOfferings(final String name, final String uniqueName, final int cpuCount, final int ramSize, final int cpuSpeed,
+    public List<ServiceOfferingVO> createSystemServiceOfferings(final String name, final String uniqueName, final int cpuCount, final int ramSize,
                                                                 final Integer rateMbps, final Integer multicastRateMbps, final boolean offerHA, final String displayText, final
                                                                 ProvisioningType provisioningType,
                                                                 final boolean recreatable, final String tags, final boolean systemUse, final VirtualMachine.Type vmType, final
                                                                 boolean defaultUse) {
         final List<ServiceOfferingVO> list = new ArrayList<>();
-        ServiceOfferingVO offering = new ServiceOfferingVO(name, cpuCount, ramSize, cpuSpeed, rateMbps, multicastRateMbps, offerHA, displayText,
+        ServiceOfferingVO offering = new ServiceOfferingVO(name, cpuCount, ramSize, rateMbps, multicastRateMbps, offerHA, displayText,
                 provisioningType, false, recreatable, tags, systemUse, vmType, defaultUse);
         offering.setUniqueName(uniqueName);
         offering = persistSystemServiceOffering(offering);
@@ -214,7 +208,7 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
             useLocal = false;
         }
 
-        offering = new ServiceOfferingVO(name + (useLocal ? " - Local Storage" : ""), cpuCount, ramSize, cpuSpeed, rateMbps, multicastRateMbps, offerHA, displayText,
+        offering = new ServiceOfferingVO(name + (useLocal ? " - Local Storage" : ""), cpuCount, ramSize, rateMbps, multicastRateMbps, offerHA, displayText,
                 provisioningType, useLocal, recreatable, tags, systemUse, vmType, defaultUse);
         offering.setUniqueName(uniqueName + (useLocal ? "-Local" : ""));
         offering = persistSystemServiceOffering(offering);

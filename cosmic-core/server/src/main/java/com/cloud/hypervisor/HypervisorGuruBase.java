@@ -72,10 +72,8 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         final ServiceOffering offering = _serviceOfferingDao.findById(vmProfile.getId(), vmProfile.getServiceOfferingId());
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final Long minMemory = (long) (offering.getRamSize() / vmProfile.getMemoryOvercommitRatio());
-        final int minspeed = (int) (offering.getSpeed() / vmProfile.getCpuOvercommitRatio());
-        final int maxspeed = offering.getSpeed();
         final VirtualMachineTO to =
-                new VirtualMachineTO(vm.getId(), vm.getInstanceName(), vm.getType(), offering.getCpu(), minspeed, maxspeed, minMemory * 1024l * 1024l,
+                new VirtualMachineTO(vm.getId(), vm.getInstanceName(), vm.getType(), offering.getCpu(), minMemory * 1024l * 1024l,
                         offering.getRamSize() * 1024l * 1024l, null, null, vm.isHaEnabled(), vm.limitCpuUse(), vm.getVncPassword());
         to.setBootArgs(vmProfile.getBootArgs());
 

@@ -116,9 +116,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName(ApiConstants.CPU_NUMBER)
     @Param(description = "the number of cpu this virtual machine is running with")
     private Integer cpuNumber;
-    @SerializedName(ApiConstants.CPU_SPEED)
-    @Param(description = "the speed of each cpu")
-    private Integer cpuSpeed;
     @SerializedName(ApiConstants.MEMORY)
     @Param(description = "the memory allocated for the virtual machine")
     private Integer memory;
@@ -487,14 +484,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
-    }
-
-    public Integer getCpuSpeed() {
-        return cpuSpeed;
-    }
-
-    public void setCpuSpeed(final Integer cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
     }
 
     public Integer getMemory() {

@@ -260,7 +260,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     final long actualTotalCpu = capacityCpu.getTotalCapacity();
                     final float cpuOvercommitRatio = Float.parseFloat(_clusterDetailsDao.findDetail(clusterIdFinal, "cpuOvercommitRatio").getValue());
                     final float memoryOvercommitRatio = Float.parseFloat(_clusterDetailsDao.findDetail(clusterIdFinal, "memoryOvercommitRatio").getValue());
-                    final int vmCPU = svo.getCpu() * svo.getSpeed();
+                    final int vmCPU = svo.getCpu();
                     final long vmMem = svo.getRamSize() * 1024L * 1024L;
                     final long actualTotalMem = capacityMemory.getTotalCapacity();
                     final long totalMem = (long) (actualTotalMem * memoryOvercommitRatio);
@@ -335,7 +335,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
             return;
         }
 
-        final int cpu = svo.getCpu() * svo.getSpeed();
+        final int cpu = svo.getCpu();
         final long ram = svo.getRamSize() * 1024L * 1024L;
 
         try {
@@ -552,7 +552,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
         for (final VMInstanceVO vm : vms) {
             final ServiceOffering so = offeringsMap.get(vm.getServiceOfferingId());
             usedMemory += (so.getRamSize() * 1024L * 1024L);
-            usedCpu += (so.getCpu() * so.getSpeed());
+            usedCpu += so.getCpu();
         }
 
         final List<VMInstanceVO> vmsByLastHostId = _vmDao.listByLastHostId(host.getId());
@@ -565,7 +565,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                 final ServiceOffering so = offeringsMap.get(vm.getServiceOfferingId());
 
                 reservedMemory += (so.getRamSize() * 1024L * 1024L);
-                reservedCpu += (so.getCpu() * so.getSpeed());
+                reservedCpu += so.getCpu();
             } else {
                 // signal if not done already, that the VM has been stopped for skip.counting.hours,
                 // hence capacity will not be reserved anymore.
@@ -589,7 +589,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
             if (host.getTotalMemory() != null) {
                 memCap.setTotalCapacity(host.getTotalMemory());
             }
-            final long hostTotalCpu = host.getCpus().longValue() * host.getSpeed();
+            final long hostTotalCpu = host.getCpus().longValue();
 
             if (cpuCap.getTotalCapacity() != hostTotalCpu) {
                 s_logger.debug("Calibrate total cpu for host: " + host.getId() + " old total CPU:" + cpuCap.getTotalCapacity() + " new total CPU:" + hostTotalCpu);
@@ -672,8 +672,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     _capacityDao.persist(capacity);
 
                     capacity =
-                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus().longValue() *
-                                    host.getSpeed(), Capacity.CAPACITY_TYPE_CPU);
+                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus().longValue(), Capacity.CAPACITY_TYPE_CPU);
                     capacity.setReservedCapacity(reservedCpuFinal);
                     capacity.setCapacityState(capacityState);
                     _capacityDao.persist(capacity);
@@ -734,22 +733,19 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     }
 
     @Override
-    public boolean checkIfHostHasCpuCapability(final long hostId, final Integer cpuNum, final Integer cpuSpeed) {
+    public boolean checkIfHostHasCpuCapability(final long hostId, final Integer cpuNum) {
 
-        // Check host can support the Cpu Number and Speed.
+        // Check host can support the Cpu Number.
         final Host host = _hostDao.findById(hostId);
         final boolean isCpuNumGood = host.getCpus() >= cpuNum;
-        final boolean isCpuSpeedGood = host.getSpeed().intValue() >= cpuSpeed;
-        if (isCpuNumGood && isCpuSpeedGood) {
+        if (isCpuNumGood) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Host: " + hostId + " has cpu capability (cpu:" + host.getCpus() + ", speed:" + host.getSpeed() +
-                        ") to support requested CPU: " + cpuNum + " and requested speed: " + cpuSpeed);
+                s_logger.debug("Host: " + hostId + " has cpu capability (cpu:" + host.getCpus() + ") to support requested CPU: " + cpuNum);
             }
             return true;
         } else {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Host: " + hostId + " doesn't have cpu capability (cpu:" + host.getCpus() + ", speed:" + host.getSpeed() +
-                        ") to support requested CPU: " + cpuNum + " and requested speed: " + cpuSpeed);
+                s_logger.debug("Host: " + hostId + " doesn't have cpu capability (cpu:" + host.getCpus() + ") to support requested CPU: " + cpuNum);
             }
             return false;
         }

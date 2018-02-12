@@ -46,7 +46,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             + "data_center.id, data_center.name, data_center.is_security_group_enabled, host.id, host.name, "
             + "vm_template.id, vm_template.name, vm_template.display_text, iso.id, iso.name, "
             + "vm_template.enable_password, service_offering.id, disk_offering.name, storage_pool.id, storage_pool.pool_type, "
-            + "service_offering.cpu, service_offering.speed, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type, security_group.id, security_group" +
+            + "service_offering.cpu, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type, security_group.id, security_group" +
             ".name, "
             + "security_group.description, nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, " +
             "nics.isolation_uri, "
@@ -539,11 +539,10 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             }
 
             //service_offering.id, disk_offering.name, "
-            //"service_offering.cpu, service_offering.speed, service_offering.ram_size,
+            //"service_offering.cpu, service_offering.ram_size,
             userVmData.setServiceOfferingId(rs.getLong("service_offering.id"));
             userVmData.setServiceOfferingName(rs.getString("disk_offering.name"));
             userVmData.setCpuNumber(rs.getInt("service_offering.cpu"));
-            userVmData.setCpuSpeed(rs.getInt("service_offering.speed"));
             userVmData.setMemory(rs.getInt("service_offering.ram_size"));
 
             // volumes.device_id, volumes.volume_type,

@@ -74,10 +74,6 @@ public class HostForMigrationResponse extends BaseResponse {
     @Param(description = "the CPU number of the host")
     private Integer cpuNumber;
 
-    @SerializedName("cpuspeed")
-    @Param(description = "the CPU speed of the host")
-    private Long cpuSpeed;
-
     @SerializedName("cpuallocated")
     @Param(description = "the amount of the host's CPU currently allocated")
     private String cpuAllocated;
@@ -286,10 +282,6 @@ public class HostForMigrationResponse extends BaseResponse {
 
     public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
-    }
-
-    public void setCpuSpeed(final Long cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
     }
 
     public String getCpuAllocated() {

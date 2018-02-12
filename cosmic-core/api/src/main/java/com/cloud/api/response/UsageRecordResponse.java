@@ -87,10 +87,6 @@ public class UsageRecordResponse extends BaseResponse implements ControlledEntit
     @Param(description = "number of cpu of resource")
     private Long cpuNumber;
 
-    @SerializedName(ApiConstants.CPU_SPEED)
-    @Param(description = "speed of each cpu of resource")
-    private Long cpuSpeed;
-
     @SerializedName(ApiConstants.MEMORY)
     @Param(description = "memory allocated for the resource")
     private Long memory;
@@ -226,10 +222,6 @@ public class UsageRecordResponse extends BaseResponse implements ControlledEntit
 
     public void setCpuNumber(final Long cpuNumber) {
         this.cpuNumber = cpuNumber;
-    }
-
-    public void setCpuSpeed(final Long cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
     }
 
     public void setMemory(final Long memory) {

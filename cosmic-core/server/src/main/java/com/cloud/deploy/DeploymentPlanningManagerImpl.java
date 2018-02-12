@@ -257,7 +257,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
             planner = getDeploymentPlannerByName(plannerName);
         }
 
-        final int cpu_requested = offering.getCpu() * offering.getSpeed();
+        final int cpu_requested = offering.getCpu();
         final long ram_requested = offering.getRamSize() * 1024L * 1024L;
 
         if (s_logger.isDebugEnabled()) {

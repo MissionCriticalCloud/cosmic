@@ -7,7 +7,6 @@ import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.StorageManager;
@@ -586,14 +585,6 @@ public enum Config {
             "Time (in seconds) between VM pings when agent is disconnected",
             null),
     MigrateRetryInterval("Advanced", HighAvailabilityManager.class, Integer.class, "migrate.retry.interval", "120", "Time (in seconds) between migration retries", null),
-    RouterCpuMHz(
-            "Advanced",
-            NetworkOrchestrationService.class,
-            Integer.class,
-            "router.cpu.mhz",
-            String.valueOf(VpcVirtualNetworkApplianceManager.DEFAULT_ROUTER_CPU_MHZ),
-            "Default CPU speed (MHz) for router VM.",
-            null),
     RestartRetryInterval(
             "Advanced",
             HighAvailabilityManager.class,
@@ -983,14 +974,6 @@ public enum Config {
             "network.loadbalancer.basiczone.elb.vm.ram.size",
             "128",
             "Memory in MB for the elastic load balancer vm",
-            null),
-    ElasticLoadBalancerVmCpuMhz(
-            "Advanced",
-            ManagementServer.class,
-            Integer.class,
-            "network.loadbalancer.basiczone.elb.vm.cpu.mhz",
-            "128",
-            "CPU speed for the elastic load balancer vm",
             null),
     ElasticLoadBalancerVmNumVcpu(
             "Advanced",

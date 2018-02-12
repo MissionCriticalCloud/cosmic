@@ -134,15 +134,6 @@
                                             number: true
                                         }
                                     },
-                                    cpuSpeed: {
-                                        label: 'label.cpu.mhz',
-                                        dependsOn: 'isCustomized',
-                                        docID: 'helpComputeOfferingCPUMHz',
-                                        validation: {
-                                            required: true,
-                                            number: true
-                                        }
-                                    },
                                     memory: {
                                         label: 'label.memory.mb',
                                         dependsOn: 'isCustomized',
@@ -585,9 +576,6 @@
                                         cpuNumber: args.data.cpuNumber
                                     });
                                     $.extend(data, {
-                                        cpuSpeed: args.data.cpuSpeed
-                                    });
-                                    $.extend(data, {
                                         memory: args.data.memory
                                     });
                                 }
@@ -838,12 +826,6 @@
                                     },
                                     cpunumber: {
                                         label: 'label.num.cpu.cores'
-                                    },
-                                    cpuspeed: {
-                                        label: 'label.cpu.mhz',
-                                        converter: function (args) {
-                                            return cloudStack.converters.convertHz(args);
-                                        }
                                     },
                                     memory: {
                                         label: 'label.memory.mb',
@@ -1099,14 +1081,6 @@
                                             number: true
                                         }
                                     },
-                                    cpuSpeed: {
-                                        label: 'label.cpu.mhz',
-                                        docID: 'helpSystemOfferingCPUMHz',
-                                        validation: {
-                                            required: true,
-                                            number: true
-                                        }
-                                    },
                                     memory: {
                                         label: 'label.memory.mb',
                                         docID: 'helpSystemOfferingMemory',
@@ -1223,7 +1197,6 @@
                                     storageType: args.data.storageType,
                                     provisioningType: args.data.provisioningType,
                                     cpuNumber: args.data.cpuNumber,
-                                    cpuSpeed: args.data.cpuSpeed,
                                     memory: args.data.memory
                                 };
 
@@ -1433,12 +1406,6 @@
                                     },
                                     cpunumber: {
                                         label: 'label.num.cpu.cores'
-                                    },
-                                    cpuspeed: {
-                                        label: 'label.cpu.mhz',
-                                        converter: function (args) {
-                                            return cloudStack.converters.convertHz(args);
-                                        }
                                     },
                                     memory: {
                                         label: 'label.memory.mb',

@@ -7,20 +7,16 @@ public class ScaleVmCommand extends Command {
     VirtualMachineTO vm;
     String vmName;
     int cpus;
-    Integer minSpeed;
-    Integer maxSpeed;
     long minRam;
     long maxRam;
 
-    public ScaleVmCommand(final String vmName, final int cpus, final Integer minSpeed, final Integer maxSpeed, final long minRam, final long maxRam, final boolean limitCpuUse) {
+    public ScaleVmCommand(final String vmName, final int cpus, final long minRam, final long maxRam, final boolean limitCpuUse) {
         super();
         this.vmName = vmName;
         this.cpus = cpus;
-        this.minSpeed = minSpeed;
-        this.maxSpeed = maxSpeed;
         this.minRam = minRam;
         this.maxRam = maxRam;
-        this.vm = new VirtualMachineTO(1L, vmName, null, cpus, minSpeed, maxSpeed, minRam, maxRam, null, null, false, limitCpuUse, null);
+        this.vm = new VirtualMachineTO(1L, vmName, null, cpus, minRam, maxRam, null, null, false, limitCpuUse, null);
         /*vm.setName(vmName);
         vm.setCpus(cpus);
         vm.setRam(minRam, maxRam);*/
@@ -47,22 +43,6 @@ public class ScaleVmCommand extends Command {
 
     public void setCpus(final int cpus) {
         this.cpus = cpus;
-    }
-
-    public Integer getMinSpeed() {
-        return minSpeed;
-    }
-
-    public void setMinSpeed(final Integer minSpeed) {
-        this.minSpeed = minSpeed;
-    }
-
-    public Integer getMaxSpeed() {
-        return minSpeed;
-    }
-
-    public void setMaxSpeed(final Integer maxSpeed) {
-        this.maxSpeed = maxSpeed;
     }
 
     public long getMinRam() {

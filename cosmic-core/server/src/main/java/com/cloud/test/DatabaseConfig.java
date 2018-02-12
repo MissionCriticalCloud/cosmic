@@ -51,7 +51,6 @@ public class DatabaseConfig {
         fieldNames.add("vlanId");
         fieldNames.add("cpu");
         fieldNames.add("ramSize");
-        fieldNames.add("speed");
         fieldNames.add("useLocalStorage");
         fieldNames.add("hypervisorType");
         fieldNames.add("diskSpace");

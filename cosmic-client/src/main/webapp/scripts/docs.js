@@ -233,10 +233,6 @@ cloudStack.docs = {
         desc: 'The number of cores which should be allocated to a VM with this offering',
         externalLink: ''
     },
-    helpComputeOfferingCPUMHz: {
-        desc: 'The CPU speed of the cores that the VM is allocated. For example, 2000 provides a 2 GHz clock.',
-        externalLink: ''
-    },
     helpComputeOfferingMemory: {
         desc: 'The amount of memory in megabytes to allocate for the system VM. For example, 2048 provides 2 GB RAM.',
         externalLink: ''
@@ -791,10 +787,6 @@ cloudStack.docs = {
     },
     helpSystemOfferingCPUCores: {
         desc: 'The number of cores which should be allocated to a system VM with this offering',
-        externalLink: ''
-    },
-    helpSystemOfferingCPUMHz: {
-        desc: 'The CPU speed of the cores that the system VM is allocated. For example, 2000 would provide for a 2 GHz clock.',
         externalLink: ''
     },
     helpSystemOfferingMemory: {

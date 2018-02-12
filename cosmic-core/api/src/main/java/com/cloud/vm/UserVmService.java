@@ -153,7 +153,6 @@ public interface UserVmService {
      * @param defaultIp           TODO
      * @param displayVm           - Boolean flag whether to the display the vm to the end user or not
      * @param affinityGroupIdList
-     * @param cpuSpeed
      * @param memory
      * @param cpuNumber
      * @param customId
@@ -258,7 +257,6 @@ public interface UserVmService {
      * @param defaultIps          TODO
      * @param displayVm           - Boolean flag whether to the display the vm to the end user or not
      * @param affinityGroupIdList
-     * @param cpuSpeed
      * @param memory
      * @param cpuNumber
      * @param customId

@@ -70,8 +70,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
     private Integer cpuSockets;
     @Column(name = "cpus")
     private Integer cpus;
-    @Column(name = "speed")
-    private Long speed;
     @Column(name = "ram")
     private long totalMemory;
     @Column(name = "cluster_id")
@@ -205,10 +203,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
 
     public void setCpus(final Integer cpus) {
         this.cpus = cpus;
-    }
-
-    public void setSpeed(final Long speed) {
-        this.speed = speed;
     }
 
     public void setTotalMemory(final long totalMemory) {
@@ -379,10 +373,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
 
     public Integer getCpus() {
         return cpus;
-    }
-
-    public Long getSpeed() {
-        return speed;
     }
 
     public long getTotalMemory() {

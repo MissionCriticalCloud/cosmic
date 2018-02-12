@@ -103,7 +103,6 @@ public class FirstFitPlannerTest {
     long accountId = 1L;
     long offeringId = 12L;
     int noOfCpusInOffering = 1;
-    int cpuSpeedInOffering = 500;
     int ramInOffering = 512;
     AccountVO acct = new AccountVO(accountId);
 
@@ -170,7 +169,6 @@ public class FirstFitPlannerTest {
         when(offering.getId()).thenReturn(offeringId);
         when(vmProfile.getServiceOfferingId()).thenReturn(offeringId);
         when(offering.getCpu()).thenReturn(noOfCpusInOffering);
-        when(offering.getSpeed()).thenReturn(cpuSpeedInOffering);
         when(offering.getRamSize()).thenReturn(ramInOffering);
 
         final List<Long> clustersWithEnoughCapacity = new ArrayList<>();
@@ -182,7 +180,7 @@ public class FirstFitPlannerTest {
         clustersWithEnoughCapacity.add(6L);
 
         when(
-                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
+                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering, ramInOffering * 1024L * 1024L,
                         Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
 
         final Map<Long, Double> clusterCapacityMap = new HashMap<>();
@@ -219,12 +217,12 @@ public class FirstFitPlannerTest {
         final int ramInBytes = ramInOffering * 1024 * 1024;
         when(serviceOfferingDetailsDao.findDetail(Matchers.anyLong(), anyString())).thenReturn(null);
         when(hostGpuGroupsDao.listHostIds()).thenReturn(hostList0);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(1), Host.Type.Routing.toString())).thenReturn(hostList1);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(2), Host.Type.Routing.toString())).thenReturn(hostList2);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(3), Host.Type.Routing.toString())).thenReturn(hostList3);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(4), Host.Type.Routing.toString())).thenReturn(hostList4);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(5), Host.Type.Routing.toString())).thenReturn(hostList5);
-        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering * cpuSpeedInOffering, ramInBytes, new Long(6), Host.Type.Routing.toString())).thenReturn(hostList6);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(1), Host.Type.Routing.toString())).thenReturn(hostList1);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(2), Host.Type.Routing.toString())).thenReturn(hostList2);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(3), Host.Type.Routing.toString())).thenReturn(hostList3);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(4), Host.Type.Routing.toString())).thenReturn(hostList4);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(5), Host.Type.Routing.toString())).thenReturn(hostList5);
+        when(capacityDao.listHostsWithEnoughCapacity(noOfCpusInOffering, ramInBytes, new Long(6), Host.Type.Routing.toString())).thenReturn(hostList6);
         when(hostTagsDao.getDistinctImplicitHostTags(hostList1, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr", "xyz"));
         when(hostTagsDao.getDistinctImplicitHostTags(hostList2, implicitHostTags)).thenReturn(Arrays.asList("abc", "123", "pqr", "456", "xyz"));
         when(hostTagsDao.getDistinctImplicitHostTags(hostList3, implicitHostTags)).thenReturn(Arrays.asList("abc", "pqr"));

@@ -2459,7 +2459,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             // 2.In case vm is running return only offerings greater than equal to current offering compute.
             if (vmInstance.getState() == VirtualMachine.State.Running) {
                 sc.addAnd("cpu", Op.GTEQ, currentVmOffering.getCpu());
-                sc.addAnd("speed", Op.GTEQ, currentVmOffering.getSpeed());
                 sc.addAnd("ramSize", Op.GTEQ, currentVmOffering.getRamSize());
             }
         }
@@ -3563,7 +3562,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             } else if (network != null && !StringUtils.isEmpty(network.getName())) {
                 response.setNetworkName(network.getName());
             }
-
 
             final Network associatedNetwork = _networkDao.findById(ipAddress.getAssociatedWithNetworkId());
 

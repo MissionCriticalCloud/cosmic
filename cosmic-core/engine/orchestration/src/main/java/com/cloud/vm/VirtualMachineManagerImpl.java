@@ -3233,8 +3233,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final Float cpuOvercommitRatio = CapacityManager.CpuOverprovisioningFactor.valueIn(hostVo.getClusterId());
         final long minMemory = (long) (newServiceOffering.getRamSize() / memoryOvercommitRatio);
         final ScaleVmCommand reconfigureCmd =
-                new ScaleVmCommand(vm.getInstanceName(), newServiceOffering.getCpu(), (int) (newServiceOffering.getSpeed() / cpuOvercommitRatio),
-                        newServiceOffering.getSpeed(), minMemory * 1024L * 1024L, newServiceOffering.getRamSize() * 1024L * 1024L, newServiceOffering.getLimitCpuUse());
+                new ScaleVmCommand(vm.getInstanceName(), newServiceOffering.getCpu(), minMemory * 1024L * 1024L, newServiceOffering.getRamSize() * 1024L * 1024L, newServiceOffering.getLimitCpuUse());
 
         final Long dstHostId = vm.getHostId();
 
@@ -3903,7 +3902,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         // Check that there are enough resources to upgrade the service offering
         if (!isVirtualMachineUpgradable(vmInstance, newServiceOffering)) {
             throw new InvalidParameterValueException("Unable to upgrade virtual machine, not enough resources available " + "for an offering of " +
-                    newServiceOffering.getCpu() + " cpu(s) at " + newServiceOffering.getSpeed() + " Mhz, and " + newServiceOffering.getRamSize() + " MB of memory");
+                    newServiceOffering.getCpu() + " cpu(s), and " + newServiceOffering.getRamSize() + " MB of memory");
         }
     }
 

@@ -1,5 +1,6 @@
 (function ($, cloudStack) {
-    var zoneObjs, hypervisorObjs, featuredTemplateObjs, communityTemplateObjs, myTemplateObjs, sharedTemplateObjs, featuredIsoObjs, communityIsoObjs, myIsoObjs, sharedIsoObjs, serviceOfferingObjs, community, networkObjs;
+    var zoneObjs, hypervisorObjs, featuredTemplateObjs, communityTemplateObjs, myTemplateObjs, sharedTemplateObjs, featuredIsoObjs, communityIsoObjs, myIsoObjs, sharedIsoObjs, serviceOfferingObjs,
+        community, networkObjs;
     var selectedZoneObj, selectedTemplateObj, selectedHypervisor, selectedDiskOfferingObj;
     var selectedTemplateOrIso; //'select-template', 'select-iso'
     var step6ContainerType = 'nothing-to-select'; //'nothing-to-select', 'select-network', 'select-security-group', 'select-advanced-sg'(advanced sg-enabled zone)
@@ -26,7 +27,7 @@
         // -- if vpcID == -1, always show all networks
         vpcFilter: function (data, vpcID) {
             return vpcID != -1 ?
-            data.vpcid == vpcID : true;
+                data.vpcid == vpcID : true;
         },
 
         // Runs when advanced SG-enabled zone is run, before
@@ -744,11 +745,6 @@
                 if (args.$wizard.find('input[name=compute-cpu-cores]').val().length > 0) {
                     $.extend(deployVmData, {
                         'details[0].cpuNumber': args.$wizard.find('input[name=compute-cpu-cores]').val()
-                    });
-                }
-                if (args.$wizard.find('input[name=compute-cpu]').val().length > 0) {
-                    $.extend(deployVmData, {
-                        'details[0].cpuSpeed': args.$wizard.find('input[name=compute-cpu]').val()
                     });
                 }
                 if (args.$wizard.find('input[name=compute-memory]').val().length > 0) {

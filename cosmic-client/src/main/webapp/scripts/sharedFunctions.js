@@ -567,6 +567,9 @@ var roleTypeAdmin = "1";
 var roleTypeDomainAdmin = "2";
 
 cloudStack.converters = {
+    notConvert: function (value) {
+        return value
+    },
     convertBytes: function (bytes) {
         if (bytes == undefined)
             return '';
@@ -646,16 +649,6 @@ cloudStack.converters = {
             text1 = "";
         }
         return text1;
-    },
-    convertHz: function (hz) {
-        if (hz == null)
-            return "";
-
-        if (hz < 1000) {
-            return hz + " MHz";
-        } else {
-            return (hz / 1000).toFixed(2) + " GHz";
-        }
     },
     toDayOfWeekDesp: function (dayOfWeek) {
         if (dayOfWeek == "1")
@@ -815,7 +808,7 @@ cloudStack.converters = {
             case 0:
                 return cloudStack.converters.convertBytes(value);
             case 1:
-                return cloudStack.converters.convertHz(value);
+                return cloudStack.converters.notConvert(value);
             case 2:
                 return cloudStack.converters.convertBytes(value);
             case 3:

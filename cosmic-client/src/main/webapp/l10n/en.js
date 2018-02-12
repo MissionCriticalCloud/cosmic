@@ -964,6 +964,7 @@ var dictionary = {
     "label.metrics.cpu.allocated": "CPU Allocation",
     "label.metrics.cpu.max.dev": "Deviation",
     "label.metrics.cpu.total": "Total",
+    "label.metrics.cpu.total.cores": "Total Cores",
     "label.metrics.cpu.usage": "CPU Usage",
     "label.metrics.cpu.used.avg": "Used",
     "label.metrics.disk": "Disk",

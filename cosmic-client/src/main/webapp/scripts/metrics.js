@@ -194,7 +194,7 @@
                                             $.each(json.listcapacityresponse.capacity, function (i, capacity) {
                                                 // CPU
                                                 if (capacity.type == 1) {
-                                                    items[idx].cputotal = parseInt(capacity.capacitytotal) / 1000.0;
+                                                    items[idx].cputotal = parseInt(capacity.capacitytotal);
                                                 }
                                                 // Memory
                                                 if (capacity.type == 0) {
@@ -219,7 +219,7 @@
                                 items[idx].cpuusedavg = (items[idx].cpuusedavg).toFixed(2) + "%";
                                 items[idx].cpumaxdev = (items[idx].cpumaxdev).toFixed(2) + "%";
                                 items[idx].cpuallocated = (items[idx].cpuallocated).toFixed(2) + "%";
-                                items[idx].cputotal = (items[idx].cputotal).toFixed(2) + " Ghz";
+                                items[idx].cputotal = (items[idx].cputotal).toFixed(0) + " Cores";
 
                                 items[idx].memusedavg = (items[idx].memusedavg).toFixed(2) + "%";
                                 items[idx].memmaxdev = (items[idx].memmaxdev).toFixed(2) + "%";
@@ -454,7 +454,7 @@
                                             $.each(json.listcapacityresponse.capacity, function (i, capacity) {
                                                 // CPU
                                                 if (capacity.type == 1) {
-                                                    items[idx].cputotal = parseInt(capacity.capacitytotal) / 1000.0;
+                                                    items[idx].cputotal = parseInt(capacity.capacitytotal);
                                                 }
                                                 // Memory
                                                 if (capacity.type == 0) {
@@ -480,7 +480,7 @@
                                 items[idx].cpuusedavg = (items[idx].cpuusedavg).toFixed(2) + "%";
                                 items[idx].cpumaxdev = (items[idx].cpumaxdev).toFixed(2) + "%";
                                 items[idx].cpuallocated = (items[idx].cpuallocated).toFixed(2) + "%";
-                                items[idx].cputotal = (items[idx].cputotal).toFixed(2) + " Ghz";
+                                items[idx].cputotal = (items[idx].cputotal).toFixed(0) + " Cores";
 
                                 items[idx].memusedavg = (items[idx].memusedavg).toFixed(2) + "%";
                                 items[idx].memmaxdev = (items[idx].memmaxdev).toFixed(2) + "%";
@@ -551,11 +551,8 @@
                     label: 'label.metrics.cpu.usage',
                     collapsible: true,
                     columns: {
-                        cores: {
-                            label: 'label.metrics.num.cpu.cores'
-                        },
                         cputotal: {
-                            label: 'label.metrics.cpu.total'
+                            label: 'label.metrics.cpu.total.cores'
                         },
                         cpuusedavg: {
                             label: 'label.metrics.cpu.used.avg',
@@ -648,13 +645,13 @@
                         if (items) {
                             $.each(items, function (idx, host) {
                                 items[idx].cores = host.cpunumber;
-                                items[idx].cputotal = (parseFloat(host.cpunumber) * parseFloat(host.cpuspeed) / 1000.0).toFixed(2);
+                                items[idx].cputotal = parseFloat(host.cpunumber).toFixed(0);
                                 if (host.cpuused) {
-                                    items[idx].cpuusedavg = (parseFloat(host.cpuused) * items[idx].cputotal / 100.0).toFixed(2) + ' Ghz';
+                                    items[idx].cpuusedavg = (parseFloat(host.cpuused) * items[idx].cputotal / 100.0).toFixed(2) + ' Cores';
                                 } else {
                                     items[idx].cpuusedavg = '';
                                 }
-                                items[idx].cpuallocated = (parseFloat(host.cpuallocated) * host.cpuwithoverprovisioning / 100.0 / 1000.0).toFixed(2) + ' Ghz';
+                                items[idx].cpuallocated = (parseFloat(host.cpuallocated) * host.cpuwithoverprovisioning / 100.0).toFixed(0) + ' Cores';
                                 items[idx].memtotal = (parseFloat(host.memorytotal) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB';
                                 items[idx].memallocated = (parseFloat(host.memoryallocated) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB';
                                 if (host.memoryused) {
@@ -727,7 +724,7 @@
                                 });
 
 
-                                items[idx].cputotal = items[idx].cputotal + ' Ghz (x' + cpuOverCommit + ')';
+                                items[idx].cputotal = items[idx].cputotal + ' Cores (x' + cpuOverCommit + ')';
                                 items[idx].memtotal = items[idx].memtotal + ' (x' + memOverCommit + ')';
 
                                 items[idx].instances = 0;
@@ -875,7 +872,7 @@
                             items = json.listvirtualmachinesresponse.virtualmachine;
                             $.each(items, function (idx, vm) {
                                 items[idx].cores = vm.cpunumber;
-                                items[idx].cputotal = (parseFloat(vm.cpunumber) * parseFloat(vm.cpuspeed) / 1000.0).toFixed(1) + ' Ghz';
+                                items[idx].cputotal = (parseInt(vm.cpunumber)).toFixed(0) + ' Cores';
                                 items[idx].cpuusedavg = vm.cpuused;
                                 items[idx].cpuallocated = vm.cpuallocated;
                                 items[idx].memallocated = (parseFloat(vm.memory) / 1024.0).toFixed(2) + ' GB';

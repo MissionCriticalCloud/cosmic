@@ -14,7 +14,7 @@ import java.util.Map;
 public interface ServiceOfferingDao extends GenericDao<ServiceOfferingVO, Long> {
     ServiceOfferingVO findByName(String name);
 
-    List<ServiceOfferingVO> createSystemServiceOfferings(String name, String uniqueName, int cpuCount, int ramSize, int cpuSpeed,
+    List<ServiceOfferingVO> createSystemServiceOfferings(String name, String uniqueName, int cpuCount, int ramSize,
                                                          Integer rateMbps, Integer multicastRateMbps, boolean offerHA, String displayText, ProvisioningType provisioningType,
                                                          boolean recreatable, String tags, boolean systemUse, VirtualMachine.Type vmType, boolean defaultUse);
 

@@ -44,8 +44,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     private boolean systemUse;
     @Column(name = "cpu")
     private Integer cpu;
-    @Column(name = "speed")
-    private Integer speed;
     @Column(name = "ram_size")
     private Integer ramSize;
     @Column(name = "nw_rate")
@@ -150,10 +148,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
 
     public void setCpu(final Integer cpu) {
         this.cpu = cpu;
-    }
-
-    public void setSpeed(final Integer speed) {
-        this.speed = speed;
     }
 
     public void setRamSize(final Integer ramSize) {
@@ -318,10 +312,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         return cpu;
     }
 
-    public Integer getSpeed() {
-        return speed;
-    }
-
     public Integer getRamSize() {
         return ramSize;
     }
@@ -379,6 +369,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     }
 
     public boolean isDynamic() {
-        return cpu == null || speed == null || ramSize == null;
+        return cpu == null || ramSize == null;
     }
 }

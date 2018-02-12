@@ -263,7 +263,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         }
 
         if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Looking for speed=" + (offering.getCpu() * offering.getSpeed()) + "Mhz, Ram=" + offering.getRamSize());
+            s_logger.debug("Looking for CPU=" + offering.getCpu() + " cores, Ram=" + offering.getRamSize());
         }
 
         final long serviceOfferingId = offering.getId();
@@ -301,7 +301,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
                 }
             }
 
-            final int cpu_requested = offering.getCpu() * offering.getSpeed();
+            final int cpu_requested = offering.getCpu();
             final long ram_requested = offering.getRamSize() * 1024L * 1024L;
             final Cluster cluster = _clusterDao.findById(host.getClusterId());
             final ClusterDetailsVO clusterDetailsCpuOvercommit = _clusterDetailsDao.findDetail(cluster.getId(), "cpuOvercommitRatio");
@@ -309,7 +309,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
             final Float cpuOvercommitRatio = Float.parseFloat(clusterDetailsCpuOvercommit.getValue());
             final Float memoryOvercommitRatio = Float.parseFloat(clusterDetailsRamOvercommmt.getValue());
 
-            final boolean hostHasCpuCapability = _capacityMgr.checkIfHostHasCpuCapability(host.getId(), offering.getCpu(), offering.getSpeed());
+            final boolean hostHasCpuCapability = _capacityMgr.checkIfHostHasCpuCapability(host.getId(), offering.getCpu());
             final boolean hostHasCapacity = _capacityMgr.checkIfHostHasCapacity(host.getId(), cpu_requested, ram_requested, false, cpuOvercommitRatio, memoryOvercommitRatio,
                     considerReservedCapacity);
 
