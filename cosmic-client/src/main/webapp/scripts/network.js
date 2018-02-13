@@ -1531,7 +1531,7 @@
             networks: {
                 id: 'networks',
                 type: 'select',
-                title: 'label.networks.long',
+                title: 'label.networks.private',
                 listView: {
                     actions: {
                         add: {
