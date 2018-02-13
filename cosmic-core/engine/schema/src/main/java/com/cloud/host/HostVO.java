@@ -121,8 +121,6 @@ public class HostVO implements Host {
     private Integer cpus;
     @Column(name = "url")
     private String storageUrl;
-    @Column(name = "speed")
-    private Long speed;
     @Column(name = "ram")
     private long totalMemory;
     @Column(name = "parent", nullable = false)
@@ -162,9 +160,8 @@ public class HostVO implements Host {
     public HostVO(final long id, final String name, final Type type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
             publicIpAddress,
                   final String publicNetmask, final String publicMacAddress, final String storageIpAddress, final String storageNetmask, final String storageMacAddress, final
-                  String deuxStorageIpAddress,
-                  final String duxStorageNetmask, final String deuxStorageMacAddress, final String guid, final Status status, final String version, final String iqn, final Date
-                          disconnectedOn, final long dcId, final Long podId,
+                  String deuxStorageIpAddress, final String duxStorageNetmask, final String deuxStorageMacAddress, final String guid, final Status status, final String version, final String iqn,
+                  final Date disconnectedOn, final long dcId, final Long podId,
                   final long serverId, final long ping, final String parent, final long totalSize, final StoragePoolType fsType) {
         this(id,
                 name,
@@ -189,7 +186,6 @@ public class HostVO implements Host {
                 ping,
                 null,
                 null,
-                null,
                 0,
                 null);
         this.parent = parent;
@@ -199,12 +195,10 @@ public class HostVO implements Host {
     }
 
     public HostVO(final long id, final String name, final Type type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
-            publicIpAddress,
-                  final String publicNetmask, final String publicMacAddress, final String storageIpAddress, final String storageNetmask, final String storageMacAddress, final
-                  String guid, final Status status,
-                  final String version, final String url, final Date disconnectedOn, final long dcId, final Long podId, final long serverId, final long ping, final Integer cpus,
-                  final Long speed, final Long totalMemory,
-                  final long dom0MinMemory, final String caps) {
+            publicIpAddress, final String publicNetmask, final String publicMacAddress, final String storageIpAddress, final String storageNetmask, final String storageMacAddress, final String
+                          guid, final Status status, final String version, final String url, final Date disconnectedOn, final long dcId, final Long podId, final long serverId, final long ping,
+                  final Integer
+                          cpus, final Long totalMemory, final long dom0MinMemory, final String caps) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -222,7 +216,6 @@ public class HostVO implements Host {
         this.podId = podId;
         this.cpus = cpus;
         this.version = version;
-        this.speed = speed;
         this.totalMemory = totalMemory != null ? totalMemory : 0;
         this.guid = guid;
         this.parent = null;
@@ -375,15 +368,6 @@ public class HostVO implements Host {
 
     public void setCpus(final Integer cpus) {
         this.cpus = cpus;
-    }
-
-    @Override
-    public Long getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(final Long speed) {
-        this.speed = speed;
     }
 
     @Override

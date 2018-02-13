@@ -139,7 +139,7 @@
                 },
                 hostname: {
                     label: 'label.hypervisor',
-                    converter: function(args) {
+                    converter: function (args) {
                         if (args)
                             return args.split('.')[0];
                         else
@@ -558,7 +558,7 @@
                                                 success: function (json) {
                                                     if (json.listhostsresponse.host != undefined) {
                                                         hostObjs = json.listhostsresponse.host;
-                                                        hostObjs.sort(function(a,b) {
+                                                        hostObjs.sort(function (a, b) {
                                                             if (a.name < b.name)
                                                                 return -1;
                                                             if (a.name > b.name)
@@ -1505,7 +1505,7 @@
                                                 label: 'label.memory.available'
                                             }
                                         },
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             var data = {
                                                 page: args.page,
                                                 pagesize: pageSize
@@ -1518,7 +1518,7 @@
                                                 data: data,
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     if (json.findhostsformigrationresponse.host != undefined) {
                                                         vmMigrationHostObjs = json.findhostsformigrationresponse.host;
                                                         if (vmMigrationHostObjs != null && vmMigrationHostObjs.length > 0) {
@@ -1527,7 +1527,7 @@
                                                             });
                                                         }
                                                         var items = [];
-                                                        $(vmMigrationHostObjs).each(function() {
+                                                        $(vmMigrationHostObjs).each(function () {
                                                             var suitability = (this.suitableformigration ? "Suitable" : "Not Suitable");
                                                             if (this.requiresStorageMotion == true) {
                                                                 suitability += ("-Storage migration required");
@@ -1539,7 +1539,7 @@
                                                                 availableHostName: this.name,
                                                                 availableHostSuitability: suitability,
                                                                 cpuallocated: this.cpuallocated,
-                                                                memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated)/(1024.0*1024.0*1024.0)).toFixed(2) + ' GB',
+                                                                memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB',
                                                                 dedicated: dedicated,
                                                                 requiresStorageMotion: this.requiresStorageMotion
                                                             });
@@ -1547,7 +1547,7 @@
                                                         args.response.success({
                                                             data: items
                                                         });
-                                                    } else if(args.page == 1) {
+                                                    } else if (args.page == 1) {
                                                         cloudStack.dialog.notice({
                                                             message: _l('message.no.host.available')
                                                         }); //Only a single host in the set up
@@ -1561,7 +1561,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var selectedHostObj;
                                     if (args.context.selectedHost != null && args.context.selectedHost.length > 0) {
                                         selectedHostObj = args.context.selectedHost[0];
@@ -1570,15 +1570,15 @@
                                                 url: createURL("migrateVirtualMachineWithVolume&hostid=" + selectedHostObj.id + "&virtualmachineid=" + args.context.instances[0].id),
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var jid = json.migratevirtualmachinewithvolumeresponse.jobid;
                                                     args.response.success({
                                                         _custom: {
                                                             jobId: jid,
-                                                            getUpdatedItem: function(json) {
+                                                            getUpdatedItem: function (json) {
                                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                                             },
-                                                            getActionFilter: function() {
+                                                            getActionFilter: function () {
                                                                 return vmActionfilter;
                                                             }
                                                         }
@@ -1590,15 +1590,15 @@
                                                 url: createURL("migrateVirtualMachine&hostid=" + selectedHostObj.id + "&virtualmachineid=" + args.context.instances[0].id),
                                                 dataType: "json",
                                                 async: true,
-                                                success: function(json) {
+                                                success: function (json) {
                                                     var jid = json.migratevirtualmachineresponse.jobid;
                                                     args.response.success({
                                                         _custom: {
                                                             jobId: jid,
-                                                            getUpdatedItem: function(json) {
+                                                            getUpdatedItem: function (json) {
                                                                 return json.queryasyncjobresultresponse.jobresult.virtualmachine;
                                                             },
-                                                            getActionFilter: function() {
+                                                            getActionFilter: function () {
                                                                 return vmActionfilter;
                                                             }
                                                         }
@@ -1642,7 +1642,7 @@
                                             async: true,
                                             success: function (json) {
                                                 var pools = json.liststoragepoolsresponse.storagepool;
-                                                pools.sort(function(a,b) {
+                                                pools.sort(function (a, b) {
                                                     if (a.name < b.name)
                                                         return -1;
                                                     if (a.name > b.name)
@@ -1713,7 +1713,7 @@
                                             async: true,
                                             success: function (json) {
                                                 serviceofferingObjs = json.listserviceofferingsresponse.serviceoffering;
-                                                serviceofferingObjs.sort(function(a,b) {
+                                                serviceofferingObjs.sort(function (a, b) {
                                                     if (a.name < b.name)
                                                         return -1;
                                                     if (a.name > b.name)
@@ -1756,24 +1756,14 @@
                                                 return;
 
                                             if (selectedServiceofferingObj.iscustomized == true) {
-                                                $form.find('.form-item[rel=cpuSpeed]').css('display', 'inline-block');
                                                 $form.find('.form-item[rel=cpuNumber]').css('display', 'inline-block');
                                                 $form.find('.form-item[rel=memory]').css('display', 'inline-block');
                                             } else {
-                                                $form.find('.form-item[rel=cpuSpeed]').hide();
                                                 $form.find('.form-item[rel=cpuNumber]').hide();
                                                 $form.find('.form-item[rel=memory]').hide();
                                             }
                                         });
                                     }
-                                },
-                                cpuSpeed: {
-                                    label: 'label.cpu.mhz',
-                                    validation: {
-                                        required: true,
-                                        number: true
-                                    },
-                                    isHidden: true
                                 },
                                 cpuNumber: {
                                     label: 'label.num.cpu.cores',
@@ -1800,11 +1790,6 @@
                                 serviceofferingid: args.data.serviceofferingid
                             };
 
-                            if (args.$form.find('.form-item[rel=cpuSpeed]').is(':visible')) {
-                                $.extend(data, {
-                                    'details[0].cpuSpeed': args.data.cpuSpeed
-                                });
-                            }
                             if (args.$form.find('.form-item[rel=cpuNumber]').is(':visible')) {
                                 $.extend(data, {
                                     'details[0].cpuNumber': args.data.cpuNumber
@@ -2180,9 +2165,6 @@
                             cpunumber: {
                                 label: 'label.num.cpu.cores'
                             },
-                            cpuspeed: {
-                                label: 'label.cpu.mhz'
-                            },
                             memory: {
                                 label: 'label.memory.mb'
                             },
@@ -2321,7 +2303,7 @@
                                                             for (var i = 0; i < networkObjs.length; i++) {
                                                                 var networkObj = networkObjs[i];
                                                                 var isNetworkExists = false;
-    
+
                                                                 for (var j = 0; j < nicObjs.length; j++) {
                                                                     if (nicObjs[j].networkid == networkObj.id) {
                                                                         isNetworkExists = true;
@@ -2354,8 +2336,8 @@
                                                     $.ajax({
                                                         url: createURL('listNetworks'),
                                                         data: {
-                                                                issystem: true,
-                                                                trafficType: "Public"
+                                                            issystem: true,
+                                                            trafficType: "Public"
                                                         },
                                                         success: function (json) {
                                                             var networkObjs = json.listnetworksresponse.network;
@@ -2389,25 +2371,25 @@
                                                                 });
                                                             }
                                                         }
-                                                    })).done(function(data1, data2) {
-                                                        var selectList = $('#label_network option');
-                                                        selectList.sort(function(a,b){
-                                                            if (a.text.toLowerCase() < b.text.toLowerCase())
-                                                                return -1;
-                                                            if (a.text.toLowerCase() > b.text.toLowerCase())
-                                                                return 1;
-                                                            return 0;
-                                                        });
+                                                    })).done(function (data1, data2) {
+                                                    var selectList = $('#label_network option');
+                                                    selectList.sort(function (a, b) {
+                                                        if (a.text.toLowerCase() < b.text.toLowerCase())
+                                                            return -1;
+                                                        if (a.text.toLowerCase() > b.text.toLowerCase())
+                                                            return 1;
+                                                        return 0;
+                                                    });
 
-                                                        $('#label_network option').filter(function() {
-                                                                return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
-                                                            })
-                                                            .remove();
+                                                    $('#label_network option').filter(function () {
+                                                        return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
+                                                    })
+                                                        .remove();
 
                                                     $('#label_network').html(selectList);
 
-                                                        return data1.concat(data2);
-                                                    });
+                                                    return data1.concat(data2);
+                                                });
                                             }
                                         }
                                     }
@@ -2620,7 +2602,7 @@
                                 label: 'label.ip.address'
                             },
                             macaddress: {
-                              label: 'label.macaddress'
+                                label: 'label.macaddress'
                             },
                             secondaryips: {
                                 label: 'label.secondary.ips'
@@ -2780,7 +2762,7 @@
                                     var jsonObj = json.listvirtualmachinesresponse.virtualmachine[0];
                                     args.response.success({
                                         data: {
-                                            totalCPU: jsonObj.cpunumber + " x " + cloudStack.converters.convertHz(jsonObj.cpuspeed),
+                                            totalCPU: jsonObj.cpunumber,
                                             cpuused: jsonObj.cpuused,
                                             networkkbsread: (jsonObj.networkkbsread == null) ? "N/A" : cloudStack.converters.convertBytes(jsonObj.networkkbsread * 1024),
                                             networkkbswrite: (jsonObj.networkkbswrite == null) ? "N/A" : cloudStack.converters.convertBytes(jsonObj.networkkbswrite * 1024),

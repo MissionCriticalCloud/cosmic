@@ -765,8 +765,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
         Command cmd;
         for (int i = 0; i < cmds.length; i++) {
             cmd = cmds[i];
-            if (cmd instanceof StartupRoutingCommand || cmd instanceof StartupProxyCommand || cmd instanceof StartupSecondaryStorageCommand ||
-                    cmd instanceof StartupStorageCommand) {
+            if (cmd instanceof StartupRoutingCommand || cmd instanceof StartupProxyCommand || cmd instanceof StartupSecondaryStorageCommand || cmd instanceof StartupStorageCommand) {
                 answers[i] = new StartupAnswer((StartupCommand) cmds[i], 0, getPingInterval());
                 break;
             }
@@ -1511,9 +1510,9 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                 if (h != null) {
                     final ResourceState resourceState = h.getResourceState();
                     if (resourceState == ResourceState.Disabled || resourceState == ResourceState.Maintenance || resourceState == ResourceState.ErrorInMaintenance) {
-                            /*
-                             * Host is in non-operation state, so no investigation and direct put agent to Disconnected
-                             */
+                        /*
+                         * Host is in non-operation state, so no investigation and direct put agent to Disconnected
+                         */
                         status_logger.debug("Ping timeout but agent " + agentId + " is in resource state of " + resourceState + ", so no investigation");
                         disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
                     } else {

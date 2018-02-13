@@ -146,8 +146,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String serviceOfferingName;
     @Column(name = "cpu")
     private int cpu;
-    @Column(name = "speed")
-    private int speed;
     @Column(name = "ram_size")
     private int ramSize;
     @Column(name = "pool_id", updatable = false, nullable = false)
@@ -499,10 +497,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setCpu(final int cpu) {
         this.cpu = cpu;
-    }
-
-    public void setSpeed(final int speed) {
-        this.speed = speed;
     }
 
     public void setRamSize(final int ramSize) {
@@ -975,10 +969,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public int getCpu() {
         return cpu;
-    }
-
-    public int getSpeed() {
-        return speed;
     }
 
     public int getRamSize() {

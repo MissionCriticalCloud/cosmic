@@ -38,7 +38,6 @@ public class UserVmData {
     private String serviceOfferingName;
     private Boolean forVirtualNetwork;
     private Integer cpuNumber;
-    private Integer cpuSpeed;
     private Integer memory;
     private String cpuUsed;
     private Long networkKbsRead;
@@ -310,14 +309,6 @@ public class UserVmData {
 
     public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
-    }
-
-    public Integer getCpuSpeed() {
-        return cpuSpeed;
-    }
-
-    public void setCpuSpeed(final Integer cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
     }
 
     public Integer getMemory() {

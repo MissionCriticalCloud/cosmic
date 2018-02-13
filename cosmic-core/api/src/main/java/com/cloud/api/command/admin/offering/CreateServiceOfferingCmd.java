@@ -34,8 +34,6 @@ public class CreateServiceOfferingCmd extends BaseCmd {
     private final String provisioningType = Storage.ProvisioningType.THIN.toString();
     @Parameter(name = ApiConstants.CPU_NUMBER, type = CommandType.INTEGER, required = false, description = "the CPU number of the service offering")
     private Integer cpuNumber;
-    @Parameter(name = ApiConstants.CPU_SPEED, type = CommandType.INTEGER, required = false, description = "the CPU speed of the service offering in MHz.")
-    private Integer cpuSpeed;
     @Parameter(name = ApiConstants.DISPLAY_TEXT, type = CommandType.STRING, required = true, description = "the display text of the service offering")
     private String displayText;
     @Parameter(name = ApiConstants.MEMORY, type = CommandType.INTEGER, required = false, description = "the total memory of the service offering in MB")
@@ -128,10 +126,6 @@ public class CreateServiceOfferingCmd extends BaseCmd {
         return cpuNumber;
     }
 
-    public Integer getCpuSpeed() {
-        return cpuSpeed;
-    }
-
     public String getDisplayText() {
         return displayText;
     }
@@ -193,7 +187,7 @@ public class CreateServiceOfferingCmd extends BaseCmd {
     }
 
     public boolean getCustomized() {
-        return cpuNumber == null || memory == null || cpuSpeed == null;
+        return cpuNumber == null || memory == null;
     }
 
     public Map<String, String> getDetails() {

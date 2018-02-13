@@ -136,7 +136,6 @@ public class ImplicitPlannerTest {
     long accountId = 200L;
     long offeringId = 12L;
     int noOfCpusInOffering = 1;
-    int cpuSpeedInOffering = 500;
     int ramInOffering = 512;
     AccountVO acct = new AccountVO(accountId);
 
@@ -236,7 +235,6 @@ public class ImplicitPlannerTest {
         when(offering.getId()).thenReturn(offeringId);
         when(vmProfile.getServiceOfferingId()).thenReturn(offeringId);
         when(offering.getCpu()).thenReturn(noOfCpusInOffering);
-        when(offering.getSpeed()).thenReturn(cpuSpeedInOffering);
         when(offering.getRamSize()).thenReturn(ramInOffering);
 
         final List<Long> clustersWithEnoughCapacity = new ArrayList<>();
@@ -244,7 +242,7 @@ public class ImplicitPlannerTest {
         clustersWithEnoughCapacity.add(2L);
         clustersWithEnoughCapacity.add(3L);
         when(
-                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering * cpuSpeedInOffering, ramInOffering * 1024L * 1024L,
+                capacityDao.listClustersInZoneOrPodByHostCapacities(dataCenterId, noOfCpusInOffering, ramInOffering * 1024L * 1024L,
                         Capacity.CAPACITY_TYPE_CPU, true)).thenReturn(clustersWithEnoughCapacity);
 
         final Map<Long, Double> clusterCapacityMap = new HashMap<>();

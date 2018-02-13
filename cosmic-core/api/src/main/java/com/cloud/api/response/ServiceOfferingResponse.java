@@ -29,10 +29,6 @@ public class ServiceOfferingResponse extends BaseResponse {
     @Param(description = "the number of CPU")
     private Integer cpuNumber;
 
-    @SerializedName("cpuspeed")
-    @Param(description = "the clock rate CPU speed in Mhz")
-    private Integer cpuSpeed;
-
     @SerializedName("memory")
     @Param(description = "the memory in MB")
     private Integer memory;
@@ -194,14 +190,6 @@ public class ServiceOfferingResponse extends BaseResponse {
 
     public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
-    }
-
-    public int getCpuSpeed() {
-        return cpuSpeed;
-    }
-
-    public void setCpuSpeed(final Integer cpuSpeed) {
-        this.cpuSpeed = cpuSpeed;
     }
 
     public int getMemory() {

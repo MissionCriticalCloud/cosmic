@@ -235,13 +235,12 @@ public class VirtualMachineManagerImplTest {
         final String displayText = "displayText";
         final int cpu = 1;
         //int ramSize = 256;
-        final int speed = 128;
 
         final boolean ha = false;
         final boolean useLocalStorage = false;
 
         final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
+                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
 
@@ -268,8 +267,7 @@ public class VirtualMachineManagerImplTest {
         doReturn(1L).when(hostVO).getClusterId();
         when(CapacityManager.CpuOverprovisioningFactor.valueIn(1L)).thenReturn(1.0f);
         final ScaleVmCommand reconfigureCmd =
-                new ScaleVmCommand("myVmName", newServiceOffering.getCpu(), newServiceOffering.getSpeed(), newServiceOffering.getSpeed(), newServiceOffering.getRamSize(),
-                        newServiceOffering.getRamSize(), newServiceOffering.getLimitCpuUse());
+                new ScaleVmCommand("myVmName", newServiceOffering.getCpu(), newServiceOffering.getRamSize(), newServiceOffering.getRamSize(), newServiceOffering.getLimitCpuUse());
         new ScaleVmAnswer(reconfigureCmd, true, "details");
         when(_agentMgr.send(2l, reconfigureCmd)).thenReturn(null);
         _vmMgr.reConfigureVm(_vmInstance.getUuid(), getSvcoffering(256), false);

@@ -711,21 +711,17 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         final Integer cpuNumber = cmd.getCpuNumber();
-        final Integer cpuSpeed = cmd.getCpuSpeed();
         final Integer memory = cmd.getMemory();
 
         //restricting the createserviceoffering to allow setting all or none of the dynamic parameters to null
-        if (cpuNumber == null || cpuSpeed == null || memory == null) {
-            if (cpuNumber != null || cpuSpeed != null || memory != null) {
-                throw new InvalidParameterValueException("For creating a custom compute offering cpu, cpu speed and memory all should be null");
+        if (cpuNumber == null || memory == null) {
+            if (cpuNumber != null || memory != null) {
+                throw new InvalidParameterValueException("For creating a custom compute offering cpu and memory all should be null");
             }
         }
 
         if (cpuNumber != null && (cpuNumber.intValue() <= 0 || cpuNumber.longValue() > Integer.MAX_VALUE)) {
             throw new InvalidParameterValueException("Failed to create service offering " + name + ": specify the cpu number value between 1 and " + Integer.MAX_VALUE);
-        }
-        if (cpuSpeed != null && (cpuSpeed.intValue() < 0 || cpuSpeed.longValue() > Integer.MAX_VALUE)) {
-            throw new InvalidParameterValueException("Failed to create service offering " + name + ": specify the cpu speed value between 0 and " + Integer.MAX_VALUE);
         }
         if (memory != null && (memory.intValue() < 32 || memory.longValue() > Integer.MAX_VALUE)) {
             throw new InvalidParameterValueException("Failed to create service offering " + name + ": specify the memory value between 32 and " + Integer.MAX_VALUE + " MB");
@@ -793,14 +789,14 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
-        return createServiceOffering(userId, cmd.getIsSystem(), vmType, cmd.getServiceOfferingName(), cpuNumber, memory, cpuSpeed, cmd.getDisplayText(),
+        return createServiceOffering(userId, cmd.getIsSystem(), vmType, cmd.getServiceOfferingName(), cpuNumber, memory, cmd.getDisplayText(),
                 cmd.getProvisioningType(), localStorageRequired, offerHA, limitCpuUse, volatileVm, cmd.getTags(), cmd.getDomainId(), cmd.getHostTag(),
                 cmd.getNetworkRate(), cmd.getDeploymentPlanner(), cmd.getDetails(), cmd.isCustomizedIops(), cmd.getMinIops(), cmd.getMaxIops(),
                 cmd.getBytesReadRate(), cmd.getBytesWriteRate(), cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getHypervisorSnapshotReserve());
     }
 
     protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachine.Type vmType,
-                                                      final String name, final Integer cpu, final Integer ramSize, final Integer speed, final String displayText, final String
+                                                      final String name, final Integer cpu, final Integer ramSize, final String displayText, final String
                                                               provisioningType, final boolean localStorageRequired,
                                                       final boolean offerHA, final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId, final
                                                       String hostTag,
@@ -832,7 +828,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         tags = StringUtils.cleanupTags(tags);
 
-        ServiceOfferingVO offering = new ServiceOfferingVO(name, cpu, ramSize, speed, networkRate, null, offerHA,
+        ServiceOfferingVO offering = new ServiceOfferingVO(name, cpu, ramSize, networkRate, null, offerHA,
                 limitResourceUse, volatileVm, displayText, typedProvisioningType, localStorageRequired, false, tags, isSystem, vmType,
                 domainId, hostTag, deploymentPlanner);
 

@@ -67,14 +67,8 @@ public class CloudOrchestrator implements OrchestrationService {
 
     @Override
     public void createVirtualMachine(final String id, final String owner, final String templateId, final String hostName, final String displayName, final String
-            hypervisor, final int cpu,
-                                     final int speed, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags,
-                                     final Map<String, NicProfile>
-                                             networkNicMap, final DeploymentPlan plan,
-                                     final Long rootDiskSize) throws InsufficientCapacityException {
-
-        // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
-        // vmEntityManager);
+            hypervisor, final int cpu, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags, final Map<String, NicProfile>
+                                             networkNicMap, final DeploymentPlan plan, final Long rootDiskSize) throws InsufficientCapacityException {
 
         final LinkedHashMap<NetworkVO, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<>();
         for (final String uuid : networkNicMap.keySet()) {
@@ -155,14 +149,9 @@ public class CloudOrchestrator implements OrchestrationService {
 
     @Override
     public void createVirtualMachineFromScratch(final String id, final String owner, final String isoId, final String hostName, final String displayName, final
-    String hypervisor, final String os,
-                                                final int cpu, final int speed, final long memory, final Long diskSize, final List<String> computeTags, final
-                                                List<String> rootDiskTags, final Map<String,
-            NicProfile> networkNicMap, final DeploymentPlan plan)
-            throws InsufficientCapacityException {
+    String hypervisor, final String os, final int cpu, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags, final Map<String,
+            NicProfile> networkNicMap, final DeploymentPlan plan) throws InsufficientCapacityException {
 
-        // VirtualMachineEntityImpl vmEntity = new VirtualMachineEntityImpl(id, owner, hostName, displayName, cpu, speed, memory, computeTags, rootDiskTags, networks,
-        // vmEntityManager);
         final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);
         vmEntity.init(id, owner, hostName, displayName, computeTags, rootDiskTags, new ArrayList<>(networkNicMap.keySet()));
 

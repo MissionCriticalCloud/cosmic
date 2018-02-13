@@ -3628,17 +3628,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final ServiceOffering currentServiceOffering = _offeringDao.findByIdIncludingRemoved(vmInstance.getId(), vmInstance.getServiceOfferingId());
         final int newCpu = newServiceOffering.getCpu();
         final int newMemory = newServiceOffering.getRamSize();
-        final int newSpeed = newServiceOffering.getSpeed();
         final int currentCpu = currentServiceOffering.getCpu();
         final int currentMemory = currentServiceOffering.getRamSize();
-        final int currentSpeed = currentServiceOffering.getSpeed();
         final int memoryDiff = newMemory - currentMemory;
-        final int cpuDiff = newCpu * newSpeed - currentCpu * currentSpeed;
+        final int cpuDiff = newCpu - currentCpu;
 
         // Don't allow to scale when (Any of the new values less than current values) OR (All current and new values are same)
-        if (newSpeed < currentSpeed || newMemory < currentMemory || newCpu < currentCpu || newSpeed == currentSpeed && newMemory == currentMemory && newCpu == currentCpu) {
-            throw new InvalidParameterValueException("Only scaling up the vm is supported, new service offering(speed=" + newSpeed + ",cpu=" + newCpu + ",memory=," + newMemory
-                    + ")" + " should have at least one value(cpu/ram) greater than old value and no resource value less than older(speed=" + currentSpeed + ",cpu=" + currentCpu
+        if (newMemory < currentMemory || newCpu < currentCpu || newMemory == currentMemory && newCpu == currentCpu) {
+            throw new InvalidParameterValueException("Only scaling up the vm is supported, new service offering(cpu=" + newCpu + ",memory=," + newMemory
+                    + ")" + " should have at least one value(cpu/ram) greater than old value and no resource value less than older(cpu=" + currentCpu
                     + ",memory=," + currentMemory + ")");
         }
 
@@ -3688,7 +3686,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                     // #1 Check existing host has capacity
                     if (!excludes.shouldAvoid(ApiDBUtils.findHostById(vmInstance.getHostId()))) {
-                        existingHostHasCapacity = _capacityMgr.checkIfHostHasCpuCapability(vmInstance.getHostId(), newCpu, newSpeed)
+                        existingHostHasCapacity = _capacityMgr.checkIfHostHasCpuCapability(vmInstance.getHostId(), newCpu)
                                 && _capacityMgr.checkIfHostHasCapacity(vmInstance.getHostId(), cpuDiff, memoryDiff * 1024L * 1024L, false,
                                 _capacityMgr.getClusterOverProvisioningFactor(host.getClusterId(), Capacity.CAPACITY_TYPE_CPU),
                                 _capacityMgr.getClusterOverProvisioningFactor(host.getClusterId(), Capacity.CAPACITY_TYPE_MEMORY), false);
@@ -4537,11 +4535,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                 if (isIso) {
                     _orchSrvc.createVirtualMachineFromScratch(vm.getUuid(), Long.toString(owner.getAccountId()), vm.getIsoId().toString(), hostName, displayName,
-                            hypervisorType.name(), guestOSCategory.getName(), offering.getCpu(), offering.getSpeed(), offering.getRamSize(), diskSize, computeTags, rootDiskTags,
+                            hypervisorType.name(), guestOSCategory.getName(), offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags,
                             networkNicMap, plan);
                 } else {
                     _orchSrvc.createVirtualMachine(vm.getUuid(), Long.toString(owner.getAccountId()), Long.toString(template.getId()), hostName, displayName, hypervisorType.name(),
-                            offering.getCpu(), offering.getSpeed(), offering.getRamSize(), diskSize, computeTags, rootDiskTags, networkNicMap, plan, rootDiskSize);
+                            offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags, networkNicMap, plan, rootDiskSize);
                 }
 
                 if (s_logger.isDebugEnabled()) {

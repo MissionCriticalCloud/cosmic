@@ -23,7 +23,6 @@ public class XsHost {
     private String storagePif1;
     private String storagePif2;
     private String pool;
-    private int speed;
     private Integer cpuSockets;
     private int cpus;
     private String productVersion;
@@ -147,14 +146,6 @@ public class XsHost {
 
     public void setPool(final String pool) {
         this.pool = pool;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(final int speed) {
-        this.speed = speed;
     }
 
     public Integer getCpuSockets() {

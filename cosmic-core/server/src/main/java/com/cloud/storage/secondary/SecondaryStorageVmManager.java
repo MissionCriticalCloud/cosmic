@@ -12,7 +12,6 @@ import java.util.List;
 public interface SecondaryStorageVmManager extends Manager {
 
     int DEFAULT_SS_VM_RAMSIZE = 512;            // 512M
-    int DEFAULT_SS_VM_CPUMHZ = 500;             // 500 MHz
     int DEFAULT_SS_VM_MTUSIZE = 1500;
     int DEFAULT_SS_VM_CAPACITY = 50;            // max command execution session per SSVM
     int DEFAULT_STANDBY_CAPACITY = 10;          // standy capacity to reserve per zone

@@ -480,14 +480,12 @@ public class UserVmManagerTest {
         final String name = "name";
         final String displayText = "displayText";
         final int cpu = 1;
-        //int ramSize = 256;
-        final int speed = 128;
 
         final boolean ha = false;
         final boolean useLocalStorage = false;
 
         final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, speed, null, null, ha, displayText, Storage.ProvisioningType.THIN,
+                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, Storage.ProvisioningType.THIN,
                         useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }

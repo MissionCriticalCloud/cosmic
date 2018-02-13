@@ -12,7 +12,6 @@ import java.util.Map;
 public class StartupRoutingCommand extends StartupCommand {
     Integer cpuSockets;
     int cpus;
-    long speed;
     long memory;
     long dom0MinMemory;
     boolean poolSync;
@@ -39,21 +38,18 @@ public class StartupRoutingCommand extends StartupCommand {
         this.hostDetails = hostDetails;
     }
 
-    public StartupRoutingCommand(final int cpus, final long speed, final long memory, final long dom0MinMemory, final String caps, final HypervisorType hypervisorType,
-                                 final RouterPrivateIpStrategy privIpStrategy) {
-        this(cpus, speed, memory, dom0MinMemory, caps, hypervisorType);
+    public StartupRoutingCommand(final int cpus, final long memory, final long dom0MinMemory, final String caps, final HypervisorType hypervisorType, final RouterPrivateIpStrategy privIpStrategy) {
+        this(cpus, memory, dom0MinMemory, caps, hypervisorType);
         getHostDetails().put(RouterPrivateIpStrategy.class.getCanonicalName(), privIpStrategy.toString());
     }
 
-    public StartupRoutingCommand(final int cpus2, final long speed2, final long memory2, final long dom0MinMemory2, final String caps2, final HypervisorType hypervisorType2) {
-        this(cpus2, speed2, memory2, dom0MinMemory2, caps2, hypervisorType2, new HashMap<>());
+    public StartupRoutingCommand(final int cpus2, final long memory2, final long dom0MinMemory2, final String caps2, final HypervisorType hypervisorType2) {
+        this(cpus2, memory2, dom0MinMemory2, caps2, hypervisorType2, new HashMap<>());
     }
 
-    public StartupRoutingCommand(final int cpus, final long speed, final long memory, final long dom0MinMemory, final String caps, final HypervisorType hypervisorType,
-                                 final Map<String, String> hostDetails) {
+    public StartupRoutingCommand(final int cpus, final long memory, final long dom0MinMemory, final String caps, final HypervisorType hypervisorType, final Map<String, String> hostDetails) {
         super(Host.Type.Routing);
         this.cpus = cpus;
-        this.speed = speed;
         this.memory = memory;
         this.dom0MinMemory = dom0MinMemory;
         this.hypervisorType = hypervisorType;
@@ -80,14 +76,6 @@ public class StartupRoutingCommand extends StartupCommand {
 
     public String getCapabilities() {
         return caps;
-    }
-
-    public long getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(final long speed) {
-        this.speed = speed;
     }
 
     public long getMemory() {

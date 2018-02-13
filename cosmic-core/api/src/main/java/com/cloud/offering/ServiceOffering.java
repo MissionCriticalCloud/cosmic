@@ -14,8 +14,6 @@ public interface ServiceOffering extends DiskOffering, InfrastructureEntity, Int
 
     Integer getCpu();
 
-    Integer getSpeed();
-
     Integer getRamSize();
 
     boolean getOfferHA();

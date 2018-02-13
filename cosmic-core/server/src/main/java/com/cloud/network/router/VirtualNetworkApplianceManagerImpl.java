@@ -286,7 +286,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     ZoneRepository zoneRepository;
 
     int _routerRamSize;
-    int _routerCpuMHz;
     int _retry = 2;
     int _routerStatsInterval = 300;
     int _routerCheckInterval = 30;
@@ -318,7 +317,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final Map<String, String> configs = _configDao.getConfiguration("AgentManager", params);
 
         _routerRamSize = NumbersUtil.parseInt(configs.get("router.ram.size"), DEFAULT_ROUTER_VM_RAMSIZE);
-        _routerCpuMHz = NumbersUtil.parseInt(configs.get("router.cpu.mhz"), DEFAULT_ROUTER_CPU_MHZ);
 
         _routerExtraPublicNics = NumbersUtil.parseInt(_configDao.getValue(Config.RouterExtraPublicNics.key()), 2);
 
@@ -342,12 +340,12 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         value = configs.get("router.check.poolsize");
         _rvrStatusUpdatePoolSize = NumbersUtil.parseInt(value, 10);
 
-    /*
-     * We assume that one thread can handle 20 requests in 1 minute in
-     * normal situation, so here we give the queue size up to 50 minutes.
-     * It's mostly for buffer, since each time CheckRouterTask running, it
-     * would add all the redundant networks in the queue immediately
-     */
+        /*
+         * We assume that one thread can handle 20 requests in 1 minute in
+         * normal situation, so here we give the queue size up to 50 minutes.
+         * It's mostly for buffer, since each time CheckRouterTask running, it
+         * would add all the redundant networks in the queue immediately
+         */
         _vrUpdateQueue = new LinkedBlockingQueue<>(_rvrStatusUpdatePoolSize * 1000);
 
         _rvrStatusUpdateExecutor = Executors.newFixedThreadPool(_rvrStatusUpdatePoolSize, new NamedThreadFactory("RedundantRouterStatusMonitor"));
@@ -371,11 +369,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         _agentMgr.registerForHostEvents(new SshKeysDistriMonitor(_agentMgr, _hostDao, _configDao), true, false, false);
 
         final List<ServiceOfferingVO> offerings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Software Router",
-                ServiceOffering.routerDefaultOffUniqueName, 1, _routerRamSize, _routerCpuMHz, null,
+                ServiceOffering.routerDefaultOffUniqueName, 1, _routerRamSize, null,
                 null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
 
         final List<ServiceOfferingVO> SecondaryOfferings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Secundary Software Router",
-                ServiceOffering.routerDefaultSecondaryOffUniqueName, 1, _routerRamSize, _routerCpuMHz, null,
+                ServiceOffering.routerDefaultSecondaryOffUniqueName, 1, _routerRamSize, null,
                 null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
 
         // this can sometimes happen, if DB is manually or programmatically manipulated
@@ -506,7 +504,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             if (host == null || host.getState() != Status.Up) {
                 continue;
             } else if (host.getManagementServerId() != ManagementServerNode.getManagementServerId()) {
-        /* Only cover hosts managed by this management server */
+                /* Only cover hosts managed by this management server */
                 continue;
             } else if (privateIP != null) {
                 final CheckS2SVpnConnectionsCommand command = new CheckS2SVpnConnectionsCommand(ipList);
@@ -1005,11 +1003,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             buf.append(" dnssearchorder=").append(domain_suffix);
         }
 
-    /*
-     * If virtual router didn't provide DNS service but provide DHCP
-     * service, we need to override the DHCP response to return DNS server
-     * rather than virtual router itself.
-     */
+        /*
+         * If virtual router didn't provide DNS service but provide DHCP
+         * service, we need to override the DHCP response to return DNS server
+         * rather than virtual router itself.
+         */
         if (dnsProvided || dhcpProvided) {
             if (defaultDns1 != null) {
                 buf.append(" dns1=").append(defaultDns1);

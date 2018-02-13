@@ -397,7 +397,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         host.setCpuSockets(ssCmd.getCpuSockets());
         host.setCpus(ssCmd.getCpus());
         host.setTotalMemory(ssCmd.getMemory());
-        host.setSpeed(ssCmd.getSpeed());
         host.setHypervisorType(hyType);
         host.setHypervisorVersion(ssCmd.getHypervisorVersion());
         host.setGpuGroups(ssCmd.getGpuGroupDetails());
@@ -517,7 +516,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         } else if (event == ResourceState.Event.AdminCancelMaintenance) {
             return doCancelMaintenance(hostId);
         } else if (event == ResourceState.Event.DeleteHost) {
-      /* TODO: Ask alex why we assume the last two parameters are false */
+            /* TODO: Ask alex why we assume the last two parameters are false */
             return doDeleteHost(hostId, false, false);
         } else if (event == ResourceState.Event.Unmanaged) {
             return doUmanageHost(hostId);
@@ -666,7 +665,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
 
     @Override
     public List<HostVO> findDirectlyConnectedHosts() {
-    /* The resource column is not null for direct connected resource */
+        /* The resource column is not null for direct connected resource */
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getResource(), Op.NNULL);
         sc.and(sc.entity().getResourceState(), Op.NIN, ResourceState.Disabled);
@@ -1032,7 +1031,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 "starting maintenance for host " + hostId, true, 0);
         _agentMgr.pullAgentToMaintenance(hostId);
 
-    /* TODO: move below to listener */
+        /* TODO: move below to listener */
         if (host.getType() == Host.Type.Routing) {
 
             final List<VMInstanceVO> vms = _vmDao.listByHostId(hostId);
@@ -1063,16 +1062,16 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             return true;
         }
 
-    /*
-     * TODO: think twice about returning true or throwing out exception, I
-     * really prefer to exception that always exposes bugs
-     */
+        /*
+         * TODO: think twice about returning true or throwing out exception, I
+         * really prefer to exception that always exposes bugs
+         */
         if (host.getResourceState() != ResourceState.PrepareForMaintenance && host.getResourceState() != ResourceState.Maintenance &&
                 host.getResourceState() != ResourceState.ErrorInMaintenance) {
             throw new CloudRuntimeException("Cannot perform cancelMaintenance when resource state is " + host.getResourceState() + ", hostId = " + hostId);
         }
 
-    /* TODO: move to listener */
+        /* TODO: move to listener */
         _haMgr.cancelScheduledMigrations(host);
 
         boolean vms_migrating = false;
@@ -1291,7 +1290,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 return null;
             }
 
-      /* Generate a random version in a dev setup situation */
+            /* Generate a random version in a dev setup situation */
             if (this.getClass().getPackage().getImplementationVersion() == null) {
                 for (final StartupCommand cmd : cmds) {
                     if (cmd.getVersion() == null) {
@@ -1320,7 +1319,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             host = createHostVO(cmds, resource, details, hostTags, ResourceStateAdapter.Event.CREATE_HOST_VO_FOR_DIRECT_CONNECT);
             if (host != null) {
                 created = _agentMgr.handleDirectConnectAgent(host, cmds, resource, forRebalance);
-        /* reload myself from database */
+                /* reload myself from database */
                 host = _hostDao.findById(host.getId());
             }
         } catch (final Exception e) {
@@ -1395,10 +1394,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 s_logger.debug("Cannot parse " + pod + " into Long.");
             }
         }
-    /*
-     * ResourceStateAdapter is responsible for throwing Exception if Pod is
-     * null and non-null is required. for example, XcpServerDiscoever.
-     */
+        /*
+         * ResourceStateAdapter is responsible for throwing Exception if Pod is
+         * null and non-null is required. for example, XcpServerDiscoever.
+         */
         final Long podId = p == null ? null : p.getId();
 
         Long clusterId = null;
@@ -1458,7 +1457,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             host.setStorageNetmaskDeux(startup.getStorageNetmaskDeux());
         }
         if (resource != null) {
-      /* null when agent is connected agent */
+            /* null when agent is connected agent */
             host.setResource(resource.getClass().getName());
         }
 
@@ -1475,7 +1474,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
 
         try {
             resourceStateTransitTo(host, ResourceState.Event.InternalCreated, _nodeId);
-      /* Agent goes to Connecting status */
+            /* Agent goes to Connecting status */
             _agentMgr.agentStatusTransitTo(host, Status.Event.AgentConnected, _nodeId);
         } catch (final Exception e) {
             s_logger.debug("Cannot transmit host " + host.getId() + " to Creating state", e);
@@ -1626,10 +1625,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             if (resources != null) {
                 for (final Map.Entry<? extends ServerResource, Map<String, String>> entry : resources.entrySet()) {
                     final ServerResource resource = entry.getKey();
-          /*
-           * For KVM, if we go to here, that means kvm agent is
-           * already connected to mgt svr.
-           */
+                    /*
+                     * For KVM, if we go to here, that means kvm agent is
+                     * already connected to mgt svr.
+                     */
                     if (resource instanceof KvmDummyResourceBase) {
                         final Map<String, String> details = entry.getValue();
                         final String guid = details.get("guid");
@@ -2305,10 +2304,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final List<HostVO> hosts = listAllHostsInCluster(command.getClusterId());
         for (final HostVO host : hosts) {
             try {
-        /*
-         * FIXME: this is a buggy logic, check with alex. Shouldn't
-         * return if propagation return non null
-         */
+                /*
+                 * FIXME: this is a buggy logic, check with alex. Shouldn't
+                 * return if propagation return non null
+                 */
                 final Boolean result = propagateResourceEvent(host.getId(), ResourceState.Event.UpdatePassword);
                 if (result != null) {
                     return result;
@@ -2472,7 +2471,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 return null;
             }
 
-      /* Generate a random version in a dev setup situation */
+            /* Generate a random version in a dev setup situation */
             if (this.getClass().getPackage().getImplementationVersion() == null) {
                 for (final StartupCommand cmd : cmds) {
                     if (cmd.getVersion() == null) {

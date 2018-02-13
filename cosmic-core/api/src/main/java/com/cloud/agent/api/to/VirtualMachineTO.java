@@ -10,18 +10,6 @@ import java.util.Map;
 public class VirtualMachineTO {
     Type type;
     int cpus;
-    /**
-     * 'speed' is still here since 4.0.X/4.1.X management servers do not support
-     * the overcommit feature yet.
-     * <p>
-     * The overcommit feature sends minSpeed and maxSpeed
-     * <p>
-     * So this is here for backwards compatibility with 4.0.X/4.1.X management servers
-     * and newer agents.
-     */
-    Integer speed;
-    Integer minSpeed;
-    Integer maxSpeed;
     long minRam;
     long maxRam;
     String hostName;
@@ -51,32 +39,12 @@ public class VirtualMachineTO {
     private String name;
     private BootloaderType bootloader;
 
-    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final Integer speed, final long minRam, final long maxRam,
-                            final BootloaderType bootloader,
-                            final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
-        this.id = id;
-        name = instanceName;
-        this.type = type;
-        this.cpus = cpus;
-        this.speed = speed;
-        this.minRam = minRam;
-        this.maxRam = maxRam;
-        this.bootloader = bootloader;
-        this.os = os;
-        this.enableHA = enableHA;
-        this.limitCpuUse = limitCpuUse;
-        this.vncPassword = vncPassword;
-    }
-
-    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final Integer minSpeed, final Integer maxSpeed, final long
-            minRam, final long maxRam,
+    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
         this.id = id;
         name = instanceName;
         this.type = type;
         this.cpus = cpus;
-        this.minSpeed = minSpeed;
-        this.maxSpeed = maxSpeed;
         this.minRam = minRam;
         this.maxRam = maxRam;
         this.bootloader = bootloader;
@@ -131,18 +99,6 @@ public class VirtualMachineTO {
 
     public void setCpus(final int cpus) {
         this.cpus = cpus;
-    }
-
-    public Integer getSpeed() {
-        return speed;
-    }
-
-    public Integer getMinSpeed() {
-        return minSpeed;
-    }
-
-    public Integer getMaxSpeed() {
-        return maxSpeed;
     }
 
     public boolean getLimitCpuUse() {

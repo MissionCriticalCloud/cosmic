@@ -68,11 +68,6 @@ public interface Host extends StateObject<Status>, Identity, InternalIdentity {
     Integer getCpus();
 
     /**
-     * @return speed of each cpu in mhz.
-     */
-    Long getSpeed();
-
-    /**
      * @return the proxy port that is being listened at the agent host
      */
     Integer getProxyPort();

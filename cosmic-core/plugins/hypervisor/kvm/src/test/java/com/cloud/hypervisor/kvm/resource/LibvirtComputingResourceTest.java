@@ -153,8 +153,6 @@ public class LibvirtComputingResourceTest {
 
     /**
      * This test tests if the Agent can handle a vmSpec coming from a <=4.1 management server.
-     * <p>
-     * The overcommit feature has not been merged in there and thus only 'speed' is set.
      */
     @Test
     public void testcreateVmFromSpecLegacy() {
@@ -162,7 +160,6 @@ public class LibvirtComputingResourceTest {
         final String name = "test-instance-1";
 
         final int cpus = _random.nextInt(2) + 1;
-        final int speed = 1024;
         final int minRam = 256 * 1024;
         final int maxRam = 512 * 1024;
 
@@ -171,7 +168,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, speed, minRam, maxRam,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minRam, maxRam,
                 BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -260,8 +257,6 @@ public class LibvirtComputingResourceTest {
         final String name = "test-instance-1";
 
         final int cpus = 12;
-        final int minSpeed = 1024;
-        final int maxSpeed = 2048;
         final int minRam = 256 * 1024;
         final int maxRam = 512 * 1024;
 
@@ -270,7 +265,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -289,8 +284,6 @@ public class LibvirtComputingResourceTest {
         final String name = "test-instance-1";
 
         final int cpus = 8;
-        final int minSpeed = 1024;
-        final int maxSpeed = 2048;
         final int minRam = 256 * 1024;
         final int maxRam = 512 * 1024;
 
@@ -299,7 +292,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -311,8 +304,6 @@ public class LibvirtComputingResourceTest {
 
     /**
      * This test tests if the Agent can handle a vmSpec coming from a >4.1 management server.
-     * <p>
-     * It tests if the Agent can handle a vmSpec with overcommit data like minSpeed and maxSpeed in there
      */
     @Test
     public void testcreateVmFromSpec() {
@@ -320,8 +311,6 @@ public class LibvirtComputingResourceTest {
         final String name = "test-instance-1";
 
         final int cpus = _random.nextInt(2) + 1;
-        final int minSpeed = 1024;
-        final int maxSpeed = 2048;
         final int minRam = 256 * 1024;
         final int maxRam = 512 * 1024;
 
@@ -330,7 +319,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minSpeed, maxSpeed,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -450,9 +439,9 @@ public class LibvirtComputingResourceTest {
         LibvirtComputingResource.getCpuSpeed(nodeInfo);
     }
 
-  /*
-   * New Tests
-   */
+    /*
+     * New Tests
+     */
 
     @Test
     public void testStopCommandNoCheck() {

@@ -1258,34 +1258,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             s_logger.debug("Created VM " + vm.getUuid(conn) + " for " + vmSpec.getName());
         }
 
-        final Map<String, String> vcpuParams = new HashMap<>();
-
-        final Integer speed = vmSpec.getMinSpeed();
-        if (speed != null) {
-
-            int cpuWeight = _maxWeight; // cpu_weight
-            int utilization = 0; // max CPU cap, default is unlimited
-
-            // weight based allocation, CPU weight is calculated per VCPU
-            cpuWeight = (int) (speed * 0.99 / _host.getSpeed() * _maxWeight);
-            if (cpuWeight > _maxWeight) {
-                cpuWeight = _maxWeight;
-            }
-
-            if (vmSpec.getLimitCpuUse()) {
-                // CPU cap is per VM, so need to assign cap based on the number
-                // of vcpus
-                utilization = (int) (vmSpec.getMaxSpeed() * 0.99 * vmSpec.getCpus() / _host.getSpeed() * 100);
-            }
-
-            vcpuParams.put("weight", Integer.toString(cpuWeight));
-            vcpuParams.put("cap", Integer.toString(utilization));
-        }
-
-        if (vcpuParams.size() > 0) {
-            vm.setVCPUsParams(conn, vcpuParams);
-        }
-
         final String bootArgs = vmSpec.getBootArgs();
         if (bootArgs != null && bootArgs.length() > 0) {
             String pvargs = vm.getPVArgs(conn);
@@ -1826,27 +1798,27 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     hostStats.setCpuUtilization(hostStats.getCpuUtilization() + getDataAverage(dataNode, col, numRows));
                 }
 
-        /*
-         * if (param.contains("loadavg")) { hostStats.setAverageLoad((hostStats.getAverageLoad() +
-         * getDataAverage(dataNode, col, numRows))); }
-         */
+                /*
+                 * if (param.contains("loadavg")) { hostStats.setAverageLoad((hostStats.getAverageLoad() +
+                 * getDataAverage(dataNode, col, numRows))); }
+                 */
             }
         }
 
         // add the host cpu utilization
-    /*
-     * if (hostStats.getNumCpus() != 0) { hostStats.setCpuUtilization(hostStats.getCpuUtilization() /
-     * hostStats.getNumCpus()); s_logger.debug("Host cpu utilization " + hostStats.getCpuUtilization()); }
-     */
+        /*
+         * if (hostStats.getNumCpus() != 0) { hostStats.setCpuUtilization(hostStats.getCpuUtilization() /
+         * hostStats.getNumCpus()); s_logger.debug("Host cpu utilization " + hostStats.getCpuUtilization()); }
+         */
 
         return hostStats;
     }
 
     protected Object[] getRRDData(final Connection conn, final int flag) {
 
-    /*
-     * Note: 1 => called from host, hence host stats 2 => called from vm, hence vm stats
-     */
+        /*
+         * Note: 1 => called from host, hence host stats 2 => called from vm, hence vm stats
+         */
         Document doc = null;
 
         try {
@@ -2153,10 +2125,10 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             return new XsLocalNetwork(this, Network.getByUuid(conn, _host.getPublicNetwork()), null,
                     PIF.getByUuid(conn, _host.getPublicPif()), null);
         } else if (type == TrafficType.Storage) {
-      /*
-       * TrafficType.Storage is for secondary storage, while storageNetwork1 is for primary storage, we need better name
-       * here
-       */
+            /*
+             * TrafficType.Storage is for secondary storage, while storageNetwork1 is for primary storage, we need better name
+             * here
+             */
             return new XsLocalNetwork(this, Network.getByUuid(conn, _host.getStorageNetwork1()), null,
                     PIF.getByUuid(conn, _host.getStoragePif1()), null);
         }
@@ -2386,12 +2358,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             if (cpuInfo.get("socket_count") != null) {
                 _host.setCpuSockets(Integer.parseInt(cpuInfo.get("socket_count")));
             }
-            // would hcs be null we would have thrown an exception on condition
-            // (_host.getCpus() <= 0) by now
-            for (final HostCpu hc : hcs) {
-                _host.setSpeed(hc.getSpeed(conn).intValue());
-                break;
-            }
             final Host.Record hr = myself.getRecord(conn);
             _host.setProductVersion(CitrixHelper.getProductVersion(hr));
 
@@ -2510,7 +2476,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             }
             cmd.setCaps(caps.toString());
 
-            cmd.setSpeed(_host.getSpeed());
             cmd.setCpuSockets(_host.getCpuSockets());
             cmd.setCpus(_host.getCpus());
 
@@ -4080,33 +4045,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
         vm.setMemoryDynamicRange(conn, newDynamicMemoryMin, newDynamicMemoryMax);
         vm.setVCPUsNumberLive(conn, (long) vmSpec.getCpus());
-
-        final Integer speed = vmSpec.getMinSpeed();
-        if (speed != null) {
-
-            int cpuWeight = _maxWeight; // cpu_weight
-
-            // weight based allocation
-
-            cpuWeight = (int) (speed * 0.99 / _host.getSpeed() * _maxWeight);
-            if (cpuWeight > _maxWeight) {
-                cpuWeight = _maxWeight;
-            }
-
-            if (vmSpec.getLimitCpuUse()) {
-                long utilization = 0; // max CPU cap, default is unlimited
-                utilization = (int) (vmSpec.getMaxSpeed() * 0.99 * vmSpec.getCpus() / _host.getSpeed() * 100);
-                // vm.addToVCPUsParamsLive(conn, "cap",
-                // Long.toString(utilization)); currently xenserver doesnot
-                // support Xapi to add VCPUs params live.
-                callHostPlugin(conn, "vmops", "add_to_VCPUs_params_live", "key", "cap", "value", Long.toString(utilization),
-                        "vmname", vmSpec.getName());
-            }
-            // vm.addToVCPUsParamsLive(conn, "weight",
-            // Integer.toString(cpuWeight));
-            callHostPlugin(conn, "vmops", "add_to_VCPUs_params_live", "key", "weight", "value", Integer.toString(cpuWeight),
-                    "vmname", vmSpec.getName());
-        }
     }
 
     public void setCanBridgeFirewall(final boolean canBridgeFirewall) {
@@ -4241,7 +4179,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 }
             }
 
-      /* Make sure there is a physical bridge on this network */
+            /* Make sure there is a physical bridge on this network */
             VIF dom0vif = null;
             final Pair<VM, VM.Record> vm = getControlDomain(conn);
             final VM dom0 = vm.first();
@@ -4258,7 +4196,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 }
             }
 
-      /* create temp VIF0 */
+            /* create temp VIF0 */
             if (dom0vif == null) {
                 s_logger.debug("Can't find a vif on dom0 for link local, creating a new one");
                 final VIF.Record vifr = new VIF.Record();
@@ -4302,7 +4240,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 + (packageVersion == null ? Long.toString(System.currentTimeMillis()) : packageVersion);
 
         try {
-      /* push patches to XenServer */
+            /* push patches to XenServer */
             final Host.Record hr = host.getRecord(conn);
 
             final Iterator<String> it = hr.tags.iterator();

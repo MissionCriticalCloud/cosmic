@@ -91,7 +91,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setName(host.getName());
         hostResponse.setPodId(host.getPodUuid());
         hostResponse.setRemoved(host.getRemoved());
-        hostResponse.setCpuSpeed(host.getSpeed());
         hostResponse.setState(host.getStatus());
         hostResponse.setIpAddress(host.getPrivateIpAddress());
         hostResponse.setVersion(host.getVersion());
@@ -185,9 +184,9 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 hostResponse.setHypervisorVersion(host.getHypervisorVersion());
 
-                final String cpuAlloc = Float.toString(((float) cpu / (host.getCpus() * host.getSpeed() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()))) * 100f) + "%";
+                final String cpuAlloc = Float.toString(((float) cpu / (host.getCpus() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()))) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()));
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * CapacityManager.CpuOverprovisioningFactor.valueIn(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 
@@ -286,7 +285,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setName(host.getName());
         hostResponse.setPodId(host.getPodUuid());
         hostResponse.setRemoved(host.getRemoved());
-        hostResponse.setCpuSpeed(host.getSpeed());
         hostResponse.setState(host.getStatus());
         hostResponse.setIpAddress(host.getPrivateIpAddress());
         hostResponse.setVersion(host.getVersion());
@@ -353,9 +351,9 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
                 hostResponse.setHypervisorVersion(host.getHypervisorVersion());
 
-                final String cpuAlloc = decimalFormat.format(((float) cpu / (float) (host.getCpus() * host.getSpeed())) * 100f) + "%";
+                final String cpuAlloc = decimalFormat.format(((float) cpu / (float) host.getCpus()) * 100f) + "%";
                 hostResponse.setCpuAllocated(cpuAlloc);
-                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * host.getSpeed() * ApiDBUtils.getCpuOverprovisioningFactor(host.getClusterId()));
+                final String cpuWithOverprovisioning = Float.toString(host.getCpus() * ApiDBUtils.getCpuOverprovisioningFactor(host.getClusterId()));
                 hostResponse.setCpuWithOverprovisioning(cpuWithOverprovisioning);
             }
 

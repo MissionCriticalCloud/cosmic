@@ -163,7 +163,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
             final ServiceOffering offering = vmProfile.getServiceOffering();
             // In case of non-GPU VMs, protect GPU enabled Hosts and prefer VM deployment on non-GPU Hosts.
             if ((serviceOfferingDetailsDao.findDetail(offering.getId(), GPU.Keys.vgpuType.toString()) == null) && !(hostGpuGroupsDao.listHostIds().isEmpty())) {
-                final int requiredCpu = offering.getCpu() * offering.getSpeed();
+                final int requiredCpu = offering.getCpu();
                 final long requiredRam = offering.getRamSize() * 1024L * 1024L;
                 reorderClustersBasedOnImplicitTags(clusterList, requiredCpu, requiredRam);
             }
@@ -198,7 +198,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     private List<Long> scanPodsForDestination(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) {
 
         final ServiceOffering offering = vmProfile.getServiceOffering();
-        final int requiredCpu = offering.getCpu() * offering.getSpeed();
+        final int requiredCpu = offering.getCpu();
         final long requiredRam = offering.getRamSize() * 1024L * 1024L;
         //list pods under this zone by cpu and ram capacity
         List<Long> prioritizedPodIds = new ArrayList<>();
@@ -294,7 +294,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
         List<Long> clustersCrossingThreshold = new ArrayList<>();
 
         final ServiceOffering offering = vmProfile.getServiceOffering();
-        final int cpu_requested = offering.getCpu() * offering.getSpeed();
+        final int cpu_requested = offering.getCpu();
         final long ram_requested = offering.getRamSize() * 1024L * 1024L;
 
         // For each capacity get the cluster list crossing the threshold and
@@ -329,7 +329,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final ServiceOffering offering = vmProfile.getServiceOffering();
-        final int requiredCpu = offering.getCpu() * offering.getSpeed();
+        final int requiredCpu = offering.getCpu();
         final long requiredRam = offering.getRamSize() * 1024L * 1024L;
 
         //list clusters under this zone by cpu and ram capacity

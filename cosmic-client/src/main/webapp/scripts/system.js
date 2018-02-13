@@ -390,7 +390,7 @@
 
                                     args.response.success({
                                         data: {
-                                            cpuCapacityTotal: capacityTotal(1, cloudStack.converters.convertHz),
+                                            cpuCapacityTotal: capacityTotal(1, cloudStack.converters.notConvert),
                                             memCapacityTotal: capacityTotal(0, cloudStack.converters.convertBytes),
                                             storageCapacityTotal: capacityTotal(2, cloudStack.converters.convertBytes)
                                         }
@@ -400,7 +400,7 @@
 
                                     args.response.success({
                                         data: {
-                                            cpuCapacityTotal: cloudStack.converters.convertHz(0),
+                                            cpuCapacityTotal: cloudStack.converters.notConvert(0),
                                             memCapacityTotal: cloudStack.converters.convertBytes(0),
                                             storageCapacityTotal: cloudStack.converters.convertBytes(0)
                                         }
@@ -9815,7 +9815,7 @@
                                             var jsonObj = json.listhostsresponse.host[0];
                                             args.response.success({
                                                 data: {
-                                                    totalCPU: jsonObj.cpunumber + " x " + cloudStack.converters.convertHz(jsonObj.cpuspeed),
+                                                    totalCPU: jsonObj.cpunumber,
                                                     cpuused: jsonObj.cpuused,
                                                     cpuallocated: (jsonObj.cpuallocated == null || jsonObj.cpuallocated == 0) ? "N/A" : jsonObj.cpuallocated,
                                                     memorytotal: (jsonObj.memorytotal == null || jsonObj.memorytotal == 0) ? "N/A" : cloudStack.converters.convertBytes(jsonObj.memorytotal),
