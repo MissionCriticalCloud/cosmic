@@ -444,11 +444,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
                 result = result & element.stopSite2SiteVpn(conn);
             }
 
-            if (!result) {
-                conn.setState(State.Error);
-                _vpnConnectionDao.persist(conn);
-                throw new ResourceUnavailableException("Failed to apply site-to-site VPN", Site2SiteVpnConnection.class, id);
-            }
         } finally {
             _vpnConnectionDao.releaseFromLockTable(conn.getId());
         }
