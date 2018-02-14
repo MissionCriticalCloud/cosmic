@@ -182,6 +182,13 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     }
 
     @Override
+    public List<VolumeVO> findIncludingRemovedByAccount(long accountId) {
+        SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
+        sc.setParameters("accountId", accountId);
+        return listIncludingRemovedBy(sc);
+    }
+
+    @Override
     @DB()
     public Pair<Long, Long> getCountAndTotalByPool(final long poolId) {
         final SearchCriteria<SumCount> sc = TotalSizeByPoolSearch.create();
