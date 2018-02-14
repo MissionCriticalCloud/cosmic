@@ -544,7 +544,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
     @Override
     public boolean deleteSnapshotDirsForAccount(final long accountId) {
 
-        final List<VolumeVO> volumes = _volsDao.findByAccount(accountId);
+        final List<VolumeVO> volumes = _volsDao.findIncludingRemovedByAccount(accountId);
         // The above call will list only non-destroyed volumes.
         // So call this method before marking the volumes as destroyed.
         // i.e Call them before the VMs for those volumes are destroyed.
