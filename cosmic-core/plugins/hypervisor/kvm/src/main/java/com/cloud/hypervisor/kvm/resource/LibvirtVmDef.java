@@ -337,13 +337,10 @@ public class LibvirtVmDef {
     }
 
     public static class TermPolicy {
-        private String reboot;
-        private String powerOff;
-        private String crash;
-
-        public TermPolicy() {
-            reboot = powerOff = crash = "destroy";
-        }
+        private static final String DEFAULT_VALUE = "destroy";
+        private String reboot = DEFAULT_VALUE;
+        private String powerOff = DEFAULT_VALUE;
+        private String crash = DEFAULT_VALUE;
 
         public void setRebootPolicy(final String rbPolicy) {
             reboot = rbPolicy;
@@ -362,7 +359,7 @@ public class LibvirtVmDef {
             final StringBuilder term = new StringBuilder();
             term.append("<on_reboot>" + reboot + "</on_reboot>\n");
             term.append("<on_poweroff>" + powerOff + "</on_poweroff>\n");
-            term.append("<on_crash>" + powerOff + "</on_crash>\n");
+            term.append("<on_crash>" + crash + "</on_crash>\n");
             return term.toString();
         }
     }

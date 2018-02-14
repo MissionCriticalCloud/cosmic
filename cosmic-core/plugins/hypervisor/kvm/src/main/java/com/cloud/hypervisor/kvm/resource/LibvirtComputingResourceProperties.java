@@ -20,6 +20,12 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_STOP_SCRIPT_TIMEOUT;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_STORAGE_SCRIPTS_DIR;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_SYSTEMVM_ISO_PATH;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_CRASH_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_CRASH_VM;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_POWEROFF_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_POWEROFF_VM;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_REBOOT_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_REBOOT_VM;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_DOWNTIME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_PAUSEAFTER;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_SPEED;
@@ -58,6 +64,12 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_STOP_SCRIPT_TIMEOUT;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_STORAGE_SCRIPTS_DIR;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_SYSTEMVM_ISO_PATH;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_CRASH_VM;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_POWEROFF_VM;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER;
+import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_REBOOT_VM;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MEMBALLOON_DISABLE;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_DOWNTIME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER;
@@ -146,6 +158,14 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private int vmMigrateSpeed = DEFAULT_VM_MIGRATE_SPEED;
     private String zone = DEFAULT_ZONE;
 
+    private String termPolicyCrashRouter = DEFAULT_TERMPOLICY_CRASH_ROUTER;
+    private String termPolicyPowerOffRouter = DEFAULT_TERMPOLICY_POWEROFF_ROUTER;
+    private String termPolicyRebootRouter = DEFAULT_TERMPOLICY_REBOOT_ROUTER;
+
+    private String termPolicyCrashVm = DEFAULT_TERMPOLICY_CRASH_VM;
+    private String termPolicyPowerOffVm = DEFAULT_TERMPOLICY_POWEROFF_VM;
+    private String termPolicyRebootVm = DEFAULT_TERMPOLICY_REBOOT_VM;
+
     @Override
     public void load(final Properties properties) {
         cluster = parse(properties, PROPERTY_KEY_CLUSTER, cluster);
@@ -199,6 +219,13 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         vmWatchdogModel = parse(properties, PROPERTY_KEY_VM_WATCHDOG_MODEL, vmWatchdogModel, WatchDogModel.class);
         vmWatchdogAction = parse(properties, PROPERTY_KEY_VM_WATCHDOG_ACTION, vmWatchdogAction, WatchDogAction.class);
 
+        termPolicyCrashRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER, termPolicyCrashRouter);
+        termPolicyPowerOffRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER, termPolicyPowerOffRouter);
+        termPolicyRebootRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER, termPolicyRebootRouter);
+
+        termPolicyCrashVm = parse(properties, PROPERTY_KEY_TERMPOLICY_CRASH_VM, termPolicyCrashVm);
+        termPolicyPowerOffVm = parse(properties, PROPERTY_KEY_TERMPOLICY_POWEROFF_VM, termPolicyPowerOffVm);
+        termPolicyRebootVm = parse(properties, PROPERTY_KEY_TERMPOLICY_REBOOT_VM, termPolicyRebootVm);
         validateValues();
     }
 
@@ -398,6 +425,30 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return guestCpuFeatures;
     }
 
+    public String getRouterTermPolicyCrash() {
+        return termPolicyCrashRouter;
+    }
+
+    public String getRouterTermPolicyPowerOff() {
+        return termPolicyPowerOffRouter;
+    }
+
+    public String getRouterTermPolicyReboot() {
+        return termPolicyRebootRouter;
+    }
+
+    public String getVmTermPolicyCrash() {
+        return termPolicyCrashVm;
+    }
+
+    public String getVmTermPolicyPowerOff() {
+        return termPolicyPowerOffVm;
+    }
+
+    public String getVmTermPolicyReboot() {
+        return termPolicyRebootVm;
+    }
+
     public String getInstance() {
         return instance;
     }
@@ -486,6 +537,14 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER = "vm.migrate.pauseafter";
         public static final String PROPERTY_KEY_VM_MIGRATE_SPEED = "vm.migrate.speed";
 
+        public static final String PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER = "termpolicy.router.oncrash";
+        public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER = "termpolicy.router.onpoweroff";
+        public static final String PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER = "termpolicy.router.onreboot";
+
+        public static final String PROPERTY_KEY_TERMPOLICY_CRASH_VM = "termpolicy.vm.oncrash";
+        public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_VM = "termpolicy.vm.onpoweroff";
+        public static final String PROPERTY_KEY_TERMPOLICY_REBOOT_VM = "termpolicy.vm.onreboot";
+
         public static final int DEFAULT_CPU_SHARES = 1024;
         public static final int DEFAULT_CPU_SHARES_ROUTER = 1024;
         public static final int DEFAULT_CMDS_TIMEOUT = 7200;
@@ -510,6 +569,14 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final int DEFAULT_VM_MIGRATE_DOWNTIME = -1;
         public static final int DEFAULT_VM_MIGRATE_PAUSEAFTER = -1;
         public static final int DEFAULT_VM_MIGRATE_SPEED = -1;
+
+        public static final String DEFAULT_TERMPOLICY_CRASH_ROUTER = "restart";
+        public static final String DEFAULT_TERMPOLICY_POWEROFF_ROUTER = "restart";
+        public static final String DEFAULT_TERMPOLICY_REBOOT_ROUTER = "restart";
+
+        public static final String DEFAULT_TERMPOLICY_CRASH_VM = "destroy";
+        public static final String DEFAULT_TERMPOLICY_POWEROFF_VM = "destroy";
+        public static final String DEFAULT_TERMPOLICY_REBOOT_VM = "destroy";
 
         public static final String DEFAULT_VM_RNG_PATH = "/dev/random";
         public static final String SCRIPT_MODIFY_VLAN = "modifyvlan.sh";

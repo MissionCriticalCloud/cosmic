@@ -1483,9 +1483,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         final TermPolicy term = new TermPolicy();
         if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
-            term.setCrashPolicy("restart");
-            term.setPowerOffPolicy("restart");
-            term.setRebootPolicy("restart");
+            term.setCrashPolicy(getRouterTermpolicyCrash());
+            term.setPowerOffPolicy(getRouterTermpolicyPowerOff());
+            term.setRebootPolicy(getRouterTermpolicyReboot());
+        } else {
+            term.setCrashPolicy(getVmTermpolicyCrash());
+            term.setPowerOffPolicy(getVmTermpolicyPowerOff());
+            term.setRebootPolicy(getVmTermpolicyReboot());
         }
         vm.addComponent(term);
 
@@ -2780,6 +2784,30 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     public List<String> getCpuFeatures() {
         return libvirtComputingResourceProperties.getGuestCpuFeatures();
+    }
+
+    public String getRouterTermpolicyCrash() {
+        return libvirtComputingResourceProperties.getRouterTermPolicyCrash();
+    }
+
+    public String getRouterTermpolicyPowerOff() {
+        return libvirtComputingResourceProperties.getRouterTermPolicyPowerOff();
+    }
+
+    public String getRouterTermpolicyReboot() {
+        return libvirtComputingResourceProperties.getRouterTermPolicyReboot();
+    }
+
+    public String getVmTermpolicyCrash() {
+        return libvirtComputingResourceProperties.getVmTermPolicyCrash();
+    }
+
+    public String getVmTermpolicyPowerOff() {
+        return libvirtComputingResourceProperties.getVmTermPolicyPowerOff();
+    }
+
+    public String getVmTermpolicyReboot() {
+        return libvirtComputingResourceProperties.getVmTermPolicyReboot();
     }
 
     public String[] getIfNamePatterns() {
