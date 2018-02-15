@@ -15,6 +15,7 @@ public class GuestOSDaoImpl extends GenericDaoBase<GuestOSVO, Long> implements G
     protected GuestOSDaoImpl() {
         Search = createSearchBuilder();
         Search.and("display_name", Search.entity().getDisplayName(), SearchCriteria.Op.EQ);
+        Search.and("id", Search.entity().getId(), SearchCriteria.Op.EQ);
         Search.done();
     }
 
@@ -22,6 +23,13 @@ public class GuestOSDaoImpl extends GenericDaoBase<GuestOSVO, Long> implements G
     public GuestOSVO listByDisplayName(final String displayName) {
         final SearchCriteria<GuestOSVO> sc = Search.create();
         sc.setParameters("display_name", displayName);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public GuestOSVO listByGuestOSId(final long guestOsId) {
+        final SearchCriteria<GuestOSVO> sc = Search.create();
+        sc.setParameters("id", guestOsId);
         return findOneBy(sc);
     }
 }

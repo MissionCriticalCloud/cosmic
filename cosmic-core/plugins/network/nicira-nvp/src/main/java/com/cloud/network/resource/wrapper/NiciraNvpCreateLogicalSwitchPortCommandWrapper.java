@@ -41,10 +41,18 @@ public final class NiciraNvpCreateLogicalSwitchPortCommandWrapper extends Comman
                 niciraNvpApi.deleteLogicalSwitchPort(logicalSwitchUuid, staleSwitchPortUuid);
             }
 
+            // We can't set Mac Learning unless there is an attachment
+            logicalSwitchPort.setMacLearning(null);
             final LogicalSwitchPort newPort = niciraNvpApi.createLogicalSwitchPort(logicalSwitchUuid, logicalSwitchPort);
 
             try {
                 niciraNvpApi.updateLogicalSwitchPortAttachment(command.getLogicalSwitchUuid(), newPort.getUuid(), new VifAttachment(attachmentUuid));
+
+                if (command.getMacLearning()) {
+                    s_logger.info("Updating newly created logical switch port: " + newPort.getUuid() + " to enable mac_learning");
+                    newPort.setMacLearning(true);
+                    niciraNvpApi.updateLogicalSwitchPort(logicalSwitchUuid, newPort);
+                }
             } catch (final NiciraNvpApiException ex) {
                 s_logger.warn("modifyLogicalSwitchPort failed after switchport was created, removing switchport");
                 niciraNvpApi.deleteLogicalSwitchPort(command.getLogicalSwitchUuid(), newPort.getUuid());

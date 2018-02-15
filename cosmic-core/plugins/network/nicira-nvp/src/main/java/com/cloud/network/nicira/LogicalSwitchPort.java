@@ -9,16 +9,18 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
     private String queueUuid;
     private List<String> securityProfiles;
     private List<String> mirrorTargets;
+    private Boolean macLearning;
 
     public LogicalSwitchPort() {
         super();
     }
 
-    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled) {
+    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled, final Boolean macLearning) {
         super();
         this.displayName = displayName;
         this.tags = tags;
         this.adminStatusEnabled = adminStatusEnabled;
+        this.macLearning = macLearning;
     }
 
     public Integer getPortno() {
@@ -59,5 +61,13 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
 
     public void setMirrorTargets(final List<String> mirrorTargets) {
         this.mirrorTargets = mirrorTargets;
+    }
+
+    public Boolean getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final Boolean macLearning) {
+        this.macLearning = macLearning;
     }
 }

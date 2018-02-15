@@ -36,8 +36,7 @@ public class NiciraNvpUtilities {
         final List<NiciraNvpTag> tags = new ArrayList<>();
         tags.add(new NiciraNvpTag("cs_account", command.getOwnerName()));
 
-        final LogicalSwitchPort logicalSwitchPort = new LogicalSwitchPort(attachmentUuid, tags, true);
-        return logicalSwitchPort;
+        return new LogicalSwitchPort(attachmentUuid, tags, true, command.getMacLearning());
     }
 
     public VifAttachment createVifAttachment(final String attachmentUuid) {
