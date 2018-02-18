@@ -47,8 +47,6 @@ public final class LibvirtStopCommandWrapper extends CommandWrapper<StopCommand,
 
             final List<LibvirtDiskDef> disks = libvirtComputingResource.getDisks(conn, vmName);
             final List<InterfaceDef> ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
-
-            libvirtComputingResource.destroyNetworkRulesForVm(conn, vmName);
             final String result = libvirtComputingResource.stopVm(conn, vmName, command.isForceStop());
             if (result == null) {
                 for (final LibvirtDiskDef disk : disks) {

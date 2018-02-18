@@ -273,10 +273,6 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
                     details.put("storage.network.device1", storageNetworkLabel);
                 }
 
-                final Zone zone = zoneRepository.findOne(dcId);
-                final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
-                params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
-
                 params.put("router.aggregation.command.each.timeout", _configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
                 params.put("wait", Integer.toString(_wait));
                 details.put("wait", Integer.toString(_wait));
@@ -515,13 +511,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
 
     @Override
     protected HashMap<String, Object> buildConfigParams(final HostVO host) {
-        final HashMap<String, Object> params = super.buildConfigParams(host);
-        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
-        if (zone != null) {
-            final boolean securityGroupEnabled = zone.isSecurityGroupEnabled();
-            params.put("securitygroupenabled", Boolean.toString(securityGroupEnabled));
-        }
-        return params;
+        return super.buildConfigParams(host);
     }
 
     @Override

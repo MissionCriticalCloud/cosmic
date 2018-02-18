@@ -22,7 +22,6 @@ public class ListCapabilitiesCmd extends BaseCmd {
     public void execute() {
         final Map<String, Object> capabilities = _mgr.listCapabilities(this);
         final CapabilitiesResponse response = new CapabilitiesResponse();
-        response.setSecurityGroupsEnabled((Boolean) capabilities.get("securityGroupsEnabled"));
         response.setCloudStackVersion((String) capabilities.get("cloudStackVersion"));
         response.setCosmic((Boolean) true);
         response.setUserPublicTemplateEnabled((Boolean) capabilities.get("userPublicTemplateEnabled"));

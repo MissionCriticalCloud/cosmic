@@ -313,13 +313,6 @@ import com.cloud.api.command.user.resource.ListHypervisorsCmd;
 import com.cloud.api.command.user.resource.ListResourceLimitsCmd;
 import com.cloud.api.command.user.resource.UpdateResourceCountCmd;
 import com.cloud.api.command.user.resource.UpdateResourceLimitCmd;
-import com.cloud.api.command.user.securitygroup.AuthorizeSecurityGroupEgressCmd;
-import com.cloud.api.command.user.securitygroup.AuthorizeSecurityGroupIngressCmd;
-import com.cloud.api.command.user.securitygroup.CreateSecurityGroupCmd;
-import com.cloud.api.command.user.securitygroup.DeleteSecurityGroupCmd;
-import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
-import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupEgressCmd;
-import com.cloud.api.command.user.securitygroup.RevokeSecurityGroupIngressCmd;
 import com.cloud.api.command.user.snapshot.CreateSnapshotCmd;
 import com.cloud.api.command.user.snapshot.CreateSnapshotFromVMSnapshotCmd;
 import com.cloud.api.command.user.snapshot.DeleteSnapshotCmd;
@@ -492,7 +485,6 @@ import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
 import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
@@ -2327,22 +2319,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Map<String, Object> capabilities = new HashMap<>();
 
         final Account caller = getCaller();
-        boolean securityGroupsEnabled = false;
         final boolean elasticLoadBalancerEnabled;
         final boolean KVMSnapshotEnabled;
         String supportELB = "false";
-        final List<NetworkVO> networks = _networkDao.listSecurityGroupEnabledNetworks();
-        if (networks != null && !networks.isEmpty()) {
-            securityGroupsEnabled = true;
-            final String elbEnabled = _configDao.getValue(Config.ElasticLoadBalancerEnabled.key());
-            elasticLoadBalancerEnabled = elbEnabled == null ? false : Boolean.parseBoolean(elbEnabled);
-            if (elasticLoadBalancerEnabled) {
-                final String networkType = _configDao.getValue(Config.ElasticLoadBalancerNetwork.key());
-                if (networkType != null) {
-                    supportELB = networkType;
-                }
-            }
-        }
 
         final long diskOffMinSize = VolumeOrchestrationService.CustomDiskOfferingMinSize.value();
         final long diskOffMaxSize = VolumeOrchestrationService.CustomDiskOfferingMaxSize.value();
@@ -2368,7 +2347,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             regionSecondaryEnabled = true;
         }
 
-        capabilities.put("securityGroupsEnabled", securityGroupsEnabled);
         capabilities.put("userPublicTemplateEnabled", userPublicTemplateEnabled);
         capabilities.put("cloudStackVersion", getVersion());
         capabilities.put("supportELB", supportELB);
@@ -3073,7 +3051,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     }
 
     @Override
-    public HypervisorCapabilities updateHypervisorCapabilities(final Long id, final Long maxGuestsLimit, final Boolean securityGroupEnabled) {
+    public HypervisorCapabilities updateHypervisorCapabilities(final Long id, final Long maxGuestsLimit) {
         HypervisorCapabilitiesVO hpvCapabilities = _hypervisorCapabilitiesDao.findById(id, true);
 
         if (hpvCapabilities == null) {
@@ -3082,7 +3060,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw ex;
         }
 
-        final boolean updateNeeded = maxGuestsLimit != null || securityGroupEnabled != null;
+        final boolean updateNeeded = maxGuestsLimit != null;
         if (!updateNeeded) {
             return hpvCapabilities;
         }
@@ -3091,10 +3069,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         if (maxGuestsLimit != null) {
             hpvCapabilities.setMaxGuestsLimit(maxGuestsLimit);
-        }
-
-        if (securityGroupEnabled != null) {
-            hpvCapabilities.setSecurityGroupEnabled(securityGroupEnabled);
         }
 
         if (_hypervisorCapabilitiesDao.update(id, hpvCapabilities)) {
@@ -3596,13 +3570,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(ListResourceLimitsCmd.class);
         cmdList.add(UpdateResourceCountCmd.class);
         cmdList.add(UpdateResourceLimitCmd.class);
-        cmdList.add(AuthorizeSecurityGroupEgressCmd.class);
-        cmdList.add(AuthorizeSecurityGroupIngressCmd.class);
-        cmdList.add(CreateSecurityGroupCmd.class);
-        cmdList.add(DeleteSecurityGroupCmd.class);
-        cmdList.add(ListSecurityGroupsCmd.class);
-        cmdList.add(RevokeSecurityGroupEgressCmd.class);
-        cmdList.add(RevokeSecurityGroupIngressCmd.class);
         cmdList.add(CreateSnapshotCmd.class);
         cmdList.add(CreateSnapshotFromVMSnapshotCmd.class);
         cmdList.add(DeleteSnapshotCmd.class);

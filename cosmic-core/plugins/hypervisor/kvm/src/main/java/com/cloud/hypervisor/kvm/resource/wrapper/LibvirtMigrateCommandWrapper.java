@@ -174,7 +174,6 @@ public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCo
         }
 
         if (result == null) {
-            libvirtComputingResource.destroyNetworkRulesForVm(conn, vmName);
             for (final InterfaceDef iface : ifaces) {
                 // We don't know which "traffic type" is associated with
                 // each interface at this point, so inform all vif drivers

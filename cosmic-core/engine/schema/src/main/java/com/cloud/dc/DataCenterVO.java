@@ -34,8 +34,6 @@ public class DataCenterVO implements DataCenter {
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
     AllocationState allocationState;
-    @Column(name = "is_security_group_enabled")
-    boolean securityGroupEnabled;
     @Column(name = "is_local_storage_enabled")
     boolean localStorageEnabled;
     @Id
@@ -76,15 +74,14 @@ public class DataCenterVO implements DataCenter {
 
     public DataCenterVO(final long id, final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr, final String
             domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
-        this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, false, null, null);
+        this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, null, null);
         this.id = id;
         this.allocationState = AllocationState.Enabled;
         this.uuid = UUID.randomUUID().toString();
     }
 
     public DataCenterVO(final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr, final
-    String domain, final Long domainId,
-                        final NetworkType zoneType, final String zoneToken, final String domainSuffix, final boolean securityGroupEnabled, final boolean localStorageEnabled,
+    String domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix, final boolean localStorageEnabled,
                         final String ip6Dns1, final String ip6Dns2) {
         this.name = name;
         this.description = description;
@@ -99,7 +96,6 @@ public class DataCenterVO implements DataCenter {
         this.domainId = domainId;
         this.networkType = zoneType;
         this.allocationState = AllocationState.Enabled;
-        this.securityGroupEnabled = securityGroupEnabled;
         this.localStorageEnabled = localStorageEnabled;
 
         this.zoneToken = zoneToken;
@@ -188,15 +184,6 @@ public class DataCenterVO implements DataCenter {
     @Override
     public String getInternalDns2() {
         return internalDns2;
-    }
-
-    @Override
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
-
-    public void setSecurityGroupEnabled(final boolean enabled) {
-        this.securityGroupEnabled = enabled;
     }
 
     @Override

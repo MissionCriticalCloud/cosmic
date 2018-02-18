@@ -996,17 +996,6 @@
                                     // Show non-VPC networks by default
                                     filterNetworkList(-1);
 
-                                    // Security groups (alt. page)
-                                    var $sgSelects = makeSelects('security-groups', args.data.securityGroups, {
-                                        name: 'name',
-                                        desc: 'description',
-                                        id: 'id'
-                                    }, {
-                                        type: 'checkbox',
-                                        'wizard-field': 'security-groups'
-                                    });
-                                    $step.find('.security-groups .select-container').append($sgSelects);
-
                                     //If there is only one security group and the only one is 'default', make it selected by default
                                     if ($sgSelects.length == 1) {
                                         var $firstCheckbox = $sgSelects.eq(0);
@@ -1185,23 +1174,6 @@
                                 });
                                 return false;
                             }
-
-                            if ($activeStep.hasClass('next-use-security-groups')) {
-                                var advSGFilter = args.advSGFilter({
-                                    data: cloudStack.serializeForm($form)
-                                });
-
-                                if (advSGFilter == 0) { //when total number of selected sg networks is 0, then 'Select Security Group' is skipped, go to step 6 directly
-                                    showStep(6);
-                                } else { //when total number of selected sg networks > 0
-                                    if ($activeStep.find('input[type=checkbox]:checked').size() > 1) { //when total number of selected networks > 1
-                                        cloudStack.dialog.notice({
-                                            message: "Can't create a vm with multiple networks one of which is Security Group enabled"
-                                        });
-                                        return false;
-                                    }
-                                }
-                            }
                         }
 
                         //step 6 - review (spcifiy displyname, group as well)
@@ -1235,17 +1207,8 @@
                         var $networkStep = $steps.filter('.network');
                         var index = $step.index();
 
-                        $networkStep.removeClass('next-use-security-groups');
-
                         if (index) {
-                            if (index == $steps.size() - 1 && $networkStep.hasClass('next-use-security-groups')) {
-                                showStep(5);
-                            } else if ($activeStep.find('.select-security-group:visible').size() &&
-                                $activeStep.find('.select-network.no-add-network').size()) {
-                                showStep(5);
-                            } else {
-                                showStep(index);
-                            }
+                            showStep(index);
                         }
 
                         return false;

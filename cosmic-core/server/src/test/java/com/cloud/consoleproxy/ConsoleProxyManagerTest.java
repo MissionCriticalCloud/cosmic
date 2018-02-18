@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy;
 
 import static org.mockito.AdditionalMatchers.not;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -14,7 +13,6 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.ConsoleProxyVO;
 
 import java.util.Collections;
@@ -99,10 +97,9 @@ public class ConsoleProxyManagerTest {
     }
 
     @Test
-    public void getDefaultNetworkForAdvancedNonSG() {
+    public void getDefaultNetwork() {
         final Zone zone = mock(Zone.class);
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(zone.isSecurityGroupEnabled()).thenReturn(false);
 
         when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
 
@@ -114,119 +111,10 @@ public class ConsoleProxyManagerTest {
         when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Public))))
                 .thenReturn(Collections.singletonList(badNetwork));
 
-        when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                .thenReturn(Collections.singletonList(badNetwork));
-
         final NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForAdvancedZone(zone);
 
         Assert.assertNotNull(returnedNetwork);
         Assert.assertEquals(network, returnedNetwork);
         Assert.assertNotEquals(badNetwork, returnedNetwork);
-    }
-
-    @Test
-    public void getDefaultNetworkForAdvancedSG() {
-        final Zone zone = mock(Zone.class);
-        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(zone.isSecurityGroupEnabled()).thenReturn(true);
-
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
-
-        final NetworkVO network = Mockito.mock(NetworkVO.class);
-        final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                .thenReturn(Collections.singletonList(badNetwork));
-
-        when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                .thenReturn(Collections.singletonList(network));
-
-        final NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForAdvancedZone(zone);
-
-        Assert.assertEquals(network, returnedNetwork);
-        Assert.assertNotEquals(badNetwork, returnedNetwork);
-    }
-
-    @Test
-    public void getDefaultNetworkForBasicNonSG() {
-        final Zone zone = mock(Zone.class);
-        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(zone.isSecurityGroupEnabled()).thenReturn(false);
-
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
-
-        final NetworkVO network = Mockito.mock(NetworkVO.class);
-        final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                .thenReturn(Collections.singletonList(network));
-
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                .thenReturn(Collections.singletonList(badNetwork));
-
-        final NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForBasicZone(zone);
-        Assert.assertNotNull(returnedNetwork);
-        Assert.assertEquals(network, returnedNetwork);
-        Assert.assertNotEquals(badNetwork, returnedNetwork);
-    }
-
-    @Test
-    public void getDefaultNetworkForBasicSG() {
-        final Zone zone = mock(Zone.class);
-        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(zone.isSecurityGroupEnabled()).thenReturn(true);
-
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
-
-        final NetworkVO network = Mockito.mock(NetworkVO.class);
-        final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                .thenReturn(Collections.singletonList(network));
-
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                .thenReturn(Collections.singletonList(badNetwork));
-
-        final NetworkVO returnedNetwork = cpvmManager.getDefaultNetworkForBasicZone(zone);
-
-        Assert.assertNotNull(returnedNetwork);
-        Assert.assertEquals(network, returnedNetwork);
-        Assert.assertNotEquals(badNetwork, returnedNetwork);
-    }
-
-    //also test invalid input
-    @Test(expected = CloudRuntimeException.class)
-    public void getDefaultNetworkForBasicSGWrongZoneType() {
-        final Zone zone = mock(Zone.class);
-        when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(zone.isSecurityGroupEnabled()).thenReturn(true);
-
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
-
-        final NetworkVO network = Mockito.mock(NetworkVO.class);
-        final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), eq(TrafficType.Guest)))
-                .thenReturn(Collections.singletonList(network));
-
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), not(eq(TrafficType.Guest))))
-                .thenReturn(Collections.singletonList(badNetwork));
-
-        cpvmManager.getDefaultNetworkForBasicZone(zone);
-    }
-
-    @Test(expected = CloudRuntimeException.class)
-    public void getDefaultNetworkForAdvancedWrongZoneType() {
-        final Zone zone = mock(Zone.class);
-        when(zone.getNetworkType()).thenReturn(NetworkType.Basic);
-        when(zone.isSecurityGroupEnabled()).thenReturn(true);
-
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
-
-        final NetworkVO network = Mockito.mock(NetworkVO.class);
-        final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);
-        when(_networkDao.listByZoneAndTrafficType(anyLong(), any(TrafficType.class)))
-                .thenReturn(Collections.singletonList(badNetwork));
-
-        when(_networkDao.listByZoneSecurityGroup(anyLong()))
-                .thenReturn(Collections.singletonList(network));
-
-        cpvmManager.getDefaultNetworkForAdvancedZone(zone);
     }
 }

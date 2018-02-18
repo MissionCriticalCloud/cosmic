@@ -19,7 +19,6 @@ import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmData.NicData;
-import com.cloud.vm.dao.UserVmData.SecurityGroupData;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -43,13 +42,11 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
                     + "GROUP BY pod_id HAVING count(id) > 0 ORDER BY count(id) DESC";
     private static final String VM_DETAILS = "select vm_instance.id, "
             + "account.id, account.account_name, account.type, domain.name, instance_group.id, instance_group.name,"
-            + "data_center.id, data_center.name, data_center.is_security_group_enabled, host.id, host.name, "
+            + "data_center.id, data_center.name, host.id, host.name, "
             + "vm_template.id, vm_template.name, vm_template.display_text, iso.id, iso.name, "
             + "vm_template.enable_password, service_offering.id, disk_offering.name, storage_pool.id, storage_pool.pool_type, "
-            + "service_offering.cpu, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type, security_group.id, security_group" +
-            ".name, "
-            + "security_group.description, nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, " +
-            "nics.isolation_uri, "
+            + "service_offering.cpu, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type,"
+            + "nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, nics.isolation_uri, "
             + "networks.traffic_type, networks.guest_type, user_ip_address.id, user_ip_address.public_ip_address from vm_instance "
             + "left join account on vm_instance.account_id=account.id  " + "left join domain on vm_instance.domain_id=domain.id "
             + "left join instance_group_vm_map on vm_instance.id=instance_group_vm_map.instance_id "
@@ -58,9 +55,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             + "left join user_vm on vm_instance.id=user_vm.id " + "left join vm_template iso on iso.id=user_vm.iso_id "
             + "left join service_offering on vm_instance.service_offering_id=service_offering.id "
             + "left join disk_offering  on vm_instance.service_offering_id=disk_offering.id " + "left join volumes on vm_instance.id=volumes.instance_id "
-            + "left join storage_pool on volumes.pool_id=storage_pool.id " + "left join security_group_vm_map on vm_instance.id=security_group_vm_map.instance_id "
-            + "left join security_group on security_group_vm_map.security_group_id=security_group.id " + "left join nics on vm_instance.id=nics.instance_id "
-            + "left join networks on nics.network_id=networks.id " + "left join user_ip_address on user_ip_address.vm_id=vm_instance.id " + "where vm_instance.id in (";
+            + "left join storage_pool on volumes.pool_id=storage_pool.id " + "left join nics on vm_instance.id=nics.instance_id " + "left join networks on nics.network_id=networks.id " + "left join" +
+            " user_ip_address on user_ip_address.vm_id=vm_instance.id " + "where vm_instance.id in (";
     private static final String VMS_DETAIL_BY_NAME = "select vm_instance.instance_name, vm_instance.vm_type, vm_instance.id , user_vm_details.value, user_vm_details.name from " +
             "vm_instance "
             + "left join user_vm_details on vm_instance.id = user_vm_details.vm_id where (user_vm_details.name is null or user_vm_details.name = ? ) and vm_instance" +
@@ -79,7 +75,6 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     protected SearchBuilder<UserVmVO> AccountDataCenterVirtualSearch;
     protected GenericSearchBuilder<UserVmVO, Long> CountByAccountPod;
     protected GenericSearchBuilder<UserVmVO, Long> CountByAccount;
-    protected GenericSearchBuilder<UserVmVO, Long> PodsHavingVmsForAccount;
     protected SearchBuilder<UserVmVO> UserVmSearch;
     protected SearchBuilder<UserVmVO> UserVmByIsoSearch;
     protected Attribute _updateTimeAttr;
@@ -87,7 +82,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     protected UserVmDetailsDao _detailsDao;
     @Inject
     protected NicDao _nicDao;
-    // ResourceTagsDaoImpl _tagsDao = ComponentLocator.inject(ResourceTagsDaoImpl.class);
+
     @Inject
     ResourceTagDao _tagsDao;
 
@@ -559,16 +554,6 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
                 }
             }
             userVmData.setInitialized();
-        }
-
-        final Long securityGroupId = rs.getLong("security_group.id");
-        if (securityGroupId != null && securityGroupId.longValue() != 0) {
-            final SecurityGroupData resp = userVmData.newSecurityGroupData();
-            resp.setId(rs.getLong("security_group.id"));
-            resp.setName(rs.getString("security_group.name"));
-            resp.setDescription(rs.getString("security_group.description"));
-            resp.setObjectName("securitygroup");
-            userVmData.addSecurityGroup(resp);
         }
 
         final long nic_id = rs.getLong("nics.id");

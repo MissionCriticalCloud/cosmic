@@ -32,7 +32,6 @@ public class NicProfile implements InternalIdentity, Serializable {
     ReservationStrategy strategy;
     boolean defaultNic;
     Integer networkRate;
-    boolean isSecurityGroupEnabled;
 
     // IPv4
     String iPv4Address;
@@ -57,8 +56,7 @@ public class NicProfile implements InternalIdentity, Serializable {
     public NicProfile() {
     }
 
-    public NicProfile(final Nic nic, final Network network, final URI broadcastUri, final URI isolationUri, final Integer networkRate, final boolean isSecurityGroupEnabled,
-                      final String name) {
+    public NicProfile(final Nic nic, final Network network, final URI broadcastUri, final URI isolationUri, final Integer networkRate, final String name) {
         id = nic.getId();
         networkId = network.getId();
         mode = network.getMode();
@@ -81,7 +79,6 @@ public class NicProfile implements InternalIdentity, Serializable {
         this.broadcastUri = broadcastUri;
         this.isolationUri = isolationUri;
 
-        this.isSecurityGroupEnabled = isSecurityGroupEnabled;
         vmId = nic.getInstanceId();
         this.name = name;
         uuid = nic.getUuid();
@@ -241,14 +238,6 @@ public class NicProfile implements InternalIdentity, Serializable {
 
     public void setNetworkRate(final Integer networkRate) {
         this.networkRate = networkRate;
-    }
-
-    public boolean isSecurityGroupEnabled() {
-        return isSecurityGroupEnabled;
-    }
-
-    public void setSecurityGroupEnabled(final boolean enabled) {
-        isSecurityGroupEnabled = enabled;
     }
 
     //

@@ -50,8 +50,6 @@ public interface ResourceTag extends ControlledEntity, Identity, InternalIdentit
         LoadBalancer(true, true),
         PortForwardingRule(true, true),
         FirewallRule(true, true),
-        SecurityGroup(true, false),
-        SecurityGroupRule(true, false),
         PublicIpAddress(true, true),
         Project(true, false),
         Vpc(true, true),

@@ -206,10 +206,6 @@ public class ApiConstants {
     public static final String SINCE = "since";
     public static final String KEY = "key";
     public static final String SEARCH_BASE = "searchbase";
-    public static final String SECURITY_GROUP_IDS = "securitygroupids";
-    public static final String SECURITY_GROUP_NAMES = "securitygroupnames";
-    public static final String SECURITY_GROUP_NAME = "securitygroupname";
-    public static final String SECURITY_GROUP_ID = "securitygroupid";
     public static final String SENT = "sent";
     public static final String SENT_BYTES = "sentbytes";
     public static final String SERVER_TIMEOUT = "servertimeout";
@@ -256,7 +252,6 @@ public class ApiConstants {
     public static final String USER_ID = "userid";
     public static final String USE_SSL = "ssl";
     public static final String USERNAME = "username";
-    public static final String USER_SECURITY_GROUP_LIST = "usersecuritygrouplist";
     public static final String USE_VIRTUAL_NETWORK = "usevirtualnetwork";
     public static final String VALUE = "value";
     public static final String VIRTUAL_MACHINE_ID = "virtualmachineid";
@@ -375,7 +370,6 @@ public class ApiConstants {
     public static final String SERVICE_NAME = "servicename";
     public static final String DHCP_RANGE = "dhcprange";
     public static final String UUID = "uuid";
-    public static final String SECURITY_GROUP_EANBLED = "securitygroupenabled";
     public static final String LOCAL_STORAGE_ENABLED = "localstorageenabled";
     public static final String GUEST_IP_TYPE = "guestiptype";
     public static final String XENSERVER_NETWORK_LABEL = "xennetworklabel";

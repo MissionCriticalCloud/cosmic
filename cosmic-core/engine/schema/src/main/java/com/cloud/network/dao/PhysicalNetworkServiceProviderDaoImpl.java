@@ -44,7 +44,6 @@ public class PhysicalNetworkServiceProviderDaoImpl extends GenericDaoBase<Physic
         AllFieldsSearch.and("staticNatService", AllFieldsSearch.entity().isStaticnatServiceProvided(), Op.EQ);
         AllFieldsSearch.and("pfService", AllFieldsSearch.entity().isPortForwardingServiceProvided(), Op.EQ);
         AllFieldsSearch.and("userDataService", AllFieldsSearch.entity().isUserdataServiceProvided(), Op.EQ);
-        AllFieldsSearch.and("securityGroupService", AllFieldsSearch.entity().isSecuritygroupServiceProvided(), Op.EQ);
         AllFieldsSearch.done();
     }
 
@@ -89,8 +88,6 @@ public class PhysicalNetworkServiceProviderDaoImpl extends GenericDaoBase<Physic
             sc.setParameters("lbService", true);
         } else if (serviceType.equalsIgnoreCase(Service.PortForwarding.getName())) {
             sc.setParameters("pfService", true);
-        } else if (serviceType.equalsIgnoreCase(Service.SecurityGroup.getName())) {
-            sc.setParameters("securityGroupService", true);
         } else if (serviceType.equalsIgnoreCase(Service.SourceNat.getName())) {
             sc.setParameters("sourceNatService", true);
         } else if (serviceType.equalsIgnoreCase(Service.StaticNat.getName())) {

@@ -1,11 +1,11 @@
 import json
 import os
+from marvin.cloudstackException import printException
+from marvin.codes import *
 from optparse import OptionParser
 
 import jsonHelper
 from config.test_data import test_data
-from marvin.cloudstackException import printException
-from marvin.codes import *
 
 
 class managementServer(object):
@@ -58,7 +58,6 @@ class zone(object):
         self.networktype = None
         self.dns2 = None
         self.internaldns2 = None
-        self.securitygroupenabled = None
         self.localstorageenabled = None
         '''default public network, in advanced mode'''
         self.ipranges = []
@@ -358,114 +357,6 @@ def getDeviceUrl(obj):
         return None
 
 
-def descSetupInBasicMode():
-    '''sample code to generate setup configuration file'''
-    zs = cloudstackConfiguration()
-
-    for l in range(1):
-        z = zone()
-        z.dns1 = "8.8.8.8"
-        z.dns2 = "8.8.4.4"
-        z.internaldns1 = "192.168.110.254"
-        z.internaldns2 = "192.168.110.253"
-        z.name = "test" + str(l)
-        z.networktype = 'Basic'
-        z.securitygroupenabled = 'True'
-
-        # If security groups are reqd
-        sgprovider = provider()
-        sgprovider.broadcastdomainrange = 'Pod'
-        sgprovider.name = 'SecurityGroupProvider'
-
-        pn = physicalNetwork()
-        pn.name = "test-network"
-        pn.traffictypes = [trafficType("Guest"), trafficType("Management")]
-        pn.providers.append(sgprovider)
-
-        z.physical_networks.append(pn)
-
-        '''create 10 pods'''
-        for i in range(2):
-            p = pod()
-            p.name = "test" + str(l) + str(i)
-            p.gateway = "192.168.%d.1" % i
-            p.netmask = "255.255.255.0"
-            p.startip = "192.168.%d.150" % i
-            p.endip = "192.168.%d.220" % i
-
-            '''add two pod guest ip ranges'''
-            for j in range(2):
-                ip = iprange()
-                ip.gateway = p.gateway
-                ip.netmask = p.netmask
-                ip.startip = "192.168.%d.%d" % (i, j * 20)
-                ip.endip = "192.168.%d.%d" % (i, j * 20 + 10)
-
-                p.guestIpRanges.append(ip)
-
-            '''add 10 clusters'''
-            for j in range(2):
-                c = cluster()
-                c.clustername = "test" + str(l) + str(i) + str(j)
-                c.clustertype = "CloudManaged"
-                c.hypervisor = "Simulator"
-
-                '''add 10 hosts'''
-                for k in range(2):
-                    h = host()
-                    h.username = "root"
-                    h.password = "password"
-                    memory = 8 * 1024 * 1024 * 1024
-                    localstorage = 1 * 1024 * 1024 * 1024 * 1024
-                    h.url = "http://sim/%d%d%d%d" % (l, i, j, k)
-                    c.hosts.append(h)
-
-                '''add 2 primary storages'''
-                for m in range(2):
-                    primary = primaryStorage()
-                    primary.name = "primary" + \
-                                   str(l) + str(i) + str(j) + str(m)
-                    primary.url = "nfs://localhost/path%s" % (str(l) + str(i) +
-                                                              str(j) + str(m))
-                    c.primaryStorages.append(primary)
-
-                p.clusters.append(c)
-
-            z.pods.append(p)
-
-        '''add two secondary'''
-        for i in range(5):
-            secondary = secondaryStorage()
-            secondary.url = "nfs://localhost/path" + str(l) + str(i)
-            z.secondaryStorages.append(secondary)
-
-        zs.zones.append(z)
-
-    '''Add one mgt server'''
-    mgt = managementServer()
-    mgt.mgtSvrIp = "localhost"
-    zs.mgtSvr.append(mgt)
-
-    '''Add a database'''
-    db = dbServer()
-    db.dbSvr = "localhost"
-
-    zs.dbSvr = db
-
-    '''add global configuration'''
-    global_settings = {'expunge.delay': '60',
-                       'expunge.interval': '60',
-                       'expunge.workers': '3',
-                       }
-    for k, v in global_settings.iteritems():
-        cfg = configuration()
-        cfg.name = k
-        cfg.value = v
-        zs.globalConfig.append(cfg)
-
-    return zs
-
-
 def descSetupInAdvancedMode():
     '''sample code to generate setup configuration file'''
     zs = cloudstackConfiguration()
@@ -571,123 +462,10 @@ def descSetupInAdvancedMode():
     zs.dbSvr = db
 
     '''add global configuration'''
-    global_settings = {'expunge.delay': '60',
-                       'expunge.interval': '60',
-                       'expunge.workers': '3',
-                       }
-    for k, v in global_settings.iteritems():
-        cfg = configuration()
-        cfg.name = k
-        cfg.value = v
-        zs.globalConfig.append(cfg)
-
-    return zs
-
-
-'''sample code to generate setup configuration file'''
-
-
-def descSetupInAdvancedsgMode():
-    zs = cloudstackConfiguration()
-
-    for l in range(1):
-        z = zone()
-        z.dns1 = "8.8.8.8"
-        z.dns2 = "8.8.4.4"
-        z.internaldns1 = "192.168.110.254"
-        z.internaldns2 = "192.168.110.253"
-        z.name = "test" + str(l)
-        z.networktype = 'Advanced'
-        z.vlan = "100-2000"
-        z.securitygroupenabled = "true"
-
-        pn = physicalNetwork()
-        pn.name = "test-network"
-        pn.traffictypes = [trafficType("Guest"), trafficType("Management")]
-
-        # If security groups are reqd
-        sgprovider = provider()
-        sgprovider.broadcastdomainrange = 'ZONE'
-        sgprovider.name = 'SecurityGroupProvider'
-
-        pn.providers.append(sgprovider)
-        z.physical_networks.append(pn)
-
-        '''create 10 pods'''
-        for i in range(2):
-            p = pod()
-            p.name = "test" + str(l) + str(i)
-            p.gateway = "192.168.%d.1" % i
-            p.netmask = "255.255.255.0"
-            p.startip = "192.168.%d.200" % i
-            p.endip = "192.168.%d.220" % i
-
-            '''add 10 clusters'''
-            for j in range(2):
-                c = cluster()
-                c.clustername = "test" + str(l) + str(i) + str(j)
-                c.clustertype = "CloudManaged"
-                c.hypervisor = "Simulator"
-
-                '''add 10 hosts'''
-                for k in range(2):
-                    h = host()
-                    h.username = "root"
-                    h.password = "password"
-                    memory = 8 * 1024 * 1024 * 1024
-                    localstorage = 1 * 1024 * 1024 * 1024 * 1024
-                    # h.url = "http://sim/%d%d%d%d/cpucore=1&cpuspeed=8000&\
-                    # memory=%d&localstorage=%d" % (l, i, j, k, memory,
-                    # localstorage)
-                    h.url = "http://sim/%d%d%d%d" % (l, i, j, k)
-                    c.hosts.append(h)
-
-                '''add 2 primary storages'''
-                for m in range(2):
-                    primary = primaryStorage()
-                    primary.name = "primary" + \
-                                   str(l) + str(i) + str(j) + str(m)
-                    primary.url = "nfs://localhost/path%s" % \
-                                  (str(l) + str(i) + str(j) + str(m))
-                    c.primaryStorages.append(primary)
-
-                p.clusters.append(c)
-
-            z.pods.append(p)
-
-        '''add two secondary'''
-        for i in range(5):
-            secondary = secondaryStorage()
-            secondary.url = "nfs://localhost/path" + str(l) + str(i)
-            z.secondaryStorages.append(secondary)
-
-        '''add default guest network'''
-        ips = iprange()
-        ips.vlan = "26"
-        ips.startip = "172.16.26.2"
-        ips.endip = "172.16.26.100"
-        ips.gateway = "172.16.26.1"
-        ips.netmask = "255.255.255.0"
-        z.ipranges.append(ips)
-
-        zs.zones.append(z)
-
-    '''Add one mgt server'''
-    mgt = managementServer()
-    mgt.mgtSvrIp = "localhost"
-    zs.mgtSvr.append(mgt)
-
-    '''Add a database'''
-    db = dbServer()
-    db.dbSvr = "localhost"
-
-    zs.dbSvr = db
-
-    '''add global configuration'''
-    global_settings = {'expunge.delay': '60',
-                       'expunge.interval': '60',
-                       'expunge.workers': '3',
-                       }
+    global_settings = { 'expunge.delay': '60',
+                        'expunge.interval': '60',
+                        'expunge.workers': '3',
+                        }
     for k, v in global_settings.iteritems():
         cfg = configuration()
         cfg.name = k
@@ -729,9 +507,6 @@ if __name__ == "__main__":
                       dest="inputfile", help="input file")
     parser.add_option("-a", "--advanced", action="store_true", default=False,
                       dest="advanced", help="use advanced networking")
-    parser.add_option("-s", "--advancedsg", action="store_true", default=False,
-                      dest="advancedsg", help="use advanced networking \
-with security groups")
     parser.add_option("-o", "--output", action="store",
                       default="./datacenterCfg", dest="output",
                       help="the path where the json config file generated, \
@@ -743,9 +518,5 @@ by default is ./datacenterCfg")
         config = getSetupConfig(options.inputfile)
     if options.advanced:
         config = descSetupInAdvancedMode()
-    elif options.advancedsg:
-        config = descSetupInAdvancedsgMode()
-    else:
-        config = descSetupInBasicMode()
 
     generate_setup_config(config, options.output)

@@ -107,10 +107,10 @@ public class AddIpToVmNicCmd extends BaseAsyncCreateCmd {
 
         if (result != null) {
             CallContext.current().setEventDetails("secondary Ip Id: " + getEntityId());
-            boolean success = false;
-            success = _networkService.configureNicSecondaryIp(result, isZoneSGEnabled());
+            boolean success;
+            success = _networkService.configureNicSecondaryIp(result);
 
-            if (success == false) {
+            if (!success) {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to set security group rules for the secondary ip");
             }
 
@@ -120,12 +120,6 @@ public class AddIpToVmNicCmd extends BaseAsyncCreateCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to assign secondary ip to nic");
         }
-    }
-
-    private boolean isZoneSGEnabled() {
-        final Network ntwk = _entityMgr.findById(Network.class, getNetworkId());
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, ntwk.getDataCenterId());
-        return dc.isSecurityGroupEnabled();
     }
 
     @Override
@@ -146,10 +140,9 @@ public class AddIpToVmNicCmd extends BaseAsyncCreateCmd {
     }
 
     @Override
-    public void create() throws ResourceAllocationException {
+    public void create() {
         final String ip;
         final NicSecondaryIp result;
-        final String secondaryIp = null;
         if ((ip = getIpaddress()) != null) {
             if (!NetUtils.isValidIp4(ip)) {
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Invalid ip address " + ip);

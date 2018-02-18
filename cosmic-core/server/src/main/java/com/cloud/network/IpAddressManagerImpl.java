@@ -182,14 +182,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         defaultIsolatedNetworkOfferingProviders.put(Service.PortForwarding, defaultProviders);
         defaultIsolatedNetworkOfferingProviders.put(Service.Vpn, defaultProviders);
 
-        final Map<Network.Service, Set<Network.Provider>> defaultSharedSGEnabledNetworkOfferingProviders = new HashMap<>();
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.Dhcp, defaultProviders);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.Dns, defaultProviders);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.UserData, defaultProviders);
-        final Set<Provider> sgProviders = new HashSet<>();
-        sgProviders.add(Provider.SecurityGroupProvider);
-        defaultSharedSGEnabledNetworkOfferingProviders.put(Service.SecurityGroup, sgProviders);
-
         final Map<Network.Service, Set<Network.Provider>> defaultIsolatedSourceNatEnabledNetworkOfferingProviders = new HashMap<>();
         defaultProviders.clear();
         defaultProviders.add(Network.Provider.VirtualRouter);
