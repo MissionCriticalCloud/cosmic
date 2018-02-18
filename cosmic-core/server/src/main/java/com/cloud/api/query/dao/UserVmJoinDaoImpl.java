@@ -8,7 +8,6 @@ import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.NicSecondaryIpResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
@@ -190,24 +189,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             }
         }
 
-        if (details.contains(VMDetails.all) || details.contains(VMDetails.secgrp)) {
-            final Long securityGroupId = userVm.getSecurityGroupId();
-            if (securityGroupId != null && securityGroupId.longValue() != 0) {
-                final SecurityGroupResponse resp = new SecurityGroupResponse();
-                resp.setId(userVm.getSecurityGroupUuid());
-                resp.setName(userVm.getSecurityGroupName());
-                resp.setDescription(userVm.getSecurityGroupDescription());
-                resp.setObjectName("securitygroup");
-                if (userVm.getAccountType() == Account.ACCOUNT_TYPE_PROJECT) {
-                    resp.setProjectId(userVm.getProjectUuid());
-                    resp.setProjectName(userVm.getProjectName());
-                } else {
-                    resp.setAccountName(userVm.getAccountName());
-                }
-                userVmResponse.addSecurityGroup(resp);
-            }
-        }
-
         if (details.contains(VMDetails.all) || details.contains(VMDetails.nics)) {
             final long nic_id = userVm.getNicId();
             if (nic_id > 0) {
@@ -294,22 +275,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
 
     @Override
     public UserVmResponse setUserVmResponse(final ResponseView view, final UserVmResponse userVmData, final UserVmJoinVO uvo) {
-        final Long securityGroupId = uvo.getSecurityGroupId();
-        if (securityGroupId != null && securityGroupId.longValue() != 0) {
-            final SecurityGroupResponse resp = new SecurityGroupResponse();
-            resp.setId(uvo.getSecurityGroupUuid());
-            resp.setName(uvo.getSecurityGroupName());
-            resp.setDescription(uvo.getSecurityGroupDescription());
-            resp.setObjectName("securitygroup");
-            if (uvo.getAccountType() == Account.ACCOUNT_TYPE_PROJECT) {
-                resp.setProjectId(uvo.getProjectUuid());
-                resp.setProjectName(uvo.getProjectName());
-            } else {
-                resp.setAccountName(uvo.getAccountName());
-            }
-            userVmData.addSecurityGroup(resp);
-        }
-
         final long nic_id = uvo.getNicId();
         if (nic_id > 0) {
             final NicResponse nicResponse = new NicResponse();

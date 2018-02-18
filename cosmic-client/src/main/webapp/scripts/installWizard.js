@@ -249,8 +249,8 @@
                                 return service.name;
                             });
 
-                            //pick the network offering including SecurityGroup, but excluding Lb and StaticNat. (bug 13665)
-                            return (($.inArray('SecurityGroup', services) != -1) && ($.inArray('Lb', services) == -1) && ($.inArray('StaticNat', services) == -1));
+                            //pick the network offering excluding Lb and StaticNat. (bug 13665)
+                            return ($.inArray('Lb', services) == -1) && ($.inArray('StaticNat', services) == -1);
                         }
                     )[0];
                 }

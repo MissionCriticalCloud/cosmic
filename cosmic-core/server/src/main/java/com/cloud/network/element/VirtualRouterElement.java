@@ -349,7 +349,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 String tablesize = "200k"; // optional
                 String expire = "30m"; // optional
 
-        /* overwrite default values with the stick parameters */
+                /* overwrite default values with the stick parameters */
                 for (final Pair<String, String> paramKV : paramsList) {
                     final String key = paramKV.first();
                     final String value = paramKV.second();
@@ -843,8 +843,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         if (_networkMdl.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, getProvider())) {
             publicNetwork = true;
         }
-        final boolean isPodBased = (dest.getZone().getNetworkType() == NetworkType.Basic || _networkMdl.isSecurityGroupSupportedInNetwork(network))
-                && network.getTrafficType() == TrafficType.Guest;
+        final boolean isPodBased = dest.getZone().getNetworkType() == NetworkType.Basic && network.getTrafficType() == TrafficType.Guest;
 
         final List<DomainRouterVO> routers;
 

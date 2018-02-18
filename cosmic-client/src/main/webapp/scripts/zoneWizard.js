@@ -257,27 +257,12 @@
 
         preFilters: {
             addPublicNetwork: function (args) {
-                var isShown;
                 var $publicTrafficDesc = $('.zone-wizard:visible').find('#add_zone_public_traffic_desc');
-                if (args.data['network-model'] == 'Basic') {
-                    if (selectedNetworkOfferingHavingSG == true && selectedNetworkOfferingHavingEIP == true && selectedNetworkOfferingHavingELB == true) {
-                        isShown = true;
-                    } else {
-                        isShown = false;
-                    }
 
-                    $publicTrafficDesc.find('#for_basic_zone').css('display', 'inline');
-                    $publicTrafficDesc.find('#for_advanced_zone').hide();
-                } else { //args.data['network-model'] == 'Advanced'
-                    if (args.data["zone-advanced-sg-enabled"] != "on")
-                        isShown = true;
-                    else
-                        isShown = false;
+                $publicTrafficDesc.find('#for_advanced_zone').css('display', 'inline');
+                $publicTrafficDesc.find('#for_basic_zone').hide();
 
-                    $publicTrafficDesc.find('#for_advanced_zone').css('display', 'inline');
-                    $publicTrafficDesc.find('#for_basic_zone').hide();
-                }
-                return isShown;
+                return true;
             },
 
             setupPhysicalNetwork: function (args) {
@@ -294,17 +279,11 @@
             },
 
             configureGuestTraffic: function (args) {
-                if ((args.data['network-model'] == 'Basic') || (args.data['network-model'] == 'Advanced' && args.data["zone-advanced-sg-enabled"] == "on")) {
-                    $('.setup-guest-traffic').addClass('basic');
-                    $('.setup-guest-traffic').removeClass('advanced');
-                    skipGuestTrafficStep = false; //set value
-                } else { //args.data['network-model'] == 'Advanced' && args.data["zone-advanced-sg-enabled"] !=    "on"
-                    $('.setup-guest-traffic').removeClass('basic');
-                    $('.setup-guest-traffic').addClass('advanced');
+                $('.setup-guest-traffic').removeClass('basic');
+                $('.setup-guest-traffic').addClass('advanced');
 
-                    skipGuestTrafficStep = false; //set value
+                skipGuestTrafficStep = false; //set value
 
-                }
                 return !skipGuestTrafficStep;
             },
 
@@ -330,28 +309,11 @@
             zone: {
                 preFilter: function (args) {
                     var $form = args.$form;
+                    args.$form.find('[rel=networkOfferingId]').hide();
+                    args.$form.find('[rel=guestcidraddress]').show();
 
-                    if (args.data['network-model'] == 'Basic') { //Basic zone
-                        args.$form.find('[rel=networkOfferingId]').show(); //will be used to create a guest network during zone creation
-                        args.$form.find('[rel=guestcidraddress]').hide();
-
-                        args.$form.find('[rel=ip6dns1]').hide();
-                        args.$form.find('[rel=ip6dns2]').hide();
-                    } else { //Advanced zone
-                        if (args.data["zone-advanced-sg-enabled"] != "on") { //Advanced SG-disabled zone
-                            args.$form.find('[rel=networkOfferingId]').hide();
-                            args.$form.find('[rel=guestcidraddress]').show();
-
-                            args.$form.find('[rel=ip6dns1]').show();
-                            args.$form.find('[rel=ip6dns2]').show();
-                        } else { //Advanced SG-enabled zone
-                            args.$form.find('[rel=networkOfferingId]').show(); //will be used to create a guest network during zone creation
-                            args.$form.find('[rel=guestcidraddress]').hide();
-
-                            args.$form.find('[rel=ip6dns1]').hide();
-                            args.$form.find('[rel=ip6dns2]').hide();
-                        }
-                    }
+                    args.$form.find('[rel=ip6dns1]').show();
+                    args.$form.find('[rel=ip6dns2]').show();
                 },
                 fields: {
                     name: {
@@ -423,11 +385,8 @@
                                     var items = json.listhypervisorsresponse.hypervisor;
                                     var array1 = [];
 
-                                    var firstOption = "XenServer";
+                                    var firstOption = "KVM";
                                     var nonSupportedHypervisors = {};
-                                    if (args.context.zones[0]['network-model'] == "Advanced" && args.context.zones[0]['zone-advanced-sg-enabled'] == "on") {
-                                        firstOption = "KVM";
-                                    }
 
                                     if (items != null) {
                                         for (var i = 0; i < items.length; i++) {
@@ -495,9 +454,7 @@
                                         $(this.service).each(function () {
                                             var thisService = this;
 
-                                            if (thisService.name == "SecurityGroup") {
-                                                thisNetworkOffering.havingSG = true;
-                                            } else if (thisService.name == "StaticNat") {
+                                            if (thisService.name == "StaticNat") {
                                                 $(thisService.capability).each(function () {
                                                     if (this.name == "ElasticIp" && this.value == "true") {
                                                         thisNetworkOffering.havingEIP = true;
@@ -513,18 +470,6 @@
                                                 });
                                             }
                                         });
-
-                                        if (thisNetworkOffering.havingEIP == true && thisNetworkOffering.havingELB == true) { //EIP ELB
-                                            if (args.context.zones[0]["network-model"] == "Advanced" && args.context.zones[0]["zone-advanced-sg-enabled"] == "on") { // Advanced SG-enabled zone doesn't support EIP ELB
-                                                return true; //move to next item in $.each() loop
-                                            }
-                                        }
-
-                                        if (args.context.zones[0]["network-model"] == "Advanced" && args.context.zones[0]["zone-advanced-sg-enabled"] == "on") { // Advanced SG-enabled zone
-                                            if (thisNetworkOffering.havingSG != true) {
-                                                return true; //move to next item in $.each() loop
-                                            }
-                                        }
 
                                         availableNetworkOfferingObjs.push(thisNetworkOffering);
                                     });
@@ -703,40 +648,15 @@
             guestTraffic: {
                 preFilter: function (args) {
                     var $guestTrafficDesc = $('.zone-wizard:visible').find('#add_zone_guest_traffic_desc');
-                    if ((args.data['network-model'] == 'Basic') || (args.data['network-model'] == 'Advanced' && args.data["zone-advanced-sg-enabled"] == "on")) {
-                        $guestTrafficDesc.find('#for_basic_zone').css('display', 'inline');
-                        $guestTrafficDesc.find('#for_advanced_zone').hide();
-                    } else { //args.data['network-model'] == 'Advanced' && args.data["zone-advanced-sg-enabled"] !=    "on"
-                        $guestTrafficDesc.find('#for_advanced_zone').css('display', 'inline');
-                        $guestTrafficDesc.find('#for_basic_zone').hide();
-                    }
+                    $guestTrafficDesc.find('#for_advanced_zone').css('display', 'inline');
+                    $guestTrafficDesc.find('#for_basic_zone').hide();
 
-                    var selectedZoneObj = {
-                        networktype: args.data['network-model']
-                    };
-
-                    if (selectedZoneObj.networktype == 'Basic') {
-                        args.$form.find('[rel="guestGateway"]').show();
-                        args.$form.find('[rel="guestNetmask"]').show();
-                        args.$form.find('[rel="guestStartIp"]').show();
-                        args.$form.find('[rel="guestEndIp"]').show();
-                        args.$form.find('[rel="vlanId"]').hide();
-                        args.$form.find('[rel="vlanRange"]').hide();
-                    } else if (selectedZoneObj.networktype == 'Advanced' && args.data["zone-advanced-sg-enabled"] == "on") {
-                        args.$form.find('[rel="guestGateway"]').show();
-                        args.$form.find('[rel="guestNetmask"]').show();
-                        args.$form.find('[rel="guestStartIp"]').show();
-                        args.$form.find('[rel="guestEndIp"]').show();
-                        args.$form.find('[rel="vlanId"]').show();
-                        args.$form.find('[rel="vlanRange"]').hide();
-                    } else if (selectedZoneObj.networktype == 'Advanced' && args.data["zone-advanced-sg-enabled"] != "on") { //this conditional statement is useless because the div will be replaced with other div(multiple tabs in Advanced zone without SG) later
-                        args.$form.find('[rel="guestGateway"]').hide();
-                        args.$form.find('[rel="guestNetmask"]').hide();
-                        args.$form.find('[rel="guestStartIp"]').hide();
-                        args.$form.find('[rel="guestEndIp"]').hide();
-                        args.$form.find('[rel="vlanId"]').hide();
-                        args.$form.find('[rel="vlanRange"]').show();
-                    }
+                    args.$form.find('[rel="guestGateway"]').hide();
+                    args.$form.find('[rel="guestNetmask"]').hide();
+                    args.$form.find('[rel="guestStartIp"]').hide();
+                    args.$form.find('[rel="guestEndIp"]').hide();
+                    args.$form.find('[rel="vlanId"]').hide();
+                    args.$form.find('[rel="vlanRange"]').show();
                 },
 
                 fields: {
@@ -1512,21 +1432,8 @@
                     var networkType = args.data.zone.networkType; //"Basic", "Advanced"
                     array1.push("&networktype=" + todb(networkType));
 
-                    if (networkType == "Basic") {
-                        if (selectedNetworkOfferingHavingSG == true)
-                            array1.push("&securitygroupenabled=true");
-                        else
-                            array1.push("&securitygroupenabled=false");
-                    } else { // networkType == "Advanced"
-                        if (args.data.zone.sgEnabled != true) {
-                            array1.push("&securitygroupenabled=false");
-
-                            if (args.data.zone.guestcidraddress != null && args.data.zone.guestcidraddress.length > 0)
-                                array1.push("&guestcidraddress=" + todb(args.data.zone.guestcidraddress));
-                        } else { // args.data.zone.sgEnabled    == true
-                            array1.push("&securitygroupenabled=true");
-                        }
-                    }
+                    if (args.data.zone.guestcidraddress != null && args.data.zone.guestcidraddress.length > 0)
+                        array1.push("&guestcidraddress=" + todb(args.data.zone.guestcidraddress));
 
                     array1.push("&name=" + todb(args.data.zone.name));
 
@@ -2046,57 +1953,6 @@
                                                                                                             if (args.data.pluginFrom != null && args.data.pluginFrom.name == "installWizard") {
                                                                                                                 selectedNetworkOfferingHavingSG = args.data.pluginFrom.selectedNetworkOfferingHavingSG;
                                                                                                             }
-                                                                                                            if (selectedNetworkOfferingHavingSG == true) { //need to Enable security group provider first
-                                                                                                                message(_l('message.enabling.security.group.provider'));
-
-                                                                                                                // get network service provider ID of Security Group
-                                                                                                                var securityGroupProviderId;
-                                                                                                                $.ajax({
-                                                                                                                    url: createURL("listNetworkServiceProviders&name=SecurityGroupProvider&physicalNetworkId=" + args.data.returnedBasicPhysicalNetwork.id),
-                                                                                                                    dataType: "json",
-                                                                                                                    async: false,
-                                                                                                                    success: function (json) {
-                                                                                                                        var items = json.listnetworkserviceprovidersresponse.networkserviceprovider;
-                                                                                                                        if (items != null && items.length > 0) {
-                                                                                                                            securityGroupProviderId = items[0].id;
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                });
-                                                                                                                if (securityGroupProviderId == null) {
-                                                                                                                    alert("error: listNetworkServiceProviders API doesn't return security group provider ID");
-                                                                                                                    return;
-                                                                                                                }
-
-                                                                                                                $.ajax({
-                                                                                                                    url: createURL("updateNetworkServiceProvider&state=Enabled&id=" + securityGroupProviderId),
-                                                                                                                    dataType: "json",
-                                                                                                                    async: false,
-                                                                                                                    success: function (json) {
-                                                                                                                        var enableSecurityGroupProviderIntervalID = setInterval(function () {
-                                                                                                                            $.ajax({
-                                                                                                                                url: createURL("queryAsyncJobResult&jobId=" + json.updatenetworkserviceproviderresponse.jobid),
-                                                                                                                                dataType: "json",
-                                                                                                                                success: function (json) {
-                                                                                                                                    var result = json.queryasyncjobresultresponse;
-                                                                                                                                    if (result.jobstatus == 0) {
-                                                                                                                                        return; //Job has not completed
-                                                                                                                                    } else {
-                                                                                                                                        clearInterval(enableSecurityGroupProviderIntervalID);
-
-                                                                                                                                        if (result.jobstatus == 2) {
-                                                                                                                                            alert("failed to enable security group provider. Error: " + _s(result.jobresult.errortext));
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                },
-                                                                                                                                error: function (XMLHttpResponse) {
-                                                                                                                                    var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                                                                    alert("failed to enable security group provider. Error: " + errorMsg);
-                                                                                                                                }
-                                                                                                                            });
-                                                                                                                        }, g_queryAsyncJobResultInterval);
-                                                                                                                    }
-                                                                                                                });
-                                                                                                            }
                                                                                                         } else if (result.jobstatus == 2) {
                                                                                                             alert("failed to enable Virtual Router Provider. Error: " + _s(result.jobresult.errortext));
                                                                                                         }
@@ -2370,58 +2226,6 @@
                                                                 }
                                                             });
                                                             // ***** VPC Virtual Router ***** (end) *****
-                                                        } else { //args.data.zone.sgEnabled == true  //Advanced SG-enabled zone
-                                                            message(_l('message.enabling.security.group.provider'));
-
-                                                            // get network service provider ID of Security Group
-                                                            var securityGroupProviderId;
-                                                            $.ajax({
-                                                                url: createURL("listNetworkServiceProviders&name=SecurityGroupProvider&physicalNetworkId=" + thisPhysicalNetwork.id),
-                                                                dataType: "json",
-                                                                async: false,
-                                                                success: function (json) {
-                                                                    var items = json.listnetworkserviceprovidersresponse.networkserviceprovider;
-                                                                    if (items != null && items.length > 0) {
-                                                                        securityGroupProviderId = items[0].id;
-                                                                    }
-                                                                }
-                                                            });
-                                                            if (securityGroupProviderId == null) {
-                                                                alert("error: listNetworkServiceProviders API doesn't return security group provider ID");
-                                                                return;
-                                                            }
-
-                                                            $.ajax({
-                                                                url: createURL("updateNetworkServiceProvider&state=Enabled&id=" + securityGroupProviderId),
-                                                                dataType: "json",
-                                                                async: false,
-                                                                success: function (json) {
-                                                                    var enableSecurityGroupProviderIntervalID = setInterval(function () {
-                                                                        $.ajax({
-                                                                            url: createURL("queryAsyncJobResult&jobId=" + json.updatenetworkserviceproviderresponse.jobid),
-                                                                            dataType: "json",
-                                                                            success: function (json) {
-                                                                                var result = json.queryasyncjobresultresponse;
-                                                                                if (result.jobstatus == 0) {
-                                                                                    return; //Job has not completed
-                                                                                } else {
-                                                                                    clearInterval(enableSecurityGroupProviderIntervalID);
-
-                                                                                    if (result.jobstatus == 1) { //Security group provider has been enabled successfully
-                                                                                        //don't need to do anything here
-                                                                                    } else if (result.jobstatus == 2) {
-                                                                                        alert("failed to enable security group provider. Error: " + _s(result.jobresult.errortext));
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            error: function (XMLHttpResponse) {
-                                                                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                alert("failed to enable security group provider. Error: " + errorMsg);
-                                                                            }
-                                                                        });
-                                                                    }, g_queryAsyncJobResultInterval);
-                                                                }
-                                                            });
                                                         }
                                                     } else if (result.jobstatus == 2) {
                                                         alert("failed to enable physical network. Error: " + _s(result.jobresult.errortext));

@@ -13,7 +13,6 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_RESIZE_VOLUME;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
-import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SECURITY_GROUP;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
 import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperties.Constants.SCRIPT_VERSIONS;
 
@@ -24,7 +23,6 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.HostVmStateReportEntry;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.PingRoutingCommand;
-import com.cloud.agent.api.PingRoutingWithNwGroupsCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.StartupStorageCommand;
@@ -261,7 +259,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     private String resizeVolumePath;
     private String createTmplPath;
     private String heartBeatPath;
-    private String securityGroupPath;
     private String ovsPvlanDhcpHostPath;
     private String ovsPvlanVmPath;
     private String routerProxyPath;
@@ -274,7 +271,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     private KvmStoragePoolManager storagePoolMgr;
     private VifDriver defaultVifDriver;
     private Map<TrafficType, VifDriver> trafficTypeVifDrivers;
-    private boolean canBridgeFirewall;
     private long totalMemory;
 
     @Override
@@ -690,7 +686,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         initBridges();
         checkPhysicalInterfaces();
-        initCanBridgeFirewall();
         initLocalGateway();
 
         checkVmMigrationSpeed(libvirtComputingResourceProperties);
@@ -730,7 +725,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         manageSnapshotPath = findScriptPath(storageScriptsDir, SCRIPT_MANAGE_SNAPSHOT);
         resizeVolumePath = findScriptPath(storageScriptsDir, SCRIPT_RESIZE_VOLUME);
         createTmplPath = findScriptPath(storageScriptsDir, SCRIPT_CREATE_TEMPLATE);
-        securityGroupPath = findScriptPath(networkScriptsDir, SCRIPT_SECURITY_GROUP);
         routerProxyPath = findScriptPath(PATH_SCRIPTS_NETWORK_DOMR, SCRIPT_ROUTER_PROXY);
         ovsPvlanDhcpHostPath = findScriptPath(networkScriptsDir, SCRIPT_OVS_PVLAN_DHCP_HOST);
         ovsPvlanVmPath = findScriptPath(networkScriptsDir, SCRIPT_OVS_PVLAN_VM);
@@ -763,10 +757,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         if (localGateway == null) {
             logger.debug("Failed to found the local gateway");
         }
-    }
-
-    private void initCanBridgeFirewall() {
-        canBridgeFirewall = canBridgeFirewall(pifs.get("public"));
     }
 
     private void checkPhysicalInterfaces() throws ConfigurationException {
@@ -1053,17 +1043,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         logger.debug("done looking for pifs, no more bridges");
-    }
-
-    private boolean canBridgeFirewall(final String prvNic) {
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("can_bridge_firewall");
-        cmd.add(prvNic);
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
     }
 
     protected void configureVifDrivers(final Map<String, Object> params) throws ConfigurationException {
@@ -1645,13 +1624,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-
-        if (!canBridgeFirewall) {
-            return new PingRoutingCommand(com.cloud.host.Host.Type.Routing, id, this.getHostVmStateReport());
-        } else {
-            final HashMap<String, Pair<Long, Long>> nwGrpStates = syncNetworkGroups(id);
-            return new PingRoutingWithNwGroupsCommand(getType(), id, this.getHostVmStateReport(), nwGrpStates);
-        }
+        return new PingRoutingCommand(com.cloud.host.Host.Type.Routing, id, this.getHostVmStateReport());
     }
 
     public void createVbd(final Connect conn, final VirtualMachineTO vmSpec, final String vmName, final LibvirtVmDef vm)
@@ -2619,140 +2592,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
     }
 
-    public boolean destroyNetworkRulesForVm(final Connect conn, final String vmName) {
-        if (!canBridgeFirewall) {
-            return false;
-        }
-        String vif = null;
-        final List<InterfaceDef> intfs = getInterfaces(conn, vmName);
-        if (intfs.size() > 0) {
-            final InterfaceDef intf = intfs.get(0);
-            vif = intf.getDevName();
-        }
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("destroy_network_rules_for_vm");
-        cmd.add("--vmname", vmName);
-        if (vif != null) {
-            cmd.add("--vif", vif);
-        }
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean defaultNetworkRules(final Connect conn, final String vmName, final NicTO nic, final Long vmId,
-                                       final String secIpStr) {
-        if (!canBridgeFirewall) {
-            return false;
-        }
-
-        final List<InterfaceDef> intfs = getInterfaces(conn, vmName);
-        if (intfs.size() == 0 || intfs.size() < nic.getDeviceId()) {
-            return false;
-        }
-
-        final InterfaceDef intf = intfs.get(nic.getDeviceId());
-        final String brname = intf.getBrName();
-        final String vif = intf.getDevName();
-
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("default_network_rules");
-        cmd.add("--vmname", vmName);
-        cmd.add("--vmid", vmId.toString());
-        if (nic.getIp() != null) {
-            cmd.add("--vmip", nic.getIp());
-        }
-        cmd.add("--vmmac", nic.getMac());
-        cmd.add("--vif", vif);
-        cmd.add("--brname", brname);
-        cmd.add("--nicsecips", secIpStr);
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean configureDefaultNetworkRulesForSystemVm(final Connect conn, final String vmName) {
-        if (!canBridgeFirewall) {
-            return false;
-        }
-
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("default_network_rules_systemvm");
-        cmd.add("--vmname", vmName);
-        cmd.add("--localbrname", getLinkLocalBridgeName());
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean addNetworkRules(final String vmName, final String vmId, final String guestIp, final String sig,
-                                   final String seq, final String mac, final String rules, final String vif, final String brname,
-                                   final String secIps) {
-        if (!canBridgeFirewall) {
-            return false;
-        }
-
-        final String newRules = rules.replace(" ", ";");
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("add_network_rules");
-        cmd.add("--vmname", vmName);
-        cmd.add("--vmid", vmId);
-        cmd.add("--vmip", guestIp);
-        cmd.add("--sig", sig);
-        cmd.add("--seq", seq);
-        cmd.add("--vmmac", mac);
-        cmd.add("--vif", vif);
-        cmd.add("--brname", brname);
-        cmd.add("--nicsecips", secIps);
-        if (newRules != null && !newRules.isEmpty()) {
-            cmd.add("--rules", newRules);
-        }
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean configureNetworkRulesVmSecondaryIp(final Connect conn, final String vmName, final String secIp,
-                                                      final String action) {
-
-        if (!canBridgeFirewall) {
-            return false;
-        }
-
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("network_rules_vmSecondaryIp");
-        cmd.add("--vmname", vmName);
-        cmd.add("--nicsecips", secIp);
-        cmd.add("--action", action);
-
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean cleanupRules() {
-        if (!canBridgeFirewall) {
-            return false;
-        }
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("cleanup_rules");
-        final String result = cmd.execute();
-        if (result != null) {
-            return false;
-        }
-        return true;
-    }
-
     private String executeBashScript(final String script) {
         final Script command = new Script("/bin/bash", getScriptsTimeout(), logger);
         command.add("-c");
@@ -2858,37 +2697,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         long bytesRead;
         long bytesWrote;
         Calendar timestamp;
-    }
-
-    public String getRuleLogsForVms() {
-        final Script cmd = new Script(securityGroupPath, getScriptsTimeout(), logger);
-        cmd.add("get_rule_logs_for_vms");
-        final OutputInterpreter.OneLineParser parser = new OutputInterpreter.OneLineParser();
-        final String result = cmd.execute(parser);
-        if (result == null) {
-            return parser.getLine();
-        }
-        return null;
-    }
-
-    private HashMap<String, Pair<Long, Long>> syncNetworkGroups(final long id) {
-        final HashMap<String, Pair<Long, Long>> states = new HashMap<>();
-
-        final String result = getRuleLogsForVms();
-        logger.trace("syncNetworkGroups: id=" + id + " got: " + result);
-        final String[] rulelogs = result != null ? result.split(";") : new String[0];
-        for (final String rulesforvm : rulelogs) {
-            final String[] log = rulesforvm.split(",");
-            if (log.length != 6) {
-                continue;
-            }
-            try {
-                states.put(log[0], new Pair<>(Long.parseLong(log[1]), Long.parseLong(log[5])));
-            } catch (final NumberFormatException nfe) {
-                states.put(log[0], new Pair<>(-1L, -1L));
-            }
-        }
-        return states;
     }
 
     /* online snapshot supported by enhanced qemu-kvm */

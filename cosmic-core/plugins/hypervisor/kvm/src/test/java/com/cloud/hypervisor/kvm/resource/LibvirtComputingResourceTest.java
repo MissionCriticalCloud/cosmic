@@ -19,7 +19,6 @@ import com.cloud.agent.api.CheckOnHostCommand;
 import com.cloud.agent.api.CheckRouterAnswer;
 import com.cloud.agent.api.CheckRouterCommand;
 import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.CleanupNetworkRulesCmd;
 import com.cloud.agent.api.CreatePrivateTemplateFromSnapshotCommand;
 import com.cloud.agent.api.CreatePrivateTemplateFromVolumeCommand;
 import com.cloud.agent.api.CreateStoragePoolCommand;
@@ -36,8 +35,6 @@ import com.cloud.agent.api.ManageSnapshotCommand;
 import com.cloud.agent.api.MigrateCommand;
 import com.cloud.agent.api.ModifySshKeysCommand;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
-import com.cloud.agent.api.NetworkRulesSystemVmCommand;
-import com.cloud.agent.api.NetworkRulesVmSecondaryIpCommand;
 import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.agent.api.PlugNicCommand;
@@ -46,8 +43,6 @@ import com.cloud.agent.api.PvlanSetupCommand;
 import com.cloud.agent.api.ReadyCommand;
 import com.cloud.agent.api.RebootCommand;
 import com.cloud.agent.api.RebootRouterCommand;
-import com.cloud.agent.api.SecurityGroupRulesCmd;
-import com.cloud.agent.api.SecurityGroupRulesCmd.IpPortAndProto;
 import com.cloud.agent.api.StartCommand;
 import com.cloud.agent.api.StopCommand;
 import com.cloud.agent.api.UnPlugNicCommand;
@@ -2038,154 +2033,6 @@ public class LibvirtComputingResourceTest {
     }
 
     @Test
-    public void testCleanupNetworkRulesCmd() {
-        final CleanupNetworkRulesCmd command = new CleanupNetworkRulesCmd(1);
-
-        when(libvirtComputingResource.cleanupRules()).thenReturn(true);
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertTrue(answer.getResult());
-
-        verify(libvirtComputingResource, times(1)).cleanupRules();
-    }
-
-    @Test
-    public void testNetworkRulesVmSecondaryIpCommand() {
-        final String vmName = "Test";
-        final String vmMac = "00:00:00:00";
-        final String secondaryIp = "127.0.0.1";
-        final boolean action = true;
-
-        final NetworkRulesVmSecondaryIpCommand command = new NetworkRulesVmSecondaryIpCommand(vmName, vmMac, secondaryIp,
-                action);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-        final Connect conn = Mockito.mock(Connect.class);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenReturn(conn);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        when(libvirtComputingResource.configureNetworkRulesVmSecondaryIp(conn, command.getVmName(), command.getVmSecIp(),
-                command.getAction())).thenReturn(true);
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertTrue(answer.getResult());
-
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-        verify(libvirtComputingResource, times(1)).configureNetworkRulesVmSecondaryIp(conn, command.getVmName(),
-                command.getVmSecIp(), command.getAction());
-    }
-
-    @Test
-    public void testNetworkRulesVmSecondaryIpCommandFailure() {
-        final String vmName = "Test";
-        final String vmMac = "00:00:00:00";
-        final String secondaryIp = "127.0.0.1";
-        final boolean action = true;
-
-        final NetworkRulesVmSecondaryIpCommand command = new NetworkRulesVmSecondaryIpCommand(vmName, vmMac, secondaryIp,
-                action);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenThrow(LibvirtException.class);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertFalse(answer.getResult());
-
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-    }
-
-    @Test
-    public void testNetworkRulesSystemVmCommand() {
-        final String vmName = "Test";
-        final Type type = Type.SecondaryStorageVm;
-
-        final NetworkRulesSystemVmCommand command = new NetworkRulesSystemVmCommand(vmName, type);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-        final Connect conn = Mockito.mock(Connect.class);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenReturn(conn);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        when(libvirtComputingResource.configureDefaultNetworkRulesForSystemVm(conn, command.getVmName())).thenReturn(true);
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertTrue(answer.getResult());
-
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-        verify(libvirtComputingResource, times(1)).configureDefaultNetworkRulesForSystemVm(conn, command.getVmName());
-    }
-
-    @Test
-    public void testNetworkRulesSystemVmCommandFailure() {
-        final String vmName = "Test";
-        final Type type = Type.SecondaryStorageVm;
-
-        final NetworkRulesSystemVmCommand command = new NetworkRulesSystemVmCommand(vmName, type);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenThrow(LibvirtException.class);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertFalse(answer.getResult());
-
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-    }
-
-    @Test
     public void testCheckSshCommand() {
         final String instanceName = "Test";
         final String ip = "127.0.0.1";
@@ -2458,166 +2305,6 @@ public class LibvirtComputingResourceTest {
 
         verify(libvirtComputingResource, times(1)).getMonitor();
         verify(monitor, times(1)).getStoragePools();
-    }
-
-    @Test
-    public void testSecurityGroupRulesCmdFalse() {
-        final String guestIp = "127.0.0.1";
-        final String guestMac = "00:00:00:00";
-        final String vmName = "Test";
-        final Long vmId = 1l;
-        final String signature = "signature";
-        final Long seqNum = 1l;
-        final IpPortAndProto[] ingressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-        final IpPortAndProto[] egressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-
-        final SecurityGroupRulesCmd command = new SecurityGroupRulesCmd(guestIp, guestMac, vmName, vmId, signature, seqNum,
-                ingressRuleSet, egressRuleSet);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-        final Connect conn = Mockito.mock(Connect.class);
-
-        final List<InterfaceDef> nics = new ArrayList<>();
-        final InterfaceDef interfaceDef = Mockito.mock(InterfaceDef.class);
-        nics.add(interfaceDef);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        when(libvirtComputingResource.getInterfaces(conn, command.getVmName())).thenReturn(nics);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenReturn(conn);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-
-        when(ingressRuleSet[0].getProto()).thenReturn("tcp");
-        when(ingressRuleSet[0].getStartPort()).thenReturn(22);
-        when(ingressRuleSet[0].getEndPort()).thenReturn(22);
-        when(ingressRuleSet[0].getAllowedCidrs()).thenReturn(new String[]{"0.0.0.0/0"});
-
-        when(egressRuleSet[0].getProto()).thenReturn("tcp");
-        when(egressRuleSet[0].getStartPort()).thenReturn(22);
-        when(egressRuleSet[0].getEndPort()).thenReturn(22);
-        when(egressRuleSet[0].getAllowedCidrs()).thenReturn(new String[]{"0.0.0.0/0"});
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertFalse(answer.getResult());
-
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSecurityGroupRulesCmdTrue() {
-        final String guestIp = "127.0.0.1";
-        final String guestMac = "00:00:00:00";
-        final String vmName = "Test";
-        final Long vmId = 1l;
-        final String signature = "signature";
-        final Long seqNum = 1l;
-        final IpPortAndProto[] ingressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-        final IpPortAndProto[] egressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-
-        final SecurityGroupRulesCmd command = new SecurityGroupRulesCmd(guestIp, guestMac, vmName, vmId, signature, seqNum,
-                ingressRuleSet, egressRuleSet);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-        final Connect conn = Mockito.mock(Connect.class);
-
-        final List<InterfaceDef> nics = new ArrayList<>();
-        final InterfaceDef interfaceDef = Mockito.mock(InterfaceDef.class);
-        nics.add(interfaceDef);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        when(libvirtComputingResource.getInterfaces(conn, command.getVmName())).thenReturn(nics);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenReturn(conn);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-
-        when(interfaceDef.getDevName()).thenReturn("eth0");
-        when(interfaceDef.getBrName()).thenReturn("br0");
-
-        final String vif = nics.get(0).getDevName();
-        final String brname = nics.get(0).getBrName();
-
-        when(ingressRuleSet[0].getProto()).thenReturn("tcp");
-        when(ingressRuleSet[0].getStartPort()).thenReturn(22);
-        when(ingressRuleSet[0].getEndPort()).thenReturn(22);
-        when(ingressRuleSet[0].getAllowedCidrs()).thenReturn(new String[]{"0.0.0.0/0"});
-
-        when(egressRuleSet[0].getProto()).thenReturn("tcp");
-        when(egressRuleSet[0].getStartPort()).thenReturn(22);
-        when(egressRuleSet[0].getEndPort()).thenReturn(22);
-        when(egressRuleSet[0].getAllowedCidrs()).thenReturn(new String[]{"0.0.0.0/0"});
-
-        when(libvirtComputingResource.addNetworkRules(command.getVmName(), Long.toString(command.getVmId()),
-                command.getGuestIp(), command.getSignature(),
-                Long.toString(command.getSeqNum()), command.getGuestMac(), command.stringifyRules(), vif, brname,
-                command.getSecIpsString())).thenReturn(true);
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertTrue(answer.getResult());
-
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSecurityGroupRulesCmdException() {
-        final String guestIp = "127.0.0.1";
-        final String guestMac = "00:00:00:00";
-        final String vmName = "Test";
-        final Long vmId = 1l;
-        final String signature = "signature";
-        final Long seqNum = 1l;
-        final IpPortAndProto[] ingressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-        final IpPortAndProto[] egressRuleSet = new IpPortAndProto[]{Mockito.mock(IpPortAndProto.class)};
-
-        final SecurityGroupRulesCmd command = new SecurityGroupRulesCmd(guestIp, guestMac, vmName, vmId, signature, seqNum,
-                ingressRuleSet, egressRuleSet);
-
-        final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
-        final Connect conn = Mockito.mock(Connect.class);
-
-        final List<InterfaceDef> nics = new ArrayList<>();
-        final InterfaceDef interfaceDef = Mockito.mock(InterfaceDef.class);
-        nics.add(interfaceDef);
-
-        when(libvirtComputingResource.getLibvirtUtilitiesHelper()).thenReturn(libvirtUtilitiesHelper);
-        when(libvirtComputingResource.getInterfaces(conn, command.getVmName())).thenReturn(nics);
-        try {
-            when(libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName())).thenThrow(LibvirtException.class);
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
-
-        final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        final Answer answer = wrapper.execute(command, libvirtComputingResource);
-        assertFalse(answer.getResult());
-
-        verify(libvirtComputingResource, times(1)).getLibvirtUtilitiesHelper();
-        try {
-            verify(libvirtUtilitiesHelper, times(1)).getConnectionByVmName(command.getVmName());
-        } catch (final LibvirtException e) {
-            fail(e.getMessage());
-        }
     }
 
     @Test
@@ -4521,7 +4208,6 @@ public class LibvirtComputingResourceTest {
 
             when(libvirtComputingResource.startVm(conn, vmName, vmDef.toString())).thenReturn("SUCCESS");
 
-            when(nic.isSecurityGroupEnabled()).thenReturn(true);
             when(nic.getIsolationUri()).thenReturn(new URI("ec2://test"));
 
             when(vmSpec.getBootArgs()).thenReturn("ls -lart");

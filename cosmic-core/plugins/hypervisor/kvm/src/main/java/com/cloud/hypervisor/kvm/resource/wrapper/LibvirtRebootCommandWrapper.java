@@ -31,7 +31,6 @@ public final class LibvirtRebootCommandWrapper extends CommandWrapper<RebootComm
                 } catch (final LibvirtException e) {
                     s_logger.trace("Ignoring libvirt error.", e);
                 }
-                libvirtComputingResource.getRuleLogsForVms();
                 return new RebootAnswer(command, null, vncPort);
             } else {
                 return new RebootAnswer(command, result, false);

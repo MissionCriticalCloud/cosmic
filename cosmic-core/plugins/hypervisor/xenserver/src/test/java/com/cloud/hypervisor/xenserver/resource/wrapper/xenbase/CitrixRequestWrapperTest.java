@@ -1,9 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -17,7 +15,6 @@ import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.CheckOnHostCommand;
 import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.CleanupNetworkRulesCmd;
 import com.cloud.agent.api.ClusterVMMetaDataSyncCommand;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.CreateStoragePoolCommand;
@@ -34,8 +31,6 @@ import com.cloud.agent.api.MaintainCommand;
 import com.cloud.agent.api.MigrateCommand;
 import com.cloud.agent.api.ModifySshKeysCommand;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
-import com.cloud.agent.api.NetworkRulesSystemVmCommand;
-import com.cloud.agent.api.NetworkRulesVmSecondaryIpCommand;
 import com.cloud.agent.api.PerformanceMonitorCommand;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.agent.api.PlugNicCommand;
@@ -47,7 +42,6 @@ import com.cloud.agent.api.RebootCommand;
 import com.cloud.agent.api.RebootRouterCommand;
 import com.cloud.agent.api.RevertToVMSnapshotCommand;
 import com.cloud.agent.api.ScaleVmCommand;
-import com.cloud.agent.api.SecurityGroupRulesCmd;
 import com.cloud.agent.api.SetupCommand;
 import com.cloud.agent.api.StartCommand;
 import com.cloud.agent.api.StopCommand;
@@ -675,144 +669,6 @@ public class CitrixRequestWrapperTest {
     }
 
     @Test
-    public void testSecurityGroupRulesCommand() {
-        final Connection conn = Mockito.mock(Connection.class);
-        final XsHost xsHost = Mockito.mock(XsHost.class);
-
-        final SecurityGroupRulesCmd sshCommand = new SecurityGroupRulesCmd();
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
-
-        final Answer answer = wrapper.execute(sshCommand, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertFalse(answer.getResult());
-    }
-
-    @Test
-    public void testCleanupNetworkRulesCmd() {
-        final Connection conn = Mockito.mock(Connection.class);
-        final XsHost xsHost = Mockito.mock(XsHost.class);
-
-        final CleanupNetworkRulesCmd cleanupNets = new CleanupNetworkRulesCmd(20);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.canBridgeFirewall()).thenReturn(true);
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
-        when(citrixResourceBase.getVMInstanceName()).thenReturn("VM");
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "cleanup_rules", "instance", citrixResourceBase.getVMInstanceName())).thenReturn("1");
-
-        final Answer answer = wrapper.execute(cleanupNets, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertTrue(answer.getResult());
-    }
-
-    @Test
-    public void testCleanupNetworkRulesCmdLTZ() {
-        final Connection conn = Mockito.mock(Connection.class);
-        final XsHost xsHost = Mockito.mock(XsHost.class);
-
-        final CleanupNetworkRulesCmd cleanupNets = new CleanupNetworkRulesCmd(20);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.canBridgeFirewall()).thenReturn(true);
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
-        when(citrixResourceBase.getVMInstanceName()).thenReturn("VM");
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "cleanup_rules", "instance", citrixResourceBase.getVMInstanceName())).thenReturn("-1");
-
-        final Answer answer = wrapper.execute(cleanupNets, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-        verify(xsHost, times(1)).getIp();
-
-        assertFalse(answer.getResult());
-        assertEquals(answer.getDetails(), "-1");
-    }
-
-    @Test
-    public void testCleanupNetworkRulesCmdNullDetails() {
-        final CleanupNetworkRulesCmd cleanupNets = new CleanupNetworkRulesCmd(20);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.canBridgeFirewall()).thenReturn(false);
-        final Answer answer = wrapper.execute(cleanupNets, citrixResourceBase);
-
-        assertTrue(answer.getResult());
-        assertNull(answer.getDetails());
-    }
-
-    @Test
-    public void testNetworkRulesSystemVmCommand() {
-        final Connection conn = Mockito.mock(Connection.class);
-
-        final NetworkRulesSystemVmCommand netRules = new NetworkRulesSystemVmCommand("Test", VirtualMachine.Type.User);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-
-        final Answer answer = wrapper.execute(netRules, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertTrue(answer.getResult());
-    }
-
-    @Test
-    public void testNetworkRulesSystemVmCommandNonUser() {
-        final Connection conn = Mockito.mock(Connection.class);
-
-        final NetworkRulesSystemVmCommand netRules = new NetworkRulesSystemVmCommand("Test", VirtualMachine.Type.DomainRouter);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "default_network_rules_systemvm", "vmName", netRules.getVmName())).thenReturn("true");
-
-        final Answer answer = wrapper.execute(netRules, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertTrue(answer.getResult());
-    }
-
-    @Test
-    public void testNetworkRulesSystemVmCommandNonUserFalse() {
-        final Connection conn = Mockito.mock(Connection.class);
-
-        final NetworkRulesSystemVmCommand netRules = new NetworkRulesSystemVmCommand("Test", VirtualMachine.Type.DomainRouter);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "default_network_rules_systemvm", "vmName", netRules.getVmName())).thenReturn("false");
-
-        final Answer answer = wrapper.execute(netRules, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertFalse(answer.getResult());
-    }
-
-    @Test
     public void testUpdateHostPasswordCommand() {
         final XenServerUtilitiesHelper xenServerUtilitiesHelper = Mockito.mock(XenServerUtilitiesHelper.class);
         final Pair<Boolean, String> result = Mockito.mock(Pair.class);
@@ -1119,46 +975,6 @@ public class CitrixRequestWrapperTest {
         when(citrixResourceBase.getConnection()).thenReturn(conn);
 
         final Answer answer = wrapper.execute(vmSnapshot, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertFalse(answer.getResult());
-    }
-
-    @Test
-    public void testNetworkRulesVmSecondaryIpCommandSuccess() {
-        final Connection conn = Mockito.mock(Connection.class);
-
-        final NetworkRulesVmSecondaryIpCommand rulesVm = new NetworkRulesVmSecondaryIpCommand("Test", VirtualMachine.Type.User);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "network_rules_vmSecondaryIp", "vmName", rulesVm.getVmName(), "vmMac", rulesVm.getVmMac(),
-                "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("true");
-
-        final Answer answer = wrapper.execute(rulesVm, citrixResourceBase);
-
-        verify(citrixResourceBase, times(1)).getConnection();
-
-        assertTrue(answer.getResult());
-    }
-
-    @Test
-    public void testNetworkRulesVmSecondaryIpCommandFailure() {
-        final Connection conn = Mockito.mock(Connection.class);
-
-        final NetworkRulesVmSecondaryIpCommand rulesVm = new NetworkRulesVmSecondaryIpCommand("Test", VirtualMachine.Type.User);
-
-        final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
-        assertNotNull(wrapper);
-
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.callHostPlugin(conn, "vmops", "network_rules_vmSecondaryIp", "vmName", rulesVm.getVmName(), "vmMac", rulesVm.getVmMac(),
-                "vmSecIp", rulesVm.getVmSecIp(), "action", rulesVm.getAction())).thenReturn("false");
-
-        final Answer answer = wrapper.execute(rulesVm, citrixResourceBase);
 
         verify(citrixResourceBase, times(1)).getConnection();
 

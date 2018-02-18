@@ -372,7 +372,13 @@ public interface ManagementService {
      *
      * @param Long vmId
      *             Id of The VM to migrate
-     * @return Ternary<List<? extends Host>, List<? extends Host>, Map<Host, Boolean>> List of all Hosts to which a VM
+     * @return Ternary<List
+                       *       <   p>
+     * <
+     * ?
+     * extends
+     * Host>, List<? extends Host>, Map<Host, Boolean>> List of all Hosts to
+     * which a VM
      * can be migrated, list of Hosts with enough capacity and hosts requiring storage motion for migration.
      */
     Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>> listHostsForMigrationOfVM(Long vmId, Long startIndex, Long pageSize, String keyword);
@@ -382,7 +388,12 @@ public interface ManagementService {
      * volume can be migrated. Current pool is not included in the list.
      *
      * @param Long volumeId
-     * @return Pair<List<? extends StoragePool>, List<? extends StoragePool>> List of storage pools in cluster and list
+     * @return Pair<List
+                       *       <
+                       *       ?
+                       *       extends
+                       *       StoragePool>, List<? extends StoragePool>> List of storage pools in
+     * cluster and list
      * of pools with enough capacity.
      */
     Pair<List<? extends StoragePool>, List<? extends StoragePool>> listStoragePoolsForMigrationOfVolume(Long volumeId);
@@ -392,7 +403,7 @@ public interface ManagementService {
     Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(Long id, HypervisorType hypervisorType, String keyword, Long startIndex,
                                                                                      Long pageSizeVal);
 
-    HypervisorCapabilities updateHypervisorCapabilities(Long id, Long maxGuestsLimit, Boolean securityGroupEnabled);
+    HypervisorCapabilities updateHypervisorCapabilities(Long id, Long maxGuestsLimit);
 
     /**
      * list all the top consumed resources across different capacity types

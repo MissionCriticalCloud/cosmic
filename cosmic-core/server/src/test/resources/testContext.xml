@@ -48,8 +48,6 @@
         </property>
     </bean>
 
-    <bean class="com.cloud.network.security.SecurityGroupManagerTestConfiguration" />
-
     <!--
       RPC/Async/EventBus
     -->

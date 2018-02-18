@@ -97,7 +97,6 @@ public class DatabaseConfig {
         fieldNames.add("staticNat");
         fieldNames.add("portForwarding");
         fieldNames.add("userData");
-        fieldNames.add("securityGroup");
         fieldNames.add("nspId");
 
         s_configurationDescriptions.put("host.stats.interval", "the interval in milliseconds when host stats are retrieved from agents");

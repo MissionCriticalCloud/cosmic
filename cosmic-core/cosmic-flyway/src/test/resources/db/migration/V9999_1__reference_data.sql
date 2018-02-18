@@ -129,14 +129,6 @@ VALUES ('Advanced', 'DEFAULT', 'management-server', 'account.cleanup.interval', 
   ('Advanced', 'DEFAULT', 'ManagementServer', 'xen.heartbeat.timeout', '180', 'Timeout value to send to the xenheartbeat script for guarding the self fencing functionality', '120', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'AgentManager', 'xenserver.nics.max', '7', 'Maximum allowed nics for Vms created on XenServer', '7', NULL, NULL, 0);
 
-INSERT INTO `counter` (`id`, `uuid`, `source`, `name`, `value`, `removed`, `created`)
-VALUES (1, 'ad0d8f56-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux User CPU - percentage', '1.3.6.1.4.1.2021.11.9.0', NULL, '2017-07-20 20:46:00'),
-  (2, 'ad0d98b3-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux System CPU - percentage', '1.3.6.1.4.1.2021.11.10.0', NULL, '2017-07-20 20:46:00'),
-  (3, 'ad0da998-6d7b-11e7-8f09-5254001daa61', 'snmp', 'Linux CPU Idle - percentage', '1.3.6.1.4.1.2021.11.11.0', NULL, '2017-07-20 20:46:00'),
-  (4, 'ad0dbb35-6d7b-11e7-8f09-5254001daa61', 'cpu', 'Linux User CPU - percentage - native', '1.3.6.1.4.1.2021.11.9.1', NULL, '2017-07-20 20:46:00'),
-  (5, 'ad0dc2af-6d7b-11e7-8f09-5254001daa61', 'memory', 'Linux User RAM - percentage - native', '1.3.6.1.4.1.2021.11.10.1', NULL, '2017-07-20 20:46:00'),
-  (100, 'ad0db25d-6d7b-11e7-8f09-5254001daa61', 'netscaler', 'Response Time - microseconds', 'RESPTIME', NULL, '2017-07-20 20:46:00');
-
 INSERT INTO `guest_os_category` (`id`, `name`, `uuid`)
 VALUES (1, 'CentOS', '9cc42fac-6d7b-11e7-8f09-5254001daa61'), (2, 'Debian', '9cc438cd-6d7b-11e7-8f09-5254001daa61'), (3, 'Oracle', '9cc441de-6d7b-11e7-8f09-5254001daa61'),
   (4, 'RedHat', '9cc44be5-6d7b-11e7-8f09-5254001daa61'), (5, 'SUSE', '9cc45476-6d7b-11e7-8f09-5254001daa61'), (6, 'Windows', '9cc45cf1-6d7b-11e7-8f09-5254001daa61'),
@@ -251,13 +243,12 @@ VALUES (12, 'XenServer', 'CentOS 5.3 (64-bit)', 12, 'default', 'add07eb2-6d7b-11
   (2487, 'KVM', 'VirtIO-SCSI capable OS', 1002, 'default', 'b0b651a9-6d7b-11e7-8f09-5254001daa61', '2017-07-20 18:46:07', NULL, 0),
   (2488, 'KVM', 'Windows VirtIO-SCSI', 1023, 'default', 'b0b65d81-6d7b-11e7-8f09-5254001daa61', '2017-07-20 18:46:07', NULL, 0);
 
-INSERT INTO `hypervisor_capabilities` (`id`, `uuid`, `hypervisor_type`, `hypervisor_version`, `max_guests_limit`, `security_group_enabled`, `max_data_volumes_limit`, `max_hosts_per_cluster`, `storage_motion_supported`, `vm_snapshot_enabled`)
-VALUES (1, '1', 'XenServer', 'default', 50, 1, 6, NULL, 0, 1), (2, '2', 'XenServer', 'XCP 1.0', 50, 1, 6, NULL, 0, 1), (3, '3', 'XenServer', '5.6', 50, 1, 6, NULL, 0, 1),
-  (4, '4', 'XenServer', '5.6 FP1', 50, 1, 6, NULL, 0, 1), (5, '5', 'XenServer', '5.6 SP2', 50, 1, 6, NULL, 0, 1), (6, '6', 'XenServer', '6.0', 50, 1, 13, NULL, 0, 1),
-  (7, '7', 'XenServer', '6.0.2', 50, 1, 13, NULL, 0, 1), (13, '13', 'KVM', 'default', 50, 1, 32, NULL, 0, 1), (14, '14', 'Ovm', 'default', 25, 1, 6, NULL, 0, 0),
-  (15, '15', 'Ovm', '2.3', 25, 1, 6, NULL, 0, 0), (16, 'ad275d27-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.1.0', 150, 1, 13, NULL, 1, 1),
-  (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 1, 13, NULL, 1, 1), (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 1, 13, NULL, 1, 0),
-  (23, NULL, 'Ovm3', '3.2', 25, 0, 6, NULL, 0, 0), (24, NULL, 'Ovm3', '3.3', 50, 0, 6, NULL, 0, 0);
+INSERT INTO `hypervisor_capabilities` (`id`, `uuid`, `hypervisor_type`, `hypervisor_version`, `max_guests_limit`, `max_data_volumes_limit`, `max_hosts_per_cluster`, `storage_motion_supported`, `vm_snapshot_enabled`)
+VALUES (1, '1', 'XenServer', 'default', 50, 6, NULL, 0, 1), (2, '2', 'XenServer', 'XCP 1.0', 50, 6, NULL, 0, 1), (3, '3', 'XenServer', '5.6', 50, 6, NULL, 0, 1),
+  (4, '4', 'XenServer', '5.6 FP1', 50, 6, NULL, 0, 1), (5, '5', 'XenServer', '5.6 SP2', 50, 6, NULL, 0, 1), (6, '6', 'XenServer', '6.0', 50, 13, NULL, 0, 1),
+  (7, '7', 'XenServer', '6.0.2', 50, 13, NULL, 0, 1), (13, '13', 'KVM', 'default', 50, 32, NULL, 0, 1), (14, '14', 'Ovm', 'default', 25, 6, NULL, 0, 0), (15, '15', 'Ovm', '2.3', 25, 6, NULL, 0, 0),
+  (16, 'ad275d27-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.1.0', 150, 13, NULL, 1, 1), (17, 'ad2765bf-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.2.0', 500, 13, NULL, 1, 1),
+  (22, 'ae2d1005-6d7b-11e7-8f09-5254001daa61', 'XenServer', '6.5.0', 500, 13, NULL, 1, 0);
 
 INSERT INTO `network_acl` (`id`, `name`, `uuid`, `vpc_id`, `description`, `display`) VALUES (1, 'default_deny', 'ad69103c-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Deny All', 1),
   (2, 'default_allow', 'ad692983-6d7b-11e7-8f09-5254001daa61', 0, 'Default Network ACL Allow All', 1);

@@ -446,52 +446,6 @@
                         };
                     }
                 }],
-                tabFilter: function (args) {
-                    var hiddenTabs = [];
-
-                    var zoneObj;
-                    $.ajax({
-                        url: createURL("listZones&id=" + args.context.instances[0].zoneid),
-                        dataType: "json",
-                        async: false,
-                        success: function (json) {
-                            zoneObj = json.listzonesresponse.zone[0];
-                        }
-                    });
-
-                    var includingSecurityGroupService = false;
-                    if (zoneObj.networktype == "Basic") { //Basic zone
-                        $.ajax({
-                            url: createURL("listNetworks&id=" + args.context.instances[0].nic[0].networkid),
-                            dataType: "json",
-                            async: false,
-                            success: function (json) {
-                                var items = json.listnetworksresponse.network;
-                                if (items != null && items.length > 0) {
-                                    var networkObj = items[0]; //Basic zone has only one guest network (only one NIC)
-                                    var serviceObjArray = networkObj.service;
-                                    for (var k = 0; k < serviceObjArray.length; k++) {
-                                        if (serviceObjArray[k].name == "SecurityGroup") {
-                                            includingSecurityGroupService = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else if (zoneObj.networktype == "Advanced") { //Advanced zone
-                        if (zoneObj.securitygroupsenabled == true)
-                            includingSecurityGroupService = true;
-                        else
-                            includingSecurityGroupService = false;
-                    }
-
-                    if (includingSecurityGroupService == false) {
-                        hiddenTabs.push("securityGroups");
-                    }
-
-                    return hiddenTabs;
-                },
                 actions: {
                     start: {
                         label: 'label.action.start.instance',
@@ -1633,7 +1587,7 @@
                                                 label: 'label.primary.storage'
                                             }
                                         },
-                                        dataProvider: function(args) {
+                                        dataProvider: function (args) {
                                             var data = {
                                                 page: args.page,
                                                 pagesize: pageSize
@@ -2374,18 +2328,18 @@
                                                             }
                                                         }
                                                     })).done(function (data1, data2) {
-                                                        var selectList = $('#label_network option');
-                                                        selectList.sort(function (a, b) {
-                                                            return a.text.localeCompare(b.text);
-                                                        });
+                                                    var selectList = $('#label_network option');
+                                                    selectList.sort(function (a, b) {
+                                                        return a.text.localeCompare(b.text);
+                                                    });
 
-                                                        $('#label_network option').filter(function () {
-                                                            return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
-                                                        }).remove();
+                                                    $('#label_network option').filter(function () {
+                                                        return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
+                                                    }).remove();
 
-                                                        $('#label_network').html(selectList);
+                                                    $('#label_network').html(selectList);
 
-                                                        return data1.concat(data2);
+                                                    return data1.concat(data2);
                                                 });
                                             }
                                         }
@@ -2682,39 +2636,6 @@
                                         })
                                     });
                                 }
-                            });
-                        }
-                    },
-
-                    /**
-                     * Security Groups tab
-                     */
-                    securityGroups: {
-                        title: 'label.menu.security.groups',
-                        multiple: true,
-                        fields: [{
-                            id: {
-                                label: 'label.id'
-                            },
-                            name: {
-                                label: 'label.name'
-                            },
-                            description: {
-                                label: 'label.description'
-                            }
-                        }],
-                        dataProvider: function (args) {
-                            // args.response.success({data: args.context.instances[0].securitygroup});
-                            $.ajax({
-                                url: createURL("listVirtualMachines&details=secgrp&id=" + args.context.instances[0].id),
-                                dataType: "json",
-                                async: true,
-                                success: function (json) {
-                                    args.response.success({
-                                        data: json.listvirtualmachinesresponse.virtualmachine[0].securitygroup
-                                    });
-                                }
-
                             });
                         }
                     },

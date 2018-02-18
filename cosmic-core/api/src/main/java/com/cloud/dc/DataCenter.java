@@ -34,8 +34,6 @@ public interface DataCenter extends InfrastructureEntity, Identity, InternalIden
 
     String getInternalDns2();
 
-    boolean isSecurityGroupEnabled();
-
     Map<String, String> getDetails();
 
     void setDetails(Map<String, String> details);

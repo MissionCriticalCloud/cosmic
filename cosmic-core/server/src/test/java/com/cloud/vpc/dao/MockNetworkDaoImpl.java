@@ -167,15 +167,6 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listByZoneSecurityGroup(java.lang.Long)
-     */
-    @Override
-    public List<NetworkVO> listByZoneSecurityGroup(final Long zoneId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.dao.NetworkDao#addDomainToNetwork(long, long, java.lang.Boolean)
      */
     @Override
@@ -189,15 +180,6 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
      */
     @Override
     public List<NetworkVO> listByPhysicalNetwork(final long physicalNetworkId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listSecurityGroupEnabledNetworks()
-     */
-    @Override
-    public List<NetworkVO> listSecurityGroupEnabledNetworks() {
         // TODO Auto-generated method stub
         return null;
     }

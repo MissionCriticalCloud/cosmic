@@ -472,7 +472,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     @Override
-    public boolean configureNicSecondaryIp(final NicSecondaryIp secIp, final boolean isZoneSgEnabled) {
+    public boolean configureNicSecondaryIp(final NicSecondaryIp secIp) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

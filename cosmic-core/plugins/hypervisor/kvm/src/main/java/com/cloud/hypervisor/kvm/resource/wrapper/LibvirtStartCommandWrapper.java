@@ -10,14 +10,12 @@ import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
-import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.VirtualMachine;
 
 import java.net.URISyntaxException;
-import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.libvirt.Connect;
@@ -65,29 +63,6 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
 
             s_logger.debug("starting " + vmName + ": " + vm.toString());
             libvirtComputingResource.startVm(conn, vmName, vm.toString());
-
-            for (final NicTO nic : nics) {
-                if (nic.isSecurityGroupEnabled() || nic.getIsolationUri() != null
-                        && nic.getIsolationUri().getScheme().equalsIgnoreCase(IsolationType.Ec2.toString())) {
-                    if (vmSpec.getType() != VirtualMachine.Type.User) {
-                        libvirtComputingResource.configureDefaultNetworkRulesForSystemVm(conn, vmName);
-                        break;
-                    } else {
-                        final List<String> nicSecIps = nic.getNicSecIps();
-                        final String secIpsStr;
-                        final StringBuilder sb = new StringBuilder();
-                        if (nicSecIps != null) {
-                            for (final String ip : nicSecIps) {
-                                sb.append(ip).append(":");
-                            }
-                            secIpsStr = sb.toString();
-                        } else {
-                            secIpsStr = "0:";
-                        }
-                        libvirtComputingResource.defaultNetworkRules(conn, vmName, nic, vmSpec.getId(), secIpsStr);
-                    }
-                }
-            }
 
             // system vms
             if (vmSpec.getType() != VirtualMachine.Type.User) {

@@ -151,7 +151,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
         public static final Service SourceNat = new Service("SourceNat", Capability.SupportedSourceNatTypes, Capability.RedundantRouter);
         public static final Service StaticNat = new Service("StaticNat", Capability.ElasticIp);
         public static final Service PortForwarding = new Service("PortForwarding");
-        public static final Service SecurityGroup = new Service("SecurityGroup");
         public static final Service NetworkACL = new Service("NetworkACL", Capability.SupportedProtocols);
         public static final Service Connectivity = new Service("Connectivity", Capability.StretchedL2Subnet);
         private final String name;
@@ -193,7 +192,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
         public static final Provider VirtualRouter = new Provider("VirtualRouter", false);
         public static final Provider ElasticLoadBalancerVm = new Provider("ElasticLoadBalancerVm");
-        public static final Provider SecurityGroupProvider = new Provider("SecurityGroupProvider");
         public static final Provider VPCVirtualRouter = new Provider("VpcVirtualRouter");
         public static final Provider NiciraNvp = new Provider("NiciraNvp");
         public static final Provider None = new Provider("None");

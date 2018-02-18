@@ -31,9 +31,6 @@ public class UpdateHypervisorCapabilitiesCmd extends BaseCmd {
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = HypervisorCapabilitiesResponse.class, description = "ID of the hypervisor capability")
     private Long id;
 
-    @Parameter(name = ApiConstants.SECURITY_GROUP_EANBLED, type = CommandType.BOOLEAN, description = "set true to enable security group for this hypervisor.")
-    private Boolean securityGroupEnabled;
-
     @Parameter(name = ApiConstants.MAX_GUESTS_LIMIT, type = CommandType.LONG, description = "the max number of Guest VMs per host for this hypervisor.")
     private Long maxGuestsLimit;
 
@@ -43,7 +40,7 @@ public class UpdateHypervisorCapabilitiesCmd extends BaseCmd {
 
     @Override
     public void execute() {
-        final HypervisorCapabilities result = _mgr.updateHypervisorCapabilities(getId(), getMaxGuestsLimit(), getSecurityGroupEnabled());
+        final HypervisorCapabilities result = _mgr.updateHypervisorCapabilities(getId(), getMaxGuestsLimit());
         if (result != null) {
             final HypervisorCapabilitiesResponse response = _responseGenerator.createHypervisorCapabilitiesResponse(result);
             response.setResponseName(getCommandName());
@@ -64,10 +61,6 @@ public class UpdateHypervisorCapabilitiesCmd extends BaseCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    public Boolean getSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
 
     @Override
     public String getCommandName() {

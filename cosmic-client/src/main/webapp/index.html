@@ -422,16 +422,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Step 5c: Select security group -->
-                    <div class="wizard-step-conditional select-security-group">
-                        <div class="main-desc">
-                            <translate key="message.select.security.groups"/>
-                        </div>
-                        <div class="content security-groups">
-                            <div class="select-container">
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <!-- Step 7: SSH Key pairs -->
                 <div class="step sshkeyPairs" wizard-step-id="sshkeyPairs">
@@ -585,21 +575,6 @@
                                 </div>
                             </div>
 
-                            <!-- Security groups -->
-                            <div class="select odd">
-                                <div class="name">
-                                    <span><translate key="label.security.groups"/></span>
-                                </div>
-                                <div class="value">
-                                    <span wizard-field="security-groups" conditional-field="select-security-group"></span>
-                                </div>
-                                <div class="edit">
-                                    <a href="6">
-                                        <translate key="label.edit"/>
-                                    </a>
-                                </div>
-                            </div>
-
                             <!-- SSH Key Pairs -->
                             <div class="select">
                                 <div class="name">
@@ -739,17 +714,6 @@
                                 <div class="isolation-mode">
                                     <div class="title">
                                         <translate key="label.isolation.mode"/>
-                                    </div>
-
-                                    <!-- Security groups -->
-                                    <div class="select-area">
-                                        <div class="desc">
-                                            <translate key="message.advanced.security.group"/>
-                                        </div>
-                                        <input type="checkbox" name="zone-advanced-sg-enabled" disabled="disabled"/>
-                                        <label>
-                                            <translate key="label.menu.security.groups"/>
-                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -1813,7 +1777,6 @@
 <script type="text/javascript" src="scripts/ui-custom/regions.js"></script>
 <script type="text/javascript" src="scripts/ui-custom/ipRules.js"></script>
 <script type="text/javascript" src="scripts/ui-custom/enableStaticNAT.js"></script>
-<script type="text/javascript" src="scripts/ui-custom/securityRules.js"></script>
 <script type="text/javascript" src="scripts/ui-custom/vpc.js"></script>
 <script type="text/javascript" src="scripts/vpc.js"></script>
 <script type="text/javascript" src="scripts/ui-custom/uploadVolume.js"></script>

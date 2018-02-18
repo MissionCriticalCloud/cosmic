@@ -10,7 +10,6 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.NetworkResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
@@ -62,14 +61,6 @@ public class AssignVMCmd extends BaseCmd {
                     "In case there is no network yet created for the new account the default network will be created.")
     private List<Long> networkIds;
 
-    @Parameter(name = ApiConstants.SECURITY_GROUP_IDS,
-            type = CommandType.LIST,
-            collectionType = CommandType.UUID,
-            entityType = SecurityGroupResponse.class,
-            description = "list of security group ids to be applied on the virtual machine. " +
-                    "In case no security groups are provided the VM is part of the default security group.")
-    private List<Long> securityGroupIdList;
-
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -84,10 +75,6 @@ public class AssignVMCmd extends BaseCmd {
 
     public List<Long> getNetworkIds() {
         return networkIds;
-    }
-
-    public List<Long> getSecurityGroupIdList() {
-        return securityGroupIdList;
     }
 
     @Override

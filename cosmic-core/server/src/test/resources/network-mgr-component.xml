@@ -63,7 +63,6 @@
 
         <adapters key="com.cloud.network.element.NetworkElement">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
-            <adapter name="SecurityGroupProvider" class="com.cloud.network.element.SecurityGroupElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
             <!--<adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
         </adapters>

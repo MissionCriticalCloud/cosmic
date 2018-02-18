@@ -47,10 +47,6 @@
         <property name="name" value="PrivateNetworkGuru" />
     </bean>
 
-    <bean id="SecurityGroupProvider" class="com.cloud.network.element.SecurityGroupElement">
-        <property name="name" value="SecurityGroupProvider" />
-    </bean>
-
     <bean id="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement">
         <property name="name" value="VirtualRouter" />
     </bean>
