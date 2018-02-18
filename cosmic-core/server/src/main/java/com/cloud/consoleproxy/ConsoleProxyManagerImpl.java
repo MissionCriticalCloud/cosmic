@@ -964,9 +964,10 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             return null;
         }
 
-        VMTemplateVO template = null;
         final HypervisorType availableHypervisor = _resourceMgr.getAvailableHypervisor(dataCenterId);
-        template = _templateDao.findSystemVMReadyTemplate(dataCenterId, availableHypervisor);
+        final String templateName = retrieveTemplateName(dataCenterId);
+        final VMTemplateVO template = _templateDao.findRoutingTemplate(availableHypervisor, templateName);
+
         if (template == null) {
             throw new CloudRuntimeException("Not able to find the System templates or not downloaded in zone " + dataCenterId);
         }

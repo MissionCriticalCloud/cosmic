@@ -7,6 +7,7 @@ import com.cloud.context.CallContext;
 import com.cloud.db.model.Zone;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
+import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.dao.HostDao;
 import com.cloud.info.RunningHostCountInfo;
 import com.cloud.info.RunningHostInfoAgregator;
@@ -17,6 +18,7 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.router.VirtualNetworkApplianceManager;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.component.ManagerBase;
@@ -157,4 +159,10 @@ public abstract class SystemVmManagerBase extends ManagerBase implements SystemV
                 return;
         }
     }
+
+    protected String retrieveTemplateName(final long datacenterId) {
+        final ConfigKey<String> hypervisorConfigKey = VirtualNetworkApplianceManager.RouterTemplateKvm;
+        return hypervisorConfigKey.valueIn(datacenterId);
+    }
+
 }
