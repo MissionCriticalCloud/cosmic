@@ -1304,7 +1304,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         Boolean isBasic = false;
         String allocationState = cmd.getAllocationState();
         final String networkDomain = cmd.getDomain();
-        boolean isSecurityGroupEnabled = cmd.getSecuritygroupenabled();
         final boolean isLocalStorageEnabled = cmd.getLocalStorageEnabled();
 
         if (allocationState == null) {
@@ -1330,12 +1329,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             domainVO = _domainDao.findById(domainId);
         }
 
-        if (zoneType == NetworkType.Basic) {
-            isSecurityGroupEnabled = true;
-        }
-
-        return createZone(userId, zoneName, dns1, dns2, internalDns1, internalDns2, guestCidr, domainVO != null ? domainVO.getName() : null, domainId, zoneType, allocationState,
-                networkDomain, isSecurityGroupEnabled, isLocalStorageEnabled, ip6Dns1, ip6Dns2);
+        return createZone(userId, zoneName, dns1, dns2, internalDns1, internalDns2, guestCidr, domainVO != null ? domainVO.getName() : null, domainId, zoneType, allocationState, networkDomain,
+                isLocalStorageEnabled, ip6Dns1, ip6Dns2);
     }
 
     @Override
@@ -1497,9 +1492,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                             // zone should have a physical network with management
                             // traffiType
                             mgmtPhyNetwork = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Management);
-                            if (NetworkType.Advanced == zone.getNetworkType() && !zone.isSecurityGroupEnabled()) {
-                                // advanced zone without SG should have a physical
-                                // network with public Thpe
+                            if (NetworkType.Advanced == zone.getNetworkType()) {
+                                // advanced zone should have a physical network with public type
                                 _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Public);
                             }
 
@@ -1740,7 +1734,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         if (ipv6) {
-            if (network.getGuestType() != GuestType.Shared || zone.isSecurityGroupEnabled()) {
+            if (network.getGuestType() != GuestType.Shared) {
                 throw new InvalidParameterValueException("Only support IPv6 on extending existed share network without SG");
             }
         }
@@ -1771,11 +1765,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                         // zone
                         physicalNetworkId = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Guest).getId();
                     } else if (zone.getNetworkType() == NetworkType.Advanced) {
-                        if (zone.isSecurityGroupEnabled()) {
-                            physicalNetworkId = _networkModel.getDefaultPhysicalNetworkByZoneAndTrafficType(zoneId, TrafficType.Guest).getId();
-                        } else {
-                            throw new InvalidParameterValueException("Physical Network Id is null, please provide the Network id for Direct vlan creation ");
-                        }
+                        throw new InvalidParameterValueException("Physical Network Id is null, please provide the Network id for Direct vlan creation ");
                     }
                 }
             }
@@ -1786,10 +1776,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (AllocationState.Disabled == zone.getAllocationState()
                 && !_accountMgr.isRootAdmin(caller.getId())) {
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
-        }
-
-        if (zone.isSecurityGroupEnabled() && zone.getNetworkType() != NetworkType.Basic && forVirtualNetwork) {
-            throw new InvalidParameterValueException("Can't add virtual ip range into a zone with security group enabled");
         }
 
         // If networkId is not specified, and vlan is Virtual or Direct
@@ -1807,13 +1793,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 if (zone.getNetworkType() == NetworkType.Basic) {
                     networkId = _networkModel.getExclusiveGuestNetwork(zoneId).getId();
                     network = _networkModel.getNetwork(networkId);
-                } else {
-                    network = _networkModel.getNetworkWithSecurityGroupEnabled(zoneId);
-                    if (network == null) {
-                        throw new InvalidParameterValueException("Nework id is required for Direct vlan creation ");
-                    }
-                    networkId = network.getId();
-                    zoneId = network.getDataCenterId();
                 }
             } else if (network.getGuestType() == null ||
                     network.getGuestType() == Network.GuestType.Isolated
@@ -2450,16 +2429,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 throw new InvalidParameterValueException("Invalid service " + serviceName);
             }
 
-            if (service == Service.SecurityGroup) {
-                // allow security group service for Shared networks only
-                if (guestType != GuestType.Shared) {
-                    throw new InvalidParameterValueException("Secrity group service is supported for network offerings with guest ip type " + GuestType.Shared);
-                }
-                final Set<Network.Provider> sgProviders = new HashSet<>();
-                sgProviders.add(Provider.SecurityGroupProvider);
-                serviceProviderMap.put(Network.Service.SecurityGroup, sgProviders);
-                continue;
-            }
             serviceProviderMap.put(service, defaultProviders);
         }
 
@@ -3417,11 +3386,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     @Override
     @DB
-    public DataCenterVO createZone(final long userId, final String zoneName, final String dns1, final String dns2, final String internalDns1, final String internalDns2, final
-    String guestCidr, final String domain,
-                                   final Long domainId, final NetworkType zoneType, final String allocationStateStr, final String networkDomain, final boolean
-                                           isSecurityGroupEnabled, final boolean isLocalStorageEnabled,
-                                   final String ip6Dns1, final String ip6Dns2) {
+    public DataCenterVO createZone(final long userId, final String zoneName, final String dns1, final String dns2, final String internalDns1, final String internalDns2, final String guestCidr,
+                                   final String domain, final Long domainId, final NetworkType zoneType, final String allocationStateStr, final String networkDomain, final boolean
+                                           isLocalStorageEnabled, final String ip6Dns1, final String ip6Dns2) {
 
         // checking the following params outside checkzoneparams method as we do
         // not use these params for updatezone
@@ -3447,7 +3414,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         // Create the new zone in the database
         final DataCenterVO zoneFinal = new DataCenterVO(zoneName, null, dns1, dns2, internalDns1, internalDns2, guestCidr, domain, domainId, zoneType, zoneToken, networkDomain,
-                isSecurityGroupEnabled, isLocalStorageEnabled, ip6Dns1, ip6Dns2);
+                isLocalStorageEnabled, ip6Dns1, ip6Dns2);
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             final AllocationState allocationState = AllocationState.valueOf(allocationStateStr);
             zoneFinal.setAllocationState(allocationState);
@@ -4057,7 +4024,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 } else if (offering.getTrafficType() == TrafficType.Control) {
                     broadcastDomainType = BroadcastDomainType.LinkLocal;
                 } else if (offering.getTrafficType() == TrafficType.Public) {
-                    if (zone.getNetworkType() == NetworkType.Advanced && !zone.isSecurityGroupEnabled() || zone.getNetworkType() == NetworkType.Basic) {
+                    if (zone.getNetworkType() == NetworkType.Advanced || zone.getNetworkType() == NetworkType.Basic) {
                         broadcastDomainType = BroadcastDomainType.Vlan;
                     } else {
                         continue; // so broadcastDomainType remains null! why have None/Undecided/UnKnown?

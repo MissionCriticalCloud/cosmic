@@ -587,7 +587,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String SCRIPT_MANAGE_SNAPSHOT = "managesnapshot.sh";
         public static final String SCRIPT_RESIZE_VOLUME = "resizevolume.sh";
         public static final String SCRIPT_CREATE_TEMPLATE = "createtmplt.sh";
-        public static final String SCRIPT_SECURITY_GROUP = "security_group.py";
         public static final String SCRIPT_ROUTER_PROXY = "router_proxy.sh";
         public static final String SCRIPT_OVS_PVLAN_DHCP_HOST = "ovs-pvlan-dhcp-host.sh";
         public static final String SCRIPT_OVS_PVLAN_VM = "ovs-pvlan-vm.sh";

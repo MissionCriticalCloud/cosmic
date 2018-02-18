@@ -17,7 +17,6 @@ import com.cloud.network.IpAddressManager;
 import com.cloud.network.Ipv6AddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
@@ -136,15 +135,6 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
             if (userSpecified.getBroadcastDomainType() != null) {
                 config.setBroadcastDomainType(userSpecified.getBroadcastDomainType());
             }
-        }
-
-        final boolean isSecurityGroupEnabled = _networkModel.areServicesSupportedByNetworkOffering(offering.getId(), Service.SecurityGroup);
-        if (isSecurityGroupEnabled) {
-            if (userSpecified.getIp6Cidr() != null) {
-                throw new InvalidParameterValueException("Didn't support security group with IPv6");
-            }
-            config.setName("SecurityGroupEnabledNetwork");
-            config.setDisplayText("SecurityGroupEnabledNetwork");
         }
 
         return config;

@@ -23,7 +23,6 @@ import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.network.security.SecurityGroup;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateGateway;
@@ -231,15 +230,6 @@ public class EventTypes {
     public static final String EVENT_STORAGE_IP_RANGE_UPDATE = "STORAGE.IP.RANGE.UPDATE";
     // Configuration Table
     public static final String EVENT_CONFIGURATION_VALUE_EDIT = "CONFIGURATION.VALUE.EDIT";
-    // Security Groups
-    public static final String EVENT_SECURITY_GROUP_AUTHORIZE_INGRESS = "SG.AUTH.INGRESS";
-    public static final String EVENT_SECURITY_GROUP_REVOKE_INGRESS = "SG.REVOKE.INGRESS";
-    public static final String EVENT_SECURITY_GROUP_AUTHORIZE_EGRESS = "SG.AUTH.EGRESS";
-    public static final String EVENT_SECURITY_GROUP_REVOKE_EGRESS = "SG.REVOKE.EGRESS";
-    public static final String EVENT_SECURITY_GROUP_CREATE = "SG.CREATE";
-    public static final String EVENT_SECURITY_GROUP_DELETE = "SG.DELETE";
-    public static final String EVENT_SECURITY_GROUP_ASSIGN = "SG.ASSIGN";
-    public static final String EVENT_SECURITY_GROUP_REMOVE = "SG.REMOVE";
     // Host
     public static final String EVENT_HOST_RECONNECT = "HOST.RECONNECT";
     // Maintenance
@@ -565,16 +555,6 @@ public class EventTypes {
 
         // Configuration Table
         entityEventDetails.put(EVENT_CONFIGURATION_VALUE_EDIT, Configuration.class);
-
-        // Security Groups
-        entityEventDetails.put(EVENT_SECURITY_GROUP_AUTHORIZE_INGRESS, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_REVOKE_INGRESS, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_AUTHORIZE_EGRESS, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_REVOKE_EGRESS, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_CREATE, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_DELETE, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_ASSIGN, SecurityGroup.class);
-        entityEventDetails.put(EVENT_SECURITY_GROUP_REMOVE, SecurityGroup.class);
 
         // Host
         entityEventDetails.put(EVENT_HOST_RECONNECT, Host.class);

@@ -38,7 +38,6 @@ import com.cloud.api.command.user.offering.ListDiskOfferingsCmd;
 import com.cloud.api.command.user.offering.ListServiceOfferingsCmd;
 import com.cloud.api.command.user.project.ListProjectInvitationsCmd;
 import com.cloud.api.command.user.project.ListProjectsCmd;
-import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
 import com.cloud.api.command.user.tag.ListTagsCmd;
 import com.cloud.api.command.user.template.ListTemplatesCmd;
 import com.cloud.api.command.user.vm.ListVMsCmd;
@@ -61,7 +60,6 @@ import com.cloud.api.query.dao.ProjectAccountJoinDao;
 import com.cloud.api.query.dao.ProjectInvitationJoinDao;
 import com.cloud.api.query.dao.ProjectJoinDao;
 import com.cloud.api.query.dao.ResourceTagJoinDao;
-import com.cloud.api.query.dao.SecurityGroupJoinDao;
 import com.cloud.api.query.dao.ServiceOfferingJoinDao;
 import com.cloud.api.query.dao.StoragePoolJoinDao;
 import com.cloud.api.query.dao.StorageTagDao;
@@ -85,7 +83,6 @@ import com.cloud.api.query.vo.ProjectAccountJoinVO;
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
-import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.api.query.vo.ServiceOfferingJoinVO;
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.query.vo.StorageTagVO;
@@ -110,7 +107,6 @@ import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceDetailResponse;
 import com.cloud.api.response.ResourceTagResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.StorageTagResponse;
@@ -153,8 +149,6 @@ import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDetailsDao;
-import com.cloud.network.security.SecurityGroupVMMapVO;
-import com.cloud.network.security.dao.SecurityGroupVMMapDao;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project;
@@ -276,10 +270,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     private IPAddressDao _ipAddressDao;
     @Inject
     private VpcDao _vpcDao;
-    @Inject
-    private SecurityGroupJoinDao _securityGroupJoinDao;
-    @Inject
-    private SecurityGroupVMMapDao _securityGroupVMMapDao;
     @Inject
     private DomainRouterJoinDao _routerJoinDao;
     @Inject
@@ -998,118 +988,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         }
         final List<UserVmJoinVO> vms = _userVmJoinDao.searchByIds(vmIds);
         return new Pair<>(vms, count);
-    }
-
-    @Override
-    public ListResponse<SecurityGroupResponse> searchForSecurityGroups(final ListSecurityGroupsCmd cmd) {
-        final Pair<List<SecurityGroupJoinVO>, Integer> result = searchForSecurityGroupsInternal(cmd);
-        final ListResponse<SecurityGroupResponse> response = new ListResponse<>();
-        final List<SecurityGroupResponse> routerResponses = ViewResponseHelper.createSecurityGroupResponses(result.first());
-        response.setResponses(routerResponses, result.second());
-        return response;
-    }
-
-    private Pair<List<SecurityGroupJoinVO>, Integer> searchForSecurityGroupsInternal(final ListSecurityGroupsCmd cmd) throws PermissionDeniedException,
-            InvalidParameterValueException {
-        final Account caller = CallContext.current().getCallingAccount();
-        final Long instanceId = cmd.getVirtualMachineId();
-        final String securityGroup = cmd.getSecurityGroupName();
-        final Long id = cmd.getId();
-        final Object keyword = cmd.getKeyword();
-        final List<Long> permittedAccounts = new ArrayList<>();
-        final Map<String, String> tags = cmd.getTags();
-
-        if (instanceId != null) {
-            final UserVmVO userVM = _userVmDao.findById(instanceId);
-            if (userVM == null) {
-                throw new InvalidParameterValueException("Unable to list network groups for virtual machine instance " + instanceId + "; instance not found.");
-            }
-            _accountMgr.checkAccess(caller, null, true, userVM);
-            return listSecurityGroupRulesByVM(instanceId.longValue(), cmd.getStartIndex(), cmd.getPageSizeVal());
-        }
-
-        final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<>(
-                cmd.getDomainId(), cmd.isRecursive(), null);
-        _accountMgr.buildACLSearchParameters(caller, id, cmd.getAccountName(), cmd.getProjectId(), permittedAccounts,
-                domainIdRecursiveListProject, cmd.listAll(), false);
-        final Long domainId = domainIdRecursiveListProject.first();
-        final Boolean isRecursive = domainIdRecursiveListProject.second();
-        final ListProjectResourcesCriteria listProjectResourcesCriteria = domainIdRecursiveListProject.third();
-
-        final Filter searchFilter = new Filter(SecurityGroupJoinVO.class, "id", true, cmd.getStartIndex(), cmd.getPageSizeVal());
-        final SearchBuilder<SecurityGroupJoinVO> sb = _securityGroupJoinDao.createSearchBuilder();
-        sb.select(null, Func.DISTINCT, sb.entity().getId()); // select distinct
-        // ids
-        _accountMgr.buildACLViewSearchBuilder(sb, domainId, isRecursive, permittedAccounts,
-                listProjectResourcesCriteria);
-
-        sb.and("id", sb.entity().getId(), SearchCriteria.Op.EQ);
-        sb.and("name", sb.entity().getName(), SearchCriteria.Op.EQ);
-
-        final SearchCriteria<SecurityGroupJoinVO> sc = sb.create();
-        _accountMgr.buildACLViewSearchCriteria(sc, domainId, isRecursive, permittedAccounts,
-                listProjectResourcesCriteria);
-
-        if (id != null) {
-            sc.setParameters("id", id);
-        }
-
-        if (tags != null && !tags.isEmpty()) {
-            final SearchCriteria<SecurityGroupJoinVO> tagSc = _securityGroupJoinDao.createSearchCriteria();
-            for (final String key : tags.keySet()) {
-                final SearchCriteria<SecurityGroupJoinVO> tsc = _securityGroupJoinDao.createSearchCriteria();
-                tsc.addAnd("tagKey", SearchCriteria.Op.EQ, key);
-                tsc.addAnd("tagValue", SearchCriteria.Op.EQ, tags.get(key));
-                tagSc.addOr("tagKey", SearchCriteria.Op.SC, tsc);
-            }
-            sc.addAnd("tagKey", SearchCriteria.Op.SC, tagSc);
-        }
-
-        if (securityGroup != null) {
-            sc.setParameters("name", securityGroup);
-        }
-
-        if (keyword != null) {
-            final SearchCriteria<SecurityGroupJoinVO> ssc = _securityGroupJoinDao.createSearchCriteria();
-            ssc.addOr("name", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            ssc.addOr("description", SearchCriteria.Op.LIKE, "%" + keyword + "%");
-            sc.addAnd("name", SearchCriteria.Op.SC, ssc);
-        }
-
-        // search security group together with rules
-        final Pair<List<SecurityGroupJoinVO>, Integer> uniqueSgPair = _securityGroupJoinDao.searchAndCount(sc, searchFilter);
-        final Integer count = uniqueSgPair.second();
-        if (count.intValue() == 0) {
-            // handle empty result cases
-            return uniqueSgPair;
-        }
-
-        final List<SecurityGroupJoinVO> uniqueSgs = uniqueSgPair.first();
-        final Long[] sgIds = new Long[uniqueSgs.size()];
-        int i = 0;
-        for (final SecurityGroupJoinVO v : uniqueSgs) {
-            sgIds[i++] = v.getId();
-        }
-        final List<SecurityGroupJoinVO> sgs = _securityGroupJoinDao.searchByIds(sgIds);
-        return new Pair<>(sgs, count);
-    }
-
-    private Pair<List<SecurityGroupJoinVO>, Integer> listSecurityGroupRulesByVM(final long vmId, final long pageInd, final long pageSize) {
-        final Filter sf = new Filter(SecurityGroupVMMapVO.class, null, true, pageInd, pageSize);
-        final Pair<List<SecurityGroupVMMapVO>, Integer> sgVmMappingPair = _securityGroupVMMapDao.listByInstanceId(vmId, sf);
-        final Integer count = sgVmMappingPair.second();
-        if (count.intValue() == 0) {
-            // handle empty result cases
-            return new Pair<>(new ArrayList<>(), count);
-        }
-        final List<SecurityGroupVMMapVO> sgVmMappings = sgVmMappingPair.first();
-        final Long[] sgIds = new Long[sgVmMappings.size()];
-        int i = 0;
-        for (final SecurityGroupVMMapVO sgVm : sgVmMappings) {
-            sgIds[i++] = sgVm.getSecurityGroupId();
-        }
-        final List<SecurityGroupJoinVO> sgs = _securityGroupJoinDao.searchByIds(sgIds);
-        return new Pair<>(sgs, count);
     }
 
     @Override
@@ -3216,21 +3094,14 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
     }
 
     private Pair<List<AffinityGroupJoinVO>, Integer> listAffinityGroupsByVM(final long vmId, final long pageInd, final long pageSize) {
-        final Filter sf = new Filter(SecurityGroupVMMapVO.class, null, true, pageInd, pageSize);
-        final Pair<List<AffinityGroupVMMapVO>, Integer> agVmMappingPair = _affinityGroupVMMapDao.listByInstanceId(vmId, sf);
-        final Integer count = agVmMappingPair.second();
-        if (count.intValue() == 0) {
-            // handle empty result cases
-            return new Pair<>(new ArrayList<>(), count);
-        }
-        final List<AffinityGroupVMMapVO> agVmMappings = agVmMappingPair.first();
+        final List<AffinityGroupVMMapVO> agVmMappings = _affinityGroupVMMapDao.listByInstanceId(vmId);
         final Long[] agIds = new Long[agVmMappings.size()];
         int i = 0;
         for (final AffinityGroupVMMapVO agVm : agVmMappings) {
             agIds[i++] = agVm.getAffinityGroupId();
         }
         final List<AffinityGroupJoinVO> ags = _affinityGroupJoinDao.searchByIds(agIds);
-        return new Pair<>(ags, count);
+        return new Pair<>(ags, ags.size());
     }
 
     private SearchCriteria<AffinityGroupJoinVO> buildAffinityGroupSearchCriteria(final Long domainId, final boolean isRecursive, final List<Long> permittedAccounts,

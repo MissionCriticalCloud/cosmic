@@ -57,13 +57,9 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
 
     void clearCheckForGc(long networkId);
 
-    List<NetworkVO> listByZoneSecurityGroup(Long zoneId);
-
     void addDomainToNetwork(long networkId, long domainId, Boolean subdomainAccess);
 
     List<NetworkVO> listByPhysicalNetwork(long physicalNetworkId);
-
-    List<NetworkVO> listSecurityGroupEnabledNetworks();
 
     List<NetworkVO> listByPhysicalNetworkTrafficType(long physicalNetworkId, TrafficType trafficType);
 

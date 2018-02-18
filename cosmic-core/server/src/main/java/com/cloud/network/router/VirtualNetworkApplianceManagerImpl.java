@@ -1387,7 +1387,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             if (network.getTrafficType() == TrafficType.Guest) {
                 guestNetworks.add(network);
                 if (nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, "pvlan-nic");
 
                     final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
                     try {
@@ -1475,7 +1475,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                 final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
                 if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, "pvlan-nic");
 
                     final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
                     try {

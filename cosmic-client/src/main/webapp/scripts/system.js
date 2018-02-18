@@ -3361,127 +3361,6 @@
                         }
                     },
 
-                    // Security groups detail view
-                    securityGroups: {
-                        id: 'securityGroup-providers',
-                        label: 'label.menu.security.groups',
-                        type: 'detailView',
-                        viewAll: {
-                            label: 'label.rules',
-                            path: 'network.securityGroups'
-                        },
-                        tabs: {
-                            details: {
-                                title: 'label.details',
-                                fields: [{
-                                    name: {
-                                        label: 'label.name'
-                                    }
-                                },
-                                    {
-                                        state: {
-                                            label: 'label.state'
-                                        }
-                                    }],
-                                dataProvider: function (args) {
-                                    refreshNspData("SecurityGroupProvider");
-                                    var providerObj;
-                                    $(nspHardcodingArray).each(function () {
-                                        if (this.id == "securityGroups") {
-                                            providerObj = this;
-                                            return false; //break each loop
-                                        }
-                                    });
-                                    args.response.success({
-                                        actionFilter: function (args) {
-                                            var allowedActions = [];
-                                            var jsonObj = providerObj;
-                                            if (jsonObj.state == "Enabled")
-                                                allowedActions.push("disable"); else if (jsonObj.state == "Disabled")
-                                                allowedActions.push("enable");
-                                            return allowedActions;
-                                        },
-                                        data: providerObj
-                                    });
-                                }
-                            }
-                        },
-                        actions: {
-                            enable: {
-                                label: 'label.enable.provider',
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("updateNetworkServiceProvider&id=" + nspMap["securityGroups"].id + "&state=Enabled"),
-                                        async: true,
-                                        success: function (json) {
-                                            var jid = json.updatenetworkserviceproviderresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        $(window).trigger('cloudStack.fullRefresh');
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                },
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.confirm.enable.provider';
-                                    },
-                                    notification: function () {
-                                        return 'label.enable.provider';
-                                    }
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            },
-                            disable: {
-                                label: 'label.disable.provider',
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL("updateNetworkServiceProvider&id=" + nspMap["securityGroups"].id + "&state=Disabled"),
-                                        dataType: "json",
-                                        success: function (json) {
-                                            var jid = json.updatenetworkserviceproviderresponse.jobid;
-                                            args.response.success({
-                                                _custom: {
-                                                    jobId: jid,
-                                                    getUpdatedItem: function (json) {
-                                                        $(window).trigger('cloudStack.fullRefresh');
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                },
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.confirm.disable.provider';
-                                    },
-                                    notification: function () {
-                                        return 'label.disable.provider';
-                                    }
-                                },
-                                notification: {
-                                    poll: pollAsyncJobResult
-                                }
-                            }
-                        },
-
-                        fields: {
-                            id: {
-                                label: 'label.id'
-                            },
-                            name: {
-                                label: 'label.name'
-                            }
-                            //,
-                            //state: { label: 'label.status' } //comment it for now, since dataProvider below doesn't get called by widget code after action is done
-                        }
-                    },
                     // Nicira Nvp provider detail view
                     niciraNvp: {
                         type: 'detailView',
@@ -12351,162 +12230,30 @@
                                                                                                 } else {
                                                                                                     clearInterval(enableVirtualRouterProviderIntervalID);
                                                                                                     if (result.jobstatus == 1) {
-                                                                                                        //alert("Virtual Router Provider is enabled");
+                                                                                                        //Advanced zone
+                                                                                                        //create pod
+                                                                                                        var array3 = [];
+                                                                                                        array3.push("&zoneId=" + newZoneObj.id);
+                                                                                                        array3.push("&name=" + todb(args.data.podName));
+                                                                                                        array3.push("&gateway=" + todb(args.data.podGateway));
+                                                                                                        array3.push("&netmask=" + todb(args.data.podNetmask));
+                                                                                                        array3.push("&startIp=" + todb(args.data.podStartIp));
 
-                                                                                                        if (newZoneObj.networktype == "Basic") {
-                                                                                                            if (args.data["security-groups-enabled"] == "on") {
-                                                                                                                //need to Enable security group provider first
-                                                                                                                // get network service provider ID of Security Group
-                                                                                                                var securityGroupProviderId;
-                                                                                                                $.ajax({
-                                                                                                                    url: createURL("listNetworkServiceProviders&name=SecurityGroupProvider&physicalNetworkId=" + newPhysicalnetwork.id),
-                                                                                                                    dataType: "json",
-                                                                                                                    async: false,
-                                                                                                                    success: function (json) {
-                                                                                                                        var items = json.listnetworkserviceprovidersresponse.networkserviceprovider;
-                                                                                                                        if (items != null && items.length > 0) {
-                                                                                                                            securityGroupProviderId = items[0].id;
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                });
-                                                                                                                if (securityGroupProviderId == null) {
-                                                                                                                    alert("error: listNetworkServiceProviders API doesn't return security group provider ID");
-                                                                                                                    return;
-                                                                                                                }
+                                                                                                        var endip = args.data.podEndIp; //optional
+                                                                                                        if (endip != null && endip.length > 0)
+                                                                                                            array3.push("&endIp=" + todb(endip));
 
-                                                                                                                $.ajax({
-                                                                                                                    url: createURL("updateNetworkServiceProvider&state=Enabled&id=" + securityGroupProviderId),
-                                                                                                                    dataType: "json",
-                                                                                                                    async: false,
-                                                                                                                    success: function (json) {
-                                                                                                                        var jobId = json.updatenetworkserviceproviderresponse.jobid;
-                                                                                                                        var enableSecurityGroupProviderIntervalID = setInterval(function () {
-                                                                                                                                $.ajax({
-                                                                                                                                    url: createURL("queryAsyncJobResult&jobId=" + jobId),
-                                                                                                                                    dataType: "json",
-                                                                                                                                    success: function (json) {
-                                                                                                                                        var result = json.queryasyncjobresultresponse;
-                                                                                                                                        if (result.jobstatus == 0) {
-                                                                                                                                            return; //Job has not completed
-                                                                                                                                        } else {
-                                                                                                                                            clearInterval(enableSecurityGroupProviderIntervalID);
-                                                                                                                                            if (result.jobstatus == 1) {
-                                                                                                                                                //alert("Security group provider is enabled");
-
-                                                                                                                                                //create network (for basic zone only)
-                                                                                                                                                var array2 = [];
-                                                                                                                                                array2.push("&zoneid=" + newZoneObj.id);
-                                                                                                                                                array2.push("&name=guestNetworkForBasicZone");
-                                                                                                                                                array2.push("&displaytext=guestNetworkForBasicZone");
-                                                                                                                                                array2.push("&networkofferingid=" + args.data.networkOfferingId);
-                                                                                                                                                $.ajax({
-                                                                                                                                                    url: createURL("createNetwork" + array2.join("")),
-                                                                                                                                                    dataType: "json",
-                                                                                                                                                    async: false,
-                                                                                                                                                    success: function (json) {
-                                                                                                                                                        //create pod
-                                                                                                                                                        var array3 = [];
-                                                                                                                                                        array3.push("&zoneId=" + newZoneObj.id);
-                                                                                                                                                        array3.push("&name=" + todb(args.data.podName));
-                                                                                                                                                        array3.push("&gateway=" + todb(args.data.podGateway));
-                                                                                                                                                        array3.push("&netmask=" + todb(args.data.podNetmask));
-                                                                                                                                                        array3.push("&startIp=" + todb(args.data.podStartIp));
-
-                                                                                                                                                        var endip = args.data.podEndIp; //optional
-                                                                                                                                                        if (endip != null && endip.length > 0)
-                                                                                                                                                            array3.push("&endIp=" + todb(endip));
-
-                                                                                                                                                        $.ajax({
-                                                                                                                                                            url: createURL("createPod" + array3.join("")),
-                                                                                                                                                            dataType: "json",
-                                                                                                                                                            async: false,
-                                                                                                                                                            success: function (json) {
-                                                                                                                                                            },
-                                                                                                                                                            error: function (XMLHttpResponse) {
-                                                                                                                                                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                                                                                                alert("createPod failed. Error: " + errorMsg);
-                                                                                                                                                            }
-                                                                                                                                                        });
-                                                                                                                                                    }
-                                                                                                                                                });
-                                                                                                                                            } else if (result.jobstatus == 2) {
-                                                                                                                                                alert("failed to enable security group provider. Error: " + _s(result.jobresult.errortext));
-                                                                                                                                            }
-                                                                                                                                        }
-                                                                                                                                    },
-                                                                                                                                    error: function (XMLHttpResponse) {
-                                                                                                                                        var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                                                                        alert("updateNetworkServiceProvider failed. Error: " + errorMsg);
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                            },
-                                                                                                                            g_queryAsyncJobResultInterval);
-                                                                                                                    }
-                                                                                                                });
-                                                                                                            } else {
-                                                                                                                //create network (for basic zone only)
-                                                                                                                var array2 = [];
-                                                                                                                array2.push("&zoneid=" + newZoneObj.id);
-                                                                                                                array2.push("&name=guestNetworkForBasicZone");
-                                                                                                                array2.push("&displaytext=guestNetworkForBasicZone");
-                                                                                                                array2.push("&networkofferingid=" + args.data.networkOfferingId);
-                                                                                                                $.ajax({
-                                                                                                                    url: createURL("createNetwork" + array2.join("")),
-                                                                                                                    dataType: "json",
-                                                                                                                    async: false,
-                                                                                                                    success: function (json) {
-                                                                                                                        //create pod
-                                                                                                                        var array3 = [];
-                                                                                                                        array3.push("&zoneId=" + newZoneObj.id);
-                                                                                                                        array3.push("&name=" + todb(args.data.podName));
-                                                                                                                        array3.push("&gateway=" + todb(args.data.podGateway));
-                                                                                                                        array3.push("&netmask=" + todb(args.data.podNetmask));
-                                                                                                                        array3.push("&startIp=" + todb(args.data.podStartIp));
-
-                                                                                                                        var endip = args.data.podEndIp; //optional
-                                                                                                                        if (endip != null && endip.length > 0)
-                                                                                                                            array3.push("&endIp=" + todb(endip));
-
-                                                                                                                        $.ajax({
-                                                                                                                            url: createURL("createPod" + array3.join("")),
-                                                                                                                            dataType: "json",
-                                                                                                                            async: false,
-                                                                                                                            success: function (json) {
-                                                                                                                            },
-                                                                                                                            error: function (XMLHttpResponse) {
-                                                                                                                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                                                                alert("createPod failed. Error: " + errorMsg);
-                                                                                                                            }
-                                                                                                                        });
-                                                                                                                    }
-                                                                                                                });
+                                                                                                        $.ajax({
+                                                                                                            url: createURL("createPod" + array3.join("")),
+                                                                                                            dataType: "json",
+                                                                                                            async: false,
+                                                                                                            success: function (json) {
+                                                                                                            },
+                                                                                                            error: function (XMLHttpResponse) {
+                                                                                                                var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
+                                                                                                                alert("createPod failed. Error: " + errorMsg);
                                                                                                             }
-                                                                                                        } else {
-                                                                                                            //Advanced zone
-                                                                                                            //create pod
-                                                                                                            var array3 = [];
-                                                                                                            array3.push("&zoneId=" + newZoneObj.id);
-                                                                                                            array3.push("&name=" + todb(args.data.podName));
-                                                                                                            array3.push("&gateway=" + todb(args.data.podGateway));
-                                                                                                            array3.push("&netmask=" + todb(args.data.podNetmask));
-                                                                                                            array3.push("&startIp=" + todb(args.data.podStartIp));
-
-                                                                                                            var endip = args.data.podEndIp; //optional
-                                                                                                            if (endip != null && endip.length > 0)
-                                                                                                                array3.push("&endIp=" + todb(endip));
-
-                                                                                                            $.ajax({
-                                                                                                                url: createURL("createPod" + array3.join("")),
-                                                                                                                dataType: "json",
-                                                                                                                async: false,
-                                                                                                                success: function (json) {
-                                                                                                                },
-                                                                                                                error: function (XMLHttpResponse) {
-                                                                                                                    var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
-                                                                                                                    alert("createPod failed. Error: " + errorMsg);
-                                                                                                                }
-                                                                                                            });
-                                                                                                        }
+                                                                                                        });
                                                                                                     } else if (result.jobstatus == 2) {
                                                                                                         alert("failed to enable Virtual Router Provider. Error: " + _s(result.jobresult.errortext));
                                                                                                     }
@@ -12856,9 +12603,6 @@
                             case "VpcVirtualRouter":
                                 nspMap["vpcVirtualRouter"] = items[i];
                                 break;
-                            case "SecurityGroupProvider":
-                                nspMap["securityGroups"] = items[i];
-                                break;
                             case "NiciraNvp":
                                 nspMap["niciraNvp"] = items[i];
                                 break;
@@ -12887,13 +12631,7 @@
             selectedPhysicalNetworkObj: selectedPhysicalNetworkObj
         });
 
-        if (selectedZoneObj.networktype == "Basic") {
-            nspHardcodingArray.push({
-                id: 'securityGroups',
-                name: 'Security Groups',
-                state: nspMap.securityGroups ? nspMap.securityGroups.state : 'Disabled'
-            });
-        } else if (selectedZoneObj.networktype == "Advanced") {
+        if (selectedZoneObj.networktype == "Advanced") {
             nspHardcodingArray.push({
                 id: 'vpcVirtualRouter',
                 name: 'VPC Virtual Router',

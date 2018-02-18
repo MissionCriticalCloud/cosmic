@@ -50,7 +50,6 @@ import com.cloud.api.response.ResourceCountResponse;
 import com.cloud.api.response.ResourceLimitResponse;
 import com.cloud.api.response.ResourceTagResponse;
 import com.cloud.api.response.SSHKeyPairResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.ServiceResponse;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
@@ -107,8 +106,6 @@ import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityRule;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateGateway;
@@ -231,10 +228,6 @@ public interface ResponseGenerator {
 
     List<TemplateResponse> createTemplateResponses(ResponseView view, long templateId, Long snapshotId, Long volumeId, boolean readyOnly);
 
-    SecurityGroupResponse createSecurityGroupResponseFromSecurityGroupRule(List<? extends SecurityRule> securityRules);
-
-    SecurityGroupResponse createSecurityGroupResponse(SecurityGroup group);
-
     ExtractResponse createExtractResponse(Long id, Long zoneId, Long accountId, String mode, String url);
 
     String toSerializedString(CreateCmdResponse response, String responseType);
@@ -256,8 +249,6 @@ public interface ResponseGenerator {
     UserResponse createUserResponse(User user);
 
     AccountResponse createUserAccountResponse(ResponseView view, UserAccount user);
-
-    Long getSecurityGroupId(String groupName, long accountId);
 
     List<TemplateResponse> createIsoResponses(ResponseView view, VirtualMachineTemplate iso, Long zoneId, boolean readyOnly);
 

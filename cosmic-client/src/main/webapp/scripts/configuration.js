@@ -2326,7 +2326,6 @@
                                          when service(s) has VPC Virtual Router as provider:
                                          (1) conserve mode is set to unchecked and grayed out.
                                          (2) redundant router capability checkbox is set to unchecked and grayed out.
-                                         (3) remove Firewall service, SecurityGroup service.
                                          */
                                         var havingVpcVirtualRouterForAtLeastOneService = false;
                                         $(serviceCheckboxNames).each(function () {
@@ -2352,48 +2351,6 @@
                                         }
 
                                         $(':ui-dialog').dialog('option', 'position', 'center');
-
-                                        //CS-16612 show all services regardless of guestIpType(Shared/Isolated)
-                                        /*
-                                         //hide/show service fields ***** (begin) *****
-                                         var serviceFieldsToHide = [];
-                                         if($guestTypeField.val() == 'Shared') { //Shared network offering
-                                         serviceFieldsToHide = [
-                                         'service.SourceNat.isEnabled',
-                                         'service.PortForwarding.isEnabled',
-                                         'service.Firewall.isEnabled',
-                                         'service.Vpn.isEnabled'
-                                         ];
-                                         if(havingVpcVirtualRouterForAtLeastOneService == true) { //add SecurityGroup to to-hide-list
-                                         serviceFieldsToHide.push('service.SecurityGroup.isEnabled');
-                                         }
-                                         else { //remove SecurityGroup from to-hide-list
-                                         var temp = $.map(serviceFieldsToHide, function(item) {
-                                         if (item != 'service.SecurityGroup.isEnabled') {
-                                         return item;
-                                         }
-                                         });
-                                         serviceFieldsToHide = temp;
-                                         }
-                                         }
-                                         else { //Isolated network offering
-                                         serviceFieldsToHide = [
-                                         'service.SecurityGroup.isEnabled'
-                                         ];
-                                         if(havingVpcVirtualRouterForAtLeastOneService == true) { //add firewall to to-hide-list
-                                         serviceFieldsToHide.push('service.Firewall.isEnabled');
-                                         }
-                                         else { //remove firewall from to-hide-list
-                                         var temp = $.map(serviceFieldsToHide, function(item) {
-                                         if (item != 'service.Firewall.isEnabled') {
-                                         return item;
-                                         }
-                                         });
-                                         serviceFieldsToHide = temp;
-                                         }
-                                         }
-                                         */
-
 
                                         //CS-16687: NetworkACL should be removed when the guest_type is SHARED
                                         //hide/show service fields ***** (begin) *****
@@ -2605,9 +2562,6 @@
                                                                 break;
                                                             case 'PortForwarding':
                                                                 serviceDisplayName = _l('label.port.forwarding');
-                                                                break;
-                                                            case 'SecurityGroup':
-                                                                serviceDisplayName = _l('label.security.groups');
                                                                 break;
                                                             case 'UserData':
                                                                 serviceDisplayName = _l('label.user.data');

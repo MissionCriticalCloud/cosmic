@@ -757,44 +757,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public NetworkVO getNetworkWithSGWithFreeIPs(final Long zoneId) {
-        final List<NetworkVO> networks = _networksDao.listByZoneSecurityGroup(zoneId);
-        if (networks == null || networks.isEmpty()) {
-            return null;
-        }
-        NetworkVO ret_network = null;
-        for (final NetworkVO nw : networks) {
-            final List<VlanVO> vlans = _vlanDao.listVlansByNetworkId(nw.getId());
-            for (final VlanVO vlan : vlans) {
-                if (_ipAddressDao.countFreeIpsInVlan(vlan.getId()) > 0) {
-                    ret_network = nw;
-                    break;
-                }
-            }
-            if (ret_network != null) {
-                break;
-            }
-        }
-        if (ret_network == null) {
-            s_logger.debug("Can not find network with security group enabled with free IPs");
-        }
-        return ret_network;
-    }
-
-    @Override
-    public NetworkVO getNetworkWithSecurityGroupEnabled(final Long zoneId) {
-        final List<NetworkVO> networks = _networksDao.listByZoneSecurityGroup(zoneId);
-        if (networks == null || networks.isEmpty()) {
-            return null;
-        }
-
-        if (networks.size() > 1) {
-            s_logger.debug("There are multiple network with security group enabled? select one of them...");
-        }
-        return networks.get(0);
-    }
-
-    @Override
     public PublicIpAddress getPublicIpAddress(final long ipAddressId) {
         final IPAddressVO addr = _ipAddressDao.findById(ipAddressId);
         if (addr == null) {
@@ -1109,39 +1071,9 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public List<Long> listNetworkOfferingsForUpgrade(final long networkId) {
-        final List<Long> offeringsToReturn = new ArrayList<>();
         final NetworkOffering originalOffering = _entityMgr.findById(NetworkOffering.class, getNetwork(networkId).getNetworkOfferingId());
 
-        final boolean securityGroupSupportedByOriginalOff = areServicesSupportedByNetworkOffering(originalOffering.getId(), Service.SecurityGroup);
-
-        // security group supported property should be the same
-
-        final List<Long> offerings = _networkOfferingDao.getOfferingIdsToUpgradeFrom(originalOffering);
-
-        for (final Long offeringId : offerings) {
-            if (areServicesSupportedByNetworkOffering(offeringId, Service.SecurityGroup) == securityGroupSupportedByOriginalOff) {
-                offeringsToReturn.add(offeringId);
-            }
-        }
-
-        return offeringsToReturn;
-    }
-
-    @Override
-    public boolean isSecurityGroupSupportedInNetwork(final Network network) {
-        if (network.getTrafficType() != TrafficType.Guest) {
-            s_logger.trace("Security group can be enabled for Guest networks only; and network " + network + " has a diff traffic type");
-            return false;
-        }
-
-        Long physicalNetworkId = network.getPhysicalNetworkId();
-
-        // physical network id can be null in Guest Network in Basic zone, so locate the physical network
-        if (physicalNetworkId == null) {
-            physicalNetworkId = findPhysicalNetworkId(network.getDataCenterId(), null, null);
-        }
-
-        return isServiceEnabledInNetwork(physicalNetworkId, network.getId(), Service.SecurityGroup);
+        return _networkOfferingDao.getOfferingIdsToUpgradeFrom(originalOffering);
     }
 
     @Override
@@ -1413,12 +1345,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean canAddDefaultSecurityGroup() {
-        final String defaultAdding = _configDao.getValue(Config.SecurityGroupDefaultAdding.key());
-        return defaultAdding != null && defaultAdding.equalsIgnoreCase("true");
     }
 
     @Override
@@ -1794,24 +1720,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         final NetworkVO network = _networksDao.findById(networkId);
         final Integer networkRate = getNetworkRate(network.getId(), vm.getId());
 
-        //        NetworkGuru guru = _networkGurus.get(network.getGuruName());
-        final NicProfile profile =
-                new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, isSecurityGroupSupportedInNetwork(network), getNetworkTag(
-                        vm.getHypervisorType(), network));
-        //        guru.updateNicProfile(profile, network);
-        return profile;
-    }
-
-    private List<Provider> getNetworkProviders(final long networkId) {
-        final List<String> providerNames = _ntwkSrvcDao.getDistinctProviders(networkId);
-        final Map<String, Provider> providers = new HashMap<>();
-        for (final String providerName : providerNames) {
-            if (!providers.containsKey(providerName)) {
-                providers.put(providerName, Network.Provider.getProvider(providerName));
-            }
-        }
-
-        return new ArrayList<>(providers.values());
+        return new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, getNetworkTag(vm.getHypervisorType(), network));
     }
 
     @Override

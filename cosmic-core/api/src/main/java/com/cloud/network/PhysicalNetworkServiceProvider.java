@@ -39,8 +39,6 @@ public interface PhysicalNetworkServiceProvider extends InternalIdentity {
 
     boolean isUserdataServiceProvided();
 
-    boolean isSecuritygroupServiceProvided();
-
     List<Service> getEnabledServices();
 
     String getUuid();

@@ -16,8 +16,6 @@ public interface HypervisorCapabilities extends Identity, InternalIdentity {
 
     String getHypervisorVersion();
 
-    boolean isSecurityGroupEnabled();
-
     /**
      * @return the maxGuestslimit
      */

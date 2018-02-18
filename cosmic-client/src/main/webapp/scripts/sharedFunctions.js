@@ -322,21 +322,6 @@ var addPrivateNetworkDialog = {
                                         }
                                     }
                                     for (var i = 0; i < addPrivateNetworkDialog.networkOfferingObjs.length; i++) {
-                                        //for zone-wide network in Advanced SG-enabled zone, list only SG network offerings
-                                        if (selectedZoneObj.networktype == 'Advanced' && selectedZoneObj.securitygroupsenabled == true) {
-                                            if (args.scope == "zone-wide") {
-                                                var includingSecurityGroup = false;
-                                                var serviceObjArray = addPrivateNetworkDialog.networkOfferingObjs[i].service;
-                                                for (var k = 0; k < serviceObjArray.length; k++) {
-                                                    if (serviceObjArray[k].name == "SecurityGroup") {
-                                                        includingSecurityGroup = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (includingSecurityGroup == false)
-                                                    continue; //skip to next network offering
-                                            }
-                                        }
                                         items.push({
                                             id: addPrivateNetworkDialog.networkOfferingObjs[i].id,
                                             description: addPrivateNetworkDialog.networkOfferingObjs[i].displaytext

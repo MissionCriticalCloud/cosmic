@@ -197,24 +197,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNetworkWithSGWithFreeIPs(java.lang.Long)
-     */
-    @Override
-    public NetworkVO getNetworkWithSGWithFreeIPs(final Long zoneId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNetworkWithSecurityGroupEnabled(java.lang.Long)
-     */
-    @Override
-    public NetworkVO getNetworkWithSecurityGroupEnabled(final Long zoneId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.network.NetworkModel#listNetworksForAccount(long, long, com.cloud.network.Network.GuestType)
      */
     @Override
@@ -248,15 +230,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     public List<Long> listNetworkOfferingsForUpgrade(final long networkId) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isSecurityGroupSupportedInNetwork(com.cloud.network.Network)
-     */
-    @Override
-    public boolean isSecurityGroupSupportedInNetwork(final Network network) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     /* (non-Javadoc)
@@ -374,15 +347,6 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     public List<PhysicalNetworkSetupInfo> getPhysicalNetworkInfo(final long dcId, final HypervisorType hypervisorType) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#canAddDefaultSecurityGroup()
-     */
-    @Override
-    public boolean canAddDefaultSecurityGroup() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     /* (non-Javadoc)

@@ -22,7 +22,6 @@ import com.cloud.api.query.dao.ProjectAccountJoinDao;
 import com.cloud.api.query.dao.ProjectInvitationJoinDao;
 import com.cloud.api.query.dao.ProjectJoinDao;
 import com.cloud.api.query.dao.ResourceTagJoinDao;
-import com.cloud.api.query.dao.SecurityGroupJoinDao;
 import com.cloud.api.query.dao.ServiceOfferingJoinDao;
 import com.cloud.api.query.dao.StoragePoolJoinDao;
 import com.cloud.api.query.dao.StorageTagDao;
@@ -46,7 +45,6 @@ import com.cloud.api.query.vo.ProjectAccountJoinVO;
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
-import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.api.query.vo.ServiceOfferingJoinVO;
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.query.vo.StorageTagVO;
@@ -69,7 +67,6 @@ import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceTagResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.StorageTagResponse;
@@ -88,7 +85,6 @@ import com.cloud.configuration.ConfigurationService;
 import com.cloud.configuration.Resource;
 import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
-import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterDetailsDao;
@@ -146,8 +142,6 @@ import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDomainDao;
 import com.cloud.network.dao.NetworkDomainVO;
-import com.cloud.network.dao.NetworkRuleConfigDao;
-import com.cloud.network.dao.NetworkRuleConfigVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
@@ -161,10 +155,6 @@ import com.cloud.network.dao.Site2SiteVpnGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayVO;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityGroupManager;
-import com.cloud.network.security.SecurityGroupVO;
-import com.cloud.network.security.dao.SecurityGroupDao;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.StaticRouteVO;
 import com.cloud.network.vpc.VpcGatewayVO;
@@ -274,7 +264,6 @@ import java.util.Set;
 
 public class ApiDBUtils {
     static AsyncJobManager s_asyncMgr;
-    static SecurityGroupManager s_securityGroupMgr;
     static StorageManager s_storageMgr;
     static VolumeOrchestrationService s_volumeMgr;
     static UserVmManager s_userVmMgr;
@@ -300,10 +289,7 @@ public class ApiDBUtils {
     static AccountGuestVlanMapDao s_accountGuestVlanMapDao;
     static IPAddressDao s_ipAddressDao;
     static LoadBalancerDao s_loadBalancerDao;
-    static SecurityGroupDao s_securityGroupDao;
-    static SecurityGroupJoinDao s_securityGroupJoinDao;
     static ServiceOfferingJoinDao s_serviceOfferingJoinDao;
-    static NetworkRuleConfigDao s_networkRuleConfigDao;
     static HostPodDao s_podDao;
     static ServiceOfferingDao s_serviceOfferingDao;
     static ServiceOfferingDetailsDao s_serviceOfferingDetailsDao;
@@ -382,8 +368,6 @@ public class ApiDBUtils {
     @Inject
     private ManagementServer ms;
     @Inject
-    private SecurityGroupManager securityGroupMgr;
-    @Inject
     private StorageManager storageMgr;
     @Inject
     private UserVmManager userVmMgr;
@@ -397,7 +381,6 @@ public class ApiDBUtils {
     private TemplateManager templateMgr;
     @Inject
     private VolumeOrchestrationService volumeMgr;
-
     @Inject
     private AccountDao accountDao;
     @Inject
@@ -433,13 +416,7 @@ public class ApiDBUtils {
     @Inject
     private LoadBalancerDao loadBalancerDao;
     @Inject
-    private SecurityGroupDao securityGroupDao;
-    @Inject
-    private SecurityGroupJoinDao securityGroupJoinDao;
-    @Inject
     private ServiceOfferingJoinDao serviceOfferingJoinDao;
-    @Inject
-    private NetworkRuleConfigDao networkRuleConfigDao;
     @Inject
     private HostPodDao podDao;
     @Inject
@@ -672,14 +649,6 @@ public class ApiDBUtils {
         return s_resourceLimitMgr.getResourceCount(account, type);
     }
 
-    public static String getSecurityGroupsNamesForVm(final long vmId) {
-        return s_securityGroupMgr.getSecurityGroupsNamesForVm(vmId);
-    }
-
-    public static List<SecurityGroupVO> getSecurityGroupsForVm(final long vmId) {
-        return s_securityGroupMgr.getSecurityGroupsForVm(vmId);
-    }
-
     public static String getSnapshotIntervalTypes(final long snapshotId) {
         final SnapshotVO snapshot = s_snapshotDao.findById(snapshotId);
         return snapshot.getRecurringType().name();
@@ -798,10 +767,6 @@ public class ApiDBUtils {
 
     public static LoadBalancerVO findLoadBalancerById(final Long loadBalancerId) {
         return s_loadBalancerDao.findById(loadBalancerId);
-    }
-
-    public static NetworkRuleConfigVO findNetworkRuleById(final Long ruleId) {
-        return s_networkRuleConfigDao.findById(ruleId);
     }
 
     public static HostPodVO findPodById(final Long podId) {
@@ -995,12 +960,6 @@ public class ApiDBUtils {
         return s_configSvc.getVlanDomain(vlanId);
     }
 
-    public static boolean isSecurityGroupEnabledInZone(final long zoneId) {
-        final Zone zone = s_zoneRepository.findOne(zoneId);
-
-        return zone != null && zone.isSecurityGroupEnabled();
-    }
-
     public static Long getDedicatedNetworkDomain(final long networkId) {
         return s_networkModel.getDedicatedNetworkDomain(networkId);
     }
@@ -1013,10 +972,6 @@ public class ApiDBUtils {
         final String disableExtractionString = s_configDao.getValue(Config.DisableExtraction.toString());
         final boolean disableExtraction = (disableExtractionString == null) ? false : Boolean.parseBoolean(disableExtractionString);
         return disableExtraction;
-    }
-
-    public static SecurityGroup getSecurityGroup(final String groupName, final long ownerId) {
-        return s_securityGroupMgr.getSecurityGroup(groupName, ownerId);
     }
 
     public static ConsoleProxyVO findConsoleProxy(final long id) {
@@ -1200,11 +1155,6 @@ public class ApiDBUtils {
             if (ip != null) {
                 jobInstanceId = ip.getUuid();
             }
-        } else if (jobInstanceType == ApiCommandJobType.SecurityGroup) {
-            final SecurityGroup sg = ApiDBUtils.findSecurityGroupById(job.getInstanceId());
-            if (sg != null) {
-                jobInstanceId = sg.getUuid();
-            }
         } else if (jobInstanceType == ApiCommandJobType.PhysicalNetwork) {
             final PhysicalNetworkVO pnet = ApiDBUtils.findPhysicalNetworkById(job.getInstanceId());
             if (pnet != null) {
@@ -1293,10 +1243,6 @@ public class ApiDBUtils {
         return s_ipAddressDao.findById(addressId);
     }
 
-    public static SecurityGroup findSecurityGroupById(final Long groupId) {
-        return s_securityGroupDao.findById(groupId);
-    }
-
     public static PhysicalNetworkVO findPhysicalNetworkById(final long id) {
         return s_physicalNetworkDao.findById(id);
     }
@@ -1360,22 +1306,6 @@ public class ApiDBUtils {
 
     public static List<UserVmJoinVO> newUserVmView(final UserVm... userVms) {
         return s_userVmJoinDao.newUserVmView(userVms);
-    }
-
-    public static SecurityGroupResponse newSecurityGroupResponse(final SecurityGroupJoinVO vsg, final Account caller) {
-        return s_securityGroupJoinDao.newSecurityGroupResponse(vsg, caller);
-    }
-
-    public static SecurityGroupResponse fillSecurityGroupDetails(final SecurityGroupResponse vsgData, final SecurityGroupJoinVO sg) {
-        return s_securityGroupJoinDao.setSecurityGroupResponse(vsgData, sg);
-    }
-
-    public static List<SecurityGroupJoinVO> newSecurityGroupView(final SecurityGroup sg) {
-        return s_securityGroupJoinDao.newSecurityGroupView(sg);
-    }
-
-    public static List<SecurityGroupJoinVO> findSecurityGroupViewById(final Long sgId) {
-        return s_securityGroupJoinDao.searchByIds(sgId);
     }
 
     public static ResourceTagResponse newResourceTagResponse(final ResourceTagJoinVO vsg, final boolean keyValueOnly) {
@@ -1647,7 +1577,6 @@ public class ApiDBUtils {
         s_ms = ms;
         s_configMgr = configMgr;
         s_asyncMgr = asyncMgr;
-        s_securityGroupMgr = securityGroupMgr;
         s_storageMgr = storageMgr;
         s_userVmMgr = userVmMgr;
         s_networkModel = networkModel;
@@ -1672,7 +1601,6 @@ public class ApiDBUtils {
         s_hostDao = hostDao;
         s_ipAddressDao = ipAddressDao;
         s_loadBalancerDao = loadBalancerDao;
-        s_networkRuleConfigDao = networkRuleConfigDao;
         s_podDao = podDao;
         s_serviceOfferingDao = serviceOfferingDao;
         s_serviceOfferingDetailsDao = serviceOfferingDetailsDao;
@@ -1691,8 +1619,6 @@ public class ApiDBUtils {
         s_site2SiteVpnGatewayDao = site2SiteVpnGatewayDao;
         s_site2SiteCustomerGatewayDao = site2SiteCustomerGatewayDao;
         s_zoneDao = zoneDao;
-        s_securityGroupDao = securityGroupDao;
-        s_securityGroupJoinDao = securityGroupJoinDao;
         s_networkOfferingDao = networkOfferingDao;
         s_networkDao = networkDao;
         s_physicalNetworkDao = physicalNetworkDao;
