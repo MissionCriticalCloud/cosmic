@@ -804,11 +804,11 @@
                                                     });
                                                 }
                                             });
-                                        },
-                                        notification: {
-                                            poll: pollAsyncJobResult
                                         }
                                     })
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
                                 }
                             },
 
@@ -1307,11 +1307,11 @@
                                                     });
                                                 }
                                             });
-                                        },
-                                        notification: {
-                                            poll: pollAsyncJobResult
                                         }
                                     })
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
                                 }
                             },
 
