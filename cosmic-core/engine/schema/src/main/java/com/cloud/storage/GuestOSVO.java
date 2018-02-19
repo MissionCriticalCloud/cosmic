@@ -41,6 +41,9 @@ public class GuestOSVO implements GuestOS {
     @Column(name = "cpuflags")
     String cpuflags;
 
+    @Column(name = "mac_learning")
+    boolean macLearning;
+
     @Override
     public long getId() {
         return id;
@@ -119,5 +122,13 @@ public class GuestOSVO implements GuestOS {
 
     public void setCpuflags(final String cpuflags) {
         this.cpuflags = cpuflags;
+    }
+
+    public boolean isMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final boolean macLearning) {
+        this.macLearning = macLearning;
     }
 }
