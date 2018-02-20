@@ -35,6 +35,11 @@ class Firewall:
                 pass
             elif interface['metadata']['type'] == 'public':
                 self.add_public_vpc_rules(device)
+
+                # When no public ip acl is specified, default to allow_all
+                if interface['ipv4_addresses'][0]['cidr'].split("/")[0] not in self.config.dbag_publicip_acl:
+                    self.add_public_allow_all(interface['ipv4_addresses'])
+
                 public_device = device
                 public_ip = interface['ipv4_addresses'][0]['cidr']
             elif interface['metadata']['type'] == 'guesttier':
@@ -160,6 +165,11 @@ class Firewall:
             self.fw.append(["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (
                 device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
             )])
+
+    def add_public_allow_all(self, ipv4_addresses):
+        for ipv4_address in ipv4_addresses:
+            self.config.fw.append(["", "", "-A ACL_PUBLIC_IP_eth2 -p all -s 0.0.0.0/0 -d %s/32 -j ACCEPT"
+                                   % ipv4_address['cidr'].split("/")[0]])
 
     def add_private_vpc_rules(self, device, cidr):
         logging.info("Configuring Private VPC rules")
