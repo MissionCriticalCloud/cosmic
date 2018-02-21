@@ -2,45 +2,45 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
     <name>Cosmic Plugin - Hypervisor KVM</name>
-    <version>6.0.5</version>
+    <version>6.0.6-SNAPSHOT</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.5</version>
+        <version>6.0.6-SNAPSHOT</version>
         <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-datamotion</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
