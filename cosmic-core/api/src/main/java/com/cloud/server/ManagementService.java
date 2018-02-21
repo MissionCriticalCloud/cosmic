@@ -10,7 +10,6 @@ import com.cloud.api.command.admin.guest.ListGuestOsMappingCmd;
 import com.cloud.api.command.admin.guest.RemoveGuestOsCmd;
 import com.cloud.api.command.admin.guest.RemoveGuestOsMappingCmd;
 import com.cloud.api.command.admin.guest.UpdateGuestOsCmd;
-import com.cloud.api.command.admin.guest.UpdateGuestOsMappingCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.api.command.admin.pod.ListPodsByCmd;
@@ -177,13 +176,6 @@ public interface ManagementService {
      * @return A VO containing the updated display name
      */
     GuestOS updateGuestOs(UpdateGuestOsCmd updateGuestOsCmd);
-
-    /**
-     * Updates an existing guest OS mapping
-     *
-     * @return A VO containing the updated OS name for hypervisor
-     */
-    GuestOSHypervisor updateGuestOsMapping(UpdateGuestOsMappingCmd updateGuestOsMappingCmd);
 
     /**
      * Removes an existing guest OS

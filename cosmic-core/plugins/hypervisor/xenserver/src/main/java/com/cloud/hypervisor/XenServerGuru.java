@@ -173,7 +173,7 @@ public class XenServerGuru extends HypervisorGuruBase implements HypervisorGuru,
         if (guestOsMapping == null || host == null) {
             to.setPlatformEmulator(null);
         } else {
-            to.setPlatformEmulator(guestOsMapping.getGuestOsName());
+            to.setPlatformEmulator(guestOS.getDisplayName());
         }
 
         return to;

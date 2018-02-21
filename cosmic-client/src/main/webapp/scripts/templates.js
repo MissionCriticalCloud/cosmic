@@ -197,18 +197,14 @@
                                             args.$select.change(function () {
                                                 var $form = $(this).closest('form');
                                                 if ($(this).val() == "XenServer") {
-                                                    $form.find('.form-item[rel=rootDiskControllerType]').hide();
                                                     $form.find('.form-item[rel=nicAdapterType]').hide();
                                                     $form.find('.form-item[rel=keyboardType]').hide();
-                                                    $form.find('.form-item[rel=rootDiskControllerTypeKVM]').hide();
                                                     if (isAdmin())
                                                         $form.find('.form-item[rel=xenserverToolsVersion61plus]').css('display', 'inline-block');
                                                 } else {
-                                                    $form.find('.form-item[rel=rootDiskControllerType]').hide();
                                                     $form.find('.form-item[rel=nicAdapterType]').hide();
                                                     $form.find('.form-item[rel=keyboardType]').hide();
                                                     $form.find('.form-item[rel=xenserverToolsVersion61plus]').hide();
-                                                    $form.find('.form-item[rel=rootDiskControllerTypeKVM]').css('display', 'inline-block');
                                                 }
                                             });
 
@@ -238,39 +234,6 @@
                                             return b;
                                         },
                                         isHidden: true
-                                    },
-
-
-                                    //fields for hypervisor == "KVM" (starts here)
-                                    rootDiskControllerTypeKVM: {
-                                        label: 'label.root.disk.controller',
-                                        isHidden: true,
-                                        select: function(args) {
-                                            var items = []
-                                            items.push({
-                                                id: "",
-                                                description: ""
-                                            });
-                                            items.push({
-                                                id: "ide",
-                                                description: "ide"
-                                            });
-                                            items.push({
-                                                id: "osdefault",
-                                                description: "osdefault"
-                                            });
-                                            items.push({
-                                                id: "scsi",
-                                                description: "virtio-scsi"
-                                            });
-                                            items.push({
-                                                id: "virtio",
-                                                description: "virtio"
-                                            });
-                                            args.response.success({
-                                                data: items
-                                            });
-                                        }
                                     },
 
                                     format: {
@@ -427,14 +390,6 @@
                                     });
                                 }
                                 //XenServer only (ends here)
-
-                                // KVM only (starts here)
-                                if (args.$form.find('.form-item[rel=rootDiskControllerTypeKVM]').css("display") != "none" && args.data.rootDiskControllerTypeKVM != "") {
-                                    $.extend(data, {
-                                        'details[0].rootDiskController': args.data.rootDiskControllerTypeKVM
-                                    });
-                                }
-                                // KVM only (ends here)
 
                                 $.ajax({
                                     url: createURL('registerTemplate'),

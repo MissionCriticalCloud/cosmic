@@ -508,13 +508,13 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         final Map<String, String> map = getDetails();
 
         if (map != null) {
-            String minIops = (String) map.get("minIops");
-            String maxIops = (String) map.get("maxIops");
+            String minIops = map.get("minIops");
+            String maxIops = map.get("maxIops");
 
             verifyMinAndMaxIops(minIops, maxIops);
 
-            minIops = (String) map.get("minIopsDo");
-            maxIops = (String) map.get("maxIopsDo");
+            minIops = map.get("minIopsDo");
+            maxIops = map.get("maxIopsDo");
 
             verifyMinAndMaxIops(minIops, maxIops);
         }
@@ -555,7 +555,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     }
 
     @Override
-    public void create() throws ResourceAllocationException {
+    public void create() {
         try {
             //Verify that all objects exist before passing them to the service
             final Account owner = _accountService.getActiveAccountById(getEntityOwnerId());

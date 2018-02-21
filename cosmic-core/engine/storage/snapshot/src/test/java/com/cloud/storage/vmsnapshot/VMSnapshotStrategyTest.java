@@ -98,7 +98,7 @@ public class VMSnapshotStrategyTest extends TestCase {
         final GuestOSVO guestOSVO = Mockito.mock(GuestOSVO.class);
         Mockito.when(guestOSDao.findById(Matchers.anyLong())).thenReturn(guestOSVO);
         final GuestOSHypervisorVO guestOSHypervisorVO = Mockito.mock(GuestOSHypervisorVO.class);
-        Mockito.when(guestOSHypervisorVO.getGuestOsName()).thenReturn(guestOsName);
+        Mockito.when(guestOSVO.getDisplayName()).thenReturn(guestOsName);
         Mockito.when(guestOsHypervisorDao.findById(Matchers.anyLong())).thenReturn(guestOSHypervisorVO);
         Mockito.when(guestOsHypervisorDao.findByOsIdAndHypervisor(Matchers.anyLong(), Matchers.anyString(), Matchers.anyString())).thenReturn(guestOSHypervisorVO);
         Mockito.when(agentMgr.send(Matchers.anyLong(), Matchers.any(Command.class))).thenReturn(null);
@@ -142,7 +142,7 @@ public class VMSnapshotStrategyTest extends TestCase {
         final GuestOSVO guestOSVO = Mockito.mock(GuestOSVO.class);
         Mockito.when(guestOSDao.findById(Matchers.anyLong())).thenReturn(guestOSVO);
         final GuestOSHypervisorVO guestOSHypervisorVO = Mockito.mock(GuestOSHypervisorVO.class);
-        Mockito.when(guestOSHypervisorVO.getGuestOsName()).thenReturn(guestOsName);
+        Mockito.when(guestOSVO.getDisplayName()).thenReturn(guestOsName);
         Mockito.when(guestOsHypervisorDao.findById(Matchers.anyLong())).thenReturn(guestOSHypervisorVO);
         Mockito.when(guestOsHypervisorDao.findByOsIdAndHypervisor(Matchers.anyLong(), Matchers.anyString(), Matchers.anyString())).thenReturn(guestOSHypervisorVO);
         final VMSnapshotTO vmSnapshotTO = Mockito.mock(VMSnapshotTO.class);
@@ -190,7 +190,7 @@ public class VMSnapshotStrategyTest extends TestCase {
         final GuestOSVO guestOSVO = Mockito.mock(GuestOSVO.class);
         Mockito.when(guestOSDao.findById(Matchers.anyLong())).thenReturn(guestOSVO);
         final GuestOSHypervisorVO guestOSHypervisorVO = Mockito.mock(GuestOSHypervisorVO.class);
-        Mockito.when(guestOSHypervisorVO.getGuestOsName()).thenReturn(guestOsName);
+        Mockito.when(guestOSVO.getDisplayName()).thenReturn(guestOsName);
         Mockito.when(guestOsHypervisorDao.findById(Matchers.anyLong())).thenReturn(guestOSHypervisorVO);
         Mockito.when(guestOsHypervisorDao.findByOsIdAndHypervisor(Matchers.anyLong(), Matchers.anyString(), Matchers.anyString())).thenReturn(guestOSHypervisorVO);
         final VMSnapshotTO vmSnapshotTO = Mockito.mock(VMSnapshotTO.class);

@@ -22,9 +22,6 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
     @Column(name = "guest_os_id")
     long guestOsId;
 
-    @Column(name = "guest_os_name")
-    String guestOsName;
-
     @Column(name = "hypervisor_type")
     String hypervisorType;
 
@@ -51,11 +48,6 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
     @Override
     public String getHypervisorType() {
         return hypervisorType;
-    }
-
-    @Override
-    public String getGuestOsName() {
-        return guestOsName;
     }
 
     @Override
@@ -106,10 +98,6 @@ public class GuestOSHypervisorVO implements GuestOSHypervisor {
 
     public void setGuestOsId(final long guestOsId) {
         this.guestOsId = guestOsId;
-    }
-
-    public void setGuestOsName(final String guestOsName) {
-        this.guestOsName = guestOsName;
     }
 
     public void setHypervisorType(final String hypervisorType) {

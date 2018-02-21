@@ -162,7 +162,6 @@ public class ApiConstants {
     public static final String OS_CATEGORY_ID = "oscategoryid";
     public static final String OS_TYPE_ID = "ostypeid";
     public static final String OS_DISPLAY_NAME = "osdisplayname";
-    public static final String OS_NAME_FOR_HYPERVISOR = "osnameforhypervisor";
     public static final String PARAMS = "params";
     public static final String PARENT_DOMAIN_ID = "parentdomainid";
     public static final String PASSWORD = "password";

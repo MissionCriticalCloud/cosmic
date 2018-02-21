@@ -30,10 +30,6 @@ public class GuestOsMappingResponse extends BaseResponse {
     @Param(description = "standard display name for the Guest OS")
     private String osStdName;
 
-    @SerializedName(ApiConstants.OS_NAME_FOR_HYPERVISOR)
-    @Param(description = "hypervisor specific name for the Guest OS")
-    private String osNameForHypervisor;
-
     @SerializedName(ApiConstants.IS_USER_DEFINED)
     @Param(description = "is the mapping user defined")
     private String isUserDefined;
@@ -84,13 +80,5 @@ public class GuestOsMappingResponse extends BaseResponse {
 
     public void setOsStdName(final String osStdName) {
         this.osStdName = osStdName;
-    }
-
-    public String getOsNameForHypervisor() {
-        return osNameForHypervisor;
-    }
-
-    public void setOsNameForHypervisor(final String osNameForHypervisor) {
-        this.osNameForHypervisor = osNameForHypervisor;
     }
 }
