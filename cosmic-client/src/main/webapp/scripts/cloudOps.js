@@ -12,6 +12,7 @@
                 listView: {
                     id: 'haworkers',
                     label: 'label.ha.workers.list',
+                    disableInfiniteScrolling: true,
                     fields: {
                         virtualmachine: {
                             label: 'label.virtual.machine'
@@ -43,7 +44,6 @@
                     },
                     dataProvider: function (args) {
                         const data = {};
-                        listViewDataProvider(args, data);
                         $.ajax({
                             url: createURL('listHAWorkers'),
                             data: data,
@@ -181,7 +181,10 @@
                     },
                     dataProvider: function (args) {
                         const data = {};
-                        listViewDataProvider(args, data);
+                        if (args.filterBy.search.value.length == 0) {
+                            args.response.success({data:{}});
+                            return;
+                        }
                         $.extend(data, {
                             ipaddress: args.filterBy.search.value
                         });
@@ -340,7 +343,10 @@
                     },
                     dataProvider: function (args) {
                         const data = {};
-                        listViewDataProvider(args, data);
+                        if (args.filterBy.search.value.length == 0) {
+                            args.response.success({data:{}});
+                            return;
+                        }
                         $.extend(data, {
                             macaddress: args.filterBy.search.value
                         });

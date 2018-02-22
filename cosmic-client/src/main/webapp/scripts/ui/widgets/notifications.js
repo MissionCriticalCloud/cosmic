@@ -85,6 +85,12 @@
                     complete: function (args) {
                         clearInterval(pollTimer);
 
+                        if (Notification && Notification.permission === "granted") {
+                            var notification = new Notification('Cosmic Task Completed', {
+                                body: $item.text(),
+                            });
+                        }
+
                         notifications.cornerAlert({
                             message: $item.html()
                         });
@@ -103,6 +109,12 @@
                         }
 
                         clearInterval(pollTimer);
+                        if (Notification && Notification.permission === "granted") {
+                            var notification = new Notification('Cosmic Task Error', {
+                                body: $item.text(),
+                            });
+                        }
+
                         notifications.activeTasks.pop(pollTimer);
                         notifications.cornerAlert({
                             message: $item.html()
@@ -250,6 +262,11 @@
             notifications.add(args, $attachTo.data('notifications-popup'), $total);
         else
             init();
+        /**
+         * Enable W3C notifications
+         */
+        if (Notification && Notification.permission !== "granted")
+            Notification.requestPermission();
 
         return this;
     };

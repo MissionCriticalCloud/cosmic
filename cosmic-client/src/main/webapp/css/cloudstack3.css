@@ -2588,7 +2588,7 @@ div.detail-group.actions td {
 
 #user div.options {
     float: left;
-    width: 31px;
+    width: 28px;
     height: 28px;
     /*+placement:shift 0px 0px;*/
     position: relative;
@@ -2596,6 +2596,8 @@ div.detail-group.actions td {
     top: 0px;
     background-position: 0px -867px;
     cursor: pointer;
+    background-color: #FF000080;
+    border-radius: 10%;
 }
 
 #user div.options:hover {

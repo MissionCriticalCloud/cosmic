@@ -559,11 +559,7 @@
                                                     if (json.listhostsresponse.host != undefined) {
                                                         hostObjs = json.listhostsresponse.host;
                                                         hostObjs.sort(function (a, b) {
-                                                            if (a.name < b.name)
-                                                                return -1;
-                                                            if (a.name > b.name)
-                                                                return 1;
-                                                            return 0;
+                                                            return a.name.localeCompare(b.name);
                                                         });
                                                         var items = [{
                                                             id: -1,
@@ -1480,6 +1476,7 @@
                         action: {
                             custom: cloudStack.uiCustom.migrate({
                                 listView: {
+                                    label: 'label.migrate.instance.to.host',
                                     listView: {
                                         id: 'availableHosts',
                                         fields: {
@@ -1519,6 +1516,7 @@
                                                 dataType: "json",
                                                 async: true,
                                                 success: function (json) {
+                                                    var items = [];
                                                     if (json.findhostsformigrationresponse.host != undefined) {
                                                         vmMigrationHostObjs = json.findhostsformigrationresponse.host;
                                                         if (vmMigrationHostObjs != null && vmMigrationHostObjs.length > 0) {
@@ -1526,7 +1524,6 @@
                                                                 return a.name.localeCompare(b.name);
                                                             });
                                                         }
-                                                        var items = [];
                                                         $(vmMigrationHostObjs).each(function () {
                                                             var suitability = (this.suitableformigration ? "Suitable" : "Not Suitable");
                                                             if (this.requiresStorageMotion == true) {
@@ -1551,9 +1548,12 @@
                                                         cloudStack.dialog.notice({
                                                             message: _l('message.no.host.available')
                                                         }); //Only a single host in the set up
+                                                        args.response.success({
+                                                            data: []
+                                                        });
                                                     } else {
-                                                        cloudStack.dialog.notice({
-                                                            message: _l('message.no.more.hosts.available')
+                                                        args.response.success({
+                                                            data: []
                                                         });
                                                     }
                                                 }
@@ -1614,82 +1614,88 @@
                             poll: pollAsyncJobResult
                         }
                     },
-
                     migrateToAnotherStorage: {
                         label: 'label.migrate.instance.to.ps',
                         compactLabel: 'label.migrate.to.storage',
                         messages: {
-                            confirm: function (args) {
-                                return 'message.migrate.instance.to.ps';
-                            },
                             notification: function (args) {
-                                return 'label.migrate.instance.to.ps';
+                                return 'label.migrate.instance.to.host';
                             }
                         },
-                        createForm: {
-                            title: 'label.migrate.instance.to.ps',
-                            desc: '',
-                            fields: {
-                                storageId: {
-                                    label: 'label.primary.storage',
-                                    validation: {
-                                        required: true
-                                    },
-                                    select: function (args) {
-                                        $.ajax({
-                                            url: createURL("listStoragePools&zoneid=" + args.context.instances[0].zoneid),
-                                            dataType: "json",
-                                            async: true,
-                                            success: function (json) {
-                                                var pools = json.liststoragepoolsresponse.storagepool;
-                                                pools.sort(function (a, b) {
-                                                    if (a.name < b.name)
-                                                        return -1;
-                                                    if (a.name > b.name)
-                                                        return 1;
-                                                    return 0;
-                                                });
-                                                var items = [];
-                                                $(pools).each(function () {
-                                                    items.push({
-                                                        id: this.id,
-                                                        description: this.name
+                        action: {
+                            custom: cloudStack.uiCustom.migrate({
+                                listView: {
+                                    label: 'label.migrate.instance.to.ps',
+                                    listView: {
+                                        id: 'availableHosts',
+                                        fields: {
+                                            availableStorage: {
+                                                label: 'label.primary.storage'
+                                            }
+                                        },
+                                        dataProvider: function(args) {
+                                            var data = {
+                                                page: args.page,
+                                                pagesize: pageSize
+                                            };
+                                            if (args.filterBy.search.value) {
+                                                data.keyword = args.filterBy.search.value;
+                                            }
+                                            $.ajax({
+                                                url: createURL("listStoragePools&zoneid=" + args.context.instances[0].zoneid),
+                                                dataType: "json",
+                                                async: true,
+                                                data: data,
+                                                success: function (json) {
+                                                    var items = [];
+                                                    if ('storagepool' in json.liststoragepoolsresponse) {
+                                                        var pools = json.liststoragepoolsresponse.storagepool;
+                                                        pools.sort(function (a, b) {
+                                                            return a.name.localeCompare(b.name);
+                                                        });
+                                                        $(pools).each(function () {
+                                                            items.push({
+                                                                id: this.id,
+                                                                availableStorage: this.name
+                                                            });
+                                                        });
+                                                    }
+                                                    args.response.success({
+                                                        data: items
                                                     });
-                                                });
-                                                args.response.success({
-                                                    data: items
-                                                });
-                                            }
-                                        });
+                                                }
+                                            });
+                                        }
                                     }
-                                }
-                            }
-                        },
-                        action: function (args) {
-                            $.ajax({
-                                url: createURL("migrateVirtualMachine&storageid=" + args.data.storageId + "&virtualmachineid=" + args.context.instances[0].id),
-                                dataType: "json",
-                                async: true,
-                                success: function (json) {
-                                    var jid = json.migratevirtualmachineresponse.jobid;
-                                    args.response.success({
-                                        _custom: {
-                                            jobId: jid,
-                                            getUpdatedItem: function (json) {
-                                                return json.queryasyncjobresultresponse.jobresult.virtualmachine;
-                                            },
-                                            getActionFilter: function () {
-                                                return vmActionfilter;
-                                            }
+                                },
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL("migrateVirtualMachine&storageid=" + args.context.selectedHost[0].id + "&virtualmachineid=" + args.context.instances[0].id),
+                                        dataType: "json",
+                                        async: true,
+                                        success: function (json) {
+                                            var jid = json.migratevirtualmachineresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        return json.queryasyncjobresultresponse.jobresult.virtualmachine;
+                                                    },
+                                                    getActionFilter: function () {
+                                                        return vmActionfilter;
+                                                    }
+                                                }
+                                            });
                                         }
                                     });
                                 }
-                            });
+                            })
                         },
                         notification: {
                             poll: pollAsyncJobResult
                         }
                     },
+
                     scaleUp: {
                         label: 'label.change.service.offering',
                         createForm: {
@@ -1714,11 +1720,7 @@
                                             success: function (json) {
                                                 serviceofferingObjs = json.listserviceofferingsresponse.serviceoffering;
                                                 serviceofferingObjs.sort(function (a, b) {
-                                                    if (a.name < b.name)
-                                                        return -1;
-                                                    if (a.name > b.name)
-                                                        return 1;
-                                                    return 0;
+                                                    return a.name.localeCompare(b.name);
                                                 });
                                                 var items = [];
                                                 if (serviceofferingObjs != null) {
@@ -2372,23 +2374,18 @@
                                                             }
                                                         }
                                                     })).done(function (data1, data2) {
-                                                    var selectList = $('#label_network option');
-                                                    selectList.sort(function (a, b) {
-                                                        if (a.text.toLowerCase() < b.text.toLowerCase())
-                                                            return -1;
-                                                        if (a.text.toLowerCase() > b.text.toLowerCase())
-                                                            return 1;
-                                                        return 0;
-                                                    });
+                                                        var selectList = $('#label_network option');
+                                                        selectList.sort(function (a, b) {
+                                                            return a.text.localeCompare(b.text);
+                                                        });
 
-                                                    $('#label_network option').filter(function () {
-                                                        return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
-                                                    })
-                                                        .remove();
+                                                        $('#label_network option').filter(function () {
+                                                            return !this.value || $.trim(this.value).length == 0 || $.trim(this.text).length == 0;
+                                                        }).remove();
 
-                                                    $('#label_network').html(selectList);
+                                                        $('#label_network').html(selectList);
 
-                                                    return data1.concat(data2);
+                                                        return data1.concat(data2);
                                                 });
                                             }
                                         }
