@@ -344,6 +344,14 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
+    public List<IPAddressVO> listByVpcAndSourceNetwork(final long vpcId, final long networkId) {
+        final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
+        sc.setParameters("vpcId", vpcId);
+        sc.setParameters("sourcenetwork", networkId);
+        return listBy(sc);
+    }
+
+    @Override
     public List<IPAddressVO> listByAssociatedVpc(final long vpcId, final Boolean isSourceNat) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
