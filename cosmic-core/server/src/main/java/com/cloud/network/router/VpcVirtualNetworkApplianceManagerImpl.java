@@ -299,6 +299,15 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                         );
                         _userStatsDao.persist(stats);
                     }
+
+                    final List<IPAddressVO> publicIps = _ipAddressDao.listByVpcAndSourceNetwork(domainRouterVO.getVpcId(), publicNtwk.getId());
+                    publicIps.forEach(ipAddressVO -> {
+                        final Long aclId = ipAddressVO.getIpACLId();
+                        if (aclId != null) {
+                            final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(ipAddressVO.getIpACLId());
+                            _commandSetupHelper.createPublicIpACLsCommands(rules, domainRouterVO, cmds, ipAddressVO);
+                        }
+                    });
                 }
 
                 // create ip assoc for source nat

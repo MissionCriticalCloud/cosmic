@@ -48,6 +48,8 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
 
     IPAddressVO findByIpAndSourceNetworkId(long networkId, String ipAddress);
 
+    List<IPAddressVO> listByVpcAndSourceNetwork(long vpcId, long networkId);
+
     List<IPAddressVO> listByAssociatedVpc(long vpcId, Boolean isSourceNat);
 
     long countFreePublicIPs();
