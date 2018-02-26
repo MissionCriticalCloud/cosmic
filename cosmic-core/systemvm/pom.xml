@@ -6,7 +6,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.6</version>
+        <version>6.0.7-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-agent</artifactId>
-            <version>6.0.6</version>
+            <version>6.0.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
