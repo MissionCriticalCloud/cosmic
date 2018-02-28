@@ -82,6 +82,11 @@ class Config:
             if interface['metadata']['type'] == 'sync':
                 return utils.get_interface_name_from_mac_address(interface['mac_address'])
 
+    def get_public_interface_name(self):
+        for interface in self.dbag_network_overview['interfaces']:
+            if interface['metadata']['type'] == 'public':
+                return utils.get_interface_name_from_mac_address(interface['mac_address'])
+
     def get_all_ipv4_addresses_on_router(self):
         ipv4_addresses = []
 
