@@ -751,15 +751,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         // Execute
         final boolean canProceedDeployment = deployment.prepareDeployment();
         // Assert
-        boolean shouldProceedDeployment = true;
-        if (isRedundant && !isPublicNw) {
-            shouldProceedDeployment = false;
-        }
-        assertEquals(shouldProceedDeployment, canProceedDeployment);
-        if (!shouldProceedDeployment) {
-            assertEquals("Since deployment cannot proceed we should empty the list of routers",
-                    0, deployment.routers.size());
-        }
+        assertTrue(canProceedDeployment);
     }
 
     @Test

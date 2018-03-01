@@ -97,14 +97,7 @@ public class VpcRouterDeploymentDefinition extends RouterDeploymentDefinition {
     protected boolean prepareDeployment() {
         isPublicNetwork = needsPublicNic();
 
-        boolean canProceed = true;
-        if (isRedundant() && !isPublicNetwork) {
-            // TODO Shouldn't be this throw an exception instead of log error and empty list of routers
-            logger.error("Didn't support redundant virtual router without public network!");
-            routers = new ArrayList<>();
-            canProceed = false;
-        }
-        return canProceed;
+        return true;
     }
 
     @Override
