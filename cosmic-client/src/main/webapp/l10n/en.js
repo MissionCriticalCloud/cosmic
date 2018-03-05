@@ -1814,7 +1814,7 @@ var dictionary = {
     "message.confirm.archive.selected.events": "Please confirm you would like to archive the selected events",
     "message.confirm.attach.disk": "Are you sure you want to attach disk?",
     "message.confirm.create.volume": "Are you sure you want to create volume?",
-    "message.confirm.change.vpcoffering": "Changing the VPC offering will cause a Restart with Cleanup to be executed, resulting in a few minutes downtime. Are you sure?",
+    "message.confirm.change.vpcoffering": "Changing the VPC offering will cause a Restart with Cleanup to be executed. Zero down time for Redundant setups (fails over).",
     "message.confirm.current.guest.CIDR.unchanged": "Do you want to keep the current guest network CIDR unchanged?",
     "message.confirm.dedicate.cluster.domain.account": "Do you really want to dedicate this cluster to a domain/account?",
     "message.confirm.dedicate.host.domain.account": "Do you really want to dedicate this host to a domain/account?",
