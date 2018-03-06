@@ -571,7 +571,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final int DEFAULT_VM_MIGRATE_SPEED = -1;
 
         public static final String DEFAULT_TERMPOLICY_CRASH_ROUTER = "restart";
-        public static final String DEFAULT_TERMPOLICY_POWEROFF_ROUTER = "restart";
+        public static final String DEFAULT_TERMPOLICY_POWEROFF_ROUTER = "destroy";
         public static final String DEFAULT_TERMPOLICY_REBOOT_ROUTER = "restart";
 
         public static final String DEFAULT_TERMPOLICY_CRASH_VM = "destroy";
