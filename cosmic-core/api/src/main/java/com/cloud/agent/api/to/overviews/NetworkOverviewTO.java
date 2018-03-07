@@ -13,6 +13,7 @@ public class NetworkOverviewTO {
     private ServiceTO services;
     private RouteTO[] routes;
     private VPNTO vpn;
+    private SyslogTO syslog;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -44,6 +45,14 @@ public class NetworkOverviewTO {
 
     public void setVpn(final VPNTO vpn) {
         this.vpn = vpn;
+    }
+
+    public SyslogTO getSyslog() {
+        return syslog;
+    }
+
+    public void setSyslog(final SyslogTO syslog) {
+        this.syslog = syslog;
     }
 
     @Override
@@ -710,6 +719,18 @@ public class NetworkOverviewTO {
             public void setPeerList(final String peerList) {
                 this.peerList = peerList;
             }
+        }
+    }
+
+    public static class SyslogTO {
+        private String[] servers;
+
+        public String[] getServers() {
+            return servers;
+        }
+
+        public void setServers(final String[] servers) {
+            this.servers = servers;
         }
     }
 }

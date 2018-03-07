@@ -508,6 +508,8 @@ public class CommandSetupHelper {
         configureSite2SiteVpn(router, site2siteVpnToExclude, vpnTO);
         networkOverviewTO.setVpn(vpnTO);
 
+        configureSyslog(router, networkOverviewTO);
+
         return networkOverviewTO;
     }
 
@@ -636,6 +638,16 @@ public class CommandSetupHelper {
         return site2SiteTO;
     }
 
+    private void configureSyslog(final VirtualRouter router, final NetworkOverviewTO networkOverviewTO) {
+        final Vpc vpc = _vpcDao.findById(router.getVpcId());
+
+        if (StringUtils.isNotBlank(vpc.getSyslogServerList())) {
+            final NetworkOverviewTO.SyslogTO syslogTO = new NetworkOverviewTO.SyslogTO();
+            syslogTO.setServers(vpc.getSyslogServerList().split(","));
+            networkOverviewTO.setSyslog(syslogTO);
+        }
+    }
+
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
         final VMOverviewTO vmOverviewTO = new VMOverviewTO();
         final Map<UserVmVO, List<NicVO>> vmsAndNicsMap = new HashMap<>();
@@ -668,7 +680,7 @@ public class CommandSetupHelper {
 
         final List<VMOverviewTO.VMTO> vmsTO = new ArrayList<>();
         vmsAndNicsMap.forEach((vm, nics) -> {
-             _userVmDao.loadDetails(vm);
+            _userVmDao.loadDetails(vm);
             final VMOverviewTO.VMTO vmTO = new VMOverviewTO.VMTO(vm.getHostName());
             final List<VMOverviewTO.VMTO.InterfaceTO> interfacesTO = new ArrayList<>();
 
