@@ -94,6 +94,17 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
     public boolean updateVR(final Vpc vpc, final DomainRouterVO router) {
         Commands commands = new Commands(Command.OnError.Stop);
 
+        final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                router,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+        final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+        commands.addCommand(updateNetworkOverviewCommand);
+
         _commandSetupHelper.createVRConfigCommands(vpc, router, commands);
         try {
             if (_nwHelper.sendCommandsToRouter(router, commands)) {
