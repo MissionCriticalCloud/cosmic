@@ -23,12 +23,13 @@ class Rsyslog:
         self.restart_rsyslog()
 
     def init_config(self):
-        syslogservers = self.config.dbag_network_overview['syslog']['servers']
+        syslogservers = self.config.dbag_network_overview.get('syslog', {}).get('servers', {})
         for syslogserver in syslogservers:
             proto = "UDP"
             args = syslogserver.split(':')
             if len(args) < 2:
                 # Only got an IP
+                ip = args.pop()
                 port = 514
                 proto = "TCP"
             elif len(args) == 2:
