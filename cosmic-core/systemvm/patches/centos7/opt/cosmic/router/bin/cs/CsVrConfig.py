@@ -55,12 +55,30 @@ class CsVrConfig(object):
             self.syslogconf.append("# this file is managed by CsVrConfig.py")
             first = True
             for ip in ips:
+                args = ip.split(':')
+                if len(args) < 2:
+                    # Only got an IP
+                    port = 514
+                    proto = "TCP"
+                elif len(args) == 2:
+                    # Got an IP and port
+                    ip, port = args
+                elif len(args) == 3:
+                    # Got an IP, port and protocol
+                    ip, port, proto = args
+                elif len(args) > 3:
+                    # We got to much garbage, report and ignore
+                    logging.debug("Error in parsing syslog server list: %s" % ip)
+                    continue
+                if proto.lower() == "udp":
+                    proto = "@"
+                else:
+                    proto = "@@"
                 if first:
-                    self.syslogconf.append(":msg, regex, \"^\[ *[0-9]*\.[0-9]*\] iptables denied: \" @@%s:514" % ip)
+                    self.syslogconf.append(":msg, regex, \"^\[ *[0-9]*\.[0-9]*\] iptables denied: \" %s%s:%i" % (proto, ip, port))
                     first = False
                 else:
-                    self.syslogconf.append("& @@%s:514" % ip)
-
+                    self.syslogconf.append("& %s%s:%i" % (proto, ip, port))
             self.syslogconf.append("& ~")
 
         changed = self.syslogconf.is_changed()
