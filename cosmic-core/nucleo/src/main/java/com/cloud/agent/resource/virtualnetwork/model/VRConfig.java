@@ -2,7 +2,6 @@ package com.cloud.agent.resource.virtualnetwork.model;
 
 public class VRConfig extends ConfigBase {
     private String sourceNatList;
-    private String syslogServerList;
     private String vpcName;
 
     public VRConfig() {
@@ -10,10 +9,9 @@ public class VRConfig extends ConfigBase {
         super(ConfigBase.VR);
     }
 
-    public VRConfig(final String vpcName, final String sourceNatList, final String syslogServerList) {
+    public VRConfig(final String vpcName, final String sourceNatList) {
         super(ConfigBase.VR);
         this.sourceNatList = sourceNatList;
-        this.syslogServerList = syslogServerList;
         this.vpcName = vpcName;
     }
 
@@ -23,13 +21,5 @@ public class VRConfig extends ConfigBase {
 
     public void setSourceNatList(final String sourceNatList) {
         this.sourceNatList = sourceNatList;
-    }
-
-    public String getSyslogServerList() {
-        return syslogServerList;
-    }
-
-    public void setSyslogServerList(final String syslogServerList) {
-        this.syslogServerList = syslogServerList;
     }
 }
