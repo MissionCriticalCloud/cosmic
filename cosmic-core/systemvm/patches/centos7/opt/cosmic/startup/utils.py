@@ -13,7 +13,7 @@ class Utils:
     def bootstrap(self):
         self.setup_hostname()
         self.setup_dns()
-        self.setup_private_nic()
+        self.setup_system_nics()
         if "type" in self.cmdline and self.cmdline['type'] not in ("secstorage", "consoleproxy"):
             self.setup_sync_nic()
         self.setup_ssh()
@@ -30,42 +30,56 @@ class Utils:
         else:
             print("No need to change the root password")
 
-    def setup_private_nic(self):
+    def setup_system_nics(self):
 
-        for interface in [0, 1, 2, 3]:
-            if "eth%sip" % interface in self.cmdline:
+        for network_type in ["control", "public", "mgt"]:
+
+            if "type" in self.cmdline and self.cmdline['type'] not in ("secstorage", "consoleproxy"):
+                if network_type == "public" or network_type == "mgt":
+                    continue
+
+            print("Processing %s" % network_type)
+            interface = self.find_nic(network_type)
+
+            if not interface:
+                print("Unable to find interface for network_type %s" % network_type)
+                continue
+
+            print("Found interface %s" % interface)
+            if "%sip" % network_type in self.cmdline:
                 ifcfg = """
-DEVICE="eth%s"
+DEVICE="%s"
 IPV6INIT="no"
 BOOTPROTO="none"
 ONBOOT="yes"
 HWADDR="%s"
 IPADDR="%s"
 NETMASK="%s"
-""" % (interface, self.cmdline["eth%smac" % interface], self.cmdline["eth%sip" % interface], self.cmdline["eth%smask" %
-                                                                                                          interface])
+""" % (interface, self.cmdline["%smac" % network_type], self.cmdline["%sip" % network_type], self.cmdline["%smask" %
+                                                                                                          network_type])
 
-                if self.cmdline["eth%sip" % interface].count("169.254.") == 1:
-                    self.link_local_ip = self.cmdline["eth%sip" % interface]
+                if network_type == "control":
+                    self.link_local_ip = self.cmdline["controlip"]
                     print(self.link_local_ip)
 
-                with open("/etc/sysconfig/network-scripts/ifcfg-eth%s" % interface, "w") as f:
+                with open("/etc/sysconfig/network-scripts/ifcfg-%s" % interface, "w") as f:
                     f.write(ifcfg)
 
-                os.system("ifdown eth%s; ifup eth%s" % (interface, interface))
+                os.system("ifdown %s; ifup %s" % (interface, interface))
 
     def get_device_from_mac_address(self, macaddress):
+        print("Finding device for mac_address %s" % macaddress)
         device = self.execute("find /sys/class/net/*/address | xargs grep %s | cut -d\/ -f5 " % macaddress)
         if not device:
             return False
         return device[0]
 
-    def find_sync_nic(self):
-        return self.get_device_from_mac_address(self.cmdline["syncmac"])
+    def find_nic(self, name):
+        return self.get_device_from_mac_address(self.cmdline["%smac" % name])
 
     def setup_sync_nic(self):
 
-        sync_device = self.find_sync_nic()
+        sync_device = self.find_nic("sync")
         sync_ip_address = self.link_local_ip.replace("169.254", "100.100")
 
         if not sync_device:
@@ -109,7 +123,7 @@ NETMASK="%s"
 
     def setup_ssh(self):
 
-        link_local_ip = self.cmdline["eth0ip"]
+        link_local_ip = self.cmdline["controlip"]
 
         sshd_config = """
 Port %s
@@ -159,7 +173,7 @@ AcceptEnv XMODIFIERS
         with open("/etc/redhat-release", "r") as f:
             release = f.readline()
 
-        link_local_ip = self.cmdline["eth0ip"]
+        link_local_ip = self.cmdline["controlip"]
 
         prelogin_banner = """
 Cosmic sytemvm powered by %s

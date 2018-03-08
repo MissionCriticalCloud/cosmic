@@ -3,7 +3,6 @@ package com.cloud.agent.api.to;
 import java.util.List;
 
 public class NicTO extends NetworkTO {
-    int deviceId;
     Integer networkRateMbps;
     Integer networkRateMulticastMbps;
     boolean defaultNic;
@@ -12,14 +11,6 @@ public class NicTO extends NetworkTO {
 
     public NicTO() {
         super();
-    }
-
-    public int getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(final int deviceId) {
-        this.deviceId = deviceId;
     }
 
     public Integer getNetworkRateMbps() {

@@ -673,10 +673,10 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.network.Network, java.lang.Boolean, int, com.cloud.vm.VirtualMachineProfile)
+     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.network.Network, java.lang.Boolean, com.cloud.vm.VirtualMachineProfile)
      */
     @Override
-    public Pair<NicProfile, Integer> allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, final int deviceId, final VirtualMachineProfile vm)
+    public NicProfile allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, final VirtualMachineProfile vm)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
         // TODO Auto-generated method stub
         return null;

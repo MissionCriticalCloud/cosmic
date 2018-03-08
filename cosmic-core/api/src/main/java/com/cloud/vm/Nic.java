@@ -55,8 +55,6 @@ public interface Nic extends Identity, InternalIdentity {
      */
     long getInstanceId();
 
-    int getDeviceId();
-
     Mode getMode();
 
     URI getIsolationUri();

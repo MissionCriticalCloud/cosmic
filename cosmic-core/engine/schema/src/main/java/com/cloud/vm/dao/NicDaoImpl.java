@@ -1,6 +1,5 @@
 package com.cloud.vm.dao;
 
-import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.JoinBuilder;
@@ -28,7 +27,6 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     private SearchBuilder<NicVO> AllFieldsSearch;
     private GenericSearchBuilder<NicVO, String> IpSearch;
     private SearchBuilder<NicVO> NonReleasedSearch;
-    private GenericSearchBuilder<NicVO, Integer> deviceIdSearch;
     private GenericSearchBuilder<NicVO, Integer> CountByForStartingVms;
     private SearchBuilder<NicVO> IpFuzzySearch;
 
@@ -68,11 +66,6 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
         NonReleasedSearch.and("network", NonReleasedSearch.entity().getNetworkId(), Op.EQ);
         NonReleasedSearch.and("state", NonReleasedSearch.entity().getState(), Op.NOTIN);
         NonReleasedSearch.done();
-
-        deviceIdSearch = createSearchBuilder(Integer.class);
-        deviceIdSearch.select(null, Func.DISTINCT, deviceIdSearch.entity().getDeviceId());
-        deviceIdSearch.and("instance", deviceIdSearch.entity().getInstanceId(), Op.EQ);
-        deviceIdSearch.done();
 
         CountByForStartingVms = createSearchBuilder(Integer.class);
         CountByForStartingVms.select(null, Func.COUNT, CountByForStartingVms.entity().getId());
@@ -206,24 +199,6 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
             return nicVo.getIPv4Address();
         }
         return null;
-    }
-
-    @Override
-    public int getFreeDeviceId(final long instanceId) {
-        final Filter searchFilter = new Filter(NicVO.class, "deviceId", true, null, null);
-        final SearchCriteria<Integer> sc = deviceIdSearch.create();
-        sc.setParameters("instance", instanceId);
-        final List<Integer> deviceIds = customSearch(sc, searchFilter);
-
-        int freeDeviceId = 0;
-        for (final int deviceId : deviceIds) {
-            if (deviceId > freeDeviceId) {
-                break;
-            }
-            freeDeviceId++;
-        }
-
-        return freeDeviceId;
     }
 
     @Override

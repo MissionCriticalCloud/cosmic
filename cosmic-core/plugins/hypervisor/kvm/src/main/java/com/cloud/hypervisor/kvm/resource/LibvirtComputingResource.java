@@ -133,6 +133,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -1593,18 +1594,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     public void createVifs(final VirtualMachineTO vmSpec, final LibvirtVmDef vm)
             throws InternalErrorException, LibvirtException {
-        final NicTO[] nics = vmSpec.getNics();
         final Map<String, String> params = vmSpec.getDetails();
         String nicAdapter = "";
         if (params != null && params.get("nicAdapter") != null && !params.get("nicAdapter").isEmpty()) {
             nicAdapter = params.get("nicAdapter");
         }
-        for (int i = 0; i < nics.length; i++) {
-            for (final NicTO nic : vmSpec.getNics()) {
-                if (nic.getDeviceId() == i) {
-                    createVif(vm, nic, nicAdapter);
-                }
-            }
+        for (final NicTO nic : vmSpec.getNics()) {
+            createVif(vm, nic, nicAdapter);
         }
     }
 
@@ -2649,11 +2645,18 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         final List<InterfaceDef> intfs = getInterfaces(conn, vmName);
-        if (intfs.size() == 0 || intfs.size() < nic.getDeviceId()) {
+        if (intfs.size() == 0) {
             return false;
         }
 
-        final InterfaceDef intf = intfs.get(nic.getDeviceId());
+        final Optional<InterfaceDef> optional = intfs.stream()
+                                                     .filter(intf -> intf.getMacAddress().equals(nic.getMac()))
+                                                     .findFirst();
+        if (!optional.isPresent()) {
+            return false;
+        }
+
+        final InterfaceDef intf = optional.get();
         final String brname = intf.getBrName();
         final String vif = intf.getDevName();
 

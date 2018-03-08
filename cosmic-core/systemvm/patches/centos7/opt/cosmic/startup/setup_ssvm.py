@@ -52,9 +52,9 @@ server {
         autoindex off;
     }
 }
-""" % (self.cmdline["eth2ip"], self.cmdline["eth2ip"])
+""" % (self.cmdline["publicip"], self.cmdline["publicip"])
 
-        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["eth2ip"])
+        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["publicip"])
 
         with open(filename, 'w') as f:
             f.write(vhost)
