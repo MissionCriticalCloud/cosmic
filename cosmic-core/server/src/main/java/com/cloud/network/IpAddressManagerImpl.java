@@ -55,6 +55,7 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpn.RemoteAccessVpnService;
@@ -88,8 +89,10 @@ import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
+import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
+import com.cloud.vm.dao.NicDao;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -109,51 +112,53 @@ import org.slf4j.LoggerFactory;
 public class IpAddressManagerImpl extends ManagerBase implements IpAddressManager, Configurable {
     private static final Logger s_logger = LoggerFactory.getLogger(IpAddressManagerImpl.class);
     @Inject
-    NetworkOrchestrationService _networkMgr = null;
+    private NetworkOrchestrationService _networkMgr = null;
     @Inject
-    EntityManager _entityMgr = null;
+    private EntityManager _entityMgr = null;
     @Inject
-    VlanDao _vlanDao = null;
+    private VlanDao _vlanDao = null;
     @Inject
-    IPAddressDao _ipAddressDao = null;
+    private IPAddressDao _ipAddressDao = null;
     @Inject
-    AccountDao _accountDao = null;
+    private AccountDao _accountDao = null;
     @Inject
-    AccountManager _accountMgr;
+    private AccountManager _accountMgr;
     @Inject
-    AccountVlanMapDao _accountVlanMapDao;
+    private AccountVlanMapDao _accountVlanMapDao;
     @Inject
-    DomainVlanMapDao _domainVlanMapDao;
+    private DomainVlanMapDao _domainVlanMapDao;
     @Inject
-    NetworkOfferingDao _networkOfferingDao = null;
+    private NetworkOfferingDao _networkOfferingDao = null;
     @Inject
-    NetworkDao _networksDao = null;
+    private NetworkDao _networksDao = null;
     @Inject
-    RulesManager _rulesMgr;
+    private RulesManager _rulesMgr;
     @Inject
-    LoadBalancingRulesManager _lbMgr;
+    private LoadBalancingRulesManager _lbMgr;
     @Inject
-    RemoteAccessVpnService _vpnMgr;
+    private RemoteAccessVpnService _vpnMgr;
     @Inject
-    PodVlanMapDao _podVlanMapDao;
+    private PodVlanMapDao _podVlanMapDao;
     @Inject
-    FirewallManager _firewallMgr;
+    private FirewallManager _firewallMgr;
     @Inject
-    FirewallRulesDao _firewallDao;
+    private FirewallRulesDao _firewallDao;
     @Inject
-    ResourceLimitService _resourceLimitMgr;
+    private ResourceLimitService _resourceLimitMgr;
     @Inject
-    NetworkModel _networkModel;
+    private NetworkModel _networkModel;
     @Inject
-    Ipv6AddressManager _ipv6Mgr;
+    private Ipv6AddressManager _ipv6Mgr;
     @Inject
-    VpcDao _vpcDao;
+    private VpcDao _vpcDao;
     @Inject
-    ResourceTagDao _resourceTagDao;
+    private ResourceTagDao _resourceTagDao;
+    @Inject
+    private NicDao _nicDao;
 
-    SearchBuilder<IPAddressVO> AssignIpAddressSearch;
-    SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
-    Random _rand = new Random(System.currentTimeMillis());
+    private SearchBuilder<IPAddressVO> AssignIpAddressSearch;
+    private SearchBuilder<IPAddressVO> AssignIpAddressFromPodVlanSearch;
+    private Random _rand = new Random(System.currentTimeMillis());
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) {
@@ -1184,6 +1189,17 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         return NetUtils.long2Ip(array[_rand.nextInt(array.length)]);
     }
 
+    @Override
+    public String acquireGuestIpAddressForVpcRouter(final Vpc vpc, final Network network, final String requestedIp) {
+        final List<NicVO> nics = _nicDao.listByNetworkIdAndVmType(network.getId(), VirtualMachine.Type.DomainRouter);
+        if (vpc.isRedundant() && !nics.isEmpty()) {
+            return nics.get(0).getIPv4Address();
+        }
+
+        return acquireGuestIpAddressForRouter(network, requestedIp);
+    }
+
+    @Override
     public String acquireGuestIpAddressForRouter(final Network network, final String requestedIp) {
 
         final SortedSet<Long> availableIps = _networkModel.getAvailableIps(network, requestedIp);
