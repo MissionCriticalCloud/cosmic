@@ -9,6 +9,7 @@ from marvin.lib.base import (
     LoadBalancerRule,
     NATRule,
     Network,
+    User,
     VirtualMachine,
     VPC
 )
@@ -135,7 +136,40 @@ class TestDeleteAccount(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_01_delete_account(self):
+    def test_01_getsecretkey(self):
+        """Test if we can get the secretkey"""
+
+        userkeys = None
+        userinfo = None
+
+        try:
+            userkeys = User.registerUserKeys(self.apiclient, self.account.user[0].id)
+        except CloudstackAPIException:
+            self.logger.debug("Registered user keys")
+        except Exception as e:
+            self.logger.debug("Exception %s raised while registering user keys" % e)
+
+        try:
+            userinfo = User.list(self.apiclient, id=self.account.user[0].id)[0]
+        except CloudstackAPIException:
+            self.logger.debug("Retrieved user")
+        except Exception as e:
+            self.logger.debug("Exception %s raised while retrieving user" % e)
+
+        self.assertEqual(
+            userkeys.apikey,
+            userinfo.apikey,
+            "API key is different"
+        )
+        self.assertNotEqual(
+            userkeys.secretkey,
+            userinfo.secretkey,
+            "Secret key is visible"
+        )
+        return
+
+    @attr(tags=['advanced'])
+    def test_02_delete_account(self):
         """Test for delete account"""
 
         # Validate the Following

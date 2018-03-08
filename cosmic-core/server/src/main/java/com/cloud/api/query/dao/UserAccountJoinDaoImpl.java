@@ -4,6 +4,7 @@ import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.api.response.UserResponse;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
+import com.cloud.utils.StringUtils;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
@@ -52,8 +53,13 @@ public class UserAccountJoinDaoImpl extends GenericDaoBase<UserAccountJoinVO, Lo
         userResponse.setTimezone(usr.getTimezone());
         userResponse.setUsername(usr.getUsername());
         userResponse.setApiKey(usr.getApiKey());
-        userResponse.setSecretKey(usr.getSecretKey());
         userResponse.setIsDefault(usr.isDefault());
+
+        if (StringUtils.isNotBlank(usr.getSecretKey())) {
+            userResponse.setSecretKey("SecretKey only visible when generating a new key");
+        } else {
+            userResponse.setSecretKey(usr.getSecretKey());
+        }
 
         // set async job
         if (usr.getJobId() != null) {
