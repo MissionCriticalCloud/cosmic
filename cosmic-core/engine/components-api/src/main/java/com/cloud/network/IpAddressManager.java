@@ -14,6 +14,7 @@ import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.StaticNat;
+import com.cloud.network.vpc.Vpc;
 import com.cloud.user.Account;
 import com.cloud.utils.db.DB;
 import com.cloud.vm.NicProfile;
@@ -79,6 +80,8 @@ public interface IpAddressManager {
     IPAddressVO markIpAsUnavailable(long addrId);
 
     String acquireGuestIpAddress(Network network, String requestedIp);
+
+    String acquireGuestIpAddressForVpcRouter(Vpc vpc, Network network, String requestedIp);
 
     String acquireGuestIpAddressForRouter(Network network, String requestedIp);
 

@@ -95,7 +95,7 @@ public class NicProfileHelperImpl implements NicProfileHelper {
     public NicProfile createGuestNicProfileForVpcRouter(final RouterDeploymentDefinition vpcRouterDeploymentDefinition, final Network guestNetwork) {
         final NicProfile guestNic = new NicProfile();
         if (!vpcRouterDeploymentDefinition.hasGatewayService()) {
-            guestNic.setIPv4Address(_ipAddrMgr.acquireGuestIpAddressForRouter(guestNetwork, null));
+            guestNic.setIPv4Address(_ipAddrMgr.acquireGuestIpAddressForVpcRouter(vpcRouterDeploymentDefinition.getVpc(), guestNetwork, null));
         } else {
             guestNic.setIPv4Address(guestNetwork.getGateway());
         }
