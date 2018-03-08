@@ -79,7 +79,7 @@ NETMASK="%s"
     IPADDR="%s"
     NETMASK="255.255.0.0"
     HWADDR="%s"
-    """ % (sync_device, sync_ip_address, self.cmdline["%smac" % sync_device])
+    """ % (sync_device, sync_ip_address, self.cmdline['syncmac'])
 
         with open("/etc/sysconfig/network-scripts/ifcfg-%s" % sync_device, "w") as f:
             f.write(ifcfg)
