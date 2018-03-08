@@ -14,7 +14,7 @@ public class SetVRConfigItem extends AbstractConfigItemFacade {
     public List<ConfigItem> generateConfig(final NetworkElementCommand cmd) {
         final SetupVRCommand command = (SetupVRCommand) cmd;
 
-        return generateConfigItems(new VRConfig(command.getVpcName(), command.getSourceNatList(), command.getSyslogServerList()));
+        return generateConfigItems(new VRConfig(command.getVpcName(), command.getSourceNatList()));
     }
 
     @Override
