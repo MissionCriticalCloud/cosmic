@@ -21,27 +21,6 @@ then
    fi
 fi
 
-
-verify_cksum() {
-  digestalgo=""
-  case ${#1} in
-        32) digestalgo="md5sum" ;;
-        40) digestalgo="sha1sum" ;;
-        56) digestalgo="sha224sum" ;;
-        64) digestalgo="sha256sum" ;;
-        96) digestalgo="sha384sum" ;;
-        128) digestalgo="sha512sum" ;;
-        *) echo "Please provide valid cheksum" ; exit 3 ;;
-  esac
-  echo  "$1  $2" | $digestalgo  -c --status
-  #printf "$1\t$2" | $digestalgo  -c --status
-  if [ $? -gt 0 ]
-  then
-    printf "Checksum failed, not proceeding with install\n"
-    exit 3
-  fi
-}
-
 untar() {
   local ft=$(file $1| awk -F" " '{print $2}')
   local basedir=$(dirname $1)
