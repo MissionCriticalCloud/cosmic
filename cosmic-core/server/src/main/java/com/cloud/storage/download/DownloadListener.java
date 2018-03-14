@@ -244,27 +244,6 @@ public class DownloadListener implements Listener {
             // update template_zone_ref for cross-zone templates
             _imageSrv.associateCrosszoneTemplatesToZone(agent.getDataCenterId());
         }
-        /* This can be removed
-        else if ( cmd instanceof StartupStorageCommand) {
-            StartupStorageCommand storage = (StartupStorageCommand)cmd;
-            if( storage.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE ||
-                    storage.getResourceType() == Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE  ) {
-                downloadMonitor.addSystemVMTemplatesToHost(agent, storage.getTemplateInfo());
-                downloadMonitor.handleTemplateSync(agent);
-                downloadMonitor.handleVolumeSync(agent);
-            }
-        }*/
-        else if (cmd instanceof StartupSecondaryStorageCommand) {
-            try {
-                final List<DataStore> imageStores = _storeMgr.getImageStoresByScope(new ZoneScope(agent.getDataCenterId()));
-                for (final DataStore store : imageStores) {
-                    _volumeSrv.handleVolumeSync(store);
-                    _imageSrv.handleTemplateSync(store);
-                }
-            } catch (final Exception e) {
-                s_logger.error("Caught exception while doing template/volume sync ", e);
-            }
-        }
     }
 
     @Override
