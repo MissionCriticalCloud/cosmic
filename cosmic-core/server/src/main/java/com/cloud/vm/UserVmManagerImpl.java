@@ -1939,34 +1939,19 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new CloudRuntimeException("Failed to find a nic profile for the existing default network. This is bad and probably means some sort of configuration corruption");
         }
 
-        final Network oldDefaultNetwork;
-        oldDefaultNetwork = _networkModel.getDefaultNetworkForVm(vmId);
-        final String oldNicIdString = Long.toString(_networkModel.getDefaultNic(vmId).getId());
-        long oldNetworkOfferingId = -1L;
-
-        if (oldDefaultNetwork != null) {
-            oldNetworkOfferingId = oldDefaultNetwork.getNetworkOfferingId();
-        }
         NicVO existingVO = _nicDao.findById(existing.id);
-        final Integer chosenID = nic.getDeviceId();
-        final Integer existingID = existing.getDeviceId();
 
         nic.setDefaultNic(true);
-        nic.setDeviceId(existingID);
         existingVO.setDefaultNic(false);
-        existingVO.setDeviceId(chosenID);
 
         nic = _nicDao.persist(nic);
         existingVO = _nicDao.persist(existingVO);
 
-        Network newdefault;
-        newdefault = _networkModel.getDefaultNetworkForVm(vmId);
+        Network newdefault = _networkModel.getDefaultNetworkForVm(vmId);
 
         if (newdefault == null) {
             nic.setDefaultNic(false);
-            nic.setDeviceId(chosenID);
             existingVO.setDefaultNic(true);
-            existingVO.setDeviceId(existingID);
 
             nic = _nicDao.persist(nic);
             _nicDao.persist(existingVO);

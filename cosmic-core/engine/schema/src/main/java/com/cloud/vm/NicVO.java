@@ -54,8 +54,6 @@ public class NicVO implements Nic {
     String reserver;
     @Column(name = "reservation_id")
     String reservationId;
-    @Column(name = "device_id")
-    int deviceId;
     @Column(name = "update_time")
     Date updateTime;
     @Column(name = "default_nic")
@@ -162,15 +160,6 @@ public class NicVO implements Nic {
 
     public void setInstanceId(final long instanceId) {
         this.instanceId = instanceId;
-    }
-
-    @Override
-    public int getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(final int deviceId) {
-        this.deviceId = deviceId;
     }
 
     @Override

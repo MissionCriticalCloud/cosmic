@@ -919,32 +919,10 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         String defaultIp6Dns2 = null;
         for (final NicProfile nic : profile.getNics()) {
             final Network network = _networkDao.findById(nic.getNetworkId());
-            final int deviceId = nic.getDeviceId();
             final String deviceMac = nic.getMacAddress();
-            boolean ipv4 = false, ipv6 = false;
-            if (nic.getIPv4Address() != null) {
-                ipv4 = true;
-                buf.append(" eth").append(deviceId).append("ip=").append(nic.getIPv4Address());
-                buf.append(" eth").append(deviceId).append("mask=").append(nic.getIPv4Netmask());
-                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
-            }
-            if (nic.getIPv6Address() != null) {
-                ipv6 = true;
-                buf.append(" eth").append(deviceId).append("ip6=").append(nic.getIPv6Address());
-                buf.append(" eth").append(deviceId).append("ip6prelen=").append(NetUtils.getIp6CidrSize(nic.getIPv6Cidr()));
-                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
-            }
-
-            // Send mac address
-            buf.append(" eth").append(deviceId).append("mac=").append(deviceMac);
 
             if (nic.isDefaultNic()) {
-                if (ipv4) {
-                    buf.append(" gateway=").append(nic.getIPv4Gateway());
-                }
-                if (ipv6) {
-                    buf.append(" ip6gateway=").append(nic.getIPv6Gateway());
-                }
+                buf.append(" gateway=").append(nic.getIPv4Gateway());
                 defaultDns1 = nic.getIPv4Dns1();
                 defaultDns2 = nic.getIPv4Dns2();
                 defaultIp6Dns1 = nic.getIPv6Dns1();
@@ -956,6 +934,8 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             } else if (nic.getTrafficType() == TrafficType.Control) {
                 controlNic = nic;
                 buf.append(" controlmac=").append(deviceMac);
+                buf.append(" controlmask=").append(nic.getIPv4Netmask());
+                buf.append(" controlip=").append(nic.getIPv4Address());
                 buf.append(createRedundantRouterArgs(controlNic, router));
             } else if (TrafficType.Guest.equals(nic.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType())) {
                 dnsProvided = _networkModel.isProviderSupportServiceInNetwork(nic.getNetworkId(), Service.Dns, Provider.VirtualRouter);

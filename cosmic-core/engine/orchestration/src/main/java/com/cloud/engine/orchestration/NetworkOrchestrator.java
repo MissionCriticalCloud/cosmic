@@ -170,7 +170,6 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -556,19 +555,15 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         Transaction.execute(new TransactionCallbackWithExceptionNoReturn<InsufficientCapacityException>() {
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) throws InsufficientCapacityException {
-                int deviceId = 0;
                 int size = 0;
                 for (final Network ntwk : networks.keySet()) {
                     final List<? extends NicProfile> profiles = networks.get(ntwk);
                     if (profiles != null && !profiles.isEmpty()) {
-                        size = size + profiles.size();
+                        size += profiles.size();
                     } else {
-                        size = size + 1;
+                        size += 1;
                     }
                 }
-
-                final boolean[] deviceIds = new boolean[size];
-                Arrays.fill(deviceIds, false);
 
                 final List<NicProfile> nics = new ArrayList<>(size);
                 NicProfile defaultNic = null;
@@ -589,29 +584,10 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             isDefaultNic = true;
                         }
 
-                        while (deviceIds[deviceId] && deviceId < deviceIds.length) {
-                            deviceId++;
+                        NicProfile vmNic = allocateNic(requested, config, isDefaultNic, vm);
+                        if (vmNic == null) {
+                            continue;
                         }
-
-                        final Pair<NicProfile, Integer> vmNicPair = allocateNic(requested, config, isDefaultNic, deviceId, vm);
-                        NicProfile vmNic = null;
-                        if (vmNicPair != null) {
-                            vmNic = vmNicPair.first();
-                            if (vmNic == null) {
-                                continue;
-                            }
-                            deviceId = vmNicPair.second();
-                        }
-
-                        final int devId = vmNic.getDeviceId();
-                        if (devId > deviceIds.length) {
-                            throw new IllegalArgumentException("Device id for nic is too large: " + vmNic);
-                        }
-                        if (deviceIds[devId]) {
-                            throw new IllegalArgumentException("Conflicting device id for two different nics: " + vmNic);
-                        }
-
-                        deviceIds[devId] = true;
 
                         if (vmNic.isDefaultNic()) {
                             if (defaultNic != null) {
@@ -2080,7 +2056,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @DB
     @Override
-    public Pair<NicProfile, Integer> allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, int deviceId, final VirtualMachineProfile vm)
+    public NicProfile allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, final VirtualMachineProfile vm)
             throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException {
 
         final NetworkVO ntwkVO = _networksDao.findById(network.getId());
@@ -2106,16 +2082,13 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         NicVO vo = new NicVO(guru.getName(), vm.getId(), network.getId(), vm.getType());
-
-        deviceId = applyProfileToNic(vo, profile, deviceId);
+        applyProfileToNic(vo, profile);
 
         vo = _nicDao.persist(vo);
 
         final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
-        final NicProfile vmNic = new NicProfile(vo, network, vo.getBroadcastUri(), vo.getIsolationUri(), networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
+        return new NicProfile(vo, network, vo.getBroadcastUri(), vo.getIsolationUri(), networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
                 _networkModel.getNetworkTag(vm.getHypervisorType(), network));
-
-        return new Pair<>(vmNic, Integer.valueOf(deviceId));
     }
 
     @Override
@@ -2212,9 +2185,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
         //1) allocate nic (if needed) Always allocate if it is a user vm
         if (nic == null || vmProfile.getType() == VirtualMachine.Type.User) {
-            final int deviceId = _nicDao.getFreeDeviceId(vm.getId());
-
-            nic = allocateNic(requested, network, false, deviceId, vmProfile).first();
+            nic = allocateNic(requested, network, false, vmProfile);
 
             if (nic == null) {
                 throw new CloudRuntimeException("Failed to allocate nic for vm " + vm + " in network " + network);
@@ -2754,7 +2725,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     _networkModel.getNetworkRate(network.getId(), vm.getId());
                     final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
                     final NicProfile profile = new NicProfile();
-                    profile.setDeviceId(255); //dummyId
                     profile.setIPv4Address(userIp.getAddress().toString());
                     profile.setIPv4Netmask(publicIp.getNetmask());
                     profile.setIPv4Gateway(publicIp.getGateway());
@@ -2884,13 +2854,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         return true;
     }
 
-    protected Integer applyProfileToNic(final NicVO vo, final NicProfile profile, Integer deviceId) {
-        if (profile.getDeviceId() != null) {
-            vo.setDeviceId(profile.getDeviceId());
-        } else if (deviceId != null) {
-            vo.setDeviceId(deviceId++);
-        }
-
+    protected void applyProfileToNic(final NicVO vo, final NicProfile profile) {
         if (profile.getReservationStrategy() != null) {
             vo.setReservationStrategy(profile.getReservationStrategy());
         }
@@ -2921,8 +2885,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         vo.setIPv6Address(profile.getIPv6Address());
         vo.setIPv6Gateway(profile.getIPv6Gateway());
         vo.setIPv6Cidr(profile.getIPv6Cidr());
-
-        return deviceId;
     }
 
     protected int getActiveNicsInNetwork(final long networkId) {
@@ -3032,7 +2994,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     protected NicTO toNicTO(final NicVO nic, final NicProfile profile, final NetworkVO config) {
         final NicTO to = new NicTO();
-        to.setDeviceId(nic.getDeviceId());
         to.setBroadcastType(config.getBroadcastDomainType());
         to.setType(config.getTrafficType());
         to.setIp(nic.getIPv4Address());

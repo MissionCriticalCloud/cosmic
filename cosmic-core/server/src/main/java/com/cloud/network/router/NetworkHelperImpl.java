@@ -652,11 +652,6 @@ public class NetworkHelperImpl implements NetworkHelper {
                 defaultNic.setIsolationUri(IsolationType.Vlan.toUri(sourceNatIp.getVlanTag()));
             }
 
-            //If guest nic has already been added we will have 2 devices in the list.
-            if (hasGuestNic) {
-                defaultNic.setDeviceId(2);
-            }
-
             final NetworkOffering publicOffering = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemPublicNetwork).get(0);
             final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, routerDeploymentDefinition.getPlan(), null, null, false);
             final String publicIp = defaultNic.getIPv4Address();

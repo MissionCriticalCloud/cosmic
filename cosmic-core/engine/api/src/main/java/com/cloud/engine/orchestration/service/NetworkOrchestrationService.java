@@ -156,17 +156,14 @@ public interface NetworkOrchestrationService {
      * @param requested
      * @param network
      * @param isDefaultNic
-     * @param deviceId
      * @param vm
      * @return
      * @throws InsufficientVirtualNetworkCapacityException
      * @throws InsufficientAddressCapacityException
      * @throws ConcurrentOperationException
      */
-    Pair<NicProfile, Integer> allocateNic(NicProfile requested, Network network, Boolean isDefaultNic, int deviceId,
-                                          VirtualMachineProfile vm)
-            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException,
-            ConcurrentOperationException;
+    NicProfile allocateNic(NicProfile requested, Network network, Boolean isDefaultNic, VirtualMachineProfile vm)
+            throws InsufficientVirtualNetworkCapacityException, InsufficientAddressCapacityException, ConcurrentOperationException;
 
     /**
      * @param vmProfile

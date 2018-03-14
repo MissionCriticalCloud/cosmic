@@ -1149,7 +1149,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         }
         VIF.Record vifr = new VIF.Record();
         vifr.VM = vm;
-        vifr.device = Integer.toString(nic.getDeviceId());
+        vifr.device = getLowestAvailableVIFDeviceNum(conn, vm);
         vifr.MAC = nic.getMac();
 
         // Nicira needs these IDs to find the NIC
@@ -1188,7 +1188,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         if (s_logger.isDebugEnabled()) {
             vifr = vif.getRecord(conn);
             if (vifr != null) {
-                s_logger.debug("Created a vif " + vifr.uuid + " on " + nic.getDeviceId());
+                s_logger.debug("Created a vif " + vifr.uuid + " on " + vifr.device);
             }
         }
 
@@ -3956,7 +3956,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     s_logger.error(msg);
                     return new ExecutionResult(false, msg);
                 }
-                nic.setDeviceId(Integer.parseInt(vif.getDevice(conn)));
             } else {
                 final String msg = "Prepare SetNetworkACL failed due to nic is null for : " + routerName;
                 s_logger.error(msg);

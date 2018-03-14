@@ -2734,8 +2734,6 @@ public class ApiResponseHelper implements ResponseGenerator {
             response.setIp6Address(result.getIPv6Address());
         }
 
-        response.setDeviceId(String.valueOf(result.getDeviceId()));
-
         response.setIsDefault(result.isDefaultNic());
         return response;
     }

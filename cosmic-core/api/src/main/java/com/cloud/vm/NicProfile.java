@@ -18,7 +18,6 @@ public class NicProfile implements InternalIdentity, Serializable {
     long networkId;
     long vmId;
     String reservationId;
-    Integer deviceId;
 
     String name;
     String uuid;
@@ -78,7 +77,6 @@ public class NicProfile implements InternalIdentity, Serializable {
         macAddress = nic.getMacAddress();
         reservationId = nic.getReservationId();
         strategy = nic.getReservationStrategy();
-        deviceId = nic.getDeviceId();
         defaultNic = nic.isDefaultNic();
         this.broadcastUri = broadcastUri;
         this.isolationUri = isolationUri;
@@ -147,14 +145,6 @@ public class NicProfile implements InternalIdentity, Serializable {
 
     public void setReservationId(final String reservationId) {
         this.reservationId = reservationId;
-    }
-
-    public Integer getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(final int deviceId) {
-        this.deviceId = deviceId;
     }
 
     public String getName() {
@@ -390,7 +380,6 @@ public class NicProfile implements InternalIdentity, Serializable {
         macAddress = null;
         reservationId = null;
         strategy = null;
-        deviceId = null;
         broadcastUri = null;
         isolationUri = null;
     }
