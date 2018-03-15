@@ -1,12 +1,9 @@
-/var/log/cloud.log {
-        rotate 4
+/var/log/cosmic/router/router.log {
+        rotate 14
         daily
-        size 10M
+        size 100M
         missingok
         notifempty
         compress
-        # CLOUDSTACK-9155: We cannot tell the processes that are writing to this
-        # file to use the new inode, so instead we copy the original file, truncate
-        # it and keep the same inode.
         copytruncate
 }
