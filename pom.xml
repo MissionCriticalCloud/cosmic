@@ -112,6 +112,7 @@
         <cs.xmlrpc-client.version>3.1.3</cs.xmlrpc-client.version>
         <cs.xmlrpc-common.version>3.1.3</cs.xmlrpc-common.version>
         <cs.xstream.version>1.4.9</cs.xstream.version>
+        <cs.logstash-gelf.version>1.11.2</cs.logstash-gelf.version>
 
         <!-- MySQL is also used in the plugin section -->
         <cs.mysql.version>5.1.34</cs.mysql.version>
@@ -433,6 +434,11 @@
                 <artifactId>xalan</artifactId>
                 <version>${cs.xalan.version}</version>
             </dependency>
+            <dependency>
+                <groupId>biz.paluch.logging</groupId>
+                <artifactId>logstash-gelf</artifactId>
+                <version>${cs.logstash-gelf.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -479,6 +485,10 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
         </dependency>
     </dependencies>
 
