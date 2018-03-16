@@ -62,7 +62,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
@@ -626,7 +625,8 @@ public class NetworkHelperImpl implements NetworkHelper {
         return syncConfig;
     }
 
-    protected LinkedHashMap<Network, List<? extends NicProfile>> configurePublicNic(final RouterDeploymentDefinition routerDeploymentDefinition, final boolean hasGuestNic) {
+    protected LinkedHashMap<Network, List<? extends NicProfile>> configurePublicNic(final RouterDeploymentDefinition routerDeploymentDefinition, final boolean hasGuestNic)
+            throws InsufficientAddressCapacityException {
         final LinkedHashMap<Network, List<? extends NicProfile>> publicConfig = new LinkedHashMap<>(3);
 
         if (routerDeploymentDefinition.isPublicNetwork()) {
@@ -639,7 +639,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             defaultNic.setIPv4Address(sourceNatIp.getAddress().addr());
             defaultNic.setIPv4Gateway(sourceNatIp.getGateway());
             defaultNic.setIPv4Netmask(sourceNatIp.getNetmask());
-            defaultNic.setMacAddress(sourceNatIp.getMacAddress());
+            defaultNic.setMacAddress(_networkModel.getNextAvailableMacAddressInNetwork(sourceNatIp.getNetworkId()));
             // get broadcast from public network
             final Network pubNet = _networkDao.findById(sourceNatIp.getNetworkId());
             if (pubNet.getBroadcastDomainType() == BroadcastDomainType.Vxlan) {
@@ -659,14 +659,6 @@ public class NetworkHelperImpl implements NetworkHelper {
 
             final NetworkOffering publicOffering = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemPublicNetwork).get(0);
             final List<? extends Network> publicNetworks = _networkMgr.setupNetwork(s_systemAccount, publicOffering, routerDeploymentDefinition.getPlan(), null, null, false);
-            final String publicIp = defaultNic.getIPv4Address();
-            // We want to use the identical MAC address for RvR on public
-            // interface if possible
-            final NicVO peerNic = _nicDao.findByIp4AddressAndNetworkId(publicIp, publicNetworks.get(0).getId());
-            if (peerNic != null) {
-                logger.info("Use same MAC as previous RvR, the MAC is " + peerNic.getMacAddress());
-                defaultNic.setMacAddress(peerNic.getMacAddress());
-            }
             publicConfig.put(publicNetworks.get(0), new ArrayList<>(Arrays.asList(defaultNic)));
         }
 
