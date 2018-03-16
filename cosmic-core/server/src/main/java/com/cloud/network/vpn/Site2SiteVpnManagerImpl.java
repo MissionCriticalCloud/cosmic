@@ -185,9 +185,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
 
         final long accountId = owner.getAccountId();
-        if (_customerGatewayDao.findByGatewayIpAndAccountId(gatewayIp, accountId) != null) {
-            throw new InvalidParameterValueException("The customer gateway with ip " + gatewayIp + " already existed in the system!");
-        }
         if (_customerGatewayDao.findByNameAndAccountId(name, accountId) != null) {
             throw new InvalidParameterValueException("The customer gateway with name " + name + " already existed!");
         }
@@ -629,73 +626,59 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         }
         _accountMgr.checkAccess(caller, null, false, gw);
 
-        String name = cmd.getName();
+        final String name = cmd.getName();
+        if (name != null) {
+            final long accountId = gw.getAccountId();
+            Site2SiteCustomerGatewayVO existedGw = _customerGatewayDao.findByNameAndAccountId(name, accountId);
+            if (existedGw != null && existedGw.getId() != gw.getId()) {
+                throw new InvalidParameterValueException("The customer gateway with name " + name + " already existed!");
+            }
+            gw.setName(name);
+        }
         final String gatewayIp = cmd.getGatewayIp();
-        if (!NetUtils.isValidIp4(gatewayIp)) {
-            throw new InvalidParameterValueException("The customer gateway ip " + gatewayIp + " is invalid!");
+        if (gatewayIp != null) {
+            if (!NetUtils.isValidIp4(gatewayIp)) {
+                throw new InvalidParameterValueException("The customer gateway ip " + gatewayIp + " is invalid!");
+            }
+            gw.setGatewayIp(gatewayIp);
         }
-        if (name == null) {
-            name = "VPN-" + gatewayIp;
-        }
-        final String guestCidrList = getPeerCidrListString(cmd.getPeerCidrList());
-        final String ipsecPsk = cmd.getIpsecPsk();
         final String ikePolicy = cmd.getIkePolicy();
+        if (ikePolicy != null) {
+            if (!NetUtils.isValidS2SVpnPolicy("ike", ikePolicy)) {
+                throw new InvalidParameterValueException("The customer gateway IKE policy" + ikePolicy + " is invalid!");
+            }
+            gw.setIkePolicy(ikePolicy);
+        }
         final String espPolicy = cmd.getEspPolicy();
-        if (!NetUtils.isValidS2SVpnPolicy("ike", ikePolicy)) {
-            throw new InvalidParameterValueException("The customer gateway IKE policy" + ikePolicy + " is invalid!");
+        if (espPolicy != null) {
+            if (!NetUtils.isValidS2SVpnPolicy("esp", espPolicy)) {
+                throw new InvalidParameterValueException("The customer gateway ESP policy" + espPolicy + " is invalid!");
+            }
+            gw.setEspPolicy(espPolicy);
         }
-        if (!NetUtils.isValidS2SVpnPolicy("esp", espPolicy)) {
-            throw new InvalidParameterValueException("The customer gateway ESP policy" + espPolicy + " is invalid!");
+        final Long ikeLifetime = cmd.getIkeLifetime();
+        if (ikeLifetime != null) {
+            if (ikeLifetime > 86400) {
+                throw new InvalidParameterValueException("The IKE lifetime " + ikeLifetime + " of vpn connection is invalid!");
+            }
+            gw.setIkeLifetime(ikeLifetime);
         }
-        Long ikeLifetime = cmd.getIkeLifetime();
-        if (ikeLifetime == null) {
-            // Default value of lifetime is 1 day
-            ikeLifetime = (long) 86400;
+        final Long espLifetime = cmd.getEspLifetime();
+        if (espLifetime != null) {
+            if (espLifetime > 86400) {
+                throw new InvalidParameterValueException("The ESP lifetime " + espLifetime + " of vpn connection is invalid!");
+            }
+            gw.setEspLifetime(espLifetime);
         }
-        if (ikeLifetime > 86400) {
-            throw new InvalidParameterValueException("The IKE lifetime " + ikeLifetime + " of vpn connection is invalid!");
+        final List<String> peerList = cmd.getPeerCidrList();
+        if (peerList != null) {
+            final String guestCidrList = getPeerCidrListString(peerList);
+            checkCustomerGatewayCidrList(guestCidrList);
+            gw.setGuestCidrList(guestCidrList);
         }
-        Long espLifetime = cmd.getEspLifetime();
-        if (espLifetime == null) {
-            // Default value of lifetime is 1 hour
-            espLifetime = (long) 3600;
-        }
-        if (espLifetime > 86400) {
-            throw new InvalidParameterValueException("The ESP lifetime " + espLifetime + " of vpn connection is invalid!");
-        }
-
-        Boolean dpd = cmd.getDpd();
-        if (dpd == null) {
-            dpd = false;
-        }
-
-        Boolean encap = cmd.getEncap();
-        if (encap == null) {
-            encap = false;
-        }
-
-        checkCustomerGatewayCidrList(guestCidrList);
-
-        final long accountId = gw.getAccountId();
-        Site2SiteCustomerGatewayVO existedGw = _customerGatewayDao.findByGatewayIpAndAccountId(gatewayIp, accountId);
-        if (existedGw != null && existedGw.getId() != gw.getId()) {
-            throw new InvalidParameterValueException("The customer gateway with ip " + gatewayIp + " already existed in the system!");
-        }
-        existedGw = _customerGatewayDao.findByNameAndAccountId(name, accountId);
-        if (existedGw != null && existedGw.getId() != gw.getId()) {
-            throw new InvalidParameterValueException("The customer gateway with name " + name + " already existed!");
-        }
-
-        gw.setName(name);
-        gw.setGatewayIp(gatewayIp);
-        gw.setGuestCidrList(guestCidrList);
-        gw.setIkePolicy(ikePolicy);
-        gw.setEspPolicy(espPolicy);
-        gw.setIpsecPsk(ipsecPsk);
-        gw.setIkeLifetime(ikeLifetime);
-        gw.setEspLifetime(espLifetime);
-        gw.setDpd(dpd);
-        gw.setEncap(encap);
+        gw.setIpsecPsk(cmd.getIpsecPsk());
+        gw.setDpd(cmd.getDpd());
+        gw.setEncap(cmd.getEncap());
         _customerGatewayDao.persist(gw);
 
         final List<Site2SiteVpnConnectionVO> conns = _vpnConnectionDao.listByCustomerGatewayId(gw.getId());

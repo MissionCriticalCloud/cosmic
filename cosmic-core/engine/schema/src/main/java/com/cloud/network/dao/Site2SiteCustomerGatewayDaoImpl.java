@@ -25,14 +25,6 @@ public class Site2SiteCustomerGatewayDaoImpl extends GenericDaoBase<Site2SiteCus
     }
 
     @Override
-    public Site2SiteCustomerGatewayVO findByGatewayIpAndAccountId(final String ip, final long accountId) {
-        final SearchCriteria<Site2SiteCustomerGatewayVO> sc = AllFieldsSearch.create();
-        sc.setParameters("gatewayIp", ip);
-        sc.setParameters("accountId", accountId);
-        return findOneBy(sc);
-    }
-
-    @Override
     public Site2SiteCustomerGatewayVO findByNameAndAccountId(final String name, final long accountId) {
         final SearchCriteria<Site2SiteCustomerGatewayVO> sc = AllFieldsSearch.create();
         sc.setParameters("name", name);
