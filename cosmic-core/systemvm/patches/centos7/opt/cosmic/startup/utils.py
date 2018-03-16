@@ -58,6 +58,9 @@ NETMASK="%s"
 """ % (interface, self.cmdline["%smac" % network_type], self.cmdline["%sip" % network_type], self.cmdline["%smask" %
                                                                                                           network_type])
 
+                # Save interface names to be used later
+                self.cmdline["%snic" % network_type] = interface
+
                 if network_type == "control":
                     self.link_local_ip = self.cmdline["controlip"]
                     print(self.link_local_ip)
