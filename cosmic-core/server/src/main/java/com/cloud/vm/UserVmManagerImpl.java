@@ -2781,16 +2781,14 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             //raise an alert
             final String msg = "VM " + vm.getInstanceName() + " is being migrated from a explicitly dedicated host " + srcHost.getName() + " to non-dedicated host " + destHost
                     .getName();
-            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
-            s_logger.warn(msg);
+            s_logger.info(msg);
         }
         //if srcHost is non dedicated but destination Host is explicitly dedicated
         if (!srcExplDedicated && destExplDedicated) {
             //raise an alert
             final String msg = "VM " + vm.getInstanceName() + " is being migrated from a non dedicated host " + srcHost.getName() + " to a explicitly dedicated host " + destHost
                     .getName();
-            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_USERVM, vm.getDataCenterId(), vm.getPodIdToDeployIn(), msg, msg);
-            s_logger.warn(msg);
+            s_logger.info(msg);
         }
 
         // Don't allow it when hosts are dedicated to different account/domains
