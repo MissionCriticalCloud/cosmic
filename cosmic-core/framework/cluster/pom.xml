@@ -5,29 +5,29 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.10-SNAPSHOT</version>
+        <version>6.0.10</version>
         <relativePath>../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.10-SNAPSHOT</version>
+            <version>6.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-db</artifactId>
-            <version>6.0.10-SNAPSHOT</version>
+            <version>6.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>6.0.10-SNAPSHOT</version>
+            <version>6.0.10</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.10-SNAPSHOT</version>
+            <version>6.0.10</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
