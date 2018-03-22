@@ -2000,7 +2000,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (zone == null) {
             throw new InvalidParameterValueException("There is no dc with the nic");
         }
-        if (zone.getNetworkType() == NetworkType.Advanced && network.getGuestType() == Network.GuestType.Isolated) {
+        if (zone.getNetworkType() == NetworkType.Advanced && (network.getGuestType() == Network.GuestType.Isolated || network.getGuestType() == Network.GuestType.Private)) {
             try {
                 ipaddr = _ipAddrMgr.allocateGuestIP(network, ipaddr);
             } catch (final InsufficientAddressCapacityException e) {
