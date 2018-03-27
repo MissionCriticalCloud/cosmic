@@ -2351,15 +2351,12 @@
                                 }
                             }
                         } else if (args.context.networks[0].type == "Shared") {
-                            var havingSecurityGroupService = false;
                             var havingElasticIpCapability = false;
                             var havingElasticLbCapability = false;
 
                             for (var i = 0; i < services.length; i++) {
                                 var service = services[i];
-                                if (service.name == "SecurityGroup") {
-                                    havingSecurityGroupService = true;
-                                } else if (service.name == "StaticNat") {
+                                if (service.name == "StaticNat") {
                                     $(service.capability).each(function () {
                                         if (this.name == "ElasticIp" && this.value == "true") {
                                             havingElasticIpCapability = true;
@@ -2376,7 +2373,7 @@
                                 }
                             }
 
-                            if (havingSecurityGroupService == true && havingElasticIpCapability == true && havingElasticLbCapability == true)
+                            if (havingElasticIpCapability == true && havingElasticLbCapability == true)
                                 return true;
                             else
                                 return false;

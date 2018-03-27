@@ -39,7 +39,6 @@ public enum APICommandGroup {
     ResourcemetadataService("Resource metadata"),
     ResourcetagsService("Resource tags"),
     RouterService("Router"),
-    SecurityGroupService("Security Group"),
     ServiceOfferingService("Service Offering"),
     SnapshotService("Snapshot"),
     SSHService("SSH"),

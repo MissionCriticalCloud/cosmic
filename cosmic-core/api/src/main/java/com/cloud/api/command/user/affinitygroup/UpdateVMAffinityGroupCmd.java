@@ -55,8 +55,7 @@ public class UpdateVMAffinityGroupCmd extends BaseAsyncCmd {
             type = CommandType.LIST,
             collectionType = CommandType.UUID,
             entityType = AffinityGroupResponse.class,
-            description = "comma separated list of affinity groups id that are going to be applied to the virtual machine. "
-                    + "Should be passed only when vm is created from a zone with Basic Network support." + " Mutually exclusive with securitygroupnames parameter")
+            description = "comma separated list of affinity groups id that are going to be applied to the virtual machine.")
     private List<Long> affinityGroupIdList;
 
     @ACL
@@ -64,8 +63,7 @@ public class UpdateVMAffinityGroupCmd extends BaseAsyncCmd {
             type = CommandType.LIST,
             collectionType = CommandType.STRING,
             entityType = AffinityGroupResponse.class,
-            description = "comma separated list of affinity groups names that are going to be applied to the virtual machine."
-                    + " Should be passed only when vm is created from a zone with Basic Network support. " + "Mutually exclusive with securitygroupids parameter")
+            description = "comma separated list of affinity groups names that are going to be applied to the virtual machine.")
     private List<String> affinityGroupNameList;
 
     /////////////////////////////////////////////////////

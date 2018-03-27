@@ -181,7 +181,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     protected String _privateNetworkName;
     protected String _publicNetworkName;
-    protected boolean _securityGroupEnabled;
     protected String _storageNetworkName1;
     protected String _storageNetworkName2;
     protected List<VIF> _tmpDom0Vif = new ArrayList<>();
@@ -658,7 +657,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         _publicNetworkName = (String) params.get("public.network.device");
         _guestNetworkName = (String) params.get("guest.network.device");
         _instance = (String) params.get("instance.name");
-        _securityGroupEnabled = Boolean.parseBoolean((String) params.get("securitygroupenabled"));
 
         _linkLocalPrivateNetworkName = (String) params.get("private.linkLocal.device");
         if (_linkLocalPrivateNetworkName == null) {
@@ -3204,10 +3202,6 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             }
         }
         return true;
-    }
-
-    public boolean isSecurityGroupEnabled() {
-        return _securityGroupEnabled;
     }
 
     public boolean isXcp() {

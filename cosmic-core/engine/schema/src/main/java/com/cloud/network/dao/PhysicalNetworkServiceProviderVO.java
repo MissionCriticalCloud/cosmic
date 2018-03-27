@@ -44,8 +44,6 @@ public class PhysicalNetworkServiceProviderVO implements PhysicalNetworkServiceP
     boolean portForwardingServiceProvided;
     @Column(name = "user_data_service_provided")
     boolean userdataServiceProvided;
-    @Column(name = "security_group_service_provided")
-    boolean securitygroupServiceProvided;
     @Column(name = "networkacl_service_provided")
     boolean networkAclServiceProvided;
     @Column(name = GenericDao.REMOVED_COLUMN)
@@ -176,15 +174,6 @@ public class PhysicalNetworkServiceProviderVO implements PhysicalNetworkServiceP
     }
 
     @Override
-    public boolean isSecuritygroupServiceProvided() {
-        return securitygroupServiceProvided;
-    }
-
-    public void setSecuritygroupServiceProvided(final boolean securitygroupServiceProvided) {
-        this.securitygroupServiceProvided = securitygroupServiceProvided;
-    }
-
-    @Override
     public List<Service> getEnabledServices() {
         final List<Service> services = new ArrayList<>();
         if (this.isVpnServiceProvided()) {
@@ -216,9 +205,6 @@ public class PhysicalNetworkServiceProviderVO implements PhysicalNetworkServiceP
         }
         if (this.isUserdataServiceProvided()) {
             services.add(Service.UserData);
-        }
-        if (this.isSecuritygroupServiceProvided()) {
-            services.add(Service.SecurityGroup);
         }
         return services;
     }
@@ -252,7 +238,6 @@ public class PhysicalNetworkServiceProviderVO implements PhysicalNetworkServiceP
         this.setStaticnatServiceProvided(services.contains(Service.StaticNat));
         this.setPortForwardingServiceProvided(services.contains(Service.PortForwarding));
         this.setUserdataServiceProvided(services.contains(Service.UserData));
-        this.setSecuritygroupServiceProvided(services.contains(Service.SecurityGroup));
         this.setNetworkAclServiceProvided(services.contains(Service.NetworkACL));
     }
 

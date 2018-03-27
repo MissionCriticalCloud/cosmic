@@ -62,10 +62,6 @@ public interface NetworkModel {
 
     boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services);
 
-    Network getNetworkWithSGWithFreeIPs(Long zoneId);
-
-    Network getNetworkWithSecurityGroupEnabled(Long zoneId);
-
     List<? extends Network> listNetworksForAccount(long accountId, long zoneId, Network.GuestType type);
 
     String getStartIpAddress(long networkId);
@@ -73,8 +69,6 @@ public interface NetworkModel {
     Long getPodIdForVlan(long vlanDbId);
 
     List<Long> listNetworkOfferingsForUpgrade(long networkId);
-
-    boolean isSecurityGroupSupportedInNetwork(Network network);
 
     boolean isProviderSupportServiceInNetwork(long networkId, Service service, Provider provider);
 
@@ -101,8 +95,6 @@ public interface NetworkModel {
     void canProviderSupportServices(Map<Provider, Set<Service>> providersMap);
 
     List<PhysicalNetworkSetupInfo> getPhysicalNetworkInfo(long dcId, HypervisorType hypervisorType);
-
-    boolean canAddDefaultSecurityGroup();
 
     List<Service> listNetworkOfferingServices(long networkOfferingId);
 

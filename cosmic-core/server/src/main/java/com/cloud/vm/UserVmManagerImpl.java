@@ -134,9 +134,6 @@ import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityGroupManager;
-import com.cloud.network.security.dao.SecurityGroupDao;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
@@ -326,8 +323,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected PrimaryDataStoreDao _storagePoolDao;
     @Inject
-    private SecurityGroupManager _securityGroupMgr;
-    @Inject
     protected ServiceOfferingDao _serviceOfferingDao;
     @Inject
     protected NetworkOfferingDao _networkOfferingDao;
@@ -353,8 +348,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     protected UserVmDetailsDao _vmDetailsDao;
     @Inject
     protected HypervisorCapabilitiesDao _hypervisorCapabilitiesDao;
-    @Inject
-    private SecurityGroupDao _securityGroupDao;
     @Inject
     protected CapacityManager _capacityMgr;
     @Inject
@@ -736,22 +729,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             destinationHost = _hostDao.findById(hostId);
             if (destinationHost == null) {
                 throw new InvalidParameterValueException("Unable to find the host to deploy the VM, host id=" + hostId);
-            }
-        }
-
-        // check if vm is security group enabled
-        if (_securityGroupMgr.isVmSecurityGroupEnabled(vmId) && _securityGroupMgr.getSecurityGroupsForVm(vmId).isEmpty()
-                && !_securityGroupMgr.isVmMappedToDefaultSecurityGroup(vmId) && _networkModel.canAddDefaultSecurityGroup()) {
-            // if vm is not mapped to security group, create a mapping
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Vm " + vm + " is security group enabled, but not mapped to default security group; creating the mapping automatically");
-            }
-
-            final SecurityGroup defaultSecurityGroup = _securityGroupMgr.getDefaultSecurityGroup(vm.getAccountId());
-            if (defaultSecurityGroup != null) {
-                final List<Long> groupList = new ArrayList<>();
-                groupList.add(defaultSecurityGroup.getId());
-                _securityGroupMgr.addInstanceToGroups(vmId, groupList);
             }
         }
 
@@ -1233,8 +1210,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     private boolean cleanupVmResources(final long vmId) {
         boolean success = true;
-        // Remove vm from security groups
-        _securityGroupMgr.removeInstanceFromGroups(vmId);
 
         // Remove vm from instance group
         removeInstanceFromInstanceGroup(vmId);
@@ -1391,8 +1366,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
 
             final Network defaultNetwork = _networkDao.findById(defaultNic.getNetworkId());
-            final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.isSecurityGroupSupportedInNetwork(defaultNetwork),
-                    _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
+            final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
             final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(vmInstance);
             vmProfile.setParameter(VirtualMachineProfile.Param.VmPassword, password);
 
@@ -1559,8 +1533,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final Network defaultNetwork = _networkDao.findById(defaultNic.getNetworkId());
-        final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.isSecurityGroupSupportedInNetwork(defaultNetwork),
-                _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
+        final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
 
         final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(vmInstance);
 
@@ -2229,174 +2202,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
-    public UserVm createBasicSecurityGroupVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, List<Long>
-            securityGroupIdList,
-                                                         final Account owner, final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize,
-                                                         final String group, final HypervisorType hypervisor, final HTTPMethod httpmethod,
-                                                         final String userData, final String sshKeyPair, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
-                                                         final Boolean displayVm, final String keyboard, final List<Long> affinityGroupIdList,
-                                                         final Map<String, String> customParametes, final String customId) throws InsufficientCapacityException,
-            ConcurrentOperationException, ResourceUnavailableException,
-            StorageUnavailableException, ResourceAllocationException {
-
-        final Account caller = CallContext.current().getCallingAccount();
-        final List<NetworkVO> networkList = new ArrayList<>();
-
-        // Verify that caller can perform actions in behalf of vm owner
-        _accountMgr.checkAccess(caller, null, true, owner);
-
-        // Verify that owner can use the service offering
-        _accountMgr.checkAccess(owner, serviceOffering);
-        _accountMgr.checkAccess(owner, _diskOfferingDao.findById(diskOfferingId));
-
-        checkHypervisorEnabled(zone, template);
-
-        // Get default guest network in Basic zone
-        final Network defaultNetwork = _networkModel.getExclusiveGuestNetwork(zone.getId());
-
-        if (defaultNetwork == null) {
-            throw new InvalidParameterValueException("Unable to find a default network to start a vm");
-        } else {
-            networkList.add(_networkDao.findById(defaultNetwork.getId()));
-        }
-
-        if (_networkModel.isSecurityGroupSupportedInNetwork(defaultNetwork) && _networkModel.canAddDefaultSecurityGroup()) {
-            //add the default securityGroup only if no security group is specified
-            if (securityGroupIdList == null || securityGroupIdList.isEmpty()) {
-                if (securityGroupIdList == null) {
-                    securityGroupIdList = new ArrayList<>();
-                }
-                SecurityGroup defaultGroup = _securityGroupMgr.getDefaultSecurityGroup(owner.getId());
-                if (defaultGroup != null) {
-                    securityGroupIdList.add(defaultGroup.getId());
-                } else {
-                    // create default security group for the account
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Couldn't find default security group for the account " + owner + " so creating a new one");
-                    }
-                    defaultGroup = _securityGroupMgr.createSecurityGroup(SecurityGroupManager.DEFAULT_GROUP_NAME, SecurityGroupManager.DEFAULT_GROUP_DESCRIPTION,
-                            owner.getDomainId(), owner.getId(), owner.getAccountName());
-                    securityGroupIdList.add(defaultGroup.getId());
-                }
-            }
-        }
-
-        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, securityGroupIdList, group, httpmethod,
-                userData, sshKeyPair, hypervisor, caller, requestedIps, defaultIps, displayVm, keyboard, affinityGroupIdList, customParametes, customId);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
-    public UserVm createAdvancedSecurityGroupVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
-            networkIdList,
-                                                            List<Long> securityGroupIdList, final Account owner, final String hostName, final String displayName, final Long
-                                                                    diskOfferingId, final Long diskSize, final String group, final HypervisorType hypervisor,
-                                                            final HTTPMethod httpmethod, final String userData, final String sshKeyPair, final Map<Long, IpAddresses>
-                                                                    requestedIps, final IpAddresses defaultIps, final Boolean displayVm, final String keyboard,
-                                                            final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId) throws
-            InsufficientCapacityException, ConcurrentOperationException,
-            ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException {
-
-        final Account caller = CallContext.current().getCallingAccount();
-        final List<NetworkVO> networkList = new ArrayList<>();
-        boolean isSecurityGroupEnabledNetworkUsed = false;
-
-        // Verify that caller can perform actions in behalf of vm owner
-        _accountMgr.checkAccess(caller, null, true, owner);
-
-        // Verify that owner can use the service offering
-        _accountMgr.checkAccess(owner, serviceOffering);
-        _accountMgr.checkAccess(owner, _diskOfferingDao.findById(diskOfferingId));
-
-        checkHypervisorEnabled(zone, template);
-
-        // If no network is specified, find system security group enabled network
-        if (networkIdList == null || networkIdList.isEmpty()) {
-            final Network networkWithSecurityGroup = _networkModel.getNetworkWithSGWithFreeIPs(zone.getId());
-            if (networkWithSecurityGroup == null) {
-                throw new InvalidParameterValueException("No network with security enabled is found in zone id=" + zone.getUuid());
-            }
-
-            networkList.add(_networkDao.findById(networkWithSecurityGroup.getId()));
-            isSecurityGroupEnabledNetworkUsed = true;
-        } else if (securityGroupIdList != null && !securityGroupIdList.isEmpty()) {
-            // Only one network can be specified, and it should be security group enabled
-            if (networkIdList.size() > 1) {
-                throw new InvalidParameterValueException("Only support one network per VM if security group enabled");
-            }
-
-            final NetworkVO network = _networkDao.findById(networkIdList.get(0));
-
-            if (network == null) {
-                throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0).longValue());
-            }
-
-            if (!_networkModel.isSecurityGroupSupportedInNetwork(network)) {
-                throw new InvalidParameterValueException("Network is not security group enabled: " + network.getId());
-            }
-
-            networkList.add(network);
-            isSecurityGroupEnabledNetworkUsed = true;
-        } else {
-            // Verify that all the networks are Shared/Guest; can't create combination of SG enabled and disabled networks
-            for (final Long networkId : networkIdList) {
-                final NetworkVO network = _networkDao.findById(networkId);
-
-                if (network == null) {
-                    throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0).longValue());
-                }
-
-                final boolean isSecurityGroupEnabled = _networkModel.isSecurityGroupSupportedInNetwork(network);
-                if (isSecurityGroupEnabled) {
-                    if (networkIdList.size() > 1) {
-                        throw new InvalidParameterValueException("Can't create a vm with multiple networks one of" + " which is Security Group enabled");
-                    }
-
-                    isSecurityGroupEnabledNetworkUsed = true;
-                }
-
-                if (!(network.getTrafficType() == TrafficType.Guest && network.getGuestType() == Network.GuestType.Shared)) {
-                    throw new InvalidParameterValueException("Can specify only Shared Guest networks when" + " deploy vm in Advance Security Group enabled zone");
-                }
-
-                // Perform account permission check
-                if (network.getAclType() == ACLType.Account) {
-                    _accountMgr.checkAccess(caller, AccessType.UseEntry, false, network);
-                }
-                networkList.add(network);
-            }
-        }
-
-        // if network is security group enabled, and no security group is specified, then add the default security group automatically
-        if (isSecurityGroupEnabledNetworkUsed && _networkModel.canAddDefaultSecurityGroup()) {
-
-            //add the default securityGroup only if no security group is specified
-            if (securityGroupIdList == null || securityGroupIdList.isEmpty()) {
-                if (securityGroupIdList == null) {
-                    securityGroupIdList = new ArrayList<>();
-                }
-
-                SecurityGroup defaultGroup = _securityGroupMgr.getDefaultSecurityGroup(owner.getId());
-                if (defaultGroup != null) {
-                    securityGroupIdList.add(defaultGroup.getId());
-                } else {
-                    // create default security group for the account
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Couldn't find default security group for the account " + owner + " so creating a new one");
-                    }
-                    defaultGroup = _securityGroupMgr.createSecurityGroup(SecurityGroupManager.DEFAULT_GROUP_NAME, SecurityGroupManager.DEFAULT_GROUP_DESCRIPTION,
-                            owner.getDomainId(), owner.getId(), owner.getAccountName());
-                    securityGroupIdList.add(defaultGroup.getId());
-                }
-            }
-        }
-
-        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, securityGroupIdList, group, httpmethod,
-                userData, sshKeyPair, hypervisor, caller, requestedIps, defaultIps, displayVm, keyboard, affinityGroupIdList, customParameters, customId);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
     public UserVm createAdvancedVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
             networkIdList, final Account owner,
                                                final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize, final String group, final
@@ -2453,8 +2258,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             networkList.add(network);
         }
 
-        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, null, group, httpmethod, userData,
-                sshKeyPair, hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId);
+        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, group, httpmethod, userData, sshKeyPair, hypervisor,
+                caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId);
     }
 
     private void checkHypervisorEnabled(final Zone zone, final VirtualMachineTemplate template) {
@@ -2619,32 +2424,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         } catch (final CloudException e) {
             throw new CloudRuntimeException("Unable to contact the agent to stop the virtual machine " + vm, e);
         }
-    }
-
-    @Override
-    public void deletePrivateTemplateRecord(final Long templateId) {
-        if (templateId != null) {
-            _templateDao.remove(templateId);
-        }
-    }
-
-    @Override
-    public HypervisorType getHypervisorTypeOfUserVM(final long vmId) {
-        final UserVmVO userVm = _vmDao.findById(vmId);
-        if (userVm == null) {
-            final InvalidParameterValueException ex = new InvalidParameterValueException("unable to find a virtual machine with specified id");
-            ex.addProxyObject(String.valueOf(vmId), "vmId");
-            throw ex;
-        }
-
-        return userVm.getHypervisorType();
-    }
-
-    @Override
-    public UserVm createVirtualMachine(final DeployVMCmd cmd) throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException,
-            StorageUnavailableException, ResourceAllocationException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -3277,14 +3056,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // OS 3: update the network
         final List<Long> networkIdList = cmd.getNetworkIds();
-        List<Long> securityGroupIdList = cmd.getSecurityGroupIdList();
 
         if (zone.getNetworkType() == NetworkType.Basic) {
             if (networkIdList != null && !networkIdList.isEmpty()) {
                 throw new InvalidParameterValueException("Can't move vm with network Ids; this is a basic zone VM");
             }
-            // cleanup the old security groups
-            _securityGroupMgr.removeInstanceFromGroups(cmd.getVmId());
             // cleanup the network for the oldOwner
             _networkMgr.cleanupNics(vmOldProfile);
             _networkMgr.expungeNics(vmOldProfile);
@@ -3301,36 +3077,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 networkList.add(_networkDao.findById(defaultNetwork.getId()));
             }
 
-            if (_networkModel.isSecurityGroupSupportedInNetwork(defaultNetwork) && _networkModel.canAddDefaultSecurityGroup()) {
-                if (securityGroupIdList == null) {
-                    securityGroupIdList = new ArrayList<>();
-                }
-                SecurityGroup defaultGroup = _securityGroupMgr.getDefaultSecurityGroup(newAccount.getId());
-                if (defaultGroup != null) {
-                    // check if security group id list already contains Default
-                    // security group, and if not - add it
-                    boolean defaultGroupPresent = false;
-                    for (final Long securityGroupId : securityGroupIdList) {
-                        if (securityGroupId.longValue() == defaultGroup.getId()) {
-                            defaultGroupPresent = true;
-                            break;
-                        }
-                    }
-
-                    if (!defaultGroupPresent) {
-                        securityGroupIdList.add(defaultGroup.getId());
-                    }
-                } else {
-                    // create default security group for the account
-                    if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Couldn't find default security group for the account " + newAccount + " so creating a new one");
-                    }
-                    defaultGroup = _securityGroupMgr.createSecurityGroup(SecurityGroupManager.DEFAULT_GROUP_NAME, SecurityGroupManager.DEFAULT_GROUP_DESCRIPTION,
-                            newAccount.getDomainId(), newAccount.getId(), newAccount.getAccountName());
-                    securityGroupIdList.add(defaultGroup.getId());
-                }
-            }
-
             final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>();
             final NicProfile profile = new NicProfile();
             profile.setDefaultNic(true);
@@ -3339,122 +3085,111 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             final VirtualMachine vmi = _itMgr.findById(vm.getId());
             final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmi);
             _networkMgr.allocate(vmProfile, networks);
-
-            _securityGroupMgr.addInstanceToGroups(vm.getId(), securityGroupIdList);
-
-            s_logger.debug("AssignVM: Basic zone, adding security groups no " + securityGroupIdList.size() + " to " + vm.getInstanceName());
         } else {
-            if (zone.isSecurityGroupEnabled()) {
-                throw new InvalidParameterValueException("Not yet implemented for SecurityGroupEnabled advanced networks.");
-            } else {
-                if (securityGroupIdList != null && !securityGroupIdList.isEmpty()) {
-                    throw new InvalidParameterValueException("Can't move vm with security groups; security group feature is not enabled in this zone");
+            // cleanup the network for the oldOwner
+            _networkMgr.cleanupNics(vmOldProfile);
+            _networkMgr.expungeNics(vmOldProfile);
+
+            final Set<NetworkVO> applicableNetworks = new HashSet<>();
+
+            if (networkIdList != null && !networkIdList.isEmpty()) {
+                // add any additional networks
+                for (final Long networkId : networkIdList) {
+                    final NetworkVO network = _networkDao.findById(networkId);
+                    if (network == null) {
+                        final InvalidParameterValueException ex = new InvalidParameterValueException("Unable to find specified network id");
+                        ex.addProxyObject(networkId.toString(), "networkId");
+                        throw ex;
+                    }
+
+                    _networkModel.checkNetworkPermissions(newAccount, network);
+
+                    // don't allow to use system networks
+                    final NetworkOffering networkOffering = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
+                    if (networkOffering.isSystemOnly()) {
+                        final InvalidParameterValueException ex = new InvalidParameterValueException("Specified Network id is system only and can't be used for vm deployment");
+                        ex.addProxyObject(network.getUuid(), "networkId");
+                        throw ex;
+                    }
+                    applicableNetworks.add(network);
                 }
-                // cleanup the network for the oldOwner
-                _networkMgr.cleanupNics(vmOldProfile);
-                _networkMgr.expungeNics(vmOldProfile);
-
-                final Set<NetworkVO> applicableNetworks = new HashSet<>();
-
-                if (networkIdList != null && !networkIdList.isEmpty()) {
-                    // add any additional networks
-                    for (final Long networkId : networkIdList) {
-                        final NetworkVO network = _networkDao.findById(networkId);
-                        if (network == null) {
-                            final InvalidParameterValueException ex = new InvalidParameterValueException("Unable to find specified network id");
-                            ex.addProxyObject(networkId.toString(), "networkId");
-                            throw ex;
+            } else {
+                final NetworkVO defaultNetwork;
+                final List<NetworkOfferingVO> requiredOfferings = _networkOfferingDao.listByAvailability(Availability.Required, false);
+                if (requiredOfferings.size() < 1) {
+                    throw new InvalidParameterValueException("Unable to find network offering with availability=" + Availability.Required
+                            + " to automatically create the network as a part of vm creation");
+                }
+                if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
+                    // get Virtual networks
+                    final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), Network.GuestType.Isolated);
+                    if (virtualNetworks.isEmpty()) {
+                        final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
+                                                                                                                                                              .getTrafficType
+                                                                                                                                                                      ());
+                        // Validate physical network
+                        final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
+                        if (physicalNetwork == null) {
+                            throw new InvalidParameterValueException("Unable to find physical network with id: " + physicalNetworkId + " and tag: "
+                                    + requiredOfferings.get(0).getTags());
                         }
-
-                        _networkModel.checkNetworkPermissions(newAccount, network);
-
-                        // don't allow to use system networks
-                        final NetworkOffering networkOffering = _entityMgr.findById(NetworkOffering.class, network.getNetworkOfferingId());
-                        if (networkOffering.isSystemOnly()) {
-                            final InvalidParameterValueException ex = new InvalidParameterValueException("Specified Network id is system only and can't be used for vm deployment");
-                            ex.addProxyObject(network.getUuid(), "networkId");
-                            throw ex;
+                        s_logger.debug("Creating network for account " + newAccount + " from the network offering id=" + requiredOfferings.get(0).getId()
+                                + " as a part of deployVM process");
+                        Network newNetwork = _networkMgr.createGuestNetwork(requiredOfferings.get(0).getId(), newAccount.getAccountName() + "-network",
+                                newAccount.getAccountName() + "-network", null, null, null, null, newAccount, null, physicalNetwork, zone.getId(), ACLType.Account, null, null,
+                                null, null, true, null, null, null, null);
+                        // if the network offering has persistent set to true, implement the network
+                        if (requiredOfferings.get(0).getIsPersistent()) {
+                            final DeployDestination dest = new DeployDestination(zone, null, null, null);
+                            final UserVO callerUser = _userDao.findById(CallContext.current().getCallingUserId());
+                            final Journal journal = new Journal.LogJournal("Implementing " + newNetwork, s_logger);
+                            final ReservationContext context = new ReservationContextImpl(UUID.randomUUID().toString(), journal, callerUser, caller);
+                            s_logger.debug("Implementing the network for account" + newNetwork + " as a part of" + " network provision for persistent networks");
+                            try {
+                                final Pair<? extends NetworkGuru, ? extends Network> implementedNetwork = _networkMgr.implementNetwork(newNetwork.getId(), dest, context);
+                                if (implementedNetwork == null || implementedNetwork.first() == null) {
+                                    s_logger.warn("Failed to implement the network " + newNetwork);
+                                }
+                                newNetwork = implementedNetwork.second();
+                            } catch (final Exception ex) {
+                                s_logger.warn("Failed to implement network " + newNetwork + " elements and"
+                                        + " resources as a part of network provision for persistent network due to ", ex);
+                                final CloudRuntimeException e = new CloudRuntimeException("Failed to implement network"
+                                        + " (with specified id) elements and resources as a part of network provision");
+                                e.addProxyObject(newNetwork.getUuid(), "networkId");
+                                throw e;
+                            }
                         }
-                        applicableNetworks.add(network);
+                        defaultNetwork = _networkDao.findById(newNetwork.getId());
+                    } else if (virtualNetworks.size() > 1) {
+                        throw new InvalidParameterValueException("More than 1 default Isolated networks are found " + "for account " + newAccount
+                                + "; please specify networkIds");
+                    } else {
+                        defaultNetwork = _networkDao.findById(virtualNetworks.get(0).getId());
                     }
                 } else {
-                    final NetworkVO defaultNetwork;
-                    final List<NetworkOfferingVO> requiredOfferings = _networkOfferingDao.listByAvailability(Availability.Required, false);
-                    if (requiredOfferings.size() < 1) {
-                        throw new InvalidParameterValueException("Unable to find network offering with availability=" + Availability.Required
-                                + " to automatically create the network as a part of vm creation");
-                    }
-                    if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
-                        // get Virtual networks
-                        final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), Network.GuestType.Isolated);
-                        if (virtualNetworks.isEmpty()) {
-                            final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
-                                                                                                                                                                  .getTrafficType
-                                                                                                                                                                          ());
-                            // Validate physical network
-                            final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
-                            if (physicalNetwork == null) {
-                                throw new InvalidParameterValueException("Unable to find physical network with id: " + physicalNetworkId + " and tag: "
-                                        + requiredOfferings.get(0).getTags());
-                            }
-                            s_logger.debug("Creating network for account " + newAccount + " from the network offering id=" + requiredOfferings.get(0).getId()
-                                    + " as a part of deployVM process");
-                            Network newNetwork = _networkMgr.createGuestNetwork(requiredOfferings.get(0).getId(), newAccount.getAccountName() + "-network",
-                                    newAccount.getAccountName() + "-network", null, null, null, null, newAccount, null, physicalNetwork, zone.getId(), ACLType.Account, null, null,
-                                    null, null, true, null, null, null, null);
-                            // if the network offering has persistent set to true, implement the network
-                            if (requiredOfferings.get(0).getIsPersistent()) {
-                                final DeployDestination dest = new DeployDestination(zone, null, null, null);
-                                final UserVO callerUser = _userDao.findById(CallContext.current().getCallingUserId());
-                                final Journal journal = new Journal.LogJournal("Implementing " + newNetwork, s_logger);
-                                final ReservationContext context = new ReservationContextImpl(UUID.randomUUID().toString(), journal, callerUser, caller);
-                                s_logger.debug("Implementing the network for account" + newNetwork + " as a part of" + " network provision for persistent networks");
-                                try {
-                                    final Pair<? extends NetworkGuru, ? extends Network> implementedNetwork = _networkMgr.implementNetwork(newNetwork.getId(), dest, context);
-                                    if (implementedNetwork == null || implementedNetwork.first() == null) {
-                                        s_logger.warn("Failed to implement the network " + newNetwork);
-                                    }
-                                    newNetwork = implementedNetwork.second();
-                                } catch (final Exception ex) {
-                                    s_logger.warn("Failed to implement network " + newNetwork + " elements and"
-                                            + " resources as a part of network provision for persistent network due to ", ex);
-                                    final CloudRuntimeException e = new CloudRuntimeException("Failed to implement network"
-                                            + " (with specified id) elements and resources as a part of network provision");
-                                    e.addProxyObject(newNetwork.getUuid(), "networkId");
-                                    throw e;
-                                }
-                            }
-                            defaultNetwork = _networkDao.findById(newNetwork.getId());
-                        } else if (virtualNetworks.size() > 1) {
-                            throw new InvalidParameterValueException("More than 1 default Isolated networks are found " + "for account " + newAccount
-                                    + "; please specify networkIds");
-                        } else {
-                            defaultNetwork = _networkDao.findById(virtualNetworks.get(0).getId());
-                        }
-                    } else {
-                        throw new InvalidParameterValueException("Required network offering id=" + requiredOfferings.get(0).getId() + " is not in " + NetworkOffering.State
-                                .Enabled);
-                    }
-
-                    applicableNetworks.add(defaultNetwork);
+                    throw new InvalidParameterValueException("Required network offering id=" + requiredOfferings.get(0).getId() + " is not in " + NetworkOffering.State
+                            .Enabled);
                 }
 
-                // add the new nics
-                final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>();
-                int toggle = 0;
-                for (final NetworkVO appNet : applicableNetworks) {
-                    final NicProfile defaultNic = new NicProfile();
-                    if (toggle == 0) {
-                        defaultNic.setDefaultNic(true);
-                        toggle++;
-                    }
-                    networks.put(appNet, new ArrayList<>(Arrays.asList(defaultNic)));
+                applicableNetworks.add(defaultNetwork);
+            }
+
+            // add the new nics
+            final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>();
+            int toggle = 0;
+            for (final NetworkVO appNet : applicableNetworks) {
+                final NicProfile defaultNic = new NicProfile();
+                if (toggle == 0) {
+                    defaultNic.setDefaultNic(true);
+                    toggle++;
                 }
-                final VirtualMachine vmi = _itMgr.findById(vm.getId());
-                final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmi);
-                _networkMgr.allocate(vmProfile, networks);
-                s_logger.debug("AssignVM: Advance virtual, adding networks no " + networks.size() + " to " + vm.getInstanceName());
-            } // END IF NON SEC GRP ENABLED
+                networks.put(appNet, new ArrayList<>(Arrays.asList(defaultNic)));
+            }
+            final VirtualMachine vmi = _itMgr.findById(vm.getId());
+            final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmi);
+            _networkMgr.allocate(vmProfile, networks);
+            s_logger.debug("AssignVM: Advance virtual, adding networks no " + networks.size() + " to " + vm.getInstanceName());
         } // END IF ADVANCED
         s_logger.info("AssignVM: vm " + vm.getInstanceName() + " now belongs to account " + cmd.getAccountName());
         return vm;
@@ -3785,16 +3520,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return vm.getUserData();
     }
 
-    @Override
-    public boolean isDisplayResourceEnabled(final Long vmId) {
-        final UserVm vm = _vmDao.findById(vmId);
-        if (vm != null) {
-            return vm.isDisplayVm();
-        }
-
-        return true; // no info then default to true
-    }
-
     public UserVm restoreVMInternal(final Account caller, UserVmVO vm, final Long newTemplateId) throws InsufficientCapacityException, ResourceUnavailableException {
 
         final Long userId = caller.getId();
@@ -4102,15 +3827,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @DB
-    private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String
-            displayName, final Account owner,
-                                        final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final List<Long> securityGroupIdList, final String
-                                                group, final HTTPMethod httpmethod, final String userData,
-                                        final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final
-                                        IpAddresses defaultIps, final Boolean isDisplayVm, final String keyboard,
-                                        final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId) throws
-            InsufficientCapacityException, ResourceUnavailableException,
-            ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
+    private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String displayName, final Account owner,
+                                        final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod, final String userData,
+                                        final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
+                                        final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId)
+            throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
 
         _accountMgr.checkAccess(caller, null, true, owner);
 
@@ -4182,19 +3903,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.volume, isIso || diskOfferingId == null ? 1 : 2);
         _resourceLimitMgr.checkResourceLimit(owner, ResourceType.primary_storage, size);
-
-        // verify security group ids
-        if (securityGroupIdList != null) {
-            for (final Long securityGroupId : securityGroupIdList) {
-                final SecurityGroup sg = _securityGroupDao.findById(securityGroupId);
-                if (sg == null) {
-                    throw new InvalidParameterValueException("Unable to find security group by id " + securityGroupId);
-                } else {
-                    // verify permissions
-                    _accountMgr.checkAccess(caller, null, true, owner, sg);
-                }
-            }
-        }
 
         // check that the affinity groups exist
         if (affinityGroupIdList != null) {
@@ -4286,7 +3994,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final LinkedHashMap<String, NicProfile> networkNicMap = new LinkedHashMap<>();
 
         short defaultNetworkNumber = 0;
-        boolean securityGroupEnabled = false;
         boolean vpcNetwork = false;
         for (final NetworkVO network : networkList) {
             if (network.getDataCenterId() != zone.getId()) {
@@ -4362,15 +4069,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
             networks.add(new Pair<>(network, profile));
 
-            if (_networkModel.isSecurityGroupSupportedInNetwork(network)) {
-                securityGroupEnabled = true;
-            }
-
             networkNicMap.put(network.getUuid(), profile);
-        }
-
-        if (securityGroupIdList != null && !securityGroupIdList.isEmpty() && !securityGroupEnabled) {
-            throw new InvalidParameterValueException("Unable to deploy vm with security groups as SecurityGroup service is not enabled for the vm's network");
         }
 
         // Verify network information - network default network has to be set;
@@ -4435,8 +4134,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         } catch (final Exception ex) {
             throw new CloudRuntimeException("Unable to assign Vm to the group " + group);
         }
-
-        _securityGroupMgr.addInstanceToGroups(vm.getId(), securityGroupIdList);
 
         if (affinityGroupIdList != null && !affinityGroupIdList.isEmpty()) {
             _affinityGroupVMMapDao.updateMap(vm.getId(), affinityGroupIdList);
@@ -4630,7 +4327,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         for (final Nic nic : nics) {
             final Network network = _networkDao.findById(nic.getNetworkId());
-            final NicProfile nicProfile = new NicProfile(nic, network, null, null, null, _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(
+            final NicProfile nicProfile = new NicProfile(nic, network, null, null, null, _networkModel.getNetworkTag(
                     template.getHypervisorType(), network));
 
             final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(vm);
@@ -4782,7 +4479,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 guestNic = nic;
                 guestNetwork = network;
                 if (nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, "pvlan-nic");
                     if (!setupVmForPvlan(true, hostId, nicProfile)) {
                         return false;
                     }
@@ -4857,7 +4554,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             final NetworkVO network = _networkDao.findById(nic.getNetworkId());
             if (network.getTrafficType() == TrafficType.Guest) {
                 if (nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
+                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, "pvlan-nic");
                     setupVmForPvlan(false, vm.getHostId(), nicProfile);
                 }
             }

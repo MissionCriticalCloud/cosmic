@@ -23,7 +23,6 @@ import com.cloud.api.command.user.offering.ListDiskOfferingsCmd;
 import com.cloud.api.command.user.offering.ListServiceOfferingsCmd;
 import com.cloud.api.command.user.project.ListProjectInvitationsCmd;
 import com.cloud.api.command.user.project.ListProjectsCmd;
-import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
 import com.cloud.api.command.user.tag.ListTagsCmd;
 import com.cloud.api.command.user.template.ListTemplatesCmd;
 import com.cloud.api.command.user.vm.ListVMsCmd;
@@ -48,7 +47,6 @@ import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceDetailResponse;
 import com.cloud.api.response.ResourceTagResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.StorageTagResponse;
@@ -81,8 +79,6 @@ public interface QueryService {
     ListResponse<InstanceGroupResponse> searchForVmGroups(ListVMGroupsCmd cmd);
 
     ListResponse<UserVmResponse> searchForUserVMs(ListVMsCmd cmd);
-
-    ListResponse<SecurityGroupResponse> searchForSecurityGroups(ListSecurityGroupsCmd cmd);
 
     ListResponse<DomainRouterResponse> searchForRouters(ListRoutersCmd cmd);
 

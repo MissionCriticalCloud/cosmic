@@ -1,24 +1,4 @@
 (function (cloudStack, $) {
-    var ingressEgressDataMap = function (elem) {
-        var elemData = {
-            id: elem.ruleid,
-            protocol: elem.protocol,
-            startport: elem.startport,
-            endport: elem.endport,
-            cidr: elem.cidr ? elem.cidr : ''.concat(elem.account, ' - ', elem.securitygroupname),
-            tags: elem.tags
-        };
-
-        if (elemData.startport == 0 && elemData.endport) {
-            elemData.startport = '0';
-        } else if (elem.icmptype && elem.icmpcode) {
-            elemData.startport = elem.icmptype;
-            elemData.endport = elem.icmpcode;
-        }
-
-        return elemData;
-    };
-
     //value of Primary IP in subselect dropdown is -1, for single VM selection (API parameter virtualmachineid + vmguestip), e.g. enableStaticNat API, createPortForwardingRule API.
     var singleVmSecondaryIPSubselect = function (args) {
         var instance = args.context.instances[0];
@@ -252,20 +232,6 @@
             });
 
             return allowedActions;
-        },
-
-        securityGroups: function (args) {
-            var allowedActions = [];
-            var isSecurityGroupOwner = isAdmin() || isDomainAdmin() ||
-                args.context.item.account == args.context.users[0].account;
-
-            if (isSecurityGroupOwner &&
-                args.context.item.state != 'Destroyed' &&
-                args.context.item.name != 'default') {
-                allowedActions.push('remove');
-            }
-
-            return allowedActions;
         }
     };
 
@@ -278,7 +244,6 @@
         sectionSelect: {
             preFilter: function (args) {
                 var sectionsToShow = ['networks'];
-                var securityGroupsEnabledFound = false; //Until we found a zone where securitygroupsenabled is true.
 
                 //This call to show VPC and VPN Customer Gateway sections, if zone is advanced.
                 $.ajax({
@@ -293,15 +258,6 @@
                             sectionsToShow.push('vpc');
                             sectionsToShow.push('vpcTiers');
                             sectionsToShow.push('vpnCustomerGateway');
-
-                            //At the same time check if any advanced zone has securitygroupsenabled is true.
-                            //If so, show Security Group section.
-                            for (var i = 0; (i < advZoneObjs.length) && !securityGroupsEnabledFound; i++) {
-                                if (advZoneObjs[i].securitygroupsenabled) {
-                                    securityGroupsEnabledFound = true;
-                                    sectionsToShow.push('securityGroups');
-                                }
-                            }
                         }
 
                         //Call to check if VPN is enabled.
@@ -321,24 +277,6 @@
                         });
                     }
                 });
-
-                //If we didn't find any advanced zone whose securitygroupsenabled is true.
-                //Search in all Basic zones.
-                if (!securityGroupsEnabledFound) {
-                    $.ajax({
-                        url: createURL('listZones'),
-                        data: {
-                            networktype: 'Basic'
-                        },
-                        async: false,
-                        success: function (json) {
-                            var basicZoneObjs = json.listzonesresponse ? json.listzonesresponse.zone : null;
-                            if (basicZoneObjs != null && basicZoneObjs.length > 0) {
-                                sectionsToShow.push('securityGroups');
-                            }
-                        }
-                    });
-                }
 
                 return sectionsToShow;
             },
@@ -530,7 +468,7 @@
                                                 success: function (json) {
                                                     var zones = json.listzonesresponse.zone ? json.listzonesresponse.zone : [];
                                                     var advZones = $.grep(zones, function (zone) {
-                                                        return zone.networktype == 'Advanced' && !zone.securitygroupsenabled;
+                                                        return zone.networktype == 'Advanced';
                                                     });
                                                     args.response.success({
                                                         data: $.map(advZones, function (zone) {
@@ -1307,7 +1245,6 @@
                             var hasSRXFirewall = false;
                             var isVPC = false;
                             var isPrivateNet = false;
-                            var isAdvancedSGZone = false;
                             var hiddenTabs = [];
                             var isSharedNetwork;
 
@@ -1356,13 +1293,10 @@
                                 },
                                 async: false,
                                 success: function (json) {
-                                    var zone = json.listzonesresponse.zone[0];
-
-                                    isAdvancedSGZone = zone.securitygroupsenabled;
                                 }
                             });
 
-                            if (isVPC || isAdvancedSGZone || isSharedNetwork || isPrivateNet) {
+                            if (isVPC || isSharedNetwork || isPrivateNet) {
                                 hiddenTabs.push('egressRules');
                             }
 
@@ -1605,9 +1539,7 @@
                             preFilter: function (args) {
                                 if (advZoneObjs != null && advZoneObjs.length > 0) {
                                     for (var i = 0; i < advZoneObjs.length; i++) {
-                                        if (advZoneObjs[i].securitygroupsenabled != true) { //'Add Isolated Guest Network with SourceNat' is only supported in Advanced SG-disabled zone
-                                            return true;
-                                        }
+                                        return true;
                                     }
                                     return false;
                                 } else {
@@ -1644,7 +1576,7 @@
                                                 url: createURL('listZones'),
                                                 success: function (json) {
                                                     var zones = $.grep(json.listzonesresponse.zone, function (zone) {
-                                                        return (zone.networktype == 'Advanced' && zone.securitygroupsenabled != true); //Isolated networks can only be created in Advanced SG-disabled zone (but not in Basic zone nor Advanced SG-enabled zone)
+                                                        return (zone.networktype == 'Advanced'); //Isolated networks can only be created in Advanced SG-disabled zone (but not in Basic zone nor Advanced SG-enabled zone)
                                                     });
 
                                                     args.response.success({
@@ -2299,7 +2231,6 @@
                             var hasSRXFirewall = false;
                             var isVPC = false;
                             var isPrivateNet = false;
-                            var isAdvancedSGZone = false;
                             var hiddenTabs = [];
                             var isSharedNetwork;
 
@@ -2348,13 +2279,10 @@
                                 },
                                 async: false,
                                 success: function (json) {
-                                    var zone = json.listzonesresponse.zone[0];
-
-                                    isAdvancedSGZone = zone.securitygroupsenabled;
                                 }
                             });
 
-                            if (isVPC || isAdvancedSGZone || isSharedNetwork || isPrivateNet) {
+                            if (isVPC || isSharedNetwork || isPrivateNet) {
                                 hiddenTabs.push('egressRules');
                             }
 
@@ -3082,46 +3010,6 @@
                                         zoneObj = json.listzonesresponse.zone[0];
                                     }
                                 });
-
-                                if (zoneObj.networktype == 'Advanced' && zoneObj.securitygroupsenabled) {
-                                    return false;
-                                }
-
-                                if (zoneObj.networktype == 'Basic') {
-                                    var havingEIP = false,
-                                        havingELB = false;
-
-                                    var services = args.context.networks[0].service;
-                                    if (services != null) {
-                                        for (var i = 0; i < services.length; i++) {
-                                            var thisService = services[i];
-                                            var capabilities = thisService.capability;
-                                            if (thisService.name == "StaticNat") {
-                                                if (capabilities != null) {
-                                                    for (var k = 0; k < capabilities.length; k++) {
-                                                        if (capabilities[k].name == "ElasticIp" && capabilities[k].value == "true") {
-                                                            havingEIP = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            } else if (thisService.name == "Lb") {
-                                                if (capabilities != null) {
-                                                    for (var k = 0; k < capabilities.length; k++) {
-                                                        if (capabilities[k].name == "ElasticLb" && capabilities[k].value == "true") {
-                                                            havingELB = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (havingEIP != true || havingELB != true) { //not EIP-ELB
-                                        return false; //acquire new IP is not allowed in non-EIP-ELB basic zone
-                                    }
-                                }
 
                                 //*** from Guest Network section ***
                                 if ('networks' in args.context) {
@@ -5268,620 +5156,6 @@
                                                     $('<li>').html(_l('message.enabled.vpn.note'))
                                                 )
                                         )
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            securityGroups: {
-                type: 'select',
-                title: 'label.menu.security.groups',
-                id: 'securityGroups',
-                listView: {
-                    id: 'securityGroups',
-                    label: 'label.menu.security.groups',
-                    fields: {
-                        name: {
-                            label: 'label.name',
-                            editable: true
-                        },
-                        description: {
-                            label: 'label.description'
-                        },
-                        domain: {
-                            label: 'label.domain'
-                        },
-                        account: {
-                            label: 'label.account'
-                        }
-                    },
-                    actions: {
-                        add: {
-                            label: 'label.add.security.group',
-
-                            action: function (args) {
-                                $.ajax({
-                                    url: createURL('createSecurityGroup'),
-                                    data: {
-                                        name: args.data.name,
-                                        description: args.data.description
-                                    },
-                                    success: function (data) {
-                                        args.response.success({
-                                            data: data.createsecuritygroupresponse.securitygroup
-                                        });
-                                    },
-
-                                    error: function (data) {
-                                        args.response.error(parseXMLHttpResponse(data));
-                                    }
-                                });
-                            },
-
-                            notification: {
-                                poll: function (args) {
-                                    args.complete({
-                                        actionFilter: actionFilters.securityGroups
-                                    });
-                                }
-                            },
-
-                            messages: {
-                                confirm: function (args) {
-                                    return _l('message.question.are.you.sure.you.want.to.add') + ' ' + args.name + '?';
-                                },
-                                notification: function (args) {
-                                    return 'label.add.security.group';
-                                }
-                            },
-
-                            createForm: {
-                                title: 'label.add.security.group',
-                                desc: 'label.add.security.group',
-                                fields: {
-                                    name: {
-                                        label: 'label.name'
-                                    },
-                                    description: {
-                                        label: 'label.description'
-                                    }
-                                }
-                            }
-                        }
-                    },
-
-                    advSearchFields: {
-                        tagKey: {
-                            label: 'label.tag.key'
-                        },
-                        tagValue: {
-                            label: 'label.tag.value'
-                        }
-                    },
-
-                    dataProvider: function (args) {
-                        var data = {};
-                        listViewDataProvider(args, data);
-
-                        $.ajax({
-                            url: createURL('listSecurityGroups'),
-                            data: data,
-                            success: function (json) {
-                                var items = json.listsecuritygroupsresponse.securitygroup;
-                                args.response.success({
-                                    actionFilter: actionFilters.securityGroups,
-                                    data: items
-                                });
-                            }
-                        });
-                    },
-
-                    detailView: {
-                        name: 'Security group details',
-                        tabs: {
-                            details: {
-                                title: 'label.details',
-                                fields: [{
-                                    name: {
-                                        label: 'label.name'
-                                    }
-                                }, {
-                                    id: {
-                                        label: 'label.id'
-                                    },
-                                    description: {
-                                        label: 'label.description'
-                                    },
-                                    domain: {
-                                        label: 'label.domain'
-                                    },
-                                    account: {
-                                        label: 'label.account'
-                                    }
-                                }],
-
-                                tags: cloudStack.api.tags({
-                                    resourceType: 'SecurityGroup',
-                                    contextId: 'securityGroups'
-                                }),
-
-
-                                dataProvider: function (args) {
-                                    $.ajax({
-                                        url: createURL("listSecurityGroups&id=" + args.id),
-                                        dataType: "json",
-                                        async: true,
-                                        success: function (json) {
-                                            var items = json.listsecuritygroupsresponse.securitygroup;
-                                            if (items != null && items.length > 0) {
-                                                args.response.success({
-                                                    actionFilter: actionFilters.securityGroups,
-                                                    data: items[0]
-                                                });
-                                            }
-                                        }
-                                    });
-                                }
-                            },
-                            ingressRules: {
-                                title: 'label.ingress.rule',
-                                custom: cloudStack.uiCustom.securityRules({
-                                    noSelect: true,
-                                    noHeaderActionsColumn: true,
-                                    fields: {
-                                        'protocol': {
-                                            label: 'label.protocol',
-                                            select: function (args) {
-                                                args.$select.change(function () {
-                                                    var $inputs = args.$form.find('th, td');
-                                                    var $icmpFields = $inputs.filter(function () {
-                                                        var name = $(this).attr('rel');
-
-                                                        return $.inArray(name, [
-                                                            'icmptype',
-                                                            'icmpcode'
-                                                        ]) > -1;
-                                                    });
-                                                    var $otherFields = $inputs.filter(function () {
-                                                        var name = $(this).attr('rel');
-
-                                                        return name != 'icmptype' &&
-                                                            name != 'icmpcode' &&
-                                                            name != 'protocol' &&
-                                                            name != 'add-rule' &&
-                                                            name != 'cidr' &&
-                                                            name != 'accountname' &&
-                                                            name != 'securitygroup';
-                                                    });
-
-                                                    if ($(this).val() == 'icmp') {
-                                                        $icmpFields.show();
-                                                        $otherFields.hide();
-                                                    } else {
-                                                        $icmpFields.hide();
-                                                        $otherFields.show();
-                                                    }
-                                                });
-
-                                                args.response.success({
-                                                    data: [{
-                                                        name: 'tcp',
-                                                        description: 'TCP'
-                                                    }, {
-                                                        name: 'udp',
-                                                        description: 'UDP'
-                                                    }, {
-                                                        name: 'icmp',
-                                                        description: 'ICMP'
-                                                    }]
-                                                });
-                                            }
-                                        },
-                                        'startport': {
-                                            edit: true,
-                                            label: 'label.start.port',
-                                            validation: {
-                                                number: true,
-                                                range: [0, 65535]
-                                            }
-                                        },
-                                        'endport': {
-                                            edit: true,
-                                            label: 'label.end.port',
-                                            validation: {
-                                                number: true,
-                                                range: [0, 65535]
-                                            }
-                                        },
-                                        'icmptype': {
-                                            edit: true,
-                                            label: 'ICMP.type',
-                                            isHidden: true
-                                        },
-                                        'icmpcode': {
-                                            edit: true,
-                                            label: 'ICMP.code',
-                                            isHidden: true
-                                        },
-                                        'cidr': {
-                                            edit: true,
-                                            label: 'label.cidr',
-                                            isHidden: true,
-                                            validation: {
-                                                ipv4cidr: true
-                                            }
-                                        },
-                                        'accountname': {
-                                            edit: true,
-                                            label: 'label.account.and.security.group',
-                                            isHidden: true,
-                                            range: ['accountname', 'securitygroup']
-                                        },
-                                        'add-rule': {
-                                            label: 'label.add',
-                                            addButton: true
-                                        }
-                                    },
-                                    add: {
-                                        label: 'label.add',
-                                        action: function (args) {
-                                            var data = {
-                                                securitygroupid: args.context.securityGroups[0].id,
-                                                protocol: args.data.protocol,
-                                                domainid: args.context.securityGroups[0].domainid,
-                                                account: args.context.securityGroups[0].account
-                                            };
-
-                                            if (args.data.icmptype && args.data.icmpcode) { // ICMP
-                                                $.extend(data, {
-                                                    icmptype: args.data.icmptype,
-                                                    icmpcode: args.data.icmpcode
-                                                });
-                                            } else { // TCP/UDP
-                                                $.extend(data, {
-                                                    startport: args.data.startport,
-                                                    endport: args.data.endport
-                                                });
-                                            }
-
-                                            // CIDR / account
-                                            if (args.data.cidr) {
-                                                data.cidrlist = args.data.cidr;
-                                            } else {
-                                                data['usersecuritygrouplist[0].account'] = args.data.accountname;
-                                                data['usersecuritygrouplist[0].group'] = args.data.securitygroup;
-                                            }
-
-                                            $.ajax({
-                                                url: createURL('authorizeSecurityGroupIngress'),
-                                                data: data,
-                                                dataType: 'json',
-                                                async: true,
-                                                success: function (data) {
-                                                    var jobId = data.authorizesecuritygroupingressresponse.jobid;
-
-                                                    args.response.success({
-                                                        _custom: {
-                                                            jobId: jobId
-                                                        },
-                                                        notification: {
-                                                            label: 'label.add.ingress.rule',
-                                                            poll: pollAsyncJobResult
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    },
-                                    actions: {
-                                        destroy: {
-                                            label: 'label.remove.rule',
-                                            action: function (args) {
-                                                $.ajax({
-                                                    url: createURL('revokeSecurityGroupIngress'),
-                                                    data: {
-                                                        domainid: args.context.securityGroups[0].domainid,
-                                                        account: args.context.securityGroups[0].account,
-                                                        id: args.context.multiRule[0].id
-                                                    },
-                                                    dataType: 'json',
-                                                    async: true,
-                                                    success: function (data) {
-                                                        var jobID = data.revokesecuritygroupingressresponse.jobid;
-
-                                                        args.response.success({
-                                                            _custom: {
-                                                                jobId: jobID
-                                                            },
-                                                            notification: {
-                                                                label: 'label.remove.ingress.rule',
-                                                                poll: pollAsyncJobResult
-                                                            }
-                                                        });
-                                                    },
-                                                    error: function (json) {
-                                                        args.response.error(parseXMLHttpResponse(json));
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    },
-                                    ignoreEmptyFields: true,
-                                    tags: cloudStack.api.tags({
-                                        resourceType: 'SecurityGroupRule',
-                                        contextId: 'multiRule'
-                                    }),
-                                    dataProvider: function (args) {
-                                        $.ajax({
-                                            url: createURL('listSecurityGroups'),
-                                            data: {
-                                                id: args.context.securityGroups[0].id
-                                            },
-                                            dataType: 'json',
-                                            async: true,
-                                            success: function (data) {
-                                                args.response.success({
-                                                    data: $.map(
-                                                        data.listsecuritygroupsresponse.securitygroup[0].ingressrule ?
-                                                            data.listsecuritygroupsresponse.securitygroup[0].ingressrule : [],
-                                                        ingressEgressDataMap
-                                                    )
-                                                });
-                                            }
-                                        });
-                                    }
-                                })
-                            },
-
-                            egressRules: {
-                                title: 'label.egress.rule',
-                                custom: cloudStack.uiCustom.securityRules({
-                                    noSelect: true,
-                                    noHeaderActionsColumn: true,
-                                    fields: {
-                                        'protocol': {
-                                            label: 'label.protocol',
-                                            select: function (args) {
-                                                args.$select.change(function () {
-                                                    var $inputs = args.$form.find('th, td');
-                                                    var $icmpFields = $inputs.filter(function () {
-                                                        var name = $(this).attr('rel');
-
-                                                        return $.inArray(name, [
-                                                            'icmptype',
-                                                            'icmpcode'
-                                                        ]) > -1;
-                                                    });
-                                                    var $otherFields = $inputs.filter(function () {
-                                                        var name = $(this).attr('rel');
-
-                                                        return name != 'icmptype' &&
-                                                            name != 'icmpcode' &&
-                                                            name != 'protocol' &&
-                                                            name != 'add-rule' &&
-                                                            name != 'cidr' &&
-                                                            name != 'accountname' &&
-                                                            name != 'securitygroup';
-                                                    });
-
-                                                    if ($(this).val() == 'icmp') {
-                                                        $icmpFields.show();
-                                                        $otherFields.hide();
-                                                    } else {
-                                                        $icmpFields.hide();
-                                                        $otherFields.show();
-                                                    }
-                                                });
-
-                                                args.response.success({
-                                                    data: [{
-                                                        name: 'tcp',
-                                                        description: 'TCP'
-                                                    }, {
-                                                        name: 'udp',
-                                                        description: 'UDP'
-                                                    }, {
-                                                        name: 'icmp',
-                                                        description: 'ICMP'
-                                                    }]
-                                                });
-                                            }
-                                        },
-                                        'startport': {
-                                            edit: true,
-                                            label: 'label.start.port',
-                                            validation: {
-                                                number: true,
-                                                range: [0, 65535]
-                                            }
-                                        },
-                                        'endport': {
-                                            edit: true,
-                                            label: 'label.end.port',
-                                            validation: {
-                                                number: true,
-                                                range: [0, 65535]
-                                            }
-                                        },
-                                        'icmptype': {
-                                            edit: true,
-                                            label: 'ICMP.type',
-                                            isHidden: true
-                                        },
-                                        'icmpcode': {
-                                            edit: true,
-                                            label: 'ICMP.code',
-                                            isHidden: true
-                                        },
-                                        'cidr': {
-                                            edit: true,
-                                            label: 'label.cidr',
-                                            isHidden: true,
-                                            validation: {
-                                                ipv4cidr: true
-                                            }
-                                        },
-                                        'accountname': {
-                                            edit: true,
-                                            label: 'label.account.and.security.group',
-                                            isHidden: true,
-                                            range: ['accountname', 'securitygroup']
-                                        },
-                                        'add-rule': {
-                                            label: 'label.add',
-                                            addButton: true
-                                        }
-                                    },
-                                    add: {
-                                        label: 'label.add',
-                                        action: function (args) {
-                                            var data = {
-                                                securitygroupid: args.context.securityGroups[0].id,
-                                                protocol: args.data.protocol,
-                                                domainid: args.context.securityGroups[0].domainid,
-                                                account: args.context.securityGroups[0].account
-                                            };
-
-                                            if (args.data.icmptype && args.data.icmpcode) { // ICMP
-                                                $.extend(data, {
-                                                    icmptype: args.data.icmptype,
-                                                    icmpcode: args.data.icmpcode
-                                                });
-                                            } else { // TCP/UDP
-                                                $.extend(data, {
-                                                    startport: args.data.startport,
-                                                    endport: args.data.endport
-                                                });
-                                            }
-
-                                            // CIDR / account
-                                            if (args.data.cidr) {
-                                                data.cidrlist = args.data.cidr;
-                                            } else {
-                                                data['usersecuritygrouplist[0].account'] = args.data.accountname;
-                                                data['usersecuritygrouplist[0].group'] = args.data.securitygroup;
-                                            }
-
-                                            $.ajax({
-                                                url: createURL('authorizeSecurityGroupEgress'),
-                                                data: data,
-                                                dataType: 'json',
-                                                async: true,
-                                                success: function (data) {
-                                                    var jobId = data.authorizesecuritygroupegressresponse.jobid;
-
-                                                    args.response.success({
-                                                        _custom: {
-                                                            jobId: jobId
-                                                        },
-                                                        notification: {
-                                                            label: 'label.add.egress.rule',
-                                                            poll: pollAsyncJobResult
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    },
-                                    actions: {
-                                        destroy: {
-                                            label: 'label.remove.rule',
-                                            action: function (args) {
-                                                $.ajax({
-                                                    url: createURL('revokeSecurityGroupEgress'),
-                                                    data: {
-                                                        domainid: args.context.securityGroups[0].domainid,
-                                                        account: args.context.securityGroups[0].account,
-                                                        id: args.context.multiRule[0].id
-                                                    },
-                                                    dataType: 'json',
-                                                    async: true,
-                                                    success: function (data) {
-                                                        var jobID = data.revokesecuritygroupegressresponse.jobid;
-
-                                                        args.response.success({
-                                                            _custom: {
-                                                                jobId: jobID
-                                                            },
-                                                            notification: {
-                                                                label: 'label.remove.egress.rule',
-                                                                poll: pollAsyncJobResult
-                                                            }
-                                                        });
-                                                    },
-                                                    error: function (json) {
-                                                        args.response.error(parseXMLHttpResponse(json));
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    },
-                                    ignoreEmptyFields: true,
-                                    tags: cloudStack.api.tags({
-                                        resourceType: 'SecurityGroupRule',
-                                        contextId: 'multiRule'
-                                    }),
-                                    dataProvider: function (args) {
-                                        $.ajax({
-                                            url: createURL('listSecurityGroups'),
-                                            data: {
-                                                id: args.context.securityGroups[0].id
-                                            },
-                                            dataType: 'json',
-                                            async: true,
-                                            success: function (data) {
-                                                args.response.success({
-                                                    data: $.map(
-                                                        data.listsecuritygroupsresponse.securitygroup[0].egressrule ?
-                                                            data.listsecuritygroupsresponse.securitygroup[0].egressrule : [],
-                                                        ingressEgressDataMap
-                                                    )
-                                                });
-                                            }
-                                        });
-                                    }
-                                })
-                            }
-                        },
-
-                        actions: {
-                            remove: {
-                                label: 'label.action.delete.security.group',
-                                messages: {
-                                    confirm: function (args) {
-                                        return 'message.action.delete.security.group';
-                                    },
-                                    notification: function (args) {
-                                        return 'label.action.delete.security.group';
-                                    }
-                                },
-                                action: function (args) {
-                                    $.ajax({
-                                        url: createURL('deleteSecurityGroup'),
-                                        data: {
-                                            id: args.context.securityGroups[0].id
-                                        },
-                                        dataType: 'json',
-                                        async: true,
-                                        success: function (data) {
-                                            args.response.success();
-                                        },
-                                        error: function (json) {
-                                            args.response.error(parseXMLHttpResponse(json));
-                                        }
-                                    });
-                                },
-
-                                notification: {
-                                    poll: function (args) {
-                                        args.complete({
-                                            data: {
-                                                state: 'Destroyed'
-                                            },
-                                            actionFilter: actionFilters.securityGroups
-                                        });
-                                    }
                                 }
                             }
                         }

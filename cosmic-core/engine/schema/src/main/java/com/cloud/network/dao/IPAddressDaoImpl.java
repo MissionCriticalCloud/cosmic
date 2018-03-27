@@ -5,7 +5,6 @@ import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.network.IpAddress.State;
 import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
-import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -199,6 +198,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         sc.setParameters("ipAddress", "%" + ipAddress + "%");
         return listBy(sc);
     }
+
     @Override
     public List<IPAddressVO> listByDcIdIpAddress(final long dcId, final String ipAddress) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
@@ -422,10 +422,6 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     public boolean remove(final Long id) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
-        final IPAddressVO entry = findById(id);
-        if (entry != null) {
-            _tagsDao.removeByIdAndType(id, ResourceObjectType.SecurityGroup);
-        }
         final boolean result = super.remove(id);
         txn.commit();
         return result;

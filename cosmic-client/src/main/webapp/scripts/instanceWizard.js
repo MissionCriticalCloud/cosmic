@@ -3,7 +3,7 @@
         community, networkObjs;
     var selectedZoneObj, selectedTemplateObj, selectedHypervisor, selectedDiskOfferingObj;
     var selectedTemplateOrIso; //'select-template', 'select-iso'
-    var step6ContainerType = 'nothing-to-select'; //'nothing-to-select', 'select-network', 'select-security-group', 'select-advanced-sg'(advanced sg-enabled zone)
+    var step6ContainerType = 'nothing-to-select';
 
     cloudStack.instanceWizard = {
         //min disk offering  size when custom disk size is used
@@ -28,33 +28,6 @@
         vpcFilter: function (data, vpcID) {
             return vpcID != -1 ?
                 data.vpcid == vpcID : true;
-        },
-
-        // Runs when advanced SG-enabled zone is run, before
-        // the security group step
-        //
-        // -- if it returns false, then 'Select Security Group' is skipped.
-        //
-        advSGFilter: function (args) {
-            var selectedNetworks;
-
-            if ($.isArray(args.data['my-networks'])) {
-                selectedNetworks = $(args.data['my-networks']).map(function (index, myNetwork) {
-                    return $.grep(networkObjs, function (networkObj) {
-                        return networkObj.id == myNetwork;
-                    });
-                });
-            } else {
-                selectedNetworks = $.grep(networkObjs, function (networkObj) {
-                    return networkObj.id == args.data['my-networks'];
-                });
-            }
-
-            return $.grep(selectedNetworks, function (network) {
-                return $.grep(network.service, function (service) {
-                    return service.name == 'SecurityGroup';
-                }).length;
-            }).length; //return total number of selected sg networks
         },
 
         // Data providers for each wizard step
@@ -435,65 +408,22 @@
                         $networkStep.find("#from_vpc_tier").prepend("tier " + _s(args.context.networks[0].name));
                         $networkStep.find("#from_vpc_tier").show();
                     } else { //from Instance page
-                        if (selectedZoneObj.securitygroupsenabled != true) { // Advanced SG-disabled zone
-                            step6ContainerType = 'select-network';
-                            $networkStep.find("#from_instance_page_1").show();
-                            $networkStep.find("#from_instance_page_2").show();
-                            $networkStep.find("#from_vpc_tier").text("");
-                            $networkStep.find("#from_vpc_tier").hide();
-                            $networkStepContainer.removeClass('next-use-security-groups');
-                        } else { // Advanced SG-enabled zone
-                            step6ContainerType = 'select-advanced-sg';
-                        }
-
-                        if ($networkStepContainer.hasClass('next-use-security-groups')) {
-                            $networkStepContainer.removeClass('repeat next-use-security-groups loaded');
-                            step6ContainerType = 'select-security-group';
-                        }
-                    }
-                } else { //Basic zone. Show securigy group list or nothing(when no SecurityGroup service in guest network)
-                    var includingSecurityGroupService = false;
-                    $.ajax({
-                        url: createURL("listNetworks&trafficType=Guest&zoneId=" + selectedZoneObj.id),
-                        dataType: "json",
-                        async: false,
-                        success: function (json) {
-                            //basic zone should have only one guest network returned in this API call
-                            var items = json.listnetworksresponse.network;
-                            if (items != null && items.length > 0) {
-                                var networkObj = items[0]; //basic zone has only one guest network
-                                var serviceObjArray = networkObj.service;
-                                for (var k = 0; k < serviceObjArray.length; k++) {
-                                    if (serviceObjArray[k].name == "SecurityGroup") {
-                                        includingSecurityGroupService = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    if (includingSecurityGroupService == false) {
-                        step6ContainerType = 'nothing-to-select';
-                    } else {
-                        step6ContainerType = 'select-security-group';
+                        step6ContainerType = 'select-network';
+                        $networkStep.find("#from_instance_page_1").show();
+                        $networkStep.find("#from_instance_page_2").show();
+                        $networkStep.find("#from_vpc_tier").text("");
+                        $networkStep.find("#from_vpc_tier").hide();
                     }
                 }
 
                 //step6ContainerType = 'nothing-to-select'; //for testing only, comment it out before checking in
-                if (step6ContainerType == 'select-network' || step6ContainerType == 'select-advanced-sg') {
+                if (step6ContainerType == 'select-network') {
                     var defaultNetworkArray = [],
                         optionalNetworkArray = [];
                     var networkData = {
                         zoneId: args.currentData.zoneid,
                         canusefordeploy: true
                     };
-
-                    if (selectedZoneObj.networktype == 'Advanced' && selectedZoneObj.securitygroupsenabled == true) {
-                        $.extend(networkData, {
-                            type: 'Shared'
-                        });
-                    }
 
                     if (!(cloudStack.context.projects && cloudStack.context.projects[0])) {
                         networkData.domainid = g_domainid;
@@ -522,25 +452,11 @@
                             if (networkObjs.length > 0) {
                                 for (var i = 0; i < networkObjs.length; i++) {
                                     var networkObj = networkObjs[i];
-                                    var includingSecurityGroup = false;
-                                    var serviceObjArray = networkObj.service;
-                                    for (var k = 0; k < serviceObjArray.length; k++) {
-                                        if (serviceObjArray[k].name == "SecurityGroup") {
-                                            networkObjs[i].type = networkObjs[i].type + ' (sg)';
-                                            includingSecurityGroup = true;
-                                            break;
-                                        }
-                                    }
 
                                     if (networkObj.vpcid) {
                                         networkObj._singleSelect = true;
                                     }
 
-                                    //for Advanced SG-enabled zone, list only SG network offerings
-                                    if (selectedZoneObj.networktype == 'Advanced' && selectedZoneObj.securitygroupsenabled == true) {
-                                        if (includingSecurityGroup == false)
-                                            continue; //skip to next network offering
-                                    }
                                     networkObjsToPopulate.push(networkObj);
                                 }
                             }
@@ -621,59 +537,15 @@
                     });
                     //get network offerings (end)    ***
 
-                    $networkStepContainer.removeClass('repeat next-use-security-groups');
-
-                    if (step6ContainerType == 'select-advanced-sg') {
-                        $networkStepContainer.addClass('repeat next-use-security-groups');
-
-                        // Add guest network is disabled
-                        $networkStepContainer.find('.select-network').addClass('no-add-network');
-                    } else {
-                        $networkStepContainer.find('.select-network').removeClass('no-add-network');
-                    }
+                    $networkStepContainer.removeClass('repeat');
+                    $networkStepContainer.find('.select-network').removeClass('no-add-network');
 
                     args.response.success({
                         type: 'select-network',
                         data: {
                             networkObjs: networkObjsToPopulate,
-                            securityGroups: [],
                             networkOfferings: networkOfferingObjs,
                             vpcs: vpcObjs
-                        }
-                    });
-                } else if (step6ContainerType == 'select-security-group') {
-                    var securityGroupArray = [];
-                    var data = {
-                        domainid: g_domainid,
-                        account: g_account
-                    };
-
-                    $.ajax({
-                        url: createURL("listSecurityGroups"),
-                        dataType: "json",
-                        async: false,
-                        data: cloudStack.context.projects ? {} : data,
-                        success: function (json) {
-                            var items = json.listsecuritygroupsresponse.securitygroup;
-                            if (items != null && items.length > 0) {
-                                for (var i = 0; i < items.length; i++) {
-                                    securityGroupArray.push(items[i]);
-                                }
-                                securityGroupArray.sort(function (a, b) {
-                                    if (a.name < b.name) return -1;
-                                    if (a.name > b.name) return 1;
-                                    return 0;
-                                })
-                            }
-                        }
-                    });
-                    args.response.success({
-                        type: 'select-security-group',
-                        data: {
-                            networkObjs: [],
-                            securityGroups: securityGroupArray,
-                            networkOfferings: [],
-                            vpcs: []
                         }
                     });
                 } else if (step6ContainerType == 'nothing-to-select') {
@@ -681,7 +553,6 @@
                         type: 'nothing-to-select',
                         data: {
                             networkObjs: [],
-                            securityGroups: [],
                             networkOfferings: [],
                             vpcs: []
                         }
@@ -812,7 +683,7 @@
             }
 
             //step 6: select network
-            if (step6ContainerType == 'select-network' || step6ContainerType == 'select-advanced-sg') {
+            if (step6ContainerType == 'select-network') {
                 var array2 = [];
                 var array3 = [];
                 var defaultNetworkId = args.data.defaultNetwork; //args.data.defaultNetwork might be equal to string "new-network" or a network ID
@@ -916,55 +787,6 @@
                     }
                 }
 
-            } else if (step6ContainerType == 'select-security-group') {
-                var checkedSecurityGroupIdArray;
-                if (typeof(args.data["security-groups"]) == "object" && args.data["security-groups"].length != null) { //args.data["security-groups"] is an array of string, e.g. ["2375f8cc-8a73-4b8d-9b26-50885a25ffe0", "27c60d2a-de7f-4bb7-96e5-a602cec681df","c6301d77-99b5-4e8a-85e2-3ea2ab31c342"],
-                    checkedSecurityGroupIdArray = args.data["security-groups"];
-                } else if (typeof(args.data["security-groups"]) == "string" && args.data["security-groups"].length > 0) { //args.data["security-groups"] is a string, e.g. "2375f8cc-8a73-4b8d-9b26-50885a25ffe0"
-                    checkedSecurityGroupIdArray = [];
-                    checkedSecurityGroupIdArray.push(args.data["security-groups"]);
-                } else { // typeof(args.data["security-groups"]) == null
-                    checkedSecurityGroupIdArray = [];
-                }
-
-                if (checkedSecurityGroupIdArray.length > 0) {
-                    $.extend(deployVmData, {
-                        securitygroupids: checkedSecurityGroupIdArray.join(",")
-                    });
-                }
-
-                if (selectedZoneObj.networktype == "Advanced" && selectedZoneObj.securitygroupsenabled == true) { // Advanced SG-enabled zone
-                    var array2 = [];
-                    var myNetworks = $('.multi-wizard:visible form').data('my-networks'); //widget limitation: If using an advanced security group zone, get the guest networks like this
-                    var defaultNetworkId = $('.multi-wizard:visible form').find('input[name=defaultNetwork]:checked').val();
-
-                    var checkedNetworkIdArray;
-                    if (typeof(myNetworks) == "object" && myNetworks.length != null) { //myNetworks is an array of string, e.g. ["203", "202"],
-                        checkedNetworkIdArray = myNetworks;
-                    } else if (typeof(myNetworks) == "string" && myNetworks.length > 0) { //myNetworks is a string, e.g. "202"
-                        checkedNetworkIdArray = [];
-                        checkedNetworkIdArray.push(myNetworks);
-                    } else { // typeof(myNetworks) == null
-                        checkedNetworkIdArray = [];
-                    }
-
-                    //add default network first
-                    if (defaultNetworkId != null && defaultNetworkId.length > 0 && defaultNetworkId != 'new-network') {
-                        array2.push(defaultNetworkId);
-                    }
-
-                    //then, add other checked networks
-                    if (checkedNetworkIdArray.length > 0) {
-                        for (var i = 0; i < checkedNetworkIdArray.length; i++) {
-                            if (checkedNetworkIdArray[i] != defaultNetworkId) //exclude defaultNetworkId that has been added to array2
-                                array2.push(checkedNetworkIdArray[i]);
-                        }
-                    }
-
-                    $.extend(deployVmData, {
-                        networkids: array2.join(",")
-                    });
-                }
             } else if (step6ContainerType == 'nothing-to-select') {
                 if ("vpc" in args.context) { //from VPC tier
                     deployVmData["iptonetworklist[0].networkid"] = args.context.networks[0].id;

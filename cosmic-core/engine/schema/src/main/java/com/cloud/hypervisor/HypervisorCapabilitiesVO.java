@@ -31,9 +31,6 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     @Column(name = "max_guests_limit")
     private Long maxGuestsLimit;
 
-    @Column(name = "security_group_enabled")
-    private boolean securityGroupEnabled;
-
     @Column(name = "uuid")
     private String uuid;
 
@@ -53,12 +50,10 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public HypervisorCapabilitiesVO(final HypervisorType hypervisorType, final String hypervisorVersion, final Long maxGuestsLimit, final boolean securityGroupEnabled,
-                                    final boolean storageMotionSupported) {
+    public HypervisorCapabilitiesVO(final HypervisorType hypervisorType, final String hypervisorVersion, final Long maxGuestsLimit, final boolean storageMotionSupported) {
         this.hypervisorType = hypervisorType;
         this.hypervisorVersion = hypervisorVersion;
         this.maxGuestsLimit = maxGuestsLimit;
-        this.securityGroupEnabled = securityGroupEnabled;
         this.storageMotionSupported = storageMotionSupported;
         this.uuid = UUID.randomUUID().toString();
     }
@@ -94,18 +89,6 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     }
 
     /**
-     * @return the securityGroupSupport
-     */
-    @Override
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
-
-    public void setSecurityGroupEnabled(final Boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
-    }
-
-    /**
      * @return the maxGuests
      */
     @Override
@@ -114,7 +97,7 @@ public class HypervisorCapabilitiesVO implements HypervisorCapabilities {
     }
 
     /**
-     * @param maxGuests the maxGuests to set
+     * @param maxGuestsLimit the maxGuestsLimit to set
      */
     public void setMaxGuestsLimit(final Long maxGuestsLimit) {
         this.maxGuestsLimit = maxGuestsLimit;

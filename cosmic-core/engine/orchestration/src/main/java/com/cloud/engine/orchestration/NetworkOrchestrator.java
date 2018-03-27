@@ -1072,8 +1072,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                         final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
                         nic.setState(Nic.State.Releasing);
                         _nicDao.update(nic.getId(), nic);
-                        final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), null, _networkModel
-                                .isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
+                        final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), null, _networkModel.getNetworkTag(vmProfile.getHypervisorType(),
+                                network));
                         if (guru.release(profile, vmProfile, nic.getReservationId())) {
                             applyProfileToNicForRelease(nic, profile);
                             nic.setState(Nic.State.Allocated);
@@ -1169,8 +1169,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
 
                 final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
-                final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate,
-                        _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(vm.getHypervisorType(), network));
+                final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
                 guru.updateNicProfile(profile, network);
                 profiles.add(profile);
             }
@@ -1292,9 +1291,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
 
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
-            final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.isSecurityGroupSupportedInNetwork
-                    (network),
-                    _networkModel.getNetworkTag(vm.getHypervisorType(), network));
+            final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
             if (guru instanceof NetworkMigrationResponder) {
                 if (!((NetworkMigrationResponder) guru).prepareMigration(profile, network, vm, dest, context)) {
                     s_logger.error("NetworkGuru " + guru + " prepareForMigration failed."); // XXX: Transaction error
@@ -1778,26 +1775,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 }
             }
         } else if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Advanced) {
-            if (zone.isSecurityGroupEnabled()) {
-                if (ipv6) {
-                    throw new InvalidParameterValueException("IPv6 is not supported with security group!");
-                }
-                if (isolatedPvlan != null) {
-                    throw new InvalidParameterValueException("Isolated Private VLAN is not supported with security group!");
-                }
-                // Only Account specific Isolated network with sourceNat service disabled are allowed in security group
-                // enabled zone
-                if (ntwkOff.getGuestType() != GuestType.Shared) {
-                    throw new InvalidParameterValueException("Only shared guest network can be created in security group enabled zone");
-                }
-                if (_networkModel.areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SourceNat)) {
-                    throw new InvalidParameterValueException("Service SourceNat is not allowed in security group enabled zone");
-                }
-                if (!_networkModel.areServicesSupportedByNetworkOffering(ntwkOff.getId(), Service.SecurityGroup)) {
-                    throw new InvalidParameterValueException("network must have SecurityGroup provider in security group enabled zone");
-                }
-            }
-
             //don't allow eip/elb networks in Advance zone
             if (ntwkOff.getElasticIp() || ntwkOff.getElasticLb()) {
                 throw new InvalidParameterValueException("Elastic IP and Elastic LB services are supported in zone of type " + NetworkType.Basic);
@@ -2112,8 +2089,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         vo = _nicDao.persist(vo);
 
         final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
-        final NicProfile vmNic = new NicProfile(vo, network, vo.getBroadcastUri(), vo.getIsolationUri(), networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
-                _networkModel.getNetworkTag(vm.getHypervisorType(), network));
+        final NicProfile vmNic = new NicProfile(vo, network, vo.getBroadcastUri(), vo.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
 
         return new Pair<>(vmNic, Integer.valueOf(deviceId));
     }
@@ -2139,8 +2115,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
             final URI isolationUri = nic.getIsolationUri();
 
-            profile = new NicProfile(nic, network, broadcastUri, isolationUri, networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
-                    _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
+            profile = new NicProfile(nic, network, broadcastUri, isolationUri, networkRate, _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
 
             guru.reserve(profile, network, vmProfile, dest, context);
             nic.setIPv4Address(profile.getIPv4Address());
@@ -2160,8 +2135,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
             updateNic(nic, network.getId(), 1);
         } else {
-            profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.isSecurityGroupSupportedInNetwork(network),
-                    _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
+            profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vmProfile.getHypervisorType(), network));
             guru.updateNicProfile(profile, network);
             nic.setState(Nic.State.Reserved);
             updateNic(nic, network.getId(), 1);
@@ -2183,7 +2157,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             }
         }
 
-        profile.setSecurityGroupEnabled(_networkModel.isSecurityGroupSupportedInNetwork(network));
         guru.updateNicProfile(profile, network);
         return profile;
     }
@@ -2712,8 +2685,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
 
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
-            final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate,
-                    _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(vm.getHypervisorType(), network));
+            final NicProfile profile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
             if (guru instanceof NetworkMigrationResponder) {
                 if (!((NetworkMigrationResponder) guru).prepareMigration(profile, network, vm, dest, context)) {
                     s_logger.error("NetworkGuru " + guru + " prepareForMigration failed."); // XXX: Transaction error
@@ -2763,7 +2735,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     profile.setTrafficType(network.getTrafficType());
                     profile.setBroadcastUri(broadcastUri);
                     profile.setIsolationUri(Networks.IsolationType.Vlan.toUri(publicIp.getVlanTag()));
-                    profile.setSecurityGroupEnabled(_networkModel.isSecurityGroupSupportedInNetwork(network));
                     profile.setName(_networkModel.getNetworkTag(vm.getHypervisorType(), network));
                     profile.setNetworId(network.getId());
 
@@ -2816,8 +2787,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         nic.setState(Nic.State.Deallocating);
         _nicDao.update(nic.getId(), nic);
         final NetworkVO network = _networksDao.findById(nic.getNetworkId());
-        final NicProfile profile = new NicProfile(nic, network, null, null, null, _networkModel.isSecurityGroupSupportedInNetwork(network), _networkModel.getNetworkTag(
-                vm.getHypervisorType(), network));
+        final NicProfile profile = new NicProfile(nic, network, null, null, null, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
 
         /*
          * We need to release the nics with a Create ReservationStrategy here

@@ -8,7 +8,6 @@ import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
-import com.cloud.network.Networks.IsolationType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Volume;
@@ -102,55 +101,6 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
             }
 
             citrixResourceBase.startVM(conn, host, vm, vmName);
-
-            if (citrixResourceBase.canBridgeFirewall()) {
-                String result = null;
-                if (vmSpec.getType() != VirtualMachine.Type.User) {
-                    final NicTO[] nics = vmSpec.getNics();
-                    boolean secGrpEnabled = false;
-                    for (final NicTO nic : nics) {
-                        if (nic.isSecurityGroupEnabled() || nic.getIsolationUri() != null && nic.getIsolationUri().getScheme().equalsIgnoreCase(IsolationType.Ec2.toString())) {
-                            secGrpEnabled = true;
-                            break;
-                        }
-                    }
-                    if (secGrpEnabled) {
-                        result = citrixResourceBase.callHostPlugin(conn, "vmops", "default_network_rules_systemvm", "vmName", vmName);
-                        if (result == null || result.isEmpty() || !Boolean.parseBoolean(result)) {
-                            s_logger.warn("Failed to program default network rules for " + vmName);
-                        } else {
-                            s_logger.info("Programmed default network rules for " + vmName);
-                        }
-                    }
-                } else {
-                    // For user vm, program the rules for each nic if the
-                    // isolation uri scheme is ec2
-                    final NicTO[] nics = vmSpec.getNics();
-                    for (final NicTO nic : nics) {
-                        if (nic.isSecurityGroupEnabled() || nic.getIsolationUri() != null && nic.getIsolationUri().getScheme().equalsIgnoreCase(IsolationType.Ec2.toString())) {
-                            final List<String> nicSecIps = nic.getNicSecIps();
-                            final String secIpsStr;
-                            final StringBuilder sb = new StringBuilder();
-                            if (nicSecIps != null) {
-                                for (final String ip : nicSecIps) {
-                                    sb.append(ip).append(":");
-                                }
-                                secIpsStr = sb.toString();
-                            } else {
-                                secIpsStr = "0:";
-                            }
-                            result = citrixResourceBase.callHostPlugin(conn, "vmops", "default_network_rules", "vmName", vmName, "vmIP", nic.getIp(), "vmMAC", nic.getMac(),
-                                    "vmID", Long.toString(vmSpec.getId()), "secIps", secIpsStr);
-
-                            if (result == null || result.isEmpty() || !Boolean.parseBoolean(result)) {
-                                s_logger.warn("Failed to program default network rules for " + vmName + " on nic with ip:" + nic.getIp() + " mac:" + nic.getMac());
-                            } else {
-                                s_logger.info("Programmed default network rules for " + vmName + " on nic with ip:" + nic.getIp() + " mac:" + nic.getMac());
-                            }
-                        }
-                    }
-                }
-            }
 
             state = VmPowerState.RUNNING;
 
