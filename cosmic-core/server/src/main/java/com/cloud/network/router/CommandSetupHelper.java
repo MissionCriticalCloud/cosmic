@@ -61,6 +61,8 @@ import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.vpc.NetworkACLItem;
+import com.cloud.network.vpc.NetworkACLItemDao;
+import com.cloud.network.vpc.NetworkACLItemVO;
 import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
@@ -144,6 +146,8 @@ public class CommandSetupHelper {
     private RouterControlHelper _routerControlHelper;
     @Inject
     private ZoneRepository zoneRepository;
+    @Inject
+    private NetworkACLItemDao _networkACLItemDao;
 
     public void createApplyLoadBalancingRulesCommands(final List<LoadBalancingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
         final LoadBalancerTO[] lbs = new LoadBalancerTO[rules.size()];
@@ -419,6 +423,17 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         cmds.addCommand(cmd);
+    }
+
+    public void createPublicIpACLsCommands(final DomainRouterVO router, final Commands cmds, final long networkId) {
+        final List<IPAddressVO> publicIps = _ipAddressDao.listByVpcAndSourceNetwork(router.getVpcId(), networkId);
+        publicIps.forEach(ipAddressVO -> {
+            final Long aclId = ipAddressVO.getIpACLId();
+            if (aclId != null) {
+                final List<NetworkACLItemVO> rules = _networkACLItemDao.listByACL(ipAddressVO.getIpACLId());
+                createPublicIpACLsCommands(rules, router, cmds, ipAddressVO);
+            }
+        });
     }
 
     public void createPasswordCommand(final VirtualRouter router, final VirtualMachineProfile profile, final NicVO nic, final Commands cmds) {

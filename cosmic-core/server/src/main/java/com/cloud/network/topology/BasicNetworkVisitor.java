@@ -72,11 +72,13 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
     @Override
     public boolean visit(final StaticNatRules nat) throws ResourceUnavailableException {
-        final VirtualRouter router = nat.getRouter();
+        final Network network = nat.getNetwork();
+        final DomainRouterVO router = (DomainRouterVO) nat.getRouter();
         final List<? extends StaticNat> rules = nat.getRules();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
         _commandSetupHelper.createApplyStaticNatCommands(rules, router, cmds);
+        _commandSetupHelper.createPublicIpACLsCommands(router, cmds, network.getPhysicalNetworkId());
 
         return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }
@@ -89,6 +91,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
         final Commands cmds = new Commands(Command.OnError.Continue);
         _commandSetupHelper.createApplyLoadBalancingRulesCommands(rules, router, cmds, network.getId());
+        _commandSetupHelper.createPublicIpACLsCommands(router, cmds, network.getPhysicalNetworkId());
 
         return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
     }
@@ -96,13 +99,14 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
     @Override
     public boolean visit(final FirewallRules firewall) throws ResourceUnavailableException {
         final Network network = firewall.getNetwork();
-        final VirtualRouter router = firewall.getRouter();
+        final DomainRouterVO router = (DomainRouterVO) firewall.getRouter();
         final List<? extends FirewallRule> rules = firewall.getRules();
         final List<LoadBalancingRule> loadbalancingRules = firewall.getLoadbalancingRules();
 
         final Purpose purpose = firewall.getPurpose();
 
         final Commands cmds = new Commands(Command.OnError.Continue);
+        _commandSetupHelper.createPublicIpACLsCommands(router, cmds, network.getPhysicalNetworkId());
         if (purpose == Purpose.LoadBalancing) {
 
             _commandSetupHelper.createApplyLoadBalancingRulesCommands(loadbalancingRules, router, cmds, network.getId());
