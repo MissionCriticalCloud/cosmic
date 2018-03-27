@@ -551,7 +551,7 @@ public class CommandSetupHelper {
                     if (TrafficType.Public.equals(trafficType)) {
                         ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
                                                           .stream()
-                                                          .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()))
+                                                          .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()) && ipAddressVO.getAssociatedWithNetworkId() != null)
                                                           .map(ipAddressVO -> {
                                                               final Ip ip = ipAddressVO.getAddress();
                                                               final VlanVO vlanVO = _vlanDao.findById(ipAddressVO.getVlanId());
