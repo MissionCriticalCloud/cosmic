@@ -1425,8 +1425,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             _routerDao.persist(router, guestNetworks);
         }
 
-        updateRoutersRedundantState(router);
-
+        final List<DomainRouterVO> routers = _routerDao.listByVpcId(router.getVpcId());
+        for (final DomainRouterVO domainRouterVO : routers) {
+            s_logger.info("Updating the redundant state of router " + router);
+            updateRoutersRedundantState(domainRouterVO);
+        }
         return result;
     }
 
