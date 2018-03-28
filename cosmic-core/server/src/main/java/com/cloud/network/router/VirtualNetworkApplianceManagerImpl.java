@@ -562,7 +562,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         boolean updated;
         updated = false;
         final RedundantState prevState = router.getRedundantState();
-        if (router.getState() != VirtualMachine.State.Running) {
+        if (router.getState() != VirtualMachine.State.Starting && router.getState() != VirtualMachine.State.Running) {
             router.setRedundantState(RedundantState.UNKNOWN);
             updated = true;
         } else {
@@ -1424,6 +1424,8 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             router.setScriptsVersion(versionAnswer.getScriptsVersion());
             _routerDao.persist(router, guestNetworks);
         }
+
+        updateRoutersRedundantState(router);
 
         return result;
     }
