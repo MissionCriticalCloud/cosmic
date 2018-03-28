@@ -66,7 +66,8 @@ class Vpn:
     def write_ipsec_config(self):
         for site2site in self.config.dbag_network_overview['vpn']['site2site']:
             config = deepcopy(site2site)
-            filename = "ipsec.vpn-%s.conf" % config['right']
+            peer_list = config['peer_list'].split(',')
+            filename = "ipsec.vpn-%s-%s.conf" % (config['right'], peer_list[0].replace('/', '_'))
             self.filenames.append(filename)
 
             self.write_secrets(site2site['left'], site2site['right'], site2site['psk'])
@@ -79,7 +80,6 @@ class Vpn:
             config['ike'] = config['ike'].replace(';', '-')
             config['esp'] = config['esp'].replace(';', '-')
             config['forceencaps'] = utils.bool_to_yn(config['force_encaps'])
-            peer_list = config['peer_list'].split(',')
             config.pop('peer_list', None)
             config.pop('dpd', None)
             config.pop('psk', None)
