@@ -396,29 +396,29 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         for (final NicProfile nic : profile.getNics()) {
-            final int deviceId = nic.getDeviceId();
-            if (nic.getIPv4Address() == null) {
-                buf.append(" eth").append(deviceId).append("mask=").append("0.0.0.0");
-                buf.append(" eth").append(deviceId).append("ip=").append("0.0.0.0");
-                buf.append(" eth").append(deviceId).append("mac=").append("00:00:00:00:00:00");
-            } else {
-                buf.append(" eth").append(deviceId).append("ip=").append(nic.getIPv4Address());
-                buf.append(" eth").append(deviceId).append("mask=").append(nic.getIPv4Netmask());
-                buf.append(" eth").append(deviceId).append("mac=").append(nic.getMacAddress());
+            if (nic.getTrafficType() == TrafficType.Control) {
+                buf.append(" controlip=").append(nic.getIPv4Address());
+                buf.append(" controlmask=").append(nic.getIPv4Netmask());
+                buf.append(" controlmac=").append(nic.getMacAddress());
             }
-
+            if (nic.getTrafficType() == TrafficType.Public) {
+                buf.append(" publicip=").append(nic.getIPv4Address());
+                buf.append(" publicmask=").append(nic.getIPv4Netmask());
+                buf.append(" publicmac=").append(nic.getMacAddress());
+            }
             if (nic.isDefaultNic()) {
                 buf.append(" gateway=").append(nic.getIPv4Gateway());
             }
             if (nic.getTrafficType() == TrafficType.Management) {
+                buf.append(" mgtip=").append(nic.getIPv4Address());
+                buf.append(" mgtmask=").append(nic.getIPv4Netmask());
+                buf.append(" mgtmac=").append(nic.getMacAddress());
+
                 final String mgmt_cidr = _configDao.getValue(Config.ManagementNetwork.key());
                 if (NetUtils.isValidIp4Cidr(mgmt_cidr)) {
                     buf.append(" mgmtcidr=").append(mgmt_cidr);
                 }
                 buf.append(" localgw=").append(dest.getPod().getGateway());
-                buf.append(" private.network.device=").append("eth").append(deviceId);
-            } else if (nic.getTrafficType() == TrafficType.Public) {
-                buf.append(" public.network.device=").append("eth").append(deviceId);
             } else if (nic.getTrafficType() == TrafficType.Storage) {
                 buf.append(" storageip=").append(nic.getIPv4Address());
                 buf.append(" storagenetmask=").append(nic.getIPv4Netmask());
@@ -1093,7 +1093,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>(offerings.size() + 1);
         final NicProfile defaultNic = new NicProfile();
         defaultNic.setDefaultNic(true);
-        defaultNic.setDeviceId(2);
         try {
             networks.put(_networkMgr.setupNetwork(systemAcct, _networkOfferingDao.findById(defaultNetwork.getNetworkOfferingId()), plan, null, null, false).get(0),
                     new ArrayList<>(Arrays.asList(defaultNic)));

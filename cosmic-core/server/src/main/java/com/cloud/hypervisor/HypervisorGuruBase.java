@@ -135,7 +135,6 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     @Override
     public NicTO toNicTO(final NicProfile profile) {
         final NicTO to = new NicTO();
-        to.setDeviceId(profile.getDeviceId());
         to.setBroadcastType(profile.getBroadcastType());
         to.setType(profile.getTrafficType());
         to.setIp(profile.getIPv4Address());

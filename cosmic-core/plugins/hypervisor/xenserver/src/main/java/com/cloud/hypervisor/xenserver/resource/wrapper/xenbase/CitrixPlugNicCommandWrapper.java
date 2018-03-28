@@ -61,8 +61,6 @@ public final class CitrixPlugNicCommandWrapper extends CommandWrapper<PlugNicCom
             // return new PlugNicAnswer(cmd, false, msg);
             // }
 
-            final String deviceId = citrixResourceBase.getLowestAvailableVIFDeviceNum(conn, vm);
-            nic.setDeviceId(Integer.parseInt(deviceId));
             final VIF vif = citrixResourceBase.createVif(conn, vmName, vm, null, nic);
             // vif = createVif(conn, vmName, vm, null, nic);
             vif.plug(conn);

@@ -4,8 +4,45 @@ import os
 from utils import Utils
 
 
-def setup_iptable_rules():
-    os.system("iptables-restore < /etc/iptables/iptables-consoleproxy")
+def setup_iptable_rules(cmdline):
+
+    iptables_rules = """
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -i lo  -j ACCEPT
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp --icmp-type 13 -j DROP
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -m tcp -s 169.254.0.1/32 --dport 3922 -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 8001 -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 8001 -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+COMMIT
+""" % (
+        cmdline['controlnic'],
+        cmdline['mgtnic'],
+        cmdline['publicnic'],
+        cmdline['controlnic'],
+        cmdline['controlnic'],
+        cmdline['mgtnic'],
+        cmdline['publicnic'],
+        cmdline['publicnic']
+    )
+
+    with open("/tmp/iptables-consoleproxy", "w") as f:
+        f.write(iptables_rules)
+
+    os.system("iptables-restore < /tmp/iptables-consoleproxy")
 
 
 class ConsoleProxyVM:
@@ -19,7 +56,7 @@ class ConsoleProxyVM:
     def start(self):
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
-        setup_iptable_rules()
+        setup_iptable_rules(self.cmdline)
         Utils(self.cmdline).set_rfc1918_routes()
 
         os.system("systemctl start cosmic-agent")

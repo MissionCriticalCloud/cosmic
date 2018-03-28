@@ -77,10 +77,6 @@ public class NicResponse extends BaseResponse {
     @Param(description = "the Secondary ipv4 addr of nic")
     private List<NicSecondaryIpResponse> secondaryIps;
 
-    @SerializedName(ApiConstants.DEVICE_ID)
-    @Param(description = "device id for the network when plugged into the virtual machine", since = "4.4")
-    private String deviceId;
-
     @SerializedName(ApiConstants.VIRTUAL_MACHINE_ID)
     @Param(description = "Id of the vm to which the nic belongs")
     private String vmId;
@@ -143,10 +139,6 @@ public class NicResponse extends BaseResponse {
 
     public void setIp6Address(final String ip6Address) {
         this.ip6Address = ip6Address;
-    }
-
-    public void setDeviceId(final String deviceId) {
-        this.deviceId = deviceId;
     }
 
     @Override

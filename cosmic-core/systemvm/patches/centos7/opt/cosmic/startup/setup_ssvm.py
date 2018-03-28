@@ -10,8 +10,42 @@ def setup_html():
         os.makedirs(html_dir, 0o755, True)
 
 
-def setup_iptable_rules():
-    os.system("iptables-restore < /etc/iptables/iptables-secstorage")
+def setup_iptable_rules(cmdline):
+
+    iptables_rules = """
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:HTTP - [0:0]
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo  -j ACCEPT
+-A INPUT -p icmp --icmp-type 13 -j DROP
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i %s -p tcp -m state --state NEW -s 169.254.0.1/32 --dport 3922 -j ACCEPT
+-A OUTPUT -o %s -p tcp -m state --state NEW -m tcp --dport 80 -j REJECT
+-A OUTPUT -o %s -p tcp -m state --state NEW -m tcp --dport 443 -j REJECT
+COMMIT
+""" % (
+        cmdline['controlnic'],
+        cmdline['mgtnic'],
+        cmdline['publicnic'],
+        cmdline['controlnic'],
+        cmdline['mgtnic'],
+        cmdline['mgtnic']
+    )
+
+    with open("/tmp/iptables-secstorage", "w") as f:
+        f.write(iptables_rules)
+
+    os.system("iptables-restore < /tmp/iptables-secstorage")
 
 
 class SecondaryStorageVM:
@@ -26,7 +60,7 @@ class SecondaryStorageVM:
         logging.info("Setting up configuration for %s" % self.cmdline["type"])
         self.setup_agent_config()
         setup_html()
-        setup_iptable_rules()
+        setup_iptable_rules(self.cmdline)
         self.setup_nginx()
         Utils(self.cmdline).set_rfc1918_routes()
 
@@ -52,9 +86,9 @@ server {
         autoindex off;
     }
 }
-""" % (self.cmdline["eth2ip"], self.cmdline["eth2ip"])
+""" % (self.cmdline["publicip"], self.cmdline["publicip"])
 
-        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["eth2ip"])
+        filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["publicip"])
 
         with open(filename, 'w') as f:
             f.write(vhost)
