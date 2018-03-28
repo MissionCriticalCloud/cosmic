@@ -311,7 +311,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                         _userStatsDao.persist(stats);
                     }
 
-                    _commandSetupHelper.createPublicIpACLsCommands(domainRouterVO, cmds, publicNtwk.getId());
+                    _commandSetupHelper.createPublicIpACLsCommands(domainRouterVO, cmds);
                 }
 
                 // create ip assoc for source nat

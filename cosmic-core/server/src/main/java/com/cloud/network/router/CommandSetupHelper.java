@@ -425,8 +425,8 @@ public class CommandSetupHelper {
         cmds.addCommand(cmd);
     }
 
-    public void createPublicIpACLsCommands(final DomainRouterVO router, final Commands cmds, final long networkId) {
-        final List<IPAddressVO> publicIps = _ipAddressDao.listByVpcAndSourceNetwork(router.getVpcId(), networkId);
+    public void createPublicIpACLsCommands(final DomainRouterVO router, final Commands cmds) {
+        final List<IPAddressVO> publicIps = _ipAddressDao.listByVpcWithAssociatedNetwork(router.getVpcId());
         publicIps.forEach(ipAddressVO -> {
             final Long aclId = ipAddressVO.getIpACLId();
             if (aclId != null) {
