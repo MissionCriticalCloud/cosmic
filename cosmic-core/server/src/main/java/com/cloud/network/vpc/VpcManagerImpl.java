@@ -977,7 +977,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             // disassociate the public IPs if not required anymore
             if (!hasSourceNatService(vpc)) {
                 boolean success = true;
-                final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
+                final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByVpc(vpcId, null);
                 s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
                 for (final IPAddressVO ipToRelease : ipsToRelease) {
                     success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), CallContext.current().getCallingUserId(), caller);
@@ -2341,7 +2341,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         _s2sVpnMgr.cleanupVpnGatewayByVpc(vpcId);
 
         // 2) release all ip addresses
-        final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByAssociatedVpc(vpcId, null);
+        final List<IPAddressVO> ipsToRelease = _ipAddressDao.listByVpc(vpcId, null);
         s_logger.debug("Releasing ips for vpc id=" + vpcId + " as a part of vpc cleanup");
         for (final IPAddressVO ipToRelease : ipsToRelease) {
             success = success && _ipAddrMgr.disassociatePublicIpAddress(ipToRelease.getId(), callerUserId, caller);

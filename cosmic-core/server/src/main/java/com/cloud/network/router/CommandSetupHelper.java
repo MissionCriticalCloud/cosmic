@@ -549,7 +549,7 @@ public class CommandSetupHelper {
                 if (network != null) {
                     final TrafficType trafficType = network.getTrafficType();
                     if (TrafficType.Public.equals(trafficType)) {
-                        ipv4Addresses.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), false)
+                        ipv4Addresses.addAll(_ipAddressDao.listByVpc(router.getVpcId(), false)
                                                           .stream()
                                                           .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()) && ipAddressVO.getAssociatedWithNetworkId() != null)
                                                           .map(ipAddressVO -> {
@@ -561,7 +561,7 @@ public class CommandSetupHelper {
                                                           })
                                                           .collect(Collectors.toList()));
 
-                        serviceSourceNatsTO.addAll(_ipAddressDao.listByAssociatedVpc(router.getVpcId(), true)
+                        serviceSourceNatsTO.addAll(_ipAddressDao.listByVpc(router.getVpcId(), true)
                                                                 .stream()
                                                                 .map(IPAddressVO::getAddress)
                                                                 .filter(ip -> !ipsToExclude.contains(ip))

@@ -115,7 +115,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
             throw new InvalidParameterValueException("The VPN gateway of VPC " + vpcId + " already exists!");
         }
         //Use source NAT ip for VPC
-        final List<IPAddressVO> ips = _ipAddressDao.listByAssociatedVpc(vpcId, true);
+        final List<IPAddressVO> ips = _ipAddressDao.listByVpc(vpcId, true);
         if (ips.size() != 1) {
             throw new CloudRuntimeException("Vpc " + vpcId + " does not have a Public IP address with SourceNat, so no VPN is possible.");
         }

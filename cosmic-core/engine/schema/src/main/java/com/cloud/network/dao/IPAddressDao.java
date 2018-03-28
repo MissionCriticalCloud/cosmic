@@ -50,7 +50,9 @@ public interface IPAddressDao extends GenericDao<IPAddressVO, Long> {
 
     List<IPAddressVO> listByVpcAndSourceNetwork(long vpcId, long networkId);
 
-    List<IPAddressVO> listByAssociatedVpc(long vpcId, Boolean isSourceNat);
+    List<IPAddressVO> listByVpc(long vpcId, Boolean isSourceNat);
+
+    List<IPAddressVO> listByVpcWithAssociatedNetwork(long vpcId);
 
     long countFreePublicIPs();
 
