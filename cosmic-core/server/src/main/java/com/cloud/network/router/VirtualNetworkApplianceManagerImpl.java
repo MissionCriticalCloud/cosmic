@@ -1427,7 +1427,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         final List<DomainRouterVO> routers = _routerDao.listByVpcId(router.getVpcId());
         for (final DomainRouterVO domainRouterVO : routers) {
-            s_logger.info("Updating the redundant state of router " + router);
+            s_logger.info("Updating the redundant state of router " + domainRouterVO);
             updateRoutersRedundantState(domainRouterVO);
         }
         return result;
@@ -1490,25 +1490,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final VirtualMachine vm = profile.getVirtualMachine();
             final DomainRouterVO domR = _routerDao.findById(vm.getId());
             processStopOrRebootAnswer(domR, answer);
-            final List<? extends Nic> routerNics = _nicDao.listByVmId(profile.getId());
-            for (final Nic nic : routerNics) {
-                final Network network = _networkModel.getNetwork(nic.getNetworkId());
-                if (network == null) {
-                    s_logger.error("Could not find a network with ID => " + nic.getNetworkId() + ".");
-                    continue;
-                }
-                final Zone zone = zoneRepository.findOne(network.getDataCenterId());
 
-                if (network.getTrafficType() == TrafficType.Guest && nic.getBroadcastUri() != null && nic.getBroadcastUri().getScheme().equals("pvlan")) {
-                    final NicProfile nicProfile = new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), 0, false, "pvlan-nic");
-
-                    final NetworkTopology networkTopology = _networkTopologyContext.retrieveNetworkTopology(zone);
-                    try {
-                        networkTopology.setupDhcpForPvlan(false, domR, domR.getHostId(), nicProfile);
-                    } catch (final ResourceUnavailableException e) {
-                        s_logger.debug("ERROR in finalizeStop: ", e);
-                    }
-                }
+            final List<DomainRouterVO> routers = _routerDao.listByVpcId(domR.getVpcId());
+            for (final DomainRouterVO domainRouterVO : routers) {
+                s_logger.info("Updating the redundant state of router " + domainRouterVO);
+                updateRoutersRedundantState(domainRouterVO);
             }
         }
     }
