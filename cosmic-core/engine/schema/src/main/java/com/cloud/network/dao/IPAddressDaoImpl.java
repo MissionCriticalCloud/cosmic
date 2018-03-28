@@ -35,6 +35,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     private static final Logger s_logger = LoggerFactory.getLogger(IPAddressDaoImpl.class);
 
     protected SearchBuilder<IPAddressVO> AllFieldsSearch;
+    protected SearchBuilder<IPAddressVO> WithAssociatedNetwork;
     protected SearchBuilder<IPAddressVO> IpFuzzySearch;
     protected SearchBuilder<IPAddressVO> VlanDbIdSearchUnallocated;
     protected GenericSearchBuilder<IPAddressVO, Integer> AllIpCount;
@@ -74,6 +75,11 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
         AllFieldsSearch.and("associatedVmIp", AllFieldsSearch.entity().getVmIp(), Op.EQ);
         AllFieldsSearch.and("ipACLId", AllFieldsSearch.entity().getIpACLId(), Op.EQ);
         AllFieldsSearch.done();
+
+        WithAssociatedNetwork = createSearchBuilder();
+        WithAssociatedNetwork.and("vpcId", WithAssociatedNetwork.entity().getVpcId(), Op.EQ);
+        WithAssociatedNetwork.and("allocated", WithAssociatedNetwork.entity().getAssociatedWithNetworkId(), Op.NNULL);
+        WithAssociatedNetwork.done();
 
         IpFuzzySearch = createSearchBuilder();
         IpFuzzySearch.and("ipAddress", IpFuzzySearch.entity().getAddress(), Op.LIKE);
@@ -352,13 +358,21 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
     }
 
     @Override
-    public List<IPAddressVO> listByAssociatedVpc(final long vpcId, final Boolean isSourceNat) {
+    public List<IPAddressVO> listByVpc(final long vpcId, final Boolean isSourceNat) {
         final SearchCriteria<IPAddressVO> sc = AllFieldsSearch.create();
         sc.setParameters("vpcId", vpcId);
 
         if (isSourceNat != null) {
             sc.setParameters("sourceNat", isSourceNat);
         }
+
+        return listBy(sc);
+    }
+
+    @Override
+    public List<IPAddressVO> listByVpcWithAssociatedNetwork(final long vpcId) {
+        final SearchCriteria<IPAddressVO> sc = WithAssociatedNetwork.create();
+        sc.setParameters("vpcId", vpcId);
 
         return listBy(sc);
     }

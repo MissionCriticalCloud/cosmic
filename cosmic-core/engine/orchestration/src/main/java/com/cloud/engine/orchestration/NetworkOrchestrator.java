@@ -2406,7 +2406,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             List<IPAddressVO> ips = null;
             final Account owner = _entityMgr.findById(Account.class, network.getAccountId());
             if (network.getVpcId() != null) {
-                ips = _ipAddressDao.listByAssociatedVpc(network.getVpcId(), true);
+                ips = _ipAddressDao.listByVpc(network.getVpcId(), true);
                 if (ips.isEmpty()) {
                     final Vpc vpc = _vpcMgr.getActiveVpc(network.getVpcId());
                     s_logger.debug("Creating a source nat ip for vpc " + vpc);

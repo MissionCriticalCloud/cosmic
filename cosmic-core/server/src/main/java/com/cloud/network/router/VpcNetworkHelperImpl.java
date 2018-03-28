@@ -97,7 +97,7 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
         }
 
         //4) allocate nic for additional public network(s)
-        final List<IPAddressVO> ips = _ipAddressDao.listByAssociatedVpc(vpcId, false);
+        final List<IPAddressVO> ips = _ipAddressDao.listByVpc(vpcId, false);
         final List<NicProfile> publicNics = new ArrayList<>();
         Network publicNetwork = null;
         for (final IPAddressVO ip : ips) {
