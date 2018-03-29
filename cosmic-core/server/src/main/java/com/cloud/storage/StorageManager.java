@@ -89,8 +89,6 @@ public interface StorageManager extends StorageService {
 
     HypervisorType getHypervisorTypeFromFormat(ImageFormat format);
 
-    boolean storagePoolHasEnoughIops(List<Volume> volume, StoragePool pool);
-
     boolean storagePoolHasEnoughSpace(List<Volume> volume, StoragePool pool);
 
     boolean registerHostListener(String providerUuid, HypervisorHostListener listener);

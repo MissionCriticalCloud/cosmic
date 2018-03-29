@@ -959,38 +959,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     }
 
     @Override
-    public boolean storagePoolHasEnoughIops(final List<Volume> requestedVolumes, final StoragePool pool) {
-        if (requestedVolumes == null || requestedVolumes.isEmpty() || pool == null) {
-            return false;
-        }
-
-        // Only IOPS guaranteed primary storage like SolidFire is using/setting IOPS.
-        // This check returns true for storage that does not specify IOPS.
-        if (pool.getCapacityIops() == null) {
-            s_logger.info("Storage pool " + pool.getName() + " (" + pool.getId() + ") does not supply IOPS capacity, assuming enough capacity");
-
-            return true;
-        }
-
-        final StoragePoolVO storagePoolVo = _storagePoolDao.findById(pool.getId());
-        final long currentIops = _capacityMgr.getUsedIops(storagePoolVo);
-
-        long requestedIops = 0;
-
-        for (final Volume requestedVolume : requestedVolumes) {
-            final Long minIops = requestedVolume.getMinIops();
-
-            if (minIops != null && minIops > 0) {
-                requestedIops += minIops;
-            }
-        }
-
-        final long futureIops = currentIops + requestedIops;
-
-        return futureIops <= pool.getCapacityIops();
-    }
-
-    @Override
     public boolean storagePoolHasEnoughSpace(final List<Volume> volumes, final StoragePool pool) {
         if (volumes == null || volumes.isEmpty()) {
             return false;

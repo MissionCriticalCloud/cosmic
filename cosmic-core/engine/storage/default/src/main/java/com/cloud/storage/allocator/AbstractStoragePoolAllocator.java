@@ -225,7 +225,7 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
         final Volume volume = _volumeDao.findById(dskCh.getVolumeId());
         final List<Volume> requestVolumes = new ArrayList<>();
         requestVolumes.add(volume);
-        return storageMgr.storagePoolHasEnoughIops(requestVolumes, pool) && storageMgr.storagePoolHasEnoughSpace(requestVolumes, pool);
+        return storageMgr.storagePoolHasEnoughSpace(requestVolumes, pool);
     }
 
     /*

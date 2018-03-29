@@ -147,10 +147,7 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
                 offering.getUseLocalStorage(),
                 offering.getSystemUse(),
                 true,
-                offering.isCustomizedIops() == null ? false : offering.isCustomizedIops(),
-                offering.getDomainId(),
-                offering.getMinIops(),
-                offering.getMaxIops());
+                offering.getDomainId());
         cpu = offering.getCpu();
         ramSize = offering.getRamSize();
         rateMbps = offering.getRateMbps();

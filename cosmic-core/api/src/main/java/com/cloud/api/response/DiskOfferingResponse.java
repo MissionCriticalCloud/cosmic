@@ -44,18 +44,6 @@ public class DiskOfferingResponse extends BaseResponse {
     @Param(description = "true if disk offering uses custom size, false otherwise")
     private Boolean customized;
 
-    @SerializedName("iscustomizediops")
-    @Param(description = "true if disk offering uses custom iops, false otherwise")
-    private Boolean customizedIops;
-
-    @SerializedName(ApiConstants.MIN_IOPS)
-    @Param(description = "the min iops of the disk offering")
-    private Long minIops;
-
-    @SerializedName(ApiConstants.MAX_IOPS)
-    @Param(description = "the max iops of the disk offering")
-    private Long maxIops;
-
     @SerializedName(ApiConstants.HYPERVISOR_SNAPSHOT_RESERVE)
     @Param(description = "Hypervisor snapshot reserve space as a percent of a volume (for managed storage using Xen)", since = "4.4")
     private Integer hypervisorSnapshotReserve;
@@ -81,12 +69,16 @@ public class DiskOfferingResponse extends BaseResponse {
     private Long bytesWriteRate;
 
     @SerializedName("diskIopsReadRate")
-    @Param(description = "io requests read rate of the disk offering")
+    @Param(description = "io requests read rate per GB of the disk offering")
     private Long iopsReadRate;
 
     @SerializedName("diskIopsWriteRate")
-    @Param(description = "io requests write rate of the disk offering")
+    @Param(description = "io requests write rate per GB of the disk offering")
     private Long iopsWriteRate;
+
+    @SerializedName("diskIopsTotalRate")
+    @Param(description = "io requests total rate per GB of the disk offering")
+    private Long iopsTotalRate;
 
     @SerializedName("cacheMode")
     @Param(description = "the cache mode to use for this disk offering. none, writeback or writethrough", since = "4.4")
@@ -176,30 +168,6 @@ public class DiskOfferingResponse extends BaseResponse {
         this.customized = customized;
     }
 
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    public void setCustomizedIops(final Boolean customizedIops) {
-        this.customizedIops = customizedIops;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
     public Integer getHypervisorSnapshotReserve() {
         return hypervisorSnapshotReserve;
     }
@@ -247,4 +215,8 @@ public class DiskOfferingResponse extends BaseResponse {
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
     }
+    public void setIopsTotalRate(final Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
 }

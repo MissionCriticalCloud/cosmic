@@ -1733,6 +1733,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 if (volumeObjectTo.getIopsWriteRate() != null && volumeObjectTo.getIopsWriteRate() > 0) {
                     disk.setIopsWriteRate(volumeObjectTo.getIopsWriteRate());
                 }
+                if (volumeObjectTo.getIopsTotalRate() != null && volumeObjectTo.getIopsTotalRate() > 0) {
+                    disk.setIopsTotalRate(volumeObjectTo.getIopsTotalRate());
+                }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
                 }

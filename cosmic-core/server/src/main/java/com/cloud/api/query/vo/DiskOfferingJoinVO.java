@@ -32,6 +32,8 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "iops_total_rate")
+    Long iopsTotalRate;
     @Column(name = "cache_mode")
     String cacheMode;
     @Column(name = "type")
@@ -53,12 +55,6 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
     private boolean systemUse;
     @Column(name = "customized")
     private boolean customized;
-    @Column(name = "customized_iops")
-    private Boolean customizedIops;
-    @Column(name = "min_iops")
-    private Long minIops;
-    @Column(name = "max_iops")
-    private Long maxIops;
     @Column(name = "hv_ss_reserve")
     private Integer hypervisorSnapshotReserve;
     @Column(name = GenericDao.CREATED_COLUMN)
@@ -109,6 +105,10 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
         this.iopsWriteRate = iopsWriteRate;
     }
 
+    public void setIopsTotalRate(final Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
     public void setType(final Type type) {
         this.type = type;
     }
@@ -143,18 +143,6 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
 
     public void setCustomized(final boolean customized) {
         this.customized = customized;
-    }
-
-    public void setCustomizedIops(final Boolean customizedIops) {
-        this.customizedIops = customizedIops;
-    }
-
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
     }
 
     public void setHypervisorSnapshotReserve(final Integer hypervisorSnapshotReserve) {
@@ -227,18 +215,6 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
         return customized;
     }
 
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
     public Integer getHypervisorSnapshotReserve() {
         return hypervisorSnapshotReserve;
     }
@@ -301,5 +277,8 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
     }
 }

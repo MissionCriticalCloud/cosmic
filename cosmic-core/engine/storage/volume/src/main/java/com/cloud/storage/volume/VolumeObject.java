@@ -247,11 +247,21 @@ public class VolumeObject implements VolumeInfo {
         return null;
     }
 
+    private Long getIopsRate(Long iopsRate) {
+        long diskSize = getSize() >> 30;
+        if (iopsRate != null && iopsRate > 0) {
+            return iopsRate * diskSize;
+        } else {
+            return iopsRate;
+        }
+    }
+
     @Override
     public Long getIopsReadRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsReadRate();
+            Long iopsReadRate = diskOfferingVO.getIopsReadRate();
+            return getIopsRate(iopsReadRate);
         }
         return null;
     }
@@ -260,7 +270,18 @@ public class VolumeObject implements VolumeInfo {
     public Long getIopsWriteRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsWriteRate();
+            Long iopsWriteRate = diskOfferingVO.getIopsWriteRate();
+            return getIopsRate(iopsWriteRate);
+        }
+        return null;
+    }
+
+    @Override
+    public Long getIopsTotalRate() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            Long iopsTotalRate = diskOfferingVO.getIopsTotalRate();
+            return getIopsRate(iopsTotalRate);
         }
         return null;
     }
@@ -505,16 +526,6 @@ public class VolumeObject implements VolumeInfo {
     @Override
     public String getName() {
         return volumeVO.getName();
-    }
-
-    @Override
-    public Long getMinIops() {
-        return volumeVO.getMinIops();
-    }
-
-    @Override
-    public Long getMaxIops() {
-        return volumeVO.getMaxIops();
     }
 
     @Override

@@ -51,6 +51,8 @@ public class DiskOfferingVO implements DiskOffering {
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "iops_total_rate")
+    Long iopsTotalRate;
     @Column(name = "provisioning_type")
     Storage.ProvisioningType provisioningType;
     @Column(name = "display_offering")
@@ -81,12 +83,6 @@ public class DiskOfferingVO implements DiskOffering {
     private boolean customized;
     @Column(name = "uuid")
     private String uuid;
-    @Column(name = "customized_iops")
-    private Boolean customizedIops;
-    @Column(name = "min_iops")
-    private Long minIops;
-    @Column(name = "max_iops")
-    private Long maxIops;
     @Column(name = "cache_mode", updatable = true, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private DiskCacheMode cacheMode;
@@ -96,8 +92,7 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     public DiskOfferingVO(final Long domainId, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final long diskSize, final String
-            tags, final boolean isCustomized,
-                          final Boolean isCustomizedIops, final Long minIops, final Long maxIops, final DiskCacheMode cacheMode) {
+            tags, final boolean isCustomized, final DiskCacheMode cacheMode) {
         this.domainId = domainId;
         this.name = name;
         this.displayText = displayText;
@@ -109,15 +104,11 @@ public class DiskOfferingVO implements DiskOffering {
         useLocalStorage = false;
         customized = isCustomized;
         uuid = UUID.randomUUID().toString();
-        customizedIops = isCustomizedIops;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
         this.cacheMode = cacheMode;
     }
 
     public DiskOfferingVO(final Long domainId, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final long diskSize, final String
-            tags, final boolean isCustomized,
-                          final Boolean isCustomizedIops, final Long minIops, final Long maxIops) {
+            tags, final boolean isCustomized) {
         this.domainId = domainId;
         this.name = name;
         this.displayText = displayText;
@@ -129,15 +120,11 @@ public class DiskOfferingVO implements DiskOffering {
         useLocalStorage = false;
         customized = isCustomized;
         uuid = UUID.randomUUID().toString();
-        customizedIops = isCustomizedIops;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
         state = State.Active;
     }
 
     public DiskOfferingVO(final String name, final String displayText, final Storage.ProvisioningType provisioningType, final boolean mirrored, final String tags, final boolean
-            recreatable,
-                          final boolean useLocalStorage, final boolean systemUse, final boolean customized) {
+            recreatable, final boolean useLocalStorage, final boolean systemUse, final boolean customized) {
         domainId = null;
         type = Type.Service;
         this.name = name;
@@ -173,8 +160,7 @@ public class DiskOfferingVO implements DiskOffering {
 
     public DiskOfferingVO(final long id, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final boolean mirrored, final String tags,
                           final boolean recreatable,
-                          final boolean useLocalStorage, final boolean systemUse, final boolean customized, final boolean customizedIops, final Long domainId, final Long
-                                  minIops, final Long maxIops) {
+                          final boolean useLocalStorage, final boolean systemUse, final boolean customized, final Long domainId) {
         this.id = id;
         type = Type.Service;
         this.name = name;
@@ -185,12 +171,9 @@ public class DiskOfferingVO implements DiskOffering {
         this.useLocalStorage = useLocalStorage;
         this.systemUse = systemUse;
         this.customized = customized;
-        this.customizedIops = customizedIops;
         this.domainId = domainId;
         uuid = UUID.randomUUID().toString();
         state = State.Active;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
     }
 
     @Override
@@ -298,36 +281,6 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     @Override
-    public void setCustomizedIops(final Boolean customizedIops) {
-        this.customizedIops = customizedIops;
-    }
-
-    @Override
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    @Override
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    @Override
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    @Override
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
-    @Override
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
-    @Override
     public boolean isRecreatable() {
         return recreatable;
     }
@@ -374,6 +327,16 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    @Override
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    @Override
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     @Override

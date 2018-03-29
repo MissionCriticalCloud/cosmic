@@ -40,12 +40,6 @@ public class ResizeVolumeCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.ID, entityType = VolumeResponse.class, required = true, type = CommandType.UUID, description = "the ID of the disk volume")
     private Long id;
 
-    @Parameter(name = ApiConstants.MIN_IOPS, type = CommandType.LONG, required = false, description = "New minimum number of IOPS")
-    private Long minIops;
-
-    @Parameter(name = ApiConstants.MAX_IOPS, type = CommandType.LONG, required = false, description = "New maximum number of IOPS")
-    private Long maxIops;
-
     @Parameter(name = ApiConstants.SIZE, type = CommandType.LONG, required = false, description = "New volume size in GB")
     private Long size;
 
@@ -74,14 +68,6 @@ public class ResizeVolumeCmd extends BaseAsyncCmd {
     //TODO use the method getId() instead of this one.
     public Long getEntityId() {
         return id;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
     }
 
     public boolean getShrinkOk() {

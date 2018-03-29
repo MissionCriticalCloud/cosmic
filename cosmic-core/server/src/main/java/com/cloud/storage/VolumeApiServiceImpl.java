@@ -267,8 +267,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         final DiskOfferingVO diskOffering;
         final Storage.ProvisioningType provisioningType;
         Long size;
-        Long minIops = null;
-        Long maxIops = null;
         // Volume VO used for extracting the source template id
         VolumeVO parentVolume = null;
 
@@ -323,35 +321,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 size = diskOffering.getDiskSize();
             }
 
-            final Boolean isCustomizedIops = diskOffering.isCustomizedIops();
-
-            if (isCustomizedIops != null) {
-                if (isCustomizedIops) {
-                    minIops = cmd.getMinIops();
-                    maxIops = cmd.getMaxIops();
-
-                    if (minIops == null && maxIops == null) {
-                        minIops = 0L;
-                        maxIops = 0L;
-                    } else {
-                        if (minIops == null || minIops <= 0) {
-                            throw new InvalidParameterValueException("The min IOPS must be greater than 0.");
-                        }
-
-                        if (maxIops == null) {
-                            maxIops = 0L;
-                        }
-
-                        if (minIops > maxIops) {
-                            throw new InvalidParameterValueException("The min IOPS must be less than or equal to the max IOPS.");
-                        }
-                    }
-                } else {
-                    minIops = diskOffering.getMinIops();
-                    maxIops = diskOffering.getMaxIops();
-                }
-            }
-
             provisioningType = diskOffering.getProvisioningType();
 
             if (!validateVolumeSizeRange(size)) {// convert size from mb to gb
@@ -379,9 +348,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             }
             size = snapshotCheck.getSize(); // ; disk offering is used for tags
             // purposes
-
-            minIops = snapshotCheck.getMinIops();
-            maxIops = snapshotCheck.getMaxIops();
 
             provisioningType = diskOffering.getProvisioningType();
             // check snapshot permissions
@@ -429,8 +395,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final String userSpecifiedName = getVolumeNameFromCommand(cmd);
 
-        final VolumeVO volume = commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size,
-                minIops, maxIops, parentVolume, userSpecifiedName, _uuidMgr.generateUuid(Volume.class, cmd.getCustomId()));
+        final VolumeVO volume = commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size, parentVolume, userSpecifiedName, _uuidMgr.generateUuid(Volume.class, cmd.getCustomId()));
 
         return volume;
     }
@@ -465,8 +430,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume,
-                                  final Long zoneId, final Long diskOfferingId, final Storage.ProvisioningType provisioningType, final Long size, final Long minIops, final Long
-                                          maxIops, final VolumeVO parentVolume,
+                                  final Long zoneId, final Long diskOfferingId, final Storage.ProvisioningType provisioningType, final Long size, final VolumeVO parentVolume,
                                   final String userSpecifiedName, final String uuid) {
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
@@ -480,8 +444,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 volume.setDomainId(owner.getDomainId());
                 volume.setDiskOfferingId(diskOfferingId);
                 volume.setSize(size);
-                volume.setMinIops(minIops);
-                volume.setMaxIops(maxIops);
                 volume.setInstanceId(null);
                 volume.setUpdated(new Date());
                 volume.setDisplayVolume(displayVolume);
@@ -1124,8 +1086,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_RESIZE, eventDescription = "resizing volume", async = true)
     public VolumeVO resizeVolume(final ResizeVolumeCmd cmd) throws ResourceAllocationException {
         Long newSize;
-        Long newMinIops;
-        Long newMaxIops;
         final boolean shrinkOk = cmd.getShrinkOk();
 
         final VolumeVO volume = _volsDao.findById(cmd.getEntityId());
@@ -1181,30 +1141,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // no parameter provided; just use the original size of the volume
                 newSize = volume.getSize();
             }
-
-            newMinIops = cmd.getMinIops();
-
-            if (newMinIops != null) {
-                if (diskOffering.isCustomizedIops() == null || !diskOffering.isCustomizedIops()) {
-                    throw new InvalidParameterValueException("The current disk offering does not support customization of the 'Min IOPS' parameter.");
-                }
-            } else {
-                // no parameter provided; just use the original min IOPS of the volume
-                newMinIops = volume.getMinIops();
-            }
-
-            newMaxIops = cmd.getMaxIops();
-
-            if (newMaxIops != null) {
-                if (diskOffering.isCustomizedIops() == null || !diskOffering.isCustomizedIops()) {
-                    throw new InvalidParameterValueException("The current disk offering does not support customization of the 'Max IOPS' parameter.");
-                }
-            } else {
-                // no parameter provided; just use the original max IOPS of the volume
-                newMaxIops = volume.getMaxIops();
-            }
-
-            validateIops(newMinIops, newMaxIops);
         } else {
             if (newDiskOffering.getRemoved() != null) {
                 throw new InvalidParameterValueException("Requested disk offering has been removed.");
@@ -1248,15 +1184,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 throw new InvalidParameterValueException("Only data volumes can be resized via a new disk offering.");
             }
 
-            if (newDiskOffering.isCustomizedIops() != null && newDiskOffering.isCustomizedIops()) {
-                newMinIops = cmd.getMinIops() != null ? cmd.getMinIops() : volume.getMinIops();
-                newMaxIops = cmd.getMaxIops() != null ? cmd.getMaxIops() : volume.getMaxIops();
-
-                validateIops(newMinIops, newMaxIops);
-            } else {
-                newMinIops = newDiskOffering.getMinIops();
-                newMaxIops = newDiskOffering.getMaxIops();
-            }
         }
 
         final long currentSize = volume.getSize();
@@ -1293,8 +1220,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             s_logger.debug("Volume is in the allocated state, but has never been created. Simply updating database with new size and IOPS.");
 
             volume.setSize(newSize);
-            volume.setMinIops(newMinIops);
-            volume.setMaxIops(newMaxIops);
 
             if (newDiskOffering != null) {
                 volume.setDiskOfferingId(cmd.getNewDiskOfferingId());
@@ -1319,13 +1244,13 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 placeHolder = createPlaceHolderWork(userVm.getId());
 
                 try {
-                    return orchestrateResizeVolume(volume.getId(), currentSize, newSize, newMinIops, newMaxIops,
+                    return orchestrateResizeVolume(volume.getId(), currentSize, newSize,
                             newDiskOffering != null ? cmd.getNewDiskOfferingId() : null, shrinkOk);
                 } finally {
                     _workJobDao.expunge(placeHolder.getId());
                 }
             } else {
-                final Outcome<Volume> outcome = resizeVolumeThroughJobQueue(userVm.getId(), volume.getId(), currentSize, newSize, newMinIops, newMaxIops,
+                final Outcome<Volume> outcome = resizeVolumeThroughJobQueue(userVm.getId(), volume.getId(), currentSize, newSize,
                         newDiskOffering != null ? cmd.getNewDiskOfferingId() : null, shrinkOk);
 
                 try {
@@ -1356,20 +1281,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             }
         }
 
-        return orchestrateResizeVolume(volume.getId(), currentSize, newSize, newMinIops, newMaxIops,
+        return orchestrateResizeVolume(volume.getId(), currentSize, newSize,
                 newDiskOffering != null ? cmd.getNewDiskOfferingId() : null, shrinkOk);
-    }
-
-    private void validateIops(final Long minIops, final Long maxIops) {
-        if (minIops == null && maxIops != null || minIops != null && maxIops == null) {
-            throw new InvalidParameterValueException("Either 'miniops' and 'maxiops' must both be provided or neither must be provided.");
-        }
-
-        if (minIops != null && maxIops != null) {
-            if (minIops > maxIops) {
-                throw new InvalidParameterValueException("The 'miniops' parameter must be less than or equal to the 'maxiops' parameter.");
-            }
-        }
     }
 
     private static boolean areIntegersEqual(Integer i1, Integer i2) {
@@ -1384,8 +1297,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return i1.equals(i2);
     }
 
-    private VolumeVO orchestrateResizeVolume(final long volumeId, final long currentSize, final long newSize, final Long newMinIops, final Long newMaxIops, final Long
-            newDiskOfferingId, final boolean shrinkOk) {
+    private VolumeVO orchestrateResizeVolume(final long volumeId, final long currentSize, final long newSize,
+                                             final Long newDiskOfferingId, final boolean shrinkOk) {
         VolumeVO volume = _volsDao.findById(volumeId);
         final UserVmVO userVm = _userVmDao.findById(volume.getInstanceId());
         /*
@@ -1422,7 +1335,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             }
         }
 
-        final ResizeVolumePayload payload = new ResizeVolumePayload(newSize, newMinIops, newMaxIops, shrinkOk, instanceName, hosts);
+        final ResizeVolumePayload payload = new ResizeVolumePayload(newSize, shrinkOk, instanceName, hosts);
 
         try {
             final VolumeInfo vol = volFactory.getVolume(volume.getId());
@@ -1492,7 +1405,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     public Outcome<Volume> resizeVolumeThroughJobQueue(final Long vmId, final long volumeId,
-                                                       final long currentSize, final long newSize, final Long newMinIops, final Long newMaxIops, final Long newServiceOfferingId,
+                                                       final long currentSize, final long newSize, final Long newServiceOfferingId,
                                                        final boolean shrinkOk) {
 
         final CallContext context = CallContext.current();
@@ -1515,7 +1428,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         // save work context info (there are some duplications)
         final VmWorkResizeVolume workInfo = new VmWorkResizeVolume(callingUser.getId(), callingAccount.getId(), vm.getId(),
-                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, currentSize, newSize, newMinIops, newMaxIops, newServiceOfferingId, shrinkOk);
+                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, currentSize, newSize, newServiceOfferingId, shrinkOk);
         workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
 
         _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
@@ -2794,7 +2707,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     @ReflectionUse
     private Pair<JobInfo.Status, String> orchestrateResizeVolume(final VmWorkResizeVolume work) throws Exception {
-        final Volume vol = orchestrateResizeVolume(work.getVolumeId(), work.getCurrentSize(), work.getNewSize(), work.getNewMinIops(), work.getNewMaxIops(),
+        final Volume vol = orchestrateResizeVolume(work.getVolumeId(), work.getCurrentSize(), work.getNewSize(),
                 work.getNewServiceOfferingId(), work.isShrinkOk());
         return new Pair<>(JobInfo.Status.SUCCEEDED,
                 _jobMgr.marshallResultObject(new Long(vol.getId())));

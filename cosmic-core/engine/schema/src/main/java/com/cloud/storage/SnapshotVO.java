@@ -51,10 +51,6 @@ public class SnapshotVO implements Snapshot {
     String version;
     @Column(name = "uuid")
     String uuid;
-    @Column(name = "min_iops")
-    Long minIops;
-    @Column(name = "max_iops")
-    Long maxIops;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -69,8 +65,7 @@ public class SnapshotVO implements Snapshot {
     }
 
     public SnapshotVO(final long dcId, final long accountId, final long domainId, final Long volumeId, final Long diskOfferingId, final String name, final short snapshotType,
-                      final String typeDescription, final long size,
-                      final Long minIops, final Long maxIops, final HypervisorType hypervisorType) {
+                      final String typeDescription, final long size, final HypervisorType hypervisorType) {
         dataCenterId = dcId;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -80,8 +75,6 @@ public class SnapshotVO implements Snapshot {
         this.snapshotType = snapshotType;
         this.typeDescription = typeDescription;
         this.size = size;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
         state = State.Allocated;
         this.hypervisorType = hypervisorType;
         version = "2.2";
@@ -180,14 +173,6 @@ public class SnapshotVO implements Snapshot {
 
     public long getSize() {
         return size;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
     }
 
     public String getTypeDescription() {

@@ -344,7 +344,7 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
 
         final SnapshotVO snapshotVO =
                 new SnapshotVO(volume.getDataCenterId(), volume.getAccountId(), volume.getDomainId(), volume.getId(), volume.getDiskOfferingId(), snapshotName,
-                        (short) snapshotType.ordinal(), snapshotType.name(), volume.getSize(), volume.getMinIops(), volume.getMaxIops(), hypervisorType);
+                        (short) snapshotType.ordinal(), snapshotType.name(), volume.getSize(), hypervisorType);
 
         final SnapshotVO snapshot = _snapshotDao.persist(snapshotVO);
         if (snapshot == null) {

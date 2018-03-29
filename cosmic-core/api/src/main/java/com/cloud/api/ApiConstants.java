@@ -48,11 +48,8 @@ public class ApiConstants {
     public static final String CTXSTARTEVENTID = "ctxstarteventid";
     public static final String CTX_START_EVENT_ID = "ctxStartEventId";
     public static final String CUSTOMIZED = "customized";
-    public static final String CUSTOMIZED_IOPS = "customizediops";
     public static final String CUSTOM_ID = "customid";
     public static final String CUSTOM_JOB_ID = "customjobid";
-    public static final String MIN_IOPS = "miniops";
-    public static final String MAX_IOPS = "maxiops";
     public static final String HYPERVISOR_SNAPSHOT_RESERVE = "hypervisorsnapshotreserve";
     public static final String DESCRIPTION = "description";
     public static final String DESTINATION_ZONE_ID = "destzoneid";
@@ -114,6 +111,7 @@ public class ApiConstants {
     public static final String INTERVAL_TYPE = "intervaltype";
     public static final String IOPS_READ_RATE = "iopsreadrate";
     public static final String IOPS_WRITE_RATE = "iopswriterate";
+    public static final String IOPS_TOTAL_RATE = "iopstotalrate";
     public static final String IP_ADDRESS = "ipaddress";
     public static final String IP6_ADDRESS = "ip6address";
     public static final String IP_ADDRESS_ID = "ipaddressid";

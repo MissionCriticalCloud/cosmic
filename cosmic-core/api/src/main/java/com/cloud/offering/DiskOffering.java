@@ -40,18 +40,6 @@ public interface DiskOffering extends InfrastructureEntity, Identity, InternalId
 
     void setDiskSize(long diskSize);
 
-    void setCustomizedIops(Boolean customizedIops);
-
-    Boolean isCustomizedIops();
-
-    Long getMinIops();
-
-    void setMinIops(Long minIops);
-
-    Long getMaxIops();
-
-    void setMaxIops(Long maxIops);
-
     boolean isRecreatable();
 
     Long getBytesReadRate();
@@ -69,6 +57,10 @@ public interface DiskOffering extends InfrastructureEntity, Identity, InternalId
     Long getIopsWriteRate();
 
     void setIopsWriteRate(Long iopsWriteRate);
+
+    Long getIopsTotalRate();
+
+    void setIopsTotalRate(Long iopsTotalRate);
 
     Integer getHypervisorSnapshotReserve();
 
