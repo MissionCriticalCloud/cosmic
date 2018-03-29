@@ -81,8 +81,6 @@
                   value="#{consoleProxyAllocatorsRegistry.registered}" />
     </bean>
 
-    <bean id="securityGroupManagerImpl2" class="com.cloud.network.security.SecurityGroupManagerImpl2" />
-
     <bean id="ipv6AddressManagerImpl" class="com.cloud.network.Ipv6AddressManagerImpl" />
 
     <bean id="alertManagerImpl" class="com.cloud.alert.AlertManagerImpl" />

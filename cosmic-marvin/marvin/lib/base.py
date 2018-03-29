@@ -290,41 +290,6 @@ class VirtualMachine:
             domainid=cmd.domainid if cmd.domainid else None
         )
         zone = zone_list[0]
-        # check if security groups settings is enabled for the zone
-        if zone.securitygroupsenabled:
-            list_security_groups = SecurityGroup.list(
-                api_client,
-                account=cmd.account,
-                domainid=cmd.domainid,
-                listall=True,
-                securitygroupname="basic_sec_grp"
-            )
-
-            if not isinstance(list_security_groups, list):
-                basic_mode_security_group = SecurityGroup.create(
-                    api_client,
-                    { "name": "basic_sec_grp" },
-                    cmd.account,
-                    cmd.domainid,
-                )
-                sec_grp_services = {
-                    "protocol": "TCP",
-                    "startport": 22,
-                    "endport": 22,
-                    "cidrlist": "0.0.0.0/0"
-                }
-                # Authorize security group for above ingress rule
-                basic_mode_security_group.authorize(api_client,
-                                                    sec_grp_services,
-                                                    account=cmd.account,
-                                                    domainid=cmd.domainid)
-            else:
-                basic_mode_security_group = list_security_groups[0]
-
-            if isinstance(cmd.securitygroupids, list):
-                cmd.securitygroupids.append(basic_mode_security_group.id)
-            else:
-                cmd.securitygroupids = [basic_mode_security_group.id]
 
     @classmethod
     def access_ssh_over_nat(
@@ -430,7 +395,7 @@ class VirtualMachine:
 
     @classmethod
     def create(cls, api_client, services=None, templateid=None, accountid=None, domainid=None, zoneid=None,
-               networkids=None, serviceofferingid=None, securitygroupids=None, projectid=None, startvm=None,
+               networkids=None, serviceofferingid=None, projectid=None, startvm=None,
                diskofferingid=None, affinitygroupnames=None, affinitygroupids=None, group=None, hostid=None,
                keypair=None, ipaddress=None, mode='default', method='GET', hypervisor=None, customcpunumber=None,
                customcpuspeed=None, custommemory=None, rootdisksize=None, zone=None, networks=None, account=None,
@@ -519,9 +484,6 @@ class VirtualMachine:
             cmd.ipaddress = ipaddress
         elif ipaddress in services:
             cmd.ipaddress = services["ipaddress"]
-
-        if securitygroupids:
-            cmd.securitygroupids = [str(sg_id) for sg_id in securitygroupids]
 
         if "affinitygroupnames" in services:
             cmd.affinitygroupnames = services["affinitygroupnames"]
@@ -3047,9 +3009,6 @@ class Zone:
             cmd.internaldns2 = services["internaldns2"]
         if domainid:
             cmd.domainid = domainid
-        if "securitygroupenabled" in services:
-            cmd.securitygroupenabled = services["securitygroupenabled"]
-
         return Zone(api_client.createZone(cmd).__dict__)
 
     def delete(self, api_client):
@@ -3343,124 +3302,6 @@ class PhysicalNetwork:
             cmd.listall = True
         return map(lambda pn: PhysicalNetwork(
             pn.__dict__), api_client.listPhysicalNetworks(cmd))
-
-
-class SecurityGroup:
-    """Manage Security Groups"""
-
-    def __init__(self, items):
-        self.__dict__.update(items)
-
-    @classmethod
-    def create(cls, api_client, services, account=None, domainid=None,
-               description=None, projectid=None):
-        """Create security group"""
-        cmd = createSecurityGroup.createSecurityGroupCmd()
-
-        cmd.name = "-".join([services["name"], random_gen()])
-        if account:
-            cmd.account = account
-        if domainid:
-            cmd.domainid = domainid
-        if description:
-            cmd.description = description
-        if projectid:
-            cmd.projectid = projectid
-
-        return SecurityGroup(api_client.createSecurityGroup(cmd).__dict__)
-
-    def delete(self, api_client):
-        """Delete Security Group"""
-
-        cmd = deleteSecurityGroup.deleteSecurityGroupCmd()
-        cmd.id = self.id
-        api_client.deleteSecurityGroup(cmd)
-
-    def authorize(self, api_client, services,
-                  account=None, domainid=None, projectid=None):
-        """Authorize Ingress Rule"""
-
-        cmd = authorizeSecurityGroupIngress.authorizeSecurityGroupIngressCmd()
-
-        if domainid:
-            cmd.domainid = domainid
-        if account:
-            cmd.account = account
-
-        if projectid:
-            cmd.projectid = projectid
-        cmd.securitygroupid = self.id
-        cmd.protocol = services["protocol"]
-
-        if services["protocol"] == 'ICMP':
-            cmd.icmptype = -1
-            cmd.icmpcode = -1
-        else:
-            cmd.startport = services["startport"]
-            cmd.endport = services["endport"]
-
-        cmd.cidrlist = services["cidrlist"]
-        return api_client.authorizeSecurityGroupIngress(cmd).__dict__
-
-    def revoke(self, api_client, id):
-        """Revoke ingress rule"""
-
-        cmd = revokeSecurityGroupIngress.revokeSecurityGroupIngressCmd()
-        cmd.id = id
-        return api_client.revokeSecurityGroupIngress(cmd)
-
-    def authorizeEgress(self, api_client, services, account=None, domainid=None,
-                        projectid=None, user_secgrp_list=None):
-        """Authorize Egress Rule"""
-
-        if user_secgrp_list is None:
-            user_secgrp_list = { }
-        cmd = authorizeSecurityGroupEgress.authorizeSecurityGroupEgressCmd()
-
-        if domainid:
-            cmd.domainid = domainid
-        if account:
-            cmd.account = account
-
-        if projectid:
-            cmd.projectid = projectid
-        cmd.securitygroupid = self.id
-        cmd.protocol = services["protocol"]
-
-        if services["protocol"] == 'ICMP':
-            cmd.icmptype = -1
-            cmd.icmpcode = -1
-        else:
-            cmd.startport = services["startport"]
-            cmd.endport = services["endport"]
-
-        cmd.cidrlist = services["cidrlist"]
-
-        cmd.usersecuritygrouplist = []
-        for account, group in user_secgrp_list.items():
-            cmd.usersecuritygrouplist.append({
-                'account': account,
-                'group': group
-            })
-
-        return api_client.authorizeSecurityGroupEgress(cmd).__dict__
-
-    def revokeEgress(self, api_client, id):
-        """Revoke Egress rule"""
-
-        cmd = revokeSecurityGroupEgress.revokeSecurityGroupEgressCmd()
-        cmd.id = id
-        return api_client.revokeSecurityGroupEgress(cmd)
-
-    @classmethod
-    def list(cls, api_client, **kwargs):
-        """Lists all security groups."""
-
-        cmd = listSecurityGroups.listSecurityGroupsCmd()
-        [setattr(cmd, k, v) for k, v in kwargs.items()]
-        if 'account' in kwargs.keys() and 'domainid' in kwargs.keys():
-            cmd.listall = True
-        return api_client.listSecurityGroups(cmd)
 
 
 class VpnCustomerGateway:

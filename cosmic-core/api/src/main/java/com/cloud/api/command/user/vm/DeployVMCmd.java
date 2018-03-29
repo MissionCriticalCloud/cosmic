@@ -17,7 +17,6 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.ProjectResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserVmResponse;
@@ -31,7 +30,6 @@ import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.offering.DiskOffering;
@@ -54,7 +52,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deployVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Creates and automatically starts a virtual machine based on a service offering, disk offering, and template.",
+@APICommand(name = "deployVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Creates and automatically starts a virtual machine based on a service offering, disk " +
+        "offering, and template.",
         responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
@@ -137,18 +136,6 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.HOST_ID, type = CommandType.UUID, entityType = HostResponse.class, description = "destination Host ID to deploy the VM to - parameter " +
             "available for root admin only")
     private Long hostId;
-
-    @ACL
-    @Parameter(name = ApiConstants.SECURITY_GROUP_IDS, type = CommandType.LIST, collectionType = CommandType.UUID, entityType = SecurityGroupResponse.class, description = "comma" +
-            " separated list of security groups id that going to be applied to the virtual machine. "
-            + "Should be passed only when vm is created from a zone with Basic Network support." + " Mutually exclusive with securitygroupnames parameter")
-    private List<Long> securityGroupIdList;
-
-    @ACL
-    @Parameter(name = ApiConstants.SECURITY_GROUP_NAMES, type = CommandType.LIST, collectionType = CommandType.STRING, entityType = SecurityGroupResponse.class, description =
-            "comma separated list of security groups names that going to be applied to the virtual machine."
-                    + " Should be passed only when vm is created from a zone with Basic Network support. " + "Mutually exclusive with securitygroupids parameter")
-    private List<String> securityGroupNameList;
 
     @Parameter(name = ApiConstants.IP_NETWORK_LIST, type = CommandType.MAP, description = "ip to network mapping. Can't be specified with networkIds parameter."
             + " Example: iptonetworklist[0].ip=10.10.10.11&iptonetworklist[0].ipv6=fc00:1234:5678::abcd&iptonetworklist[0].networkid=uuid - requests to use ip 10.10.10.11 in " +
@@ -261,28 +248,6 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         return displayVm;
     }
 
-    public List<Long> getSecurityGroupIdList() {
-        if (securityGroupNameList != null && securityGroupIdList != null) {
-            throw new InvalidParameterValueException("securitygroupids parameter is mutually exclusive with securitygroupnames parameter");
-        }
-
-        //transform group names to ids here
-        if (securityGroupNameList != null) {
-            final List<Long> securityGroupIds = new ArrayList<>();
-            for (final String groupName : securityGroupNameList) {
-                final Long groupId = _responseGenerator.getSecurityGroupId(groupName, getEntityOwnerId());
-                if (groupId == null) {
-                    throw new InvalidParameterValueException("Unable to find group by name " + groupName);
-                } else {
-                    securityGroupIds.add(groupId);
-                }
-            }
-            return securityGroupIds;
-        } else {
-            return securityGroupIdList;
-        }
-    }
-
     public Long getServiceOfferingId() {
         return serviceOfferingId;
     }
@@ -360,9 +325,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                     requestedIpv6 = NetUtils.standardizeIp6Address(requestedIpv6);
                 }
                 if (requestedMac != null) {
-                    if(!NetUtils.isValidMac(requestedMac)) {
+                    if (!NetUtils.isValidMac(requestedMac)) {
                         throw new InvalidParameterValueException("MAC-Address is not valid: " + requestedMac);
-                    } else if(!NetUtils.isUnicastMac(requestedMac)) {
+                    } else if (!NetUtils.isUnicastMac(requestedMac)) {
                         throw new InvalidParameterValueException("MAC-Address is not unicast: " + requestedMac);
                     }
                     requestedMac = NetUtils.standardizeMacAddress(requestedMac);
@@ -386,9 +351,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         if (macAddress == null) {
             return null;
         }
-        if(!NetUtils.isValidMac(macAddress)) {
+        if (!NetUtils.isValidMac(macAddress)) {
             throw new InvalidParameterValueException("MAC-Address is not valid: " + macAddress);
-        } else if(!NetUtils.isUnicastMac(macAddress)) {
+        } else if (!NetUtils.isUnicastMac(macAddress)) {
             throw new InvalidParameterValueException("MAC-Address is not unicast: " + macAddress);
         }
         return NetUtils.standardizeMacAddress(macAddress);
@@ -555,7 +520,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     }
 
     @Override
-    public void create() throws ResourceAllocationException {
+    public void create() {
         try {
             //Verify that all objects exist before passing them to the service
             final Account owner = _accountService.getActiveAccountById(getEntityOwnerId());
@@ -596,30 +561,10 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                 }
             }
 
-            UserVm vm = null;
             final IpAddresses addrs = new IpAddresses(ipAddress, ip6Address, getMacAddress());
-            if (zone.getNetworkType() == NetworkType.Basic) {
-                if (getNetworkIds() != null) {
-                    throw new InvalidParameterValueException("Can't specify network Ids in Basic zone");
-                } else {
-                    vm = _userVmService.createBasicSecurityGroupVirtualMachine(zone, serviceOffering, template, getSecurityGroupIdList(), owner, name, displayName, diskOfferingId,
-                            size, group, getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(),
-                            getDetails(), getCustomId());
-                }
-            } else {
-                if (zone.isSecurityGroupEnabled()) {
-                    vm = _userVmService.createAdvancedSecurityGroupVirtualMachine(zone, serviceOffering, template, getNetworkIds(), getSecurityGroupIdList(), owner, name,
-                            displayName, diskOfferingId, size, group, getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard,
-                            getAffinityGroupIdList(), getDetails(), getCustomId());
-                } else {
-                    if (getSecurityGroupIdList() != null && !getSecurityGroupIdList().isEmpty()) {
-                        throw new InvalidParameterValueException("Can't create vm with security groups; security group feature is not enabled per zone");
-                    }
-                    vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
-                            getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                            getCustomId());
-                }
-            }
+            final UserVm vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
+                    getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
+                    getCustomId());
 
             if (vm != null) {
                 setEntityId(vm.getId());

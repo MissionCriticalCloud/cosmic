@@ -76,7 +76,6 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
-import com.cloud.network.security.SecurityGroupService;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.StaticRoute;
@@ -178,8 +177,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     private static final long MAX_VXLAN_VNI = 16777214L; // 2^24 -2
     // MAX_VXLAN_VNI should be 16777215L (2^24-1), but Linux vxlan interface doesn't accept VNI:2^24-1 now.
     // It seems a bug.
-    @Inject
-    private SecurityGroupService _securityGroupService;
     @Inject
     DataCenterDao _dcDao = null;
     @Inject
@@ -1908,9 +1905,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (vnetRange != null) {
             // Verify zone type
-            if (zoneType == NetworkType.Basic || zoneType == NetworkType.Advanced && zone.isSecurityGroupEnabled()) {
-                throw new InvalidParameterValueException("Can't add vnet range to the physical network in the zone that supports " + zoneType
-                        + " network, Security Group enabled: " + zone.isSecurityGroupEnabled());
+            if (zoneType == NetworkType.Basic) {
+                throw new InvalidParameterValueException("Can't add vnet range to the physical network in the zone that supports " + zoneType + " network");
             }
         }
 
@@ -1958,9 +1954,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
                     // add VirtualRouter as the default network service provider
                     addDefaultVirtualRouterToPhysicalNetwork(pNetwork.getId());
-
-                    // add security group provider to the physical network
-                    addDefaultSecurityGroupProviderToPhysicalNetwork(pNetwork.getId());
 
                     // add VPCVirtualRouter as the default network service provider
                     addDefaultVpcVirtualRouterToPhysicalNetwork(pNetwork.getId());
@@ -2017,9 +2010,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw ex;
         }
         if (newVnetRange != null) {
-            if (zone.getNetworkType() == NetworkType.Basic || zone.getNetworkType() == NetworkType.Advanced && zone.isSecurityGroupEnabled()) {
-                throw new InvalidParameterValueException("Can't add vnet range to the physical network in the zone that supports " + zone.getNetworkType()
-                        + " network, Security Group enabled: " + zone.isSecurityGroupEnabled());
+            if (zone.getNetworkType() == NetworkType.Basic) {
+                throw new InvalidParameterValueException("Can't add vnet range to the physical network in the zone that supports " + zone.getNetworkType() + " network");
             }
         }
 
@@ -3373,18 +3365,9 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     }
 
     @Override
-    @ActionEvent(eventType = EventTypes.EVENT_NIC_SECONDARY_IP_CONFIGURE, eventDescription = "Configuring secondary ip " +
-            "rules", async = true)
-    public boolean configureNicSecondaryIp(final NicSecondaryIp secIp, final boolean isZoneSgEnabled) {
-        boolean success = false;
-
-        if (isZoneSgEnabled) {
-            success = _securityGroupService.securityGroupRulesForVmSecIp(secIp.getNicId(), secIp.getIp4Address(), true);
-            s_logger.info("Associated ip address to NIC : " + secIp.getIp4Address());
-        } else {
-            success = true;
-        }
-        return success;
+    @ActionEvent(eventType = EventTypes.EVENT_NIC_SECONDARY_IP_CONFIGURE, eventDescription = "Configuring secondary ip rules", async = true)
+    public boolean configureNicSecondaryIp(final NicSecondaryIp secIp) {
+        return true;
     }
 
     private NicSecondaryIp getNicSecondaryIp(final long id) {
@@ -3487,10 +3470,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         element.addElement(nsp.getId(), Type.VirtualRouter);
 
         return nsp;
-    }
-
-    private PhysicalNetworkServiceProvider addDefaultSecurityGroupProviderToPhysicalNetwork(final long physicalNetworkId) {
-        return addProviderToPhysicalNetwork(physicalNetworkId, Provider.SecurityGroupProvider.getName(), null, null);
     }
 
     private PhysicalNetworkServiceProvider addDefaultVpcVirtualRouterToPhysicalNetwork(final long physicalNetworkId) {
@@ -3795,13 +3774,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         // can upgrade only Isolated networks
         if (oldNetworkOffering.getGuestType() != GuestType.Isolated) {
             throw new InvalidParameterValueException("NetworkOfferingId can be upgraded only for the network of type " + GuestType.Isolated);
-        }
-
-        // security group service should be the same
-        if (areServicesSupportedByNetworkOffering(oldNetworkOfferingId, Service.SecurityGroup) != areServicesSupportedByNetworkOffering(newNetworkOfferingId, Service
-                .SecurityGroup)) {
-            s_logger.debug("Offerings " + newNetworkOfferingId + " and " + oldNetworkOfferingId + " have different securityGroupProperty, can't upgrade");
-            return false;
         }
 
         // Type of the network should be the same

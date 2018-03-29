@@ -18,7 +18,6 @@ import com.cloud.api.command.user.offering.ListDiskOfferingsCmd;
 import com.cloud.api.command.user.offering.ListServiceOfferingsCmd;
 import com.cloud.api.command.user.project.ListProjectInvitationsCmd;
 import com.cloud.api.command.user.project.ListProjectsCmd;
-import com.cloud.api.command.user.securitygroup.ListSecurityGroupsCmd;
 import com.cloud.api.command.user.tag.ListTagsCmd;
 import com.cloud.api.command.user.vm.ListVMsCmd;
 import com.cloud.api.command.user.vmgroup.ListVMGroupsCmd;
@@ -584,8 +583,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
             // if the command is of the listXXXCommand, we will need to also return the
             // the job id and status if possible
             // For those listXXXCommand which we have already created DB views, this step is not needed since async job is joined in their db views.
-            if (cmdObj instanceof BaseListCmd && !(cmdObj instanceof ListVMsCmd) && !(cmdObj instanceof ListVMsCmdByAdmin) && !(cmdObj instanceof ListRoutersCmd)
-                    && !(cmdObj instanceof ListSecurityGroupsCmd) &&
+            if (cmdObj instanceof BaseListCmd && !(cmdObj instanceof ListVMsCmd) && !(cmdObj instanceof ListVMsCmdByAdmin) && !(cmdObj instanceof ListRoutersCmd) &&
                     !(cmdObj instanceof ListTagsCmd) && !(cmdObj instanceof ListEventsCmd) && !(cmdObj instanceof ListVMGroupsCmd) && !(cmdObj instanceof ListProjectsCmd) &&
                     !(cmdObj instanceof ListProjectAccountsCmd) && !(cmdObj instanceof ListProjectInvitationsCmd) && !(cmdObj instanceof ListHostsCmd) &&
                     !(cmdObj instanceof ListVolumesCmd) && !(cmdObj instanceof ListVolumesCmdByAdmin) && !(cmdObj instanceof ListUsersCmd) && !(cmdObj instanceof ListAccountsCmd)

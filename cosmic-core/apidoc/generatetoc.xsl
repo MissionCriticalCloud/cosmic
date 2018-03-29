@@ -288,18 +288,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='authorizeSecurityGroupIngress'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='detachIso'">
                                 <td>
                                     <A HREF="resumepage.html">
@@ -680,18 +668,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='listSecurityGroups'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='stopVirtualMachine'">
                                 <td>
                                     <A HREF="resumepage.html">
@@ -970,28 +946,6 @@
                                     </td>
                                     <td>
                                         <h4 ALIGN='CENTER'>Zone Specific Command Descriptions</h4>
-                                        <br></br>
-                                    </td>
-                                </tr>
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
-                            <xsl:if test="name='createSecurityGroup'">
-                                <tr>
-                                    <td>
-                                        <h4 ALIGN='CENTER'>Security Group Specific Commands</h4>
-                                        <br></br>
-                                    </td>
-                                    <td>
-                                        <h4 ALIGN='CENTER'>Security Group Specific Command Descriptions</h4>
                                         <br></br>
                                     </td>
                                 </tr>
@@ -2056,18 +2010,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='revokeSecurityGroupIngress'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='createDiskOffering'">
                                 <tr>
                                     <td>
@@ -2113,18 +2055,6 @@
                                         <br></br>
                                     </td>
                                 </tr>
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
-                            <xsl:if test="name='deleteSecurityGroup'">
                                 <td>
                                     <A HREF="resumepage.html">
                                         <xsl:value-of select="name" />

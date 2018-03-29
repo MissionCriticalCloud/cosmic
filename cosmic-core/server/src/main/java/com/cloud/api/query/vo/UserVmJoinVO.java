@@ -106,8 +106,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String dataCenterUuid;
     @Column(name = "data_center_name")
     private String dataCenterName = null;
-    @Column(name = "security_group_enabled")
-    private boolean securityGroupEnabled;
     @Column(name = "host_id", updatable = true, nullable = true)
     private long hostId;
     @Column(name = "host_uuid")
@@ -164,14 +162,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
     private Volume.Type volumeType;
-    @Column(name = "security_group_id")
-    private long securityGroupId;
-    @Column(name = "security_group_uuid")
-    private String securityGroupUuid;
-    @Column(name = "security_group_name")
-    private String securityGroupName;
-    @Column(name = "security_group_description")
-    private String securityGroupDescription;
     @Column(name = "vpc_id")
     private long vpcId;
     @Column(name = "vpc_uuid")
@@ -419,10 +409,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.dataCenterUuid = dataCenterUuid;
     }
 
-    public void setSecurityGroupEnabled(final boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
-    }
-
     public void setHostId(final long hostId) {
         this.hostId = hostId;
     }
@@ -525,22 +511,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setVolumeType(final Volume.Type volumeType) {
         this.volumeType = volumeType;
-    }
-
-    public void setSecurityGroupId(final long securityGroupId) {
-        this.securityGroupId = securityGroupId;
-    }
-
-    public void setSecurityGroupUuid(final String securityGroupUuid) {
-        this.securityGroupUuid = securityGroupUuid;
-    }
-
-    public void setSecurityGroupName(final String securityGroupName) {
-        this.securityGroupName = securityGroupName;
-    }
-
-    public void setSecurityGroupDescription(final String securityGroupDescription) {
-        this.securityGroupDescription = securityGroupDescription;
     }
 
     public void setVpcId(final long vpcId) {
@@ -907,10 +877,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         return dataCenterName;
     }
 
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
-
     public Long getHostId() {
         return hostId;
     }
@@ -993,18 +959,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public Volume.Type getVolumeType() {
         return volumeType;
-    }
-
-    public long getSecurityGroupId() {
-        return securityGroupId;
-    }
-
-    public String getSecurityGroupName() {
-        return securityGroupName;
-    }
-
-    public String getSecurityGroupDescription() {
-        return securityGroupDescription;
     }
 
     public long getVpcId() {
@@ -1145,10 +1099,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public String getVolume_uuid() {
         return volumeUuid;
-    }
-
-    public String getSecurityGroupUuid() {
-        return securityGroupUuid;
     }
 
     public String getVpcUuid() {

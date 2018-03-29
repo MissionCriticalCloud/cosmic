@@ -45,10 +45,8 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     SearchBuilder<NetworkVO> RelatedConfigSearch;
     SearchBuilder<NetworkVO> AccountNetworkSearch;
     SearchBuilder<NetworkVO> ZoneBroadcastUriSearch;
-    SearchBuilder<NetworkVO> ZoneSecurityGroupSearch;
     GenericSearchBuilder<NetworkVO, Integer> CountBy;
     SearchBuilder<NetworkVO> PhysicalNetworkSearch;
-    SearchBuilder<NetworkVO> SecurityGroupSearch;
     GenericSearchBuilder<NetworkVO, Long> NetworksRegularUserCanCreateSearch;
     GenericSearchBuilder<NetworkVO, Integer> NetworksCount;
     SearchBuilder<NetworkVO> SourceNATSearch;
@@ -142,13 +140,6 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
 
         CountByZoneAndURI.done();
 
-        ZoneSecurityGroupSearch = createSearchBuilder();
-        ZoneSecurityGroupSearch.and("dataCenterId", ZoneSecurityGroupSearch.entity().getDataCenterId(), Op.EQ);
-        final SearchBuilder<NetworkServiceMapVO> offJoin = _ntwkSvcMap.createSearchBuilder();
-        offJoin.and("service", offJoin.entity().getService(), Op.EQ);
-        ZoneSecurityGroupSearch.join("services", offJoin, ZoneSecurityGroupSearch.entity().getId(), offJoin.entity().getNetworkId(), JoinBuilder.JoinType.INNER);
-        ZoneSecurityGroupSearch.done();
-
         CountBy = createSearchBuilder(Integer.class);
         CountBy.select(null, Func.COUNT, CountBy.entity().getId());
         CountBy.and("offeringId", CountBy.entity().getNetworkOfferingId(), Op.EQ);
@@ -163,12 +154,6 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         PhysicalNetworkSearch = createSearchBuilder();
         PhysicalNetworkSearch.and("physicalNetworkId", PhysicalNetworkSearch.entity().getPhysicalNetworkId(), Op.EQ);
         PhysicalNetworkSearch.done();
-
-        SecurityGroupSearch = createSearchBuilder();
-        final SearchBuilder<NetworkServiceMapVO> join3 = _ntwkSvcMap.createSearchBuilder();
-        join3.and("service", join3.entity().getService(), Op.EQ);
-        SecurityGroupSearch.join("services", join3, SecurityGroupSearch.entity().getId(), join3.entity().getNetworkId(), JoinBuilder.JoinType.INNER);
-        SecurityGroupSearch.done();
 
         NetworksCount = createSearchBuilder(Integer.class);
         NetworksCount.select(null, Func.COUNT, NetworksCount.entity().getId());
@@ -415,16 +400,6 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listByZoneSecurityGroup(final Long zoneId) {
-        final SearchCriteria<NetworkVO> sc = ZoneSecurityGroupSearch.create();
-        if (zoneId != null) {
-            sc.setParameters("dataCenterId", zoneId);
-        }
-        sc.setJoinParameters("services", "service", Service.SecurityGroup.getName());
-        return search(sc, null);
-    }
-
-    @Override
     public void addDomainToNetwork(final long networkId, final long domainId, final Boolean subdomainAccess) {
         addDomainToNetworknetwork(networkId, domainId, subdomainAccess);
     }
@@ -438,13 +413,6 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     public List<NetworkVO> listByPhysicalNetwork(final long physicalNetworkId) {
         final SearchCriteria<NetworkVO> sc = PhysicalNetworkSearch.create();
         sc.setParameters("physicalNetworkId", physicalNetworkId);
-        return listBy(sc);
-    }
-
-    @Override
-    public List<NetworkVO> listSecurityGroupEnabledNetworks() {
-        final SearchCriteria<NetworkVO> sc = SecurityGroupSearch.create();
-        sc.setJoinParameters("services", "service", Service.SecurityGroup.getName());
         return listBy(sc);
     }
 

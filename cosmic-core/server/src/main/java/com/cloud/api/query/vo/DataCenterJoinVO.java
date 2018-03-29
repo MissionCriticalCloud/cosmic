@@ -24,8 +24,6 @@ public class DataCenterJoinVO extends BaseViewVO implements InternalIdentity, Id
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
     AllocationState allocationState;
-    @Column(name = "is_security_group_enabled")
-    boolean securityGroupEnabled;
     @Column(name = "is_local_storage_enabled")
     boolean localStorageEnabled;
     @Id
@@ -90,10 +88,6 @@ public class DataCenterJoinVO extends BaseViewVO implements InternalIdentity, Id
 
     public void setAllocationState(final AllocationState allocationState) {
         this.allocationState = allocationState;
-    }
-
-    public void setSecurityGroupEnabled(final boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
     }
 
     public void setLocalStorageEnabled(final boolean localStorageEnabled) {
@@ -244,10 +238,6 @@ public class DataCenterJoinVO extends BaseViewVO implements InternalIdentity, Id
 
     public AllocationState getAllocationState() {
         return allocationState;
-    }
-
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
     }
 
     public boolean isLocalStorageEnabled() {

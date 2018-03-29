@@ -171,12 +171,6 @@ public class Zone extends com.cloud.model.Zone {
     }
 
     @Access(AccessType.PROPERTY)
-    @Column(name = "is_security_group_enabled")
-    public boolean isSecurityGroupEnabled() {
-        return super.isSecurityGroupEnabled();
-    }
-
-    @Access(AccessType.PROPERTY)
     @Column(name = "userdata_provider")
     public String getUserDataProvider() {
         return super.getUserDataProvider();

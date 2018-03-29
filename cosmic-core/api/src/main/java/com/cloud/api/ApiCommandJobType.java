@@ -14,7 +14,6 @@ public enum ApiCommandJobType {
     StoragePool,
     ImageStore,
     IpAddress,
-    SecurityGroup,
     PhysicalNetwork,
     TrafficType,
     PhysicalNetworkServiceProvider,

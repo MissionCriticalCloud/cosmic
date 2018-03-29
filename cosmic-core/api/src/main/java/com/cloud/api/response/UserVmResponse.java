@@ -152,9 +152,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName("rootdevicetype")
     @Param(description = "device type of the root volume")
     private String rootDeviceType;
-    @SerializedName("securitygroup")
-    @Param(description = "list of security groups associated with the virtual machine", responseObject = SecurityGroupResponse.class)
-    private Set<SecurityGroupResponse> securityGroupList;
     @SerializedName(ApiConstants.PASSWORD)
     @Param(description = "the password (if exists) of the virtual machine", isSensitive = true)
     private String password;
@@ -205,7 +202,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     private Long osTypeId;
 
     public UserVmResponse() {
-        securityGroupList = new LinkedHashSet<>();
         nics = new LinkedHashSet<>();
         tags = new LinkedHashSet<>();
         tagIds = new LinkedHashSet<>();
@@ -582,14 +578,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
         this.rootDeviceType = rootDeviceType;
     }
 
-    public Set<SecurityGroupResponse> getSecurityGroupList() {
-        return securityGroupList;
-    }
-
-    public void setSecurityGroupList(final Set<SecurityGroupResponse> securityGroups) {
-        securityGroupList = securityGroups;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -680,10 +668,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void addNic(final NicResponse nic) {
         nics.add(nic);
-    }
-
-    public void addSecurityGroup(final SecurityGroupResponse securityGroup) {
-        securityGroupList.add(securityGroup);
     }
 
     public boolean containTag(final Long tagId) {

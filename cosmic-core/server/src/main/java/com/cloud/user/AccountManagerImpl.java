@@ -58,8 +58,6 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.RemoteAccessVpnDao;
 import com.cloud.network.dao.RemoteAccessVpnVO;
 import com.cloud.network.dao.VpnUserDao;
-import com.cloud.network.security.SecurityGroupManager;
-import com.cloud.network.security.dao.SecurityGroupDao;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpn.RemoteAccessVpnService;
@@ -189,11 +187,7 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
     @Inject
     private NetworkDao _networkDao;
     @Inject
-    private SecurityGroupDao _securityGroupDao;
-    @Inject
     private VMInstanceDao _vmDao;
-    @Inject
-    private SecurityGroupManager _networkGroupMgr;
     @Inject
     private NetworkOrchestrationService _networkMgr;
     @Inject
@@ -1156,10 +1150,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 s_logger.warn("Failed to cleanup remote access vpn resources as a part of account id=" + accountId + " cleanup due to Exception: ", ex);
                 accountCleanupNeeded = true;
             }
-
-            // Cleanup security groups
-            final int numRemoved = _securityGroupDao.removeByAccountId(accountId);
-            s_logger.info("deleteAccount: Deleted " + numRemoved + " network groups for account " + accountId);
 
             // Cleanup affinity groups
             final int numAGRemoved = _affinityGroupDao.removeByAccountId(accountId);
@@ -2132,9 +2122,6 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
 
                 // Create resource count records for the account
                 _resourceCountDao.createResourceCounts(accountId, ResourceLimit.ResourceOwnerType.Account);
-
-                // Create default security group
-                _networkGroupMgr.createDefaultSecurityGroup(accountId);
 
                 return account;
             }

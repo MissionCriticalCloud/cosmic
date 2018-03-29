@@ -21,7 +21,6 @@ import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.lb.LoadBalancingRulesService;
 import com.cloud.network.rules.RulesService;
-import com.cloud.network.security.SecurityGroupService;
 import com.cloud.network.vpc.NetworkACLService;
 import com.cloud.network.vpc.VpcProvisioningService;
 import com.cloud.network.vpc.VpcService;
@@ -87,8 +86,6 @@ public abstract class BaseCmd {
     public NetworkService _networkService;
     @Inject
     public TemplateApiService _templateService;
-    @Inject
-    public SecurityGroupService _securityGroupService;
     @Inject
     public SnapshotApiService _snapshotService;
     @Inject

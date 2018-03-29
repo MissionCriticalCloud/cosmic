@@ -172,7 +172,6 @@
     <bean id="networkOfferingDaoImpl" class="com.cloud.offerings.dao.NetworkOfferingDaoImpl" />
     <bean id="networkOfferingServiceMapDaoImpl" class="com.cloud.offerings.dao.NetworkOfferingServiceMapDaoImpl" />
     <bean id="networkOpDaoImpl" class="com.cloud.network.dao.NetworkOpDaoImpl" />
-    <bean id="networkRuleConfigDaoImpl" class="com.cloud.network.dao.NetworkRuleConfigDaoImpl" />
     <bean id="networkServiceMapDaoImpl" class="com.cloud.network.dao.NetworkServiceMapDaoImpl" />
     <bean id="nicDaoImpl" class="com.cloud.vm.dao.NicDaoImpl" />
     <bean id="nicDetailsDaoImpl" class="com.cloud.vm.dao.NicDetailsDaoImpl" />
@@ -204,12 +203,6 @@
     <bean id="routerNetworkDaoImpl" class="com.cloud.network.dao.RouterNetworkDaoImpl" />
     <bean id="sSHKeyPairDaoImpl" class="com.cloud.user.dao.SSHKeyPairDaoImpl" />
     <bean id="secondaryStorageVmDaoImpl" class="com.cloud.vm.dao.SecondaryStorageVmDaoImpl" />
-    <bean id="securityGroupDaoImpl" class="com.cloud.network.security.dao.SecurityGroupDaoImpl" />
-    <bean id="securityGroupJoinDaoImpl" class="com.cloud.api.query.dao.SecurityGroupJoinDaoImpl" />
-    <bean id="securityGroupRuleDaoImpl" class="com.cloud.network.security.dao.SecurityGroupRuleDaoImpl" />
-    <bean id="securityGroupRulesDaoImpl" class="com.cloud.network.security.dao.SecurityGroupRulesDaoImpl" />
-    <bean id="securityGroupVMMapDaoImpl" class="com.cloud.network.security.dao.SecurityGroupVMMapDaoImpl" />
-    <bean id="securityGroupWorkDaoImpl" class="com.cloud.network.security.dao.SecurityGroupWorkDaoImpl" />
     <bean id="serviceOfferingJoinDaoImpl" class="com.cloud.api.query.dao.ServiceOfferingJoinDaoImpl" />
     <bean id="site2SiteCustomerGatewayDaoImpl" class="com.cloud.network.dao.Site2SiteCustomerGatewayDaoImpl" />
     <bean id="site2SiteVpnConnectionDaoImpl" class="com.cloud.network.dao.Site2SiteVpnConnectionDaoImpl" />
@@ -249,7 +242,6 @@
     <bean id="vMTemplatePoolDaoImpl" class="com.cloud.storage.dao.VMTemplatePoolDaoImpl" />
     <bean id="vMTemplateZoneDaoImpl" class="com.cloud.storage.dao.VMTemplateZoneDaoImpl" />
     <bean id="virtualRouterProviderDaoImpl" class="com.cloud.network.dao.VirtualRouterProviderDaoImpl" />
-    <bean id="vmRulesetLogDaoImpl" class="com.cloud.network.security.dao.VmRulesetLogDaoImpl" />
     <bean id="volumeDaoImpl" class="com.cloud.storage.dao.VolumeDaoImpl" />
     <bean id="volumeDetailsDaoImpl" class="com.cloud.storage.dao.VolumeDetailsDaoImpl" />
     <bean id="volumeHostDaoImpl" class="com.cloud.storage.dao.VolumeHostDaoImpl" />

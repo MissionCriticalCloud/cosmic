@@ -32,7 +32,6 @@ public class Zone {
     private NetworkType networkType;
     private Date removed;
     private String routerMacAddress = "02:00:00:00:00:01";
-    private boolean securityGroupEnabled;
     private String userDataProvider;
     private String uuid;
     private String vpnProvider;
@@ -228,14 +227,6 @@ public class Zone {
 
     public void setRouterMacAddress(final String routerMacAddress) {
         this.routerMacAddress = routerMacAddress;
-    }
-
-    public boolean isSecurityGroupEnabled() {
-        return securityGroupEnabled;
-    }
-
-    public void setSecurityGroupEnabled(final boolean securityGroupEnabled) {
-        this.securityGroupEnabled = securityGroupEnabled;
     }
 
     public String getUserDataProvider() {

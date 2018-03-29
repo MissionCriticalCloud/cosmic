@@ -79,7 +79,6 @@ known_categories = {
     'StorageMaintenance': 'Storage Pool',
     'StoragePool': 'Storage Pool',
     'StorageProvider': 'Storage Pool',
-    'SecurityGroup': 'Security Group',
     'SSH': 'SSH',
     'register': 'Registration',
     'AsyncJob': 'Async job',

@@ -10,7 +10,6 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.AsyncJobResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.IPAddressResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.SnapshotResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.TemplateResponse;
@@ -73,7 +72,6 @@ public class ApiXmlDocWriter {
         asyncResponses.add(IPAddressResponse.class.getName());
         asyncResponses.add(StoragePoolResponse.class.getName());
         asyncResponses.add(UserVmResponse.class.getName());
-        asyncResponses.add(SecurityGroupResponse.class.getName());
         asyncResponses.add(SnapshotResponse.class.getName());
 
         return asyncResponses;

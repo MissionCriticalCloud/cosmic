@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "classpath:/testContext.xml")
 public class GlobalLockTest {
     public static final Logger s_logger = LoggerFactory.getLogger(GlobalLockTest.class);
-    private final static GlobalLock WorkLock = GlobalLock.getInternLock("SecurityGroupWork");
+    private final static GlobalLock WorkLock = GlobalLock.getInternLock("LockWork");
 
     @Test
     public void testTimeout() {

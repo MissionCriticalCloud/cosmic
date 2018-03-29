@@ -145,5 +145,5 @@ public interface NetworkService {
 
     IpAddress updateIP(Long id, String customId, Boolean displayIp);
 
-    boolean configureNicSecondaryIp(NicSecondaryIp secIp, boolean isZoneSgEnabled);
+    boolean configureNicSecondaryIp(NicSecondaryIp secIp);
 }

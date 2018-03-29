@@ -81,7 +81,6 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
-import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.org.Cluster;
@@ -1925,12 +1924,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         if (hypervisorType == null) {
             s_logger.error("Unable to resolve " + cmd.getHypervisor() + " to a valid supported hypervisor type");
             throw new InvalidParameterValueException("Unable to resolve " + cmd.getHypervisor() + " to a supported ");
-        }
-
-        if (zone.isSecurityGroupEnabled() && zone.getNetworkType().equals(NetworkType.Advanced)) {
-            if (hypervisorType != HypervisorType.KVM && hypervisorType != HypervisorType.XenServer) {
-                throw new InvalidParameterValueException("Don't support hypervisor type " + hypervisorType + " in advanced security enabled zone");
-            }
         }
 
         Cluster.ClusterType clusterType = null;
