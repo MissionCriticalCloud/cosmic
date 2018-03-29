@@ -4,6 +4,7 @@ import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.network.IpAddress.State;
+import com.cloud.network.vpc.NetworkACL;
 import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;
@@ -157,6 +158,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
 
         final IPAddressVO ip = createForUpdate();
         ip.setState(State.Releasing);
+        ip.setIpACLId(NetworkACL.DEFAULT_DENY);
         if (update(ip, sc) != 1) {
             return null;
         }

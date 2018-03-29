@@ -55,6 +55,7 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
+import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
@@ -644,6 +645,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                 addr.setAllocatedInDomainId(owner.getDomainId());
                 addr.setAllocatedToAccountId(owner.getId());
                 addr.setSystem(isSystem);
+                addr.setIpACLId(NetworkACL.DEFAULT_DENY);
                 if (displayIp != null) {
                     addr.setDisplay(displayIp);
                 }
@@ -795,6 +797,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         for (final IPAddressVO addr : userIps) {
             if (addr.getState() == IpAddress.State.Allocating) {
                 addr.setAssociatedWithNetworkId(network.getId());
+                addr.setIpACLId(NetworkACL.DEFAULT_DENY);
                 markPublicIpAsAllocated(addr);
             } else if (addr.getState() == IpAddress.State.Releasing) {
                 // Cleanup all the resources for ip address if there are any, and only then un-assign ip in the system
