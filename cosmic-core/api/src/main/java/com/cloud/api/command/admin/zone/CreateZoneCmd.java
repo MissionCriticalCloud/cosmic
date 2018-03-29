@@ -67,9 +67,6 @@ public class CreateZoneCmd extends BaseCmd {
     @Parameter(name = ApiConstants.ALLOCATION_STATE, type = CommandType.STRING, description = "Allocation state of this Zone for allocation of new resources")
     private String allocationState;
 
-    @Parameter(name = ApiConstants.SECURITY_GROUP_EANBLED, type = CommandType.BOOLEAN, description = "true if network is security group enabled, false otherwise")
-    private Boolean securitygroupenabled;
-
     @Parameter(name = ApiConstants.LOCAL_STORAGE_ENABLED, type = CommandType.BOOLEAN, description = "true if local storage offering enabled, false otherwise")
     private Boolean localStorageEnabled;
 
@@ -119,13 +116,6 @@ public class CreateZoneCmd extends BaseCmd {
 
     public String getAllocationState() {
         return allocationState;
-    }
-
-    public Boolean getSecuritygroupenabled() {
-        if (securitygroupenabled == null) {
-            return false;
-        }
-        return securitygroupenabled;
     }
 
     public Boolean getLocalStorageEnabled() {

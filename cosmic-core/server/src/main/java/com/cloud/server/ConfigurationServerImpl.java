@@ -360,42 +360,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 } catch (final SQLException ex) {
                     s_logger.debug("Looks like admin user already exists");
                 }
-
-                try {
-                    String tableName = "security_group";
-                    try {
-                        final String checkSql = "SELECT * from network_group";
-                        final PreparedStatement stmt = txn.prepareAutoCloseStatement(checkSql);
-                        stmt.executeQuery();
-                        tableName = "network_group";
-                    } catch (final Exception ex) {
-                        // Ignore in case of exception, table must not exist
-                    }
-
-                    insertSql = "SELECT * FROM " + tableName + " where account_id=2 and name='default'";
-                    PreparedStatement stmt = txn.prepareAutoCloseStatement(insertSql);
-                    final ResultSet rs = stmt.executeQuery();
-                    if (!rs.next()) {
-                        // save default security group
-                        if (tableName.equals("security_group")) {
-                            insertSql = "INSERT INTO " + tableName + " (uuid, name, description, account_id, domain_id) "
-                                    + "VALUES (UUID(), 'default', 'Default Security Group', 2, 1)";
-                        } else {
-                            insertSql = "INSERT INTO " + tableName + " (name, description, account_id, domain_id, account_name) "
-                                    + "VALUES ('default', 'Default Security Group', 2, 1, 'admin')";
-                        }
-
-                        try {
-                            stmt = txn.prepareAutoCloseStatement(insertSql);
-                            stmt.executeUpdate();
-                        } catch (final SQLException ex) {
-                            s_logger.warn("Failed to create default security group for default admin account due to ", ex);
-                        }
-                    }
-                    rs.close();
-                } catch (final Exception ex) {
-                    s_logger.warn("Failed to create default security group for default admin account due to ", ex);
-                }
             }
         });
     }
@@ -477,7 +441,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     } else if (trafficType == TrafficType.Control) {
                         broadcastDomainType = BroadcastDomainType.LinkLocal;
                     } else if (offering.getTrafficType() == TrafficType.Public) {
-                        if ((zone.getNetworkType() == NetworkType.Advanced && !zone.isSecurityGroupEnabled()) || zone.getNetworkType() == NetworkType.Basic) {
+                        if (zone.getNetworkType() == NetworkType.Advanced || zone.getNetworkType() == NetworkType.Basic) {
                             specifyIpRanges = true;
                             broadcastDomainType = BroadcastDomainType.Vlan;
                         } else {

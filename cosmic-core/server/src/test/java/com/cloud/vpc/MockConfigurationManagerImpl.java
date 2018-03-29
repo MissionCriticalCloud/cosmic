@@ -340,12 +340,9 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     @Override
-    public DataCenterVO createZone(final long userId, final String zoneName, final String dns1, final String dns2, final String internalDns1, final String internalDns2, final
-    String guestCidr, final String domain,
-                                   final Long domainId, final NetworkType zoneType, final String allocationState, final String networkDomain, final boolean
-                                           isSecurityGroupEnabled, final boolean
-                                           isLocalStorageEnabled, final String ip6Dns1,
-                                   final String ip6Dns2) {
+    public DataCenterVO createZone(final long userId, final String zoneName, final String dns1, final String dns2, final String internalDns1, final String internalDns2, final String guestCidr,
+                                   final String domain, final Long domainId, final NetworkType zoneType, final String allocationState, final String networkDomain, final boolean
+                                           isLocalStorageEnabled, final String ip6Dns1, final String ip6Dns2) {
         // TODO Auto-generated method stub
         return null;
     }

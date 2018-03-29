@@ -21,7 +21,6 @@ import com.cloud.api.query.vo.ImageStoreJoinVO;
 import com.cloud.api.query.vo.InstanceGroupJoinVO;
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
-import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.api.query.vo.ServiceOfferingJoinVO;
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.query.vo.TemplateJoinVO;
@@ -79,8 +78,6 @@ import com.cloud.api.response.ResourceCountResponse;
 import com.cloud.api.response.ResourceLimitResponse;
 import com.cloud.api.response.ResourceTagResponse;
 import com.cloud.api.response.SSHKeyPairResponse;
-import com.cloud.api.response.SecurityGroupResponse;
-import com.cloud.api.response.SecurityGroupRuleResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.ServiceResponse;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
@@ -166,9 +163,6 @@ import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.network.security.SecurityGroup;
-import com.cloud.network.security.SecurityRule;
-import com.cloud.network.security.SecurityRule.SecurityRuleType;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.PrivateGateway;
@@ -1359,74 +1353,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         return createTemplateResponses(view, templateId, zoneId, readyOnly);
     }
 
-    @Override
-    public SecurityGroupResponse createSecurityGroupResponseFromSecurityGroupRule(final List<? extends SecurityRule> securityRules) {
-        final SecurityGroupResponse response = new SecurityGroupResponse();
-        final Map<Long, Account> securiytGroupAccounts = new HashMap<>();
-
-        if (securityRules != null && !securityRules.isEmpty()) {
-            final SecurityGroupJoinVO securityGroup = ApiDBUtils.findSecurityGroupViewById(securityRules.get(0).getSecurityGroupId()).get(0);
-            response.setId(securityGroup.getUuid());
-            response.setName(securityGroup.getName());
-            response.setDescription(securityGroup.getDescription());
-
-            securiytGroupAccounts.get(securityGroup.getAccountId());
-
-            if (securityGroup.getAccountType() == Account.ACCOUNT_TYPE_PROJECT) {
-                response.setProjectId(securityGroup.getProjectUuid());
-                response.setProjectName(securityGroup.getProjectName());
-            } else {
-                response.setAccountName(securityGroup.getAccountName());
-            }
-
-            response.setDomainId(securityGroup.getDomainUuid());
-            response.setDomainName(securityGroup.getDomainName());
-
-            for (final SecurityRule securityRule : securityRules) {
-                final SecurityGroupRuleResponse securityGroupData = new SecurityGroupRuleResponse();
-
-                securityGroupData.setRuleId(securityRule.getUuid());
-                securityGroupData.setProtocol(securityRule.getProtocol());
-                if ("icmp".equalsIgnoreCase(securityRule.getProtocol())) {
-                    securityGroupData.setIcmpType(securityRule.getStartPort());
-                    securityGroupData.setIcmpCode(securityRule.getEndPort());
-                } else {
-                    securityGroupData.setStartPort(securityRule.getStartPort());
-                    securityGroupData.setEndPort(securityRule.getEndPort());
-                }
-
-                final Long allowedSecurityGroupId = securityRule.getAllowedNetworkId();
-                if (allowedSecurityGroupId != null) {
-                    final List<SecurityGroupJoinVO> sgs = ApiDBUtils.findSecurityGroupViewById(allowedSecurityGroupId);
-                    if (sgs != null && sgs.size() > 0) {
-                        final SecurityGroupJoinVO sg = sgs.get(0);
-                        securityGroupData.setSecurityGroupName(sg.getName());
-                        securityGroupData.setAccountName(sg.getAccountName());
-                    }
-                } else {
-                    securityGroupData.setCidr(securityRule.getAllowedSourceIpCidr());
-                }
-                if (securityRule.getRuleType() == SecurityRuleType.IngressRule) {
-                    securityGroupData.setObjectName("ingressrule");
-                    response.addSecurityGroupIngressRule(securityGroupData);
-                } else {
-                    securityGroupData.setObjectName("egressrule");
-                    response.addSecurityGroupEgressRule(securityGroupData);
-                }
-            }
-            response.setObjectName("securitygroup");
-        }
-        return response;
-    }
-
-    @Override
-    public SecurityGroupResponse createSecurityGroupResponse(final SecurityGroup group) {
-        final List<SecurityGroupJoinVO> viewSgs = ApiDBUtils.newSecurityGroupView(group);
-        final List<SecurityGroupResponse> listSgs = ViewResponseHelper.createSecurityGroupResponses(viewSgs);
-        assert listSgs != null && listSgs.size() == 1 : "There should be one security group returned";
-        return listSgs.get(0);
-    }
-
     //TODO: we need to deprecate uploadVO, since extract is done in a synchronous fashion
     @Override
     public ExtractResponse createExtractResponse(final Long id, final Long zoneId, final Long accountId, final String mode, final String url) {
@@ -2017,16 +1943,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public Long getSecurityGroupId(final String groupName, final long accountId) {
-        final SecurityGroup sg = ApiDBUtils.getSecurityGroup(groupName, accountId);
-        if (sg == null) {
-            return null;
-        } else {
-            return sg.getId();
-        }
-    }
-
-    @Override
     public List<TemplateResponse> createIsoResponses(final ResponseView view, final VirtualMachineTemplate result, final Long zoneId, final boolean readyOnly) {
         final List<TemplateJoinVO> tvo;
         if (zoneId == null || zoneId == -1) {
@@ -2102,7 +2018,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         hpvCapabilitiesResponse.setId(hpvCapabilities.getUuid());
         hpvCapabilitiesResponse.setHypervisor(hpvCapabilities.getHypervisorType());
         hpvCapabilitiesResponse.setHypervisorVersion(hpvCapabilities.getHypervisorVersion());
-        hpvCapabilitiesResponse.setIsSecurityGroupEnabled(hpvCapabilities.isSecurityGroupEnabled());
         hpvCapabilitiesResponse.setMaxGuestsLimit(hpvCapabilities.getMaxGuestsLimit());
         hpvCapabilitiesResponse.setMaxDataVolumesLimit(hpvCapabilities.getMaxDataVolumesLimit());
         hpvCapabilitiesResponse.setMaxHostsPerCluster(hpvCapabilities.getMaxHostsPerCluster());

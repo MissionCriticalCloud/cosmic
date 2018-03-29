@@ -1,14 +1,10 @@
 package com.cloud.vm.dao;
 
-import com.cloud.api.response.SecurityGroupRuleResponse;
-
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class UserVmData {
-    private final Set<SecurityGroupData> securityGroupList;
     private final Set<NicData> nics;
     private Long id;
     private String name;
@@ -62,7 +58,6 @@ public class UserVmData {
     private boolean initialized;
 
     public UserVmData() {
-        securityGroupList = new HashSet<>();
         nics = new HashSet<>();
         initialized = false;
     }
@@ -77,10 +72,6 @@ public class UserVmData {
 
     public NicData newNicData() {
         return new NicData();
-    }
-
-    public SecurityGroupData newSecurityGroupData() {
-        return new SecurityGroupData();
     }
 
     public String getHypervisor() {
@@ -439,14 +430,6 @@ public class UserVmData {
         this.nics.add(nics);
     }
 
-    public Set<SecurityGroupData> getSecurityGroupList() {
-        return securityGroupList;
-    }
-
-    public void addSecurityGroup(final SecurityGroupData securityGroups) {
-        this.securityGroupList.add(securityGroups);
-    }
-
     public long getAccountId() {
         return accountId;
     }
@@ -622,114 +605,6 @@ public class UserVmData {
                 return false;
             }
             final NicData other = (NicData) obj;
-            if (id == null) {
-                if (other.id != null) {
-                    return false;
-                }
-            } else if (!id.equals(other.id)) {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    public class SecurityGroupData {
-        private String objectName;
-        private Long id;
-        private String name;
-        private String description;
-        private String accountName;
-        private Long domainId;
-        private String domainName;
-        private Long jobId;
-        private Integer jobStatus;
-        private List<SecurityGroupRuleResponse> securityGroupRules;
-
-        public String getObjectName() {
-            return objectName;
-        }
-
-        public void setObjectName(final String objectName) {
-            this.objectName = objectName;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(final Long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(final String description) {
-            this.description = description;
-        }
-
-        public String getAccountName() {
-            return accountName;
-        }
-
-        public void setAccountName(final String accountName) {
-            this.accountName = accountName;
-        }
-
-        public Long getDomainId() {
-            return domainId;
-        }
-
-        public void setDomainId(final Long domainId) {
-            this.domainId = domainId;
-        }
-
-        public String getDomainName() {
-            return domainName;
-        }
-
-        public void setDomainName(final String domainName) {
-            this.domainName = domainName;
-        }
-
-        /* FIXME : the below functions are not used, so commenting out later need to include egress list
-                public List<SecurityGroupRuleResponse> getIngressRules() {
-                    return securityGroupRules;
-                }
-
-                public void setIngressRules(List<SecurityGroupRuleResponse> securityGroupRules) {
-                    this.securityGroupRules = securityGroupRules;
-                } */
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((id == null) ? 0 : id.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final SecurityGroupData other = (SecurityGroupData) obj;
             if (id == null) {
                 if (other.id != null) {
                     return false;

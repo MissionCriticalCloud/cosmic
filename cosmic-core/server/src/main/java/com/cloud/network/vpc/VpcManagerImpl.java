@@ -144,7 +144,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     protected final List<HypervisorType> hTypes = new ArrayList<>();
     private final ScheduledExecutorService _executor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("VpcChecker"));
-    private final List<Service> nonSupportedServices = Arrays.asList(Service.SecurityGroup, Service.Firewall);
+    private final List<Service> nonSupportedServices = Arrays.asList(Service.Firewall);
     private final List<Provider> supportedProviders = Arrays.asList(Provider.VPCVirtualRouter, Provider.NiciraNvp);
     @Inject
     EntityManager _entityMgr;

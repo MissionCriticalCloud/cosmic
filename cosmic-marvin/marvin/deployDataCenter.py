@@ -11,6 +11,8 @@ class DeleteDataCenters: Deletes a DataCenter based upon the dc cfg
 import os
 import pickle
 import sys
+from marvin.cloudstackAPI import *
+from marvin.utils.MarvinLog import MarvinLog
 from optparse import OptionParser
 from time import sleep, strftime, localtime
 
@@ -20,8 +22,6 @@ from cloudstackTestClient import CSTestClient
 from codes import (FAILED, SUCCESS)
 from config.test_data import test_data
 from lib.utils import random_gen
-from marvin.cloudstackAPI import *
-from marvin.utils.MarvinLog import MarvinLog
 
 
 class DeployDataCenters(object):
@@ -37,7 +37,7 @@ class DeployDataCenters(object):
         self.__config = cfg
         self.__logger = MarvinLog('marvin').get_logger()
         self.__apiClient = None
-        self.__cleanUp = {}
+        self.__cleanUp = { }
 
     def __persistDcConfig(self):
         try:
@@ -160,7 +160,7 @@ class DeployDataCenters(object):
                 primarycmd = createStoragePool.createStoragePoolCmd()
                 if primary.details:
                     for key, value in vars(primary.details).iteritems():
-                        primarycmd.details.append({key: value})
+                        primarycmd.details.append({ key: value })
                 primarycmd.name = primary.name
 
                 primarycmd.tags = primary.tags
@@ -382,8 +382,6 @@ class DeployDataCenters(object):
                         vrconfig.id = vrprovid
                         self.__apiClient.configureVirtualRouterElement(vrconfig)
                         self.enableProvider(pnetprovres[0].id)
-                    elif provider.name == 'SecurityGroupProvider':
-                        self.enableProvider(pnetprovres[0].id)
                 elif provider.name in ['NiciraNvp']:
                     netprov = addNetworkServiceProvider.addNetworkServiceProviderCmd()
                     netprov.name = provider.name
@@ -489,12 +487,10 @@ class DeployDataCenters(object):
                 zonecmd.internaldns1 = zone.internaldns1
                 zonecmd.internaldns2 = zone.internaldns2
                 zonecmd.name = zone.name
-                zonecmd.securitygroupenabled = zone.securitygroupenabled
                 zonecmd.localstorageenabled = zone.localstorageenabled
                 zonecmd.networktype = zone.networktype
                 zonecmd.domain = zone.domain
-                if zone.securitygroupenabled != "true":
-                    zonecmd.guestcidraddress = zone.guestcidraddress
+                zonecmd.guestcidraddress = zone.guestcidraddress
                 zoneId = self.createZone(zonecmd)
                 if zoneId == FAILED:
                     self.__logger.error("=== Zone: %s Creation Failed. So Exiting ===" % str(zone.name))
@@ -521,34 +517,10 @@ class DeployDataCenters(object):
                     self.createPods(zone.pods, zoneId, networkid)
                     if self.isEipElbZone(zone):
                         self.createVlanIpRanges(zone.networktype, zone.ipranges, zoneId, forvirtualnetwork=True)
-                isPureAdvancedZone = (zone.networktype == "Advanced" and zone.securitygroupenabled != "true")
+                isPureAdvancedZone = zone.networktype == "Advanced"
                 if isPureAdvancedZone:
                     self.createPods(zone.pods, zoneId)
                     self.createVlanIpRanges(zone.networktype, zone.ipranges, zoneId)
-                elif zone.networktype == "Advanced" and zone.securitygroupenabled == "true":
-                    listnetworkoffering = listNetworkOfferings.listNetworkOfferingsCmd()
-                    listnetworkoffering.name = "DefaultSharedNetworkOfferingWithSGService"
-                    if zone.networkofferingname is not None:
-                        listnetworkoffering.name = zone.networkofferingname
-                    listnetworkofferingresponse = self.__apiClient.listNetworkOfferings(listnetworkoffering)
-                    networkcmd = createNetwork.createNetworkCmd()
-                    networkcmd.displaytext = "Shared SG enabled network"
-                    networkcmd.name = "Shared SG enabled network"
-                    networkcmd.networkofferingid = listnetworkofferingresponse[0].id
-                    networkcmd.zoneid = zoneId
-                    ipranges = zone.ipranges
-                    if ipranges:
-                        iprange = ipranges.pop()
-                        networkcmd.startip = iprange.startip
-                        networkcmd.endip = iprange.endip
-                        networkcmd.gateway = iprange.gateway
-                        networkcmd.netmask = iprange.netmask
-                        networkcmd.vlan = iprange.vlan
-                    networkcmdresponse = self.__apiClient.createNetwork(networkcmd)
-                    if networkcmdresponse.id:
-                        self.__addToCleanUp("Network", networkcmdresponse.id)
-                        self.__logger.debug("create Network Successful. NetworkId : %s " % str(networkcmdresponse.id))
-                    self.createPods(zone.pods, zoneId, networkcmdresponse.id)
                 '''Note: Swift needs cache storage first'''
                 self.createCacheStorages(zone.cacheStorages, zoneId)
                 self.createSecondaryStorages(zone.secondaryStorages, zoneId)

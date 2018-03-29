@@ -21,7 +21,6 @@ import com.cloud.api.query.vo.ProjectAccountJoinVO;
 import com.cloud.api.query.vo.ProjectInvitationJoinVO;
 import com.cloud.api.query.vo.ProjectJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
-import com.cloud.api.query.vo.SecurityGroupJoinVO;
 import com.cloud.api.query.vo.ServiceOfferingJoinVO;
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.query.vo.StorageTagVO;
@@ -44,7 +43,6 @@ import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectInvitationResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceTagResponse;
-import com.cloud.api.response.SecurityGroupResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.StorageTagResponse;
@@ -112,7 +110,7 @@ public class ViewResponseHelper {
                 // first time encountering this vm
                 userVmData = ApiDBUtils.newUserVmResponse(view, objectName, userVm, details, caller);
             } else {
-                // update nics, securitygroups, tags, affinitygroups for 1 to many mapping fields
+                // update nics, tags, affinitygroups for 1 to many mapping fields
                 userVmData = ApiDBUtils.fillVmDetails(view, userVmData, userVm);
             }
             vmDataList.put(userVm.getId(), userVmData);
@@ -132,24 +130,6 @@ public class ViewResponseHelper {
             } else {
                 // update nics for 1 to many mapping fields
                 vrData = ApiDBUtils.fillRouterDetails(vrData, vr);
-            }
-            vrDataList.put(vr.getId(), vrData);
-        }
-        return new ArrayList<>(vrDataList.values());
-    }
-
-    public static List<SecurityGroupResponse> createSecurityGroupResponses(final List<SecurityGroupJoinVO> securityGroups) {
-        final Account caller = CallContext.current().getCallingAccount();
-        final Hashtable<Long, SecurityGroupResponse> vrDataList = new Hashtable<>();
-        // Initialise the vrdatalist with the input data
-        for (final SecurityGroupJoinVO vr : securityGroups) {
-            SecurityGroupResponse vrData = vrDataList.get(vr.getId());
-            if (vrData == null) {
-                // first time encountering this sg
-                vrData = ApiDBUtils.newSecurityGroupResponse(vr, caller);
-            } else {
-                // update rules for 1 to many mapping fields
-                vrData = ApiDBUtils.fillSecurityGroupDetails(vrData, vr);
             }
             vrDataList.put(vr.getId(), vrData);
         }

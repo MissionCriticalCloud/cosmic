@@ -790,11 +790,6 @@ public class NetUtils {
         }
     }
 
-    public static boolean isValidSecurityGroupProto(final String p) {
-        final String proto = p.toLowerCase();
-        return proto.equals(TCP_PROTO) || proto.equals(UDP_PROTO) || proto.equals(ICMP_PROTO) || proto.equals(ALL_PROTO);
-    }
-
     public static boolean isValidAlgorithm(final String p) {
         final String algo = p.toLowerCase();
         return algo.equals("roundrobin") || algo.equals("leastconn") || algo.equals("source");

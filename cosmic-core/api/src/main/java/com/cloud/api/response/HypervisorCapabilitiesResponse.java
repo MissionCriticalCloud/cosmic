@@ -27,10 +27,6 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
     @Param(description = "the maximum number of guest vms recommended for this hypervisor")
     private Long maxGuestsLimit;
 
-    @SerializedName(ApiConstants.SECURITY_GROUP_EANBLED)
-    @Param(description = "true if security group is supported")
-    private boolean isSecurityGroupEnabled;
-
     @SerializedName(ApiConstants.MAX_DATA_VOLUMES_LIMIT)
     @Param(description = "the maximum number of Data Volumes that can be attached for this hypervisor")
     private Integer maxDataVolumesLimit;
@@ -73,14 +69,6 @@ public class HypervisorCapabilitiesResponse extends BaseResponse {
 
     public void setMaxGuestsLimit(final Long maxGuestsLimit) {
         this.maxGuestsLimit = maxGuestsLimit;
-    }
-
-    public Boolean getIsSecurityGroupEnabled() {
-        return this.isSecurityGroupEnabled;
-    }
-
-    public void setIsSecurityGroupEnabled(final Boolean sgEnabled) {
-        this.isSecurityGroupEnabled = sgEnabled;
     }
 
     public Boolean getIsStorageMotionSupported() {

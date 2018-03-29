@@ -171,8 +171,6 @@
                         <exclude>com/cloud/vm/dao/*</exclude>
                         <exclude>com/cloud/api/ListPerfTest.java</exclude>
                         <exclude>com/cloud/network/vpn/RemoteAccessVpnTest.java</exclude>
-                        <exclude>com/cloud/network/security/SecurityGroupManagerImpl2Test.java</exclude>
-                        <exclude>com/cloud/network/security/SecurityGroupManagerImpl2Test.java</exclude>
                         <exclude>com/cloud/vpc/VpcTestConfiguration.java</exclude>
                         <exclude>com/cloud/vpc/VpcApiUnitTest.java</exclude>
                         <exclude>com/cloud/vpc/VpcManagerTest.java</exclude>

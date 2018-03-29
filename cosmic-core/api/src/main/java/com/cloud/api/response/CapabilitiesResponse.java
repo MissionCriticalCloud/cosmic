@@ -7,10 +7,6 @@ import com.cloud.serializer.Param;
 import com.google.gson.annotations.SerializedName;
 
 public class CapabilitiesResponse extends BaseResponse {
-    @SerializedName("securitygroupsenabled")
-    @Param(description = "true if security groups support is enabled, false otherwise")
-    private boolean securityGroupsEnabled;
-
     @SerializedName("cloudstackversion")
     @Param(description = "version of the cloud stack")
     private String cloudStackVersion;
@@ -81,10 +77,6 @@ public class CapabilitiesResponse extends BaseResponse {
 
     public void setKvmDeploymentsEnabled(final boolean kvmDeploymentsEnabled) {
         this.kvmDeploymentsEnabled = kvmDeploymentsEnabled;
-    }
-
-    public void setSecurityGroupsEnabled(final boolean securityGroupsEnabled) {
-        this.securityGroupsEnabled = securityGroupsEnabled;
     }
 
     public void setCloudStackVersion(final String cloudStackVersion) {
