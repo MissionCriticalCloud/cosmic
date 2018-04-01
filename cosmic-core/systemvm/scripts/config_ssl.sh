@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+NGINX_UPLOAD_CONF="/etc/nginx/conf.d/upload.conf"
+
 help() {
    printf " -c use customized key/cert\n"
    printf " -k path of private key\n"
@@ -8,90 +10,63 @@ help() {
    printf " -u path of root ca certificate \n"
 }
 
+config_nginx_conf() {
+    local ip=$1
+    local srvr=$2
+    cat > $NGINX_UPLOAD_CONF << EOF
+server {
+  listen $ip:80;
+  listen $ip:443 ssl;
+  server_name $srvr;
+  ssl_certificate /etc/nginx/ssl/certs/cert_nginx.crt;
+  ssl_certificate_key /etc/nginx/ssl/keys/cert_nginx.key;
+  ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+  ssl_ciphers HIGH:!aNULL:!MD5;
+  client_max_body_size 20G;
+  location /upload/ {
+    if (\$request_method = 'GET') {
+      return 401;
+    }
+    if (\$request_method = 'OPTIONS') {
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token, x-signature, x-metadata, x-expires" always;
+      add_header 'Access-Control-Max-Age' 1728000;
+      add_header Content-Type "text/plain charset=UTF-8";
+      add_header Content-Length "0";
+      return 204;
+    }
+    if (\$request_method = 'POST') {
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token, x-signature, x-metadata, x-expires" always;
+    }
 
-config_httpd_conf() {
-  local ip=$1
-  local srvr=$2
-  cp -f /etc/httpd/conf/httpd.conf.orig /etc/httpd/conf/httpd.conf
-  sed -i -e "s/Listen.*:80$/Listen $ip:80/" /etc/httpd/conf/httpd.conf
-  echo "<VirtualHost $ip:443> " >> /etc/httpd/conf/httpd.conf
-  echo "  DocumentRoot /var/www/html/" >> /etc/httpd/conf/httpd.conf
-  echo "  ServerName $srvr" >> /etc/httpd/conf/httpd.conf
-  echo "  SSLEngine on" >>  /etc/httpd/conf/httpd.conf
-  echo "  SSLProtocol all -SSLv2 -SSLv3" >>  /etc/httpd/conf/httpd.conf
-  echo "  SSLCertificateFile /etc/httpd/ssl/certs/realhostip.crt" >>  /etc/httpd/conf/httpd.conf
-  echo "  SSLCertificateKeyFile /etc/httpd/ssl/keys/realhostip.key" >> /etc/httpd/conf/httpd.conf
-  echo "</VirtualHost>" >> /etc/httpd/conf/httpd.conf
+    rewrite /upload/(.*) /upload?uuid=\$1 break;
+    proxy_pass http://127.0.0.1:8210;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Forwarded-Host \$host:\$server_port;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+  }
 }
-
-config_apache2_conf() {
-  local ip=$1
-  local srvr=$2
-  cp -f /etc/apache2/sites-available/default.orig /etc/apache2/sites-available/default
-  cp -f /etc/apache2/sites-available/default-ssl.orig /etc/apache2/sites-available/default-ssl
-  sed -i -e "s/<VirtualHost.*>/<VirtualHost $ip:80>/" /etc/apache2/sites-available/default
-  sed -i -e "s/<VirtualHost.*>/<VirtualHost $ip:443>/" /etc/apache2/sites-available/default-ssl
-  sed -i -e "s/Listen .*:80/Listen $ip:80/g" /etc/apache2/ports.conf
-  sed -i -e "s/Listen .*:443/Listen $ip:443/g" /etc/apache2/ports.conf
-  sed -i -e "s/NameVirtualHost .*:80/NameVirtualHost $ip:80/g" /etc/apache2/ports.conf
-  sed -i  's/ssl-cert-snakeoil.key/cert_apache.key/' /etc/apache2/sites-available/default-ssl
-  sed -i  's/ssl-cert-snakeoil.pem/cert_apache.crt/' /etc/apache2/sites-available/default-ssl
-  sed -i  's/SSLProtocol.*$/SSLProtocol all -SSLv2 -SSLv3/' /etc/apache2/sites-available/default-ssl
-  if [ -f /etc/ssl/certs/cert_apache_chain.crt ]
-  then
-    sed -i -e "s/#SSLCertificateChainFile.*/SSLCertificateChainFile \/etc\/ssl\/certs\/cert_apache_chain.crt/" /etc/apache2/sites-available/default-ssl
-  fi
-
-  SSL_FILE="/etc/apache2/sites-available/default-ssl"
-  PATTERN="RewriteRule ^\/upload\/(.*)"
-  CORS_PATTERN="Header set Access-Control-Allow-Origin"
-  if [ -f $SSL_FILE ]; then
-    if grep -q "$PATTERN" $SSL_FILE ; then
-      echo "rewrite rules already exist in file $SSL_FILE"
-    else
-        echo "adding rewrite rules to file: $SSL_FILE"
-        sed -i -e "s/<\/VirtualHost>/RewriteEngine On \n&/" $SSL_FILE
-        sed -i -e "s/<\/VirtualHost>/RewriteCond %{HTTPS} =on \n&/" $SSL_FILE
-        sed -i -e "s/<\/VirtualHost>/RewriteCond %{REQUEST_METHOD} =POST \n&/" $SSL_FILE
-        sed -i -e "s/<\/VirtualHost>/RewriteRule ^\/upload\/(.*) http:\/\/127.0.0.1:8210\/upload?uuid=\$1 [P,L] \n&/" $SSL_FILE
-    fi
-    if grep -q "$CORS_PATTERN" $SSL_FILE ; then
-      echo "cors rules already exist in file $SSL_FILE"
-    else
-        echo "adding cors rules to file: $SSL_FILE"
-        sed -i -e "s/<\/VirtualHost>/Header always set Access-Control-Allow-Origin \"*\" \n&/" $SSL_FILE
-        sed -i -e "s/<\/VirtualHost>/Header always set Access-Control-Allow-Methods \"POST, OPTIONS\" \n&/" $SSL_FILE
-        sed -i -e "s/<\/VirtualHost>/Header always set Access-Control-Allow-Headers \"x-requested-with, Content-Type, origin, authorization, accept, client-security-token, x-signature, x-metadata, x-expires\" \n&/" $SSL_FILE
-    fi
-  fi
-
+EOF
 }
 
 copy_certs() {
-  local certdir=$(dirname $0)/certs
-  local mydir=$(dirname $0)
-  if [ -d $certdir ] && [ -f $customPrivKey ] &&  [ -f $customPrivCert ] ; then
-       mkdir -p /etc/httpd/ssl/keys  &&  mkdir -p /etc/httpd/ssl/certs  &&  cp $customprivKey /etc/httpd/ssl/keys   &&  cp $customPrivCert /etc/httpd/ssl/certs
-      return $?
-  fi
-  if [ ! -z customCertChain ] && [ -f $customCertChain ] ; then
-     cp $customCertChain /etc/httpd/ssl/certs
-  fi
-  return 1
+    local key=$1
+    local crt=$2
+    local certdir=$(dirname $0)/certs
+    local mydir=$(dirname $0)
+    if [ -d $certdir ] && [ -f $customPrivKey ] && [ -f $customPrivCert ]; then
+        mkdir -p /etc/nginx/ssl/keys && mkdir -p /etc/nginx/ssl/certs && cp $key /etc/nginx/ssl/keys/cert_nginx.key && cp $crt /etc/nginx/ssl/certs/cert_nginx.crt
+        return $?
+    fi
+    if [ ! -z customCertChain ] && [ -f $customCertChain ]; then
+        cp $customCertChain /etc/nginx/ssl/certs
+    fi
+    return 1
 }
-
-copy_certs_apache2() {
-  local certdir=$(dirname $0)/certs
-  local mydir=$(dirname $0)
-  if [ -f $customPrivKey ] &&  [ -f $customPrivCert ] ; then
-      cp $customPrivKey /etc/ssl/private/cert_apache.key   &&  cp $customPrivCert /etc/ssl/certs/cert_apache.crt
-  fi
-  if [ ! -z "$customCertChain" ] && [ -f "$customCertChain" ] ; then
-     cp $customCertChain /etc/ssl/certs/cert_apache_chain.crt
-  fi
-  return 0
-}
-
 
 cflag=
 cpkflag=
@@ -170,13 +145,7 @@ then
   fi
 fi
 
-if [ -d /etc/apache2 ]
-then
-  copy_certs_apache2
-else
-  copy_certs
-fi
-
+copy_certs $customPrivKey $customPrivCert
 if [ $? -ne 0 ]
 then
   echo "Failed to copy certificates"
@@ -190,12 +159,12 @@ then
   keytool -importkeystore -srckeystore $defaultJavaKeyStoreFile -destkeystore $keyStore -srcstorepass $defaultJavaKeyStorePass -deststorepass $storepass -noprompt
 fi
 
-if [ -d /etc/apache2 ]
-then
-  config_apache2_conf $publicIp $hostName
-  /etc/init.d/apache2 stop
-  /etc/init.d/apache2 start
-else
-  config_httpd_conf $publicIp $hostName
-fi
+config_nginx_conf $publicIp $hostName
+systemctl restart nginx
 
+systemctl is-active nginx > /dev/null
+if [ $? -ne 0 ]; then
+    echo "Something is wrong in config ${NGINX_UPLOAD_CONF}, renamed it to ${NGINX_UPLOAD_CONF}.broken and restarting NGINX"
+    mv $NGINX_UPLOAD_CONF $NGINX_UPLOAD_CONF.broken
+    systemctl restart nginx
+fi
