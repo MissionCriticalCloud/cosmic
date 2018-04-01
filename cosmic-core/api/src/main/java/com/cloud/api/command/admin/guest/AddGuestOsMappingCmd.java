@@ -43,9 +43,6 @@ public class AddGuestOsMappingCmd extends BaseAsyncCreateCmd {
             " default versions")
     private String hypervisorVersion;
 
-    @Parameter(name = ApiConstants.OS_NAME_FOR_HYPERVISOR, type = CommandType.STRING, required = true, description = "OS name specific to the hypervisor")
-    private String osNameForHypervisor;
-
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -64,10 +61,6 @@ public class AddGuestOsMappingCmd extends BaseAsyncCreateCmd {
 
     public String getHypervisorVersion() {
         return hypervisorVersion;
-    }
-
-    public String getOsNameForHypervisor() {
-        return osNameForHypervisor;
     }
 
     /////////////////////////////////////////////////////

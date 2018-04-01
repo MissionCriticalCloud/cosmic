@@ -81,7 +81,7 @@ public class ApiAsyncJobDispatcher extends AdapterBase implements AsyncJobDispat
             if (contextDetails != null) {
                 final Type objectMapType = new TypeToken<Map<Object, Object>>() {
                 }.getType();
-                ctx.putContextParameters((Map<Object, Object>) gson.fromJson(contextDetails, objectMapType));
+                ctx.putContextParameters(gson.fromJson(contextDetails, objectMapType));
             }
 
             try {

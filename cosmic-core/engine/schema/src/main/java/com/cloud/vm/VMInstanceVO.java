@@ -42,18 +42,18 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     @Column(name = "id", updatable = false, nullable = false)
     protected long id;
 
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "name", nullable = false)
     protected String hostName = null;
 
     @Encrypt
-    @Column(name = "vnc_password", updatable = true, nullable = false, length = 255)
+    @Column(name = "vnc_password", nullable = false)
     protected String vncPassword;
 
-    @Column(name = "proxy_id", updatable = true, nullable = true)
+    @Column(name = "proxy_id")
     protected Long proxyId;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "proxy_assign_time", updatable = true, nullable = true)
+    @Column(name = "proxy_assign_time")
     protected Date proxyAssignTime;
 
     /**
@@ -63,52 +63,52 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
      */
     @Enumerated(value = EnumType.STRING)
     @StateMachine(state = State.class, event = Event.class)
-    @Column(name = "state", updatable = true, nullable = false, length = 32)
+    @Column(name = "state", nullable = false, length = 32)
     protected State state = null;
 
-    @Column(name = "private_ip_address", updatable = true)
+    @Column(name = "private_ip_address")
     protected String privateIpAddress;
 
-    @Column(name = "instance_name", updatable = true, nullable = false)
+    @Column(name = "instance_name", nullable = false)
     protected String instanceName;
 
-    @Column(name = "vm_template_id", updatable = true, nullable = true, length = 17)
-    protected Long templateId = new Long(-1);
+    @Column(name = "vm_template_id", length = 17)
+    protected Long templateId = (long) -1;
 
     @Column(name = "guest_os_id", nullable = false, length = 17)
     protected long guestOSId;
 
-    @Column(name = "host_id", updatable = true, nullable = true)
+    @Column(name = "host_id")
     protected Long hostId;
 
-    @Column(name = "last_host_id", updatable = true, nullable = true)
+    @Column(name = "last_host_id")
     protected Long lastHostId;
 
-    @Column(name = "pod_id", updatable = true, nullable = false)
+    @Column(name = "pod_id", nullable = false)
     protected Long podIdToDeployIn;
 
-    @Column(name = "private_mac_address", updatable = true, nullable = true)
+    @Column(name = "private_mac_address")
     protected String privateMacAddress;
 
-    @Column(name = "data_center_id", updatable = true, nullable = false)
+    @Column(name = "data_center_id", nullable = false)
     protected long dataCenterId;
 
     @Column(name = "vm_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
     protected Type type;
 
-    @Column(name = "ha_enabled", updatable = true, nullable = true)
+    @Column(name = "ha_enabled")
     protected boolean haEnabled;
 
-    @Column(name = "display_vm", updatable = true, nullable = false)
+    @Column(name = "display_vm", nullable = false)
     protected boolean displayVm = true;
-    @Column(name = "update_count", updatable = true, nullable = false)
+    @Column(name = "update_count", nullable = false)
     protected long updated; // This field should be updated everytime the state is updated.  There's no set method in the vo object because it is done with in the dao code.
     @Column(name = GenericDao.CREATED_COLUMN)
     protected Date created;
     @Column(name = GenericDao.REMOVED_COLUMN)
     protected Date removed;
-    @Column(name = "update_time", updatable = true)
+    @Column(name = "update_time")
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date updateTime;
     @Column(name = "domain_id")
@@ -129,29 +129,25 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     @Column(name = "uuid")
     protected String uuid = UUID.randomUUID().toString();
 
-    /*
-    @Column(name="tags")
-    protected String tags;
-    */
     @Column(name = "disk_offering_id")
     protected Long diskOfferingId;
     //
     // Power state for VM state sync
     //
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "power_state", updatable = true)
+    @Column(name = "power_state")
     protected PowerState powerState;
-    @Column(name = "power_state_update_time", updatable = true, nullable = false)
+    @Column(name = "power_state_update_time", nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
     protected Date powerStateUpdateTime;
-    @Column(name = "power_state_update_count", updatable = true)
+    @Column(name = "power_state_update_count")
     protected int powerStateUpdateCount;
-    @Column(name = "power_host", updatable = true)
+    @Column(name = "power_host")
     protected Long powerHostId;
     @Transient
     Map<String, String> details;
     transient String toString;
-    @Column(name = "limit_cpu_use", updatable = true, nullable = true)
+    @Column(name = "limit_cpu_use")
     private boolean limitCpuUse;
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,

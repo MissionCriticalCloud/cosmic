@@ -231,7 +231,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     public List<UserVmVO> listUpByHostId(final Long hostId) {
         final SearchCriteria<UserVmVO> sc = HostUpSearch.create();
         sc.setParameters("host", hostId);
-        sc.setParameters("states", new Object[]{State.Destroyed, State.Stopped, State.Expunging});
+        sc.setParameters("states", State.Destroyed, State.Stopped, State.Expunging);
         return listBy(sc);
     }
 

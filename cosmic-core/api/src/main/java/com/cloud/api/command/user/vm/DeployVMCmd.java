@@ -473,13 +473,13 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         final Map<String, String> map = getDetails();
 
         if (map != null) {
-            String minIops = (String) map.get("minIops");
-            String maxIops = (String) map.get("maxIops");
+            String minIops = map.get("minIops");
+            String maxIops = map.get("maxIops");
 
             verifyMinAndMaxIops(minIops, maxIops);
 
-            minIops = (String) map.get("minIopsDo");
-            maxIops = (String) map.get("maxIopsDo");
+            minIops = map.get("minIopsDo");
+            maxIops = map.get("maxIopsDo");
 
             verifyMinAndMaxIops(minIops, maxIops);
         }

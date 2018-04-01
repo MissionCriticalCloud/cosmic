@@ -120,7 +120,7 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
             if (guestOsMapping == null) {
                 ccmd.setPlatformEmulator(null);
             } else {
-                ccmd.setPlatformEmulator(guestOsMapping.getGuestOsName());
+                ccmd.setPlatformEmulator(guestOS.getDisplayName());
             }
             ccmd.setWait(_wait);
 
@@ -225,7 +225,7 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
             if (guestOsMapping == null) {
                 revertToSnapshotCommand.setPlatformEmulator(null);
             } else {
-                revertToSnapshotCommand.setPlatformEmulator(guestOsMapping.getGuestOsName());
+                revertToSnapshotCommand.setPlatformEmulator(guestOS.getDisplayName());
             }
 
             final RevertToVMSnapshotAnswer answer = (RevertToVMSnapshotAnswer) agentMgr.send(hostId, revertToSnapshotCommand);
@@ -240,10 +240,7 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
                 s_logger.error(errMsg);
                 throw new CloudRuntimeException(errMsg);
             }
-        } catch (final OperationTimedoutException e) {
-            s_logger.debug("Failed to revert vm snapshot", e);
-            throw new CloudRuntimeException(e.getMessage());
-        } catch (final AgentUnavailableException e) {
+        } catch (final OperationTimedoutException | AgentUnavailableException e) {
             s_logger.debug("Failed to revert vm snapshot", e);
             throw new CloudRuntimeException(e.getMessage());
         } finally {

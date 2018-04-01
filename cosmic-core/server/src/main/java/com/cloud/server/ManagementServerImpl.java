@@ -48,7 +48,6 @@ import com.cloud.api.command.admin.guest.ListGuestOsMappingCmd;
 import com.cloud.api.command.admin.guest.RemoveGuestOsCmd;
 import com.cloud.api.command.admin.guest.RemoveGuestOsMappingCmd;
 import com.cloud.api.command.admin.guest.UpdateGuestOsCmd;
-import com.cloud.api.command.admin.guest.UpdateGuestOsMappingCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
 import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
 import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
@@ -1518,7 +1517,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final String osStdName = cmd.getOsStdName();
         final String hypervisor = cmd.getHypervisor();
         final String hypervisorVersion = cmd.getHypervisorVersion();
-        final String osNameForHypervisor = cmd.getOsNameForHypervisor();
         GuestOS guestOs = null;
 
         if (osTypeId == null && (osStdName == null || osStdName.isEmpty())) {
@@ -1555,7 +1553,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
         final GuestOSHypervisorVO guestOsMapping = new GuestOSHypervisorVO();
         guestOsMapping.setGuestOsId(guestOs.getId());
-        guestOsMapping.setGuestOsName(osNameForHypervisor);
         guestOsMapping.setHypervisorType(hypervisorType.toString());
         guestOsMapping.setHypervisorVersion(hypervisorVersion);
         guestOsMapping.setIsUserDefined(true);
@@ -1587,7 +1584,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
 
         final GuestOSVO guestOsVo = new GuestOSVO();
-        guestOsVo.setCategoryId(categoryId.longValue());
+        guestOsVo.setCategoryId(categoryId);
         guestOsVo.setDisplayName(displayName);
         guestOsVo.setName(name);
         guestOsVo.setIsUserDefined(true);
@@ -1631,32 +1628,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         guestOs.setDisplayName(displayName);
         if (_guestOSDao.update(id, guestOs)) {
             return _guestOSDao.findById(id);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    @DB
-    @ActionEvent(eventType = EventTypes.EVENT_GUEST_OS_MAPPING_UPDATE, eventDescription = "updating guest OS mapping", async = true)
-    public GuestOSHypervisor updateGuestOsMapping(final UpdateGuestOsMappingCmd cmd) {
-        final Long id = cmd.getId();
-        final String osNameForHypervisor = cmd.getOsNameForHypervisor();
-
-        //check if mapping exists
-        final GuestOSHypervisor guestOsHypervisorHandle = _guestOSHypervisorDao.findById(id);
-        if (guestOsHypervisorHandle == null) {
-            throw new InvalidParameterValueException("Guest OS Mapping not found. Please specify a valid ID for the Guest OS Mapping");
-        }
-
-        if (!guestOsHypervisorHandle.getIsUserDefined()) {
-            throw new InvalidParameterValueException("Unable to modify system defined Guest OS mapping");
-        }
-
-        final GuestOSHypervisorVO guestOsHypervisor = _guestOSHypervisorDao.createForUpdate(id);
-        guestOsHypervisor.setGuestOsName(osNameForHypervisor);
-        if (_guestOSHypervisorDao.update(id, guestOsHypervisor)) {
-            return _guestOSHypervisorDao.findById(id);
         } else {
             return null;
         }
@@ -3511,7 +3482,6 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(AddGuestOsCmd.class);
         cmdList.add(AddGuestOsMappingCmd.class);
         cmdList.add(UpdateGuestOsCmd.class);
-        cmdList.add(UpdateGuestOsMappingCmd.class);
         cmdList.add(RemoveGuestOsCmd.class);
         cmdList.add(RemoveGuestOsMappingCmd.class);
         cmdList.add(AttachIsoCmd.class);

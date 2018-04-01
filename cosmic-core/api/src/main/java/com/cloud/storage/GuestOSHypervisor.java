@@ -8,8 +8,6 @@ public interface GuestOSHypervisor extends InternalIdentity {
 
     String getHypervisorType();
 
-    String getGuestOsName();
-
     long getGuestOsId();
 
     String getHypervisorVersion();

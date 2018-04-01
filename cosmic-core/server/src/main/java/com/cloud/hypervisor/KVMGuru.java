@@ -10,23 +10,23 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
+import com.cloud.storage.command.CopyCommand;
+import com.cloud.storage.command.StorageSubSystemCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.StorageSubSystemCommand;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
     @Inject
-    GuestOSDao _guestOsDao;
+    private GuestOSDao _guestOsDao;
     @Inject
-    GuestOSHypervisorDao _guestOsHypervisorDao;
+    private GuestOSHypervisorDao _guestOsHypervisorDao;
     @Inject
-    HostDao _hostDao;
+    private HostDao _hostDao;
 
     protected KVMGuru() {
         super();
@@ -52,11 +52,11 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
             }
             c.setExecuteInSequence(inSeq);
             if (srcData.getHypervisorType() == HypervisorType.KVM) {
-                return new Pair<>(true, new Long(hostId));
+                return new Pair<>(true, hostId);
             }
         }
 
-        return new Pair<>(false, new Long(hostId));
+        return new Pair<>(false, hostId);
     }
 
     @Override
@@ -70,7 +70,6 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
     }
 
     @Override
-
     public VirtualMachineTO implement(final VirtualMachineProfile vm) {
         final VirtualMachineTO to = toVirtualMachineTO(vm);
 
@@ -87,7 +86,7 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
         if (guestOsMapping == null) {
             to.setPlatformEmulator("Default - VirtIO capable OS (64-bit)");
         } else {
-            to.setPlatformEmulator(guestOsMapping.getGuestOsName());
+            to.setPlatformEmulator(guestOS.getDisplayName());
         }
 
         return to;

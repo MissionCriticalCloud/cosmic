@@ -1301,7 +1301,6 @@ var dictionary = {
     "label.revoke.project.invite": "Revoke invitation",
     "label.role": "Role",
     "label.root.certificate": "Root certificate",
-    "label.root.disk.controller": "Root disk controller",
     "label.root.disk.offering": "Root Disk Offering",
     "label.root.disk.size": "Root disk size (GB)",
     "label.router.vm.scaled.up": "Router VM Scaled Up",

@@ -2555,7 +2555,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setId(guestOSHypervisor.getUuid());
         response.setHypervisor(guestOSHypervisor.getHypervisorType());
         response.setHypervisorVersion(guestOSHypervisor.getHypervisorVersion());
-        response.setOsNameForHypervisor(guestOSHypervisor.getGuestOsName());
         response.setIsUserDefined(Boolean.valueOf(guestOSHypervisor.getIsUserDefined()).toString());
         final GuestOS guestOs = ApiDBUtils.findGuestOSById(guestOSHypervisor.getGuestOsId());
         if (guestOs != null) {
