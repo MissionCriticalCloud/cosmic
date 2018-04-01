@@ -144,7 +144,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     private static final String TEMPLATE_ROOT_DIR = "template/tmpl";
     private static final String VOLUME_ROOT_DIR = "volumes";
-    private static final String POST_UPLOAD_KEY_LOCATION = "/etc/cloudstack/agent/ms-psk";
+    private static final String POST_UPLOAD_KEY_LOCATION = "/etc/cosmic/agent/ms-psk";
     private final List<String> nfsIps = new ArrayList<>();
     final private String _tmpltpp = "template.properties";
     private final HashMap<String, UploadEntity> uploadEntityStateMap = new HashMap<>();
