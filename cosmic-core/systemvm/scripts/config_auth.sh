@@ -1,29 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_DIR="/var/www/html/copy/template/"
-HTACCESS="$BASE_DIR/.htaccess"
-
-PASSWDFILE="/etc/httpd/.htpasswd"
-if [ -d /etc/apache2 ]
-then
-  PASSWDFILE="/etc/apache2/.htpasswd"
-fi
-
-config_htaccess() {
-  mkdir -p $BASE_DIR
-  result=$?
-  echo "Options -Indexes" > $HTACCESS
-  let "result=$result+$?"
-  echo "AuthType Basic" >> $HTACCESS
-  let "result=$result+$?"
-  echo "AuthName \"Authentication Required\"" >> $HTACCESS
-  let "result=$result+$?"
-  echo "AuthUserFile  \"$PASSWDFILE\"" >> $HTACCESS
-  let "result=$result+$?"
-  echo "Require valid-user" >> $HTACCESS
-  let "result=$result+$?"
-  return $result
-}
+PASSWDFILE="/etc/nginx/upload.htpasswd"
 
 write_passwd() {
   local user=$1
@@ -43,6 +21,4 @@ then
   echo "Failed to update password"
   exit 2
 fi
-
-config_htaccess
 exit $?
