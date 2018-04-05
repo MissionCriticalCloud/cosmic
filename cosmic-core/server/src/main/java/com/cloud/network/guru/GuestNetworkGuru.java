@@ -298,9 +298,8 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                         guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
                         break;
                     case DomainRouter:
-                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VirtualRouter) ||
-                                _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.SourceNat, Provider.VPCVirtualRouter)) {
-                            // Networks that support SourceNat acquire the gateway ip on their nic
+                        if ( _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway, Provider.VPCVirtualRouter)) {
+                            // Networks that support the Gateway service acquire the gateway ip on their nic
                             guestIp = network.getGateway();
                         } else {
                             // In other cases, acquire an ip address from the DHCP range (take lowest possible)
