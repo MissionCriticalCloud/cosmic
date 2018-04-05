@@ -374,4 +374,4 @@ VALUES (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (2, 7, 'SecurityG
   (73, 15, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (74, 15, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (75, 15, 'StaticNat', 'VpcVirtualRouter', '2017-12-12 14:16:24'),
   (76, 15, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:24'), (85, 18, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (86, 18, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
   (87, 18, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (88, 19, 'Dhcp', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (89, 19, 'NetworkACL', 'VpcVirtualRouter', '2017-12-12 14:16:27'),
-  (90, 19, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (91, 19, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27');
+  (90, 19, 'UserData', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (91, 19, 'Dns', 'VpcVirtualRouter', '2017-12-12 14:16:27'), (92, 19, 'Gateway', 'VpcVirtualRouter', '2017-12-12 14:16:27');
