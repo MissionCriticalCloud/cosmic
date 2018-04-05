@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cloud.cosmic</groupId>
@@ -36,7 +37,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.4.6.RELEASE</version>
-        <relativePath /> <!-- lookup parent from repository -->
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
@@ -74,7 +75,7 @@
         <cs.commons-net.version>3.3</cs.commons-net.version>
         <cs.commons-validator.version>1.5.0</cs.commons-validator.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
-        <cs.dependency-check-maven.version>1.4.5</cs.dependency-check-maven.version>
+        <cs.dependency-check-maven.version>3.1.2</cs.dependency-check-maven.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.flyway.version>4.2.0</cs.flyway.version>
@@ -660,7 +661,7 @@
                         <id>enforce</id>
                         <configuration>
                             <rules>
-                                <DependencyConvergence />
+                                <DependencyConvergence/>
                             </rules>
                         </configuration>
                         <goals>
@@ -703,7 +704,8 @@
             <properties>
                 <maven.test.failure.ignore>true</maven.test.failure.ignore>
 
-                <sonar.dependencyCheck.reportPath>${cs.dependency.check.report.dir}/dependency-check-report.xml</sonar.dependencyCheck.reportPath>
+                <sonar.dependencyCheck.reportPath>${cs.dependency.check.report.dir}/dependency-check-report.xml
+                </sonar.dependencyCheck.reportPath>
                 <sonar.jacoco.reportPath>${unit.tests.report}</sonar.jacoco.reportPath>
                 <sonar.jacoco.itReportPath>${integration.tests.report}</sonar.jacoco.itReportPath>
                 <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
