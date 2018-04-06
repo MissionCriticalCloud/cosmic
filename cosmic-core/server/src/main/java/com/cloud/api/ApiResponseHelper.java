@@ -783,6 +783,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             final NetworkVO nw = ApiDBUtils.findNetworkById(networkId);
             if (nw != null) {
                 ipResponse.setNetworkId(nw.getUuid());
+                ipResponse.setAssociatedNetworkName(nw.getName());
             }
         }
         ipResponse.setState(ipAddr.getState().toString());
@@ -790,6 +791,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         final NetworkACL acl = ApiDBUtils.findByNetworkACLId(ipAddr.getIpACLId());
         if (acl != null) {
             ipResponse.setAclId(acl.getUuid());
+            ipResponse.setAclName(acl.getName());
         }
 
         if (ipAddr.getPhysicalNetworkId() != null) {
@@ -1910,6 +1912,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             final NetworkACL acl = ApiDBUtils.findByNetworkACLId(network.getNetworkACLId());
             if (acl != null) {
                 response.setAclId(acl.getUuid());
+                response.setAclName(acl.getName());
             }
         }
 

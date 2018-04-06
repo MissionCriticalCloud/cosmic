@@ -3668,20 +3668,15 @@
                                 title: 'label.details',
                                 preFilter: function (args) {
                                     var hiddenFields = [];
-                                    var zoneObj;
-                                    $.ajax({
-                                        url: createURL("listZones&id=" + args.context.ipAddresses[0].zoneid),
-                                        dataType: "json",
-                                        async: false,
-                                        success: function (json) {
-                                            zoneObj = json.listzonesresponse.zone[0];
-                                        }
-                                    });
-                                    if (zoneObj.networktype == "Advanced") {
-                                        hiddenFields.push("issystem");
-                                        hiddenFields.push("purpose");
+                                    if (typeof args.context.ipAddresses[0].vmipaddress == "undefined") {
+                                        hiddenFields.push("vmipaddress");
                                     }
-
+                                    if (typeof args.context.ipAddresses[0].virtualmachinedisplayname == "undefined") {
+                                        hiddenFields.push("virtualmachinedisplayname");
+                                    }
+                                    if (typeof args.context.ipAddresses[0].associatednetworkid == "undefined") {
+                                        hiddenFields.push("associatednetworkid")
+                                    }
                                     if (!isAdmin()) {
                                         hiddenFields.push("vlanname");
                                     }
@@ -3707,6 +3702,9 @@
                                     aclid: {
                                         label: 'label.acl.id'
                                     },
+                                    aclname: {
+                                        label: 'label.acl.name'
+                                    },
                                     networkid: {
                                         label: 'label.network.id'
                                     },
@@ -3721,13 +3719,6 @@
                                     vmipaddress: {
                                         label: 'label.vm.ip'
                                     },
-                                    issystem: {
-                                        label: 'label.is.system',
-                                        converter: cloudStack.converters.toBooleanText
-                                    }, //(basic zone only)
-                                    purpose: {
-                                        label: 'label.purpose'
-                                    }, //(basic zone only) When an IP is system-generated, the purpose it serves can be Lb or static nat.
                                     virtualmachinedisplayname: {
                                         label: 'label.vm.name'
                                     },
@@ -6326,7 +6317,11 @@
 
         var data = [];
         $(algorithms).each(function () {
-            data.push({id: this.valueOf(), name: this.valueOf(), description: _l('label.lb.algorithm.' + this.valueOf())});
+            data.push({
+                id: this.valueOf(),
+                name: this.valueOf(),
+                description: _l('label.lb.algorithm.' + this.valueOf())
+            });
         });
 
         return data;
