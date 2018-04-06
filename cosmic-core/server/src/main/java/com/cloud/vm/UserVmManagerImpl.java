@@ -101,8 +101,10 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
+import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.host.dao.HostTagsDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
@@ -266,6 +268,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     private static final int MAX_HTTP_POST_LENGTH = 16 * MAX_USER_DATA_LENGTH_BYTES;
     @Inject
     protected HostDao _hostDao = null;
+    @Inject
+    protected HostTagsDao _hostTagsDao = null;
     @Inject
     protected ServiceOfferingDao _offeringDao = null;
     @Inject
@@ -2497,11 +2501,29 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final HostVO destinationHostVO = _hostDao.findById(destinationHost.getId());
         if (_capacityMgr.checkIfHostReachMaxGuestLimit(destinationHostVO)) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Host name: " + destinationHost.getName() + ", hostId: " + destinationHost.getId()
+                s_logger.debug("Host name: " + destinationHost.getName() + ": " + destinationHost.getName()
                         + " already has max Running VMs(count includes system VMs), cannot migrate to this host");
             }
-            throw new VirtualMachineMigrationException("Destination host, hostId: " + destinationHost.getId()
+            throw new VirtualMachineMigrationException("Destination host: " + destinationHost.getName()
                     + " already has max Running VMs(count includes system VMs), cannot migrate to this host");
+        }
+
+        // Check host tags
+        final ServiceOffering serviceOffering = _serviceOfferingDao.findById(vm.getServiceOfferingId());
+        if (serviceOffering != null) {
+            final String requiredHostTag = serviceOffering.getHostTag();
+            final List<String> hostTags = _hostTagsDao.gethostTags(destinationHost.getId());
+
+            boolean foundRequiredHostTag = false;
+            for (final String hostTag : hostTags) {
+                if (hostTag.equals(requiredHostTag)) {
+                    foundRequiredHostTag = true;
+                    break;
+                }
+            }
+            if (!foundRequiredHostTag && requiredHostTag != null) {
+                throw new VirtualMachineMigrationException("Destination host: " + destinationHost.getName() + " does not have required host tag " + requiredHostTag);
+            }
         }
 
         final UserVmVO uservm = _vmDao.findById(vmId);
