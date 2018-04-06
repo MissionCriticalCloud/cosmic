@@ -2730,8 +2730,10 @@ public class ApiResponseHelper implements ResponseGenerator {
         if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
             // find the project
             final Project project = ApiDBUtils.findProjectByProjectAccountId(account.getId());
-            response.setProjectId(project.getUuid());
-            response.setProjectName(project.getName());
+            if (project != null) {
+                response.setProjectId(project.getUuid());
+                response.setProjectName(project.getName());
+            }
         } else {
             response.setAccountName(account.getAccountName());
         }
@@ -2777,9 +2779,11 @@ public class ApiResponseHelper implements ResponseGenerator {
         if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
             // find the project
             final Project project = ApiDBUtils.findProjectByProjectAccountId(account.getId());
-            response.setProjectId(project.getUuid());
-            response.setProjectName(project.getName());
-            response.setAccountName(account.getAccountName());
+            if (project != null) {
+                response.setProjectId(project.getUuid());
+                response.setProjectName(project.getName());
+                response.setAccountName(account.getAccountName());
+            }
         } else {
             response.setAccountName(account.getAccountName());
         }
