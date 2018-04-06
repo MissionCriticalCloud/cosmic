@@ -208,6 +208,10 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
     @Param(description = "ACL Id associated with the VPC network")
     private String aclId;
 
+    @SerializedName(ApiConstants.ACL_NAME)
+    @Param(description = "the name of the ACL applied to this IP")
+    private String aclName;
+
     @SerializedName(ApiConstants.STRECHED_L2_SUBNET)
     @Param(description = "true if network can span multiple zones", since = "4.4")
     private Boolean strechedL2Subnet;
@@ -427,5 +431,9 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
 
     public void setNetworkSpannedZones(final Set<String> networkSpannedZones) {
         this.networkSpannedZones = networkSpannedZones;
+    }
+
+    public void setAclName(final String aclName) {
+        this.aclName = aclName;
     }
 }

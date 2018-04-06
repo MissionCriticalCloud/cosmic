@@ -110,6 +110,10 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
     @Param(description = "the ID of the ACL applied to this IP")
     private String aclId;
 
+    @SerializedName(ApiConstants.ACL_NAME)
+    @Param(description = "the name of the ACL applied to this IP")
+    private String aclName;
+
     @SerializedName(ApiConstants.STATE)
     @Param(description = "State of the ip address. Can be: Allocatin, Allocated and Releasing")
     private String state;
@@ -271,5 +275,9 @@ public class IPAddressResponse extends BaseResponse implements ControlledEntityR
 
     public void setForDisplay(final Boolean forDisplay) {
         this.forDisplay = forDisplay;
+    }
+
+    public void setAclName(final String aclName) {
+        this.aclName = aclName;
     }
 }
