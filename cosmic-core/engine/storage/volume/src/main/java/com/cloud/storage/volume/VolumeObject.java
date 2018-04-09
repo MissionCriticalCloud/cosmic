@@ -177,23 +177,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -453,23 +437,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -478,6 +446,26 @@ public class VolumeObject implements VolumeInfo {
             throw ex;
         }
         this.processEvent(event);
+    }
+
+    private void processDownloadAnswer(final Answer answer) {
+        // image store or imageCache store
+        if (answer instanceof DownloadAnswer) {
+            final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            volStore.setInstallPath(dwdAnswer.getInstallPath());
+            volStore.setChecksum(dwdAnswer.getCheckSum());
+            volumeStoreDao.update(volStore.getId(), volStore);
+        } else if (answer instanceof CopyCmdAnswer) {
+            final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
+            volStore.setInstallPath(newVol.getPath());
+            if (newVol.getSize() != null) {
+                volStore.setSize(newVol.getSize());
+            }
+            volumeStoreDao.update(volStore.getId(), volStore);
+        }
     }
 
     public long getVolumeId() {
