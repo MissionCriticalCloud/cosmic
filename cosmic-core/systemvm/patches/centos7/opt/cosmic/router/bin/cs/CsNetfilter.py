@@ -141,7 +141,10 @@ class CsNetfilters(object):
             if isinstance(fw[1], int):
                 new_rule.set_count(fw[1])
 
-            logging.info("Add: rule=%s table=%s", fw[2], new_rule.get_table())
+            # This makes the logs very verbose, you probably don't want this
+            # Uncomment when debugging
+            # logging.info("Add: rule=%s table=%s", fw[2], new_rule.get_table())
+
             # front means insert instead of append
             cpy = fw[2]
             if fw[1] == "front":
