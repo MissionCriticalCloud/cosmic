@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import json
-import sys
 import subprocess
+
+import sys
 
 NETWORK_OVERVIEW = "/etc/cosmic/router/network_overview.json"
 
@@ -26,7 +27,7 @@ def main():
                     exitcode = 0
 
                 batchinfo += "%s:%s:%s&" % (vpn['right'], exitcode, exittext)
-            print batchinfo
+    print batchinfo
     return 0
 
 
