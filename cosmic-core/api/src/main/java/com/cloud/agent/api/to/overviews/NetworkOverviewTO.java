@@ -10,10 +10,10 @@ import java.util.Objects;
 
 public class NetworkOverviewTO {
     private InterfaceTO[] interfaces;
-    private ServiceTO services;
     private RouteTO[] routes;
     private VPNTO vpn;
     private SyslogTO syslog;
+    private SourceNatTO[] sourcenat;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -21,14 +21,6 @@ public class NetworkOverviewTO {
 
     public void setInterfaces(final InterfaceTO[] interfaces) {
         this.interfaces = interfaces;
-    }
-
-    public ServiceTO getServices() {
-        return services;
-    }
-
-    public void setServices(final ServiceTO services) {
-        this.services = services;
     }
 
     public RouteTO[] getRoutes() {
@@ -55,6 +47,14 @@ public class NetworkOverviewTO {
         this.syslog = syslog;
     }
 
+    public SourceNatTO[] getSourcenat() {
+        return sourcenat;
+    }
+
+    public void setSourceNat(final SourceNatTO[] sourcenat) {
+        this.sourcenat = sourcenat;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -65,13 +65,12 @@ public class NetworkOverviewTO {
         }
         final NetworkOverviewTO that = (NetworkOverviewTO) o;
         return Arrays.equals(getInterfaces(), that.getInterfaces()) &&
-                Objects.equals(getServices(), that.getServices()) &&
                 Arrays.equals(getRoutes(), that.getRoutes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInterfaces(), getServices(), getRoutes());
+        return Objects.hash(getInterfaces(), getRoutes());
     }
 
     public static class InterfaceTO {
@@ -367,15 +366,32 @@ public class NetworkOverviewTO {
         }
     }
 
-    public static class ServiceTO {
-        private ServiceSourceNatTO[] sourceNat;
+    public static class SourceNatTO {
+        private String to;
+        private String gateway;
 
-        public ServiceSourceNatTO[] getSourceNat() {
-            return sourceNat;
+        public SourceNatTO() {
         }
 
-        public void setSourceNat(final ServiceSourceNatTO[] sourceNat) {
-            this.sourceNat = sourceNat;
+        public SourceNatTO(final String to, final String gateway) {
+            this.to = to;
+            this.gateway = gateway;
+        }
+
+        public String getTo() {
+            return to;
+        }
+
+        public void setTo(final String to) {
+            this.to = to;
+        }
+
+        public String getGateway() {
+            return gateway;
+        }
+
+        public void setGateway(final String gateway) {
+            this.gateway = gateway;
         }
 
         @Override
@@ -383,63 +399,17 @@ public class NetworkOverviewTO {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof ServiceTO)) {
+            if (!(o instanceof SourceNatTO)) {
                 return false;
             }
-            final ServiceTO serviceTO = (ServiceTO) o;
-            return Arrays.equals(getSourceNat(), serviceTO.getSourceNat());
+            final SourceNatTO that = (SourceNatTO) o;
+            return Objects.equals(getTo(), that.getTo()) &&
+                    Objects.equals(getGateway(), that.getGateway());
         }
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(getSourceNat());
-        }
-
-        public static class ServiceSourceNatTO {
-            private String to;
-            private String gateway;
-
-            public ServiceSourceNatTO() {
-            }
-
-            public ServiceSourceNatTO(final String to, final String gateway) {
-                this.to = to;
-                this.gateway = gateway;
-            }
-
-            public String getTo() {
-                return to;
-            }
-
-            public void setTo(final String to) {
-                this.to = to;
-            }
-
-            public String getGateway() {
-                return gateway;
-            }
-
-            public void setGateway(final String gateway) {
-                this.gateway = gateway;
-            }
-
-            @Override
-            public boolean equals(final Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (!(o instanceof ServiceSourceNatTO)) {
-                    return false;
-                }
-                final ServiceSourceNatTO that = (ServiceSourceNatTO) o;
-                return Objects.equals(getTo(), that.getTo()) &&
-                        Objects.equals(getGateway(), that.getGateway());
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(getTo(), getGateway());
-            }
+            return Objects.hash(getTo(), getGateway());
         }
     }
 

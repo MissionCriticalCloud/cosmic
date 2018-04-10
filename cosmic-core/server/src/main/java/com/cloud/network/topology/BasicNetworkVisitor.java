@@ -11,44 +11,20 @@ import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.router.CommandSetupHelper;
 import com.cloud.network.router.NetworkHelper;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.rules.AdvancedVpnRules;
-import com.cloud.network.rules.BasicVpnRules;
-import com.cloud.network.rules.DhcpEntryRules;
-import com.cloud.network.rules.DhcpPvlanRules;
-import com.cloud.network.rules.DhcpSubNetRules;
-import com.cloud.network.rules.FirewallRule;
+import com.cloud.network.rules.*;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRules;
-import com.cloud.network.rules.IpAssociationRules;
-import com.cloud.network.rules.LoadBalancingRules;
-import com.cloud.network.rules.NetworkAclsRules;
-import com.cloud.network.rules.NicPlugInOutRules;
-import com.cloud.network.rules.PasswordToRouterRules;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.PrivateGatewayRules;
-import com.cloud.network.rules.PublicIpAclsRules;
-import com.cloud.network.rules.SshKeyToRouterRules;
-import com.cloud.network.rules.StaticNat;
-import com.cloud.network.rules.StaticNatRule;
-import com.cloud.network.rules.StaticNatRules;
-import com.cloud.network.rules.StaticRoutesRules;
-import com.cloud.network.rules.UserdataPwdRules;
-import com.cloud.network.rules.UserdataToRouterRules;
-import com.cloud.network.rules.VirtualNetworkApplianceFactory;
-import com.cloud.network.rules.VpcIpAssociationRules;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VirtualMachineProfile;
-
-import javax.inject.Inject;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.List;
 
 @Component
 public class BasicNetworkVisitor extends NetworkTopologyVisitor {
@@ -123,7 +99,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
         } else if (purpose == Purpose.Firewall) {
 
-            _commandSetupHelper.createApplyFirewallRulesCommands(rules, router, cmds, network.getId());
+            _commandSetupHelper.createFirewallRulesCommands(rules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
         }
