@@ -2,50 +2,50 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-plugin-hypervisor-xenserver</artifactId>
     <name>Cosmic Plugin - Hypervisor XenServer</name>
-    <version>6.0.12-SNAPSHOT</version>
+    <version>6.0.12</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.12-SNAPSHOT</version>
+        <version>6.0.12</version>
         <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-datamotion</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-default</artifactId>
-            <version>6.0.12-SNAPSHOT</version>
+            <version>6.0.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
