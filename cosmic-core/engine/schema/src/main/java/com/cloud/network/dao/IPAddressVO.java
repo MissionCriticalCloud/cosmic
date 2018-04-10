@@ -1,6 +1,7 @@
 package com.cloud.network.dao;
 
 import com.cloud.network.IpAddress;
+import com.cloud.network.vpc.NetworkACL;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.Ip;
 
@@ -84,7 +85,7 @@ public class IPAddressVO implements IpAddress {
 
     protected IPAddressVO() {
         uuid = UUID.randomUUID().toString();
-        ipACLId = 2L; // Default Allow ACL
+        ipACLId = NetworkACL.DEFAULT_DENY;
     }
 
     public IPAddressVO(final Ip address, final long dataCenterId, final long macAddress, final long vlanDbId, final boolean sourceNat) {
@@ -98,7 +99,7 @@ public class IPAddressVO implements IpAddress {
         state = State.Free;
         this.macAddress = macAddress;
         uuid = UUID.randomUUID().toString();
-        ipACLId = 2L; // Default Allow ACL
+        ipACLId = NetworkACL.DEFAULT_DENY;
     }
 
     public IPAddressVO(final Ip address, final long dataCenterId, final Long networkId, final Long vpcId, final long physicalNetworkId, final long sourceNetworkId, final long
@@ -111,7 +112,7 @@ public class IPAddressVO implements IpAddress {
         this.sourceNetworkId = sourceNetworkId;
         vlanId = vlanDbId;
         uuid = UUID.randomUUID().toString();
-        ipACLId = 2L; // Default Allow ACL
+        ipACLId = NetworkACL.DEFAULT_DENY;
     }
 
     public void setId(final long id) {
