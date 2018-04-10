@@ -98,10 +98,10 @@ class Keepalived:
         virtualroutes = []
 
         # Set the default route here until we handle it from the management server
-        if 'source_nat' in self.config.dbag_network_overview['services'] and \
-                self.config.dbag_network_overview['services']['source_nat']:
+        if 'source_nat' in self.config.dbag_network_overview and \
+                self.config.dbag_network_overview['source_nat']:
             virtualroutes.append(
-                'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
+                'default via %s' % self.config.dbag_network_overview['source_nat'][0]['gateway']
             )
 
         for route in self.config.dbag_network_overview['routes']:
