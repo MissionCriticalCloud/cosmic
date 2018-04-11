@@ -35,6 +35,7 @@ class Keepalived:
         self.parse_vrrp_interface_instances()
         self.parse_vrrp_routes_instance()
         self.write_sync_group()
+        self.write_load_balancing_config()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
 
@@ -164,6 +165,21 @@ class Keepalived:
 
         with open(self.keepalived_config_path + filename, 'w') as f:
             f.write(content)
+
+    def write_load_balancing_config(self):
+        if 'nat' in self.config.dbag_network_overview['services']['load_balancing']:
+            for load_balancing in self.config.dbag_network_overview['services']['load_balancing']['nat']:
+                content = self.jinja_env.get_template('keepalived_load_balancing.conf').render(
+                    virtual_server=load_balancing['virtual_server'],
+                    port=load_balancing['port'],
+                    protocol=load_balancing['protocol'],
+                    lb_algo=load_balancing['lb_algo'],
+                    real_servers=load_balancing['real_servers']
+                )
+                filename = 'keepalived_load_balancing__%s__%s__%s__.conf' % \
+                           (load_balancing['virtual_server'], load_balancing['port'], load_balancing['protocol'])
+
+                self.write_keepalived_config(filename, content)
 
     def zap_keepalived_config_directory(self):
         logging.debug("Zapping directory %s" % self.keepalived_config_path)
