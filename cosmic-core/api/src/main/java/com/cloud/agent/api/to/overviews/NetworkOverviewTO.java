@@ -509,17 +509,17 @@ public class NetworkOverviewTO {
                 Integer port;
                 String lbAlgo;
                 String protocol;
-                RealServerTO[] realServer;
+                RealServerTO[] realServers;
 
                 public NatTO() {
                 }
 
-                public NatTO(final String virtualServer, final Integer port, final String lbAlgo, final String protocol, final RealServerTO[] realServer) {
+                public NatTO(final String virtualServer, final Integer port, final String lbAlgo, final String protocol, final RealServerTO[] realServers) {
                     this.virtualServer = virtualServer;
                     this.port = port;
                     this.lbAlgo = lbAlgo;
                     this.protocol = protocol;
-                    this.realServer = realServer;
+                    this.realServers = realServers;
                 }
 
                 public String getVirtualServer() {
@@ -554,12 +554,12 @@ public class NetworkOverviewTO {
                     this.protocol = protocol;
                 }
 
-                public RealServerTO[] getRealServer() {
-                    return realServer;
+                public RealServerTO[] getRealServers() {
+                    return realServers;
                 }
 
-                public void setRealServer(final RealServerTO[] realServer) {
-                    this.realServer = realServer;
+                public void setRealServers(final RealServerTO[] realServers) {
+                    this.realServers = realServers;
                 }
 
                 @Override
@@ -575,14 +575,14 @@ public class NetworkOverviewTO {
                             Objects.equals(port, natTO.port) &&
                             Objects.equals(lbAlgo, natTO.lbAlgo) &&
                             Objects.equals(protocol, natTO.protocol) &&
-                            Arrays.equals(realServer, natTO.realServer);
+                            Arrays.equals(realServers, natTO.realServers);
                 }
 
                 @Override
                 public int hashCode() {
 
                     int result = Objects.hash(virtualServer, port, lbAlgo, protocol);
-                    result = 31 * result + Arrays.hashCode(realServer);
+                    result = 31 * result + Arrays.hashCode(realServers);
                     return result;
                 }
 
