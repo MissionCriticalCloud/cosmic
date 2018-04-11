@@ -8,9 +8,7 @@ class CsForwardingRules(object):
             if public_ip == "id":
                 continue
             for rule in self.dbag[public_ip]:
-                if rule["type"] == "forward":
-                    self.processForwardRule(rule)
-                elif rule["type"] == "staticnat":
+                if rule["type"] == "staticnat":
                     self.processStaticNatRule(rule)
 
     def portsToString(self, ports, delimiter):
@@ -19,42 +17,6 @@ class CsForwardingRules(object):
             return str(ports_parts[0])
         else:
             return "%s%s%s" % (ports_parts[0], delimiter, ports_parts[1])
-
-    def processForwardRule(self, rule):
-        if self.config.is_vpc():
-            self.forward_vpc(rule)
-
-    def forward_vpc(self, rule):
-        fw_prerout_rule = "-A PREROUTING -d %s/32" % rule["public_ip"]
-        if not rule["protocol"] == "any":
-            fw_prerout_rule += " -m %s -p %s" % (rule["protocol"], rule["protocol"])
-        if not rule["public_ports"] == "any":
-            fw_prerout_rule += " --dport %s" % self.portsToString(rule["public_ports"], ":")
-        fw_prerout_rule += " -j DNAT --to-destination %s" % rule["internal_ip"]
-        if not rule["internal_ports"] == "any":
-            fw_prerout_rule += ":" + self.portsToString(rule["internal_ports"], "-")
-
-        fw_postrout_rule = "-A POSTROUTING -d %s/32 " % rule["public_ip"]
-        if not rule["protocol"] == "any":
-            fw_postrout_rule += " -m %s -p %s" % (rule["protocol"], rule["protocol"])
-        if not rule["public_ports"] == "any":
-            fw_postrout_rule += " --dport %s" % self.portsToString(rule["public_ports"], ":")
-        fw_postrout_rule += " -j SNAT --to-source %s" % rule["internal_ip"]
-        if not rule["internal_ports"] == "any":
-            fw_postrout_rule += ":" + self.portsToString(rule["internal_ports"], "-")
-
-        fw_output_rule = "-A OUTPUT -d %s/32" % rule["public_ip"]
-        if not rule["protocol"] == "any":
-            fw_output_rule += " -m %s -p %s" % (rule["protocol"], rule["protocol"])
-        if not rule["public_ports"] == "any":
-            fw_output_rule += " --dport %s" % self.portsToString(rule["public_ports"], ":")
-        fw_output_rule += " -j DNAT --to-destination %s" % rule["internal_ip"]
-        if not rule["internal_ports"] == "any":
-            fw_output_rule += ":" + self.portsToString(rule["internal_ports"], "-")
-
-        self.config.fw.append(["nat", "", fw_prerout_rule])
-        self.config.fw.append(["nat", "", fw_postrout_rule])
-        self.config.fw.append(["nat", "", fw_output_rule])
 
     def processStaticNatRule(self, rule):
         device = self.config.get_public_interface_name()
