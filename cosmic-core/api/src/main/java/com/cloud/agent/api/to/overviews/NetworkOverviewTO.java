@@ -369,7 +369,7 @@ public class NetworkOverviewTO {
 
     public static class ServiceTO {
         private ServiceSourceNatTO[] sourceNat;
-        private ServiceLoadBalancingTO[] loadBalancing;
+        private ServiceLoadBalancingTO loadBalancing;
 
         public ServiceSourceNatTO[] getSourceNat() {
             return sourceNat;
@@ -379,11 +379,11 @@ public class NetworkOverviewTO {
             this.sourceNat = sourceNat;
         }
 
-        public ServiceLoadBalancingTO[] getLoadBalancing() {
+        public ServiceLoadBalancingTO getLoadBalancing() {
             return loadBalancing;
         }
 
-        public void setLoadBalancing(final ServiceLoadBalancingTO[] loadBalancing) {
+        public void setLoadBalancing(final ServiceLoadBalancingTO loadBalancing) {
             this.loadBalancing = loadBalancing;
         }
 
@@ -397,14 +397,14 @@ public class NetworkOverviewTO {
             }
             final ServiceTO serviceTO = (ServiceTO) o;
             return Arrays.equals(sourceNat, serviceTO.sourceNat) &&
-                    Arrays.equals(loadBalancing, serviceTO.loadBalancing);
+                    Objects.equals(loadBalancing, serviceTO.loadBalancing);
         }
 
         @Override
         public int hashCode() {
 
-            int result = Arrays.hashCode(sourceNat);
-            result = 31 * result + Arrays.hashCode(loadBalancing);
+            int result = Objects.hash(loadBalancing);
+            result = 31 * result + Arrays.hashCode(sourceNat);
             return result;
         }
 
