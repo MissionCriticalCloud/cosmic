@@ -142,6 +142,9 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -165,10 +168,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 @Component
 public class StorageManagerImpl extends ManagerBase implements StorageManager, ClusterManagerListener, Configurable {
@@ -332,11 +331,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                     }
                 }
             }
-      /*
-       * Can't find the vm where host resides on(vm is destroyed? or
-       * volume is detached from vm), randomly choose a host to send the
-       * cmd
-       */
+            /*
+             * Can't find the vm where host resides on(vm is destroyed? or
+             * volume is detached from vm), randomly choose a host to send the
+             * cmd
+             */
         }
         final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), Status.Up);
         Collections.shuffle(poolHosts);
@@ -956,6 +955,46 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         } else {
             return HypervisorType.None;
         }
+    }
+
+    @Override
+    public boolean storagePoolHasEnoughIops(final List<Volume> requestedVolumes, final StoragePool pool) {
+        if (requestedVolumes == null || requestedVolumes.isEmpty() || pool == null) {
+            return false;
+        }
+
+        // Only IOPS guaranteed primary storage like SolidFire is using/setting IOPS.
+        // This check returns true for storage that does not specify IOPS.
+        if (pool.getCapacityIops() == null) {
+            s_logger.info("Storage pool " + pool.getName() + " (" + pool.getId() + ") does not supply IOPS capacity, assuming enough capacity");
+
+            return true;
+        }
+
+        final Double overProvFactor = CapacityManager.StorageIopsOverprovisioningFactor.valueIn(pool.getId());
+        final Long storagePoolTotalIops = pool.getCapacityIops() * overProvFactor.longValue();
+
+        long requestedIops = 0;
+        for (final Volume requestedVolume : requestedVolumes) {
+            final Long diskOfferingId = requestedVolume.getDiskOfferingId();
+            final DiskOfferingVO diskOfferingVO = _diskOfferingDao.findById(diskOfferingId);
+            final Long totalIops = diskOfferingVO.getIopsTotalRate();
+            final Long readIops = diskOfferingVO.getIopsReadRate();
+            final Long writeIops = diskOfferingVO.getIopsWriteRate();
+
+            if (totalIops != null && totalIops > 0) {
+                requestedIops += totalIops;
+            } else {
+                if (readIops != null && readIops > 0) {
+                    requestedIops += readIops;
+                }
+                if (writeIops != null && writeIops > 0) {
+                    requestedIops += writeIops;
+                }
+            }
+        }
+
+        return requestedIops <= storagePoolTotalIops;
     }
 
     @Override

@@ -23,6 +23,8 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -33,9 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractStoragePoolAllocator extends AdapterBase implements StoragePoolAllocator {
     private static final Logger s_logger = LoggerFactory.getLogger(AbstractStoragePoolAllocator.class);
@@ -225,7 +224,7 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
         final Volume volume = _volumeDao.findById(dskCh.getVolumeId());
         final List<Volume> requestVolumes = new ArrayList<>();
         requestVolumes.add(volume);
-        return storageMgr.storagePoolHasEnoughSpace(requestVolumes, pool);
+        return storageMgr.storagePoolHasEnoughSpace(requestVolumes, pool) && storageMgr.storagePoolHasEnoughIops(requestVolumes, pool);
     }
 
     /*

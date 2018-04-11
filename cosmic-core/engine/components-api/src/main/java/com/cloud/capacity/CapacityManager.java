@@ -16,6 +16,7 @@ public interface CapacityManager {
     static final String MemOverprovisioningFactorCK = "mem.overprovisioning.factor";
     static final String StorageCapacityDisableThresholdCK = "pool.storage.capacity.disablethreshold";
     static final String StorageOverprovisioningFactorCK = "storage.overprovisioning.factor";
+    static final String StorageIopsOverprovisioningFactorCK = "storage.iopsoverprovisioning.factor";
     static final String StorageAllocatedCapacityDisableThresholdCK = "pool.storage.allocated.capacity.disablethreshold";
 
     static final ConfigKey<Float> CpuOverprovisioningFactor = new ConfigKey<>(Float.class, CpuOverprovisioningFactorCK, "Advanced", "1.0",
@@ -27,6 +28,8 @@ public interface CapacityManager {
             ConfigKey.Scope.Zone);
     static final ConfigKey<Double> StorageOverprovisioningFactor = new ConfigKey<>("Storage", Double.class, StorageOverprovisioningFactorCK, "2",
             "Used for storage overprovisioning calculation; available storage will be (actualStorageSize * storage.overprovisioning.factor)", true, ConfigKey.Scope.StoragePool);
+    static final ConfigKey<Double> StorageIopsOverprovisioningFactor = new ConfigKey<>("Storage", Double.class, StorageIopsOverprovisioningFactorCK, "2",
+            "Used for storage IOPS overprovisioning calculation; available IOPS will be (actual IOPS * storage.iopsoverprovisioning.factor)", true, ConfigKey.Scope.StoragePool);
     static final ConfigKey<Double> StorageAllocatedCapacityDisableThreshold =
             new ConfigKey<>(
                     "Alert",
