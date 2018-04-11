@@ -369,6 +369,7 @@ public class NetworkOverviewTO {
 
     public static class ServiceTO {
         private ServiceSourceNatTO[] sourceNat;
+        private ServiceLoadBalancingTO[] loadBalancing;
 
         public ServiceSourceNatTO[] getSourceNat() {
             return sourceNat;
@@ -378,21 +379,33 @@ public class NetworkOverviewTO {
             this.sourceNat = sourceNat;
         }
 
+        public ServiceLoadBalancingTO[] getLoadBalancing() {
+            return loadBalancing;
+        }
+
+        public void setLoadBalancing(final ServiceLoadBalancingTO[] loadBalancing) {
+            this.loadBalancing = loadBalancing;
+        }
+
         @Override
         public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof ServiceTO)) {
+            if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             final ServiceTO serviceTO = (ServiceTO) o;
-            return Arrays.equals(getSourceNat(), serviceTO.getSourceNat());
+            return Arrays.equals(sourceNat, serviceTO.sourceNat) &&
+                    Arrays.equals(loadBalancing, serviceTO.loadBalancing);
         }
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(getSourceNat());
+
+            int result = Arrays.hashCode(sourceNat);
+            result = 31 * result + Arrays.hashCode(loadBalancing);
+            return result;
         }
 
         public static class ServiceSourceNatTO {
@@ -439,6 +452,202 @@ public class NetworkOverviewTO {
             @Override
             public int hashCode() {
                 return Objects.hash(getTo(), getGateway());
+            }
+        }
+
+        public static class ServiceLoadBalancingTO {
+            private NatTO[] nat;
+            private ProxyTO[] proxy;
+
+            public ServiceLoadBalancingTO() {
+            }
+
+            public ServiceLoadBalancingTO(final NatTO[] nat, final ProxyTO[] proxy) {
+                this.nat = nat;
+                this.proxy = proxy;
+            }
+
+            public NatTO[] getNat() {
+                return nat;
+            }
+
+            public void setNat(final NatTO[] nat) {
+                this.nat = nat;
+            }
+
+            public ProxyTO[] getProxy() {
+                return proxy;
+            }
+
+            public void setProxy(final ProxyTO[] proxy) {
+                this.proxy = proxy;
+            }
+
+            @Override
+            public boolean equals(final Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+                final ServiceLoadBalancingTO that = (ServiceLoadBalancingTO) o;
+                return Arrays.equals(nat, that.nat) &&
+                        Arrays.equals(proxy, that.proxy);
+            }
+
+            @Override
+            public int hashCode() {
+
+                int result = Arrays.hashCode(nat);
+                result = 31 * result + Arrays.hashCode(proxy);
+                return result;
+            }
+
+            public static class NatTO {
+                String virtualServer;
+                Integer port;
+                String lbAlgo;
+                String protocol;
+                RealServerTO[] realServer;
+
+                public NatTO() {
+                }
+
+                public NatTO(final String virtualServer, final Integer port, final String lbAlgo, final String protocol, final RealServerTO[] realServer) {
+                    this.virtualServer = virtualServer;
+                    this.port = port;
+                    this.lbAlgo = lbAlgo;
+                    this.protocol = protocol;
+                    this.realServer = realServer;
+                }
+
+                public String getVirtualServer() {
+                    return virtualServer;
+                }
+
+                public void setVirtualServer(final String virtualServer) {
+                    this.virtualServer = virtualServer;
+                }
+
+                public Integer getPort() {
+                    return port;
+                }
+
+                public void setPort(final Integer port) {
+                    this.port = port;
+                }
+
+                public String getLbAlgo() {
+                    return lbAlgo;
+                }
+
+                public void setLbAlgo(final String lbAlgo) {
+                    this.lbAlgo = lbAlgo;
+                }
+
+                public String getProtocol() {
+                    return protocol;
+                }
+
+                public void setProtocol(final String protocol) {
+                    this.protocol = protocol;
+                }
+
+                public RealServerTO[] getRealServer() {
+                    return realServer;
+                }
+
+                public void setRealServer(final RealServerTO[] realServer) {
+                    this.realServer = realServer;
+                }
+
+                @Override
+                public boolean equals(final Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+                    final NatTO natTO = (NatTO) o;
+                    return Objects.equals(virtualServer, natTO.virtualServer) &&
+                            Objects.equals(port, natTO.port) &&
+                            Objects.equals(lbAlgo, natTO.lbAlgo) &&
+                            Objects.equals(protocol, natTO.protocol) &&
+                            Arrays.equals(realServer, natTO.realServer);
+                }
+
+                @Override
+                public int hashCode() {
+
+                    int result = Objects.hash(virtualServer, port, lbAlgo, protocol);
+                    result = 31 * result + Arrays.hashCode(realServer);
+                    return result;
+                }
+
+                public static class RealServerTO {
+                    String ipAddress;
+                    Integer port;
+                    Integer weight;
+
+                    public RealServerTO() {
+                    }
+
+                    public RealServerTO(final String ipAddress, final Integer port, final Integer weight) {
+                        this.ipAddress = ipAddress;
+                        this.port = port;
+                        this.weight = weight;
+                    }
+
+                    public String getIpAddress() {
+                        return ipAddress;
+                    }
+
+                    public void setIpAddress(final String ipAddress) {
+                        this.ipAddress = ipAddress;
+                    }
+
+                    public Integer getPort() {
+                        return port;
+                    }
+
+                    public void setPort(final Integer port) {
+                        this.port = port;
+                    }
+
+                    public Integer getWeight() {
+                        return weight;
+                    }
+
+                    public void setWeight(final Integer weight) {
+                        this.weight = weight;
+                    }
+
+                    @Override
+                    public boolean equals(final Object o) {
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
+                        final RealServerTO that = (RealServerTO) o;
+                        return Objects.equals(ipAddress, that.ipAddress) &&
+                                Objects.equals(port, that.port) &&
+                                Objects.equals(weight, that.weight);
+                    }
+
+                    @Override
+                    public int hashCode() {
+
+                        return Objects.hash(ipAddress, port, weight);
+                    }
+                }
+            }
+
+            public static class ProxyTO {
+
             }
         }
     }
