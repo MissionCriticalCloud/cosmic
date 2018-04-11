@@ -149,16 +149,16 @@ class Firewall:
         self.fw.append(["filter", "", "-N SOURCE_NAT_LIST"])
         self.fw.append(["filter", "", "-A FORWARD -j SOURCE_NAT_LIST"])
 
-        if 'source_nat' in self.config.dbag_network_overview['services'] and \
-                self.config.dbag_network_overview['services']['source_nat']:
+        if 'source_nat' in self.config.dbag_network_overview and \
+                self.config.dbag_network_overview['source_nat']:
             logging.info("Adding SourceNAT for interface %s to %s" % (
-                device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
+                device, self.config.dbag_network_overview['source_nat'][0]['to']
             ))
             self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 10.0.0.0/8 -j RETURN" % device])
             self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 172.16.0.0/12 -j RETURN" % device])
             self.fw.append(["nat", "", "-A POSTROUTING -o %s -d 192.168.0.0/16 -j RETURN" % device])
             self.fw.append(["nat", "", "-A POSTROUTING -j SNAT -o %s --to-source %s" % (
-                device, self.config.dbag_network_overview['services']['source_nat'][0]['to']
+                device, self.config.dbag_network_overview['source_nat'][0]['to']
             )])
 
     def add_private_vpc_rules(self, device, cidr):
@@ -181,11 +181,11 @@ class Firewall:
         logging.info("Configuring Site2Site VPN rules")
 
         self.config.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 500 -s %s -d %s -j ACCEPT" % (
-        device, site2site['right'], site2site['left'])])
+            device, site2site['right'], site2site['left'])])
         self.config.fw.append(["", "front", "-A INPUT -i %s -p udp -m udp --dport 4500 -s %s -d %s -j ACCEPT" % (
-        device, site2site['right'], site2site['left'])])
+            device, site2site['right'], site2site['left'])])
         self.config.fw.append(["", "front", "-A INPUT -i %s -p esp -s %s -d %s -j ACCEPT" % (
-        device, site2site['right'], site2site['left'])])
+            device, site2site['right'], site2site['left'])])
         self.config.fw.append(["nat", "front", "-A POSTROUTING -o %s -m mark --mark 0x525 -j ACCEPT" % device])
 
         # Make it possible to tcpdump on ipsec tunnels
@@ -225,16 +225,16 @@ class Firewall:
         for net in site2site['peer_list'].lstrip().rstrip().split(','):
             self.config.fw.append(["mangle", "front",
                                    "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (
-                                   site2site['left_subnet'], net)])
+                                       site2site['left_subnet'], net)])
             self.config.fw.append(["mangle", "",
                                    "-A OUTPUT -s %s -d %s -j MARK --set-xmark 0x525/0xffffffff" % (
-                                   site2site['left_subnet'], net)])
+                                       site2site['left_subnet'], net)])
             self.config.fw.append(["mangle", "front",
                                    "-A FORWARD -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
-                                   net, site2site['left_subnet'])])
+                                       net, site2site['left_subnet'])])
             self.config.fw.append(["mangle", "",
                                    "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
-                                   net, site2site['left_subnet'])])
+                                       net, site2site['left_subnet'])])
 
     def add_remote_access_vpn_rules(self, device, publicip, remote_access):
         logging.info("Configuring RemoteAccess VPN rules")
@@ -242,9 +242,12 @@ class Firewall:
         localcidr = remote_access['local_cidr']
         local_ip = remote_access['local_ip']
 
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(
+            ["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(
+            ["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(
+            ["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j ACCEPT" % (device, publicip)])
         self.config.fw.append(["", "", "-A INPUT -i %s -p ah -j ACCEPT" % device])
         self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j ACCEPT" % device])
         self.config.fw.append(["", "", " -N VPN_FORWARD"])
@@ -256,4 +259,5 @@ class Firewall:
         self.config.fw.append(["", "", "-A VPN_FORWARD -i ppp+  -o ppp+ -j RETURN"])
         self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
         self.config.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
-        self.config.fw.append(["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
+        self.config.fw.append(
+            ["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])

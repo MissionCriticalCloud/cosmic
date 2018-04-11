@@ -3,22 +3,8 @@ package com.cloud.network.router;
 import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SavePasswordCommand;
-import com.cloud.agent.api.routing.SetFirewallRulesCommand;
-import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
-import com.cloud.agent.api.routing.SetPublicIpACLCommand;
-import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.to.FirewallRuleTO;
-import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.NetworkACLTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.agent.api.to.PublicIpACLTO;
-import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.agent.api.routing.*;
+import com.cloud.agent.api.to.*;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
@@ -28,44 +14,16 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.NetworkModel;
+import com.cloud.network.*;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.PublicIpAddress;
-import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.Site2SiteVpnConnection;
-import com.cloud.network.VpnUser;
-import com.cloud.network.dao.FirewallRulesDao;
-import com.cloud.network.dao.IPAddressDao;
-import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
-import com.cloud.network.dao.RemoteAccessVpnDao;
-import com.cloud.network.dao.RemoteAccessVpnVO;
-import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
-import com.cloud.network.dao.Site2SiteCustomerGatewayVO;
-import com.cloud.network.dao.Site2SiteVpnConnectionDao;
-import com.cloud.network.dao.Site2SiteVpnConnectionVO;
-import com.cloud.network.dao.Site2SiteVpnGatewayDao;
-import com.cloud.network.dao.Site2SiteVpnGatewayVO;
-import com.cloud.network.dao.VpnUserDao;
+import com.cloud.network.dao.*;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
-import com.cloud.network.rules.FirewallRule;
+import com.cloud.network.rules.*;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNat;
-import com.cloud.network.rules.StaticNatRule;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.NetworkACLItemDao;
-import com.cloud.network.vpc.NetworkACLItemVO;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.network.vpc.*;
 import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
@@ -77,17 +35,11 @@ import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
-import com.cloud.vm.NicProfile;
-import com.cloud.vm.NicVO;
-import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachineManager;
-import com.cloud.vm.VirtualMachineProfile;
+import com.cloud.vm.*;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -96,8 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 
 public class CommandSetupHelper {
 
@@ -266,48 +216,6 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand(cmd);
-    }
-
-    public void createApplyFirewallRulesCommands(final List<? extends FirewallRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<FirewallRuleTO> rulesTO = new ArrayList<>();
-        String systemRule = null;
-        Boolean defaultEgressPolicy = false;
-        if (rules != null) {
-            if (rules.size() > 0) {
-                if (rules.get(0).getTrafficType() == FirewallRule.TrafficType.Egress && rules.get(0).getType() == FirewallRule.FirewallRuleType.System) {
-                    systemRule = String.valueOf(FirewallRule.FirewallRuleType.System);
-                }
-            }
-            for (final FirewallRule rule : rules) {
-                _rulesDao.loadSourceCidrs((FirewallRuleVO) rule);
-                final FirewallRule.TrafficType traffictype = rule.getTrafficType();
-                if (traffictype == FirewallRule.TrafficType.Ingress) {
-                    final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, sourceIp.getAddress().addr(), Purpose.Firewall, traffictype);
-                    rulesTO.add(ruleTO);
-                } else if (rule.getTrafficType() == FirewallRule.TrafficType.Egress) {
-                    final NetworkVO network = _networkDao.findById(guestNetworkId);
-                    final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-                    defaultEgressPolicy = offering.getEgressDefaultPolicy();
-                    assert rule.getSourceIpAddressId() == null : "ipAddressId should be null for egress firewall rule. ";
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, "", Purpose.Firewall, traffictype, defaultEgressPolicy);
-                    rulesTO.add(ruleTO);
-                }
-            }
-        }
-
-        final SetFirewallRulesCommand cmd = new SetFirewallRulesCommand(rulesTO);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        if (systemRule != null) {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, systemRule);
-        } else {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, String.valueOf(defaultEgressPolicy));
-        }
-
         cmds.addCommand(cmd);
     }
 
@@ -491,9 +399,9 @@ public class CommandSetupHelper {
 
             ipsToExclude.addAll(
                     ipAddrList.stream()
-                              .filter(ip -> IpAddress.State.Releasing.equals(ip.getState()))
-                              .map(PublicIpAddress::getAddress)
-                              .collect(Collectors.toList())
+                            .filter(ip -> IpAddress.State.Releasing.equals(ip.getState()))
+                            .map(PublicIpAddress::getAddress)
+                            .collect(Collectors.toList())
             );
         }
     }
@@ -509,14 +417,14 @@ public class CommandSetupHelper {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<NetworkOverviewTO.InterfaceTO> interfacesTO = new ArrayList<>();
 
-        final NetworkOverviewTO.ServiceTO servicesTO = new NetworkOverviewTO.ServiceTO();
-        final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
+        final List<NetworkOverviewTO.SourceNatTO> serviceSourceNatsTO = new ArrayList<>();
 
         configureInterfacesAndIps(router, nicsToExclude, ipsToExclude, networkOverviewTO, interfacesTO, serviceSourceNatsTO);
         configureStaticRoutes(router, staticRoutesToExclude, networkOverviewTO);
 
-        servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
-        networkOverviewTO.setServices(servicesTO);
+
+        networkOverviewTO.setSourceNat(serviceSourceNatsTO
+                .toArray(new NetworkOverviewTO.SourceNatTO[serviceSourceNatsTO.size()]));
 
         final NetworkOverviewTO.VPNTO vpnTO = new NetworkOverviewTO.VPNTO();
         configureRemoteAccessVpn(router, remoteAccessVpnToExclude, vpnTO);
@@ -529,53 +437,52 @@ public class CommandSetupHelper {
     }
 
     private void configureInterfacesAndIps(final VirtualRouter router, final List<Nic> nicsToExclude, final List<Ip> ipsToExclude, final NetworkOverviewTO networkOverviewTO,
-                                           final List<NetworkOverviewTO.InterfaceTO> interfacesTO, final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO) {
+                                           final List<NetworkOverviewTO.InterfaceTO> interfacesTO, final List<NetworkOverviewTO.SourceNatTO> serviceSourceNatsTO) {
         final List<NicVO> nics = _nicDao.listByVmId(router.getId());
         nics.stream()
-            .filter(nic -> !nicsToExclude.contains(nic))
-            .forEach(nic -> {
-                final NetworkOverviewTO.InterfaceTO interfaceTO = new NetworkOverviewTO.InterfaceTO();
-                interfaceTO.setMacAddress(nic.getMacAddress());
+                .filter(nic -> !nicsToExclude.contains(nic))
+                .forEach(nic -> {
+                    final NetworkOverviewTO.InterfaceTO interfaceTO = new NetworkOverviewTO.InterfaceTO();
+                    interfaceTO.setMacAddress(nic.getMacAddress());
 
-                final List<NetworkOverviewTO.InterfaceTO.IPv4AddressTO> ipv4Addresses = new ArrayList<>();
-                if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
-                    ipv4Addresses.add(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
-                            NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()),
-                            nic.getIPv4Gateway())
-                    );
-                }
-
-                final NetworkVO network = _networkDao.findById(nic.getNetworkId());
-                if (network != null) {
-                    final TrafficType trafficType = network.getTrafficType();
-                    if (TrafficType.Public.equals(trafficType)) {
-                        ipv4Addresses.addAll(_ipAddressDao.listByVpc(router.getVpcId(), false)
-                                                          .stream()
-                                                          .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()) && ipAddressVO.getAssociatedWithNetworkId() != null)
-                                                          .map(ipAddressVO -> {
-                                                              final Ip ip = ipAddressVO.getAddress();
-                                                              final VlanVO vlanVO = _vlanDao.findById(ipAddressVO.getVlanId());
-                                                              return new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
-                                                                      NetUtils.getIpv4AddressWithCidrSize(ip.addr(), vlanVO.getVlanNetmask()),
-                                                                      nic.getIPv4Gateway());
-                                                          })
-                                                          .collect(Collectors.toList()));
-
-                        serviceSourceNatsTO.addAll(_ipAddressDao.listByVpc(router.getVpcId(), true)
-                                                                .stream()
-                                                                .map(IPAddressVO::getAddress)
-                                                                .filter(ip -> !ipsToExclude.contains(ip))
-                                                                .map(Ip::addr)
-                                                                .map(ip -> new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO(ip, nic.getIPv4Gateway()))
-                                                                .collect(Collectors.toList()));
+                    final List<NetworkOverviewTO.InterfaceTO.IPv4AddressTO> ipv4Addresses = new ArrayList<>();
+                    if (StringUtils.isNotBlank(nic.getIPv4Address()) && StringUtils.isNotBlank(nic.getIPv4Netmask())) {
+                        ipv4Addresses.add(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                                NetUtils.getIpv4AddressWithCidrSize(nic.getIPv4Address(), nic.getIPv4Netmask()),
+                                nic.getIPv4Gateway())
+                        );
                     }
 
-                    interfaceTO.setMetadata(new NetworkOverviewTO.InterfaceTO.MetadataTO(network));
-                }
+                    final NetworkVO network = _networkDao.findById(nic.getNetworkId());
+                    if (network != null) {
+                        final TrafficType trafficType = network.getTrafficType();
+                        if (TrafficType.Public.equals(trafficType)) {
+                            ipv4Addresses.addAll(_ipAddressDao.listByVpc(router.getVpcId(), false)
+                                    .stream()
+                                    .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()) && ipAddressVO.getAssociatedWithNetworkId() != null)
+                                    .map(ipAddressVO -> {
+                                        final Ip ip = ipAddressVO.getAddress();
+                                        final VlanVO vlanVO = _vlanDao.findById(ipAddressVO.getVlanId());
+                                        return new NetworkOverviewTO.InterfaceTO.IPv4AddressTO(
+                                                NetUtils.getIpv4AddressWithCidrSize(ip.addr(), vlanVO.getVlanNetmask()),
+                                                nic.getIPv4Gateway());
+                                    })
+                                    .collect(Collectors.toList()));
 
-                interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO[ipv4Addresses.size()]));
-                interfacesTO.add(interfaceTO);
-            });
+                            serviceSourceNatsTO.addAll(_ipAddressDao.listByVpc(router.getVpcId(), true)
+                                    .stream()
+                                    .map(IPAddressVO::getAddress)
+                                    .filter(ip -> !ipsToExclude.contains(ip))
+                                    .map(Ip::addr)
+                                    .map(ip -> new NetworkOverviewTO.SourceNatTO(ip, nic.getIPv4Gateway()))
+                                    .collect(Collectors.toList()));
+                        }
+
+                        interfaceTO.setMetadata(new NetworkOverviewTO.InterfaceTO.MetadataTO(network));
+                    }
+                    interfaceTO.setIpv4Addresses(ipv4Addresses.toArray(new NetworkOverviewTO.InterfaceTO.IPv4AddressTO[ipv4Addresses.size()]));
+                    interfacesTO.add(interfaceTO);
+                });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new NetworkOverviewTO.InterfaceTO[interfacesTO.size()]));
     }
@@ -584,11 +491,11 @@ public class CommandSetupHelper {
         final List<NetworkOverviewTO.RouteTO> routesTO = new ArrayList<>();
         if (router.getVpcId() != null) {
             routesTO.addAll(_staticRouteDao.listByVpcId(router.getVpcId())
-                                           .stream()
-                                           .map(StaticRouteProfile::new)
-                                           .filter(route -> !staticRoutesToExclude.contains(route))
-                                           .map(route -> new NetworkOverviewTO.RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
-                                           .collect(Collectors.toList()));
+                    .stream()
+                    .map(StaticRouteProfile::new)
+                    .filter(route -> !staticRoutesToExclude.contains(route))
+                    .map(route -> new NetworkOverviewTO.RouteTO(route.getCidr(), route.getGwIpAddress(), route.getMetric()))
+                    .collect(Collectors.toList()));
         }
         networkOverviewTO.setRoutes(routesTO.toArray(new NetworkOverviewTO.RouteTO[routesTO.size()]));
     }
@@ -610,10 +517,10 @@ public class CommandSetupHelper {
 
             remoteAccessTO.setVpnUsers(
                     _vpnUsersDao.listByAccount(vpn.getAccountId())
-                                .stream()
-                                .filter(vpnUser -> VpnUser.State.Add.equals(vpnUser.getState()) || VpnUser.State.Active.equals(vpnUser.getState()))
-                                .map(vpnUser -> new NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO(vpnUser.getUsername(), vpnUser.getPassword()))
-                                .toArray(NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO[]::new)
+                            .stream()
+                            .filter(vpnUser -> VpnUser.State.Add.equals(vpnUser.getState()) || VpnUser.State.Active.equals(vpnUser.getState()))
+                            .map(vpnUser -> new NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO(vpnUser.getUsername(), vpnUser.getPassword()))
+                            .toArray(NetworkOverviewTO.VPNTO.RemoteAccessTO.VPNUserTO[]::new)
             );
 
             vpnTO.setRemoteAccess(remoteAccessTO);
@@ -622,10 +529,10 @@ public class CommandSetupHelper {
 
     private void configureSite2SiteVpn(final VirtualRouter router, final Site2SiteVpnConnection site2siteVpnToExclude, final NetworkOverviewTO.VPNTO vpnTO) {
         vpnTO.setSite2site(_s2sVpnDao.listByVpcId(router.getVpcId())
-                                     .stream()
-                                     .filter(vpnConnection -> !vpnConnection.equals(site2siteVpnToExclude))
-                                     .map(this::toSite2SiteTO)
-                                     .toArray(NetworkOverviewTO.VPNTO.Site2SiteTO[]::new));
+                .stream()
+                .filter(vpnConnection -> !vpnConnection.equals(site2siteVpnToExclude))
+                .map(this::toSite2SiteTO)
+                .toArray(NetworkOverviewTO.VPNTO.Site2SiteTO[]::new));
     }
 
     private NetworkOverviewTO.VPNTO.Site2SiteTO toSite2SiteTO(Site2SiteVpnConnectionVO vpnConnection) {
