@@ -58,8 +58,10 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRule;
+import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
+import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.NetworkACLItemDao;
 import com.cloud.network.vpc.NetworkACLItemVO;
@@ -148,6 +150,8 @@ public class CommandSetupHelper {
     private ZoneRepository zoneRepository;
     @Inject
     private NetworkACLItemDao _networkACLItemDao;
+    @Inject
+    private PortForwardingRulesDao _portForwardingRulesDao;
 
     public void createApplyLoadBalancingRulesCommands(final List<LoadBalancingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
         final LoadBalancerTO[] lbs = new LoadBalancerTO[rules.size()];
@@ -511,11 +515,14 @@ public class CommandSetupHelper {
 
         final NetworkOverviewTO.ServiceTO servicesTO = new NetworkOverviewTO.ServiceTO();
         final List<NetworkOverviewTO.ServiceTO.ServiceSourceNatTO> serviceSourceNatsTO = new ArrayList<>();
+        final NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO serviceLoadBalancingTO = new NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO();
 
         configureInterfacesAndIps(router, nicsToExclude, ipsToExclude, networkOverviewTO, interfacesTO, serviceSourceNatsTO);
+        configureLoadbalancingRules(router, ipsToExclude, serviceLoadBalancingTO);
         configureStaticRoutes(router, staticRoutesToExclude, networkOverviewTO);
 
         servicesTO.setSourceNat(serviceSourceNatsTO.toArray(new NetworkOverviewTO.ServiceTO.ServiceSourceNatTO[serviceSourceNatsTO.size()]));
+        servicesTO.setLoadBalancing(serviceLoadBalancingTO);
         networkOverviewTO.setServices(servicesTO);
 
         final NetworkOverviewTO.VPNTO vpnTO = new NetworkOverviewTO.VPNTO();
@@ -578,6 +585,35 @@ public class CommandSetupHelper {
             });
 
         networkOverviewTO.setInterfaces(interfacesTO.toArray(new NetworkOverviewTO.InterfaceTO[interfacesTO.size()]));
+    }
+
+    private void configureLoadbalancingRules(final VirtualRouter router, final List<Ip> ipsToExclude, final NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO serviceLoadBalancingTO) {
+        serviceLoadBalancingTO.setNat(_ipAddressDao.listByVpc(router.getVpcId(), null)
+                                                   .stream()
+                                                   .filter(ipAddressVO -> !ipsToExclude.contains(ipAddressVO.getAddress()))
+                                                   .flatMap(ipAddressVO -> {
+                                                       List<PortForwardingRuleVO> portForwardingRuleVOList = _portForwardingRulesDao.listByIp(ipAddressVO.getId());
+
+                                                       return portForwardingRuleVOList
+                                                               .stream()
+                                                               .map(portForwardingRuleVO -> {
+                                                                   NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO.RealServerTO[] realServerTO = {
+                                                                           new NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO.RealServerTO(
+                                                                                   portForwardingRuleVO.getDestinationIpAddress().toString(),
+                                                                                   portForwardingRuleVO.getDestinationPortStart(),
+                                                                                   1
+                                                                           )
+                                                                   };
+
+                                                                   return new NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO(
+                                                                           ipAddressVO.toString(),
+                                                                           portForwardingRuleVO.getSourcePortStart(),
+                                                                           "rr",
+                                                                           portForwardingRuleVO.getProtocol(),
+                                                                           realServerTO
+                                                                   );
+                                                               });
+                                                   }).toArray(NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO[]::new));
     }
 
     private void configureStaticRoutes(final VirtualRouter router, final List<StaticRouteProfile> staticRoutesToExclude, final NetworkOverviewTO networkOverviewTO) {
