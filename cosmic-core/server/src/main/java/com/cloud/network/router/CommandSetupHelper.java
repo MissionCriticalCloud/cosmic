@@ -606,7 +606,7 @@ public class CommandSetupHelper {
                                                                    };
 
                                                                    return new NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO(
-                                                                           ipAddressVO.toString(),
+                                                                           ipAddressVO.getAddress().toString(),
                                                                            portForwardingRuleVO.getSourcePortStart(),
                                                                            "rr",
                                                                            portForwardingRuleVO.getProtocol(),
