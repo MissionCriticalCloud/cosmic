@@ -609,7 +609,7 @@ public class CommandSetupHelper {
                                                                            ipAddressVO.getAddress().toString(),
                                                                            portForwardingRuleVO.getSourcePortStart(),
                                                                            "rr",
-                                                                           portForwardingRuleVO.getProtocol(),
+                                                                           portForwardingRuleVO.getProtocol().toUpperCase(),
                                                                            realServerTO
                                                                    );
                                                                });
