@@ -39,7 +39,6 @@ import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
 import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.AccountGuestVlanMapDaoImpl;
-import com.cloud.network.dao.FirewallRulesCidrsDaoImpl;
 import com.cloud.network.dao.FirewallRulesDaoImpl;
 import com.cloud.network.dao.IPAddressDaoImpl;
 import com.cloud.network.dao.LoadBalancerDaoImpl;
@@ -109,8 +108,8 @@ import org.springframework.core.type.filter.TypeFilter;
         DiskOfferingDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class,
         DataCenterDetailsDaoImpl.class, NicSecondaryIpDaoImpl.class, UserIpv6AddressDaoImpl.class, UserDaoImpl.class, NicDaoImpl.class,
         NetworkDomainDaoImpl.class, HostDetailsDaoImpl.class, HostTagsDaoImpl.class, ClusterDaoImpl.class, FirewallRulesDaoImpl.class,
-        FirewallRulesCidrsDaoImpl.class, PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class,
-        PhysicalNetworkIsolationMethodDaoImpl.class, LoadBalancerDaoImpl.class, NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
+        PhysicalNetworkDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, PhysicalNetworkServiceProviderDaoImpl.class, PhysicalNetworkIsolationMethodDaoImpl.class, LoadBalancerDaoImpl.class,
+        NetworkServiceMapDaoImpl.class, PrimaryDataStoreDaoImpl.class, StoragePoolDetailsDaoImpl.class,
         RegionDaoImpl.class, AccountGuestVlanMapDaoImpl.class},
         includeFilters = {@Filter(value = ChildTestConfiguration.Library.class, type = FilterType.CUSTOM)},
         useDefaultFilters = false)

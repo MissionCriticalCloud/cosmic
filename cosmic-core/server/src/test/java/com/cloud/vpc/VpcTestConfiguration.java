@@ -24,7 +24,6 @@ import com.cloud.host.dao.HostDetailsDaoImpl;
 import com.cloud.host.dao.HostTagsDaoImpl;
 import com.cloud.network.Ipv6AddressManagerImpl;
 import com.cloud.network.StorageNetworkManager;
-import com.cloud.network.dao.FirewallRulesCidrsDaoImpl;
 import com.cloud.network.dao.FirewallRulesDaoImpl;
 import com.cloud.network.dao.IPAddressDaoImpl;
 import com.cloud.network.dao.LoadBalancerDaoImpl;
@@ -95,14 +94,14 @@ import org.springframework.core.type.filter.TypeFilter;
         ResourceTagsDaoImpl.class, FirewallRulesDaoImpl.class, VlanDaoImpl.class, AccountDaoImpl.class, ResourceCountDaoImpl.class,
         Site2SiteVpnGatewayDaoImpl.class, PodVlanMapDaoImpl.class, AccountVlanMapDaoImpl.class, DomainVlanMapDaoImpl.class, HostDaoImpl.class, HostDetailsDaoImpl.class,
         HostTagsDaoImpl.class, HostTransferMapDaoImpl.class, ClusterDaoImpl.class, HostPodDaoImpl.class, RouterNetworkDaoImpl.class,
-        UserStatisticsDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, FirewallRulesCidrsDaoImpl.class, ResourceLimitManagerImpl.class,
+        UserStatisticsDaoImpl.class, PhysicalNetworkTrafficTypeDaoImpl.class, ResourceLimitManagerImpl.class,
         ResourceLimitDaoImpl.class, ResourceCountDaoImpl.class, DomainDaoImpl.class, UserVmDaoImpl.class, UserVmDetailsDaoImpl.class, NicDaoImpl.class,
         SnapshotDaoImpl.class, VMInstanceDaoImpl.class, VolumeDaoImpl.class, UserIpv6AddressDaoImpl.class, NicSecondaryIpDaoImpl.class,
         VpcServiceMapDaoImpl.class, ServiceOfferingDaoImpl.class, VMTemplateHostDaoImpl.class, MockVpcDaoImpl.class, VMTemplateDaoImpl.class,
         VMTemplateZoneDaoImpl.class, VMTemplateDetailsDaoImpl.class, DataCenterDaoImpl.class, DataCenterIpAddressDaoImpl.class, PhysicalNetworkIsolationMethodDaoImpl.class,
         DataCenterLinkLocalIpAddressDaoImpl.class, DataCenterVnetDaoImpl.class, PodVlanDaoImpl.class, DataCenterDetailsDaoImpl.class,
         MockNetworkManagerImpl.class, MockVpcVirtualNetworkApplianceManager.class, EntityManagerImpl.class, LoadBalancerDaoImpl.class,
-        FirewallRulesCidrsDaoImpl.class, VirtualRouterProviderDaoImpl.class, ProjectDaoImpl.class, ProjectAccountDaoImpl.class, MockVpcOfferingDaoImpl.class,
+        VirtualRouterProviderDaoImpl.class, ProjectDaoImpl.class, ProjectAccountDaoImpl.class, MockVpcOfferingDaoImpl.class,
         MockConfigurationManagerImpl.class, MockNetworkOfferingServiceMapDaoImpl.class, MockNetworkServiceMapDaoImpl.class,
         MockVpcOfferingServiceMapDaoImpl.class, MockNetworkOfferingDaoImpl.class, MockNetworkModelImpl.class, Ipv6AddressManagerImpl.class},
         includeFilters = {@Filter(value = VpcTestConfiguration.VpcLibrary.class, type = FilterType.CUSTOM)},
