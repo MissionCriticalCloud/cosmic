@@ -36,9 +36,8 @@ public class PortForwardingRuleTO implements InternalIdentity {
     private String dstIp;
     private int dstPort;
 
-    public PortForwardingRuleTO(final PortForwardingRule rule, final String srcVlanTag, final String srcIp) {
+    public PortForwardingRuleTO(final PortForwardingRule rule, final String srcIp) {
         this(rule.getId(),
-                srcVlanTag,
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePort(),
@@ -54,7 +53,7 @@ public class PortForwardingRuleTO implements InternalIdentity {
 
     public PortForwardingRuleTO(final long id, final String srcIp, final int srcPort, final String dstIp, final int dstPort, final String protocol, final boolean revoked, final boolean
             alreadyAdded) {
-        this(id, null, srcIp, protocol, srcPort, revoked, alreadyAdded, FirewallRule.Purpose.PortForwarding, null, 0, 0);
+        this(id, srcIp, protocol, srcPort, revoked, alreadyAdded, FirewallRule.Purpose.PortForwarding, null, 0, 0);
         this.dstIp = dstIp;
         this.dstPort = dstPort;
     }
@@ -72,11 +71,6 @@ public class PortForwardingRuleTO implements InternalIdentity {
 
     PortForwardingRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
             purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
-        this(id, null, srcIp, protocol, srcPort, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
-    }
-
-    PortForwardingRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final
-    FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this.id = id;
         this.srcIp = srcIp;
         this.protocol = protocol;

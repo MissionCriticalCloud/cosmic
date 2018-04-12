@@ -826,7 +826,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         for (final PortForwardingRule rule : rules) {
             final IpAddress sourceIp = networkModel.getIp(rule.getSourceIpAddressId());
             final Vlan vlan = vlanDao.findById(sourceIp.getVlanId());
-            final PortForwardingRuleTO ruleTO = new PortForwardingRuleTO(rule, vlan.getVlanTag(), sourceIp.getAddress().addr());
+            final PortForwardingRuleTO ruleTO = new PortForwardingRuleTO(rule, sourceIp.getAddress().addr());
             portForwardingRules.add(ruleTO);
         }
 
