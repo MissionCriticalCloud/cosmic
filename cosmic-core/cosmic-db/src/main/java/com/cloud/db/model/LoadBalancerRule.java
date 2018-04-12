@@ -102,7 +102,7 @@ public class LoadBalancerRule extends com.cloud.model.LoadBalancerRule {
         return super.getLoadBalancingKind();
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "loadBalancerRule")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "loadBalancerRule", targetEntity = com.cloud.db.model.LoadBalancerRuleBackend.class)
     public List<LoadBalancerRuleBackend> getLoadBalancingRuleBackends() {
         return super.getLoadBalancingRuleBackends();
     }
