@@ -16,7 +16,6 @@ import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ExtractResponse;
-import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
@@ -27,7 +26,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.api.response.LBStickinessResponse;
@@ -100,11 +98,9 @@ import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
@@ -208,8 +204,6 @@ public interface ResponseGenerator {
 
     FirewallRuleResponse createPortForwardingRuleResponse(PortForwardingRule fwRule);
 
-    IpForwardingRuleResponse createIpForwardingRuleResponse(StaticNatRule fwRule);
-
     User findUserById(Long userId);
 
     UserVm findUserVmById(Long vmId);
@@ -253,8 +247,6 @@ public interface ResponseGenerator {
     List<TemplateResponse> createIsoResponses(ResponseView view, VirtualMachineTemplate iso, Long zoneId, boolean readyOnly);
 
     ProjectResponse createProjectResponse(Project project);
-
-    FirewallResponse createFirewallResponse(FirewallRule fwRule);
 
     HypervisorCapabilitiesResponse createHypervisorCapabilitiesResponse(HypervisorCapabilities hpvCapabilities);
 

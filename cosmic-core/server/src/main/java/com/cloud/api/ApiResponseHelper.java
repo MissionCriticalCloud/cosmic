@@ -42,7 +42,6 @@ import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ExtractResponse;
-import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
@@ -53,7 +52,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckPolicyResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
@@ -161,7 +159,6 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
@@ -1215,43 +1212,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public IpForwardingRuleResponse createIpForwardingRuleResponse(final StaticNatRule fwRule) {
-        final IpForwardingRuleResponse response = new IpForwardingRuleResponse();
-        response.setId(fwRule.getUuid());
-        response.setProtocol(fwRule.getProtocol());
-
-        final IpAddress ip = ApiDBUtils.findIpAddressById(fwRule.getSourceIpAddressId());
-
-        if (ip != null) {
-            response.setPublicIpAddressId(ip.getId());
-            response.setPublicIpAddress(ip.getAddress().addr());
-            if (fwRule.getDestIpAddress() != null) {
-                final UserVm vm = ApiDBUtils.findUserVmById(ip.getAssociatedWithVmId());
-                if (vm != null) {// vm might be destroyed
-                    response.setVirtualMachineId(vm.getUuid());
-                    response.setVirtualMachineName(vm.getHostName());
-                    if (vm.getDisplayName() != null) {
-                        response.setVirtualMachineDisplayName(vm.getDisplayName());
-                    } else {
-                        response.setVirtualMachineDisplayName(vm.getHostName());
-                    }
-                }
-            }
-        }
-        final FirewallRule.State state = fwRule.getState();
-        String stateToSet = state.toString();
-        if (state.equals(FirewallRule.State.Revoke)) {
-            stateToSet = "Deleting";
-        }
-
-        response.setStartPort(fwRule.getSourcePortStart());
-        response.setProtocol(fwRule.getProtocol());
-        response.setState(stateToSet);
-        response.setObjectName("ipforwardingrule");
-        return response;
-    }
-
-    @Override
     public User findUserById(final Long userId) {
         return ApiDBUtils.findUserById(userId);
     }
@@ -1960,52 +1920,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ProjectResponse> listPrjs = ViewResponseHelper.createProjectResponse(viewPrjs.toArray(new ProjectJoinVO[viewPrjs.size()]));
         assert listPrjs != null && listPrjs.size() == 1 : "There should be one project  returned";
         return listPrjs.get(0);
-    }
-
-    @Override
-    public FirewallResponse createFirewallResponse(final FirewallRule fwRule) {
-        final FirewallResponse response = new FirewallResponse();
-
-        response.setId(fwRule.getUuid());
-        response.setProtocol(fwRule.getProtocol());
-        if (fwRule.getSourcePortStart() != null) {
-            response.setStartPort(fwRule.getSourcePortStart());
-        }
-
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
-        response.setCidrList(StringUtils.join(cidrs, ","));
-
-        if (fwRule.getTrafficType() == FirewallRule.TrafficType.Ingress) {
-            final IpAddress ip = ApiDBUtils.findIpAddressById(fwRule.getSourceIpAddressId());
-            response.setPublicIpAddressId(ip.getUuid());
-            response.setPublicIpAddress(ip.getAddress().addr());
-        }
-
-        final Network network = ApiDBUtils.findNetworkById(fwRule.getNetworkId());
-        response.setNetworkId(network.getUuid());
-
-        final FirewallRule.State state = fwRule.getState();
-        String stateToSet = state.toString();
-        if (state.equals(FirewallRule.State.Revoke)) {
-            stateToSet = "Deleting";
-        }
-
-        response.setIcmpCode(fwRule.getIcmpCode());
-        response.setIcmpType(fwRule.getIcmpType());
-        response.setForDisplay(fwRule.isDisplay());
-
-        // set tag information
-        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.FirewallRule, fwRule.getId());
-        final List<ResourceTagResponse> tagResponses = new ArrayList<>();
-        for (final ResourceTag tag : tags) {
-            final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
-        }
-        response.setTags(tagResponses);
-
-        response.setState(stateToSet);
-        response.setObjectName("firewallrule");
-        return response;
     }
 
     @Override
