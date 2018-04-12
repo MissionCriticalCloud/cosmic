@@ -299,8 +299,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     public void create() {
         // cidr list parameter is deprecated
         if (cidrlist != null) {
-            throw new InvalidParameterValueException(
-                    "Parameter cidrList is deprecated; if you need to open firewall rule for the specific cidr, please refer to createFirewallRule command");
+            throw new InvalidParameterValueException("Parameter cidrList is deprecated; if you need to open firewall rule for the specific cidr, please refer to createFirewallRule command");
         }
 
         final Ip privateIp = getVmSecondaryIp();
