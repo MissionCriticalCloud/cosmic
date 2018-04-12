@@ -627,7 +627,7 @@ public class NiciraNvpResourceTest {
         when(cmd.getLogicalRouterUuid()).thenReturn("aaaaa");
 
         // Mock the api create calls
-        final NatRule[] rulepair = resource.generatePortForwardingRulePair("10.10.10.10", new int[]{8080}, "11.11.11.11", new int[]{80}, "tcp");
+        final NatRule[] rulepair = resource.generatePortForwardingRulePair("10.10.10.10", new int[]{8080, 8080}, "11.11.11.11", new int[]{80, 80}, "tcp");
         rulepair[0].setUuid(UUID.randomUUID());
         rulepair[1].setUuid(UUID.randomUUID());
         when(nvpApi.createLogicalRouterNatRule(eq("aaaaa"), (NatRule) any())).thenReturn(rulepair[0]).thenReturn(rulepair[1]);
