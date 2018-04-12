@@ -60,7 +60,7 @@ public class FirewallRuleTO implements InternalIdentity {
             srcPortRange = new int[portRange.size()];
             int i = 0;
             for (final Integer port : portRange) {
-                srcPortRange[i] = port.intValue();
+                srcPortRange[i] = port;
                 i++;
             }
         }

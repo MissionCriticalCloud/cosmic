@@ -431,8 +431,7 @@ public class CommandSetupHelper {
         if (rules != null) {
             for (final StaticNat rule : rules) {
                 final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                final StaticNatRuleTO ruleTO = new StaticNatRuleTO(0, sourceIp.getAddress().addr(), null, null, rule.getDestIpAddress(), null, null, null, rule.isForRevoke(),
-                        false);
+                final StaticNatRuleTO ruleTO = new StaticNatRuleTO(0, sourceIp.getAddress().addr(), rule.getDestIpAddress(), null, rule.isForRevoke(), false);
                 rulesTO.add(ruleTO);
             }
         }
