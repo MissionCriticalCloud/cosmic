@@ -19,7 +19,7 @@ public class SetFirewallRulesConfigItem extends AbstractConfigItemFacade {
 
         final List<FirewallRule> rules = new ArrayList<>();
         for (final FirewallRuleTO rule : command.getRules()) {
-            final FirewallRule fwRule = new FirewallRule(rule.getId(), rule.getSrcVlanTag(), rule.getSrcIp(), rule.getProtocol(), rule.getSrcPortRange(), rule.revoked(),
+            final FirewallRule fwRule = new FirewallRule(rule.getId(), rule.getSrcVlanTag(), rule.getSrcIp(), rule.getProtocol(), rule.getSrcPort(), rule.revoked(),
                     rule.isAlreadyAdded(), rule.getSourceCidrList(), rule.getPurpose().toString(), rule.getIcmpType(), rule.getIcmpCode(), rule.getTrafficType().toString(),
                     rule.getGuestCidr(), rule.isDefaultEgressPolicy());
             rules.add(fwRule);

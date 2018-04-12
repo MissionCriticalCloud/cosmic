@@ -278,13 +278,12 @@ public class NiciraNvpResource implements ServerResource {
         }
     }
 
-    public NatRule[] generatePortForwardingRulePair(final String insideIp, final int[] insidePorts, final String outsideIp, final int[] outsidePorts,
-                                                    final String protocol) {
+    public NatRule[] generatePortForwardingRulePair(final String insideIp, final int insidePorts, final String outsideIp, final int outsidePorts, final String protocol) {
         // Start with a basic static nat rule, then add port and protocol details
         final NatRule[] rulepair = generateStaticNatRulePair(insideIp, outsideIp);
 
-        ((DestinationNatRule) rulepair[0]).setToDestinationPort(insidePorts[0]);
-        rulepair[0].getMatch().setDestinationPort(outsidePorts[0]);
+        ((DestinationNatRule) rulepair[0]).setToDestinationPort(insidePorts);
+        rulepair[0].getMatch().setDestinationPort(outsidePorts);
         rulepair[0].setOrder(50);
         rulepair[0].getMatch().setEthertype("IPv4");
         if ("tcp".equals(protocol)) {
@@ -293,8 +292,8 @@ public class NiciraNvpResource implements ServerResource {
             rulepair[0].getMatch().setProtocol(17);
         }
 
-        ((SourceNatRule) rulepair[1]).setToSourcePort(outsidePorts[0]);
-        rulepair[1].getMatch().setSourcePort(insidePorts[0]);
+        ((SourceNatRule) rulepair[1]).setToSourcePort(outsidePorts);
+        rulepair[1].getMatch().setSourcePort(insidePorts);
         rulepair[1].setOrder(50);
         rulepair[1].getMatch().setEthertype("IPv4");
         if ("tcp".equals(protocol)) {

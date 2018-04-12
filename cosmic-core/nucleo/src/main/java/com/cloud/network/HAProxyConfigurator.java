@@ -39,7 +39,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
 
         for (final PortForwardingRuleTO rule : fwRules) {
             final StringBuilder sb = new StringBuilder();
-            final String poolName = sb.append(rule.getSrcIp().replace(".", "_")).append('-').append(rule.getSrcPortRange()[0]).toString();
+            final String poolName = sb.append(rule.getSrcIp().replace(".", "_")).append('-').append(rule.getSrcPort()[0]).toString();
             if (!rule.revoked()) {
                 List<PortForwardingRuleTO> fwList = pools.get(poolName);
                 if (fwList == null) {
@@ -74,7 +74,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
     private List<String> getRulesForPool(final String poolName, final List<PortForwardingRuleTO> fwRules) {
         final PortForwardingRuleTO firstRule = fwRules.get(0);
         final String publicIP = firstRule.getSrcIp();
-        final int publicPort = firstRule.getSrcPortRange()[0];
+        final int publicPort = firstRule.getSrcPort()[0];
 
         final List<String> result = new ArrayList<>();
         // Add line like this: "listen  65_37_141_30-80 65.37.141.30:80"
@@ -107,7 +107,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
               .append(" ")
               .append(rule.getDstIp())
               .append(":")
-              .append(rule.getDstPortRange()[0])
+              .append(rule.getDstPort())
               .append(" check");
             result.add(sb.toString());
         }

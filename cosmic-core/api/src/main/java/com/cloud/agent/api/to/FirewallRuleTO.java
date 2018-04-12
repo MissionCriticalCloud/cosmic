@@ -3,9 +3,7 @@ package com.cloud.agent.api.to;
 import com.cloud.api.InternalIdentity;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.State;
-import com.cloud.utils.net.NetUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ import java.util.List;
  * If the rule already exists on the destination, the destination should
  * reply the rule is successfully applied.
  * <p>
- * - srcPortRange: port range to open.
+ * - srcPort: port range to open.
  * - protocol: protocol to open for.  Usually tcp and udp.
  */
 public class FirewallRuleTO implements InternalIdentity {
@@ -26,7 +24,7 @@ public class FirewallRuleTO implements InternalIdentity {
     String srcVlanTag;
     String srcIp;
     String protocol;
-    int[] srcPortRange;
+    int srcPort;
     boolean revoked;
     boolean alreadyAdded;
     FirewallRule.Purpose purpose;
@@ -40,30 +38,18 @@ public class FirewallRuleTO implements InternalIdentity {
     protected FirewallRuleTO() {
     }
 
-    public FirewallRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPortStart, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
+    public FirewallRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
             purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
-        this(id, null, srcIp, protocol, srcPortStart, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
+        this(id, null, srcIp, protocol, srcPort, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
     }
 
-    public FirewallRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPortStart, final boolean revoked, final boolean alreadyAdded, final
+    public FirewallRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final
     FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this.id = id;
         this.srcVlanTag = srcVlanTag;
         this.srcIp = srcIp;
         this.protocol = protocol;
-
-        if (srcPortStart != null) {
-            final List<Integer> portRange = new ArrayList<>();
-            portRange.add(srcPortStart);
-
-            srcPortRange = new int[portRange.size()];
-            int i = 0;
-            for (final Integer port : portRange) {
-                srcPortRange[i] = port;
-                i++;
-            }
-        }
-
+        this.srcPort = srcPort;
         this.revoked = revoked;
         this.alreadyAdded = alreadyAdded;
         this.purpose = purpose;
@@ -201,8 +187,8 @@ public class FirewallRuleTO implements InternalIdentity {
         return protocol;
     }
 
-    public int[] getSrcPortRange() {
-        return srcPortRange;
+    public int getSrcPort() {
+        return srcPort;
     }
 
     public Integer getIcmpType() {
@@ -211,14 +197,6 @@ public class FirewallRuleTO implements InternalIdentity {
 
     public Integer getIcmpCode() {
         return icmpCode;
-    }
-
-    public String getStringSrcPortRange() {
-        if (srcPortRange == null || srcPortRange.length < 2) {
-            return "0:0";
-        } else {
-            return NetUtils.portRangeToString(srcPortRange);
-        }
     }
 
     public boolean revoked() {
