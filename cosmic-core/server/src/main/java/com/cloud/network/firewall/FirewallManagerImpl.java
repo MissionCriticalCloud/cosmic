@@ -414,9 +414,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             }
             if (!notNullPorts) {
                 continue;
-            } else if (!oneOfRulesIsFirewall && !(bothRulesFirewall && !duplicatedCidrs) && (rule.getSourcePortStart() <= newRule.getSourcePortStart() ||
-                    newRule.getSourcePortStart() <= rule.getSourcePortStart()
-            )) {
+            } else if (!oneOfRulesIsFirewall && !(bothRulesFirewall && !duplicatedCidrs) && (newRule.getSourcePortStart() == rule.getSourcePortStart())) {
                 // we allow port forwarding rules with the same parameters but different protocols
                 final boolean allowPf =
                         (rule.getPurpose() == Purpose.PortForwarding && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()))
