@@ -59,8 +59,6 @@ public class FirewallRuleVO implements FirewallRule {
     Integer icmpCode;
     @Column(name = "icmp_type")
     Integer icmpType;
-    @Column(name = "related")
-    Long related;
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
     FirewallRuleType type;
@@ -80,18 +78,14 @@ public class FirewallRuleVO implements FirewallRule {
         uuid = UUID.randomUUID().toString();
     }
 
-    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final Integer portEnd, final String protocol, final long networkId, final long
-            accountId, final long domainId,
-                          final Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related, final TrafficType
-                                  trafficType, final FirewallRuleType type) {
-        this(xId, ipAddressId, portStart, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, trafficType);
+    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long accountId, final long domainId, final Purpose
+            purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final TrafficType trafficType, final FirewallRuleType type) {
+        this(xId, ipAddressId, portStart, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, trafficType);
         this.type = type;
     }
 
-    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long
-            accountId, final long domainId,
-                          final Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related, final TrafficType
-                                  trafficType) {
+    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long accountId, final long domainId,
+                          final Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final TrafficType trafficType) {
         this.xId = xId;
         if (xId == null) {
             this.xId = UUID.randomUUID().toString();
@@ -107,20 +101,14 @@ public class FirewallRuleVO implements FirewallRule {
         this.icmpCode = icmpCode;
         this.icmpType = icmpType;
         this.sourceCidrs = sourceCidrs;
-
-        if (related != null) {
-            assert (purpose == Purpose.Firewall) : "related field can be set for rule of purpose " + Purpose.Firewall + " only";
-        }
-
-        this.related = related;
         uuid = UUID.randomUUID().toString();
         type = FirewallRuleType.User;
         this.trafficType = trafficType;
     }
 
-    public FirewallRuleVO(final String xId, final long ipAddressId, final int port, final String protocol, final long networkId, final long accountId, final long domainId, final
-    Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related) {
-        this(xId, ipAddressId, port, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, null);
+    public FirewallRuleVO(final String xId, final long ipAddressId, final int port, final String protocol, final long networkId, final long accountId, final long domainId, final Purpose purpose,
+                          final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType) {
+        this(xId, ipAddressId, port, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, null);
     }
 
     @Override
@@ -194,11 +182,6 @@ public class FirewallRuleVO implements FirewallRule {
 
     public void setSourceCidrList(final List<String> sourceCidrs) {
         this.sourceCidrs = sourceCidrs;
-    }
-
-    @Override
-    public Long getRelated() {
-        return related;
     }
 
     @Override
