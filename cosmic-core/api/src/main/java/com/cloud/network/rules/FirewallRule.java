@@ -37,8 +37,6 @@ public interface FirewallRule extends ControlledEntity, Identity, InternalIdenti
 
     List<String> getSourceCidrList();
 
-    FirewallRuleType getType();
-
     TrafficType getTrafficType();
 
     @Override
@@ -46,11 +44,6 @@ public interface FirewallRule extends ControlledEntity, Identity, InternalIdenti
 
     enum Purpose {
         Firewall, PortForwarding, LoadBalancing, Vpn, StaticNat, NetworkACL,
-    }
-
-    enum FirewallRuleType {
-        System, // The pre-defined rules created by admin, in the system wide
-        User // the rules created by user, to a specific ip
     }
 
     enum State {

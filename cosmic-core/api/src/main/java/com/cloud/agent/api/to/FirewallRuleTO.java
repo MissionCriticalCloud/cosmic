@@ -36,7 +36,6 @@ public class FirewallRuleTO implements InternalIdentity {
     private FirewallRule.TrafficType trafficType;
     private String guestCidr;
     private boolean defaultEgressPolicy;
-    private FirewallRule.FirewallRuleType type;
 
     protected FirewallRuleTO() {
     }
@@ -163,8 +162,7 @@ public class FirewallRuleTO implements InternalIdentity {
                 rule.getIcmpCode());
     }
 
-    public FirewallRuleTO(final FirewallRule rule, final String guestVlanTag, final FirewallRule.TrafficType trafficType, final String guestCidr, final boolean defaultEgressPolicy,
-                          final FirewallRule.FirewallRuleType type) {
+    public FirewallRuleTO(final FirewallRule rule, final String guestVlanTag, final FirewallRule.TrafficType trafficType, final String guestCidr, final boolean defaultEgressPolicy) {
         this(rule.getId(),
                 guestVlanTag,
                 null,
@@ -180,7 +178,6 @@ public class FirewallRuleTO implements InternalIdentity {
         this.trafficType = trafficType;
         this.defaultEgressPolicy = defaultEgressPolicy;
         this.guestCidr = guestCidr;
-        this.type = type;
     }
 
     public FirewallRule.TrafficType getTrafficType() {
@@ -246,9 +243,5 @@ public class FirewallRuleTO implements InternalIdentity {
 
     public String getGuestCidr() {
         return guestCidr;
-    }
-
-    public FirewallRule.FirewallRuleType getType() {
-        return type;
     }
 }

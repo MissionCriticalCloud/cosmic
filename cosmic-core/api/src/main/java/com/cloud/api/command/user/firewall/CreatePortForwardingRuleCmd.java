@@ -259,11 +259,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     }
 
     @Override
-    public FirewallRuleType getType() {
-        return FirewallRuleType.User;
-    }
-
-    @Override
     public TrafficType getTrafficType() {
         return null;
     }

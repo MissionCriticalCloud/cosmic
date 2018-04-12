@@ -102,11 +102,6 @@ public class StaticNatRuleImpl implements StaticNatRule {
     }
 
     @Override
-    public FirewallRuleType getType() {
-        return FirewallRuleType.User;
-    }
-
-    @Override
     public TrafficType getTrafficType() {
         return null;
     }

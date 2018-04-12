@@ -19,7 +19,6 @@ import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerVMMapDao;
 import com.cloud.network.dao.LoadBalancerVMMapVO;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
@@ -439,8 +438,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
         }
 
         try {
-            _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.PortForwarding,
-                    FirewallRuleType.User, networkId, rule.getTrafficType());
+            _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.PortForwarding, networkId, rule.getTrafficType());
 
             final Long accountId = ipAddress.getAllocatedToAccountId();
             final Long domainId = ipAddress.getAllocatedInDomainId();
@@ -695,8 +693,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             throw new NetworkRuleConflictException("Can't do static nat on ip address: " + ipAddress.getAddress());
         }
 
-        _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.StaticNat,
-                FirewallRuleType.User, null, rule.getTrafficType());
+        _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.StaticNat, null, rule.getTrafficType());
 
         final Long networkId = ipAddress.getAssociatedWithNetworkId();
         final Long accountId = ipAddress.getAllocatedToAccountId();
@@ -716,9 +713,8 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             @Override
             public StaticNatRule doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
 
-                FirewallRuleVO newRule =
-                        new FirewallRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePortStart(), rule.getProtocol().toLowerCase(),
-                                networkId, accountId, domainId, rule.getPurpose(), null, null, null, null, null);
+                FirewallRuleVO newRule = new FirewallRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePortStart(), rule.getProtocol().toLowerCase(), networkId, accountId, domainId,
+                        rule.getPurpose(), null, null, null, null);
 
                 newRule = _firewallDao.persist(newRule);
                 try {

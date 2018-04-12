@@ -22,7 +22,6 @@ import com.cloud.network.element.PortForwardingServiceProvider;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.FirewallRuleVO;
@@ -212,15 +211,10 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final String proto, final Purpose
-            purpose, final FirewallRuleType type,
-                                     Long networkId, final FirewallRule.TrafficType trafficType) {
+    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final String proto, final Purpose purpose, Long networkId, final FirewallRule
+            .TrafficType trafficType) {
         if (portStart != null && !NetUtils.isValidPort(portStart)) {
             throw new InvalidParameterValueException("publicPort is an invalid value: " + portStart);
-        }
-
-        if (ipAddress == null && type == FirewallRuleType.System) {
-            return;
         }
 
         if (ipAddress != null) {

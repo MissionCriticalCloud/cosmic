@@ -4,7 +4,6 @@ import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.firewall.FirewallService;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.user.Account;
 
@@ -27,7 +26,7 @@ public interface FirewallManager extends FirewallService {
      */
     void detectRulesConflict(FirewallRule newRule) throws NetworkRuleConflictException;
 
-    void validateFirewallRule(Account caller, IPAddressVO ipAddress, Integer portStart, String proto, Purpose purpose, FirewallRuleType type, Long networkid, FirewallRule.TrafficType trafficType);
+    void validateFirewallRule(Account caller, IPAddressVO ipAddress, Integer portStart, String proto, Purpose purpose, Long networkid, FirewallRule.TrafficType trafficType);
 
     boolean applyRules(List<? extends FirewallRule> rules, boolean continueOnError, boolean updateRulesInDB) throws ResourceUnavailableException;
 

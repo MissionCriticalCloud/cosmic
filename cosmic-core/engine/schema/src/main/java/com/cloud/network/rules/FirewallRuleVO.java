@@ -59,9 +59,6 @@ public class FirewallRuleVO implements FirewallRule {
     Integer icmpCode;
     @Column(name = "icmp_type")
     Integer icmpType;
-    @Column(name = "type")
-    @Enumerated(value = EnumType.STRING)
-    FirewallRuleType type;
     @Column(name = "traffic_type")
     @Enumerated(value = EnumType.STRING)
     TrafficType trafficType;
@@ -76,12 +73,6 @@ public class FirewallRuleVO implements FirewallRule {
 
     protected FirewallRuleVO() {
         uuid = UUID.randomUUID().toString();
-    }
-
-    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long accountId, final long domainId, final Purpose
-            purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final TrafficType trafficType, final FirewallRuleType type) {
-        this(xId, ipAddressId, portStart, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, trafficType);
-        this.type = type;
     }
 
     public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long accountId, final long domainId,
@@ -102,7 +93,6 @@ public class FirewallRuleVO implements FirewallRule {
         this.icmpType = icmpType;
         this.sourceCidrs = sourceCidrs;
         uuid = UUID.randomUUID().toString();
-        type = FirewallRuleType.User;
         this.trafficType = trafficType;
     }
 
@@ -182,15 +172,6 @@ public class FirewallRuleVO implements FirewallRule {
 
     public void setSourceCidrList(final List<String> sourceCidrs) {
         this.sourceCidrs = sourceCidrs;
-    }
-
-    @Override
-    public FirewallRuleType getType() {
-        return type;
-    }
-
-    public void setType(final FirewallRuleType type) {
-        this.type = type;
     }
 
     @Override

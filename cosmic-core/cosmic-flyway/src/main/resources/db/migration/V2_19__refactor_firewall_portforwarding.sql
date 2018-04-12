@@ -3,6 +3,8 @@ ALTER TABLE `port_forwarding_rules`
   DROP COLUMN `dest_port_end`;
 ALTER TABLE `firewall_rules`
   DROP COLUMN `end_port`;
+ALTER TABLE `firewall_rules`
+  DROP COLUMN `type`;
 
 -- Rename columns
 ALTER TABLE `port_forwarding_rules`
