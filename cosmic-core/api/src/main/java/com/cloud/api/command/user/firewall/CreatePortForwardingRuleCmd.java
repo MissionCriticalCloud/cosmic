@@ -189,7 +189,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     // ///////////////////////////////////////////////////
 
     @Override
-    public Integer getSourcePortStart() {
+    public Integer getSourcePort() {
         return publicStartPort.intValue();
     }
 

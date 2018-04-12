@@ -76,7 +76,7 @@ public class LoadBalancingRule {
     }
 
     public Integer getSourcePortStart() {
-        return lb.getSourcePortStart();
+        return lb.getSourcePort();
     }
 
     public String getProtocol() {

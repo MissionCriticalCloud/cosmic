@@ -260,7 +260,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                                 for (final FirewallRule vpnFwRule : vpnFwRules) {
                                     _rulesDao.remove(vpnFwRule.getId());
                                     s_logger.debug("Successfully removed firewall rule with ip id=" + vpnFwRule.getSourceIpAddressId() + " and port " +
-                                            vpnFwRule.getSourcePortStart() + " as a part of vpn cleanup");
+                                            vpnFwRule.getSourcePort() + " as a part of vpn cleanup");
                                 }
                             }
                         }

@@ -861,7 +861,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         final IPAddressVO publicIp = ApiDBUtils.findIpAddressById(loadBalancer.getSourceIpAddressId());
         lbResponse.setPublicIpId(publicIp.getUuid());
         lbResponse.setPublicIp(publicIp.getAddress().addr());
-        lbResponse.setPublicPort(Integer.toString(loadBalancer.getSourcePortStart()));
+        lbResponse.setPublicPort(Integer.toString(loadBalancer.getSourcePort()));
         lbResponse.setPrivatePort(Integer.toString(loadBalancer.getDefaultPortStart()));
         lbResponse.setAlgorithm(loadBalancer.getAlgorithm());
         lbResponse.setLbProtocol(loadBalancer.getLbProtocol());
@@ -1163,7 +1163,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setId(fwRule.getUuid());
         response.setPrivateStartPort(Integer.toString(fwRule.getDestinationPortStart()));
         response.setProtocol(fwRule.getProtocol());
-        response.setPublicStartPort(Integer.toString(fwRule.getSourcePortStart()));
+        response.setPublicStartPort(Integer.toString(fwRule.getSourcePort()));
         final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
         response.setCidrList(StringUtils.join(cidrs, ","));
 

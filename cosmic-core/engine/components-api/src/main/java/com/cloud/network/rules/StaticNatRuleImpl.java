@@ -21,7 +21,7 @@ public class StaticNatRuleImpl implements StaticNatRule {
         xid = rule.getXid();
         uuid = rule.getUuid();
         protocol = rule.getProtocol();
-        portStart = rule.getSourcePortStart().intValue();
+        portStart = rule.getSourcePort().intValue();
         state = rule.getState();
         accountId = rule.getAccountId();
         domainId = rule.getDomainId();
@@ -57,7 +57,7 @@ public class StaticNatRuleImpl implements StaticNatRule {
     }
 
     @Override
-    public Integer getSourcePortStart() {
+    public Integer getSourcePort() {
         return portStart;
     }
 

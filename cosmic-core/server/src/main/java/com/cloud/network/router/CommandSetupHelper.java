@@ -485,7 +485,7 @@ public class CommandSetupHelper {
 
                                              return new NetworkOverviewTO.ServiceTO.ServiceLoadBalancingTO.NatTO(
                                                      ipAddressVO.getAddress().toString(),
-                                                     portForwardingRuleVO.getSourcePortStart(),
+                                                     portForwardingRuleVO.getSourcePort(),
                                                      "rr",
                                                      portForwardingRuleVO.getProtocol().toUpperCase(),
                                                      realServerTO

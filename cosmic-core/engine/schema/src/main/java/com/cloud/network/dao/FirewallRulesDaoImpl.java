@@ -58,7 +58,7 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
         NotRevokedSearch.and("state", NotRevokedSearch.entity().getState(), Op.NEQ);
         NotRevokedSearch.and("purpose", NotRevokedSearch.entity().getPurpose(), Op.EQ);
         NotRevokedSearch.and("protocol", NotRevokedSearch.entity().getProtocol(), Op.EQ);
-        NotRevokedSearch.and("sourcePortStart", NotRevokedSearch.entity().getSourcePortStart(), Op.EQ);
+        NotRevokedSearch.and("sourcePortStart", NotRevokedSearch.entity().getSourcePort(), Op.EQ);
         NotRevokedSearch.and("networkId", NotRevokedSearch.entity().getNetworkId(), Op.EQ);
         NotRevokedSearch.and("trafficType", NotRevokedSearch.entity().getTrafficType(), Op.EQ);
         NotRevokedSearch.done();
@@ -67,7 +67,7 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
         ReleaseSearch.and("protocol", ReleaseSearch.entity().getProtocol(), Op.EQ);
         ReleaseSearch.and("ipId", ReleaseSearch.entity().getSourceIpAddressId(), Op.EQ);
         ReleaseSearch.and("purpose", ReleaseSearch.entity().getPurpose(), Op.EQ);
-        ReleaseSearch.and("ports", ReleaseSearch.entity().getSourcePortStart(), Op.IN);
+        ReleaseSearch.and("ports", ReleaseSearch.entity().getSourcePort(), Op.IN);
         ReleaseSearch.done();
 
         RulesByIpCount = createSearchBuilder(Long.class);

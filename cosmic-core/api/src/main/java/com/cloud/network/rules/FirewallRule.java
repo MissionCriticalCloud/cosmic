@@ -8,19 +8,10 @@ import com.cloud.api.InternalIdentity;
 import java.util.List;
 
 public interface FirewallRule extends ControlledEntity, Identity, InternalIdentity, Displayable {
-    /**
-     * @return external id.
-     */
     String getXid();
 
-    /**
-     * @return first port of the source port range.
-     */
-    Integer getSourcePortStart();
+    Integer getSourcePort();
 
-    /**
-     * @return protocol to open these ports for.
-     */
     String getProtocol();
 
     Purpose getPurpose();

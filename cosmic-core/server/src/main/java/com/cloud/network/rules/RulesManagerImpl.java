@@ -438,7 +438,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
         }
 
         try {
-            _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.PortForwarding, networkId, rule.getTrafficType());
+            _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePort(), rule.getProtocol(), Purpose.PortForwarding, networkId, rule.getTrafficType());
 
             final Long accountId = ipAddress.getAllocatedToAccountId();
             final Long domainId = ipAddress.getAllocatedInDomainId();
@@ -480,7 +480,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                 @Override
                 public PortForwardingRuleVO doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                     PortForwardingRuleVO newRule =
-                            new PortForwardingRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePortStart(), dstIpFinal, rule.getDestinationPortStart(),
+                            new PortForwardingRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePort(), dstIpFinal, rule.getDestinationPortStart(),
                                     rule.getProtocol().toLowerCase(), networkId, accountId, domainId, vmId);
 
                     if (forDisplay != null) {
@@ -693,7 +693,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             throw new NetworkRuleConflictException("Can't do static nat on ip address: " + ipAddress.getAddress());
         }
 
-        _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePortStart(), rule.getProtocol(), Purpose.StaticNat, null, rule.getTrafficType());
+        _firewallMgr.validateFirewallRule(caller, ipAddress, rule.getSourcePort(), rule.getProtocol(), Purpose.StaticNat, null, rule.getTrafficType());
 
         final Long networkId = ipAddress.getAssociatedWithNetworkId();
         final Long accountId = ipAddress.getAllocatedToAccountId();
@@ -713,7 +713,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             @Override
             public StaticNatRule doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
 
-                FirewallRuleVO newRule = new FirewallRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePortStart(), rule.getProtocol().toLowerCase(), networkId, accountId, domainId,
+                FirewallRuleVO newRule = new FirewallRuleVO(rule.getXid(), rule.getSourceIpAddressId(), rule.getSourcePort(), rule.getProtocol().toLowerCase(), networkId, accountId, domainId,
                         rule.getPurpose(), null, null, null, null);
 
                 newRule = _firewallDao.persist(newRule);

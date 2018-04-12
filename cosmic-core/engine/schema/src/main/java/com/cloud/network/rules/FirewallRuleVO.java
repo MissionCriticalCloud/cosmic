@@ -122,7 +122,7 @@ public class FirewallRuleVO implements FirewallRule {
     }
 
     @Override
-    public Integer getSourcePortStart() {
+    public Integer getSourcePort() {
         return sourcePortStart;
     }
 

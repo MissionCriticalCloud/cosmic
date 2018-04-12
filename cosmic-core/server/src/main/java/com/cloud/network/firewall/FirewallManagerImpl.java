@@ -131,8 +131,8 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                 newRule.getProtocol().equalsIgnoreCase(rule.getProtocol());
             }
 
-            final boolean notNullPorts = (newRule.getSourcePortStart() != null && rule.getSourcePortStart() != null);
-            if (notNullPorts && (newRule.getSourcePortStart().equals(rule.getSourcePortStart()))) {
+            final boolean notNullPorts = (newRule.getSourcePort() != null && rule.getSourcePort() != null);
+            if (notNullPorts && (newRule.getSourcePort().equals(rule.getSourcePort()))) {
                 // we allow port forwarding rules with the same parameters but different protocols
                 final boolean allowPf =
                         (rule.getPurpose() == Purpose.PortForwarding && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()))
@@ -153,8 +153,8 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                         && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
 
                 if (!(allowPf || allowStaticNat || allowVpnPf || allowVpnLb)) {
-                    throw new NetworkRuleConflictException("The new port specified, " + newRule.getSourcePortStart() + ", conflicts with rule " + rule.getId() + " which has " + rule
-                            .getSourcePortStart());
+                    throw new NetworkRuleConflictException("The new port specified, " + newRule.getSourcePort() + ", conflicts with rule " + rule.getId() + " which has " + rule
+                            .getSourcePort());
                 }
             }
         }
