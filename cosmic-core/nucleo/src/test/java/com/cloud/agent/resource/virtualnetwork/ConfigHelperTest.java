@@ -6,13 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
-import com.cloud.agent.resource.virtualnetwork.model.ForwardingRule;
-import com.cloud.agent.resource.virtualnetwork.model.ForwardingRules;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRule;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRules;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
@@ -77,49 +73,6 @@ public class ConfigHelperTest {
         final LoadBalancerConfigCommand cmd = new LoadBalancerConfigCommand(arrayLbs, "64.10.2.10", "10.1.10.2", "192.168.1.2", nic, null, "1000", false);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, "10.1.10.2");
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
-
-        return cmd;
-    }
-
-    @Test
-    public void testSetPortForwardingRulesVpc() {
-
-        final SetPortForwardingRulesVpcCommand command = generateSetPortForwardingRulesVpcCommand();
-
-        final AbstractConfigItemFacade configItemFacade = AbstractConfigItemFacade.getInstance(command.getClass());
-
-        final List<ConfigItem> config = configItemFacade.generateConfig(command);
-        assertTrue(config.size() > 0);
-
-        final ConfigItem fileConfig = config.get(0);
-        assertNotNull(fileConfig);
-        assertTrue(fileConfig instanceof FileConfigItem);
-
-        final String fileContents = ((FileConfigItem) fileConfig).getFileContents();
-        assertNotNull(fileContents);
-
-        final ForwardingRules jsonClass = gson.fromJson(fileContents, ForwardingRules.class);
-        assertNotNull(jsonClass);
-        assertEquals(jsonClass.getType(), "forwardrules");
-
-        final ForwardingRule[] rules = jsonClass.getRules();
-        assertNotNull(rules);
-        assertTrue(rules.length == 2);
-        assertEquals(rules[0].getSourceIpAddress(), "64.1.1.10");
-
-        final ConfigItem scriptConfig = config.get(1);
-        assertNotNull(scriptConfig);
-        assertTrue(scriptConfig instanceof ScriptConfigItem);
-    }
-
-    protected SetPortForwardingRulesVpcCommand generateSetPortForwardingRulesVpcCommand() {
-        final List<PortForwardingRuleTO> pfRules = new ArrayList<>();
-        pfRules.add(new PortForwardingRuleTO(1, "64.1.1.10", 22, 80, "10.10.1.10", 22, 80, "TCP", false, false));
-        pfRules.add(new PortForwardingRuleTO(2, "64.1.1.11", 8080, 8080, "10.10.1.11", 8080, 8080, "UDP", true, false));
-
-        final SetPortForwardingRulesVpcCommand cmd = new SetPortForwardingRulesVpcCommand(pfRules);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, ROUTERNAME);
-        assertEquals(cmd.getAnswersCount(), 2);
 
         return cmd;
     }

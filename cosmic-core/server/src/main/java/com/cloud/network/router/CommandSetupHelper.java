@@ -8,15 +8,12 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.api.to.PublicIpACLTO;
 import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
@@ -57,7 +54,6 @@ import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
@@ -226,32 +222,6 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand(cmd);
-    }
-
-    public void createApplyPortForwardingRulesCommands(final List<? extends PortForwardingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<PortForwardingRuleTO> rulesTO = new ArrayList<>();
-        if (rules != null) {
-            for (final PortForwardingRule rule : rules) {
-                final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                final PortForwardingRuleTO ruleTO = new PortForwardingRuleTO(rule, null, sourceIp.getAddress().addr());
-                rulesTO.add(ruleTO);
-            }
-        }
-
-        final SetPortForwardingRulesCommand cmd;
-
-        if (router.getVpcId() != null) {
-            cmd = new SetPortForwardingRulesVpcCommand(rulesTO);
-        } else {
-            cmd = new SetPortForwardingRulesCommand(rulesTO);
-        }
-
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-
         cmds.addCommand(cmd);
     }
 

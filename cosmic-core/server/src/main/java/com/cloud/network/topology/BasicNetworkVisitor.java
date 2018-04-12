@@ -24,7 +24,6 @@ import com.cloud.network.rules.LoadBalancingRules;
 import com.cloud.network.rules.NetworkAclsRules;
 import com.cloud.network.rules.NicPlugInOutRules;
 import com.cloud.network.rules.PasswordToRouterRules;
-import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PrivateGatewayRules;
 import com.cloud.network.rules.PublicIpAclsRules;
 import com.cloud.network.rules.SshKeyToRouterRules;
@@ -112,10 +111,7 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
         } else if (purpose == Purpose.PortForwarding) {
-
-            _commandSetupHelper.createApplyPortForwardingRulesCommands((List<? extends PortForwardingRule>) rules, router, cmds, network.getId());
-
-            return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
+            return true;
         } else if (purpose == Purpose.StaticNat) {
 
             _commandSetupHelper.createApplyStaticNatRulesCommands((List<StaticNatRule>) rules, router, cmds, network.getId());
