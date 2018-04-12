@@ -728,6 +728,9 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 final List<StoragePool> volumePoolList = suitableVolumeStoragePools.get(vol);
                 hostCanAccessPool = false;
                 for (final StoragePool potentialSPool : volumePoolList) {
+                    if (!_storageMgr.storagePoolHasEnoughIops(Arrays.asList(vol), potentialSPool)) {
+                        continue;
+                    }
                     if (hostCanAccessSPool(potentialHost, potentialSPool)) {
                         hostCanAccessPool = true;
                         if (multipleVolume && !readyAndReusedVolumes.contains(vol)) {
