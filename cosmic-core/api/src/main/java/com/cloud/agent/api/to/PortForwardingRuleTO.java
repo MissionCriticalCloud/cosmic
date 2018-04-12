@@ -21,23 +21,20 @@ import java.util.List;
  * - protocol: protocol to open for.  Usually tcp and udp.
  */
 public class PortForwardingRuleTO implements InternalIdentity {
-    long id;
-    String srcVlanTag;
-    String srcIp;
-    String protocol;
-    int srcPort;
-    boolean revoked;
-    boolean alreadyAdded;
-    FirewallRule.Purpose purpose;
+    private long id;
+    private String srcIp;
+    private String protocol;
+    private int srcPort;
+    private boolean revoked;
+    private boolean alreadyAdded;
+    private FirewallRule.Purpose purpose;
     private List<String> sourceCidrList;
     private Integer icmpType;
     private Integer icmpCode;
     private FirewallRule.TrafficType trafficType;
-    private String guestCidr;
-    private boolean defaultEgressPolicy;
 
-    String dstIp;
-    int dstPort;
+    private String dstIp;
+    private int dstPort;
 
     public PortForwardingRuleTO(final PortForwardingRule rule, final String srcVlanTag, final String srcIp) {
         this(rule.getId(),
@@ -70,18 +67,17 @@ public class PortForwardingRuleTO implements InternalIdentity {
         return dstPort;
     }
 
-    protected PortForwardingRuleTO() {
+    PortForwardingRuleTO() {
     }
 
-    public PortForwardingRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
+    PortForwardingRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
             purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this(id, null, srcIp, protocol, srcPort, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
     }
 
-    public PortForwardingRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final
+    PortForwardingRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final
     FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this.id = id;
-        this.srcVlanTag = srcVlanTag;
         this.srcIp = srcIp;
         this.protocol = protocol;
         this.srcPort = srcPort;
@@ -101,10 +97,6 @@ public class PortForwardingRuleTO implements InternalIdentity {
     @Override
     public long getId() {
         return id;
-    }
-
-    public String getSrcVlanTag() {
-        return srcVlanTag;
     }
 
     public String getSrcIp() {
@@ -141,13 +133,5 @@ public class PortForwardingRuleTO implements InternalIdentity {
 
     public FirewallRule.Purpose getPurpose() {
         return purpose;
-    }
-
-    public boolean isDefaultEgressPolicy() {
-        return defaultEgressPolicy;
-    }
-
-    public String getGuestCidr() {
-        return guestCidr;
     }
 }
