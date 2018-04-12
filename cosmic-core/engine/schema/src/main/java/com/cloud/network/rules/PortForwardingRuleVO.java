@@ -30,8 +30,8 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     public PortForwardingRuleVO() {
     }
 
-    public PortForwardingRuleVO(final String xId, final long srcIpId, final int srcPort, final Ip dstIp, final int dstPort, final String protocol, final List<String>
-            sourceCidrs, final long networkId, final long accountId, final long domainId, final long instanceId) {
+    public PortForwardingRuleVO(final String xId, final long srcIpId, final int srcPort, final Ip dstIp, final int dstPort, final String protocol, final List<String> sourceCidrs, final long
+            networkId, final long accountId, final long domainId, final long instanceId) {
         this(xId, srcIpId, srcPort, dstIp, dstPort, protocol.toLowerCase(), networkId, accountId, domainId, instanceId);
     }
 
@@ -69,10 +69,5 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
 
     public void setVirtualMachineId(final long virtualMachineId) {
         this.virtualMachineId = virtualMachineId;
-    }
-
-    @Override
-    public Long getRelated() {
-        return null;
     }
 }
