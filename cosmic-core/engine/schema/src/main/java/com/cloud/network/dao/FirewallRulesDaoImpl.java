@@ -62,7 +62,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
         NotRevokedSearch.and("purpose", NotRevokedSearch.entity().getPurpose(), Op.EQ);
         NotRevokedSearch.and("protocol", NotRevokedSearch.entity().getProtocol(), Op.EQ);
         NotRevokedSearch.and("sourcePortStart", NotRevokedSearch.entity().getSourcePortStart(), Op.EQ);
-        NotRevokedSearch.and("sourcePortEnd", NotRevokedSearch.entity().getSourcePortEnd(), Op.EQ);
         NotRevokedSearch.and("networkId", NotRevokedSearch.entity().getNetworkId(), Op.EQ);
         NotRevokedSearch.and("trafficType", NotRevokedSearch.entity().getTrafficType(), Op.EQ);
         NotRevokedSearch.done();
