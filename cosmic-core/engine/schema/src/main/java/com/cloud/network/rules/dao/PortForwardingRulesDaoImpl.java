@@ -1,6 +1,5 @@
 package com.cloud.network.rules.dao;
 
-import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.PortForwardingRuleVO;
@@ -9,7 +8,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 
-import javax.inject.Inject;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -22,9 +20,6 @@ public class PortForwardingRulesDaoImpl extends GenericDaoBase<PortForwardingRul
     protected final SearchBuilder<PortForwardingRuleVO> ActiveRulesSearch;
     protected final SearchBuilder<PortForwardingRuleVO> AllRulesSearchByVM;
     protected final SearchBuilder<PortForwardingRuleVO> ActiveRulesSearchByAccount;
-
-    @Inject
-    protected FirewallRulesCidrsDao _portForwardingRulesCidrsDao;
 
     protected PortForwardingRulesDaoImpl() {
         super();

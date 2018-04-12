@@ -3,7 +3,6 @@ package com.cloud.network.dao;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
-import com.cloud.network.rules.FirewallRule.TrafficType;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -31,8 +30,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     protected final SearchBuilder<FirewallRuleVO> ReleaseSearch;
     protected final GenericSearchBuilder<FirewallRuleVO, Long> RulesByIpCount;
     protected SearchBuilder<FirewallRuleVO> VmSearch;
-    @Inject
-    protected FirewallRulesCidrsDao _firewallRulesCidrsDao;
     @Inject
     ResourceTagDao _tagsDao;
     @Inject
@@ -193,20 +190,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     }
 
     @Override
-    public List<FirewallRuleVO> listByNetworkPurposeTrafficType(final long networkId, final Purpose purpose, final TrafficType trafficType) {
-        final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
-        sc.setParameters("networkId", networkId);
-
-        if (purpose != null) {
-            sc.setParameters("purpose", purpose);
-        }
-
-        sc.setParameters("trafficType", trafficType);
-
-        return listBy(sc);
-    }
-
-    @Override
     public List<FirewallRuleVO> listByIpAndPurposeWithState(final Long ipId, final Purpose purpose, final State state) {
         final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("ipId", ipId);
@@ -223,30 +206,15 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     }
 
     @Override
-    public void loadSourceCidrs(final FirewallRuleVO rule) {
-        final List<String> sourceCidrs = _firewallRulesCidrsDao.getSourceCidrs(rule.getId());
-        rule.setSourceCidrList(sourceCidrs);
-    }
-
-    @Override
     @DB
     public FirewallRuleVO persist(final FirewallRuleVO firewallRule) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
 
         final FirewallRuleVO dbfirewallRule = super.persist(firewallRule);
-        saveSourceCidrs(firewallRule, firewallRule.getSourceCidrList());
-        loadSourceCidrs(dbfirewallRule);
 
         txn.commit();
         return dbfirewallRule;
-    }
-
-    public void saveSourceCidrs(final FirewallRuleVO firewallRule, final List<String> cidrList) {
-        if (cidrList == null) {
-            return;
-        }
-        _firewallRulesCidrsDao.persist(firewallRule.getId(), cidrList);
     }
 
     @Override

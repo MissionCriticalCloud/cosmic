@@ -7,7 +7,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 
-import javax.inject.Inject;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
 public class LoadBalancerDaoImpl extends GenericDaoBase<LoadBalancerVO, Long> implements LoadBalancerDao {
     protected final SearchBuilder<LoadBalancerVO> TransitionStateSearch;
     private final SearchBuilder<LoadBalancerVO> ListByIp;
-    @Inject
-    protected FirewallRulesCidrsDao _portForwardingRulesCidrsDao;
 
     protected LoadBalancerDaoImpl() {
         ListByIp = createSearchBuilder();
