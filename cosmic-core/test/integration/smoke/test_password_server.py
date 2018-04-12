@@ -1,9 +1,4 @@
 import time
-
-from marvin.utils.MarvinLog import MarvinLog
-from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
-
 from marvin.cloudstackAPI import (
     createNetworkACLList,
     createNetworkACL,
@@ -11,6 +6,7 @@ from marvin.cloudstackAPI import (
     restartVPC,
     restartNetwork
 )
+from marvin.cloudstackTestCase import cloudstackTestCase
 from marvin.lib.base import (
     Network,
     VirtualMachine,
@@ -32,6 +28,8 @@ from marvin.lib.utils import (
     get_process_status,
     cleanup_resources
 )
+from marvin.utils.MarvinLog import MarvinLog
+from nose.plugins.attrib import attr
 
 
 class TestPasswordService(cloudstackTestCase):

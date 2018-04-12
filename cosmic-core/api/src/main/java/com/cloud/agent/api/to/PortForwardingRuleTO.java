@@ -18,13 +18,13 @@ public class PortForwardingRuleTO extends FirewallRuleTO {
     public PortForwardingRuleTO(final PortForwardingRule rule, final String srcVlanTag, final String srcIp) {
         super(rule, srcVlanTag, srcIp);
         this.dstIp = rule.getDestinationIpAddress().addr();
-        this.dstPortRange = new int[]{rule.getDestinationPortStart(), rule.getDestinationPortEnd()};
+        this.dstPortRange = new int[]{rule.getDestinationPortStart()};
     }
 
-    public PortForwardingRuleTO(final long id, final String srcIp, final int srcPortStart, final int srcPortEnd, final String dstIp, final int dstPortStart, final int
+    public PortForwardingRuleTO(final long id, final String srcIp, final int srcPortStart, final String dstIp, final int dstPortStart, final int
             dstPortEnd, final String protocol,
                                 final boolean revoked, final boolean alreadyAdded) {
-        super(id, null, srcIp, protocol, srcPortStart, srcPortEnd, revoked, alreadyAdded, FirewallRule.Purpose.PortForwarding, null, 0, 0);
+        super(id, null, srcIp, protocol, srcPortStart, revoked, alreadyAdded, FirewallRule.Purpose.PortForwarding, null, 0, 0);
         this.dstIp = dstIp;
         this.dstPortRange = new int[]{dstPortStart, dstPortEnd};
     }

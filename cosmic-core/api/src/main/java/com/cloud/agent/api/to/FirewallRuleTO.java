@@ -41,15 +41,13 @@ public class FirewallRuleTO implements InternalIdentity {
     protected FirewallRuleTO() {
     }
 
-    public FirewallRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPortStart, final Integer srcPortEnd, final boolean revoked, final boolean
-            alreadyAdded,
-                          final FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
-        this(id, null, srcIp, protocol, srcPortStart, srcPortEnd, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
+    public FirewallRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPortStart, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
+            purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
+        this(id, null, srcIp, protocol, srcPortStart, revoked, alreadyAdded, purpose, sourceCidr, icmpType, icmpCode);
     }
 
-    public FirewallRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPortStart, final Integer srcPortEnd, final boolean
-            revoked, final boolean alreadyAdded,
-                          final FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
+    public FirewallRuleTO(final long id, final String srcVlanTag, final String srcIp, final String protocol, final Integer srcPortStart, final boolean revoked, final boolean alreadyAdded, final
+    FirewallRule.Purpose purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this.id = id;
         this.srcVlanTag = srcVlanTag;
         this.srcIp = srcIp;
@@ -58,9 +56,6 @@ public class FirewallRuleTO implements InternalIdentity {
         if (srcPortStart != null) {
             final List<Integer> portRange = new ArrayList<>();
             portRange.add(srcPortStart);
-            if (srcPortEnd != null) {
-                portRange.add(srcPortEnd);
-            }
 
             srcPortRange = new int[portRange.size()];
             int i = 0;
@@ -85,7 +80,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 rule.getPurpose(),
@@ -100,7 +94,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 rule.getPurpose(),
@@ -115,7 +108,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 purpose,
@@ -130,7 +122,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 purpose,
@@ -147,7 +138,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 purpose,
@@ -165,7 +155,6 @@ public class FirewallRuleTO implements InternalIdentity {
                 srcIp,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
                 revokeState,
                 alreadyAdded,
                 purpose,
@@ -181,7 +170,7 @@ public class FirewallRuleTO implements InternalIdentity {
                 null,
                 rule.getProtocol(),
                 rule.getSourcePortStart(),
-                rule.getSourcePortEnd(),
+
                 rule.getState() == State.Revoke,
                 rule.getState() == State.Active,
                 rule.getPurpose(),
