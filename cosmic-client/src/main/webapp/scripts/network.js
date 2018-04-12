@@ -4381,7 +4381,6 @@
                                                     name: args.data.name,
                                                     privateport: args.data.privateport,
                                                     publicport: args.data.publicport,
-                                                    openfirewall: false,
                                                     networkid: networkid,
                                                     publicipid: args.context.ipAddresses[0].id
                                                 };

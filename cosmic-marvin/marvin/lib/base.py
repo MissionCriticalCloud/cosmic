@@ -1559,7 +1559,7 @@ class NATRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None, openfirewall=False,
+    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None,
                networkid=None, network=None, vpcid=None, vpc=None, vmguestip=None, ipaddress=None, data=None):
         """Create Port forwarding rule"""
         if data:
@@ -1585,13 +1585,6 @@ class NATRule:
 
         if projectid:
             cmd.projectid = projectid
-
-        if 'openfirewall' in services:
-            cmd.openfirewall = services['openfirewall']
-
-        if openfirewall:
-            # FIXME: it should be `cmd.openfirewall = openfirewall`, not changed for backwards compatibility
-            cmd.openfirewall = True
 
         if networkid:
             cmd.networkid = networkid
@@ -1660,14 +1653,13 @@ class StaticNATRule:
         return StaticNATRule(api_client.createFirewallRule(cmd).__dict__)
 
     @classmethod
-    def createIpForwardingRule(cls, api_client, startport, endport, protocol, ipaddressid, openfirewall):
+    def createIpForwardingRule(cls, api_client, startport, endport, protocol, ipaddressid):
         """Creates static ip forwarding rule"""
 
         cmd = createIpForwardingRule.createIpForwardingRuleCmd()
         cmd.startport = startport
         cmd.endport = endport
         cmd.protocol = protocol
-        cmd.openfirewall = openfirewall
         cmd.ipaddressid = ipaddressid
         return StaticNATRule(api_client.createIpForwardingRule(cmd).__dict__)
 
@@ -2106,9 +2098,6 @@ class LoadBalancerRule:
         cmd.algorithm = services["alg"]
         cmd.privateport = services["privateport"]
         cmd.publicport = services["publicport"]
-
-        if "openfirewall" in services:
-            cmd.openfirewall = services["openfirewall"]
 
         if projectid:
             cmd.projectid = projectid
@@ -2854,7 +2843,7 @@ class Vpn:
 
     @classmethod
     def create(cls, api_client, publicipid, account=None, domainid=None,
-               projectid=None, networkid=None, vpcid=None, openfirewall=None, iprange=None, fordisplay=False):
+               projectid=None, networkid=None, vpcid=None, iprange=None, fordisplay=False):
         """Create VPN for Public IP address"""
         cmd = createRemoteAccessVpn.createRemoteAccessVpnCmd()
         cmd.publicipid = publicipid
@@ -2870,8 +2859,6 @@ class Vpn:
             cmd.vpcid = vpcid
         if iprange:
             cmd.iprange = iprange
-        if openfirewall:
-            cmd.openfirewall = openfirewall
 
         cmd.fordisplay = fordisplay
         return Vpn(api_client.createRemoteAccessVpn(cmd).__dict__)

@@ -1,20 +1,14 @@
 package com.cloud.network.firewall;
 
-import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.user.Account;
-import com.cloud.utils.Pair;
-
-import java.util.List;
 
 public interface FirewallService {
     FirewallRule createIngressFirewallRule(FirewallRule rule) throws NetworkRuleConflictException;
 
     FirewallRule createEgressFirewallRule(FirewallRule rule) throws NetworkRuleConflictException;
-
-    Pair<List<? extends FirewallRule>, Integer> listFirewallRules(IListFirewallRulesCmd cmd);
 
     /**
      * Revokes a firewall rule

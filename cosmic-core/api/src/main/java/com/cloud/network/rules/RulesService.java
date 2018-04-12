@@ -48,7 +48,7 @@ public interface RulesService {
 
     boolean enableStaticNat(long ipAddressId, long vmId, long networkId, String vmGuestIp) throws NetworkRuleConflictException, ResourceUnavailableException;
 
-    StaticNatRule createStaticNatRule(StaticNatRule rule, boolean openFirewall) throws NetworkRuleConflictException;
+    StaticNatRule createStaticNatRule(StaticNatRule rule) throws NetworkRuleConflictException;
 
     boolean revokeStaticNatRule(long ruleId, boolean apply);
 

@@ -716,7 +716,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_NET_RULE_ADD, eventDescription = "creating static nat rule", create = true)
-    public StaticNatRule createStaticNatRule(final StaticNatRule rule, final boolean openFirewall) throws NetworkRuleConflictException {
+    public StaticNatRule createStaticNatRule(final StaticNatRule rule) throws NetworkRuleConflictException {
         final Account caller = CallContext.current().getCallingAccount();
 
         final Long ipAddrId = rule.getSourceIpAddressId();
@@ -756,13 +756,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                                 networkId, accountId, domainId, rule.getPurpose(), null, null, null, null, null);
 
                 newRule = _firewallDao.persist(newRule);
-
-                // create firewallRule for 0.0.0.0/0 cidr
-                if (openFirewall) {
-                    _firewallMgr.createRuleForAllCidrs(ipAddrId, caller, rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(), null, null,
-                            newRule.getId(), networkId);
-                }
-
                 try {
                     _firewallMgr.detectRulesConflict(newRule);
                     if (!_firewallDao.setStateToAdd(newRule)) {

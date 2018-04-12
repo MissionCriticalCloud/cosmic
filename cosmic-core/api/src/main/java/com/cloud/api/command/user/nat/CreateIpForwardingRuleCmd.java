@@ -54,12 +54,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     @Parameter(name = ApiConstants.PROTOCOL, type = CommandType.STRING, required = true, description = "the protocol for the rule. Valid values are TCP or UDP.")
     private String protocol;
 
-    @Parameter(name = ApiConstants.OPEN_FIREWALL,
-            type = CommandType.BOOLEAN,
-            description = "if true, firewall rule for source/end public port is automatically created; if false - firewall rule has to be created explicitly. Has value true by " +
-                    "default")
-    private Boolean openFirewall;
-
     @Parameter(name = ApiConstants.CIDR_LIST, type = CommandType.LIST, collectionType = CommandType.STRING, description = "the CIDR list to forward traffic from")
     private List<String> cidrlist;
 
@@ -87,11 +81,7 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
         try {
             CallContext.current().setEventDetails("Rule ID: " + getEntityId());
 
-            if (getOpenFirewall()) {
-                result = result && _firewallService.applyIngressFirewallRules(ipAddressId, CallContext.current().getCallingAccount());
-            }
-
-            result = result && _rulesService.applyStaticNatRules(ipAddressId, CallContext.current().getCallingAccount());
+            result = _rulesService.applyStaticNatRules(ipAddressId, CallContext.current().getCallingAccount());
             rule = _entityMgr.findById(FirewallRule.class, getEntityId());
             final StaticNatRule staticNatRule = _rulesService.buildStaticNatRule(rule, false);
             final IpForwardingRuleResponse fwResponse = _responseGenerator.createIpForwardingRuleResponse(staticNatRule);
@@ -99,11 +89,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
             setResponseObject(fwResponse);
         } finally {
             if (!result || rule == null) {
-
-                if (getOpenFirewall()) {
-                    _firewallService.revokeRelatedFirewallRule(getEntityId(), true);
-                }
-
                 _rulesService.revokeStaticNatRule(getEntityId(), true);
 
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Error in creating IP forwarding rule on the domr");
@@ -114,14 +99,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    public Boolean getOpenFirewall() {
-        if (openFirewall != null) {
-            return openFirewall;
-        } else {
-            return true;
-        }
-    }
 
     @Override
     public String getCommandName() {
@@ -154,7 +131,7 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
         }
 
         try {
-            final StaticNatRule rule = _rulesService.createStaticNatRule(this, getOpenFirewall());
+            final StaticNatRule rule = _rulesService.createStaticNatRule(this);
             setEntityId(rule.getId());
             setEntityUuid(rule.getUuid());
         } catch (final NetworkRuleConflictException e) {
