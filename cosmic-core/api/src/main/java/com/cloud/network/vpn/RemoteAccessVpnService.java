@@ -14,7 +14,7 @@ import java.util.List;
 public interface RemoteAccessVpnService {
     static final String RemoteAccessVpnClientIpRangeCK = "remote.access.vpn.client.iprange";
 
-    RemoteAccessVpn createRemoteAccessVpn(long vpnServerAddressId, String ipRange, boolean openFirewall, Boolean forDisplay) throws NetworkRuleConflictException;
+    RemoteAccessVpn createRemoteAccessVpn(long vpnServerAddressId, String ipRange, Boolean forDisplay) throws NetworkRuleConflictException;
 
     boolean destroyRemoteAccessVpnForIp(long ipId, Account caller) throws ResourceUnavailableException;
 

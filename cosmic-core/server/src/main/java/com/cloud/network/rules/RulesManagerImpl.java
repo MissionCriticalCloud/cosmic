@@ -1221,7 +1221,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
 
     @Override
     @DB
-    public FirewallRuleVO[] reservePorts(final IpAddress ip, final String protocol, final FirewallRule.Purpose purpose, final boolean openFirewall, final Account caller,
+    public FirewallRuleVO[] reservePorts(final IpAddress ip, final String protocol, final FirewallRule.Purpose purpose, final Account caller,
                                          final int... ports) throws NetworkRuleConflictException {
         final FirewallRuleVO[] rules = new FirewallRuleVO[ports.length];
 
@@ -1234,11 +1234,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                             new FirewallRuleVO(null, ip.getId(), ports[i], protocol, ip.getAssociatedWithNetworkId(), ip.getAllocatedToAccountId(),
                                     ip.getAllocatedInDomainId(), purpose, null, null, null, null);
                     rules[i] = _firewallDao.persist(rules[i]);
-
-                    if (openFirewall) {
-                        _firewallMgr.createRuleForAllCidrs(ip.getId(), caller, ports[i], ports[i], protocol, null, null, rules[i].getId(),
-                                ip.getAssociatedWithNetworkId());
-                    }
                 }
             }
         });

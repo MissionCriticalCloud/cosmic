@@ -121,7 +121,7 @@ public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {
     @Override
     public void create() {
         try {
-            final RemoteAccessVpn vpn = _ravService.createRemoteAccessVpn(publicIpId, ipRange, getOpenFirewall(), isDisplay());
+            final RemoteAccessVpn vpn = _ravService.createRemoteAccessVpn(publicIpId, ipRange, isDisplay());
             if (vpn != null) {
                 setEntityId(vpn.getId());
                 setEntityUuid(vpn.getUuid());

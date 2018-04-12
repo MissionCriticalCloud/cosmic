@@ -106,7 +106,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
 
     @Override
     @DB
-    public RemoteAccessVpn createRemoteAccessVpn(final long publicIpId, String ipRange, boolean openFirewall, final Boolean forDisplay) throws NetworkRuleConflictException {
+    public RemoteAccessVpn createRemoteAccessVpn(final long publicIpId, String ipRange, final Boolean forDisplay) throws NetworkRuleConflictException {
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
 
@@ -132,15 +132,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
         }
 
         final Long vpcId = ipAddress.getVpcId();
-        /* IP Address used for VPC must be the source NAT IP of whole VPC */
-        if (vpcId != null && ipAddress.isSourceNat()) {
-            assert networkId == null;
-            // No firewall setting for VPC, it would be open internally
-            openFirewall = false;
-        }
-
-        final boolean openFirewallFinal = openFirewall;
-
         if (networkId == null && vpcId == null) {
             throw new InvalidParameterValueException("Unable to create remote access vpn for the ipAddress: " + ipAddr.getAddress().addr() +
                     " as ip is not associated with any network or VPC");
@@ -210,7 +201,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             @Override
             public RemoteAccessVpn doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                 if (vpcId == null) {
-                    _rulesMgr.reservePorts(ipAddr, NetUtils.UDP_PROTO, Purpose.Vpn, openFirewallFinal, caller, NetUtils.VPN_PORT, NetUtils.VPN_L2TP_PORT,
+                    _rulesMgr.reservePorts(ipAddr, NetUtils.UDP_PROTO, Purpose.Vpn, caller, NetUtils.VPN_PORT, NetUtils.VPN_L2TP_PORT,
                             NetUtils.VPN_NATT_PORT);
                 }
                 final RemoteAccessVpnVO vpnVO =
