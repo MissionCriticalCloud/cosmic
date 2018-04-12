@@ -32,7 +32,7 @@ public interface LoadBalancingRulesService {
      * @throws InsufficientAddressCapacityException
      */
     LoadBalancer createPublicLoadBalancerRule(String xId, String name, String description, int srcPortStart, int srcPortEnd, int defPortStart, int defPortEnd,
-                                              Long ipAddrId, String protocol, String algorithm, long networkId, long lbOwnerId, boolean openFirewall, String lbProtocol,
+                                              Long ipAddrId, String protocol, String algorithm, long networkId, long lbOwnerId, String lbProtocol,
                                               Boolean forDisplay, Integer clientTimeout, Integer serverTimeout) throws NetworkRuleConflictException,
             InsufficientAddressCapacityException;
 

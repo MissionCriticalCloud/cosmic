@@ -80,11 +80,6 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
             description = "the public port from where the network traffic will be load balanced from")
     private Integer publicPort;
 
-    @Parameter(name = ApiConstants.OPEN_FIREWALL, type = CommandType.BOOLEAN, description = "if true, firewall rule for"
-            + " source/end public port is automatically created; if false - firewall rule has to be created explicitely. If not specified 1) defaulted to false when LB"
-            + " rule is being created for VPC guest network 2) in all other cases defaulted to true")
-    private Boolean openFirewall;
-
     @Parameter(name = ApiConstants.ACCOUNT,
             type = CommandType.STRING,
             description = "the account associated with the load balancer. Must be used with the domainId parameter.")
@@ -178,10 +173,6 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
         try {
             CallContext.current().setEventDetails("Rule Id: " + getEntityId());
 
-            if (getOpenFirewall()) {
-                success = success && _firewallService.applyIngressFirewallRules(getSourceIpAddressId(), callerContext.getCallingAccount());
-            }
-
             // State might be different after the rule is applied, so get new object here
             rule = _entityMgr.findById(LoadBalancer.class, getEntityId());
             LoadBalancerResponse lbResponse = new LoadBalancerResponse();
@@ -193,30 +184,11 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
         } catch (final Exception ex) {
             s_logger.warn("Failed to create LB rule due to exception ", ex);
         }
-        if (!success || rule == null) {
-
-            if (getOpenFirewall()) {
-                _firewallService.revokeRelatedFirewallRule(getEntityId(), true);
-            }
+        if (rule == null) {
             // no need to apply the rule on the backend as it exists in the db only
             _lbService.deleteLoadBalancerRule(getEntityId(), false);
 
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create load balancer rule");
-        }
-    }
-
-    public Boolean getOpenFirewall() {
-        final boolean isVpc = getVpcId() == null ? false : true;
-        if (openFirewall != null) {
-            if (isVpc && openFirewall) {
-                throw new InvalidParameterValueException("Can't have openFirewall=true when IP address belongs to VPC");
-            }
-            return openFirewall;
-        } else {
-            if (isVpc) {
-                return false;
-            }
-            return true;
         }
     }
 
@@ -287,7 +259,7 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
         try {
             final LoadBalancer result =
                     _lbService.createPublicLoadBalancerRule(getXid(), getName(), getDescription(), getSourcePortStart(), getSourcePortEnd(), getDefaultPortStart(),
-                            getDefaultPortEnd(), getSourceIpAddressId(), getProtocol(), getAlgorithm(), getNetworkId(), getEntityOwnerId(), getOpenFirewall(), getLbProtocol(),
+                            getDefaultPortEnd(), getSourceIpAddressId(), getProtocol(), getAlgorithm(), getNetworkId(), getEntityOwnerId(), getLbProtocol(),
                             isDisplay(), getClientTimeout(), getServerTimeout());
             this.setEntityId(result.getId());
             this.setEntityUuid(result.getUuid());

@@ -255,7 +255,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
     @ActionEvent(eventType = EventTypes.EVENT_LOAD_BALANCER_CREATE, eventDescription = "creating load balancer")
     public LoadBalancer createPublicLoadBalancerRule(final String xId, final String name, final String description, final int srcPortStart, final int srcPortEnd,
                                                      final int defPortStart, final int defPortEnd, final Long ipAddrId, final String protocol, final String algorithm,
-                                                     final long networkId, final long lbOwnerId, final boolean openFirewall, final String lbProtocol, final Boolean forDisplay,
+                                                     final long networkId, final long lbOwnerId, final String lbProtocol, final Boolean forDisplay,
                                                      Integer clientTimeout, Integer serverTimeout) throws NetworkRuleConflictException, InsufficientAddressCapacityException {
         final Account lbOwner = _accountMgr.getAccount(lbOwnerId);
 
@@ -324,7 +324,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     serverTimeout = defaultServerTimeout;
                 }
 
-                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, openFirewall, CallContext.current(),
+                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, CallContext.current(),
                         lbProtocol, forDisplay, clientTimeout, serverTimeout);
             } catch (final Exception ex) {
                 s_logger.warn("Failed to create load balancer due to ", ex);
@@ -358,7 +358,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
     @DB
     @Override
     public LoadBalancer createPublicLoadBalancer(final String xId, final String name, final String description, final int srcPort, final int destPort, final long sourceIpId,
-                                                 final String protocol, final String algorithm, final boolean openFirewall, final CallContext caller, final String lbProtocol,
+                                                 final String protocol, final String algorithm, final CallContext caller, final String lbProtocol,
                                                  final Boolean forDisplay, final int clientTimeout, final int serverTimeout)
             throws NetworkRuleConflictException {
 
@@ -435,11 +435,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                 }
 
                 newRule = _lbDao.persist(newRule);
-
-                //create rule for all CIDRs
-                if (openFirewall) {
-                    _firewallMgr.createRuleForAllCidrs(sourceIpId, caller.getCallingAccount(), srcPort, srcPort, protocol, null, null, newRule.getId(), networkId);
-                }
 
                 boolean success = true;
 
