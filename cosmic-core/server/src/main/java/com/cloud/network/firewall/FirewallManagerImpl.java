@@ -121,7 +121,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         final Long sourceIpAddressId = rule.getSourceIpAddressId();
 
         return createFirewallRule(sourceIpAddressId, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(),
-                rule.getSourceCidrList(), rule.getIcmpCode(), rule.getIcmpType(), null, rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
+                rule.getSourceCidrList(), rule.getIcmpCode(), rule.getIcmpType(), rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
     }
 
     @Override
@@ -135,7 +135,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         }
 
         return createFirewallRule(null, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
-                rule.getIcmpCode(), rule.getIcmpType(), null, rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
+                rule.getIcmpCode(), rule.getIcmpType(), rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
     }
 
     @Override
@@ -273,7 +273,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
 
     @DB
     protected FirewallRule createFirewallRule(final Long ipAddrId, final Account caller, final String xId, final Integer portStart, final String protocol, final List<String> sourceCidrList, final
-    Integer icmpCode, final Integer icmpType, final Long relatedRuleId, final FirewallRule.FirewallRuleType type, final Long networkId, final FirewallRule.TrafficType trafficType, final Boolean
+    Integer icmpCode, final Integer icmpType, final FirewallRule.FirewallRuleType type, final Long networkId, final FirewallRule.TrafficType trafficType, final Boolean
                                                       forDisplay) throws NetworkRuleConflictException {
 
         IPAddressVO ipAddress = null;
@@ -319,7 +319,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             public FirewallRuleVO doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                 FirewallRuleVO newRule =
                         new FirewallRuleVO(xId, ipAddrId, portStart, protocol.toLowerCase(), networkId, accountIdFinal, domainIdFinal, Purpose.Firewall, sourceCidrList, icmpCode, icmpType,
-                                relatedRuleId, trafficType);
+                                trafficType);
                 newRule.setType(type);
                 if (forDisplay != null) {
                     newRule.setDisplay(forDisplay);
@@ -737,7 +737,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                     _firewallDao.loadSourceCidrs(rule);
                 }
                 createFirewallRule(ip.getId(), acct, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
-                        rule.getIcmpCode(), rule.getIcmpType(), rule.getRelated(), FirewallRuleType.System, rule.getNetworkId(), rule.getTrafficType(), true);
+                        rule.getIcmpCode(), rule.getIcmpType(), FirewallRuleType.System, rule.getNetworkId(), rule.getTrafficType(), true);
             } catch (final Exception e) {
                 s_logger.debug("Failed to add system wide firewall rule, due to:" + e.toString());
             }
@@ -762,8 +762,8 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
 
         sourceCidr.add(NetUtils.ALL_IP4_CIDRS);
         final FirewallRuleVO ruleVO =
-                new FirewallRuleVO(null, null, null, null, "all", networkId, network.getAccountId(), network.getDomainId(), Purpose.Firewall, sourceCidr, null, null, null,
-                        FirewallRule.TrafficType.Egress, FirewallRuleType.System);
+                new FirewallRuleVO(null, null, null, "all", networkId, network.getAccountId(), network.getDomainId(), Purpose.Firewall, sourceCidr, null, null, FirewallRule.TrafficType.Egress,
+                        FirewallRuleType.System);
         ruleVO.setState(add ? State.Add : State.Revoke);
         final List<FirewallRuleVO> rules = new ArrayList<>();
         rules.add(ruleVO);
