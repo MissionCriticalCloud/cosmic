@@ -18,7 +18,7 @@ public interface RemoteAccessVpnService {
 
     boolean destroyRemoteAccessVpnForIp(long ipId, Account caller) throws ResourceUnavailableException;
 
-    RemoteAccessVpn startRemoteAccessVpn(long vpnServerAddressId, boolean openFirewall) throws ResourceUnavailableException;
+    RemoteAccessVpn startRemoteAccessVpn(long vpnServerAddressId) throws ResourceUnavailableException;
 
     VpnUser addVpnUser(long vpnOwnerId, String userName, String password);
 

@@ -829,7 +829,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         if (vpnsToReapply != null) {
             for (final RemoteAccessVpn vpn : vpnsToReapply) {
                 // Start remote access vpn per ip
-                if (_vpnMgr.startRemoteAccessVpn(vpn.getServerAddressId(), false) == null) {
+                if (_vpnMgr.startRemoteAccessVpn(vpn.getServerAddressId()) == null) {
                     s_logger.warn("Failed to reapply vpn rules as a part of network id=" + networkId + " restart");
                     success = false;
                 }

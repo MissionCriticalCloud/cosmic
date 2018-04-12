@@ -314,7 +314,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
     @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_REMOTE_ACCESS_VPN_CREATE, eventDescription = "creating remote access vpn", async = true)
-    public RemoteAccessVpnVO startRemoteAccessVpn(final long ipAddressId, boolean openFirewall) throws ResourceUnavailableException {
+    public RemoteAccessVpnVO startRemoteAccessVpn(final long ipAddressId) throws ResourceUnavailableException {
         final Account caller = CallContext.current().getCallingAccount();
 
         final RemoteAccessVpnVO vpn = _remoteAccessVpnDao.findByPublicIpAddress(ipAddressId);
@@ -322,18 +322,11 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             throw new InvalidParameterValueException("Unable to find your vpn: " + ipAddressId);
         }
 
-        if (vpn.getVpcId() != null) {
-            openFirewall = false;
-        }
-
         _accountMgr.checkAccess(caller, null, true, vpn);
 
         boolean started = false;
         try {
             boolean firewallOpened = true;
-            if (openFirewall) {
-                firewallOpened = _firewallMgr.applyIngressFirewallRules(vpn.getServerAddressId(), caller);
-            }
 
             if (firewallOpened) {
                 for (final RemoteAccessVPNServiceProvider element : _vpnServiceProviders) {

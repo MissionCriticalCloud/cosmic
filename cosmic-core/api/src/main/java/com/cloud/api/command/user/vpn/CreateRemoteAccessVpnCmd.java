@@ -22,8 +22,9 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn
-        .class},
+@APICommand(name = "createRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType =
+        {RemoteAccessVpn
+                .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateRemoteAccessVpnCmd.class.getName());
@@ -56,12 +57,6 @@ public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {
             entityType = DomainResponse.class,
             description = "an optional domainId for the VPN. If the account parameter is used, domainId must also be used.")
     private Long domainId;
-
-    @Parameter(name = ApiConstants.OPEN_FIREWALL,
-            type = CommandType.BOOLEAN,
-            description = "if true, firewall rule for source/end public port is automatically created; if false - firewall rule has to be created explicitely. Has value true by " +
-                    "default")
-    private Boolean openFirewall;
 
     @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the vpn to the end user or not", since = "4" +
             ".4", authorized = {RoleType.Admin})
@@ -140,18 +135,10 @@ public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {
         }
     }
 
-    public Boolean getOpenFirewall() {
-        if (openFirewall != null) {
-            return openFirewall;
-        } else {
-            return true;
-        }
-    }
-
     @Override
     public void execute() {
         try {
-            final RemoteAccessVpn result = _ravService.startRemoteAccessVpn(publicIpId, getOpenFirewall());
+            final RemoteAccessVpn result = _ravService.startRemoteAccessVpn(publicIpId);
             if (result != null) {
                 final RemoteAccessVpnResponse response = _responseGenerator.createRemoteAccessVpnResponse(result);
                 response.setResponseName(getCommandName());
