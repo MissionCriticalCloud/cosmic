@@ -48,8 +48,7 @@ public class MockFirewallManagerImpl extends ManagerBase implements FirewallMana
     }
 
     @Override
-    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final Integer portEnd, final String proto, final Purpose
-            purpose, final FirewallRuleType type,
+    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final String proto, final Purpose purpose, final FirewallRuleType type,
                                      final Long networkid, final TrafficType trafficType) {
         // TODO Auto-generated method stub
 
