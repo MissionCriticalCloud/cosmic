@@ -1,6 +1,5 @@
 package com.cloud.network;
 
-import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.dao.IPAddressVO;
@@ -12,7 +11,6 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.TrafficType;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.user.Account;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.naming.ConfigurationException;
@@ -126,12 +124,6 @@ public class MockFirewallManagerImpl extends ManagerBase implements FirewallMana
 
     @Override
     public FirewallRule createEgressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Pair<List<? extends FirewallRule>, Integer> listFirewallRules(final IListFirewallRulesCmd cmd) {
         // TODO Auto-generated method stub
         return null;
     }
