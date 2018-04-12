@@ -21,7 +21,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
     @Column(name = "dest_ip_address")
     private Ip destinationIpAddress = null;
 
-    @Column(name = "dest_port_start")
+    @Column(name = "dest_port")
     private int destinationPortStart;
 
     @Column(name = "instance_id")

@@ -41,7 +41,7 @@ public class FirewallRuleVO implements FirewallRule {
     long accountId;
     @Column(name = "ip_address_id", updatable = false)
     Long sourceIpAddressId;
-    @Column(name = "start_port", updatable = false)
+    @Column(name = "port", updatable = false)
     Integer sourcePortStart;
     @Column(name = "protocol", updatable = false)
     String protocol = NetUtils.TCP_PROTO;
