@@ -791,7 +791,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         return createServiceOffering(userId, cmd.getIsSystem(), vmType, cmd.getServiceOfferingName(), cpuNumber, memory, cmd.getDisplayText(),
                 cmd.getProvisioningType(), localStorageRequired, offerHA, limitCpuUse, volatileVm, cmd.getTags(), cmd.getDomainId(), cmd.getHostTag(),
                 cmd.getNetworkRate(), cmd.getDeploymentPlanner(), cmd.getDetails(), cmd.getBytesReadRate(), cmd.getBytesWriteRate(),
-                cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getHypervisorSnapshotReserve());
+                cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getIopsTotalRate(), cmd.getHypervisorSnapshotReserve());
     }
 
     protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachine.Type vmType,
@@ -800,7 +800,8 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                                                       final boolean offerHA, final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId, final
                                                       String hostTag,
                                                       final Integer networkRate, final String deploymentPlanner, final Map<String, String> details,
-                                                      Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate, final Integer hypervisorSnapshotReserve) {
+                                                      Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate, Long iopsTotalRate,
+                                                      final Integer hypervisorSnapshotReserve) {
 
         // Check if user exists in the system
         final User user = _userDao.findById(userId);
@@ -841,6 +842,13 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
         if (iopsWriteRate != null && iopsWriteRate > 0) {
             offering.setIopsWriteRate(iopsWriteRate);
+        }
+
+        if (iopsTotalRate != null && iopsTotalRate > 0) {
+            if (iopsWriteRate != null && iopsWriteRate > 0 || iopsReadRate != null && iopsReadRate > 0) {
+                throw new InvalidParameterValueException("Total IOPS rate cannot be used together with IOPS read rate or IOPS write rate");
+            }
+            offering.setIopsTotalRate(iopsTotalRate);
         }
 
         if (hypervisorSnapshotReserve != null && hypervisorSnapshotReserve < 0) {

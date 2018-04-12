@@ -974,6 +974,12 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         final Double overProvFactor = CapacityManager.StorageIopsOverprovisioningFactor.valueIn(pool.getId());
         final Long storagePoolTotalIops = pool.getCapacityIops() * overProvFactor.longValue();
 
+        if (!checkUsedIops(pool)) {
+            s_logger.debug("Insufficient IOPS available on pool: " + pool.getName());
+            return false;
+        }
+
+
         long requestedIops = 0;
         for (final Volume requestedVolume : requestedVolumes) {
             final Long diskOfferingId = requestedVolume.getDiskOfferingId();
@@ -1003,7 +1009,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             return false;
         }
 
-        if (!checkUsagedSpace(pool)) {
+        if (!checkUsedSpace(pool)) {
             return false;
         }
 
@@ -1077,7 +1083,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         return true;
     }
 
-    private boolean checkUsagedSpace(final StoragePool pool) {
+    private boolean checkUsedSpace(final StoragePool pool) {
         final StatsCollector sc = StatsCollector.getInstance();
         final double storageUsedThreshold = CapacityManager.StorageCapacityDisableThreshold.valueIn(pool.getDataCenterId());
         if (sc != null) {
@@ -1103,6 +1109,36 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             return true;
         }
         return false;
+    }
+
+    private boolean checkUsedIops(final StoragePool pool) {
+        final double overProvisioning = CapacityManager.StorageIopsOverprovisioningFactor.valueIn(pool.getDataCenterId());
+        final double totalAvailableIops = pool.getCapacityIops() * overProvisioning;
+        final List<Long> hostIds = getUpHostsInPool(pool.getId());
+        long usedIops = 0;
+        for (Long id : hostIds) {
+            List<VolumeVO> volumeDao = _volumeDao.findByInstance(id);
+            for (VolumeVO volume : volumeDao) {
+                if (!volume.poolId.equals(pool.getId())) {
+                    continue;
+                }
+                Long readIops = _diskOfferingDao.findById(volume.diskOfferingId).getIopsReadRate();
+                Long writeIops = _diskOfferingDao.findById(volume.diskOfferingId).getIopsWriteRate();
+                Long totalIops = _diskOfferingDao.findById(volume.diskOfferingId).getIopsTotalRate();
+
+                if (totalIops != null && totalIops > 0) {
+                    usedIops += totalIops;
+                } else {
+                    if (readIops != null && readIops > 0) {
+                        usedIops += readIops;
+                    }
+                    if (writeIops != null && writeIops > 0) {
+                        usedIops += writeIops;
+                    }
+                }
+            }
+        }
+        return usedIops <= totalAvailableIops;
     }
 
     private DiskOfferingVO getDiskOfferingVO(final Volume volume) {
