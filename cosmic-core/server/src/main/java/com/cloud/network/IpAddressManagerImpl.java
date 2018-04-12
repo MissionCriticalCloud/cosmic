@@ -407,14 +407,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         final FirewallRuleVO.TrafficType trafficType = rules.get(0).getTrafficType();
         final List<PublicIp> publicIps = new ArrayList<>();
 
-        if (!(rules.get(0).getPurpose() == FirewallRule.Purpose.Firewall && trafficType == FirewallRule.TrafficType.Egress)) {
-            // get the list of public ip's owned by the network
-            final List<IPAddressVO> userIps = _ipAddressDao.listByAssociatedNetwork(network.getId(), null);
-            if (userIps != null && !userIps.isEmpty()) {
-                for (final IPAddressVO userIp : userIps) {
-                    final PublicIp publicIp = PublicIp.createFromAddrAndVlan(userIp, _vlanDao.findById(userIp.getVlanId()));
-                    publicIps.add(publicIp);
-                }
+        // get the list of public ip's owned by the network
+        final List<IPAddressVO> userIps = _ipAddressDao.listByAssociatedNetwork(network.getId(), null);
+        if (userIps != null && !userIps.isEmpty()) {
+            for (final IPAddressVO userIp : userIps) {
+                final PublicIp publicIp = PublicIp.createFromAddrAndVlan(userIp, _vlanDao.findById(userIp.getVlanId()));
+                publicIps.add(publicIp);
             }
         }
         // rules can not programmed unless IP is associated with network service provider, so run IP assoication for

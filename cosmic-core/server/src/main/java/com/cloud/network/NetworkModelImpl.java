@@ -206,9 +206,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         }
 
         for (final FirewallRuleVO rule : rules) {
-            if (rule.getPurpose() != Purpose.Firewall || includingFirewall) {
-                result.add(rule.getPurpose());
-            }
+            result.add(rule.getPurpose());
         }
 
         return result;
@@ -464,9 +462,6 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
                 }
                 if (purposes.contains(Purpose.Vpn)) {
                     services.add(Service.Vpn);
-                }
-                if (purposes.contains(Purpose.Firewall)) {
-                    services.add(Service.Firewall);
                 }
                 if (services.isEmpty()) {
                     continue;

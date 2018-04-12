@@ -159,15 +159,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     }
 
     @Override
-    public FirewallRuleVO findByRelatedId(final long ruleId) {
-        final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
-        sc.setParameters("related", ruleId);
-        sc.setParameters("purpose", Purpose.Firewall);
-
-        return findOneBy(sc);
-    }
-
-    @Override
     public List<FirewallRuleVO> listByIp(final long ipId) {
         final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("ipId", ipId);
@@ -199,19 +190,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
             sc.setParameters("state", state);
         }
         return customSearch(sc, null).get(0);
-    }
-
-    @Override
-    public List<FirewallRuleVO> listByNetworkPurposeTrafficTypeAndNotRevoked(final long networkId, final FirewallRule.Purpose purpose, final TrafficType trafficType) {
-        final SearchCriteria<FirewallRuleVO> sc = NotRevokedSearch.create();
-        sc.setParameters("networkId", networkId);
-        sc.setParameters("state", State.Revoke);
-        if (purpose != null) {
-            sc.setParameters("purpose", purpose);
-        }
-        sc.setParameters("trafficType", trafficType);
-
-        return listBy(sc);
     }
 
     @Override
@@ -282,8 +260,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
                 _tagsDao.removeByIdAndType(id, ResourceObjectType.LoadBalancer);
             } else if (entry.getPurpose() == Purpose.PortForwarding) {
                 _tagsDao.removeByIdAndType(id, ResourceObjectType.PortForwardingRule);
-            } else if (entry.getPurpose() == Purpose.Firewall) {
-                _tagsDao.removeByIdAndType(id, ResourceObjectType.FirewallRule);
             } else if (entry.getPurpose() == Purpose.NetworkACL) {
                 _tagsDao.removeByIdAndType(id, ResourceObjectType.NetworkACL);
             }

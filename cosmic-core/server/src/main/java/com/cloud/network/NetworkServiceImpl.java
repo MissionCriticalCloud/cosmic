@@ -385,9 +385,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 if (purposes.contains(Purpose.Vpn)) {
                     services.add(Service.Vpn);
                 }
-                if (purposes.contains(Purpose.Firewall)) {
-                    services.add(Service.Firewall);
-                }
                 if (services.isEmpty()) {
                     continue;
                 }
@@ -472,9 +469,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         for (final FirewallRuleVO rule : rules) {
-            if (rule.getPurpose() != Purpose.Firewall || includingFirewall) {
-                result.add(rule.getPurpose());
-            }
+            result.add(rule.getPurpose());
         }
 
         return result;

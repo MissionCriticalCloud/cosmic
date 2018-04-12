@@ -117,8 +117,6 @@ public class BasicNetworkVisitor extends NetworkTopologyVisitor {
             _commandSetupHelper.createApplyStaticNatRulesCommands((List<StaticNatRule>) rules, router, cmds, network.getId());
 
             return _networkGeneralHelper.sendCommandsToRouter(router, cmds);
-        } else if (purpose == Purpose.Firewall) {
-            return true;
         }
         s_logger.warn("Unable to apply rules of purpose: " + rules.get(0).getPurpose());
 

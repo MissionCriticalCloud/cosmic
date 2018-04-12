@@ -43,7 +43,11 @@ public interface FirewallRule extends ControlledEntity, Identity, InternalIdenti
     boolean isDisplay();
 
     enum Purpose {
-        Firewall, PortForwarding, LoadBalancing, Vpn, StaticNat, NetworkACL,
+        PortForwarding,
+        LoadBalancing,
+        Vpn,
+        StaticNat,
+        NetworkACL,
     }
 
     enum State {

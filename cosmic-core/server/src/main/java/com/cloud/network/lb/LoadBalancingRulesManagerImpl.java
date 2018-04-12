@@ -236,14 +236,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
             }
         }
 
-        final FirewallRuleVO relatedRule = _firewallDao.findByRelatedId(lb.getId());
-        if (relatedRule != null) {
-            s_logger.warn("Unable to remove firewall rule id=" + lb.getId() + " as it has related firewall rule id=" + relatedRule.getId() +
-                    "; leaving it in Revoke state");
-            return false;
-        } else {
-            _firewallMgr.removeRule(lb);
-        }
+        _firewallMgr.removeRule(lb);
 
         s_logger.debug("Load balancer with id " + lb.getId() + " is removed successfully");
 

@@ -897,47 +897,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             success = false;
         }
 
-        // revoke all firewall rules for the network w/o applying them on the DB
-        final List<FirewallRuleVO> firewallRules = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Ingress);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Releasing " + firewallRules.size() + " firewall ingress rules for network id=" + networkId + " as a part of shutdownNetworkRules");
-        }
-
-        for (final FirewallRuleVO firewallRule : firewallRules) {
-            s_logger.trace("Marking firewall ingress rule " + firewallRule + " with Revoke state");
-            firewallRule.setState(FirewallRule.State.Revoke);
-        }
-
-        try {
-            if (!_firewallMgr.applyRules(firewallRules, true, false)) {
-                s_logger.warn("Failed to cleanup firewall ingress rules as a part of shutdownNetworkRules");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to cleanup firewall ingress rules as a part of shutdownNetworkRules due to ", ex);
-            success = false;
-        }
-
-        final List<FirewallRuleVO> firewallEgressRules = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Egress);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Releasing " + firewallEgressRules.size() + " firewall egress rules for network id=" + networkId + " as a part of shutdownNetworkRules");
-        }
-
-        for (final FirewallRuleVO firewallRule : firewallEgressRules) {
-            s_logger.trace("Marking firewall egress rule " + firewallRule + " with Revoke state");
-            firewallRule.setState(FirewallRule.State.Revoke);
-        }
-
-        try {
-            if (!_firewallMgr.applyRules(firewallEgressRules, true, false)) {
-                s_logger.warn("Failed to cleanup firewall egress rules as a part of shutdownNetworkRules");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to cleanup firewall egress rules as a part of shutdownNetworkRules due to ", ex);
-            success = false;
-        }
-
         if (network.getVpcId() != null) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Releasing Network ACL Items for network id=" + networkId + " as a part of shutdownNetworkRules");
