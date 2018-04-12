@@ -164,6 +164,8 @@ import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -182,9 +184,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConfigurationManagerImpl extends ManagerBase implements ConfigurationManager, ConfigurationService, Configurable {
     public static final Logger s_logger = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
@@ -4723,7 +4722,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (iopsTotalRate != null && iopsTotalRate > 0) {
             if (iopsWriteRate != null && iopsWriteRate > 0 || iopsReadRate != null && iopsReadRate > 0) {
-                throw new InvalidParameterValueException("Total IOPS rate cannot appear with iopsreadrate or iopswriterate");
+                throw new InvalidParameterValueException("Total IOPS rate cannot be used together with IOPS read rate or IOPS write rate");
             }
             newDiskOffering.setIopsTotalRate(iopsTotalRate);
         }
