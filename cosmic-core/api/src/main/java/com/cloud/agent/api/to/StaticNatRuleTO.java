@@ -28,8 +28,7 @@ public class StaticNatRuleTO extends PortForwardingRuleTO {
         this.dstIp = dstIp;
     }
 
-    public StaticNatRuleTO(final long id, final String srcIp, final String dstIp, final String protocol, final
-    boolean revoked, final boolean alreadyAdded) {
+    public StaticNatRuleTO(final long id, final String srcIp, final String dstIp, final String protocol, final boolean revoked, final boolean alreadyAdded) {
         super(id, srcIp, protocol, 0, revoked, alreadyAdded, FirewallRule.Purpose.StaticNat, null, 0, 0);
         this.dstIp = dstIp;
     }

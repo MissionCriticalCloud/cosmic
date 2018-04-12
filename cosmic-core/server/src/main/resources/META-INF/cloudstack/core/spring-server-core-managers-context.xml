@@ -93,9 +93,7 @@
 
     <bean id="firewallManagerImpl" class="com.cloud.network.firewall.FirewallManagerImpl">
         <property name="firewallElements" value="#{firewallServiceProvidersRegistry.registered}" />
-        <property name="networkAclElements" value="#{networkACLServiceProvidersRegistry.registered}" />
         <property name="pfElements" value="#{portForwardingServiceProvidersRegistry.registered}" />
-        <property name="staticNatElements" value="#{staticNatServiceProvidersRegistry.registered}" />
     </bean>
 
     <bean id="hypervisorGuruManagerImpl" class="com.cloud.hypervisor.HypervisorGuruManagerImpl">

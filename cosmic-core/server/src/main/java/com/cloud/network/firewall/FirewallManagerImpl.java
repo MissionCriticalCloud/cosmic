@@ -14,20 +14,15 @@ import com.cloud.network.NetworkRuleApplier;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.element.FirewallServiceProvider;
-import com.cloud.network.element.NetworkACLServiceProvider;
 import com.cloud.network.element.PortForwardingServiceProvider;
-import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.component.ManagerBase;
@@ -38,7 +33,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -57,32 +51,21 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     @Inject
     FirewallRulesDao _firewallDao;
     @Inject
-    IPAddressDao _ipAddressDao;
+    private IPAddressDao _ipAddressDao;
     @Inject
-    AccountManager _accountMgr;
+    private AccountManager _accountMgr;
     @Inject
-    NetworkModel _networkModel;
+    private NetworkModel _networkModel;
     @Inject
-    ConfigurationDao _configDao;
+    private ConfigurationDao _configDao;
     @Inject
-    PortForwardingRulesDao _pfRulesDao;
-    @Inject
-    UserVmDao _vmDao;
-    @Inject
-    ResourceTagDao _resourceTagDao;
-    @Inject
-    NetworkDao _networkDao;
-    @Inject
-    VpcManager _vpcMgr;
-    List<FirewallServiceProvider> _firewallElements;
+    private VpcManager _vpcMgr;
+    private List<FirewallServiceProvider> _firewallElements;
 
-    List<PortForwardingServiceProvider> _pfElements;
+    private List<PortForwardingServiceProvider> _pfElements;
 
-    List<StaticNatServiceProvider> _staticNatElements;
-
-    List<NetworkACLServiceProvider> _networkAclElements;
     @Inject
-    IpAddressManager _ipAddrMgr;
+    private IpAddressManager _ipAddrMgr;
 
     private boolean _elbEnabled = false;
 
@@ -310,15 +293,5 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     @Inject
     public void setPfElements(final List<PortForwardingServiceProvider> pfElements) {
         _pfElements = pfElements;
-    }
-
-    @Inject
-    public void setStaticNatElements(final List<StaticNatServiceProvider> staticNatElements) {
-        _staticNatElements = staticNatElements;
-    }
-
-    @Inject
-    public void setNetworkAclElements(final List<NetworkACLServiceProvider> networkAclElements) {
-        _networkAclElements = networkAclElements;
     }
 }
