@@ -43,8 +43,6 @@ public class FirewallRuleVO implements FirewallRule {
     Long sourceIpAddressId;
     @Column(name = "start_port", updatable = false)
     Integer sourcePortStart;
-    @Column(name = "end_port", updatable = false)
-    Integer sourcePortEnd;
     @Column(name = "protocol", updatable = false)
     String protocol = NetUtils.TCP_PROTO;
     @Enumerated(value = EnumType.STRING)
@@ -86,11 +84,11 @@ public class FirewallRuleVO implements FirewallRule {
             accountId, final long domainId,
                           final Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related, final TrafficType
                                   trafficType, final FirewallRuleType type) {
-        this(xId, ipAddressId, portStart, portEnd, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, trafficType);
+        this(xId, ipAddressId, portStart, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, trafficType);
         this.type = type;
     }
 
-    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final Integer portEnd, final String protocol, final long networkId, final long
+    public FirewallRuleVO(final String xId, final Long ipAddressId, final Integer portStart, final String protocol, final long networkId, final long
             accountId, final long domainId,
                           final Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related, final TrafficType
                                   trafficType) {
@@ -102,7 +100,6 @@ public class FirewallRuleVO implements FirewallRule {
         this.domainId = domainId;
         sourceIpAddressId = ipAddressId;
         sourcePortStart = portStart;
-        sourcePortEnd = portEnd;
         this.protocol = protocol;
         this.purpose = purpose;
         this.networkId = networkId;
@@ -122,9 +119,8 @@ public class FirewallRuleVO implements FirewallRule {
     }
 
     public FirewallRuleVO(final String xId, final long ipAddressId, final int port, final String protocol, final long networkId, final long accountId, final long domainId, final
-    Purpose purpose,
-                          final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related) {
-        this(xId, ipAddressId, port, port, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, null);
+    Purpose purpose, final List<String> sourceCidrs, final Integer icmpCode, final Integer icmpType, final Long related) {
+        this(xId, ipAddressId, port, protocol, networkId, accountId, domainId, purpose, sourceCidrs, icmpCode, icmpType, related, null);
     }
 
     @Override
@@ -150,11 +146,6 @@ public class FirewallRuleVO implements FirewallRule {
     @Override
     public Integer getSourcePortStart() {
         return sourcePortStart;
-    }
-
-    @Override
-    public Integer getSourcePortEnd() {
-        return sourcePortEnd;
     }
 
     @Override
