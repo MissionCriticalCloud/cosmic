@@ -855,9 +855,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         lbResponse.setId(loadBalancer.getUuid());
         lbResponse.setName(loadBalancer.getName());
         lbResponse.setDescription(loadBalancer.getDescription());
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(loadBalancer.getId());
-        lbResponse.setCidrList(StringUtils.join(cidrs, ","));
-
         final IPAddressVO publicIp = ApiDBUtils.findIpAddressById(loadBalancer.getSourceIpAddressId());
         lbResponse.setPublicIpId(publicIp.getUuid());
         lbResponse.setPublicIp(publicIp.getAddress().addr());
@@ -1074,18 +1071,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         return ApiDBUtils.newInstanceGroupResponse(vgroup);
     }
 
-  /*
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, EnumSet<VMDetails> details, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-   */
-
     @Override
     public StoragePoolResponse createStoragePoolResponse(final StoragePool pool) {
         final List<StoragePoolJoinVO> viewPools = ApiDBUtils.newStoragePoolView(pool);
@@ -1164,9 +1149,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setPrivateStartPort(Integer.toString(fwRule.getDestinationPortStart()));
         response.setProtocol(fwRule.getProtocol());
         response.setPublicStartPort(Integer.toString(fwRule.getSourcePort()));
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
-        response.setCidrList(StringUtils.join(cidrs, ","));
-
         final Network guestNtwk = ApiDBUtils.findNetworkById(fwRule.getNetworkId());
         response.setNetworkId(guestNtwk.getUuid());
 

@@ -11,7 +11,6 @@ import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkRuleApplier;
-import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -59,8 +58,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     FirewallRulesDao _firewallDao;
     @Inject
     IPAddressDao _ipAddressDao;
-    @Inject
-    FirewallRulesCidrsDao _firewallCidrsDao;
     @Inject
     AccountManager _accountMgr;
     @Inject

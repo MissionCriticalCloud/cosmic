@@ -105,7 +105,6 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.event.Event;
 import com.cloud.event.dao.EventJoinDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJob;
@@ -133,7 +132,6 @@ import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
-import com.cloud.network.dao.FirewallRulesCidrsDao;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -172,8 +170,6 @@ import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.projects.Project;
-import com.cloud.projects.ProjectAccount;
-import com.cloud.projects.ProjectInvitation;
 import com.cloud.projects.ProjectService;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
@@ -219,7 +215,6 @@ import com.cloud.user.AccountDetailsDao;
 import com.cloud.user.AccountService;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.SSHKeyPairVO;
 import com.cloud.user.User;
 import com.cloud.user.UserAccount;
 import com.cloud.user.UserStatisticsVO;
@@ -237,7 +232,6 @@ import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.InstanceGroup;
 import com.cloud.vm.InstanceGroupVO;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.UserVmManager;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
@@ -313,7 +307,6 @@ public class ApiDBUtils {
     static ConfigurationService s_configSvc;
     static ConfigurationDao s_configDao;
     static ConsoleProxyDao s_consoleProxyDao;
-    static FirewallRulesCidrsDao s_firewallCidrsDao;
     static VMInstanceDao s_vmDao;
     static ResourceLimitService s_resourceLimitMgr;
     static ProjectService s_projectMgr;
@@ -463,8 +456,6 @@ public class ApiDBUtils {
     private ConfigurationDao configDao;
     @Inject
     private ConsoleProxyDao consoleProxyDao;
-    @Inject
-    private FirewallRulesCidrsDao firewallCidrsDao;
     @Inject
     private VMInstanceDao vmDao;
     @Inject
@@ -978,28 +969,8 @@ public class ApiDBUtils {
         return s_consoleProxyDao.findById(id);
     }
 
-    public static List<String> findFirewallSourceCidrs(final long id) {
-        return s_firewallCidrsDao.getSourceCidrs(id);
-    }
-
-    public static Account getProjectOwner(final long projectId) {
-        return s_projectMgr.getProjectOwner(projectId);
-    }
-
     public static Project findProjectByProjectAccountId(final long projectAccountId) {
         return s_projectMgr.findByProjectAccountId(projectAccountId);
-    }
-
-    public static Project findProjectByProjectAccountIdIncludingRemoved(final long projectAccountId) {
-        return s_projectMgr.findByProjectAccountIdIncludingRemoved(projectAccountId);
-    }
-
-    public static Project findProjectById(final long projectId) {
-        return s_projectMgr.getProject(projectId);
-    }
-
-    public static long getProjectOwnwerId(final long projectId) {
-        return s_projectMgr.getProjectOwner(projectId).getId();
     }
 
     public static Map<String, String> getAccountDetails(final long accountId) {
@@ -1009,10 +980,6 @@ public class ApiDBUtils {
 
     public static Map<Service, Set<Provider>> listNetworkOfferingServices(final long networkOfferingId) {
         return s_networkModel.getNetworkOfferingServiceProvidersMap(networkOfferingId);
-    }
-
-    public static List<Service> getElementServices(final Provider provider) {
-        return s_networkModel.getElementServices(provider);
     }
 
     public static List<? extends Provider> getProvidersForService(final Service service) {
@@ -1029,10 +996,6 @@ public class ApiDBUtils {
         final boolean subdomainAccess = (map.isSubdomainAccess() != null) ? map.isSubdomainAccess() : s_networkModel.getAllowSubdomainAccessGlobal();
 
         return new Pair<>(map.getDomainId(), subdomainAccess);
-    }
-
-    public static long countFreePublicIps() {
-        return s_ipAddressDao.countFreePublicIPs();
     }
 
     public static long findDefaultRouterServiceOffering() {
@@ -1073,19 +1036,6 @@ public class ApiDBUtils {
         return s_taggedResourceService.listByResourceTypeAndId(type, resourceId);
     }
 
-    public static String getKeyPairName(final String sshPublicKey) {
-        final SSHKeyPairVO sshKeyPair = s_sshKeyPairDao.findByPublicKey(sshPublicKey);
-        //key might be removed prior to this point
-        if (sshKeyPair != null) {
-            return sshKeyPair.getName();
-        }
-        return null;
-    }
-
-    public static UserVmDetailVO findPublicKeyByVmId(final long vmId) {
-        return s_userVmDetailsDao.findDetail(vmId, "SSH.PublicKey");
-    }
-
     public static GuestOSCategoryVO findGuestOsCategoryById(final long catId) {
         return s_guestOSCategoryDao.findById(catId);
     }
@@ -1100,10 +1050,6 @@ public class ApiDBUtils {
 
     public static NetworkACL findByNetworkACLId(final long aclId) {
         return s_networkACLDao.findById(aclId);
-    }
-
-    public static AsyncJob findAsyncJobById(final long jobId) {
-        return s_asyncJobDao.findById(jobId);
     }
 
     public static String findJobInstanceUuid(final AsyncJob job) {
@@ -1324,10 +1270,6 @@ public class ApiDBUtils {
         return s_eventJoinDao.newEventResponse(ve);
     }
 
-    public static EventJoinVO newEventView(final Event e) {
-        return s_eventJoinDao.newEventView(e);
-    }
-
     public static InstanceGroupResponse newInstanceGroupResponse(final InstanceGroupJoinVO ve) {
         return s_vmGroupJoinDao.newInstanceGroupResponse(ve);
     }
@@ -1378,16 +1320,8 @@ public class ApiDBUtils {
         return s_projectAccountJoinDao.newProjectAccountResponse(proj);
     }
 
-    public static ProjectAccountJoinVO newProjectAccountView(final ProjectAccount proj) {
-        return s_projectAccountJoinDao.newProjectAccountView(proj);
-    }
-
     public static ProjectInvitationResponse newProjectInvitationResponse(final ProjectInvitationJoinVO proj) {
         return s_projectInvitationJoinDao.newProjectInvitationResponse(proj);
-    }
-
-    public static ProjectInvitationJoinVO newProjectInvitationView(final ProjectInvitation proj) {
-        return s_projectInvitationJoinDao.newProjectInvitationView(proj);
     }
 
     public static HostResponse newHostResponse(final HostJoinVO vr, final EnumSet<HostDetails> details) {
@@ -1510,10 +1444,6 @@ public class ApiDBUtils {
         return s_dcJoinDao.newDataCenterView(dc);
     }
 
-    public static Map<String, String> findHostDetailsById(final long hostId) {
-        return s_hostDetailsDao.findDetails(hostId);
-    }
-
     public static List<NicSecondaryIpVO> findNicSecondaryIps(final long nicId) {
         return s_nicSecondaryIpDao.listByNicId(nicId);
     }
@@ -1624,7 +1554,6 @@ public class ApiDBUtils {
         s_physicalNetworkDao = physicalNetworkDao;
         s_configDao = configDao;
         s_consoleProxyDao = consoleProxyDao;
-        s_firewallCidrsDao = firewallCidrsDao;
         s_vmDao = vmDao;
         s_resourceLimitMgr = resourceLimitMgr;
         s_projectMgr = projectMgr;
