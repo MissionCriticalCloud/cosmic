@@ -29,7 +29,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     protected final SearchBuilder<FirewallRuleVO> AllFieldsSearch;
     protected final SearchBuilder<FirewallRuleVO> NotRevokedSearch;
     protected final SearchBuilder<FirewallRuleVO> ReleaseSearch;
-    protected final SearchBuilder<FirewallRuleVO> SystemRuleSearch;
     protected final GenericSearchBuilder<FirewallRuleVO, Long> RulesByIpCount;
     protected SearchBuilder<FirewallRuleVO> VmSearch;
     @Inject
@@ -70,11 +69,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
         ReleaseSearch.and("purpose", ReleaseSearch.entity().getPurpose(), Op.EQ);
         ReleaseSearch.and("ports", ReleaseSearch.entity().getSourcePortStart(), Op.IN);
         ReleaseSearch.done();
-
-        SystemRuleSearch = createSearchBuilder();
-        SystemRuleSearch.and("type", SystemRuleSearch.entity().getType(), Op.EQ);
-        SystemRuleSearch.and("ipId", SystemRuleSearch.entity().getSourceIpAddressId(), Op.NULL);
-        SystemRuleSearch.done();
 
         RulesByIpCount = createSearchBuilder(Long.class);
         RulesByIpCount.select(null, Func.COUNT, RulesByIpCount.entity().getId());
