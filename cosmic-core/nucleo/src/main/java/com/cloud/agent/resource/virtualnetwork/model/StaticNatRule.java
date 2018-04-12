@@ -4,19 +4,17 @@ public class StaticNatRule {
     private boolean revoke;
     private String protocol;
     private String sourceIpAddress;
-    private String sourcePortRange;
     private String destinationIpAddress;
 
     public StaticNatRule() {
         // Empty constructor for (de)serialization
     }
 
-    public StaticNatRule(final boolean revoke, final String protocol, final String sourceIpAddress, final String sourcePortRange, final String destinationIpAddress) {
+    public StaticNatRule(final boolean revoke, final String protocol, final String sourceIpAddress, final String destinationIpAddress) {
         super();
         this.revoke = revoke;
         this.protocol = protocol;
         this.sourceIpAddress = sourceIpAddress;
-        this.sourcePortRange = sourcePortRange;
         this.destinationIpAddress = destinationIpAddress;
     }
 
@@ -42,14 +40,6 @@ public class StaticNatRule {
 
     public void setSourceIpAddress(final String sourceIpAddress) {
         this.sourceIpAddress = sourceIpAddress;
-    }
-
-    public String getSourcePortRange() {
-        return sourcePortRange;
-    }
-
-    public void setSourcePortRange(final String sourcePortRange) {
-        this.sourcePortRange = sourcePortRange;
     }
 
     public String getDestinationIpAddress() {

@@ -19,7 +19,7 @@ public class SetStaticNatRulesConfigItem extends AbstractConfigItemFacade {
 
         final LinkedList<StaticNatRule> rules = new LinkedList<>();
         for (final StaticNatRuleTO rule : command.getRules()) {
-            final StaticNatRule staticNatRule = new StaticNatRule(rule.revoked(), rule.getProtocol(), rule.getSrcIp(), rule.getStringSrcPortRange(), rule.getDstIp());
+            final StaticNatRule staticNatRule = new StaticNatRule(rule.revoked(), rule.getProtocol(), rule.getSrcIp(), rule.getDstIp());
             rules.add(staticNatRule);
         }
         final StaticNatRules staticNatRules = new StaticNatRules(rules);
