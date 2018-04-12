@@ -25,9 +25,7 @@ public interface LoadBalancingRulesService {
     /**
      * Create a load balancer rule from the given ipAddress/port to the given private port
      *
-     * @param openFirewall TODO
-     * @param forDisplay   TODO
-     * @param cmd          the command specifying the ip address, public port, protocol, private port, and algorithm
+     * @param forDisplay TODO
      * @return the newly created LoadBalancerVO if successful, null otherwise
      * @throws InsufficientAddressCapacityException
      */
@@ -49,9 +47,9 @@ public interface LoadBalancingRulesService {
      * @return the newly created stickiness policy if successfull, null otherwise
      * @thows NetworkRuleConflictException
      */
-    public StickinessPolicy createLBStickinessPolicy(CreateLBStickinessPolicyCmd cmd) throws NetworkRuleConflictException;
+    StickinessPolicy createLBStickinessPolicy(CreateLBStickinessPolicyCmd cmd) throws NetworkRuleConflictException;
 
-    public boolean applyLBStickinessPolicy(CreateLBStickinessPolicyCmd cmd) throws ResourceUnavailableException;
+    boolean applyLBStickinessPolicy(CreateLBStickinessPolicyCmd cmd) throws ResourceUnavailableException;
 
     boolean deleteLBStickinessPolicy(long stickinessPolicyId, boolean apply);
 
@@ -65,9 +63,9 @@ public interface LoadBalancingRulesService {
      * otherwise
      * @thows NetworkRuleConflictException
      */
-    public HealthCheckPolicy createLBHealthCheckPolicy(CreateLBHealthCheckPolicyCmd cmd);
+    HealthCheckPolicy createLBHealthCheckPolicy(CreateLBHealthCheckPolicyCmd cmd);
 
-    public boolean applyLBHealthCheckPolicy(CreateLBHealthCheckPolicyCmd cmd) throws ResourceUnavailableException;
+    boolean applyLBHealthCheckPolicy(CreateLBHealthCheckPolicyCmd cmd) throws ResourceUnavailableException;
 
     boolean deleteLBHealthCheckPolicy(long healthCheckPolicyId, boolean apply);
 
@@ -125,7 +123,7 @@ public interface LoadBalancingRulesService {
 
     LoadBalancer findById(long loadBalancer);
 
-    public void updateLBHealthChecks(Scheme scheme) throws ResourceUnavailableException;
+    void updateLBHealthChecks(Scheme scheme) throws ResourceUnavailableException;
 
     Map<Ip, UserVm> getLbInstances(long lbId);
 

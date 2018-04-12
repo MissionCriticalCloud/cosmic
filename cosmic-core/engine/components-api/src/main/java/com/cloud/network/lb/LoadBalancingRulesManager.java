@@ -17,7 +17,7 @@ import java.util.List;
 public interface LoadBalancingRulesManager {
 
     LoadBalancer createPublicLoadBalancer(String xId, String name, String description, int srcPort, int destPort, long sourceIpId, String protocol, String algorithm,
-                                          boolean openFirewall, CallContext caller, String lbProtocol, Boolean forDisplay, int clientTimeout, int serverTimeout)
+                                          CallContext caller, String lbProtocol, Boolean forDisplay, int clientTimeout, int serverTimeout)
             throws NetworkRuleConflictException;
 
     boolean removeAllLoadBalanacersForIp(long ipId, Account caller, long callerUserId);
