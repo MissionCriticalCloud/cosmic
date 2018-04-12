@@ -8,7 +8,6 @@ public class StaticNatRuleImpl implements StaticNatRule {
     String uuid;
     String protocol;
     int portStart;
-    int portEnd;
     State state;
     long accountId;
     long domainId;
@@ -23,7 +22,6 @@ public class StaticNatRuleImpl implements StaticNatRule {
         uuid = rule.getUuid();
         protocol = rule.getProtocol();
         portStart = rule.getSourcePortStart().intValue();
-        portEnd = rule.getSourcePortEnd().intValue();
         state = rule.getState();
         accountId = rule.getAccountId();
         domainId = rule.getDomainId();
@@ -61,11 +59,6 @@ public class StaticNatRuleImpl implements StaticNatRule {
     @Override
     public Integer getSourcePortStart() {
         return portStart;
-    }
-
-    @Override
-    public Integer getSourcePortEnd() {
-        return portEnd;
     }
 
     @Override
