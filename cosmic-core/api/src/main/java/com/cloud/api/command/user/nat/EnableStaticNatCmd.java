@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 @APICommand(name = "enableStaticNat", group = APICommandGroup.NATService, description = "Enables static NAT for given IP address", responseObject = SuccessResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class EnableStaticNatCmd extends BaseCmd {
-    public static final Logger s_logger = LoggerFactory.getLogger(CreateIpForwardingRuleCmd.class.getName());
+    public static final Logger s_logger = LoggerFactory.getLogger(EnableStaticNatCmd.class.getName());
 
     private static final String s_name = "enablestaticnatresponse";
 
