@@ -4943,8 +4943,7 @@
                                                     publicport: args.data.publicport,
                                                     publicendport: args.data.publicendport,
                                                     protocol: args.data.protocol,
-                                                    virtualmachineid: args.itemData[0].id,
-                                                    openfirewall: false
+                                                    virtualmachineid: args.itemData[0].id
                                                 };
 
                                                 if (args.itemData[0]._subselect && args.itemData[0]._subselect != -1) {

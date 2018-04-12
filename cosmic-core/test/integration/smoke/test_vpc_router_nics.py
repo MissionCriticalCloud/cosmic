@@ -229,7 +229,6 @@ class TestVPCNics(cloudstackTestCase):
             vm,
             services,
             ipaddressid=public_ip.ipaddress.id,
-            openfirewall=False,
             networkid=network.id,
             vpcid=self.vpc.id)
 

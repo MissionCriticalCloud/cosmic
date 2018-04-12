@@ -380,7 +380,6 @@ test_data = {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
-                                                                            "openfirewall": False,
                                                                             "virtualmachinename": "isonet01-vm01",
                                                                             "nic": "172.16.1.11"
                                                                         }
@@ -391,7 +390,6 @@ test_data = {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
                                                                             "publicport": 2202,
-                                                                            "openfirewall": False,
                                                                             "virtualmachinename": "isonet01-vm02",
                                                                             "nic": "172.16.1.12"
                                                                         }
@@ -444,7 +442,6 @@ test_data = {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
-                                                                            "openfirewall": False,
                                                                             "virtualmachinename": "isonet02-vm01",
                                                                             "nic": "172.16.2.11"
                                                                         }
@@ -2373,7 +2370,6 @@ test_data = {
         # Algorithm used for load balancing
         "privateport": 22,
         "publicport": 2222,
-        "openfirewall": False,
         "startport": 22,
         "endport": 2222,
         "protocol": "TCP",
@@ -2385,7 +2381,6 @@ test_data = {
         # Algorithm used for load balancing
         "privateport": 80,
         "publicport": 8888,
-        "openfirewall": False,
         "startport": 80,
         "endport": 8888,
         "protocol": "TCP",

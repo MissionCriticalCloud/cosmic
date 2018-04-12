@@ -2996,7 +2996,6 @@
                                             name: args.data.name,
                                             privateport: args.data.privateport,
                                             publicport: args.data.publicport,
-                                            openfirewall: false,
                                             domainid: g_domainid,
                                             account: g_account
                                         };

@@ -201,7 +201,6 @@ class EntityManager(object):
             vm,
             nat_rule_services,
             ipaddressid=public_ip.ipaddress.id,
-            openfirewall=False,
             networkid=network.id,
             vpcid=vpc_id)
 
