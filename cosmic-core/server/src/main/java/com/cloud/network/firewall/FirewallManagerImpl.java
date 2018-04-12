@@ -1,6 +1,5 @@
 package com.cloud.network.firewall;
 
-import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.event.ActionEvent;
@@ -35,21 +34,11 @@ import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.projects.Project.ListProjectResourcesCriteria;
-import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
-import com.cloud.utils.db.Filter;
-import com.cloud.utils.db.JoinBuilder;
-import com.cloud.utils.db.SearchBuilder;
-import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
@@ -147,92 +136,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
 
         return createFirewallRule(null, caller, rule.getXid(), rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(), rule.getSourceCidrList(),
                 rule.getIcmpCode(), rule.getIcmpType(), null, rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
-    }
-
-    @Override
-    public Pair<List<? extends FirewallRule>, Integer> listFirewallRules(final IListFirewallRulesCmd cmd) {
-        final Long ipId = cmd.getIpAddressId();
-        final Long id = cmd.getId();
-        final Long networkId = cmd.getNetworkId();
-        final Map<String, String> tags = cmd.getTags();
-        final FirewallRule.TrafficType trafficType = cmd.getTrafficType();
-        final Boolean display = cmd.getDisplay();
-
-        final Account caller = CallContext.current().getCallingAccount();
-        final List<Long> permittedAccounts = new ArrayList<>();
-
-        if (ipId != null) {
-            final IPAddressVO ipAddressVO = _ipAddressDao.findById(ipId);
-            if (ipAddressVO == null || !ipAddressVO.readyToUse()) {
-                throw new InvalidParameterValueException("Ip address id=" + ipId + " not ready for firewall rules yet");
-            }
-            _accountMgr.checkAccess(caller, null, true, ipAddressVO);
-        }
-
-        final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<>(cmd.getDomainId(), cmd
-                .isRecursive(), null);
-        _accountMgr.buildACLSearchParameters(caller, id, cmd.getAccountName(), cmd.getProjectId(), permittedAccounts, domainIdRecursiveListProject, cmd.listAll(), false);
-        final Long domainId = domainIdRecursiveListProject.first();
-        final Boolean isRecursive = domainIdRecursiveListProject.second();
-        final ListProjectResourcesCriteria listProjectResourcesCriteria = domainIdRecursiveListProject.third();
-
-        final Filter filter = new Filter(FirewallRuleVO.class, "id", false, cmd.getStartIndex(), cmd.getPageSizeVal());
-        final SearchBuilder<FirewallRuleVO> sb = _firewallDao.createSearchBuilder();
-        _accountMgr.buildACLSearchBuilder(sb, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
-
-        sb.and("id", sb.entity().getId(), Op.EQ);
-        sb.and("trafficType", sb.entity().getTrafficType(), Op.EQ);
-        sb.and("networkId", sb.entity().getNetworkId(), Op.EQ);
-        sb.and("ip", sb.entity().getSourceIpAddressId(), Op.EQ);
-        sb.and("purpose", sb.entity().getPurpose(), Op.EQ);
-        sb.and("display", sb.entity().isDisplay(), Op.EQ);
-
-        if (tags != null && !tags.isEmpty()) {
-            final SearchBuilder<ResourceTagVO> tagSearch = _resourceTagDao.createSearchBuilder();
-            for (int count = 0; count < tags.size(); count++) {
-                tagSearch.or().op("key" + String.valueOf(count), tagSearch.entity().getKey(), SearchCriteria.Op.EQ);
-                tagSearch.and("value" + String.valueOf(count), tagSearch.entity().getValue(), SearchCriteria.Op.EQ);
-                tagSearch.cp();
-            }
-            tagSearch.and("resourceType", tagSearch.entity().getResourceType(), SearchCriteria.Op.EQ);
-            sb.groupBy(sb.entity().getId());
-            sb.join("tagSearch", tagSearch, sb.entity().getId(), tagSearch.entity().getResourceId(), JoinBuilder.JoinType.INNER);
-        }
-
-        final SearchCriteria<FirewallRuleVO> sc = sb.create();
-        _accountMgr.buildACLSearchCriteria(sc, domainId, isRecursive, permittedAccounts, listProjectResourcesCriteria);
-
-        if (id != null) {
-            sc.setParameters("id", id);
-        }
-
-        if (tags != null && !tags.isEmpty()) {
-            int count = 0;
-            sc.setJoinParameters("tagSearch", "resourceType", ResourceObjectType.FirewallRule.toString());
-            for (final String key : tags.keySet()) {
-                sc.setJoinParameters("tagSearch", "key" + String.valueOf(count), key);
-                sc.setJoinParameters("tagSearch", "value" + String.valueOf(count), tags.get(key));
-                count++;
-            }
-        }
-
-        if (display != null) {
-            sc.setParameters("display", display);
-        }
-
-        if (ipId != null) {
-            sc.setParameters("ip", ipId);
-        }
-
-        if (networkId != null) {
-            sc.setParameters("networkId", networkId);
-        }
-
-        sc.setParameters("purpose", Purpose.Firewall);
-        sc.setParameters("trafficType", trafficType);
-
-        final Pair<List<FirewallRuleVO>, Integer> result = _firewallDao.searchAndCount(sc, filter);
-        return new Pair<>(result.first(), result.second());
     }
 
     @Override

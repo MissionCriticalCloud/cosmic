@@ -396,7 +396,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_NET_RULE_ADD, eventDescription = "creating forwarding rule", create = true)
-    public PortForwardingRule createPortForwardingRule(final PortForwardingRule rule, final Long vmId, final Ip vmIp, final boolean openFirewall, final Boolean forDisplay)
+    public PortForwardingRule createPortForwardingRule(final PortForwardingRule rule, final Long vmId, final Ip vmIp, final Boolean forDisplay)
             throws NetworkRuleConflictException {
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
@@ -516,12 +516,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                         newRule.setDisplay(forDisplay);
                     }
                     newRule = _portForwardingDao.persist(newRule);
-
-                    // create firewallRule for 0.0.0.0/0 cidr
-                    if (openFirewall) {
-                        _firewallMgr.createRuleForAllCidrs(ipAddrId, caller, rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(), null, null,
-                                newRule.getId(), networkId);
-                    }
 
                     try {
                         _firewallMgr.detectRulesConflict(newRule);

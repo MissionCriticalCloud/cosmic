@@ -34,8 +34,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createPortForwardingRule", group = APICommandGroup.FirewallService, description = "Creates a port forwarding rule", responseObject = FirewallRuleResponse.class, entityType = {FirewallRule.class,
-        VirtualMachine.class, IpAddress.class},
+@APICommand(name = "createPortForwardingRule", group = APICommandGroup.FirewallService, description = "Creates a port forwarding rule", responseObject = FirewallRuleResponse.class, entityType =
+        {FirewallRule.class,
+                VirtualMachine.class, IpAddress.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements PortForwardingRule {
     public static final Logger s_logger = LoggerFactory.getLogger(CreatePortForwardingRuleCmd.class.getName());
@@ -95,11 +96,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     @Parameter(name = ApiConstants.CIDR_LIST, type = CommandType.LIST, collectionType = CommandType.STRING, description = "the cidr list to forward traffic from")
     private List<String> cidrlist;
 
-    @Parameter(name = ApiConstants.OPEN_FIREWALL, type = CommandType.BOOLEAN, description = "if true, firewall rule for source/end public port is automatically created; "
-            + "if false - firewall rule has to be created explicitly. If not specified 1) defaulted to false when PF"
-            + " rule is being created for VPC guest network 2) in all other cases defaulted to true")
-    private Boolean openFirewall;
-
     @Parameter(name = ApiConstants.NETWORK_ID,
             type = CommandType.UUID,
             entityType = NetworkResponse.class,
@@ -128,10 +124,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
         try {
             CallContext.current().setEventDetails("Rule Id: " + getEntityId());
 
-            if (getOpenFirewall()) {
-                success = success && _firewallService.applyIngressFirewallRules(ipAddressId, callerContext.getCallingAccount());
-            }
-
             success = success && _rulesService.applyPortForwardingRules(ipAddressId, callerContext.getCallingAccount());
 
             // State is different after the rule is applied, so get new object here
@@ -144,11 +136,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
             fwResponse.setResponseName(getCommandName());
         } finally {
             if (!success || rule == null) {
-
-                if (getOpenFirewall()) {
-                    _firewallService.revokeRelatedFirewallRule(getEntityId(), true);
-                }
-
                 try {
                     _rulesService.revokePortForwardingRule(getEntityId(), true);
                 } catch (final Exception ex) {
@@ -157,21 +144,6 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
 
                 throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to apply port forwarding rule");
             }
-        }
-    }
-
-    public Boolean getOpenFirewall() {
-        final boolean isVpc = getVpcId() == null ? false : true;
-        if (openFirewall != null) {
-            if (isVpc && openFirewall) {
-                throw new InvalidParameterValueException("Can't have openFirewall=true when IP address belongs to VPC");
-            }
-            return openFirewall;
-        } else {
-            if (isVpc) {
-                return false;
-            }
-            return true;
         }
     }
 
@@ -371,7 +343,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
         }
 
         try {
-            final PortForwardingRule result = _rulesService.createPortForwardingRule(this, virtualMachineId, privateIp, getOpenFirewall(), isDisplay());
+            final PortForwardingRule result = _rulesService.createPortForwardingRule(this, virtualMachineId, privateIp, isDisplay());
             setEntityId(result.getId());
             setEntityUuid(result.getUuid());
         } catch (final NetworkRuleConflictException ex) {
@@ -382,7 +354,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     }
 
     public Ip getVmSecondaryIp() {
-        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty() ) {
+        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty()) {
             return null;
         }
         return new Ip(vmSecondaryIp);

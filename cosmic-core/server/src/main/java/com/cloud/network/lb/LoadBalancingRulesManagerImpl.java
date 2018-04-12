@@ -324,8 +324,8 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     serverTimeout = defaultServerTimeout;
                 }
 
-                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, CallContext.current(),
-                        lbProtocol, forDisplay, clientTimeout, serverTimeout);
+                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, CallContext.current(), lbProtocol, forDisplay,
+                        clientTimeout, serverTimeout);
             } catch (final Exception ex) {
                 s_logger.warn("Failed to create load balancer due to ", ex);
                 if (ex instanceof NetworkRuleConflictException) {
