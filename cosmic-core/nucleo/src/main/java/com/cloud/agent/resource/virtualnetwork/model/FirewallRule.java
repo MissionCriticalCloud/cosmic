@@ -7,7 +7,7 @@ public class FirewallRule {
     private String srcVlanTag;
     private String srcIp;
     private String protocol;
-    private int[] srcPortRange;
+    private int srcPort;
     private boolean revoked;
     private boolean alreadyAdded;
     private List<String> sourceCidrList;
@@ -23,14 +23,13 @@ public class FirewallRule {
         // Empty constructor for (de)serialization
     }
 
-    public FirewallRule(final long id, final String srcVlanTag, final String srcIp, final String protocol, final int[] srcPortRange, final boolean revoked, final boolean
-            alreadyAdded, final List<String> sourceCidrList,
-                        final String purpose, final Integer icmpType, final Integer icmpCode, final String trafficType, final String guestCidr, final boolean defaultEgressPolicy) {
+    public FirewallRule(final long id, final String srcVlanTag, final String srcIp, final String protocol, final int srcPort, final boolean revoked, final boolean alreadyAdded, final List<String>
+            sourceCidrList, final String purpose, final Integer icmpType, final Integer icmpCode, final String trafficType, final String guestCidr, final boolean defaultEgressPolicy) {
         this.id = id;
         this.srcVlanTag = srcVlanTag;
         this.srcIp = srcIp;
         this.protocol = protocol;
-        this.srcPortRange = srcPortRange;
+        this.srcPort = srcPort;
         this.revoked = revoked;
         this.alreadyAdded = alreadyAdded;
         this.sourceCidrList = sourceCidrList;
@@ -74,12 +73,12 @@ public class FirewallRule {
         this.protocol = protocol;
     }
 
-    public int[] getSrcPortRange() {
-        return srcPortRange;
+    public int getSrcPort() {
+        return srcPort;
     }
 
-    public void setSrcPortRange(final int[] srcPortRange) {
-        this.srcPortRange = srcPortRange;
+    public void setSrcPort(final int srcPort) {
+        this.srcPort = srcPort;
     }
 
     public boolean isRevoked() {

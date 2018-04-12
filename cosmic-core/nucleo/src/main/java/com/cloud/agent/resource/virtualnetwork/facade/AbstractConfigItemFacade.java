@@ -6,7 +6,6 @@ import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
-import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
@@ -46,7 +45,6 @@ public abstract class AbstractConfigItemFacade {
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());
         flyweight.put(UpdateNetworkOverviewCommand.class, new NetworkOverviewConfigItem());
         flyweight.put(UpdateVmOverviewCommand.class, new VmOverviewConfigItem());
-        flyweight.put(SetFirewallRulesCommand.class, new SetFirewallRulesConfigItem());
         flyweight.put(SetNetworkACLCommand.class, new SetNetworkAclConfigItem()); // Move to network overview
         flyweight.put(SetPublicIpACLCommand.class, new SetPublicIpAclConfigItem()); // Move to network overview
         flyweight.put(SetupVRCommand.class, new SetVRConfigItem());
