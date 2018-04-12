@@ -1421,7 +1421,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                 // FIX ME
                 final FirewallRuleVO staticNatRule =
                         new FirewallRuleVO(null, ip.getId(), 0, NetUtils.ALL_PROTO.toString(), nic.getNetworkId(), vm.getAccountId(), vm.getDomainId(),
-                                Purpose.StaticNat, null, null, null, null, null);
+                                Purpose.StaticNat, null, null, null, null);
                 result.add(staticNatRule);
                 s_logger.debug("Found rule " + staticNatRule.getId() + " " + staticNatRule.getPurpose() + " configured");
             }
