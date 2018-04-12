@@ -789,7 +789,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             // we only need the source and destination ip. Unfortunately no mention if a rule
             // is new.
             final StaticNatRuleTO ruleTO =
-                    new StaticNatRuleTO(1, sourceIp.getAddress().addr(), MIN_PORT, MAX_PORT, rule.getDestIpAddress(), MIN_PORT, MAX_PORT, "any", rule.isForRevoke(), false);
+                    new StaticNatRuleTO(1, sourceIp.getAddress().addr(), rule.getDestIpAddress(), "any", rule.isForRevoke(), false);
             staticNatRules.add(ruleTO);
         }
 
