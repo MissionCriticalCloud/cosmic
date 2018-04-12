@@ -19,11 +19,6 @@ public interface FirewallRule extends ControlledEntity, Identity, InternalIdenti
     Integer getSourcePortStart();
 
     /**
-     * @return last port of the source prot range.  If this is null, that means only one port is mapped.
-     */
-    Integer getSourcePortEnd();
-
-    /**
      * @return protocol to open these ports for.
      */
     String getProtocol();

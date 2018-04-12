@@ -180,28 +180,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     }
 
     @Override
-    public List<FirewallRuleVO> listByIpPurposeAndProtocolAndNotRevoked(final long ipAddressId, final Integer startPort, final Integer endPort, final String protocol,
-                                                                        final FirewallRule.Purpose purpose) {
-        final SearchCriteria<FirewallRuleVO> sc = NotRevokedSearch.create();
-        sc.setParameters("ipId", ipAddressId);
-        sc.setParameters("state", State.Revoke);
-
-        if (purpose != null) {
-            sc.setParameters("purpose", purpose);
-        }
-
-        if (protocol != null) {
-            sc.setParameters("protocol", protocol);
-        }
-
-        sc.setParameters("sourcePortStart", startPort);
-
-        sc.setParameters("sourcePortEnd", endPort);
-
-        return listBy(sc);
-    }
-
-    @Override
     public FirewallRuleVO findByRelatedId(final long ruleId) {
         final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("related", ruleId);

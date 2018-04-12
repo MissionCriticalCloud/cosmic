@@ -21,10 +21,6 @@ public class FirewallRuleResponse extends BaseResponse {
     @Param(description = "the starting port of port forwarding rule's private port range")
     private String privateStartPort;
 
-    @SerializedName(ApiConstants.PRIVATE_END_PORT)
-    @Param(description = "the ending port of port forwarding rule's private port range")
-    private String privateEndPort;
-
     @SerializedName(ApiConstants.PROTOCOL)
     @Param(description = "the protocol of the port forwarding rule")
     private String protocol;
@@ -32,10 +28,6 @@ public class FirewallRuleResponse extends BaseResponse {
     @SerializedName(ApiConstants.PUBLIC_START_PORT)
     @Param(description = "the starting port of port forwarding rule's public port range")
     private String publicStartPort;
-
-    @SerializedName(ApiConstants.PUBLIC_END_PORT)
-    @Param(description = "the ending port of port forwarding rule's private port range")
-    private String publicEndPort;
 
     @SerializedName(ApiConstants.VIRTUAL_MACHINE_ID)
     @Param(description = "the VM ID for the port forwarding rule")
@@ -110,14 +102,6 @@ public class FirewallRuleResponse extends BaseResponse {
         this.privateStartPort = privatePort;
     }
 
-    public String getPrivateEndPort() {
-        return privateEndPort;
-    }
-
-    public void setPrivateEndPort(final String privatePort) {
-        this.privateEndPort = privatePort;
-    }
-
     public String getProtocol() {
         return protocol;
     }
@@ -132,14 +116,6 @@ public class FirewallRuleResponse extends BaseResponse {
 
     public void setPublicStartPort(final String publicPort) {
         this.publicStartPort = publicPort;
-    }
-
-    public String getPublicEndPort() {
-        return publicEndPort;
-    }
-
-    public void setPublicEndPort(final String publicPort) {
-        this.publicEndPort = publicPort;
     }
 
     public String getVirtualMachineId() {

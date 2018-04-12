@@ -478,7 +478,6 @@ class Services:
                 "privateport": 22,
                 "publicport": 22,
                 "startport": 22,
-                "endport": 22,
                 "protocol": "TCP",
                 "cidrlist": '0.0.0.0/0',
             },

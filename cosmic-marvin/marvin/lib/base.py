@@ -330,8 +330,7 @@ class VirtualMachine:
                 ipaddressid=public_ip.ipaddress.id,
                 protocol='TCP',
                 cidrlist=['0.0.0.0/0'],
-                startport=22,
-                endport=22
+                startport=22
             )
         elif network is not None:
             acl_list = NetworkACLList.list(
@@ -352,7 +351,6 @@ class VirtualMachine:
 
                 services_acl = { "protocol": services["protocol"] if "protocol" in services else 'TCP',
                                  "startport": services["publicport"] if "publicport" in services else 22,
-                                 "endport": services["publicport"] if "publicport" in services else 22,
                                  "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress' }
 
                 ace_number = 1
@@ -1576,10 +1574,6 @@ class NATRule:
 
         cmd.privateport = services["privateport"]
         cmd.publicport = services["publicport"]
-        if "privateendport" in services:
-            cmd.privateendport = services["privateendport"]
-        if "publicendport" in services:
-            cmd.publicendport = services["publicendport"]
         cmd.protocol = services["protocol"]
         cmd.virtualmachineid = virtual_machine.id
 
@@ -1634,9 +1628,6 @@ class StaticNATRule:
         cmd.protocol = services["protocol"]
         cmd.startport = services["startport"]
 
-        if "endport" in services:
-            cmd.endport = services["endport"]
-
         if "cidrlist" in services:
             cmd.cidrlist = services["cidrlist"]
 
@@ -1653,12 +1644,11 @@ class StaticNATRule:
         return StaticNATRule(api_client.createFirewallRule(cmd).__dict__)
 
     @classmethod
-    def createIpForwardingRule(cls, api_client, startport, endport, protocol, ipaddressid):
+    def createIpForwardingRule(cls, api_client, startport, protocol, ipaddressid):
         """Creates static ip forwarding rule"""
 
         cmd = createIpForwardingRule.createIpForwardingRuleCmd()
         cmd.startport = startport
-        cmd.endport = endport
         cmd.protocol = protocol
         cmd.ipaddressid = ipaddressid
         return StaticNATRule(api_client.createIpForwardingRule(cmd).__dict__)
@@ -1714,7 +1704,7 @@ class EgressFireWallRule:
 
     @classmethod
     def create(cls, api_client, networkid=None, protocol=None, cidrlist=None,
-               startport=None, endport=None, type=None, code=None, network=None, data=None):
+               startport=None, type=None, code=None, network=None, data=None):
         """Create Egress Firewall Rule"""
         cmd = createEgressFirewallRule.createEgressFirewallRuleCmd()
         if networkid:
@@ -1733,10 +1723,6 @@ class EgressFireWallRule:
             cmd.startport = startport
         elif 'startport' in data:
             cmd.startport = data['startport']
-        if endport:
-            cmd.endport = endport
-        elif 'endport' in data:
-            cmd.endport = data['endport']
         if type:
             cmd.type = type
         if code:
@@ -1771,7 +1757,7 @@ class FireWallRule:
 
     @classmethod
     def create(cls, api_client, ipaddressid=None, protocol=None, cidrlist=None,
-               startport=None, endport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
+               startport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
         """Create Firewall Rule"""
         cmd = createFirewallRule.createFirewallRuleCmd()
         if ipaddressid:
@@ -1790,10 +1776,6 @@ class FireWallRule:
             cmd.startport = startport
         elif 'startport' in data:
             cmd.startport = data['startport']
-        if endport:
-            cmd.endport = endport
-        elif 'endport' in data:
-            cmd.endport = data['endport']
 
         if projectid:
             cmd.projectid = projectid
@@ -2724,8 +2706,6 @@ class NetworkACL:
 
         if "startport" in services:
             cmd.startport = services["startport"]
-        if "endport" in services:
-            cmd.endport = services["endport"]
 
         if "cidrlist" in services:
             cmd.cidrlist = services["cidrlist"]

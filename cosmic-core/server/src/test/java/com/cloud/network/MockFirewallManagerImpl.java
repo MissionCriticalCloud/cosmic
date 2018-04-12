@@ -80,14 +80,6 @@ public class MockFirewallManagerImpl extends ManagerBase implements FirewallMana
     }
 
     @Override
-    public FirewallRule createRuleForAllCidrs(final long ipAddrId, final Account caller, final Integer startPort, final Integer endPort, final String protocol, final Integer
-            icmpCode, final Integer icmpType,
-                                              final Long relatedRuleId, final long networkId) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean revokeAllFirewallRulesForNetwork(final long networkId, final long userId, final Account caller) throws ResourceUnavailableException {
         // TODO Auto-generated method stub
         return false;

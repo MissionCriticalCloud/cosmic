@@ -48,9 +48,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     @Parameter(name = ApiConstants.START_PORT, type = CommandType.INTEGER, required = true, description = "the start port for the rule")
     private Integer startPort;
 
-    @Parameter(name = ApiConstants.END_PORT, type = CommandType.INTEGER, description = "the end port for the rule")
-    private Integer endPort;
-
     @Parameter(name = ApiConstants.PROTOCOL, type = CommandType.STRING, required = true, description = "the protocol for the rule. Valid values are TCP or UDP.")
     private String protocol;
 
@@ -67,10 +64,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
 
     public int getStartPort() {
         return startPort;
-    }
-
-    public int getEndPort() {
-        return endPort;
     }
 
     @Override
@@ -214,15 +207,6 @@ public class CreateIpForwardingRuleCmd extends BaseAsyncCreateCmd implements Sta
     @Override
     public Integer getSourcePortStart() {
         return startPort;
-    }
-
-    @Override
-    public Integer getSourcePortEnd() {
-        if (endPort == null) {
-            return startPort;
-        } else {
-            return endPort;
-        }
     }
 
     @Override

@@ -1165,10 +1165,8 @@ public class ApiResponseHelper implements ResponseGenerator {
         final FirewallRuleResponse response = new FirewallRuleResponse();
         response.setId(fwRule.getUuid());
         response.setPrivateStartPort(Integer.toString(fwRule.getDestinationPortStart()));
-        response.setPrivateEndPort(Integer.toString(fwRule.getDestinationPortEnd()));
         response.setProtocol(fwRule.getProtocol());
         response.setPublicStartPort(Integer.toString(fwRule.getSourcePortStart()));
-        response.setPublicEndPort(Integer.toString(fwRule.getSourcePortEnd()));
         final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
         response.setCidrList(StringUtils.join(cidrs, ","));
 
@@ -1247,7 +1245,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
 
         response.setStartPort(fwRule.getSourcePortStart());
-        response.setEndPort(fwRule.getSourcePortEnd());
         response.setProtocol(fwRule.getProtocol());
         response.setState(stateToSet);
         response.setObjectName("ipforwardingrule");
@@ -1975,10 +1972,6 @@ public class ApiResponseHelper implements ResponseGenerator {
             response.setStartPort(fwRule.getSourcePortStart());
         }
 
-        if (fwRule.getSourcePortEnd() != null) {
-            response.setEndPort(fwRule.getSourcePortEnd());
-        }
-
         final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
         response.setCidrList(StringUtils.join(cidrs, ","));
 
@@ -2342,10 +2335,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setProtocol(aclItem.getProtocol());
         if (aclItem.getSourcePortStart() != null) {
             response.setStartPort(Integer.toString(aclItem.getSourcePortStart()));
-        }
-
-        if (aclItem.getSourcePortEnd() != null) {
-            response.setEndPort(Integer.toString(aclItem.getSourcePortEnd()));
         }
 
         response.setCidrList(StringUtils.join(aclItem.getSourceCidrList(), ","));

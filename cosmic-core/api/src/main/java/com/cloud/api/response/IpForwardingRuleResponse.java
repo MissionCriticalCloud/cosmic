@@ -39,10 +39,6 @@ public class IpForwardingRuleResponse extends BaseResponse {
     @Param(description = "the start port of the rule")
     private Integer startPort;
 
-    @SerializedName(ApiConstants.END_PORT)
-    @Param(description = "the end port of the rule")
-    private Integer endPort;
-
     @SerializedName(ApiConstants.STATE)
     @Param(description = "state of the ip forwarding rule")
     private String state;
@@ -109,14 +105,6 @@ public class IpForwardingRuleResponse extends BaseResponse {
 
     public void setStartPort(final Integer startPort) {
         this.startPort = startPort;
-    }
-
-    public Integer getEndPort() {
-        return endPort;
-    }
-
-    public void setEndPort(final Integer endPort) {
-        this.endPort = endPort;
     }
 
     public Long getPublicIpAddressId() {

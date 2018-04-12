@@ -660,24 +660,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_OPEN, eventDescription = "creating firewall rule", create = true)
-    public FirewallRule createRuleForAllCidrs(final long ipAddrId, final Account caller, final Integer startPort, final Integer endPort, final String protocol, final Integer
-            icmpCode, final Integer icmpType,
-                                              final Long relatedRuleId, final long networkId) throws NetworkRuleConflictException {
-
-        // If firwallRule for this port range already exists, return it
-        final List<FirewallRuleVO> rules = _firewallDao.listByIpPurposeAndProtocolAndNotRevoked(ipAddrId, startPort, endPort, protocol, Purpose.Firewall);
-        if (!rules.isEmpty()) {
-            return rules.get(0);
-        }
-
-        final List<String> oneCidr = new ArrayList<>();
-        oneCidr.add(NetUtils.ALL_IP4_CIDRS);
-        return createFirewallRule(ipAddrId, caller, null, startPort, endPort, protocol, oneCidr, icmpCode, icmpType, relatedRuleId, FirewallRule.FirewallRuleType.User,
-                networkId, FirewallRule.TrafficType.Ingress, true);
-    }
-
-    @Override
     @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_CLOSE, eventDescription = "revoking firewall rule", async = true)
     public boolean revokeAllFirewallRulesForNetwork(final long networkId, final long userId, final Account caller) throws ResourceUnavailableException {
         final List<FirewallRule> rules = new ArrayList<>();

@@ -29,7 +29,7 @@ public class ApiSerializerHelperTest {
     @Test
     public void testFromSerializedStringOtherSuccessResponse() {
         final String string = "com.cloud.api.response.NetworkACLItemResponse/networkacl/{\"id\":\"00000000-0000-0000-0000-000000000000\",\"protocol\":\"tcp\"," +
-                "\"startport\":\"22\",\"endport\":\"22\",\"traffictype\":\"Ingress\",\"state\":\"Active\",\"cidrlist\":\"10.1.0.0/16,10.2.0.0/16\"," +
+                "\"startport\":\"22\",\"traffictype\":\"Ingress\",\"state\":\"Active\",\"cidrlist\":\"10.1.0.0/16,10.2.0.0/16\"," +
                 "\"tags\":[],\"aclid\":\"00000000-0000-0000-0000-000000000000\",\"number\":1,\"action\":\"Allow\",\"fordisplay\":true}";
         final Object object = ApiSerializerHelper.fromSerializedString(string);
 
