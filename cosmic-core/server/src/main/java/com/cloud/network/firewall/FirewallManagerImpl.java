@@ -120,7 +120,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         final Account caller = CallContext.current().getCallingAccount();
         final Long sourceIpAddressId = rule.getSourceIpAddressId();
 
-        return createFirewallRule(sourceIpAddressId, caller, rule.getXid(), rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(),
+        return createFirewallRule(sourceIpAddressId, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(),
                 rule.getSourceCidrList(), rule.getIcmpCode(), rule.getIcmpType(), null, rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
     }
 
@@ -134,7 +134,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             throw new InvalidParameterValueException("Egress firewall rules are not supported for " + network.getGuestType() + "  networks");
         }
 
-        return createFirewallRule(null, caller, rule.getXid(), rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(), rule.getSourceCidrList(),
+        return createFirewallRule(null, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
                 rule.getIcmpCode(), rule.getIcmpType(), null, rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
     }
 
@@ -272,10 +272,9 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @DB
-    protected FirewallRule createFirewallRule(final Long ipAddrId, final Account caller, final String xId, final Integer portStart, final Integer portEnd,
-                                              final String protocol, final List<String> sourceCidrList, final Integer icmpCode, final Integer icmpType, final Long relatedRuleId,
-                                              final FirewallRule.FirewallRuleType type,
-                                              final Long networkId, final FirewallRule.TrafficType trafficType, final Boolean forDisplay) throws NetworkRuleConflictException {
+    protected FirewallRule createFirewallRule(final Long ipAddrId, final Account caller, final String xId, final Integer portStart, final String protocol, final List<String> sourceCidrList, final
+    Integer icmpCode, final Integer icmpType, final Long relatedRuleId, final FirewallRule.FirewallRuleType type, final Long networkId, final FirewallRule.TrafficType trafficType, final Boolean
+                                                      forDisplay) throws NetworkRuleConflictException {
 
         IPAddressVO ipAddress = null;
         if (ipAddrId != null) {
@@ -288,15 +287,15 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             _networkModel.checkIpForService(ipAddress, Service.Firewall, null);
         }
 
-        validateFirewallRule(caller, ipAddress, portStart, portEnd, protocol, Purpose.Firewall, type, networkId, trafficType);
+        validateFirewallRule(caller, ipAddress, portStart, protocol, Purpose.Firewall, type, networkId, trafficType);
 
         // icmp code and icmp type can't be passed in for any other protocol rather than icmp
         if (!protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO) && (icmpCode != null || icmpType != null)) {
             throw new InvalidParameterValueException("Can specify icmpCode and icmpType for ICMP protocol only");
         }
 
-        if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO) && (portStart != null || portEnd != null)) {
-            throw new InvalidParameterValueException("Can't specify start/end port when protocol is ICMP");
+        if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO) && (portStart != null)) {
+            throw new InvalidParameterValueException("Can't specify port when protocol is ICMP");
         }
 
         Long accountId = null;
@@ -319,8 +318,8 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             @Override
             public FirewallRuleVO doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                 FirewallRuleVO newRule =
-                        new FirewallRuleVO(xId, ipAddrId, portStart, portEnd, protocol.toLowerCase(), networkId, accountIdFinal, domainIdFinal, Purpose.Firewall,
-                                sourceCidrList, icmpCode, icmpType, relatedRuleId, trafficType);
+                        new FirewallRuleVO(xId, ipAddrId, portStart, protocol.toLowerCase(), networkId, accountIdFinal, domainIdFinal, Purpose.Firewall, sourceCidrList, icmpCode, icmpType,
+                                relatedRuleId, trafficType);
                 newRule.setType(type);
                 if (forDisplay != null) {
                     newRule.setDisplay(forDisplay);
@@ -407,31 +406,23 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
             }
 
             final boolean notNullPorts =
-                    (newRule.getSourcePortStart() != null && newRule.getSourcePortEnd() != null && rule.getSourcePortStart() != null && rule.getSourcePortEnd() != null);
+                    (newRule.getSourcePortStart() != null && rule.getSourcePortStart() != null);
             final boolean nullPorts =
-                    (newRule.getSourcePortStart() == null && newRule.getSourcePortEnd() == null && rule.getSourcePortStart() == null && rule.getSourcePortEnd() == null);
+                    (newRule.getSourcePortStart() == null && rule.getSourcePortStart() == null);
             if (nullPorts && duplicatedCidrs && (rule.getProtocol().equalsIgnoreCase(newRule.getProtocol())) && !newRule.getProtocol().equalsIgnoreCase(NetUtils.ICMP_PROTO)) {
                 throw new NetworkRuleConflictException("There is already a firewall rule specified with protocol = " + newRule.getProtocol() + " and no ports");
             }
             if (!notNullPorts) {
                 continue;
-            } else if (!oneOfRulesIsFirewall &&
-                    !(bothRulesFirewall && !duplicatedCidrs) &&
-                    ((rule.getSourcePortStart().intValue() <= newRule.getSourcePortStart().intValue() &&
-                            rule.getSourcePortEnd().intValue() >= newRule.getSourcePortStart().intValue()) ||
-                            (rule.getSourcePortStart().intValue() <= newRule.getSourcePortEnd().intValue() &&
-                                    rule.getSourcePortEnd().intValue() >= newRule.getSourcePortEnd().intValue()) ||
-                            (newRule.getSourcePortStart().intValue() <= rule.getSourcePortStart().intValue() &&
-                                    newRule.getSourcePortEnd().intValue() >= rule.getSourcePortStart().intValue()) ||
-                            (newRule.getSourcePortStart().intValue() <= rule.getSourcePortEnd().intValue() &&
-                                    newRule.getSourcePortEnd().intValue() >= rule.getSourcePortEnd().intValue()))) {
-
+            } else if (!oneOfRulesIsFirewall && !(bothRulesFirewall && !duplicatedCidrs) && (rule.getSourcePortStart() <= newRule.getSourcePortStart() ||
+                    newRule.getSourcePortStart() <= rule.getSourcePortStart()
+            )) {
                 // we allow port forwarding rules with the same parameters but different protocols
                 final boolean allowPf =
-                        (rule.getPurpose() == Purpose.PortForwarding && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol().equalsIgnoreCase(
-                                rule.getProtocol())) || (rule.getPurpose() == Purpose.Vpn && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol()
-                                                                                                                                                       .equalsIgnoreCase(
-                                                                                                                                                               rule.getProtocol()));
+                        (rule.getPurpose() == Purpose.PortForwarding && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()))
+                                ||
+                                (rule.getPurpose() == Purpose.Vpn && newRule.getPurpose() == Purpose.PortForwarding && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
+
                 final boolean allowStaticNat =
                         (rule.getPurpose() == Purpose.StaticNat
                                 && newRule.getPurpose() == Purpose.StaticNat
@@ -445,9 +436,9 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                         && newRule.getPurpose() == Purpose.Vpn
                         && !newRule.getProtocol().equalsIgnoreCase(rule.getProtocol()));
 
-                if (!(allowPf || allowStaticNat || oneOfRulesIsFirewall || allowVpnPf || allowVpnLb)) {
-                    throw new NetworkRuleConflictException("The range specified, " + newRule.getSourcePortStart() + "-" + newRule.getSourcePortEnd() +
-                            ", conflicts with rule " + rule.getId() + " which has " + rule.getSourcePortStart() + "-" + rule.getSourcePortEnd());
+                if (!(allowPf || allowStaticNat || allowVpnPf || allowVpnLb)) {
+                    throw new NetworkRuleConflictException("The new port specified, " + newRule.getSourcePortStart() + ", conflicts with rule " + rule.getId() + " which has " + rule
+                            .getSourcePortStart());
                 }
             }
         }
@@ -458,19 +449,11 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final Integer portEnd, final String proto, final Purpose
+    public void validateFirewallRule(final Account caller, final IPAddressVO ipAddress, final Integer portStart, final String proto, final Purpose
             purpose, final FirewallRuleType type,
                                      Long networkId, final FirewallRule.TrafficType trafficType) {
         if (portStart != null && !NetUtils.isValidPort(portStart)) {
             throw new InvalidParameterValueException("publicPort is an invalid value: " + portStart);
-        }
-        if (portEnd != null && !NetUtils.isValidPort(portEnd)) {
-            throw new InvalidParameterValueException("Public port range is an invalid value: " + portEnd);
-        }
-
-        // start port can't be bigger than end port
-        if (portStart != null && portEnd != null && portStart > portEnd) {
-            throw new InvalidParameterValueException("Start port can't be bigger than end port");
         }
 
         if (ipAddress == null && type == FirewallRuleType.System) {
@@ -755,7 +738,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                 if (rule.getSourceCidrList() == null && (rule.getPurpose() == Purpose.Firewall || rule.getPurpose() == Purpose.NetworkACL)) {
                     _firewallDao.loadSourceCidrs(rule);
                 }
-                createFirewallRule(ip.getId(), acct, rule.getXid(), rule.getSourcePortStart(), rule.getSourcePortEnd(), rule.getProtocol(), rule.getSourceCidrList(),
+                createFirewallRule(ip.getId(), acct, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
                         rule.getIcmpCode(), rule.getIcmpType(), rule.getRelated(), FirewallRuleType.System, rule.getNetworkId(), rule.getTrafficType(), true);
             } catch (final Exception e) {
                 s_logger.debug("Failed to add system wide firewall rule, due to:" + e.toString());
