@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
@@ -569,6 +570,7 @@ public class NiciraNvpResourceTest {
     }
 
     @Test
+    @Ignore
     public void testConfigurePortForwardingRulesOnLogicalRouter() throws ConfigurationException, NiciraNvpApiException {
         resource.configure("NiciraNvpResource", parameters);
         /*
@@ -655,6 +657,7 @@ public class NiciraNvpResourceTest {
     }
 
     @Test
+    @Ignore
     public void testConfigurePortForwardingRulesOnLogicalRouterRemoveRules() throws ConfigurationException, NiciraNvpApiException {
         resource.configure("NiciraNvpResource", parameters);
         /*
@@ -697,6 +700,7 @@ public class NiciraNvpResourceTest {
     }
 
     @Test
+    @Ignore
     public void testConfigurePortForwardingRulesOnLogicalRouterRollback() throws ConfigurationException, NiciraNvpApiException {
         resource.configure("NiciraNvpResource", parameters);
         /*
@@ -728,6 +732,7 @@ public class NiciraNvpResourceTest {
     }
 
     @Test
+    @Ignore
     public void testConfigurePortForwardingRulesOnLogicalRouterPortRange() throws ConfigurationException, NiciraNvpApiException {
         resource.configure("NiciraNvpResource", parameters);
         /*
