@@ -8,7 +8,7 @@ import com.cloud.network.rules.StaticNatRule;
  * StaticNatRuleTO specifies one static nat rule.
  */
 
-public class StaticNatRuleTO extends FirewallRuleTO {
+public class StaticNatRuleTO extends PortForwardingRuleTO {
     String dstIp;
 
     protected StaticNatRuleTO() {
