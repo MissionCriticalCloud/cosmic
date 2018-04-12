@@ -8,8 +8,6 @@ import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
@@ -43,8 +41,6 @@ public abstract class AbstractConfigItemFacade {
                 .disableHtmlEscaping()
                 .create();
 
-        flyweight.put(SetPortForwardingRulesVpcCommand.class, new SetPortForwardingRulesVpcConfigItem());
-        flyweight.put(SetPortForwardingRulesCommand.class, new SetPortForwardingRulesConfigItem());
         flyweight.put(SetStaticNatRulesCommand.class, new SetStaticNatRulesConfigItem());
         flyweight.put(LoadBalancerConfigCommand.class, new LoadBalancerConfigItem());
         flyweight.put(SavePasswordCommand.class, new SavePasswordConfigItem());
