@@ -335,6 +335,10 @@ cloudStack.docs = {
         desc: 'Allowed disk write rate in I/O requests per second',
         externalLink: ''
     },
+    helpDiskOfferingDiskIopsTotalRate: {
+        desc: 'Allowed disk total rate in I/O requests per second',
+        externalLink: ''
+    },
     helpDiskOfferingCustomDiskIops: {
         desc: 'If checked, the user can set Min and Max IOPS. If not checked, the root administrator can define such values.',
         externalLink: ''

@@ -39,7 +39,7 @@
                             indicator: {
                                 'Ready': 'on',
                                 'Migrating': 'transition',
-                                'Creating' : 'off',
+                                'Creating': 'off',
                                 'Expunging': 'off',
                                 'Allocated': 'warning'
                             }
@@ -743,7 +743,7 @@
                                                         }
                                                     }
                                                 },
-                                                dataProvider: function(args) {
+                                                dataProvider: function (args) {
                                                     var data = {
                                                         page: args.page,
                                                         pagesize: pageSize
@@ -752,7 +752,7 @@
                                                         data.keyword = args.filterBy.search.value;
                                                     }
                                                     $.ajax({
-                                                        url: createURL("listStoragePools&zoneid="+args.context.volumes[0].zoneid),
+                                                        url: createURL("listStoragePools&zoneid=" + args.context.volumes[0].zoneid),
                                                         dataType: "json",
                                                         async: true,
                                                         data: data,
@@ -1248,7 +1248,7 @@
                                                         label: 'label.storage.pool'
                                                     }
                                                 },
-                                                dataProvider: function(args) {
+                                                dataProvider: function (args) {
                                                     var data = {
                                                         page: args.page,
                                                         pagesize: pageSize
@@ -1526,6 +1526,16 @@
                                     } else {
                                         hiddenFields = ['storage', 'hypervisor'];
                                     }
+                                    if (typeof args.context.volumes[0].diskIopsTotalRate == 'undefined') {
+                                        hiddenFields.push('diskIopsTotalRate');
+                                    }
+                                    if (typeof args.context.volumes[0].diskIopsReadRate == 'undefined') {
+                                        hiddenFields.push('diskIopsReadRate');
+                                    }
+                                    if (typeof args.context.volumes[0].diskIopsWriteRate == 'undefined') {
+                                        hiddenFields.push('diskIopsWriteRate');
+                                    }
+
                                     return hiddenFields;
                                 },
 
@@ -1565,7 +1575,7 @@
                                     status: {
                                         label: 'label.status'
                                     },
-                                    diskofferingdisplaytext: {
+                                    serviceofferingname: {
                                         label: 'label.disk.offering'
                                     },
                                     type: {
@@ -1589,8 +1599,8 @@
                                                 return cloudStack.converters.convertBytes(args);
                                         }
                                     },
-                                    miniops: {
-                                        label: 'label.disk.iops.min',
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total',
                                         converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
@@ -1598,8 +1608,17 @@
                                                 return args;
                                         }
                                     },
-                                    maxiops: {
-                                        label: 'label.disk.iops.max',
+                                    diskIopsReadRate: {
+                                        label: 'label.disk.iops.read.rate',
+                                        converter: function (args) {
+                                            if (args == null || args == 0)
+                                                return "";
+                                            else
+                                                return args;
+                                        }
+                                    },
+                                    diskIopsWriteRate: {
+                                        label: 'label.disk.iops.write.rate',
                                         converter: function (args) {
                                             if (args == null || args == 0)
                                                 return "";
@@ -2173,7 +2192,7 @@
                         },
                         domainid: {
                             label: 'label.domain',
-                            select: function(args) {
+                            select: function (args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
                                         url: createURL('listDomains'),
@@ -2181,7 +2200,7 @@
                                             listAll: true,
                                             details: 'min'
                                         },
-                                        success: function(json) {
+                                        success: function (json) {
                                             var array1 = [{
                                                 id: '',
                                                 description: ''
@@ -2195,7 +2214,7 @@
                                                     });
                                                 }
                                             }
-                                            array1.sort(function(a, b) {
+                                            array1.sort(function (a, b) {
                                                 return a.description.localeCompare(b.description);
                                             });
                                             args.response.success({
@@ -2209,13 +2228,13 @@
                                     });
                                 }
                             },
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 return !(isAdmin() || isDomainAdmin());
                             }
                         },
                         account: {
                             label: 'label.account',
-                            isHidden: function(args) {
+                            isHidden: function (args) {
                                 return !(isAdmin() || isDomainAdmin());
                             }
                         },
@@ -2226,7 +2245,7 @@
                             label: 'label.tag.value'
                         }
                     },
-                    dataProvider: function(args) {
+                    dataProvider: function (args) {
                         var data = {};
                         listViewDataProvider(args, data);
 
@@ -2242,7 +2261,7 @@
                             data: data,
                             dataType: "json",
                             async: true,
-                            success: function(json) {
+                            success: function (json) {
                                 var jsonObj;
                                 jsonObj = json.listvmsnapshotresponse.vmSnapshot;
                                 args.response.success({
@@ -2301,12 +2320,12 @@
                                         converter: cloudStack.converters.toLocalDate
                                     }
                                 },
-                                dataProvider: function(args) {
+                                dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL("listVMSnapshot&listAll=true&vmsnapshotid=" + args.context.vmsnapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jsonObj;
                                             jsonObj = json.listvmsnapshotresponse.vmSnapshot[0];
                                             args.response.success({
@@ -2327,19 +2346,19 @@
                             remove: {
                                 label: 'label.action.vmsnapshot.delete',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'message.action.vmsnapshot.delete';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'label.action.vmsnapshot.delete';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("deleteVMSnapshot&vmsnapshotid=" + args.context.vmsnapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.deletevmsnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -2356,19 +2375,19 @@
                             revertToVMSnapshot: {
                                 label: 'label.action.vmsnapshot.revert',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'label.action.vmsnapshot.revert';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'message.action.vmsnapshot.revert';
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     $.ajax({
                                         url: createURL("revertToVMSnapshot&vmsnapshotid=" + args.context.vmsnapshots[0].id),
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.reverttovmsnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -2385,10 +2404,10 @@
                             takeSnapshot: {
                                 label: 'Create Snapshot From VM Snapshot',
                                 messages: {
-                                    confirm: function(args) {
+                                    confirm: function (args) {
                                         return 'Please confirm that you want to create a volume snapshot from the vm snapshot.';
                                     },
-                                    notification: function(args) {
+                                    notification: function (args) {
                                         return 'Volume snapshot is created from vm snapshot';
                                     }
                                 },
@@ -2404,15 +2423,15 @@
                                             validation: {
                                                 required: true
                                             },
-                                            select: function(args) {
+                                            select: function (args) {
                                                 $.ajax({
                                                     url: createURL("listVolumes&virtualMachineId=" + args.context.vmsnapshots[0].virtualmachineid),
                                                     dataType: "json",
                                                     async: true,
-                                                    success: function(json) {
+                                                    success: function (json) {
                                                         var volumes = json.listvolumesresponse.volume;
                                                         var items = [];
-                                                        $(volumes).each(function() {
+                                                        $(volumes).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.name
@@ -2428,7 +2447,7 @@
                                         }
                                     }
                                 },
-                                action: function(args) {
+                                action: function (args) {
                                     var data = {
                                         volumeid: args.data.volume,
                                         vmsnapshotid: args.context.vmsnapshots[0].id
@@ -2443,7 +2462,7 @@
                                         data: data,
                                         dataType: "json",
                                         async: true,
-                                        success: function(json) {
+                                        success: function (json) {
                                             var jid = json.createsnapshotfromvmsnapshotresponse.jobid;
                                             args.response.success({
                                                 _custom: {
@@ -2552,7 +2571,7 @@
         return allowedActions;
     };
 
-    var vmSnapshotActionfilter = cloudStack.actionFilter.vmSnapshotActionfilter = function(args) {
+    var vmSnapshotActionfilter = cloudStack.actionFilter.vmSnapshotActionfilter = function (args) {
         var jsonObj = args.context.item;
 
         if (jsonObj.state == 'Error') {
