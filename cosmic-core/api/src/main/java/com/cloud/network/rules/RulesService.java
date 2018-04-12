@@ -11,9 +11,6 @@ import com.cloud.utils.net.Ip;
 import java.util.List;
 
 public interface RulesService {
-    Pair<List<? extends FirewallRule>, Integer> searchStaticNatRules(Long ipId, Long id, Long vmId, Long start, Long size, String accountName, Long domainId,
-                                                                     Long projectId, boolean isRecursive, boolean listAll);
-
     /**
      * Creates a port forwarding rule between two ip addresses or between
      * an ip address and a virtual machine.
@@ -45,12 +42,6 @@ public interface RulesService {
     boolean applyPortForwardingRules(long ipAdddressId, Account caller) throws ResourceUnavailableException;
 
     boolean enableStaticNat(long ipAddressId, long vmId, long networkId, String vmGuestIp) throws NetworkRuleConflictException, ResourceUnavailableException;
-
-    StaticNatRule createStaticNatRule(StaticNatRule rule) throws NetworkRuleConflictException;
-
-    boolean revokeStaticNatRule(long ruleId, boolean apply);
-
-    boolean applyStaticNatRules(long ipAdddressId, Account caller) throws ResourceUnavailableException;
 
     StaticNatRule buildStaticNatRule(FirewallRule rule, boolean forRevoke);
 
