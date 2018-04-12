@@ -37,7 +37,7 @@ public class PortForwardingRuleVO extends FirewallRuleVO implements PortForwardi
 
     public PortForwardingRuleVO(final String xId, final long srcIpId, final int srcPortStart, final Ip dstIp, final int dstPortStart, final String protocol, final long networkId, final long
             accountId, final long domainId, final long instanceId) {
-        super(xId, srcIpId, srcPortStart, protocol, networkId, accountId, domainId, Purpose.PortForwarding, null, null, null, null, null);
+        super(xId, srcIpId, srcPortStart, protocol, networkId, accountId, domainId, Purpose.PortForwarding, null, null, null, null);
         this.destinationIpAddress = dstIp;
         this.virtualMachineId = instanceId;
         this.destinationPortStart = dstPortStart;
