@@ -1,9 +1,6 @@
 package com.cloud.network.firewall;
 
 import com.cloud.configuration.Config;
-import com.cloud.context.CallContext;
-import com.cloud.event.ActionEvent;
-import com.cloud.event.EventTypes;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -19,7 +16,6 @@ import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.element.FirewallServiceProvider;
 import com.cloud.network.element.NetworkACLServiceProvider;
 import com.cloud.network.element.PortForwardingServiceProvider;
@@ -31,7 +27,6 @@ import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -41,22 +36,18 @@ import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
-import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,232 +103,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     public boolean start() {
         s_logger.info("Firewall provider list is " + _firewallElements.iterator().next());
         return super.start();
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_OPEN, eventDescription = "creating firewall rule", create = true)
-    public FirewallRule createIngressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
-        final Account caller = CallContext.current().getCallingAccount();
-        final Long sourceIpAddressId = rule.getSourceIpAddressId();
-
-        return createFirewallRule(sourceIpAddressId, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(),
-                rule.getSourceCidrList(), rule.getIcmpCode(), rule.getIcmpType(), rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_EGRESS_OPEN, eventDescription = "creating egress firewall rule for network", create = true)
-    public FirewallRule createEgressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
-        final Account caller = CallContext.current().getCallingAccount();
-
-        final Network network = _networkDao.findById(rule.getNetworkId());
-        if (network.getGuestType() == Network.GuestType.Shared) {
-            throw new InvalidParameterValueException("Egress firewall rules are not supported for " + network.getGuestType() + "  networks");
-        }
-
-        return createFirewallRule(null, caller, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
-                rule.getIcmpCode(), rule.getIcmpType(), rule.getType(), rule.getNetworkId(), rule.getTrafficType(), rule.isDisplay());
-    }
-
-    @Override
-    public boolean revokeIngressFirewallRule(final long ruleId, final boolean apply) {
-        final Account caller = CallContext.current().getCallingAccount();
-        final long userId = CallContext.current().getCallingUserId();
-        return revokeFirewallRule(ruleId, apply, caller, userId);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_EGRESS_CLOSE, eventDescription = "revoking egress firewall rule", async = true)
-    public boolean revokeEgressFirewallRule(final long ruleId, final boolean apply) {
-        final Account caller = CallContext.current().getCallingAccount();
-        final long userId = CallContext.current().getCallingUserId();
-        return revokeFirewallRule(ruleId, apply, caller, userId);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_EGRESS_OPEN, eventDescription = "creating egress firewall rule", async = true)
-    public boolean applyEgressFirewallRules(final FirewallRule rule, final Account caller) throws ResourceUnavailableException {
-        final List<FirewallRuleVO> rules = _firewallDao.listByNetworkPurposeTrafficType(rule.getNetworkId(), Purpose.Firewall, FirewallRule.TrafficType.Egress);
-        return applyFirewallRules(rules, false, caller);
-    }
-
-    @Override
-    public boolean applyIngressFirewallRules(final long ipId, final Account caller) throws ResourceUnavailableException {
-        final List<FirewallRuleVO> rules = _firewallDao.listByIpAndPurpose(ipId, Purpose.Firewall);
-        return applyFirewallRules(rules, false, caller);
-    }
-
-    @Override
-    public FirewallRule getFirewallRule(final long ruleId) {
-        return _firewallDao.findById(ruleId);
-    }
-
-    @Override
-    public boolean revokeRelatedFirewallRule(final long ruleId, final boolean apply) {
-        final FirewallRule fwRule = _firewallDao.findByRelatedId(ruleId);
-
-        if (fwRule == null) {
-            s_logger.trace("No related firewall rule exists for rule id=" + ruleId + " so returning true here");
-            return true;
-        }
-
-        s_logger.debug("Revoking Firewall rule id=" + fwRule.getId() + " as a part of rule delete id=" + ruleId + " with apply=" + apply);
-        return revokeIngressFirewallRule(fwRule.getId(), apply);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_UPDATE, eventDescription = "updating firewall rule", async = true)
-    public FirewallRule updateIngressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
-        final Account caller = CallContext.current().getCallingAccount();
-        return updateFirewallRule(ruleId, customId, caller, forDisplay);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_EGRESS_UPDATE, eventDescription = "updating egress firewall rule", async = true)
-    public FirewallRule updateEgressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
-        final Account caller = CallContext.current().getCallingAccount();
-        return updateFirewallRule(ruleId, customId, caller, forDisplay);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_OPEN, eventDescription = "creating firewall rule", async = true)
-    public boolean applyIngressFwRules(final long ipId, final Account caller) throws ResourceUnavailableException {
-        return applyIngressFirewallRules(ipId, caller);
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_CLOSE, eventDescription = "revoking firewall rule", async = true)
-    public boolean revokeIngressFwRule(final long ruleId, final boolean apply) {
-        return revokeIngressFirewallRule(ruleId, apply);
-    }
-
-    protected FirewallRule updateFirewallRule(final long ruleId, final String customId, final Account caller, final Boolean forDisplay) {
-        final FirewallRuleVO rule = _firewallDao.findById(ruleId);
-        if (rule == null || rule.getPurpose() != Purpose.Firewall) {
-            throw new InvalidParameterValueException("Unable to find " + ruleId + " having purpose " + Purpose.Firewall);
-        }
-
-        if (rule.getType() == FirewallRuleType.System && caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
-            throw new InvalidParameterValueException("Only root admin can update the system wide firewall rule");
-        }
-
-        _accountMgr.checkAccess(caller, null, true, rule);
-
-        if (customId != null) {
-            rule.setUuid(customId);
-        }
-
-        if (forDisplay != null) {
-            rule.setDisplay(forDisplay);
-        }
-
-        _firewallDao.update(ruleId, rule);
-
-        return _firewallDao.findById(ruleId);
-    }
-
-    protected boolean revokeFirewallRule(final long ruleId, final boolean apply, final Account caller, final long userId) {
-
-        final FirewallRuleVO rule = _firewallDao.findById(ruleId);
-        if (rule == null || rule.getPurpose() != Purpose.Firewall) {
-            throw new InvalidParameterValueException("Unable to find " + ruleId + " having purpose " + Purpose.Firewall);
-        }
-
-        if (rule.getType() == FirewallRuleType.System && !_accountMgr.isRootAdmin(caller.getId())) {
-            throw new InvalidParameterValueException("Only root admin can delete the system wide firewall rule");
-        }
-
-        _accountMgr.checkAccess(caller, null, true, rule);
-
-        revokeRule(rule, caller, userId, false);
-
-        boolean success = false;
-        final Long networkId = rule.getNetworkId();
-
-        if (apply) {
-            // ingress firewall rule
-            if (rule.getSourceIpAddressId() != null) {
-                //feteches ingress firewall, ingress firewall rules associated with the ip
-                final List<FirewallRuleVO> rules = _firewallDao.listByIpAndPurpose(rule.getSourceIpAddressId(), Purpose.Firewall);
-                return applyFirewallRules(rules, false, caller);
-                //egress firewall rule
-            } else if (networkId != null) {
-                final List<FirewallRuleVO> rules = _firewallDao.listByNetworkPurposeTrafficType(rule.getNetworkId(), Purpose.Firewall, FirewallRule.TrafficType.Egress);
-                return applyFirewallRules(rules, false, caller);
-            }
-        } else {
-            success = true;
-        }
-
-        return success;
-    }
-
-    @DB
-    protected FirewallRule createFirewallRule(final Long ipAddrId, final Account caller, final String xId, final Integer portStart, final String protocol, final List<String> sourceCidrList, final
-    Integer icmpCode, final Integer icmpType, final FirewallRule.FirewallRuleType type, final Long networkId, final FirewallRule.TrafficType trafficType, final Boolean
-                                                      forDisplay) throws NetworkRuleConflictException {
-
-        IPAddressVO ipAddress = null;
-        if (ipAddrId != null) {
-            // this for ingress firewall rule, for egress id is null
-            ipAddress = _ipAddressDao.findById(ipAddrId);
-            // Validate ip address
-            if (ipAddress == null && type == FirewallRule.FirewallRuleType.User) {
-                throw new InvalidParameterValueException("Unable to create firewall rule; " + "couldn't locate IP address by id in the system");
-            }
-            _networkModel.checkIpForService(ipAddress, Service.Firewall, null);
-        }
-
-        validateFirewallRule(caller, ipAddress, portStart, protocol, Purpose.Firewall, type, networkId, trafficType);
-
-        // icmp code and icmp type can't be passed in for any other protocol rather than icmp
-        if (!protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO) && (icmpCode != null || icmpType != null)) {
-            throw new InvalidParameterValueException("Can specify icmpCode and icmpType for ICMP protocol only");
-        }
-
-        if (protocol.equalsIgnoreCase(NetUtils.ICMP_PROTO) && (portStart != null)) {
-            throw new InvalidParameterValueException("Can't specify port when protocol is ICMP");
-        }
-
-        Long accountId = null;
-        Long domainId = null;
-
-        if (ipAddress != null) {
-            //Ingress firewall rule
-            accountId = ipAddress.getAllocatedToAccountId();
-            domainId = ipAddress.getAllocatedInDomainId();
-        } else if (networkId != null) {
-            //egress firewall rule
-            final Network network = _networkModel.getNetwork(networkId);
-            accountId = network.getAccountId();
-            domainId = network.getDomainId();
-        }
-
-        final Long accountIdFinal = accountId;
-        final Long domainIdFinal = domainId;
-        return Transaction.execute(new TransactionCallbackWithException<FirewallRuleVO, NetworkRuleConflictException>() {
-            @Override
-            public FirewallRuleVO doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
-                FirewallRuleVO newRule =
-                        new FirewallRuleVO(xId, ipAddrId, portStart, protocol.toLowerCase(), networkId, accountIdFinal, domainIdFinal, Purpose.Firewall, sourceCidrList, icmpCode, icmpType,
-                                trafficType);
-                newRule.setType(type);
-                if (forDisplay != null) {
-                    newRule.setDisplay(forDisplay);
-                }
-                newRule = _firewallDao.persist(newRule);
-
-                if (type == FirewallRuleType.User) {
-                    detectRulesConflict(newRule);
-                }
-
-                if (!_firewallDao.setStateToAdd(newRule)) {
-                    throw new CloudRuntimeException("Unable to update the state to add for " + newRule);
-                }
-                CallContext.current().setEventDetails("Rule Id: " + newRule.getId());
-
-                return newRule;
-            }
-        });
     }
 
     @Override
@@ -558,35 +323,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    public boolean applyFirewallRules(final List<FirewallRuleVO> rules, final boolean continueOnError, final Account caller) {
-
-        if (rules.size() == 0) {
-            s_logger.debug("There are no firewall rules to apply");
-            return true;
-        }
-
-        for (final FirewallRuleVO rule : rules) {
-            // load cidrs if any
-            rule.setSourceCidrList(_firewallCidrsDao.getSourceCidrs(rule.getId()));
-        }
-
-        if (caller != null) {
-            _accountMgr.checkAccess(caller, null, true, rules.toArray(new FirewallRuleVO[rules.size()]));
-        }
-
-        try {
-            if (!applyRules(rules, continueOnError, true)) {
-                return false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to apply firewall rules due to : " + ex.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     @DB
     public void revokeRule(final FirewallRuleVO rule, final Account caller, final long userId, final boolean needUsageEvent) {
         if (caller != null) {
@@ -611,173 +347,10 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
     }
 
     @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_CLOSE, eventDescription = "revoking firewall rule", async = true)
-    public boolean revokeFirewallRulesForIp(final long ipId, final long userId, final Account caller) throws ResourceUnavailableException {
-        final List<FirewallRule> rules = new ArrayList<>();
-
-        final List<FirewallRuleVO> fwRules = _firewallDao.listByIpAndPurposeAndNotRevoked(ipId, Purpose.Firewall);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Releasing " + fwRules.size() + " firewall rules for ip id=" + ipId);
-        }
-
-        for (final FirewallRuleVO rule : fwRules) {
-            // Mark all Firewall rules as Revoke, but don't revoke them yet - we have to revoke all rules for ip, no
-            // need to send them one by one
-            revokeFirewallRule(rule.getId(), false, caller, Account.ACCOUNT_ID_SYSTEM);
-        }
-
-        // now send everything to the backend
-        final List<FirewallRuleVO> rulesToApply = _firewallDao.listByIpAndPurpose(ipId, Purpose.Firewall);
-        applyFirewallRules(rulesToApply, true, caller);
-
-        // Now we check again in case more rules have been inserted.
-        rules.addAll(_firewallDao.listByIpAndPurposeAndNotRevoked(ipId, Purpose.Firewall));
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Successfully released firewall rules for ip id=" + ipId + " and # of rules now = " + rules.size());
-        }
-
-        return rules.size() == 0;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_CLOSE, eventDescription = "revoking firewall rule", async = true)
-    public boolean revokeAllFirewallRulesForNetwork(final long networkId, final long userId, final Account caller) throws ResourceUnavailableException {
-        final List<FirewallRule> rules = new ArrayList<>();
-
-        final List<FirewallRuleVO> fwRules = _firewallDao.listByNetworkAndPurposeAndNotRevoked(networkId, Purpose.Firewall);
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Releasing " + fwRules.size() + " firewall rules for network id=" + networkId);
-        }
-
-        for (final FirewallRuleVO rule : fwRules) {
-            // Mark all Firewall rules as Revoke, but don't revoke them yet - we have to revoke all rules for ip, no
-            // need to send them one by one
-            revokeFirewallRule(rule.getId(), false, caller, Account.ACCOUNT_ID_SYSTEM);
-        }
-
-        // now send everything to the backend
-        final List<FirewallRuleVO> rulesToApply = _firewallDao.listByNetworkAndPurpose(networkId, Purpose.Firewall);
-        final boolean success = applyFirewallRules(rulesToApply, true, caller);
-
-        // Now we check again in case more rules have been inserted.
-        rules.addAll(_firewallDao.listByNetworkAndPurposeAndNotRevoked(networkId, Purpose.Firewall));
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Successfully released firewall rules for network id=" + networkId + " and # of rules now = " + rules.size());
-        }
-
-        return success && rules.size() == 0;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_CLOSE, eventDescription = "revoking firewall rule", async = true)
-    public boolean revokeFirewallRulesForVm(final long vmId) {
-        boolean success = true;
-        final UserVmVO vm = _vmDao.findByIdIncludingRemoved(vmId);
-        if (vm == null) {
-            return false;
-        }
-
-        final List<PortForwardingRuleVO> pfRules = _pfRulesDao.listByVm(vmId);
-        final List<FirewallRuleVO> staticNatRules = _firewallDao.listStaticNatByVmId(vm.getId());
-        final List<FirewallRuleVO> firewallRules = new ArrayList<>();
-
-        // Make a list of firewall rules to reprogram
-        for (final PortForwardingRuleVO pfRule : pfRules) {
-            final FirewallRuleVO relatedRule = _firewallDao.findByRelatedId(pfRule.getId());
-            if (relatedRule != null) {
-                firewallRules.add(relatedRule);
-            }
-        }
-
-        for (final FirewallRuleVO staticNatRule : staticNatRules) {
-            final FirewallRuleVO relatedRule = _firewallDao.findByRelatedId(staticNatRule.getId());
-            if (relatedRule != null) {
-                firewallRules.add(relatedRule);
-            }
-        }
-
-        final Set<Long> ipsToReprogram = new HashSet<>();
-
-        if (firewallRules.isEmpty()) {
-            s_logger.debug("No firewall rules are found for vm id=" + vmId);
-            return true;
-        } else {
-            s_logger.debug("Found " + firewallRules.size() + " to cleanup for vm id=" + vmId);
-        }
-
-        for (final FirewallRuleVO rule : firewallRules) {
-            // Mark firewall rules as Revoked, but don't revoke it yet (apply=false)
-            revokeFirewallRule(rule.getId(), false, _accountMgr.getSystemAccount(), Account.ACCOUNT_ID_SYSTEM);
-            ipsToReprogram.add(rule.getSourceIpAddressId());
-        }
-
-        // apply rules for all ip addresses
-        for (final Long ipId : ipsToReprogram) {
-            s_logger.debug("Applying firewall rules for ip address id=" + ipId + " as a part of vm expunge");
-            try {
-                success = success && applyIngressFirewallRules(ipId, _accountMgr.getSystemAccount());
-            } catch (final ResourceUnavailableException ex) {
-                s_logger.warn("Failed to apply port forwarding rules for ip id=" + ipId);
-                success = false;
-            }
-        }
-
-        return success;
-    }
-
-    @Override
-    @ActionEvent(eventType = EventTypes.EVENT_FIREWALL_OPEN, eventDescription = "creating firewall rule", create = true)
-    public boolean addSystemFirewallRules(final IPAddressVO ip, final Account acct) {
-        final List<FirewallRuleVO> systemRules = _firewallDao.listSystemRules();
-        for (final FirewallRuleVO rule : systemRules) {
-            try {
-                if (rule.getSourceCidrList() == null && (rule.getPurpose() == Purpose.Firewall || rule.getPurpose() == Purpose.NetworkACL)) {
-                    _firewallDao.loadSourceCidrs(rule);
-                }
-                createFirewallRule(ip.getId(), acct, rule.getXid(), rule.getSourcePortStart(), rule.getProtocol(), rule.getSourceCidrList(),
-                        rule.getIcmpCode(), rule.getIcmpType(), FirewallRuleType.System, rule.getNetworkId(), rule.getTrafficType(), true);
-            } catch (final Exception e) {
-                s_logger.debug("Failed to add system wide firewall rule, due to:" + e.toString());
-            }
-        }
-        return true;
-    }
-
-    @Override
     public void removeRule(final FirewallRule rule) {
 
         //remove the rule
         _firewallDao.remove(rule.getId());
-    }
-
-    @Override
-    public boolean applyDefaultEgressFirewallRule(final Long networkId, final boolean defaultPolicy, final boolean add) throws ResourceUnavailableException {
-
-        s_logger.debug("applying default firewall egress rules ");
-
-        final NetworkVO network = _networkDao.findById(networkId);
-        final List<String> sourceCidr = new ArrayList<>();
-
-        sourceCidr.add(NetUtils.ALL_IP4_CIDRS);
-        final FirewallRuleVO ruleVO =
-                new FirewallRuleVO(null, null, null, "all", networkId, network.getAccountId(), network.getDomainId(), Purpose.Firewall, sourceCidr, null, null, FirewallRule.TrafficType.Egress,
-                        FirewallRuleType.System);
-        ruleVO.setState(add ? State.Add : State.Revoke);
-        final List<FirewallRuleVO> rules = new ArrayList<>();
-        rules.add(ruleVO);
-
-        try {
-            //this is not required to store in db because we don't to add this rule along with the normal rules
-            if (!applyRules(rules, false, false)) {
-                return false;
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to apply default egress rules for guest network due to ", ex);
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -786,19 +359,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         switch (purpose) {
             /* StaticNatRule would be applied by Firewall provider, since the incompatible of two object */
             case StaticNat:
-            case Firewall:
-                for (final FirewallServiceProvider fwElement : _firewallElements) {
-                    final Network.Provider provider = fwElement.getProvider();
-                    final boolean isFwProvider = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Firewall, provider);
-                    if (!isFwProvider) {
-                        continue;
-                    }
-                    handled = fwElement.applyFWRules(network, rules);
-                    if (handled) {
-                        break;
-                    }
-                }
-                break;
             case PortForwarding:
                 for (final PortForwardingServiceProvider element : _pfElements) {
                     final Network.Provider provider = element.getProvider();
@@ -812,18 +372,6 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
                     }
                 }
                 break;
-            /*        case NetworkACL:
-            for (NetworkACLServiceProvider element: _networkAclElements) {
-                Network.Provider provider = element.getProvider();
-                boolean  isAclProvider = _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.NetworkACL, provider);
-                if (!isAclProvider) {
-                    continue;
-                }
-                handled = element.applyNetworkACLs(network, rules);
-                if (handled)
-                    break;
-            }
-            break;*/
             default:
                 assert (false) : "Unexpected fall through in applying rules to the network elements";
                 s_logger.error("FirewallManager cannot process rules of type " + purpose);

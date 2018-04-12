@@ -61,115 +61,14 @@ public class MockFirewallManagerImpl extends ManagerBase implements FirewallMana
     }
 
     @Override
-    public boolean applyFirewallRules(final List<FirewallRuleVO> rules, final boolean continueOnError, final Account caller) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public void revokeRule(final FirewallRuleVO rule, final Account caller, final long userId, final boolean needUsageEvent) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean revokeFirewallRulesForIp(final long ipId, final long userId, final Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean revokeAllFirewallRulesForNetwork(final long networkId, final long userId, final Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean revokeFirewallRulesForVm(final long vmId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean addSystemFirewallRules(final IPAddressVO ip, final Account acct) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public void removeRule(final FirewallRule rule) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean applyDefaultEgressFirewallRule(final Long networkId, final boolean defaultPolicy, final boolean add) throws ResourceUnavailableException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public FirewallRule createIngressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public FirewallRule createEgressFirewallRule(final FirewallRule rule) throws NetworkRuleConflictException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean revokeIngressFirewallRule(final long ruleId, final boolean apply) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean revokeEgressFirewallRule(final long ruleId, final boolean apply) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean applyEgressFirewallRules(final FirewallRule rule, final Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean applyIngressFirewallRules(final long ipId, final Account caller) throws ResourceUnavailableException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public FirewallRule getFirewallRule(final long ruleId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean revokeRelatedFirewallRule(final long ruleId, final boolean apply) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public FirewallRule updateIngressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public FirewallRule updateEgressFirewallRule(final long ruleId, final String customId, final Boolean forDisplay) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean applyIngressFwRules(final long ipId, final Account caller) throws ResourceUnavailableException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean revokeIngressFwRule(final long ruleId, final boolean apply) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

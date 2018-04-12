@@ -21,7 +21,8 @@ import com.cloud.utils.exception.InvalidParameterValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deletePortForwardingRule", group = APICommandGroup.FirewallService, description = "Deletes a port forwarding rule", responseObject = SuccessResponse.class, entityType = {PortForwardingRule.class},
+@APICommand(name = "deletePortForwardingRule", group = APICommandGroup.FirewallService, description = "Deletes a port forwarding rule", responseObject = SuccessResponse.class, entityType =
+        {PortForwardingRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeletePortForwardingRuleCmd.class.getName());
@@ -80,8 +81,7 @@ public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
     public void execute() {
         CallContext.current().setEventDetails("Rule ID: " + id);
         //revoke corresponding firewall rule first
-        boolean result = _firewallService.revokeRelatedFirewallRule(id, true);
-        result = result && _rulesService.revokePortForwardingRule(id, true);
+        boolean result = _rulesService.revokePortForwardingRule(id, true);
 
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());

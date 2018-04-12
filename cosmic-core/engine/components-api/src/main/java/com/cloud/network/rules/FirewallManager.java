@@ -31,22 +31,7 @@ public interface FirewallManager extends FirewallService {
 
     boolean applyRules(List<? extends FirewallRule> rules, boolean continueOnError, boolean updateRulesInDB) throws ResourceUnavailableException;
 
-    boolean applyFirewallRules(List<FirewallRuleVO> rules, boolean continueOnError, Account caller);
-
     void revokeRule(FirewallRuleVO rule, Account caller, long userId, boolean needUsageEvent);
 
-    boolean revokeFirewallRulesForIp(long ipId, long userId, Account caller) throws ResourceUnavailableException;
-
-    boolean revokeAllFirewallRulesForNetwork(long networkId, long userId, Account caller) throws ResourceUnavailableException;
-
-    boolean revokeFirewallRulesForVm(long vmId);
-
-    boolean addSystemFirewallRules(IPAddressVO ip, Account acct);
-
-    /**
-     * @param rule
-     */
     void removeRule(FirewallRule rule);
-
-    boolean applyDefaultEgressFirewallRule(Long networkId, boolean defaultPolicy, boolean add) throws ResourceUnavailableException;
 }

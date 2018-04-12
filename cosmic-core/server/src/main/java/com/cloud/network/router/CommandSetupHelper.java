@@ -6,11 +6,9 @@ import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
-import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
 import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.agent.api.to.LoadBalancerTO;
 import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.api.to.NicTO;
@@ -34,7 +32,6 @@ import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpnUser;
-import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -52,8 +49,6 @@ import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatRule;
@@ -67,7 +62,6 @@ import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.dao.StaticRouteDao;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -112,8 +106,6 @@ public class CommandSetupHelper {
     private NetworkModel _networkModel;
     @Inject
     private VirtualMachineManager _itMgr;
-    @Inject
-    private FirewallRulesDao _rulesDao;
     @Inject
     private NetworkOfferingDao _networkOfferingDao;
     @Inject
@@ -240,90 +232,6 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         final Zone zone = zoneRepository.findOne(router.getDataCenterId());
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        cmds.addCommand(cmd);
-    }
-
-    public void createApplyFirewallRulesCommands(final List<? extends FirewallRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<FirewallRuleTO> rulesTO = new ArrayList<>();
-        String systemRule = null;
-        Boolean defaultEgressPolicy = false;
-        if (rules != null) {
-            if (rules.size() > 0) {
-                if (rules.get(0).getTrafficType() == FirewallRule.TrafficType.Egress && rules.get(0).getType() == FirewallRule.FirewallRuleType.System) {
-                    systemRule = String.valueOf(FirewallRule.FirewallRuleType.System);
-                }
-            }
-            for (final FirewallRule rule : rules) {
-                _rulesDao.loadSourceCidrs((FirewallRuleVO) rule);
-                final FirewallRule.TrafficType traffictype = rule.getTrafficType();
-                if (traffictype == FirewallRule.TrafficType.Ingress) {
-                    final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, sourceIp.getAddress().addr(), Purpose.Firewall, traffictype);
-                    rulesTO.add(ruleTO);
-                } else if (rule.getTrafficType() == FirewallRule.TrafficType.Egress) {
-                    final NetworkVO network = _networkDao.findById(guestNetworkId);
-                    final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-                    defaultEgressPolicy = offering.getEgressDefaultPolicy();
-                    assert rule.getSourceIpAddressId() == null : "ipAddressId should be null for egress firewall rule. ";
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, "", Purpose.Firewall, traffictype, defaultEgressPolicy);
-                    rulesTO.add(ruleTO);
-                }
-            }
-        }
-
-        final SetFirewallRulesCommand cmd = new SetFirewallRulesCommand(rulesTO);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        if (systemRule != null) {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, systemRule);
-        } else {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, String.valueOf(defaultEgressPolicy));
-        }
-
-        cmds.addCommand(cmd);
-    }
-
-    public void createFirewallRulesCommands(final List<? extends FirewallRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
-        final List<FirewallRuleTO> rulesTO = new ArrayList<>();
-        String systemRule = null;
-        Boolean defaultEgressPolicy = false;
-        if (rules != null) {
-            if (rules.size() > 0) {
-                if (rules.get(0).getTrafficType() == FirewallRule.TrafficType.Egress && rules.get(0).getType() == FirewallRule.FirewallRuleType.System) {
-                    systemRule = String.valueOf(FirewallRule.FirewallRuleType.System);
-                }
-            }
-            for (final FirewallRule rule : rules) {
-                _rulesDao.loadSourceCidrs((FirewallRuleVO) rule);
-                final FirewallRule.TrafficType traffictype = rule.getTrafficType();
-                if (traffictype == FirewallRule.TrafficType.Ingress) {
-                    final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, sourceIp.getAddress().addr(), Purpose.Firewall, traffictype);
-                    rulesTO.add(ruleTO);
-                } else if (rule.getTrafficType() == FirewallRule.TrafficType.Egress) {
-                    final NetworkVO network = _networkDao.findById(guestNetworkId);
-                    final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-                    defaultEgressPolicy = offering.getEgressDefaultPolicy();
-                    assert rule.getSourceIpAddressId() == null : "ipAddressId should be null for egress firewall rule. ";
-                    final FirewallRuleTO ruleTO = new FirewallRuleTO(rule, null, "", Purpose.Firewall, traffictype, defaultEgressPolicy);
-                    rulesTO.add(ruleTO);
-                }
-            }
-        }
-
-        final SetFirewallRulesCommand cmd = new SetFirewallRulesCommand(rulesTO);
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
-        cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
-        cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
-        if (systemRule != null) {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, systemRule);
-        } else {
-            cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, String.valueOf(defaultEgressPolicy));
-        }
-
         cmds.addCommand(cmd);
     }
 

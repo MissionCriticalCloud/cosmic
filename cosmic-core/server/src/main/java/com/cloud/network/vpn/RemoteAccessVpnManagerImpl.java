@@ -33,7 +33,6 @@ import com.cloud.network.element.RemoteAccessVPNServiceProvider;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
@@ -251,51 +250,23 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                 //Cleanup corresponding ports
                 final List<? extends FirewallRule> vpnFwRules = _rulesDao.listByIpAndPurpose(ipId, Purpose.Vpn);
 
-                boolean applyFirewall = false;
-                final List<FirewallRuleVO> fwRules = new ArrayList<>();
-                //if related firewall rule is created for the first vpn port, it would be created for the 2 other ports as well, so need to cleanup the backend
-                if (vpnFwRules.size() != 0 && _rulesDao.findByRelatedId(vpnFwRules.get(0).getId()) != null) {
-                    applyFirewall = true;
-                }
-
-                if (applyFirewall) {
+                try {
                     Transaction.execute(new TransactionCallbackNoReturn() {
                         @Override
                         public void doInTransactionWithoutResult(final TransactionStatus status) {
-                            for (final FirewallRule vpnFwRule : vpnFwRules) {
-                                //don't apply on the backend yet; send all 3 rules in a banch
-                                _firewallMgr.revokeRelatedFirewallRule(vpnFwRule.getId(), false);
-                                fwRules.add(_rulesDao.findByRelatedId(vpnFwRule.getId()));
-                            }
-
-                            s_logger.debug("Marked " + fwRules.size() + " firewall rules as Revoked as a part of disable remote access vpn");
-                        }
-                    });
-
-                    //now apply vpn rules on the backend
-                    s_logger.debug("Reapplying firewall rules for ip id=" + ipId + " as a part of disable remote access vpn");
-                    success = _firewallMgr.applyIngressFirewallRules(ipId, caller);
-                }
-
-                if (success) {
-                    try {
-                        Transaction.execute(new TransactionCallbackNoReturn() {
-                            @Override
-                            public void doInTransactionWithoutResult(final TransactionStatus status) {
-                                _remoteAccessVpnDao.remove(vpn.getId());
-                                // Stop billing of VPN users when VPN is removed. VPN_User_ADD events will be generated when VPN is created again
-                                if (vpnFwRules != null) {
-                                    for (final FirewallRule vpnFwRule : vpnFwRules) {
-                                        _rulesDao.remove(vpnFwRule.getId());
-                                        s_logger.debug("Successfully removed firewall rule with ip id=" + vpnFwRule.getSourceIpAddressId() + " and port " +
-                                                vpnFwRule.getSourcePortStart().intValue() + " as a part of vpn cleanup");
-                                    }
+                            _remoteAccessVpnDao.remove(vpn.getId());
+                            // Stop billing of VPN users when VPN is removed. VPN_User_ADD events will be generated when VPN is created again
+                            if (vpnFwRules != null) {
+                                for (final FirewallRule vpnFwRule : vpnFwRules) {
+                                    _rulesDao.remove(vpnFwRule.getId());
+                                    s_logger.debug("Successfully removed firewall rule with ip id=" + vpnFwRule.getSourceIpAddressId() + " and port " +
+                                            vpnFwRule.getSourcePortStart() + " as a part of vpn cleanup");
                                 }
                             }
-                        });
-                    } catch (final Exception ex) {
-                        s_logger.warn("Unable to release the three vpn ports from the firewall rules", ex);
-                    }
+                        }
+                    });
+                } catch (final Exception ex) {
+                    s_logger.warn("Unable to release the three vpn ports from the firewall rules", ex);
                 }
             }
         }

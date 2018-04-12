@@ -79,8 +79,7 @@ public class DeleteLoadBalancerRuleCmd extends BaseAsyncCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Load balancer ID: " + getId());
-        boolean result = _firewallService.revokeRelatedFirewallRule(id, true);
-        result = result && _lbService.deleteLoadBalancerRule(id, true);
+        boolean result = _lbService.deleteLoadBalancerRule(id, true);
 
         if (result) {
             final SuccessResponse response = new SuccessResponse(getCommandName());

@@ -101,7 +101,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
-import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
@@ -1217,14 +1216,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Remove vm from instance group
         removeInstanceFromInstanceGroup(vmId);
-
-        // cleanup firewall rules
-        if (_firewallMgr.revokeFirewallRulesForVm(vmId)) {
-            s_logger.debug("Firewall rules are removed successfully as a part of vm id=" + vmId + " expunge");
-        } else {
-            success = false;
-            s_logger.warn("Fail to remove firewall rules as a part of vm id=" + vmId + " expunge");
-        }
 
         // cleanup port forwarding rules
         if (_rulesMgr.revokePortForwardingRulesForVm(vmId)) {

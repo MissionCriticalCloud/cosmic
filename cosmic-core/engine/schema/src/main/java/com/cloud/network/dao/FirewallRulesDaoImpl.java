@@ -1,7 +1,6 @@
 package com.cloud.network.dao;
 
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.FirewallRule.TrafficType;
@@ -128,18 +127,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
     }
 
     @Override
-    public boolean releasePorts(final long ipId, final String protocol, final FirewallRule.Purpose purpose, final int[] ports) {
-        final SearchCriteria<FirewallRuleVO> sc = ReleaseSearch.create();
-        sc.setParameters("protocol", protocol);
-        sc.setParameters("ipId", ipId);
-        sc.setParameters("purpose", purpose);
-        sc.setParameters("ports", ports);
-
-        final int results = remove(sc);
-        return results == ports.length;
-    }
-
-    @Override
     public List<FirewallRuleVO> listByIpAndPurpose(final long ipId, final FirewallRule.Purpose purpose) {
         final SearchCriteria<FirewallRuleVO> sc = AllFieldsSearch.create();
         sc.setParameters("ipId", ipId);
@@ -184,13 +171,6 @@ public class FirewallRulesDaoImpl extends GenericDaoBase<FirewallRuleVO, Long> i
         sc.setParameters("purpose", Purpose.Firewall);
 
         return findOneBy(sc);
-    }
-
-    @Override
-    public List<FirewallRuleVO> listSystemRules() {
-        final SearchCriteria<FirewallRuleVO> sc = SystemRuleSearch.create();
-        sc.setParameters("type", FirewallRuleType.System.toString());
-        return listBy(sc);
     }
 
     @Override

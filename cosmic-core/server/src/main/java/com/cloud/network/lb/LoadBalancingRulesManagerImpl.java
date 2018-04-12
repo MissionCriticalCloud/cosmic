@@ -456,7 +456,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     throw new CloudRuntimeException("Unable to add rule for ip address id=" + newRule.getSourceIpAddressId(), e);
                 } finally {
                     if (!success && newRule != null) {
-                        _firewallMgr.revokeRelatedFirewallRule(newRule.getId(), false);
                         removeLBRule(newRule);
                     }
                 }

@@ -772,21 +772,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     protected boolean reprogramNetworkRules(final long networkId, final Account caller, final Network network) throws ResourceUnavailableException {
         boolean success = true;
 
-        //Apply egress rules first to effect the egress policy early on the guest traffic
-        final List<FirewallRuleVO> firewallEgressRulesToApply = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Egress);
-        final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
-        if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall) && _networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall)
-                && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration
-                .NetworkType.Advanced)) {
-            // add default egress rule to accept the traffic
-            _firewallMgr.applyDefaultEgressFirewallRule(network.getId(), offering.getEgressDefaultPolicy(), true);
-        }
-        if (!_firewallMgr.applyFirewallRules(firewallEgressRulesToApply, false, caller)) {
-            s_logger.warn("Failed to reapply firewall Egress rule(s) as a part of network id=" + networkId + " restart");
-            success = false;
-        }
-
         // associate all ip addresses
         if (!_ipAddrMgr.applyIpAssociations(network, false)) {
             s_logger.warn("Failed to apply ip addresses as a part of network id" + networkId + " restart");
@@ -796,13 +781,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         // apply static nat
         if (!_rulesMgr.applyStaticNatsForNetwork(networkId, false, caller)) {
             s_logger.warn("Failed to apply static nats a part of network id" + networkId + " restart");
-            success = false;
-        }
-
-        // apply firewall rules
-        final List<FirewallRuleVO> firewallIngressRulesToApply = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Ingress);
-        if (!_firewallMgr.applyFirewallRules(firewallIngressRulesToApply, false, caller)) {
-            s_logger.warn("Failed to reapply Ingress firewall rule(s) as a part of network id=" + networkId + " restart");
             success = false;
         }
 
@@ -943,21 +921,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final List<FirewallRuleVO> firewallEgressRules = _firewallDao.listByNetworkPurposeTrafficType(networkId, Purpose.Firewall, FirewallRule.TrafficType.Egress);
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Releasing " + firewallEgressRules.size() + " firewall egress rules for network id=" + networkId + " as a part of shutdownNetworkRules");
-        }
-
-        try {
-            // delete default egress rule
-            final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
-            if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.Firewall)
-                    && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Shared && zone.getNetworkType() == com.cloud.model.enumeration
-                    .NetworkType
-                    .Advanced)) {
-                // add default egress rule to accept the traffic
-                _firewallMgr.applyDefaultEgressFirewallRule(network.getId(), _networkModel.getNetworkEgressDefaultPolicy(networkId), false);
-            }
-        } catch (final ResourceUnavailableException ex) {
-            s_logger.warn("Failed to cleanup firewall default egress rule as a part of shutdownNetworkRules due to ", ex);
-            success = false;
         }
 
         for (final FirewallRuleVO firewallRule : firewallEgressRules) {
@@ -2886,20 +2849,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             // shouldn't even come here as network is being cleaned up after all network elements are shutdown
             success = false;
             s_logger.warn("Failed to cleanup LB rules as a part of network id=" + networkId + " cleanup");
-        }
-
-        //revoke all firewall rules for the network
-        try {
-            if (_firewallMgr.revokeAllFirewallRulesForNetwork(networkId, callerUserId, caller)) {
-                s_logger.debug("Successfully cleaned up firewallRules rules for network id=" + networkId);
-            } else {
-                success = false;
-                s_logger.warn("Failed to cleanup Firewall rules as a part of network id=" + networkId + " cleanup");
-            }
-        } catch (final ResourceUnavailableException ex) {
-            success = false;
-            // shouldn't even come here as network is being cleaned up after all network elements are shutdown
-            s_logger.warn("Failed to cleanup Firewall rules as a part of network id=" + networkId + " cleanup due to resourceUnavailable ", ex);
         }
 
         //revoke all network ACLs for network

@@ -500,8 +500,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                         return newRule;
                     } catch (final Exception e) {
                         if (newRule != null) {
-                            // no need to apply the rule as it wasn't programmed on the backend yet
-                            _firewallMgr.revokeRelatedFirewallRule(newRule.getId(), false);
                             removePFRule(newRule);
                         }
 
@@ -735,8 +733,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
                     return staticNatRule;
                 } catch (final Exception e) {
                     if (newRule != null) {
-                        // no need to apply the rule as it wasn't programmed on the backend yet
-                        _firewallMgr.revokeRelatedFirewallRule(newRule.getId(), false);
                         _firewallMgr.removeRule(newRule);
                     }
 
@@ -1243,18 +1239,6 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             final InvalidParameterValueException ex = new InvalidParameterValueException("One to one nat is not enabled for the specified ip id");
             ex.addProxyObject(ipAddress.getUuid(), "ipId");
             throw ex;
-        }
-
-        // Revoke all firewall rules for the ip
-        try {
-            s_logger.debug("Revoking all " + Purpose.Firewall + "rules as a part of disabling static nat for public IP id=" + ipId);
-            if (!_firewallMgr.revokeFirewallRulesForIp(ipId, callerUserId, caller)) {
-                s_logger.warn("Unable to revoke all the firewall rules for ip id=" + ipId + " as a part of disable statis nat");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to revoke all firewall rules for ip id=" + ipId + " as a part of ip release", e);
-            success = false;
         }
 
         if (!revokeAllPFAndStaticNatRulesForIp(ipId, callerUserId, caller)) {

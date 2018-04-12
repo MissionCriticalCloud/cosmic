@@ -98,7 +98,6 @@ import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.RulesManager;
@@ -112,8 +111,6 @@ import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.offerings.NetworkOfferingVO;
-import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.Storage.ProvisioningType;
@@ -248,8 +245,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     AccountManager _accountMgr;
     @Inject
     ServiceOfferingDao _serviceOfferingDao = null;
-    @Inject
-    NetworkOfferingDao _networkOfferingDao = null;
     @Inject
     NetworkOrchestrationService _networkMgr;
     @Inject
@@ -1195,22 +1190,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         s_logger.debug("Resending ipAssoc, port forwarding, load balancing rules as a part of Virtual router start");
 
         final ArrayList<? extends PublicIpAddress> publicIps = getPublicIpsToApply(router, provider, guestNetworkId);
-        final List<FirewallRule> firewallRulesEgress = new ArrayList<>();
-
-        // Fetch firewall Egress rules.
-        if (_networkModel.isProviderSupportServiceInNetwork(guestNetworkId, Service.Firewall, provider)) {
-            firewallRulesEgress.addAll(_rulesDao.listByNetworkPurposeTrafficType(guestNetworkId, Purpose.Firewall, FirewallRule.TrafficType.Egress));
-            if (firewallRulesEgress.isEmpty()) {
-                //create egress default rule for VR
-                createDefaultEgressFirewallRule(firewallRulesEgress, guestNetworkId);
-            }
-        }
-
-        // Re-apply firewall Egress rules
-        s_logger.debug("Found " + firewallRulesEgress.size() + " firewall Egress rule(s) to apply as a part of domR " + router + " start.");
-        if (!firewallRulesEgress.isEmpty()) {
-            _commandSetupHelper.createFirewallRulesCommands(firewallRulesEgress, router, cmds, guestNetworkId);
-        }
 
         if (publicIps != null && !publicIps.isEmpty()) {
             final List<PortForwardingRule> pfRules = new ArrayList<>();
@@ -1243,12 +1222,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             s_logger.debug("Found " + staticNats.size() + " static nat(s) to apply as a part of domR " + router + " start.");
             if (!staticNats.isEmpty()) {
                 _commandSetupHelper.createApplyStaticNatCommands(staticNats, router, cmds);
-            }
-
-            // Re-apply firewall Ingress rules
-            s_logger.debug("Found " + firewallRulesIngress.size() + " firewall Ingress rule(s) to apply as a part of domR " + router + " start.");
-            if (!firewallRulesIngress.isEmpty()) {
-                _commandSetupHelper.createFirewallRulesCommands(firewallRulesIngress, router, cmds, guestNetworkId);
             }
 
             // Re-apply static nat rules
@@ -1326,25 +1299,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         // modified
 
         return providerToIpList.get(provider);
-    }
-
-    private void createDefaultEgressFirewallRule(final List<FirewallRule> rules, final long networkId) {
-        final NetworkVO network = _networkDao.findById(networkId);
-        final NetworkOfferingVO offering = _networkOfferingDao.findById(network.getNetworkOfferingId());
-        final Boolean defaultEgressPolicy = offering.getEgressDefaultPolicy();
-
-        // The default on the router is set to Deny all. So, if the default configuration in the offering is set to true (Allow), we change the Egress here
-        if (defaultEgressPolicy) {
-            final List<String> sourceCidr = new ArrayList<>();
-
-            sourceCidr.add(NetUtils.ALL_IP4_CIDRS);
-            final FirewallRule rule = new FirewallRuleVO(null, null, null, "all", networkId, network.getAccountId(), network.getDomainId(), Purpose.Firewall, sourceCidr,
-                    null, null, FirewallRule.TrafficType.Egress, FirewallRule.FirewallRuleType.System);
-
-            rules.add(rule);
-        } else {
-            s_logger.debug("Egress policy for the Network " + networkId + " is already defined as Deny. So, no need to default the rule to Allow. ");
-        }
     }
 
     @Override

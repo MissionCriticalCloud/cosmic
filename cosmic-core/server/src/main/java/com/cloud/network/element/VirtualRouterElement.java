@@ -36,7 +36,6 @@ import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
-import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
 import com.cloud.network.rules.LoadBalancerContainer;
@@ -228,35 +227,6 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         final Gson gson = new Gson();
         final String capability = gson.toJson(methodList);
         return capability;
-    }
-
-    @Override
-    public boolean applyFWRules(final Network network, final List<? extends FirewallRule> rules) throws ResourceUnavailableException {
-        boolean result = true;
-        if (canHandle(network, Service.Firewall)) {
-            final List<DomainRouterVO> routers = _routerDao.listByNetworkAndRole(network.getId(), Role.VIRTUAL_ROUTER);
-            if (routers == null || routers.isEmpty()) {
-                s_logger.debug("Virtual router elemnt doesn't need to apply firewall rules on the backend; virtual " + "router doesn't exist in the network " + network.getId());
-                return true;
-            }
-
-            if (rules != null && rules.size() == 1) {
-                // for VR no need to add default egress rule to ALLOW traffic
-                //The default allow rule is added from the router defalut iptables rules iptables-router
-                if (rules.get(0).getTrafficType() == FirewallRule.TrafficType.Egress && rules.get(0).getType() == FirewallRule.FirewallRuleType.System
-                        && _networkMdl.getNetworkEgressDefaultPolicy(network.getId())) {
-                    return true;
-                }
-            }
-
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
-            final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
-
-            for (final DomainRouterVO domainRouterVO : routers) {
-                result = result && networkTopology.applyFirewallRules(network, rules, domainRouterVO);
-            }
-        }
-        return result;
     }
 
     protected boolean canHandle(final Network network, final Service service) {
