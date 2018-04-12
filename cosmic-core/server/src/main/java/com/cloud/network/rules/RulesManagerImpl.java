@@ -3,6 +3,7 @@ package com.cloud.network.rules;
 import com.cloud.api.command.user.firewall.ListPortForwardingRulesCmd;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.db.repository.LoadBalancerRuleRepository;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
@@ -106,6 +107,9 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     NicSecondaryIpDao _nicSecondaryDao;
     @Inject
     LoadBalancerVMMapDao _loadBalancerVMMapDao;
+
+    @Inject
+    LoadBalancerRuleRepository loadBalancerRuleRepository;
 
     protected void checkIpAndUserVm(final IpAddress ipAddress, final UserVm userVm, final Account caller, final Boolean ignoreVmState) {
         if (ipAddress == null || ipAddress.getAllocatedTime() == null || ipAddress.getAllocatedToAccountId() == null) {
