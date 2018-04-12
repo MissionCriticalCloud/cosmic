@@ -14,9 +14,8 @@ public class StaticNatRuleTO extends PortForwardingRuleTO {
     protected StaticNatRuleTO() {
     }
 
-    public StaticNatRuleTO(final StaticNatRule rule, final String srcVlanTag, final String srcIp, final String dstIp) {
+    public StaticNatRuleTO(final StaticNatRule rule, final String srcIp, final String dstIp) {
         super(rule.getId(),
-                srcVlanTag,
                 srcIp,
                 rule.getProtocol(),
                 0,

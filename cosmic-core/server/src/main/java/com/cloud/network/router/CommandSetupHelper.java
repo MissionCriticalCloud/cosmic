@@ -222,7 +222,7 @@ public class CommandSetupHelper {
         if (rules != null) {
             for (final StaticNatRule rule : rules) {
                 final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
-                final StaticNatRuleTO ruleTO = new StaticNatRuleTO(rule, null, sourceIp.getAddress().addr(), rule.getDestIpAddress());
+                final StaticNatRuleTO ruleTO = new StaticNatRuleTO(rule, sourceIp.getAddress().addr(), rule.getDestIpAddress());
                 rulesTO.add(ruleTO);
             }
         }

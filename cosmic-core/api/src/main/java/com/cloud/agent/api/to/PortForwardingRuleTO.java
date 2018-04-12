@@ -36,6 +36,9 @@ public class PortForwardingRuleTO implements InternalIdentity {
     private String dstIp;
     private int dstPort;
 
+    PortForwardingRuleTO() {
+    }
+
     public PortForwardingRuleTO(final PortForwardingRule rule, final String srcIp) {
         this(rule.getId(),
                 srcIp,
@@ -51,26 +54,14 @@ public class PortForwardingRuleTO implements InternalIdentity {
         this.dstPort = rule.getDestinationPortStart();
     }
 
-    public PortForwardingRuleTO(final long id, final String srcIp, final int srcPort, final String dstIp, final int dstPort, final String protocol, final boolean revoked, final boolean
-            alreadyAdded) {
+    public PortForwardingRuleTO(final long id, final String srcIp, final int srcPort, final String dstIp, final int dstPort, final String protocol, final boolean revoked, final boolean alreadyAdded) {
         this(id, srcIp, protocol, srcPort, revoked, alreadyAdded, FirewallRule.Purpose.PortForwarding, null, 0, 0);
         this.dstIp = dstIp;
         this.dstPort = dstPort;
     }
 
-    public String getDstIp() {
-        return dstIp;
-    }
-
-    public int getDstPort() {
-        return dstPort;
-    }
-
-    PortForwardingRuleTO() {
-    }
-
-    PortForwardingRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose
-            purpose, final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
+    PortForwardingRuleTO(final long id, final String srcIp, final String protocol, final Integer srcPort, final boolean revoked, final boolean alreadyAdded, final FirewallRule.Purpose purpose,
+                         final List<String> sourceCidr, final Integer icmpType, final Integer icmpCode) {
         this.id = id;
         this.srcIp = srcIp;
         this.protocol = protocol;
@@ -97,12 +88,20 @@ public class PortForwardingRuleTO implements InternalIdentity {
         return srcIp;
     }
 
+    public String getDstIp() {
+        return dstIp;
+    }
+
     public String getProtocol() {
         return protocol;
     }
 
     public int getSrcPort() {
         return srcPort;
+    }
+
+    public int getDstPort() {
+        return dstPort;
     }
 
     public Integer getIcmpType() {
