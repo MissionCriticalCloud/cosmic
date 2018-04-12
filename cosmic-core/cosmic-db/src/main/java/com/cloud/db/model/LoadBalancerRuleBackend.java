@@ -55,7 +55,7 @@ public class LoadBalancerRuleBackend extends com.cloud.model.LoadBalancerRuleBac
         return super.getWeight();
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.cloud.db.model.LoadBalancerRule.class)
     @JoinColumn(name = "load_balancer_rule_id", nullable = false)
     public com.cloud.model.LoadBalancerRule getLoadBalancerRule() {
         return super.getLoadBalancerRule();
