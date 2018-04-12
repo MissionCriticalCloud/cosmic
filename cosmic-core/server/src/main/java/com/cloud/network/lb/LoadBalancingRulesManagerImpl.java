@@ -399,7 +399,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
         // verify that lb service is supported by the network
         isLbServiceSupportedInNetwork(networkId, Scheme.Public);
 
-        _firewallMgr.validateFirewallRule(caller.getCallingAccount(), ipAddr, srcPort, srcPort, protocol, Purpose.LoadBalancing, FirewallRuleType.User, networkId, null);
+        _firewallMgr.validateFirewallRule(caller.getCallingAccount(), ipAddr, srcPort, protocol, Purpose.LoadBalancing, FirewallRuleType.User, networkId, null);
 
         final LoadBalancerVO newRule =
                 new LoadBalancerVO(xId, name, description, sourceIpId, srcPort, destPort, algorithm, networkId, ipAddr.getAllocatedToAccountId(),
