@@ -5,33 +5,33 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.13</version>
+        <version>6.0.14-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-nucleo</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-cluster</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-security</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-jobs</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <artifactId>xml-apis</artifactId>
@@ -42,47 +42,47 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-orchestration</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-events</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-db</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.13</version>
+            <version>6.0.14-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
