@@ -5,7 +5,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.0.13-SNAPSHOT</version>
+        <version>6.0.13</version>
         <relativePath>../../../</relativePath>
     </parent>
 
@@ -13,32 +13,32 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-nucleo</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-utils</artifactId>
-            <version>6.0.13-SNAPSHOT</version>
+            <version>6.0.13</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
