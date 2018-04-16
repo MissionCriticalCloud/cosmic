@@ -50,6 +50,9 @@
         </encoder>
     </appender>
 
+    <include resource="logback-custom.xml"/>
+    <!-- Include your custom logback configuration in /etc/cosmic/management/logback-custom.xml -->
+
     <logger name="com.cloud.utils.db.GenericDaoBase" level="WARN" />
     <logger name="com.cloud.spring" level="WARN" />
 
