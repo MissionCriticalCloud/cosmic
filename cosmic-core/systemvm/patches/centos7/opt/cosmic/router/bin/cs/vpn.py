@@ -1,9 +1,9 @@
 from copy import deepcopy
 import logging
-import subprocess
-from jinja2 import Environment, FileSystemLoader
 import os
 import re
+import subprocess
+from jinja2 import Environment, FileSystemLoader
 import utils
 
 
@@ -115,8 +115,8 @@ class Vpn:
             logging.debug("Peer list to connection %s is %s" % (config['right'], peer_list))
             for connection in peer_list:
                 logging.debug("Reloading connection %s to %s" % (config['right'], connection))
-                index += 1
-                self.reload_strongswan_connection(connection_name="vpn-%s-%s" % (config['right'], index))
+                self.reload_strongswan_connection(
+                    connection_name="vpn-%s-%s" % (config['right'], connection.replace('/', '_')))
 
         self.reread_secrets()
 
@@ -247,7 +247,6 @@ class Vpn:
             subprocess.call(['strongswan', 'down', connection_name])
         except Exception as e:
             logging.error("Failed to stop strongswan with error: %s" % e)
-
 
     @staticmethod
     def update_strongswan():
