@@ -1710,11 +1710,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 } else if (pool.getType() == StoragePoolType.CLVM || physicalDisk.getFormat() == PhysicalDiskFormat.RAW) {
                     disk.defBlockBasedDisk(physicalDisk.getPath(), devId, diskBusType);
                 } else {
-                    if (volume.getType() == Volume.Type.DATADISK) {
-                        disk.defFileBasedDisk(physicalDisk.getPath(), devId, LibvirtDiskDef.DiskBus.VIRTIO, LibvirtDiskDef.DiskFmtType.QCOW2);
-                    } else {
-                        disk.defFileBasedDisk(physicalDisk.getPath(), devId, diskBusType, LibvirtDiskDef.DiskFmtType.QCOW2);
-                    }
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, diskBusType, LibvirtDiskDef.DiskFmtType.QCOW2);
                 }
             }
 
