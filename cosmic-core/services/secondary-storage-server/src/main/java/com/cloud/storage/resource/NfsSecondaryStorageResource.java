@@ -984,7 +984,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             return null;
         }
         final Script command = new Script("/bin/bash", s_logger);
-        final String intf = "eth2";
+        final String intf = "eth0";
         command.add("-c");
         command.add("iptables -I INPUT -i " + intf + " -s " + sourceCidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT");
 
@@ -1460,10 +1460,10 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     }
 
     private void configuringPublicInterface(final Map<String, Object> params) {
-        _publicIp = (String) params.get("eth2ip");
+        _publicIp = (String) params.get("eth0ip");
         s_logger.debug("Configuring public interface with IP {}", _publicIp);
         if (_publicIp != null) {
-            params.put("public.network.device", "eth2");
+            params.put("public.network.device", "eth0");
         }
     }
 
