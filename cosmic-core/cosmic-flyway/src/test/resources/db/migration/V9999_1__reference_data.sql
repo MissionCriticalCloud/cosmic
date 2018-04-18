@@ -347,7 +347,7 @@ VALUES
                                                                                                                                                                        0, 0, 1, 0, 0, NULL, 1, 0, NULL);
 
 INSERT INTO `network_offering_service_map` (`id`, `network_offering_id`, `service`, `provider`, `created`)
-VALUES (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (2, 7, 'SecurityGroup', 'SecurityGroupProvider', '2017-12-12 14:16:24'), (3, 7, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
+VALUES (1, 7, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (3, 7, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
   (4, 7, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (5, 8, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'), (6, 8, 'UserData', 'VirtualRouter', '2017-12-12 14:16:24'),
   (7, 8, 'Dns', 'VirtualRouter', '2017-12-12 14:16:24'), (8, 9, 'Firewall', 'VirtualRouter', '2017-12-12 14:16:24'), (9, 9, 'SourceNat', 'VirtualRouter', '2017-12-12 14:16:24'),
   (10, 9, 'Gateway', 'VirtualRouter', '2017-12-12 14:16:24'), (11, 9, 'Vpn', 'VirtualRouter', '2017-12-12 14:16:24'), (12, 9, 'Dhcp', 'VirtualRouter', '2017-12-12 14:16:24'),
