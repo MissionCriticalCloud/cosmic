@@ -12,6 +12,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.StoragePoolType;
@@ -829,7 +830,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), serial);
+            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), serial);
 
             return new AttachAnswer(disk);
         } catch (final LibvirtException e) {
@@ -878,7 +879,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), serial);
+            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), serial);
 
             storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
@@ -961,9 +962,9 @@ public class KvmStorageProcessor implements StorageProcessor {
                 final long total = (System.currentTimeMillis() - start) / 1000;
                 logger.debug("snapshot takes " + total + " seconds to finish");
 
-        /*
-         * libvirt on RHEL6 doesn't handle resume event emitted from qemu
-         */
+                /*
+                 * libvirt on RHEL6 doesn't handle resume event emitted from qemu
+                 */
                 vm = resource.getDomain(conn, vmName);
                 state = vm.getInfo().state;
                 if (state == DomainState.VIR_DOMAIN_PAUSED) {
@@ -993,7 +994,7 @@ public class KvmStorageProcessor implements StorageProcessor {
                                 "A RBD snapshot operation on " + disk.getName() + " failed. The error was: " + e.getMessage());
                     }
                 } else {
-          /* VM is not running, create a snapshot by ourself */
+                    /* VM is not running, create a snapshot by ourself */
                     final Script command = new Script(manageSnapshotPath, cmdsTimeout, logger);
                     command.add("-c", disk.getPath());
                     command.add("-n", snapshotName);
@@ -1105,9 +1106,8 @@ public class KvmStorageProcessor implements StorageProcessor {
         return new SnapshotAndCopyAnswer();
     }
 
-    protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName,
-                                                     final KvmPhysicalDisk attachingDisk, final int devId, final String serial) throws LibvirtException,
-            InternalErrorException {
+    protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId, final DiskControllerType
+            diskControllerType, final String serial) throws LibvirtException, InternalErrorException {
         List<LibvirtDiskDef> disks = null;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
@@ -1131,38 +1131,28 @@ public class KvmStorageProcessor implements StorageProcessor {
                     throw new InternalErrorException("disk: " + attachingDisk.getPath() + " is not attached before");
                 }
             } else {
-                LibvirtDiskDef.DiskBus diskBusType = LibvirtDiskDef.DiskBus.VIRTIO;
-                for (final LibvirtDiskDef disk : disks) {
-                    logger.debug("disk is type : " + disk.toString());
-                    if (disk.getDeviceType() == LibvirtDiskDef.DeviceType.DISK) {
-                        if (disk.getBusType() == LibvirtDiskDef.DiskBus.SCSI) {
-                            diskBusType = LibvirtDiskDef.DiskBus.SCSI;
-                        }
-                        logger.debug("Disk bus type: " + disk.getDeviceType().toString() + ", diskBusType: " + diskBusType.toString());
-                        break;
-                    }
-                }
                 diskdef = new LibvirtDiskDef();
-                if (diskBusType == LibvirtDiskDef.DiskBus.SCSI) {
+                if (diskControllerType == DiskControllerType.SCSI) {
                     diskdef.setQemuDriver(true);
                     diskdef.setDiscard(LibvirtDiskDef.DiscardType.UNMAP);
                 }
                 diskdef.setSerial(serial);
+                diskdef.setDeviceId(devId);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
-                            attachingPool.getUuid(), devId, diskBusType, LibvirtDiskDef.DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
+                            attachingPool.getUuid(), devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
                     diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), null,
-                            null, devId, diskBusType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
+                            null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskBusType, LibvirtDiskDef.DiskFmtType.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskBusType);
+                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskControllerType);
                 }
             }
 

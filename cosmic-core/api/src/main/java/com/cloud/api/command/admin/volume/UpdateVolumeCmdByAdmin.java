@@ -10,7 +10,8 @@ import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.storage.Volume;
 
-@APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType =
+        {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateVolumeCmdByAdmin extends UpdateVolumeCmd {
 
@@ -18,7 +19,7 @@ public class UpdateVolumeCmdByAdmin extends UpdateVolumeCmd {
     public void execute() {
         CallContext.current().setEventDetails("Volume Id: " + getId());
         final Volume result = _volumeService.updateVolume(getId(), getPath(), getState(), getStorageId(), getDisplayVolume(),
-                getCustomId(), getEntityOwnerId(), getChainInfo());
+                getCustomId(), getEntityOwnerId(), getChainInfo(), getDiskController());
         if (result != null) {
             final VolumeResponse response = _responseGenerator.createVolumeResponse(ResponseView.Full, result);
             response.setResponseName(getCommandName());

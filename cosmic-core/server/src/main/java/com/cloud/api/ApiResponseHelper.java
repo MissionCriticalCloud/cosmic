@@ -1077,18 +1077,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         return ApiDBUtils.newInstanceGroupResponse(vgroup);
     }
 
-  /*
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, EnumSet<VMDetails> details, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-   */
-
     @Override
     public StoragePoolResponse createStoragePoolResponse(final StoragePool pool) {
         final List<StoragePoolJoinVO> viewPools = ApiDBUtils.newStoragePoolView(pool);

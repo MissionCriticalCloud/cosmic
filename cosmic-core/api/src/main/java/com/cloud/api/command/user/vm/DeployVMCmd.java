@@ -30,6 +30,7 @@ import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.offering.DiskOffering;
@@ -117,6 +118,12 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                     "takes precedence over this parameter if both are provided",
             since = "4.4")
     private Long rootdisksize;
+
+    @Parameter(name = ApiConstants.DISK_CONTROLLER,
+            required = false,
+            type = CommandType.STRING,
+            description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
+    private String diskController;
 
     @Parameter(name = ApiConstants.GROUP, type = CommandType.STRING, description = "an optional group for the virtual machine")
     private String group;
@@ -266,6 +273,14 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
     public Long getZoneId() {
         return zoneId;
+    }
+
+    public DiskControllerType getDiskController() {
+        if (diskController != null) {
+            return DiskControllerType.valueOf(diskController);
+        } else {
+            return null;
+        }
     }
 
     public List<Long> getNetworkIds() {
@@ -564,7 +579,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             final IpAddresses addrs = new IpAddresses(ipAddress, ip6Address, getMacAddress());
             final UserVm vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
                     getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                    getCustomId());
+                    getCustomId(), getDiskController());
 
             if (vm != null) {
                 setEntityId(vm.getId());
