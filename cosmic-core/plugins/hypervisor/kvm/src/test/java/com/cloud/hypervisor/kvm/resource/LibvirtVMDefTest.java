@@ -2,6 +2,7 @@ package com.cloud.hypervisor.kvm.resource;
 
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.utils.Pair;
 
 import junit.framework.TestCase;
@@ -55,7 +56,7 @@ public class LibvirtVMDefTest extends TestCase {
         final String diskLabel = "vda";
 
         final LibvirtDiskDef disk = new LibvirtDiskDef();
-        final LibvirtDiskDef.DiskBus bus = LibvirtDiskDef.DiskBus.VIRTIO;
+        final DiskControllerType bus = DiskControllerType.VIRTIO;
         final LibvirtDiskDef.DiskFmtType type = LibvirtDiskDef.DiskFmtType.QCOW2;
         final LibvirtDiskDef.DiskCacheMode cacheMode = LibvirtDiskDef.DiskCacheMode.WRITEBACK;
 

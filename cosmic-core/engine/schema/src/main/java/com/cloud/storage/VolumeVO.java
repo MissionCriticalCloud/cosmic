@@ -1,5 +1,6 @@
 package com.cloud.storage;
 
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.NumbersUtil;
@@ -124,6 +125,9 @@ public class VolumeVO implements Volume {
     private Long isoId;
     @Column(name = "hv_ss_reserve")
     private Integer hypervisorSnapshotReserve;
+    @Column(name = "disk_controller")
+    @Enumerated(EnumType.STRING)
+    private DiskControllerType diskController;
 
     // Real Constructor
     public VolumeVO(final Type type, final String name, final long dcId, final long domainId,
@@ -142,6 +146,7 @@ public class VolumeVO implements Volume {
         this.diskOfferingId = diskOfferingId;
         state = State.Allocated;
         uuid = UUID.randomUUID().toString();
+        diskController = DiskControllerType.VIRTIO;
     }
 
     public VolumeVO(final String name, final long dcId, final long podId, final long accountId,
@@ -164,6 +169,7 @@ public class VolumeVO implements Volume {
         state = Volume.State.Allocated;
         recreatable = false;
         uuid = UUID.randomUUID().toString();
+        diskController = DiskControllerType.VIRTIO;
     }
 
     // Copy Constructor
@@ -197,6 +203,7 @@ public class VolumeVO implements Volume {
         format = that.getFormat();
         provisioningType = that.getProvisioningType();
         uuid = UUID.randomUUID().toString();
+        diskController = that.getDiskController();
     }
 
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
@@ -220,6 +227,7 @@ public class VolumeVO implements Volume {
         state = Volume.State.Allocated;
         recreatable = false;
         uuid = UUID.randomUUID().toString();
+        diskController = DiskControllerType.VIRTIO;
     }
 
     protected VolumeVO() {
@@ -592,5 +600,13 @@ public class VolumeVO implements Volume {
     @Override
     public Class<?> getEntityType() {
         return Volume.class;
+    }
+
+    public DiskControllerType getDiskController() {
+        return diskController;
+    }
+
+    public void setDiskController(final DiskControllerType diskController) {
+        this.diskController = diskController;
     }
 }

@@ -16,13 +16,15 @@ import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Volume;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted, entityType = {Volume.class},
+@APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted,
+        entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateVolumeCmd.class.getName());
@@ -59,6 +61,12 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
             type = CommandType.BOOLEAN,
             description = "an optional field, whether to the display the volume to the end user or not.", authorized = {RoleType.Admin})
     private Boolean displayVolume;
+
+    @Parameter(name = ApiConstants.DISK_CONTROLLER,
+            required = false,
+            type = CommandType.STRING,
+            description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
+    private String diskController;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -119,7 +127,7 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
     public void execute() {
         CallContext.current().setEventDetails("Volume Id: " + getId());
         final Volume result = _volumeService.updateVolume(getId(), getPath(), getState(), getStorageId(), getDisplayVolume(),
-                getCustomId(), getEntityOwnerId(), getChainInfo());
+                getCustomId(), getEntityOwnerId(), getChainInfo(), getDiskController());
         if (result != null) {
             final VolumeResponse response = _responseGenerator.createVolumeResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -135,6 +143,14 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
 
     public String getChainInfo() {
         return chainInfo;
+    }
+
+    public DiskControllerType getDiskController() {
+        if (diskController != null) {
+            return DiskControllerType.valueOf(diskController);
+        } else {
+            return null;
+        }
     }
 
     @Override

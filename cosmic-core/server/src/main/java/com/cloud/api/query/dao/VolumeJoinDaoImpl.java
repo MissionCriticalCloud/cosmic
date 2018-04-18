@@ -223,6 +223,8 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             volResponse.setJobStatus(volume.getJobStatus());
         }
 
+        volResponse.setDiskController(volume.getDiskController());
+
         volResponse.setObjectName("volume");
         return volResponse;
     }

@@ -74,6 +74,7 @@ import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.hypervisor.kvm.storage.KvmStorageProcessor;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.RouterPrivateIpStrategy;
 import com.cloud.network.Networks.TrafficType;
@@ -1520,16 +1521,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final InputDef input = new InputDef("tablet", "usb");
         devices.addDevice(input);
 
-        // get Disk controller from VM
-        LibvirtDiskDef.DiskBus diskBusType = getGuestDiskModel(vmTo.getPlatformEmulator());
+        // Always add a virtio scsi controller
+        vmTo.getName();
+        final ScsiDef sd = new ScsiDef((short) 0, 0, 0, 9, 0);
+        devices.addDevice(sd);
+        logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
 
-        // If we're using virtio scsi, then we need to add a virtual scsi controller
-        if (diskBusType == LibvirtDiskDef.DiskBus.SCSI) {
-            vmTo.getName();
-            final ScsiDef sd = new ScsiDef((short) 0, 0, 0, 9, 0);
-            devices.addDevice(sd);
-            logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
-        }
         vm.addComponent(devices);
 
         return vm;
@@ -1565,8 +1562,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     boolean isGuestVirtIoCapable(final String guestOsName) {
-        LibvirtDiskDef.DiskBus db = getGuestDiskModel(guestOsName);
-        return db != LibvirtDiskDef.DiskBus.IDE;
+        DiskControllerType db = getGuestDiskModel(guestOsName);
+        return db != DiskControllerType.IDE;
     }
 
     public void createVifs(final VirtualMachineTO vmSpec, final LibvirtVmDef vm)
@@ -1667,10 +1664,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 logger.debug("Disk activity check cleared");
             }
 
-            // get Disk controller from VM
-            LibvirtDiskDef.DiskBus diskBusType = getGuestDiskModel(vmSpec.getPlatformEmulator());
-            logger.debug("disk bus type for " + vmName + " derived from getPlatformEmulator: " + vmSpec.getPlatformEmulator() + ", diskbustype is: " + diskBusType.toString());
-
             final LibvirtDiskDef disk = new LibvirtDiskDef();
             if (volume.getType() == Volume.Type.ISO) {
                 if (volPath == null) {
@@ -1682,7 +1675,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             } else {
                 final int devId = volume.getDiskSeq().intValue();
 
-                if (diskBusType == LibvirtDiskDef.DiskBus.SCSI) {
+                if (volume.getDiskController() == DiskControllerType.SCSI) {
                     disk.setQemuDriver(true);
                     disk.setDiscard(DiscardType.UNMAP);
                 }
@@ -1694,18 +1687,18 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                      */
                     disk.defNetworkBasedDisk(physicalDisk.getPath().replace("rbd:", ""), pool.getSourceHost(),
                             pool.getSourcePort(), pool.getAuthUserName(),
-                            pool.getUuid(), devId, diskBusType, DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
+                            pool.getUuid(), devId, volume.getDiskController(), DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
                 } else if (pool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = pool.getLocalPath();
                     final String path = physicalDisk.getPath();
                     final String glusterVolume = pool.getSourceDir().replace("/", "");
                     disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(),
                             pool.getSourcePort(), null,
-                            null, devId, diskBusType, DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
+                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (pool.getType() == StoragePoolType.CLVM || physicalDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    disk.defBlockBasedDisk(physicalDisk.getPath(), devId, diskBusType);
+                    disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
                 } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, diskBusType, LibvirtDiskDef.DiskFmtType.QCOW2);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2);
                 }
             }
 
@@ -1751,13 +1744,13 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return Type.Routing;
     }
 
-    private LibvirtDiskDef.DiskBus getGuestDiskModel(final String platformEmulator) {
+    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
         if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
-            return LibvirtDiskDef.DiskBus.IDE;
+            return DiskControllerType.IDE;
         } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
-            return LibvirtDiskDef.DiskBus.SCSI;
+            return DiskControllerType.SCSI;
         } else {
-            return LibvirtDiskDef.DiskBus.VIRTIO;
+            return DiskControllerType.VIRTIO;
         }
     }
 

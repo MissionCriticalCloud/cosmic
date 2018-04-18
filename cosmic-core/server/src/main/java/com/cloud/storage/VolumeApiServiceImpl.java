@@ -66,6 +66,7 @@ import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.command.AttachAnswer;
@@ -117,7 +118,6 @@ import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
-import com.cloud.vm.VmDetailConstants;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkAttachVolume;
 import com.cloud.vm.VmWorkConstants;
@@ -429,8 +429,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final String userSpecifiedName = getVolumeNameFromCommand(cmd);
 
-        final VolumeVO volume = commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size,
-                minIops, maxIops, parentVolume, userSpecifiedName, _uuidMgr.generateUuid(Volume.class, cmd.getCustomId()));
+        DiskControllerType diskControllerType = DiskControllerType.VIRTIO;
+        if (cmd.getDiskController() != null) {
+            diskControllerType = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
+        }
+        final VolumeVO volume = commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size, minIops, maxIops, parentVolume,
+                userSpecifiedName, _uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType);
 
         return volume;
     }
@@ -464,10 +468,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return userSpecifiedName;
     }
 
-    private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume,
-                                  final Long zoneId, final Long diskOfferingId, final Storage.ProvisioningType provisioningType, final Long size, final Long minIops, final Long
-                                          maxIops, final VolumeVO parentVolume,
-                                  final String userSpecifiedName, final String uuid) {
+    private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume, final Long zoneId, final Long diskOfferingId,
+                                  final Storage.ProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
+                                  final String userSpecifiedName, final String uuid, final DiskControllerType diskController) {
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
@@ -485,6 +488,11 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 volume.setInstanceId(null);
                 volume.setUpdated(new Date());
                 volume.setDisplayVolume(displayVolume);
+
+                if (diskController != null) {
+                    volume.setDiskController(diskController);
+                }
+
                 if (parentVolume != null) {
                     volume.setTemplateId(parentVolume.getTemplateId());
                     volume.setFormat(parentVolume.getFormat());
@@ -523,10 +531,15 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     created = false;
                 }
 
+                DiskControllerType diskController = DiskControllerType.VIRTIO;
+                if (cmd.getDiskController() != null) {
+                    diskController = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
+                }
+
                 // if VM Id is provided, attach the volume to the VM
                 if (cmd.getVirtualMachineId() != null) {
                     try {
-                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId());
+                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId(), diskController);
                     } catch (final Exception ex) {
                         final StringBuilder message = new StringBuilder("Volume: ");
                         message.append(volume.getUuid());
@@ -573,7 +586,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return _volsDao.findById(createdVolume.getId());
     }
 
-    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId) {
+    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
         final Account caller = CallContext.current().getCallingAccount();
 
         // Check that the volume ID is valid
@@ -703,12 +716,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
-                return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId);
+                return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId, diskController);
             } finally {
                 _workJobDao.expunge(placeHolder.getId());
             }
         } else {
-            final Outcome<Volume> outcome = attachVolumeToVmThroughJobQueue(vmId, volumeId, deviceId);
+            final Outcome<Volume> outcome = attachVolumeToVmThroughJobQueue(vmId, volumeId, deviceId, diskController);
 
             Volume vol = null;
             try {
@@ -792,7 +805,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return workJob;
     }
 
-    private Volume orchestrateAttachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId) {
+    private Volume orchestrateAttachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
         final VolumeInfo volumeToAttach = volFactory.getVolume(volumeId);
 
         if (volumeToAttach.isAttachedVM()) {
@@ -872,11 +885,11 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 throw new InvalidParameterValueException("VM not found.");
             }
         }
-        newVol = sendAttachVolumeCommand(vm, newVol, deviceId);
+        newVol = sendAttachVolumeCommand(vm, newVol, deviceId, diskController);
         return newVol;
     }
 
-    public Outcome<Volume> attachVolumeToVmThroughJobQueue(final Long vmId, final Long volumeId, final Long deviceId) {
+    public Outcome<Volume> attachVolumeToVmThroughJobQueue(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
 
         final CallContext context = CallContext.current();
         final User callingUser = context.getCallingUser();
@@ -898,7 +911,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         // save work context info (there are some duplications)
         final VmWorkAttachVolume workInfo = new VmWorkAttachVolume(callingUser.getId(), callingAccount.getId(), vm.getId(),
-                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, deviceId);
+                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, deviceId, diskController);
         workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
 
         _jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());
@@ -965,7 +978,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return !storeForExistingStoreScope.isSameScope(storeForNewStoreScope);
     }
 
-    private VolumeVO sendAttachVolumeCommand(final UserVmVO vm, VolumeVO volumeToAttach, Long deviceId) {
+    private VolumeVO sendAttachVolumeCommand(final UserVmVO vm, VolumeVO volumeToAttach, Long deviceId, DiskControllerType diskController) {
         String errorMsg = "Failed to attach volume " + volumeToAttach.getName() + " to VM " + vm.getHostName();
         boolean sendCommand = vm.getState() == State.Running;
         AttachAnswer answer = null;
@@ -1009,7 +1022,11 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
             deviceId = getDeviceId(vm, deviceId);
 
-            final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType());
+            if (diskController != null) {
+                volumeToAttach.setDiskController(diskController);
+            }
+
+            final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType(), volumeToAttach.getDiskController());
 
             final AttachCommand cmd = new AttachCommand(disk, vm.getInstanceName());
 
@@ -1034,10 +1051,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 details.put(DiskTO.CHAP_TARGET_SECRET, chapInfo.getTargetSecret());
             }
             _userVmDao.loadDetails(vm);
-            final Map<String, String> controllerInfo = new HashMap<>();
-            controllerInfo.put(VmDetailConstants.ROOT_DISK_CONTROLLER, vm.getDetail(VmDetailConstants.ROOT_DISK_CONTROLLER));
-            controllerInfo.put(VmDetailConstants.DATA_DISK_CONTROLLER, vm.getDetail(VmDetailConstants.DATA_DISK_CONTROLLER));
-            cmd.setControllerInfo(controllerInfo);
 
             try {
                 answer = (AttachAnswer) _agentMgr.send(hostId, cmd);
@@ -1053,19 +1066,23 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             // Mark the volume as attached
             if (sendCommand) {
                 final DiskTO disk = answer.getDisk();
-                _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), disk.getDiskSeq());
+                _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), disk.getDiskSeq(), diskController);
 
                 volumeToAttach = _volsDao.findById(volumeToAttach.getId());
 
                 if (volumeToAttachStoragePool.isManaged() && volumeToAttach.getPath() == null) {
                     volumeToAttach.setPath(answer.getDisk().getPath());
 
+                    if (diskController != null) {
+                        volumeToAttach.setDiskController(diskController);
+                    }
+
                     _volsDao.update(volumeToAttach.getId(), volumeToAttach);
                 }
             } else {
                 deviceId = getDeviceId(vm, deviceId);
 
-                _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), deviceId);
+                _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), deviceId, diskController);
             }
 
             // insert record for disk I/O statistics
@@ -1856,7 +1873,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_ATTACH, eventDescription = "attaching volume", async = true)
     public Volume attachVolumeToVM(final AttachVolumeCmd command) {
-        return attachVolumeToVM(command.getVirtualMachineId(), command.getId(), command.getDeviceId());
+        return attachVolumeToVM(command.getVirtualMachineId(), command.getId(), command.getDeviceId(), command.getDiskController());
     }
 
     @Override
@@ -1995,7 +2012,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (sendCommand) {
             final DataTO volTO = volFactory.getVolume(volume.getId()).getTO();
-            final DiskTO disk = new DiskTO(volTO, volume.getDeviceId(), volume.getPath(), volume.getVolumeType());
+            final DiskTO disk = new DiskTO(volTO, volume.getDeviceId(), volume.getPath(), volume.getVolumeType(), volume.getDiskController());
 
             final DettachCommand cmd = new DettachCommand(disk, vm.getInstanceName());
 
@@ -2287,9 +2304,17 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_UPDATE, eventDescription = "updating volume", async = true)
     public Volume updateVolume(final long volumeId, final String path, final String state, final Long storageId, final Boolean displayVolume, final String customId, final long
-            entityOwnerId, final String chainInfo) {
+            entityOwnerId, final String chainInfo, final DiskControllerType diskControllerType) {
 
         final VolumeVO volume = _volsDao.findById(volumeId);
+
+        if (volume.getInstanceId() != null) {
+            VMInstanceVO vmInstanceVO = _vmInstanceDao.findById(volume.getInstanceId());
+
+            if (vmInstanceVO.getState() != State.Stopped) {
+                throw new CloudRuntimeException("Volume is attached to a running VM, unable to update volume at this point.");
+            }
+        }
 
         if (volume == null) {
             throw new InvalidParameterValueException("The volume id doesn't exist");
@@ -2301,6 +2326,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (chainInfo != null) {
             volume.setChainInfo(chainInfo);
+        }
+
+        if (diskControllerType != null) {
+            volume.setDiskController(diskControllerType);
         }
 
         if (state != null) {
@@ -2779,7 +2808,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     @ReflectionUse
     private Pair<JobInfo.Status, String> orchestrateAttachVolumeToVM(final VmWorkAttachVolume work) throws Exception {
-        final Volume vol = orchestrateAttachVolumeToVM(work.getVmId(), work.getVolumeId(), work.getDeviceId());
+        final Volume vol = orchestrateAttachVolumeToVM(work.getVmId(), work.getVolumeId(), work.getDeviceId(), work.getDiskController());
 
         return new Pair<>(JobInfo.Status.SUCCEEDED,
                 _jobMgr.marshallResultObject(new Long(vol.getId())));

@@ -3646,7 +3646,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
             handleManagedStorage(vm, root);
 
-            _volsDao.attachVolume(newVol.getId(), vmId, newVol.getDeviceId());
+            _volsDao.attachVolume(newVol.getId(), vmId, newVol.getDeviceId(), newVol.getDiskController());
 
             // Detach, destroy and create the usage event for the old root volume.
             _volsDao.detachVolume(root.getId());

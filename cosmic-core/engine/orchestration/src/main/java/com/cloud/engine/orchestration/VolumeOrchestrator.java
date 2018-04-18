@@ -216,6 +216,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 oldVol.getMinIops(),
                 oldVol.getMaxIops(),
                 oldVol.get_iScsiName());
+                oldVol.getDiskController();
         if (templateId != null) {
             newVol.setTemplateId(templateId);
         } else {
@@ -945,7 +946,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         for (final VolumeVO vol : vols) {
             final DataTO volTO = volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType());
+            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
             final VolumeInfo volumeInfo = volFactory.getVolume(vol.getId());
             final DataStore dataStore = dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 
@@ -1028,7 +1029,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 vol = result.first();
             }
             final DataTO volumeTO = volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType());
+            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
             final VolumeInfo volumeInfo = volFactory.getVolume(vol.getId());
             final DataStore dataStore = dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 

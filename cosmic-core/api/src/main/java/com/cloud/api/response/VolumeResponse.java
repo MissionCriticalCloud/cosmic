@@ -4,6 +4,7 @@ import com.cloud.acl.RoleType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.serializer.Param;
 import com.cloud.storage.Volume;
 
@@ -168,6 +169,9 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @SerializedName(ApiConstants.SNAPSHOT_QUIESCEVM)
     @Param(description = "need quiesce vm or not when taking snapshot", since = "4.3")
     private boolean needQuiescevm;
+    @SerializedName(ApiConstants.DISK_CONTROLLER)
+    @Param(description = "disk controller this volume is on")
+    private DiskControllerType diskController;
 
     public VolumeResponse() {
         tags = new LinkedHashSet<>();
@@ -453,5 +457,13 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setTemplateDisplayText(final String templateDisplayText) {
         this.templateDisplayText = templateDisplayText;
+    }
+
+    public DiskControllerType getDiskController() {
+        return diskController;
+    }
+
+    public void setDiskController(final DiskControllerType diskController) {
+        this.diskController = diskController;
     }
 }

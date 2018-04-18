@@ -9,6 +9,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.DiskOfferingVO;
@@ -110,6 +111,11 @@ public class VolumeObject implements VolumeInfo {
     @Override
     public Long getLastPoolId() {
         return volumeVO.getLastPoolId();
+    }
+
+    @Override
+    public DiskControllerType getDiskController() {
+        return volumeVO.getDiskController();
     }
 
     @Override

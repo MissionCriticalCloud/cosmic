@@ -15,6 +15,7 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Volume;
 import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
@@ -22,7 +23,8 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "attachVolume", group = APICommandGroup.VolumeService, description = "Attaches a disk volume to a virtual machine.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "attachVolume", group = APICommandGroup.VolumeService, description = "Attaches a disk volume to a virtual machine.", responseObject = VolumeResponse.class, responseView =
+        ResponseView.Restricted,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AttachVolumeCmd extends BaseAsyncCmd {
@@ -46,6 +48,12 @@ public class AttachVolumeCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.VIRTUAL_MACHINE_ID, type = CommandType.UUID, entityType = UserVmResponse.class,
             required = true, description = "    the ID of the virtual machine")
     private Long virtualMachineId;
+
+    @Parameter(name = ApiConstants.DISK_CONTROLLER,
+            required = false,
+            type = CommandType.STRING,
+            description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
+    private String diskController;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -112,5 +120,13 @@ public class AttachVolumeCmd extends BaseAsyncCmd {
             return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
         }
         return volume.getAccountId();
+    }
+
+    public DiskControllerType getDiskController() {
+        if (diskController != null) {
+            return DiskControllerType.valueOf(diskController);
+        } else {
+            return null;
+        }
     }
 }

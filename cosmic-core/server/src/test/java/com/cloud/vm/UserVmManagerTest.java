@@ -37,6 +37,7 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -252,7 +253,7 @@ public class UserVmManagerTest {
         doReturn(3L).when(_volumeMock).getTemplateId();
         when(_templateDao.findById(anyLong())).thenReturn(_templateMock);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
-        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
+        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong(), eq(DiskControllerType.SCSI));
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
 
@@ -288,7 +289,7 @@ public class UserVmManagerTest {
         doReturn(3L).when(_volumeMock).getTemplateId();
         when(_templateDao.findById(anyLong())).thenReturn(_templateMock);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
-        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
+        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong(), eq(DiskControllerType.SCSI));
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
 
@@ -330,7 +331,7 @@ public class UserVmManagerTest {
         doNothing().when(_vmMock).setTemplateId(3L);
         when(_vmDao.update(314L, _vmMock)).thenReturn(true);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
-        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
+        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong(), eq(DiskControllerType.SCSI));
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
         final List<VMSnapshotVO> mockList = mock(List.class);
@@ -376,7 +377,7 @@ public class UserVmManagerTest {
         doNothing().when(_vmMock).setTemplateId(3L);
         when(_vmDao.update(314L, _vmMock)).thenReturn(true);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
-        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong());
+        doNothing().when(_volsDao).attachVolume(anyLong(), anyLong(), anyLong(), eq(DiskControllerType.SCSI));
         when(_volumeMock.getId()).thenReturn(3L);
         doNothing().when(_volsDao).detachVolume(anyLong());
         final List<VMSnapshotVO> mockList = mock(List.class);

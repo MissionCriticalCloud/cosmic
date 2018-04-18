@@ -23,6 +23,7 @@ import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
@@ -279,38 +280,38 @@ public class VolumeApiServiceImplTest {
     // Negative test - try to attach non-root non-datadisk volume
     @Test(expected = InvalidParameterValueException.class)
     public void attachIncorrectDiskType() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 5L, 0L);
+        _svc.attachVolumeToVM(1L, 5L, 0L, DiskControllerType.VIRTIO);
     }
 
     // Negative test - attach root volume to running vm
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToRunningVm() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 6L, 0L);
+        _svc.attachVolumeToVM(1L, 6L, 0L, DiskControllerType.VIRTIO);
     }
 
     // Negative test - attach root volume from the managed data store
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskOfManagedDataStore() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 7L, 0L);
+        _svc.attachVolumeToVM(2L, 7L, 0L, DiskControllerType.VIRTIO);
     }
 
     // Negative test - root volume can't be attached to the vm already having a root volume attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToVmHavingRootDisk() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(4L, 6L, 0L);
+        _svc.attachVolumeToVM(4L, 6L, 0L, DiskControllerType.VIRTIO);
     }
 
     // Negative test - root volume in uploaded state can't be attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootInUploadedState() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 8L, 0L);
+        _svc.attachVolumeToVM(2L, 8L, 0L, DiskControllerType.VIRTIO);
     }
 
     // Positive test - attach ROOT volume in correct state, to the vm not having root volume attached
     @Test
     public void attachRootVolumePositive() throws NoSuchFieldException, IllegalAccessException {
         thrown.expect(NullPointerException.class);
-        _svc.attachVolumeToVM(2L, 6L, 0L);
+        _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.VIRTIO);
     }
 
     // volume not Ready
@@ -375,7 +376,7 @@ public class VolumeApiServiceImplTest {
         when(_svc._dcDao.findById(anyLong())).thenReturn(zoneWithDisabledLocalStorage);
         when(zoneWithDisabledLocalStorage.isLocalStorageEnabled()).thenReturn(true);
         try {
-            _svc.attachVolumeToVM(2L, 9L, null);
+            _svc.attachVolumeToVM(2L, 9L, null, DiskControllerType.VIRTIO);
         } catch (InvalidParameterValueException e) {
             Assert.assertEquals(e.getMessage(), ("primary storage resource limit check failed"));
         }

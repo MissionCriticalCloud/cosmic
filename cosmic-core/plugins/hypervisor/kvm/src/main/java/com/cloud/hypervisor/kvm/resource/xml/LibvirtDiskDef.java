@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.xml;
 
+import com.cloud.model.enumeration.DiskControllerType;
+
 public class LibvirtDiskDef {
     private DeviceType deviceType; /* floppy, disk, cdrom */
     private DiskType diskType;
@@ -10,7 +12,7 @@ public class LibvirtDiskDef {
     private String authUserName;
     private String authSecretUuid;
     private String diskLabel;
-    private DiskBus bus;
+    private DiskControllerType bus;
     private DiskFmtType diskFmtType; /* qcow2, raw etc. */
     private boolean readonly;
     private boolean shareable;
@@ -32,7 +34,7 @@ public class LibvirtDiskDef {
         this.discard = discard;
     }
 
-    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskBus bus, final DiskFmtType diskFmtType) {
+    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final DiskFmtType diskFmtType) {
         diskType = DiskType.FILE;
         deviceType = DeviceType.DISK;
         diskCacheMode = DiskCacheMode.NONE;
@@ -42,7 +44,7 @@ public class LibvirtDiskDef {
         this.bus = bus;
     }
 
-    public void defFileBasedDisk(final String filePath, final int devId, final DiskBus bus, final DiskFmtType diskFmtType) {
+    public void defFileBasedDisk(final String filePath, final int devId, final DiskControllerType bus, final DiskFmtType diskFmtType) {
         diskType = DiskType.FILE;
         deviceType = DeviceType.DISK;
         diskCacheMode = DiskCacheMode.NONE;
@@ -53,7 +55,7 @@ public class LibvirtDiskDef {
     }
 
     /* skip iso label */
-    private String getDevLabel(int devId, final DiskBus bus) {
+    private String getDevLabel(int devId, final DiskControllerType bus) {
         if (devId < 0) {
             return "";
         }
@@ -62,9 +64,9 @@ public class LibvirtDiskDef {
             devId++;
         }
 
-        if (bus == DiskBus.SCSI) {
+        if (bus == DiskControllerType.SCSI) {
             return "sd" + getDevLabelSuffix(devId);
-        } else if (bus == DiskBus.VIRTIO) {
+        } else if (bus == DiskControllerType.VIRTIO) {
             return "vd" + getDevLabelSuffix(devId);
         }
         return "hd" + getDevLabelSuffix(devId);
@@ -93,10 +95,10 @@ public class LibvirtDiskDef {
         diskLabel = "hdc";
         diskFmtType = DiskFmtType.RAW;
         diskCacheMode = DiskCacheMode.NONE;
-        bus = DiskBus.IDE;
+        bus = DiskControllerType.IDE;
     }
 
-    public void defBlockBasedDisk(final String diskName, final int devId, final DiskBus bus) {
+    public void defBlockBasedDisk(final String diskName, final int devId, final DiskControllerType bus) {
         diskType = DiskType.BLOCK;
         deviceType = DeviceType.DISK;
         diskFmtType = DiskFmtType.RAW;
@@ -106,7 +108,7 @@ public class LibvirtDiskDef {
         this.bus = bus;
     }
 
-    public void defBlockBasedDisk(final String diskName, final String diskLabel, final DiskBus bus) {
+    public void defBlockBasedDisk(final String diskName, final String diskLabel, final DiskControllerType bus) {
         diskType = DiskType.BLOCK;
         deviceType = DeviceType.DISK;
         diskFmtType = DiskFmtType.RAW;
@@ -117,7 +119,7 @@ public class LibvirtDiskDef {
     }
 
     public void defNetworkBasedDisk(final String diskName, final String sourceHost, final int sourcePort, final String authUserName,
-                                    final String authSecretUuid, final int devId, final DiskBus bus,
+                                    final String authSecretUuid, final int devId, final DiskControllerType bus,
                                     final DiskProtocol protocol, final DiskFmtType diskFmtType) {
         diskType = DiskType.NETWORK;
         deviceType = DeviceType.DISK;
@@ -134,7 +136,7 @@ public class LibvirtDiskDef {
     }
 
     public void defNetworkBasedDisk(final String diskName, final String sourceHost, final int sourcePort, final String authUserName,
-                                    final String authSecretUuid, final String diskLabel, final DiskBus bus,
+                                    final String authSecretUuid, final String diskLabel, final DiskControllerType bus,
                                     final DiskProtocol protocol, final DiskFmtType diskFmtType) {
         diskType = DiskType.NETWORK;
         deviceType = DeviceType.DISK;
@@ -190,7 +192,7 @@ public class LibvirtDiskDef {
         this.deviceType = deviceType;
     }
 
-    public DiskBus getBusType() {
+    public DiskControllerType getBusType() {
         return bus;
     }
 
@@ -273,7 +275,7 @@ public class LibvirtDiskDef {
     }
 
     public enum DiskBus {
-        IDE("ide"), SCSI("scsi"), VIRTIO("virtio"), XEN("xen"), USB("usb"), UML("uml"), FDC("fdc");
+        XEN("xen"), USB("usb"), UML("uml"), FDC("fdc");
         String bus;
 
         DiskBus(final String bus) {
@@ -387,7 +389,7 @@ public class LibvirtDiskDef {
         }
         diskBuilder.append("<target dev='" + diskLabel + "'");
         if (bus != null) {
-            diskBuilder.append(" bus='" + bus + "'");
+            diskBuilder.append(" bus='" + bus.toString().toLowerCase() + "'");
         }
         diskBuilder.append("/>\n");
 
