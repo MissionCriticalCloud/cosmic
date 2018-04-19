@@ -177,23 +177,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -247,11 +231,21 @@ public class VolumeObject implements VolumeInfo {
         return null;
     }
 
+    private Long getIopsRate(Long iopsRate) {
+        long diskSize = getSize() >> 30;
+        if (iopsRate != null && iopsRate > 0) {
+            return iopsRate * diskSize;
+        } else {
+            return iopsRate;
+        }
+    }
+
     @Override
     public Long getIopsReadRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsReadRate();
+            Long iopsReadRate = diskOfferingVO.getIopsReadRate();
+            return getIopsRate(iopsReadRate);
         }
         return null;
     }
@@ -260,7 +254,18 @@ public class VolumeObject implements VolumeInfo {
     public Long getIopsWriteRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsWriteRate();
+            Long iopsWriteRate = diskOfferingVO.getIopsWriteRate();
+            return getIopsRate(iopsWriteRate);
+        }
+        return null;
+    }
+
+    @Override
+    public Long getIopsTotalRate() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            Long iopsTotalRate = diskOfferingVO.getIopsTotalRate();
+            return getIopsRate(iopsTotalRate);
         }
         return null;
     }
@@ -432,23 +437,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -457,6 +446,26 @@ public class VolumeObject implements VolumeInfo {
             throw ex;
         }
         this.processEvent(event);
+    }
+
+    private void processDownloadAnswer(final Answer answer) {
+        // image store or imageCache store
+        if (answer instanceof DownloadAnswer) {
+            final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            volStore.setInstallPath(dwdAnswer.getInstallPath());
+            volStore.setChecksum(dwdAnswer.getCheckSum());
+            volumeStoreDao.update(volStore.getId(), volStore);
+        } else if (answer instanceof CopyCmdAnswer) {
+            final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
+            volStore.setInstallPath(newVol.getPath());
+            if (newVol.getSize() != null) {
+                volStore.setSize(newVol.getSize());
+            }
+            volumeStoreDao.update(volStore.getId(), volStore);
+        }
     }
 
     public long getVolumeId() {
@@ -505,16 +514,6 @@ public class VolumeObject implements VolumeInfo {
     @Override
     public String getName() {
         return volumeVO.getName();
-    }
-
-    @Override
-    public Long getMinIops() {
-        return volumeVO.getMinIops();
-    }
-
-    @Override
-    public Long getMaxIops() {
-        return volumeVO.getMaxIops();
     }
 
     @Override

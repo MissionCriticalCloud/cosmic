@@ -213,8 +213,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 oldVol.getDiskOfferingId(),
                 oldVol.getProvisioningType(),
                 oldVol.getSize(),
-                oldVol.getMinIops(),
-                oldVol.getMaxIops(),
                 oldVol.get_iScsiName());
         if (templateId != null) {
             newVol.setTemplateId(templateId);
@@ -557,16 +555,13 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public DiskProfile allocateRawVolume(final Type type, final String name, final DiskOffering offering, Long size, Long minIops, Long maxIops, final VirtualMachine vm, final
+    public DiskProfile allocateRawVolume(final Type type, final String name, final DiskOffering offering, Long size, final VirtualMachine vm, final
     VirtualMachineTemplate template, final Account owner) {
         if (size == null) {
             size = offering.getDiskSize();
         } else {
             size = (size * 1024 * 1024 * 1024);
         }
-
-        minIops = minIops != null ? minIops : offering.getMinIops();
-        maxIops = maxIops != null ? maxIops : offering.getMaxIops();
 
         VolumeVO vol = new VolumeVO(type,
                 name,
@@ -576,8 +571,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 offering.getId(),
                 offering.getProvisioningType(),
                 size,
-                minIops,
-                maxIops,
                 null);
         if (vm != null) {
             vol.setInstanceId(vm.getId());
@@ -1267,8 +1260,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public DiskProfile allocateTemplatedVolume(final Type type, final String name, final DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, final
-    VirtualMachineTemplate template, final VirtualMachine vm, final Account owner) {
+    public DiskProfile allocateTemplatedVolume(final Type type, final String name, final DiskOffering offering, Long rootDisksize,
+                                               final VirtualMachineTemplate template, final VirtualMachine vm, final Account owner) {
         assert (template.getFormat() != ImageFormat.ISO) : "ISO is not a template really....";
 
         Long size = _tmpltMgr.getTemplateSize(template.getId(), vm.getDataCenterId());
@@ -1283,8 +1276,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             }
         }
 
-        minIops = minIops != null ? minIops : offering.getMinIops();
-        maxIops = maxIops != null ? maxIops : offering.getMaxIops();
 
         VolumeVO vol = new VolumeVO(type,
                 name,
@@ -1294,8 +1285,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 offering.getId(),
                 offering.getProvisioningType(),
                 size,
-                minIops,
-                maxIops,
                 null);
         vol.setFormat(getSupportedImageFormatForCluster(template.getHypervisorType()));
         if (vm != null) {

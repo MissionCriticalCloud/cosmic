@@ -93,6 +93,8 @@ import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -106,9 +108,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeSet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DeploymentPlanningManagerImpl extends ManagerBase implements DeploymentPlanningManager, Manager, Listener,
         StateListener<State, VirtualMachine.Event, VirtualMachine> {
@@ -729,6 +728,9 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 final List<StoragePool> volumePoolList = suitableVolumeStoragePools.get(vol);
                 hostCanAccessPool = false;
                 for (final StoragePool potentialSPool : volumePoolList) {
+                    if (!_storageMgr.storagePoolHasEnoughIops(Arrays.asList(vol), potentialSPool)) {
+                        continue;
+                    }
                     if (hostCanAccessSPool(potentialHost, potentialSPool)) {
                         hostCanAccessPool = true;
                         if (multipleVolume && !readyAndReusedVolumes.contains(vol)) {
@@ -740,7 +742,8 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                             }
                             requestVolumes.add(vol);
 
-                            if (!_storageMgr.storagePoolHasEnoughSpace(requestVolumes, potentialSPool)) {
+                            if (!_storageMgr.storagePoolHasEnoughIops(requestVolumes, potentialSPool) ||
+                                    !_storageMgr.storagePoolHasEnoughSpace(requestVolumes, potentialSPool)) {
                                 continue;
                             }
                             volumeAllocationMap.put(potentialSPool, requestVolumes);
@@ -1120,7 +1123,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 if (saveReservation) {
                     final VMReservationVO vmReservation =
                             new VMReservationVO(vm.getId(), plannedDestination.getZone().getId(), plannedDestination.getPod().getId(), plannedDestination.getCluster()
-                                                                                                                                                         .getId(),
+                                    .getId(),
                                     plannedDestination.getHost().getId());
                     if (planner != null) {
                         vmReservation.setDeploymentPlanner(planner.getName());

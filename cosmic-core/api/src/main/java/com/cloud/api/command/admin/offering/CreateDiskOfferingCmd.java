@@ -59,20 +59,14 @@ public class CreateDiskOfferingCmd extends BaseCmd {
     @Parameter(name = ApiConstants.BYTES_WRITE_RATE, type = CommandType.LONG, required = false, description = "bytes write rate of the disk offering")
     private Long bytesWriteRate;
 
-    @Parameter(name = ApiConstants.IOPS_READ_RATE, type = CommandType.LONG, required = false, description = "io requests read rate of the disk offering")
+    @Parameter(name = ApiConstants.IOPS_READ_RATE, type = CommandType.LONG, required = false, description = "io requests read rate per GB of the disk offering")
     private Long iopsReadRate;
 
-    @Parameter(name = ApiConstants.IOPS_WRITE_RATE, type = CommandType.LONG, required = false, description = "io requests write rate of the disk offering")
+    @Parameter(name = ApiConstants.IOPS_WRITE_RATE, type = CommandType.LONG, required = false, description = "io requests write rate per GB of the disk offering")
     private Long iopsWriteRate;
 
-    @Parameter(name = ApiConstants.CUSTOMIZED_IOPS, type = CommandType.BOOLEAN, required = false, description = "whether disk offering iops is custom or not")
-    private Boolean customizedIops;
-
-    @Parameter(name = ApiConstants.MIN_IOPS, type = CommandType.LONG, required = false, description = "min iops of the disk offering")
-    private Long minIops;
-
-    @Parameter(name = ApiConstants.MAX_IOPS, type = CommandType.LONG, required = false, description = "max iops of the disk offering")
-    private Long maxIops;
+    @Parameter(name = ApiConstants.IOPS_TOTAL_RATE, type = CommandType.LONG, required = false, description = "io requests generic total rate per GB of the disk offering")
+    private Long iopsTotalRate;
 
     @Parameter(name = ApiConstants.HYPERVISOR_SNAPSHOT_RESERVE,
             type = CommandType.INTEGER,
@@ -104,18 +98,6 @@ public class CreateDiskOfferingCmd extends BaseCmd {
         return customized;
     }
 
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
     public Long getDomainId() {
         return domainId;
     }
@@ -134,6 +116,10 @@ public class CreateDiskOfferingCmd extends BaseCmd {
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
     }
 
     public String getStorageType() {

@@ -72,12 +72,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @SerializedName(ApiConstants.SIZE)
     @Param(description = "size of the disk volume")
     private Long size;
-    @SerializedName(ApiConstants.MIN_IOPS)
-    @Param(description = "min iops of the disk volume")
-    private Long minIops;
-    @SerializedName(ApiConstants.MAX_IOPS)
-    @Param(description = "max iops of the disk volume")
-    private Long maxIops;
     @SerializedName(ApiConstants.CREATED)
     @Param(description = "the date the disk volume was created")
     private Date created;
@@ -109,11 +103,14 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @Param(description = "bytes write rate of the disk volume")
     private Long bytesWriteRate;
     @SerializedName("diskIopsReadRate")
-    @Param(description = "io requests read rate of the disk volume")
+    @Param(description = "io requests read rate per GB of the disk volume")
     private Long iopsReadRate;
     @SerializedName("diskIopsWriteRate")
-    @Param(description = "io requests write rate of the disk volume")
+    @Param(description = "io requests write rate per GB of the disk volume")
     private Long iopsWriteRate;
+    @SerializedName("diskIopsTotalRate")
+    @Param(description = "io requests total rate per GB of the disk volume")
+    private Long iopsTotalRate;
     @SerializedName(ApiConstants.HYPERVISOR)
     @Param(description = "Hypervisor the volume belongs to")
     private String hypervisor;
@@ -246,14 +243,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
         this.size = size;
     }
 
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
     public void setCreated(final Date created) {
         this.created = created;
     }
@@ -317,6 +306,14 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     public void setHypervisor(final String hypervisor) {

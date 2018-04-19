@@ -257,6 +257,10 @@ cloudStack.docs = {
         desc: 'Allowed disk write rate in I/O requests per second',
         externalLink: ''
     },
+    helpComputeOfferingDiskIopsTotalRate: {
+        desc: 'Allowed disk total rate in I/O requests per second',
+        externalLink: ''
+    },
     helpComputeOfferingHA: {
         desc: 'If yes, the administrator can choose to have the VM be monitored and as highly available as possible',
         externalLink: ''
@@ -333,6 +337,10 @@ cloudStack.docs = {
     },
     helpDiskOfferingDiskIopsWriteRate: {
         desc: 'Allowed disk write rate in I/O requests per second',
+        externalLink: ''
+    },
+    helpDiskOfferingDiskIopsTotalRate: {
+        desc: 'Allowed disk total rate in I/O requests per second',
         externalLink: ''
     },
     helpDiskOfferingCustomDiskIops: {
@@ -811,6 +819,10 @@ cloudStack.docs = {
     },
     helpSystemOfferingDiskIopsWriteRate: {
         desc: 'Allowed disk write rate in I/O requests per second',
+        externalLink: ''
+    },
+    helpSystemOfferingDiskIopsTotalRate: {
+        desc: 'Allowed disk total rate in I/O requests per second',
         externalLink: ''
     },
     helpSystemOfferingHA: {

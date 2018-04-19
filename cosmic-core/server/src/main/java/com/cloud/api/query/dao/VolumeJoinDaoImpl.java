@@ -84,9 +84,6 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         // Show the virtual size of the volume
         volResponse.setSize(volume.getSize());
 
-        volResponse.setMinIops(volume.getMinIops());
-        volResponse.setMaxIops(volume.getMaxIops());
-
         volResponse.setCreated(volume.getCreated());
         volResponse.setState(volume.getState().toString());
         if (volume.getState() == Volume.State.UploadOp) {
@@ -165,6 +162,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             volResponse.setBytesWriteRate(volume.getBytesReadRate());
             volResponse.setIopsReadRate(volume.getIopsWriteRate());
             volResponse.setIopsWriteRate(volume.getIopsWriteRate());
+            volResponse.setIopsTotalRate(volume.getIopsTotalRate());
         }
 
         if (!_accountMgr.isNormalUser(caller.getId())) {

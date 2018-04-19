@@ -71,12 +71,6 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.SIZE, type = CommandType.LONG, description = "Arbitrary volume size")
     private Long size;
 
-    @Parameter(name = ApiConstants.MIN_IOPS, type = CommandType.LONG, description = "min iops")
-    private Long minIops;
-
-    @Parameter(name = ApiConstants.MAX_IOPS, type = CommandType.LONG, description = "max iops")
-    private Long maxIops;
-
     @Parameter(name = ApiConstants.SNAPSHOT_ID,
             type = CommandType.UUID,
             entityType = SnapshotResponse.class,
@@ -118,14 +112,6 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
 
     public Long getSize() {
         return size;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
     }
 
     public Long getZoneId() {

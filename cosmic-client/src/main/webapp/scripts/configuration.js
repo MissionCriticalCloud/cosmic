@@ -122,8 +122,8 @@
                                     isCustomized: {
                                         label: 'label.custom',
                                         isBoolean: true,
-                                        isReverse: true,
-                                        isChecked: false
+                                        isChecked: true,
+                                        isReverse: false
                                     },
                                     cpuNumber: {
                                         label: 'label.num.cpu.cores',
@@ -182,6 +182,7 @@
                                                 var $diskBytesWriteRate = $form.find('.form-item[rel=diskBytesWriteRate]');
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
+                                                var $diskIopsTotalRate = $form.find('.form-item[rel=diskIopsTotalRate]');
 
                                                 var qosId = $(this).val();
 
@@ -212,11 +213,13 @@
                                                     $diskBytesWriteRate.css('display', 'inline-block');
                                                     $diskIopsReadRate.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
+                                                    $diskIopsTotalRate.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
                                                     $diskBytesWriteRate.hide();
                                                     $diskIopsReadRate.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsTotalRate.hide();
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
@@ -285,6 +288,14 @@
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate',
                                         docID: 'helpComputeOfferingDiskIopsWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate',
+                                        docID: 'helpComputeOfferingDiskIopsTotalRate',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -659,6 +670,12 @@
                                             iopswriterate: args.data.diskIopsWriteRate
                                         });
                                     }
+
+                                    if (args.data.diskIopsTotalRate != null && args.data.diskIopsTotalRate.length > 0) {
+                                        $.extend(data, {
+                                            iopstotalrate: args.data.diskIopsTotalRate
+                                        });
+                                    }
                                 }
 
                                 $.extend(data, {
@@ -882,6 +899,10 @@
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate'
                                     },
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate'
+                                    },
+
                                     offerha: {
                                         label: 'label.offer.ha',
                                         converter: cloudStack.converters.toBooleanText
@@ -1124,6 +1145,14 @@
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate',
                                         docID: 'helpSystemOfferingDiskIopsWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate',
+                                        docID: 'helpSystemOfferingDiskIopsTotalRate',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -1431,6 +1460,9 @@
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate'
                                     },
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate'
+                                    },
                                     offerha: {
                                         label: 'label.offer.ha',
                                         converter: cloudStack.converters.toBooleanText
@@ -1542,8 +1574,7 @@
                             createForm: {
                                 title: 'label.add.disk.offering',
                                 preFilter: function (args) {
-                                    if (isAdmin()) {
-                                    } else {
+                                    if (!isAdmin()) {
                                         args.$form.find('.form-item[rel=isPublic]').hide();
                                         args.$form.find('.form-item[rel=domainId]').css('display', 'inline-block'); //shown
                                         args.$form.find('.form-item[rel=tags]').hide();
@@ -1646,11 +1677,13 @@
                                                 var $isCustomizedIops = $form.find('.form-item[rel=isCustomizedIops]');
                                                 var $minIops = $form.find('.form-item[rel=minIops]');
                                                 var $maxIops = $form.find('.form-item[rel=maxIops]');
+                                                var $totalIops = $form.find('.form-item[rel=totalIops]');
                                                 var $hypervisorSnapshotReserve = $form.find('.form-item[rel=hypervisorSnapshotReserve]');
                                                 var $diskBytesReadRate = $form.find('.form-item[rel=diskBytesReadRate]');
                                                 var $diskBytesWriteRate = $form.find('.form-item[rel=diskBytesWriteRate]');
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
+                                                var $diskIopsTotalRate = $form.find('.form-item[rel=diskIopsTotalRate]');
 
                                                 var qosId = $(this).val();
 
@@ -1675,12 +1708,14 @@
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
+                                                    $totalIops.hide();
                                                     $hypervisorSnapshotReserve.hide();
 
                                                     $diskBytesReadRate.css('display', 'inline-block');
                                                     $diskBytesWriteRate.css('display', 'inline-block');
                                                     $diskIopsReadRate.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
+                                                    $diskIopsTotalRate.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
                                                     $diskBytesWriteRate.hide();
@@ -1754,6 +1789,14 @@
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate',
                                         docID: 'helpDiskOfferingDiskIopsWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate',
+                                        docID: 'helpDiskOfferingDiskIopsTotalRate',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -1922,6 +1965,12 @@
                                             iopswriterate: args.data.diskIopsWriteRate
                                         });
                                     }
+
+                                    if (args.data.diskIopsTotalRate != null && args.data.diskIopsTotalRate.length > 0) {
+                                        $.extend(data, {
+                                            iopstotalrate: args.data.diskIopsTotalRate
+                                        });
+                                    }
                                 }
 
                                 if (args.data.tags != null && args.data.tags.length > 0) {
@@ -2055,12 +2104,21 @@
                                                 return "N/A";
                                         }
                                     },
+                                    hypervisorsnapshotreserve: {
+                                        label: 'label.hypervisor.snapshot.reserve',
+                                        converter: function (args) {
+                                            if (args > 0)
+                                                return args;
+                                            else
+                                                return "N/A";
+                                        }
+                                    },
                                     iscustomizediops: {
                                         label: 'label.custom.disk.iops',
                                         converter: cloudStack.converters.toBooleanText
                                     },
-                                    miniops: {
-                                        label: 'label.disk.iops.min',
+                                    diskIopsReadRate: {
+                                        label: 'label.disk.iops.read.rate',
                                         converter: function (args) {
                                             if (args > 0)
                                                 return args;
@@ -2068,8 +2126,8 @@
                                                 return "N/A";
                                         }
                                     },
-                                    maxiops: {
-                                        label: 'label.disk.iops.max',
+                                    diskIopsWriteRate: {
+                                        label: 'label.disk.iops.write.rate',
                                         converter: function (args) {
                                             if (args > 0)
                                                 return args;
@@ -2077,8 +2135,8 @@
                                                 return "N/A";
                                         }
                                     },
-                                    hypervisorsnapshotreserve: {
-                                        label: 'label.hypervisor.snapshot.reserve',
+                                    diskIopsTotalRate: {
+                                        label: 'label.disk.iops.total.rate',
                                         converter: function (args) {
                                             if (args > 0)
                                                 return args;
@@ -2091,12 +2149,6 @@
                                     },
                                     diskBytesWriteRate: {
                                         label: 'label.disk.bytes.write.rate'
-                                    },
-                                    diskIopsReadRate: {
-                                        label: 'label.disk.iops.read.rate'
-                                    },
-                                    diskIopsWriteRate: {
-                                        label: 'label.disk.iops.write.rate'
                                     },
                                     cacheMode: {
                                         label: 'label.cache.mode'
@@ -2534,7 +2586,9 @@
                                                 success: function (data) {
                                                     networkServiceObjs = data.listsupportednetworkservicesresponse.networkservice;
                                                     serviceFields = [];
-                                                    var fields = {}, providerCanenableindividualserviceMap = {}, providerServicesMap = {}, providerDropdownsForciblyChangedTogether = {};
+                                                    var fields = {}, providerCanenableindividualserviceMap = {},
+                                                        providerServicesMap = {},
+                                                        providerDropdownsForciblyChangedTogether = {};
                                                     $(networkServiceObjs).each(function () {
                                                         var serviceName = this.name;
                                                         var providerObjs = this.provider;

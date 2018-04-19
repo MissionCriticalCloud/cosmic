@@ -105,10 +105,6 @@ public class VolumeVO implements Volume {
     @Transient
     // @Column(name="reservation")
             String reservationId;
-    @Column(name = "min_iops")
-    private Long minIops;
-    @Column(name = "max_iops")
-    private Long maxIops;
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     private State state;
@@ -127,8 +123,8 @@ public class VolumeVO implements Volume {
 
     // Real Constructor
     public VolumeVO(final Type type, final String name, final long dcId, final long domainId,
-                    final long accountId, final long diskOfferingId, final Storage.ProvisioningType provisioningType, final long size,
-                    final Long minIops, final Long maxIops, final String iScsiName) {
+                    final long accountId, final long diskOfferingId, final Storage.ProvisioningType provisioningType,
+                    final long size, final String iScsiName) {
         this.volumeType = type;
         this.name = name;
         dataCenterId = dcId;
@@ -136,8 +132,6 @@ public class VolumeVO implements Volume {
         this.domainId = domainId;
         this.provisioningType = provisioningType;
         this.size = size;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
         _iScsiName = iScsiName;
         this.diskOfferingId = diskOfferingId;
         state = State.Allocated;
@@ -155,8 +149,6 @@ public class VolumeVO implements Volume {
         this.path = path;
         this.provisioningType = provisioningType;
         this.size = size;
-        minIops = null;
-        maxIops = null;
         _iScsiName = null;
         this.podId = podId;
         dataCenterId = dcId;
@@ -178,15 +170,11 @@ public class VolumeVO implements Volume {
                 that.getPath(),
                 that.getProvisioningType(),
                 that.getSize(),
-                that.getMinIops(),
-                that.getMaxIops(),
                 that.get_iScsiName(),
                 that.getVolumeType());
         recreatable = that.isRecreatable();
         state = State.Allocated; //This should be in Allocated state before going into Ready state
         size = that.getSize();
-        minIops = that.getMinIops();
-        maxIops = that.getMaxIops();
         _iScsiName = that.get_iScsiName();
         diskOfferingId = that.getDiskOfferingId();
         poolId = that.getPoolId();
@@ -201,7 +189,7 @@ public class VolumeVO implements Volume {
 
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
                     final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
-                    final long size, final Long minIops, final Long maxIops, final String iScsiName,
+                    final long size, final String iScsiName,
                     final Volume.Type vType) {
         this.name = name;
         this.accountId = accountId;
@@ -211,8 +199,6 @@ public class VolumeVO implements Volume {
         this.path = path;
         this.provisioningType = provisioningType;
         this.size = size;
-        this.minIops = minIops;
-        this.maxIops = maxIops;
         _iScsiName = iScsiName;
         this.podId = podId;
         dataCenterId = dcId;
@@ -246,24 +232,6 @@ public class VolumeVO implements Volume {
 
     public void setSize(final Long size) {
         this.size = size;
-    }
-
-    @Override
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    @Override
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
     }
 
     @Override

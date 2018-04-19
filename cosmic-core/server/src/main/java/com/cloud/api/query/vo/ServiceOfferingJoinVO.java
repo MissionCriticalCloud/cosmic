@@ -29,6 +29,8 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "iops_total_rate")
+    Long iopsTotalRate;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
@@ -62,12 +64,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     private boolean defaultUse;
     @Column(name = "vm_type")
     private String vmType;
-    @Column(name = "customized_iops")
-    private Boolean customizedIops;
-    @Column(name = "min_iops")
-    private Long minIops;
-    @Column(name = "max_iops")
-    private Long maxIops;
     @Column(name = "hv_ss_reserve")
     private Integer hypervisorSnapshotReserve;
     @Column(name = GenericDao.CREATED_COLUMN)
@@ -186,18 +182,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         this.vmType = vmType;
     }
 
-    public void setCustomizedIops(final Boolean customizedIops) {
-        this.customizedIops = customizedIops;
-    }
-
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
     public void setHypervisorSnapshotReserve(final Integer hypervisorSnapshotReserve) {
         this.hypervisorSnapshotReserve = hypervisorSnapshotReserve;
     }
@@ -288,18 +272,6 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         return domainPath;
     }
 
-    public Boolean isCustomizedIops() {
-        return customizedIops;
-    }
-
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
     public Integer getHypervisorSnapshotReserve() {
         return hypervisorSnapshotReserve;
     }
@@ -366,6 +338,14 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     public boolean isDynamic() {
