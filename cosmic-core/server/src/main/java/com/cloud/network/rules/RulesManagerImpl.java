@@ -346,6 +346,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
     @ActionEvent(eventType = EventTypes.EVENT_NET_RULE_ADD, eventDescription = "creating forwarding rule", create = true)
     public PortForwardingRule createPortForwardingRule(final PortForwardingRule rule, final Long vmId, final Ip vmIp, final Boolean forDisplay)
             throws NetworkRuleConflictException {
+
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
 
