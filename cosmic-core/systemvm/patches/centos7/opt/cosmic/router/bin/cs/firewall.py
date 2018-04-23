@@ -59,6 +59,7 @@ class Firewall:
         self.fw.append(["filter", "", "-P FORWARD DROP"])
 
         self.fw.append(["filter", "", "-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"])
+        self.fw.append(["filter", "", "-A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT"])
 
         self.fw.append(["mangle", "front", "-A POSTROUTING -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill"])
 
@@ -85,6 +86,9 @@ class Firewall:
         self.fw.append(["filter", "", "-A INPUT -i %s -m state --state RELATED,ESTABLISHED -j ACCEPT" % device])
         self.fw.append(["filter", "", "-A FORWARD -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
         self.fw.append(["filter", "", "-A OUTPUT -m state --state NEW -o %s -j ACL_INBOUND_%s" % (device, device)])
+        self.fw.append(["filter", "", "-A OUTPUT -m state --state NEW -o %s -m limit --limit 2/second -j LOG "
+                                      "--log-prefix \"iptables denied: [output] \" --log-level 4" % device])
+        self.fw.append(["filter", "", "-A OUTPUT -m state --state NEW -o %s -j DROP" % device])
 
         self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.18/32 -j ACCEPT" % device])
         self.fw.append(["filter", "front", "-A ACL_INBOUND_%s -d 224.0.0.22/32 -j ACCEPT" % device])
