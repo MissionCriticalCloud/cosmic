@@ -69,7 +69,7 @@ public class CloudOrchestrator implements OrchestrationService {
     @Override
     public void createVirtualMachine(final String id, final String owner, final String templateId, final String hostName, final String displayName, final String hypervisor,
                                      final int cpu, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags,
-                                     final Map<String, NicProfile> networkNicMap, final DeploymentPlan plan, final Long rootDiskSize, DiskControllerType diskControllerType)
+                                     final Map<String, NicProfile> networkNicMap, final DeploymentPlan plan, final Long rootDiskSize, final DiskControllerType diskControllerType)
             throws InsufficientCapacityException {
 
         final LinkedHashMap<NetworkVO, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<>();

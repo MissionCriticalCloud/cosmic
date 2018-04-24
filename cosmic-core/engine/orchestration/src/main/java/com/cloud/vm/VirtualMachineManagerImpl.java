@@ -387,7 +387,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     @DB
     public void allocate(final String vmInstanceName, final VirtualMachineTemplate template, final ServiceOffering serviceOffering, final DiskOfferingInfo rootDiskOfferingInfo,
                          final List<DiskOfferingInfo> dataDiskOfferings, final LinkedHashMap<? extends Network, List<? extends NicProfile>> auxiliaryNetworks,
-                         final DeploymentPlan plan, final HypervisorType hyperType, DiskControllerType diskControllerType
+                         final DeploymentPlan plan, final HypervisorType hyperType, final DiskControllerType diskControllerType
     ) throws InsufficientCapacityException {
 
         final VMInstanceVO vm = _vmDao.findVMByInstanceName(vmInstanceName);
@@ -417,9 +417,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 s_logger.debug("Allocating disks for " + vmFinal);
 
-                final GuestOS guestOs = _guestOSDao.findById(vmFinal.getGuestOSId());
-                final DiskControllerType diskControllerType = getGuestDiskModel(guestOs.getDisplayName());
-
                 if (template.getFormat() == ImageFormat.ISO) {
                     volumeMgr.allocateRawVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
                             rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
@@ -438,16 +435,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         });
 
         s_logger.debug("Allocation completed for VM: " + vmFinal);
-    }
-
-    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
-        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
-            return DiskControllerType.IDE;
-        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
-            return DiskControllerType.SCSI;
-        } else {
-            return DiskControllerType.VIRTIO;
-        }
     }
 
     @Override
