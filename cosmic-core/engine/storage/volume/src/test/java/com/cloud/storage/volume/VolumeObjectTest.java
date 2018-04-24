@@ -1,6 +1,7 @@
 package com.cloud.storage.volume;
 
 import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
@@ -44,7 +45,7 @@ public class VolumeObjectTest {
     public void setUp() throws Exception {
         volumeObject.configure(
                 Mockito.mock(DataStore.class),
-                new VolumeVO("name", 1L, 1L, 1L, 1L, 1L, "folder", "path", Storage.ProvisioningType.THIN, 1L, Volume.Type.DATADISK),
+                new VolumeVO("name", 1L, 1L, 1L, 1L, 1L, "folder", "path", Storage.ProvisioningType.THIN, 1L, Volume.Type.DATADISK, DiskControllerType.SCSI),
                 false
         );
     }

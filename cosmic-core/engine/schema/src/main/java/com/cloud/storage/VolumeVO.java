@@ -132,7 +132,7 @@ public class VolumeVO implements Volume {
     // Real Constructor
     public VolumeVO(final Type type, final String name, final long dcId, final long domainId,
                     final long accountId, final long diskOfferingId, final Storage.ProvisioningType provisioningType, final long size,
-                    final Long minIops, final Long maxIops, final String iScsiName) {
+                    final Long minIops, final Long maxIops, final String iScsiName, final DiskControllerType diskControllerType) {
         this.volumeType = type;
         this.name = name;
         dataCenterId = dcId;
@@ -146,12 +146,12 @@ public class VolumeVO implements Volume {
         this.diskOfferingId = diskOfferingId;
         state = State.Allocated;
         uuid = UUID.randomUUID().toString();
-        diskController = DiskControllerType.VIRTIO;
+        diskController = diskControllerType;
     }
 
     public VolumeVO(final String name, final long dcId, final long podId, final long accountId,
                     final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
-                    final long size, final Volume.Type vType) {
+                    final long size, final Volume.Type vType, final DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -169,7 +169,7 @@ public class VolumeVO implements Volume {
         state = Volume.State.Allocated;
         recreatable = false;
         uuid = UUID.randomUUID().toString();
-        diskController = DiskControllerType.VIRTIO;
+        diskController = diskControllerType;
     }
 
     // Copy Constructor
@@ -187,7 +187,8 @@ public class VolumeVO implements Volume {
                 that.getMinIops(),
                 that.getMaxIops(),
                 that.get_iScsiName(),
-                that.getVolumeType());
+                that.getVolumeType(),
+                that.getDiskController());
         recreatable = that.isRecreatable();
         state = State.Allocated; //This should be in Allocated state before going into Ready state
         size = that.getSize();
@@ -209,7 +210,7 @@ public class VolumeVO implements Volume {
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
                     final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
                     final long size, final Long minIops, final Long maxIops, final String iScsiName,
-                    final Volume.Type vType) {
+                    final Volume.Type vType, DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -227,7 +228,7 @@ public class VolumeVO implements Volume {
         state = Volume.State.Allocated;
         recreatable = false;
         uuid = UUID.randomUUID().toString();
-        diskController = DiskControllerType.VIRTIO;
+        diskController = diskControllerType;
     }
 
     protected VolumeVO() {

@@ -136,7 +136,7 @@ public class VolumeApiServiceImplTest {
         try {
             // volume of running vm id=1
             final VolumeVO volumeOfRunningVm = new VolumeVO("root", 1L, 1L, 1L, 1L, 1L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(1L)).thenReturn(volumeOfRunningVm);
 
             final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
@@ -147,7 +147,7 @@ public class VolumeApiServiceImplTest {
 
             // volume of stopped vm id=2
             final VolumeVO volumeOfStoppedVm = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             volumeOfStoppedVm.setPoolId(1L);
             when(_svc._volsDao.findById(2L)).thenReturn(volumeOfStoppedVm);
 
@@ -165,7 +165,7 @@ public class VolumeApiServiceImplTest {
             managedPool.setManaged(true);
             when(_svc._storagePoolDao.findById(2L)).thenReturn(managedPool);
             final VolumeVO managedPoolVolume = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             managedPoolVolume.setPoolId(2L);
             when(_svc._volsDao.findById(4L)).thenReturn(managedPoolVolume);
 
@@ -184,7 +184,7 @@ public class VolumeApiServiceImplTest {
             when(_svc.volFactory.getVolume(6L)).thenReturn(correctRootVolume);
 
             final VolumeVO correctRootVolumeVO = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(6L)).thenReturn(correctRootVolumeVO);
 
             // managed root volume
@@ -197,7 +197,7 @@ public class VolumeApiServiceImplTest {
             when(_svc.volFactory.getVolume(7L)).thenReturn(managedVolume);
 
             final VolumeVO managedVolume1 = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             managedVolume1.setPoolId(2L);
             managedVolume1.setDataCenterId(1L);
             when(_svc._volsDao.findById(7L)).thenReturn(managedVolume1);
@@ -223,7 +223,7 @@ public class VolumeApiServiceImplTest {
             when(_svc.volFactory.getVolume(8L)).thenReturn(uploadedVolume);
 
             final VolumeVO upVolume = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT);
+                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             upVolume.setPoolId(1L);
             upVolume.setDataCenterId(1L);
             upVolume.setState(Volume.State.Uploaded);
@@ -280,38 +280,38 @@ public class VolumeApiServiceImplTest {
     // Negative test - try to attach non-root non-datadisk volume
     @Test(expected = InvalidParameterValueException.class)
     public void attachIncorrectDiskType() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 5L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(1L, 5L, 0L, DiskControllerType.SCSI);
     }
 
     // Negative test - attach root volume to running vm
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToRunningVm() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 6L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(1L, 6L, 0L, DiskControllerType.SCSI);
     }
 
     // Negative test - attach root volume from the managed data store
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskOfManagedDataStore() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 7L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(2L, 7L, 0L, DiskControllerType.SCSI);
     }
 
     // Negative test - root volume can't be attached to the vm already having a root volume attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToVmHavingRootDisk() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(4L, 6L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(4L, 6L, 0L, DiskControllerType.SCSI);
     }
 
     // Negative test - root volume in uploaded state can't be attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootInUploadedState() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 8L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(2L, 8L, 0L, DiskControllerType.SCSI);
     }
 
     // Positive test - attach ROOT volume in correct state, to the vm not having root volume attached
     @Test
     public void attachRootVolumePositive() throws NoSuchFieldException, IllegalAccessException {
         thrown.expect(NullPointerException.class);
-        _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.VIRTIO);
+        _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.SCSI);
     }
 
     // volume not Ready
@@ -376,7 +376,7 @@ public class VolumeApiServiceImplTest {
         when(_svc._dcDao.findById(anyLong())).thenReturn(zoneWithDisabledLocalStorage);
         when(zoneWithDisabledLocalStorage.isLocalStorageEnabled()).thenReturn(true);
         try {
-            _svc.attachVolumeToVM(2L, 9L, null, DiskControllerType.VIRTIO);
+            _svc.attachVolumeToVM(2L, 9L, null, DiskControllerType.SCSI);
         } catch (InvalidParameterValueException e) {
             Assert.assertEquals(e.getMessage(), ("primary storage resource limit check failed"));
         }

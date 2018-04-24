@@ -156,6 +156,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     public static final String VM_WORK_JOB_HANDLER = VolumeApiServiceImpl.class.getSimpleName();
     static final ConfigKey<Long> VmJobCheckInterval = new ConfigKey<>("Advanced", Long.class, "vm.job.check.interval", "3000",
             "Interval in milliseconds to check if the job is complete", false);
+    static final ConfigKey<String> DefaultDiskControllerName = new ConfigKey<>("Advanced", String.class, "vm.default.disk.controller", "SCSI",
+            "Default disk controller type for routers, systemVMs and ", false);
+
     private final static Logger s_logger = LoggerFactory.getLogger(VolumeApiServiceImpl.class);
     @Inject
     DataCenterDao _dcDao = null;
@@ -429,7 +432,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final String userSpecifiedName = getVolumeNameFromCommand(cmd);
 
-        DiskControllerType diskControllerType = DiskControllerType.VIRTIO;
+        DiskControllerType diskControllerType = getDiskControllerType();
+
         if (cmd.getDiskController() != null) {
             diskControllerType = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
         }
@@ -437,6 +441,17 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 userSpecifiedName, _uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType);
 
         return volume;
+    }
+
+    private DiskControllerType getDiskControllerType() {
+        DiskControllerType diskControllerType = DiskControllerType.SCSI;
+
+        try {
+            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.toString());
+        } catch (final Exception e) {
+            s_logger.debug("Unable to parse vm.default.controller value '" + DefaultDiskControllerName + "' due to ", e);
+        }
+        return diskControllerType;
     }
 
     public boolean validateVolumeSizeRange(final long size) {
@@ -474,7 +489,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, Volume.Type.DATADISK);
+                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, Volume.Type.DATADISK, diskController);
                 volume.setPoolId(null);
                 volume.setUuid(uuid);
                 volume.setDataCenterId(zoneId);
@@ -531,7 +546,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     created = false;
                 }
 
-                DiskControllerType diskController = DiskControllerType.VIRTIO;
+                DiskControllerType diskController = getDiskControllerType();
                 if (cmd.getDiskController() != null) {
                     diskController = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
                 }
@@ -2655,7 +2670,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, Volume.Type.DATADISK);
+                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, Volume.Type.DATADISK, getDiskControllerType());
                 volume.setPoolId(null);
                 volume.setDataCenterId(zoneId);
                 volume.setPodId(null);

@@ -44,6 +44,7 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
@@ -117,6 +118,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             "Enable/disable storage migration across primary storage during HA", true);
     public static final ConfigKey<Boolean> StorageMigrationEnabled = new ConfigKey<>(Boolean.class, "enable.storage.migration", "Storage", "true",
             "Enable/disable storage migration across primary storage", true);
+    static final ConfigKey<String> DefaultDiskControllerName = new ConfigKey<>("Advanced", String.class, "vm.default.disk.controller", "SCSI",
+            "Default disk controller type for routers, systemVMs and ", false);
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeOrchestrator.class);
     private final StateMachine2<Volume.State, Volume.Event, Volume> _volStateMachine;
     @Inject
@@ -215,8 +218,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 oldVol.getSize(),
                 oldVol.getMinIops(),
                 oldVol.getMaxIops(),
-                oldVol.get_iScsiName());
-                oldVol.getDiskController();
+                oldVol.get_iScsiName(),
+                oldVol.getDiskController());
         if (templateId != null) {
             newVol.setTemplateId(templateId);
         } else {
@@ -579,7 +582,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 size,
                 minIops,
                 maxIops,
-                null);
+                null,
+                getDiskControllerType());
         if (vm != null) {
             vol.setInstanceId(vm.getId());
         }
@@ -607,6 +611,17 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
         return toDiskProfile(vol, offering);
+    }
+
+    private DiskControllerType getDiskControllerType() {
+        DiskControllerType diskControllerType = DiskControllerType.SCSI;
+
+        try {
+            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.toString());
+        } catch (final Exception e) {
+            s_logger.debug("Unable to parse vm.default.controller value '" + DefaultDiskControllerName + "' due to ", e);
+        }
+        return diskControllerType;
     }
 
     private ImageFormat getSupportedImageFormatForCluster(final HypervisorType hyperType) {
@@ -1297,7 +1312,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 size,
                 minIops,
                 maxIops,
-                null);
+                null,
+                getDiskControllerType());
         vol.setFormat(getSupportedImageFormatForCluster(template.getHypervisorType()));
         if (vm != null) {
             vol.setInstanceId(vm.getId());

@@ -15,7 +15,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
     public void testDomainXMLParser() {
         final int vncPort = 5900;
 
-        final DiskControllerType diskBus = DiskControllerType.VIRTIO;
+        final DiskControllerType diskBus = DiskControllerType.SCSI;
         final LibvirtDiskDef.DiskType diskType = LibvirtDiskDef.DiskType.FILE;
         final LibvirtDiskDef.DeviceType deviceType = LibvirtDiskDef.DeviceType.DISK;
         final LibvirtDiskDef.DiskFmtType diskFormat = LibvirtDiskDef.DiskFmtType.QCOW2;

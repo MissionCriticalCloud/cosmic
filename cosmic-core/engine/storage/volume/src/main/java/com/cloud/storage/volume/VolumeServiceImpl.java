@@ -836,6 +836,7 @@ public class VolumeServiceImpl implements VolumeService {
         newVol.setPoolId(pool.getId());
         newVol.setLastPoolId(lastPoolId);
         newVol.setPodId(pool.getPodId());
+        newVol.setDiskController(volume.getDiskController());
         return volDao.persist(newVol);
     }
 

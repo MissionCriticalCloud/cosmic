@@ -53,15 +53,16 @@ public class LibvirtVMDefTest extends TestCase {
 
     public void testDiskDef() {
         final String filePath = "/var/lib/libvirt/images/disk.qcow2";
-        final String diskLabel = "vda";
+        final String diskLabel = "sda";
+        final int deviceId = 1;
 
         final LibvirtDiskDef disk = new LibvirtDiskDef();
-        final DiskControllerType bus = DiskControllerType.VIRTIO;
+        final DiskControllerType bus = DiskControllerType.SCSI;
         final LibvirtDiskDef.DiskFmtType type = LibvirtDiskDef.DiskFmtType.QCOW2;
         final LibvirtDiskDef.DiskCacheMode cacheMode = LibvirtDiskDef.DiskCacheMode.WRITEBACK;
-
         disk.defFileBasedDisk(filePath, diskLabel, bus, type);
         disk.setCacheMode(cacheMode);
+        disk.setDeviceId(deviceId);
 
         assertEquals(filePath, disk.getDiskPath());
         assertEquals(diskLabel, disk.getDiskLabel());
@@ -71,7 +72,8 @@ public class LibvirtVMDefTest extends TestCase {
         final String xmlDef = disk.toString();
         final String expectedXml = "<disk  device='disk' type='file'>\n<driver name='qemu' type='" + type.toString() + "' cache='"
                 + cacheMode.toString() + "' />\n" +
-                "<source file='" + filePath + "'/>\n<target dev='" + diskLabel + "' bus='" + bus.toString().toLowerCase() + "'/>\n</disk>\n";
+                "<source file='" + filePath + "'/>\n<target dev='" + diskLabel + "' bus='" + bus.toString().toLowerCase() + "'/>\n" +
+                "<address type='drive' controller='0' bus='0' target='0' unit='1'/></disk>\n";
 
         assertEquals(xmlDef, expectedXml);
     }
