@@ -160,7 +160,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
     public NicProfile allocate(final Network network, NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
             InsufficientAddressCapacityException, ConcurrentOperationException {
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
 
         if (nic == null) {
             nic = new NicProfile(ReservationStrategy.Create, null, null, null, null);

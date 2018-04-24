@@ -657,7 +657,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             displayNetwork = true;
         }
 
-        final Zone zone = zoneRepository.findOne(zoneId);
+        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
         if (zone == null) {
             throw new InvalidParameterValueException("Specified zone id was not found");
         }
@@ -1828,7 +1828,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         // 3) Implement the elements and rules again
         if (restartNetwork) {
             if (network.getState() != Network.State.Allocated) {
-                final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
+                final DeployDestination dest = new DeployDestination(zoneRepository.findById(network.getDataCenterId()).orElse(null), null, null, null);
                 s_logger.debug("Implementing the network " + network + " elements and resources as a part of network update");
                 try {
                     if (!changeCidr) {
@@ -1850,7 +1850,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         if (networkOfferingChanged && !oldNtwkOff.getIsPersistent() && networkOffering.getIsPersistent()) {
             if (network.getState() == Network.State.Allocated) {
                 try {
-                    final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
+                    final DeployDestination dest = new DeployDestination(zoneRepository.findById(network.getDataCenterId()).orElse(null), null, null, null);
                     _networkMgr.implementNetwork(network.getId(), dest, context);
                 } catch (final Exception ex) {
                     s_logger.warn("Failed to implement network " + network + " elements and resources as a part o" + "f network update due to ", ex);
@@ -1876,7 +1876,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }
 
-        final Zone zone = zoneRepository.findOne(zoneId);
+        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
         if (zone == null) {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }

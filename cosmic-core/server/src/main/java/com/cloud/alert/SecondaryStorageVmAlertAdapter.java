@@ -35,7 +35,7 @@ public class SecondaryStorageVmAlertAdapter extends AdapterBase implements Alert
             s_logger.debug("received secondary storage vm alert");
         }
 
-        final Zone zone = zoneRepository.findOne(args.getZoneId());
+        final Zone zone = zoneRepository.findById(args.getZoneId()).orElse(null);
         SecondaryStorageVmVO secStorageVm = args.getSecStorageVm();
         if (secStorageVm == null && args.getSecStorageVmId() != 0) {
             secStorageVm = _ssvmDao.findById(args.getSecStorageVmId());

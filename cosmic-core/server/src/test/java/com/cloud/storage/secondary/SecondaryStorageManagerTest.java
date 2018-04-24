@@ -14,6 +14,7 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +43,7 @@ public class SecondaryStorageManagerTest {
     public void getDefaultNetwork() {
         final Zone zone = mock(Zone.class);
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(zone));
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);

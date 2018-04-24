@@ -72,7 +72,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
     public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, ExcludeList avoid) throws AffinityConflictException {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final List<AffinityGroupVMMapVO> vmGroupMappings = _affinityGroupVMMapDao.findByVmIdType(vm.getId(), getType());
-        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
         final List<DedicatedResourceVO> resourceList = new ArrayList<>();
 
         if (vmGroupMappings != null && !vmGroupMappings.isEmpty()) {
@@ -96,7 +96,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                 final HostVO host = _hostDao.findById(plan.getHostId());
                 final ClusterVO clusterofHost = _clusterDao.findById(host.getClusterId());
                 final HostPodVO podOfHost = _podDao.findById(host.getPodId());
-                final Zone zoneOfHost = zoneRepository.findOne(host.getDataCenterId());
+                final Zone zoneOfHost = zoneRepository.findById(host.getDataCenterId()).orElse(null);
                 if (resourceList != null && resourceList.size() != 0) {
                     for (final DedicatedResourceVO resource : resourceList) {
                         if ((resource.getHostId() != null && resource.getHostId().longValue() == plan.getHostId().longValue()) ||
@@ -113,7 +113,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
             } else if (plan.getClusterId() != null) {
                 final ClusterVO cluster = _clusterDao.findById(plan.getClusterId());
                 final HostPodVO podOfCluster = _podDao.findById(cluster.getPodId());
-                final Zone zoneOfCluster = zoneRepository.findOne(cluster.getDataCenterId());
+                final Zone zoneOfCluster = zoneRepository.findById(cluster.getDataCenterId()).orElse(null);
                 final List<HostVO> hostToUse = new ArrayList<>();
                 // check whether this cluster or its pod is dedicated
                 if (resourceList != null && resourceList.size() != 0) {
@@ -152,7 +152,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
                 }
             } else if (plan.getPodId() != null) {
                 final HostPodVO pod = _podDao.findById(plan.getPodId());
-                final Zone zoneOfPod = zoneRepository.findOne(pod.getDataCenterId());
+                final Zone zoneOfPod = zoneRepository.findById(pod.getDataCenterId()).orElse(null);
                 final List<ClusterVO> clustersToUse = new ArrayList<>();
                 final List<HostVO> hostsToUse = new ArrayList<>();
                 // check whether this cluster or its pod is dedicated

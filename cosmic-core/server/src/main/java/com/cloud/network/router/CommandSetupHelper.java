@@ -220,7 +220,7 @@ public class CommandSetupHelper {
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand(cmd);
     }
@@ -245,7 +245,7 @@ public class CommandSetupHelper {
 
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         cmds.addCommand(cmd);
@@ -264,7 +264,7 @@ public class CommandSetupHelper {
         final SetStaticNatRulesCommand cmd = new SetStaticNatRulesCommand(rulesTO, router.getVpcId());
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand(cmd);
     }
@@ -300,7 +300,7 @@ public class CommandSetupHelper {
         final SetFirewallRulesCommand cmd = new SetFirewallRulesCommand(rulesTO);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         if (systemRule != null) {
             cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, systemRule);
@@ -342,7 +342,7 @@ public class CommandSetupHelper {
         final SetFirewallRulesCommand cmd = new SetFirewallRulesCommand(rulesTO);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         if (systemRule != null) {
             cmd.setAccessDetail(NetworkElementCommand.FIREWALL_EGRESS_DEFAULT, systemRule);
@@ -396,7 +396,7 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.GUEST_VLAN_TAG, guestVlan);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         if (privateGateway) {
             cmd.setAccessDetail(NetworkElementCommand.VPC_PRIVATE_GATEWAY, String.valueOf(VpcGateway.Type.Private));
@@ -419,7 +419,7 @@ public class CommandSetupHelper {
         final SetPublicIpACLCommand cmd = new SetPublicIpACLCommand(rulesTO, nicTO, publicIp.getAddress().toString());
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         cmds.addCommand(cmd);
@@ -438,7 +438,7 @@ public class CommandSetupHelper {
 
     public void createPasswordCommand(final VirtualRouter router, final VirtualMachineProfile profile, final NicVO nic, final Commands cmds) {
         final String password = (String) profile.getParameter(VirtualMachineProfile.Param.VmPassword);
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
 
         // password should be set only on default network element
         if (password != null && nic.isDefaultNic()) {
@@ -467,7 +467,7 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
 
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand(cmd);
     }
@@ -476,7 +476,7 @@ public class CommandSetupHelper {
         final SetupVRCommand cmd = new SetupVRCommand(vpc);
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
         cmds.addCommand(cmd);
     }
@@ -700,7 +700,7 @@ public class CommandSetupHelper {
             final List<VMOverviewTO.VMTO.InterfaceTO> interfacesTO = new ArrayList<>();
 
             final ServiceOfferingVO serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId());
-            final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+            final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
             nics.forEach(nic -> {
                 final VMOverviewTO.VMTO.InterfaceTO interfaceTO = new VMOverviewTO.VMTO.InterfaceTO(
                         nic.getIPv4Address(),
@@ -745,7 +745,7 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
 
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         return cmd;
@@ -756,7 +756,7 @@ public class CommandSetupHelper {
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_IP, _routerControlHelper.getRouterControlIp(router.getId()));
         cmd.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
 
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         cmd.setAccessDetail(NetworkElementCommand.ZONE_NETWORK_TYPE, zone.getNetworkType().toString());
 
         return cmd;

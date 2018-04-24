@@ -33,6 +33,7 @@ import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -61,6 +62,7 @@ public class DedicatedApiUnitTest {
     public static final Logger s_logger = LoggerFactory.getLogger(DedicatedApiUnitTest.class);
     private static final long domainId = 5L;
     private static final long accountId = 5L;
+    private static final long zoneId = 10L;
     private static final String accountName = "admin";
     @Inject
     DedicatedResourceManagerImpl _dedicatedService = new DedicatedResourceManagerImpl();
@@ -84,6 +86,8 @@ public class DedicatedApiUnitTest {
     HostDao _hostDao;
     @Inject
     ConfigurationDao _configDao;
+    @Inject
+    ZoneRepository zoneRepository;
 
     @Before
     public void setUp() {
@@ -98,6 +102,7 @@ public class DedicatedApiUnitTest {
         when(_accountDao.findByIdIncludingRemoved(0L)).thenReturn(account);
         when(_accountDao.findById(anyLong())).thenReturn(account);
         when(_domainDao.findById(domainId)).thenReturn(domain);
+        when(zoneRepository.findById(zoneId)).thenReturn(Optional.empty());
     }
 
     @After
@@ -107,7 +112,7 @@ public class DedicatedApiUnitTest {
 
     @Test(expected = InvalidParameterValueException.class)
     public void InvalidDomainIDForAccountTest() {
-        _dedicatedService.dedicateZone(10L, domainId, accountName);
+        _dedicatedService.dedicateZone(zoneId, domainId, accountName);
     }
 
     @Test(expected = InvalidParameterValueException.class)
@@ -117,9 +122,9 @@ public class DedicatedApiUnitTest {
 
     @Test
     public void releaseDedicatedZoneInvalidIdTest() {
-        when(_dedicatedDao.findByZoneId(10L)).thenReturn(null);
+        when(_dedicatedDao.findByZoneId(zoneId)).thenReturn(null);
         try {
-            _dedicatedService.releaseDedicatedResource(10L, null, null, null);
+            _dedicatedService.releaseDedicatedResource(zoneId, null, null, null);
         } catch (final InvalidParameterValueException e) {
             Assert.assertTrue(e.getMessage().contains("No Dedicated Resource available to release"));
         }

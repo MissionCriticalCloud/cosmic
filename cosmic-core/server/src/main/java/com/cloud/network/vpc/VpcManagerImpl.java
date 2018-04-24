@@ -1267,7 +1267,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         // permission check
         _accountMgr.checkAccess(caller, null, false, vpc);
 
-        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
+        final Zone zone = zoneRepository.findById(vpc.getZoneId()).orElse(null);
 
         final DeployDestination dest = new DeployDestination(zone, null, null, null);
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser,
@@ -1429,7 +1429,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                     ());
         }
 
-        final DeployDestination dest = new DeployDestination(zoneRepository.findOne(vpc.getZoneId()), null, null, null);
+        final DeployDestination dest = new DeployDestination(zoneRepository.findById(vpc.getZoneId()).orElse(null), null, null, null);
 
         // If we are supposed to be redundant, let's replace the backup router
         // We do this even when backupRouter is null, so we first spin a new router before replacing the other router
