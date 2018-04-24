@@ -562,7 +562,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
     @Override
     public DiskProfile allocateRawVolume(final Type type, final String name, final DiskOffering offering, Long size, Long minIops, Long maxIops, final VirtualMachine vm, final
-    VirtualMachineTemplate template, final Account owner) {
+    VirtualMachineTemplate template, final Account owner, final DiskControllerType diskControllerType) {
         if (size == null) {
             size = offering.getDiskSize();
         } else {
@@ -583,10 +583,12 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 minIops,
                 maxIops,
                 null,
-                getDiskControllerType());
+                diskControllerType);
         if (vm != null) {
             vol.setInstanceId(vm.getId());
         }
+
+        vm.getGuestOSId();
 
         if (type.equals(Type.ROOT)) {
             vol.setDeviceId(0l);
@@ -617,7 +619,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         DiskControllerType diskControllerType = DiskControllerType.SCSI;
 
         try {
-            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.toString());
+            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.value());
         } catch (final Exception e) {
             s_logger.debug("Unable to parse vm.default.controller value '" + DefaultDiskControllerName + "' due to ", e);
         }
@@ -1284,7 +1286,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
     @Override
     public DiskProfile allocateTemplatedVolume(final Type type, final String name, final DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, final
-    VirtualMachineTemplate template, final VirtualMachine vm, final Account owner) {
+    VirtualMachineTemplate template, final VirtualMachine vm, final Account owner, final DiskControllerType diskControllerType) {
         assert (template.getFormat() != ImageFormat.ISO) : "ISO is not a template really....";
 
         Long size = _tmpltMgr.getTemplateSize(template.getId(), vm.getDataCenterId());
@@ -1313,7 +1315,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 minIops,
                 maxIops,
                 null,
-                getDiskControllerType());
+                diskControllerType);
         vol.setFormat(getSupportedImageFormatForCluster(template.getHypervisorType()));
         if (vm != null) {
             vol.setInstanceId(vm.getId());

@@ -447,7 +447,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         DiskControllerType diskControllerType = DiskControllerType.SCSI;
 
         try {
-            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.toString());
+            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.value());
         } catch (final Exception e) {
             s_logger.debug("Unable to parse vm.default.controller value '" + DefaultDiskControllerName + "' due to ", e);
         }

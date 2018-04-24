@@ -103,6 +103,7 @@ import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.jobs.JobInfo;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -116,6 +117,7 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
+import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StoragePool;
@@ -413,24 +415,37 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 s_logger.debug("Allocating disks for " + vmFinal);
 
+                final GuestOS guestOs = _guestOSDao.findById(vmFinal.getGuestOSId());
+                final DiskControllerType diskControllerType = getGuestDiskModel(guestOs.getDisplayName());
+
                 if (template.getFormat() == ImageFormat.ISO) {
                     volumeMgr.allocateRawVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
                 } else {
                     volumeMgr.allocateTemplatedVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner, diskControllerType);
                 }
 
                 if (dataDiskOfferings != null) {
                     for (final DiskOfferingInfo dataDiskOfferingInfo : dataDiskOfferings) {
                         volumeMgr.allocateRawVolume(Type.DATADISK, "DATA-" + vmFinal.getId(), dataDiskOfferingInfo.getDiskOffering(), dataDiskOfferingInfo.getSize(),
-                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner);
+                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
                     }
                 }
             }
         });
 
         s_logger.debug("Allocation completed for VM: " + vmFinal);
+    }
+
+    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
+        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
+            return DiskControllerType.IDE;
+        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
+            return DiskControllerType.SCSI;
+        } else {
+            return DiskControllerType.VIRTIO;
+        }
     }
 
     @Override
