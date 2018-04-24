@@ -101,7 +101,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
-import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
@@ -1435,7 +1434,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         if (vm.getState() == State.Running && vm.getHostId() != null) {
             collectVmDiskStatistics(vm);
-            final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+            final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
+            ;
             try {
                 if (zone.getNetworkType() == NetworkType.Advanced) {
                     //List all networks of vm
@@ -1722,7 +1722,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(caller, null, true, vmInstance);
 
         // Verify that zone is not Basic
-        final Zone zone = zoneRepository.findOne(vmInstance.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vmInstance.getDataCenterId()).orElse(null);
         if (zone.getNetworkType() == NetworkType.Basic) {
             throw new CloudRuntimeException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't add a new NIC to a VM on a Basic Network");
         }
@@ -1810,7 +1810,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(caller, null, true, vmInstance);
 
         // Verify that zone is not Basic
-        final Zone zone = zoneRepository.findOne(vmInstance.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vmInstance.getDataCenterId()).orElse(null);
         if (zone.getNetworkType() == NetworkType.Basic) {
             throw new InvalidParameterValueException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't remove a NIC from a VM on a Basic Network");
         }
@@ -1881,7 +1881,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(caller, null, true, vmInstance);
 
         // Verify that zone is not Basic
-        final Zone zone = zoneRepository.findOne(vmInstance.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vmInstance.getDataCenterId()).orElse(null);
         if (zone.getNetworkType() == NetworkType.Basic) {
             throw new CloudRuntimeException("Zone " + vmInstance.getDataCenterId() + ", has a NetworkType of Basic. Can't change default NIC on a Basic Network");
         }
@@ -1996,7 +1996,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // verify ip address
         s_logger.debug("Calling the ip allocation ...");
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
         if (zone == null) {
             throw new InvalidParameterValueException("There is no dc with the nic");
         }
@@ -2021,7 +2021,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (!_networkModel.listNetworkOfferingServices(offering.getId()).isEmpty() && network.getState() == Network.State.Implemented) {
                 final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
                 final ReservationContext context = new ReservationContextImpl(null, null, callerUser, caller);
-                final DeployDestination dest = new DeployDestination(zoneRepository.findOne(network.getDataCenterId()), null, null, null);
+                final DeployDestination dest = new DeployDestination(zoneRepository.findById(network.getDataCenterId()).orElse(null), null, null, null);
 
                 s_logger.debug("Implementing the network " + network + " elements and resources as a part of vm nic ip update");
                 try {
@@ -2492,7 +2492,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         checkHostsDedication(vm, srcHostId, destinationHost.getId());
 
         // call to core process
-        final Zone zone = zoneRepository.findOne(destinationHost.getDataCenterId());
+        final Zone zone = zoneRepository.findById(destinationHost.getDataCenterId()).orElse(null);
         final HostPodVO pod = _podDao.findById(destinationHost.getPodId());
         final Cluster cluster = _clusterDao.findById(destinationHost.getClusterId());
         final DeployDestination dest = new DeployDestination(zone, pod, cluster, destinationHost);
@@ -2995,7 +2995,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
-        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
+        ;
 
         // Get serviceOffering and Volumes for Virtual Machine
         final ServiceOfferingVO offering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId());
@@ -3266,7 +3267,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw ex;
         }
 
-        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
+        ;
         final VirtualMachineTemplate template = _entityMgr.findByIdIncludingRemoved(VirtualMachineTemplate.class, vm.getTemplateId());
 
         checkHypervisorEnabled(zone, template);
@@ -4403,7 +4405,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             final Network network = _networkModel.getNetwork(defaultNic.getNetworkId());
             if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
                 final String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()).getDisplayText();
-                final String zoneName = zoneRepository.findOne(vm.getDataCenterId()).getName();
+                final String zoneName = zoneRepository.findById(vm.getDataCenterId()).orElse(null).getName();
                 final boolean isWindows = _guestOSCategoryDao.findById(_guestOSDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
 
                 final List<String[]> vmData = _networkModel.generateVmData(vm.getUserData(), serviceOffering, zoneName, vm.getInstanceName(), vm.getId(),

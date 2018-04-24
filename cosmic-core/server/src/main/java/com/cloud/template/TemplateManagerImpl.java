@@ -169,7 +169,6 @@ import java.util.concurrent.Executors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -289,7 +288,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final TemplateProfile profile = adapter.prepare(cmd);
         final List<TemplateOrVolumePostUploadCommand> payload = adapter.createTemplateForPostUpload(profile);
 
-        if (CollectionUtils.isNotEmpty(payload)) {
+        if (payload.size() > 0) {
             final GetUploadParamsResponse response = new GetUploadParamsResponse();
 
             /*
@@ -1451,7 +1450,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         // for region wide storage, set cross zones flag
         final List<ImageStoreVO> stores = _imgStoreDao.findRegionImageStores();
-        if (!CollectionUtils.isEmpty(stores)) {
+        if (stores.size() > 0) {
             privateTemplate.setCrossZones(true);
         }
 

@@ -110,7 +110,7 @@ public class Ipv6AddressManagerImpl extends ManagerBase implements Ipv6AddressMa
             }
         }
 
-        final Zone zone = zoneRepository.findOne(dcId);
+        final Zone zone = zoneRepository.findById(dcId).orElse(null);
         final Long mac = zone.getMacAddress();
         final Long nextMac = mac + 1;
         zone.setMacAddress(nextMac);

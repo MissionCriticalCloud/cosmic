@@ -266,7 +266,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                     }
                     if (zoneId != null) {
                         // remove the domainId set in zone
-                        final Zone zone = zoneRepository.findOne(zoneId);
+                        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
 
                         if (zone != null) {
                             zone.setDomainId(null);
@@ -292,7 +292,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
     @Override
     public DedicateZoneResponse createDedicateZoneResponse(final DedicatedResources resource) {
         final DedicateZoneResponse dedicateZoneResponse = new DedicateZoneResponse();
-        final Zone zone = zoneRepository.findOne(resource.getDataCenterId());
+        final Zone zone = zoneRepository.findById(resource.getDataCenterId()).orElse(null);
         final DomainVO domain = _domainDao.findById(resource.getDomainId());
         final AccountVO account = _accountDao.findById(resource.getAccountId());
         final AffinityGroup group = _affinityGroupDao.findById(resource.getAffinityGroupId());
@@ -346,7 +346,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
         final List<Long> childDomainIds = getDomainChildIds(domainId);
         childDomainIds.add(domainId);
         checkAccountAndDomain(accountId, domainId);
-        final Zone zone = zoneRepository.findOne(zoneId);
+        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
         if (zone == null) {
             throw new InvalidParameterValueException("Unable to find zone by id " + zoneId);
         } else {
@@ -508,7 +508,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 //can dedicate a pod to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfPod.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfPod.getDomainId().equals(domainId) || domainIdInChildreanList))) {
-                    final Zone zone = zoneRepository.findOne(pod.getDataCenterId());
+                    final Zone zone = zoneRepository.findById(pod.getDataCenterId()).orElse(null);
                     s_logger.error("Cannot dedicate Pod. Its zone is already dedicated");
                     throw new CloudRuntimeException("Pod's Zone " + zone.getName() + " is already dedicated");
                 }
@@ -649,7 +649,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 if (dedicatedZoneOfCluster.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfCluster.getDomainId().equals(domainId) || domainIdInChildreanList))) {
                     s_logger.error("Cannot dedicate Cluster. Its zone is already dedicated");
-                    final Zone zone = zoneRepository.findOne(cluster.getDataCenterId());
+                    final Zone zone = zoneRepository.findById(cluster.getDataCenterId()).orElse(null);
                     throw new CloudRuntimeException("Cluster's Zone " + zone.getName() + " is already dedicated");
                 }
             }
@@ -774,7 +774,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
                 //can dedicate a host to an account/domain if zone is dedicated to parent-domain
                 if (dedicatedZoneOfHost.getAccountId() != null || (accountId == null && !domainIdInChildreanList) ||
                         (accountId != null && !(dedicatedZoneOfHost.getDomainId().equals(domainId) || domainIdInChildreanList))) {
-                    final Zone zone = zoneRepository.findOne(host.getDataCenterId());
+                    final Zone zone = zoneRepository.findById(host.getDataCenterId()).orElse(null);
                     s_logger.error("Host's Data Center " + zone.getName() + " is already dedicated");
                     throw new CloudRuntimeException("Host's Data Center " + zone.getName() + " is already dedicated");
                 }

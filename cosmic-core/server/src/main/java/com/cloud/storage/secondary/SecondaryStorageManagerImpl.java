@@ -1079,7 +1079,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final Account systemAcct = _accountMgr.getSystemAccount();
 
         final DataCenterDeployment plan = new DataCenterDeployment(dataCenterId);
-        final Zone zone = zoneRepository.findOne(plan.getDataCenterId());
+        final Zone zone = zoneRepository.findById(plan.getDataCenterId()).orElse(null);
 
         final NetworkVO defaultNetwork = getDefaultNetworkForCreation(zone);
 

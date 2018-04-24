@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
 
 public final class HostResponseTest extends TestCase {
@@ -31,7 +30,7 @@ public final class HostResponseTest extends TestCase {
         details.put("username", "test");
         details.put("password", "password");
 
-        final Map expectedDetails = new HashedMap();
+        final Map expectedDetails = new HashMap();
         expectedDetails.put(VALID_KEY, VALID_VALUE);
 
         hostResponse.setDetails(details);
@@ -49,7 +48,7 @@ public final class HostResponseTest extends TestCase {
 
         details.put(VALID_KEY, VALID_VALUE);
 
-        final Map expectedDetails = new HashedMap();
+        final Map expectedDetails = new HashMap();
         expectedDetails.put(VALID_KEY, VALID_VALUE);
 
         hostResponse.setDetails(details);

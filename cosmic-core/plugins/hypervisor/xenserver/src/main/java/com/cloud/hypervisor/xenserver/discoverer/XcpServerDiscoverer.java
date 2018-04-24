@@ -646,7 +646,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         }
 
         final HostPodVO pod = _podDao.findById(host.getPodId());
-        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
+        final Zone zone = zoneRepository.findById(host.getDataCenterId()).orElse(null);
 
         s_logger.info("Host: " + host.getName() + " connected with hypervisor type: " + HypervisorType.XenServer + ". Checking CIDR...");
         _resourceMgr.checkCIDR(pod, zone, ssCmd.getPrivateIpAddress(), ssCmd.getPrivateNetmask());

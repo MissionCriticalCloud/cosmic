@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -158,7 +159,7 @@ public class FirstFitPlannerTest {
         when(userVm.getAccountId()).thenReturn(accountId);
 
         when(vm.getDataCenterId()).thenReturn(dataCenterId);
-        when(zoneRepository.findOne(1L)).thenReturn(zone);
+        when(zoneRepository.findById(1L)).thenReturn(Optional.of(zone));
         when(avoids.shouldAvoid(zone)).thenReturn(false);
         when(plan.getDataCenterId()).thenReturn(dataCenterId);
         when(plan.getClusterId()).thenReturn(null);

@@ -83,6 +83,7 @@ import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -688,7 +689,7 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Isolated);
-        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(anyLong())).thenReturn(Optional.of(zone));
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn("10.10.10.10");
@@ -736,7 +737,7 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Shared);
-        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(anyLong())).thenReturn(Optional.of(zone));
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn("10.10.10.10");
@@ -823,7 +824,7 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Isolated);
-        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(anyLong())).thenReturn(Optional.of(zone));
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn(null);
@@ -870,7 +871,7 @@ public class UserVmManagerTest {
         when(_networkMock.getState()).thenReturn(Network.State.Implemented);
         when(_networkMock.getDataCenterId()).thenReturn(3L);
         when(_networkMock.getGuestType()).thenReturn(GuestType.Shared);
-        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(anyLong())).thenReturn(Optional.of(zone));
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn(null);

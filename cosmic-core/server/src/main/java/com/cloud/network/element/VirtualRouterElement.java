@@ -249,7 +249,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 }
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -302,7 +302,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -626,7 +626,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return null;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             return networkTopology.applyVpnUsers(network, users, routers);
@@ -663,7 +663,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -683,7 +683,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -773,7 +773,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 return true;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -804,7 +804,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -830,7 +830,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             return networkTopology.configDhcpForSubnet(network, nic, uservm, dest, routers);
@@ -896,7 +896,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                 throw new ResourceUnavailableException("Can't find at least one router!", DataCenter.class, network.getDataCenterId());
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -919,7 +919,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         // If any router is running then send save password command otherwise
@@ -956,7 +956,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
@@ -979,7 +979,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
         final VirtualMachineProfile uservm = vm;
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
@@ -1003,7 +1003,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {
@@ -1028,7 +1028,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {
@@ -1052,7 +1052,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             try {

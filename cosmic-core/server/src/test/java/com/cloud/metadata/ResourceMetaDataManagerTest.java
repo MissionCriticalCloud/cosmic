@@ -13,9 +13,9 @@ import com.cloud.storage.dao.VolumeDetailsDao;
 import com.cloud.vm.dao.NicDetailsDao;
 
 import javax.naming.ConfigurationException;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -67,7 +67,7 @@ public class ResourceMetaDataManagerTest {
 
         doNothing().when(_volumeDetailDao).removeDetail(anyLong(), anyString());
         doNothing().when(_nicDetailDao).removeDetail(anyLong(), anyString());
-        final Map<String, String> map = new HashedMap();
+        final Map<String, String> map = new HashMap<>();
         map.put("key", "value");
         _resourceMetaDataMgr.addResourceMetaData("1", ResourceTag.ResourceObjectType.Volume, map, true);
     }
