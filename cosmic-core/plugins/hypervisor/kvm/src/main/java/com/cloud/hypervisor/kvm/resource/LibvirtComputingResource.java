@@ -1705,6 +1705,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             if (data instanceof VolumeObjectTO) {
                 final VolumeObjectTO volumeObjectTo = (VolumeObjectTO) data;
                 disk.setSerial(volumeObjectTo.getDeviceId() + "-" + diskUuidToSerial(volumeObjectTo.getUuid()));
+                disk.setDeviceId(volumeObjectTo.getDeviceId().intValue());
                 if (volumeObjectTo.getBytesReadRate() != null && volumeObjectTo.getBytesReadRate() > 0) {
                     disk.setBytesReadRate(volumeObjectTo.getBytesReadRate());
                 }

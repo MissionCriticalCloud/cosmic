@@ -25,6 +25,7 @@ public class LibvirtDiskDef {
     private String serial;
     private boolean qemuDriver = true;
     private DiscardType discard = DiscardType.IGNORE;
+    private Integer deviceId;
 
     public DiscardType getDiscard() {
         return discard;
@@ -232,6 +233,14 @@ public class LibvirtDiskDef {
         this.serial = serial;
     }
 
+    public Integer getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(final Integer deviceId) {
+        this.deviceId = deviceId;
+    }
+
     public enum DeviceType {
         FLOPPY("floppy"), DISK("disk"), CDROM("cdrom"), LUN("lun");
         String type;
@@ -416,6 +425,9 @@ public class LibvirtDiskDef {
             diskBuilder.append("</iotune>\n");
         }
 
+        if (bus == DiskControllerType.SCSI) {
+            diskBuilder.append("<address type='drive' controller='0' bus='0' target='0' unit='" + getDeviceId().toString() + "'/>");
+        }
         diskBuilder.append("</disk>\n");
         return diskBuilder.toString();
     }

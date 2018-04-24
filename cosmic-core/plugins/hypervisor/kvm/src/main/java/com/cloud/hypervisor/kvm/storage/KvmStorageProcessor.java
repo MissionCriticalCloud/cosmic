@@ -1137,6 +1137,7 @@ public class KvmStorageProcessor implements StorageProcessor {
                     diskdef.setDiscard(LibvirtDiskDef.DiscardType.UNMAP);
                 }
                 diskdef.setSerial(serial);
+                diskdef.setDeviceId(devId);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
