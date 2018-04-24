@@ -110,6 +110,7 @@ import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -2192,14 +2193,12 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_CREATE, eventDescription = "deploying Vm", create = true)
     public UserVm createAdvancedVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate template, final List<Long>
-            networkIdList, final Account owner,
-                                               final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize, final String group, final
-                                               HypervisorType hypervisor, final HTTPMethod httpmethod, final String userData,
-                                               final String sshKeyPair, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps, final Boolean displayvm, final
-                                               String keyboard, final List<Long> affinityGroupIdList,
-                                               final Map<String, String> customParametrs, final String customId) throws InsufficientCapacityException,
-            ConcurrentOperationException, ResourceUnavailableException,
-            StorageUnavailableException, ResourceAllocationException {
+            networkIdList, final Account owner, final String hostName, final String displayName, final Long diskOfferingId, final Long diskSize, final String group,
+                                               final  HypervisorType hypervisor, final HTTPMethod httpmethod, final String userData, final String sshKeyPair,
+                                               final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps, final Boolean displayvm, final String keyboard,
+                                               final List<Long> affinityGroupIdList, final Map<String, String> customParametrs, final String customId,
+                                               final DiskControllerType diskControllerType)
+            throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException {
 
         final Account caller = CallContext.current().getCallingAccount();
         final List<NetworkVO> networkList = new ArrayList<>();
@@ -2247,8 +2246,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             networkList.add(network);
         }
 
-        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, group, httpmethod, userData, sshKeyPair, hypervisor,
-                caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId);
+        return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, group, httpmethod, userData, sshKeyPair,
+                hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId, diskControllerType);
     }
 
     private void checkHypervisorEnabled(final Zone zone, final VirtualMachineTemplate template) {
@@ -3837,7 +3836,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String displayName, final Account owner,
                                         final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod, final String userData,
                                         final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
-                                        final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId)
+                                        final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId,
+                                        final DiskControllerType diskControllerType)
             throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
 
         _accountMgr.checkAccess(caller, null, true, owner);
@@ -4127,8 +4127,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
-                offering,
-                isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters);
+                offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType);
 
         // Assign instance to the group
         try {
@@ -4156,10 +4155,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     private UserVmVO commitUserVm(final Zone zone, final VirtualMachineTemplate template, final String hostName, final String displayName, final Account owner,
                                   final Long diskOfferingId, final Long diskSize, final String userData, final Account caller, final Boolean isDisplayVm, final String keyboard,
-                                  final long accountId, final long userId, final ServiceOfferingVO offering, final boolean isIso, final String sshPublicKey, final
-                                  LinkedHashMap<String, NicProfile> networkNicMap,
-                                  final long id, final String instanceName, final String uuidName, final HypervisorType hypervisorType, final Map<String, String>
-                                          customParameters) throws InsufficientCapacityException {
+                                  final long accountId, final long userId, final ServiceOfferingVO offering, final boolean isIso, final String sshPublicKey,
+                                  final LinkedHashMap<String, NicProfile> networkNicMap, final long id, final String instanceName, final String uuidName,
+                                  final HypervisorType hypervisorType, final Map<String, String> customParameters, final DiskControllerType diskControllerType)
+            throws InsufficientCapacityException {
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
@@ -4238,10 +4237,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 if (isIso) {
                     _orchSrvc.createVirtualMachineFromScratch(vm.getUuid(), Long.toString(owner.getAccountId()), vm.getIsoId().toString(), hostName, displayName,
                             hypervisorType.name(), guestOSCategory.getName(), offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags,
-                            networkNicMap, plan);
+                            networkNicMap, plan, diskControllerType);
                 } else {
                     _orchSrvc.createVirtualMachine(vm.getUuid(), Long.toString(owner.getAccountId()), Long.toString(template.getId()), hostName, displayName, hypervisorType.name(),
-                            offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags, networkNicMap, plan, rootDiskSize);
+                            offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags, networkNicMap, plan, rootDiskSize, diskControllerType);
                 }
 
                 if (s_logger.isDebugEnabled()) {
