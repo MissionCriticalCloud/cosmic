@@ -143,8 +143,9 @@ public class PropertiesUtil {
      */
 
     public static File findConfigFile(final String path) {
-        final ClassLoader cl = PropertiesUtil.class.getClassLoader();
-        URL url = cl.getResource(path);
+        URL url = Thread.currentThread()
+                        .getContextClassLoader()
+                        .getResource(path);
 
         if (url != null && "file".equals(url.getProtocol())) {
             return new File(url.getFile());
@@ -166,7 +167,9 @@ public class PropertiesUtil {
             return new File(url.getFile());
         }
 
-        url = cl.getResource(newPath);
+        url = Thread.currentThread()
+                    .getContextClassLoader()
+                    .getResource(newPath);
         if (url != null && "file".equals(url.getProtocol())) {
             return new File(url.getFile());
         }
