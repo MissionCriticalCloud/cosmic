@@ -1,6 +1,7 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -159,6 +160,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String volumeUuid;
     @Column(name = "volume_device_id")
     private Long volumeDeviceId = null;
+    @Column(name = "volume_diskcontroller")
+    private DiskControllerType volumeDiskController;
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
     private Volume.Type volumeType;
@@ -1172,5 +1175,13 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Override
     public Class<?> getEntityType() {
         return VirtualMachine.class;
+    }
+
+    public DiskControllerType getVolumeDiskController() {
+        return volumeDiskController;
+    }
+
+    public void setVolumeDiskController(final DiskControllerType volumeDiskController) {
+        this.volumeDiskController = volumeDiskController;
     }
 }

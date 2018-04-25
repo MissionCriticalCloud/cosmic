@@ -153,6 +153,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             if (userVm.getVolumeType() != null) {
                 userVmResponse.setRootDeviceType(userVm.getVolumeType().toString());
             }
+            userVmResponse.setRootDeviceController(userVm.getVolumeDiskController());
         }
         userVmResponse.setPassword(userVm.getPassword());
         if (userVm.getJobId() != null) {
