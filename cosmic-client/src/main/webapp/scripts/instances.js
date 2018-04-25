@@ -2060,14 +2060,6 @@
                             templatename: {
                                 label: 'label.template'
                             },
-
-                            isdynamicallyscalable: {
-                                label: 'label.dynamically.scalable',
-                                isBoolean: true,
-                                isEditable: true,
-                                converter: cloudStack.converters.toBooleanText
-                            },
-
                             guestosid: {
                                 label: 'label.os.type',
                                 isEditable: true,
@@ -2094,7 +2086,9 @@
                                     });
                                 }
                             },
-
+                            rootdevicecontroller: {
+                                label: 'label.root.disk.controller'
+                            },
                             hypervisor: {
                                 label: 'label.hypervisor'
                             },
@@ -2123,9 +2117,6 @@
                             },
                             memory: {
                                 label: 'label.memory.mb'
-                            },
-                            vgpu: {
-                                label: 'label.vgpu'
                             },
                             haenable: {
                                 label: 'label.ha.enabled',

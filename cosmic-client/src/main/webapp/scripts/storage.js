@@ -31,8 +31,11 @@
                         type: {
                             label: 'label.type'
                         },
-                        hypervisor: {
-                            label: 'label.hypervisor'
+                        diskcontroller: {
+                            label: 'label.disk.controller'
+                        },
+                        deviceid: {
+                            label: 'label.device.id'
                         },
                         state: {
                             label: 'label.state',
@@ -159,6 +162,33 @@
                                         isHidden: true
                                     },
 
+                                    diskController: {
+                                        label: 'label.disk.controller',
+                                        docID: 'helpDiskController',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: '',
+                                                description: _l('label.default')
+                                            });
+                                            items.push({
+                                                id: 'IDE',
+                                                description: 'IDE (Legacy)'
+                                            });
+                                            items.push({
+                                                id: 'VIRTIO',
+                                                description: 'VirtIO (virtio-blk)'
+                                            });
+                                            items.push({
+                                                id: 'SCSI',
+                                                description: 'VirtIO SCSI (virtio-scsi)'
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+
                                     minIops: {
                                         label: 'label.disk.iops.min',
                                         validation: {
@@ -184,10 +214,10 @@
                                 var data = {
                                     name: args.data.name,
                                     zoneId: args.data.availabilityZone,
-                                    diskOfferingId: args.data.diskOffering
+                                    diskOfferingId: args.data.diskOffering,
+                                    diskController: args.data.diskController
                                 };
 
-                                // if(thisDialog.find("#size_container").css("display") != "none") { //wait for Brian to include $form in args
                                 if (selectedDiskOfferingObj.iscustomized == true) {
                                     $.extend(data, {
                                         size: args.data.diskSize
@@ -933,6 +963,32 @@
                                                 });
                                             }
                                         },
+                                        diskController: {
+                                            label: 'label.disk.controller',
+                                            docID: 'helpDiskController',
+                                            select: function (args) {
+                                                var items = [];
+                                                items.push({
+                                                    id: '',
+                                                    description: _l('label.default')
+                                                });
+                                                items.push({
+                                                    id: 'IDE',
+                                                    description: 'IDE (Legacy)'
+                                                });
+                                                items.push({
+                                                    id: 'VIRTIO',
+                                                    description: 'VirtIO (virtio-blk)'
+                                                });
+                                                items.push({
+                                                    id: 'SCSI',
+                                                    description: 'VirtIO SCSI (virtio-scsi)'
+                                                });
+                                                args.response.success({
+                                                    data: items
+                                                });
+                                            }
+                                        },
                                         deviceid: {
                                             label: 'label.device.id',
                                             validation: {
@@ -950,6 +1006,11 @@
                                     if (args.data.deviceid != "" && typeof parseInt(args.data.deviceid, 10) === 'number' && args.data.deviceid % 1 === 0) {
                                         $.extend(data, {
                                             deviceid: args.data.deviceid
+                                        });
+                                    }
+                                    if (args.data.diskController != "") {
+                                        $.extend(data, {
+                                            diskcontroller: args.data.diskController
                                         });
                                     }
                                     $.ajax({
@@ -1535,11 +1596,14 @@
                                         isEditable: true
                                     }
                                 }, {
-                                    id: {
-                                        label: 'label.id'
+                                    diskcontroller: {
+                                        label: 'label.disk.controller'
                                     },
-                                    zonename: {
-                                        label: 'label.zone'
+                                    deviceid: {
+                                        label: 'label.device.id'
+                                    },
+                                    storage: {
+                                        label: 'label.storage'
                                     },
                                     state: {
                                         label: 'label.state',
@@ -1570,15 +1634,6 @@
                                     },
                                     type: {
                                         label: 'label.type'
-                                    },
-                                    storagetype: {
-                                        label: 'label.storage.type'
-                                    },
-                                    provisioningtype: {
-                                        label: 'label.disk.provisioningtype'
-                                    },
-                                    hypervisor: {
-                                        label: 'label.hypervisor'
                                     },
                                     size: {
                                         label: 'label.size',
@@ -1623,21 +1678,30 @@
                                     vmstate: {
                                         label: 'label.vm.state'
                                     },
-                                    deviceid: {
-                                        label: 'label.device.id'
-                                    },
-                                    storage: {
-                                        label: 'label.storage'
-                                    },
-                                    created: {
-                                        label: 'label.created',
-                                        converter: cloudStack.converters.toLocalDate
-                                    },
                                     domain: {
                                         label: 'label.domain'
                                     },
                                     account: {
                                         label: 'label.account'
+                                    },
+                                    storagetype: {
+                                        label: 'label.storage.type'
+                                    },
+                                    provisioningtype: {
+                                        label: 'label.disk.provisioningtype'
+                                    },
+                                    hypervisor: {
+                                        label: 'label.hypervisor'
+                                    },
+                                    id: {
+                                        label: 'label.id'
+                                    },
+                                    created: {
+                                        label: 'label.created',
+                                        converter: cloudStack.converters.toLocalDate
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
                                     }
                                 }],
 
