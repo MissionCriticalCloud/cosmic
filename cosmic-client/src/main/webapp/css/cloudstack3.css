@@ -6349,6 +6349,12 @@ label.error {
     margin: 6px -1px 0 8px;
 }
 
+.multi-wizard.instance-wizard .section.custom-size select[name=rootdiskcontroller] {
+    float: left;
+    width: 100px;
+    margin: 6px -1px 0 8px;
+}
+
 .multi-wizard.instance-wizard .section.custom-iops input[type=text] {
     float: left;
     width: 28px;

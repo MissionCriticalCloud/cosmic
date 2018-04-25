@@ -452,6 +452,15 @@
                                         return true;
                                     });
 
+                                    $(args.data.rootDiskControllers).each(function () {
+                                        $step.find('select[name=rootdiskcontroller]').append(
+                                            $('<option>').attr({
+                                                value: this.id,
+                                                'wizard-field': 'rootdisk-controller'
+                                            }).html(this.displaytext)
+                                        );
+                                    });
+
                                     originalValues(formData);
 
                                 }
@@ -995,15 +1004,7 @@
 
                                     // Show non-VPC networks by default
                                     filterNetworkList(-1);
-
-                                    //If there is only one security group and the only one is 'default', make it selected by default
-                                    if ($sgSelects.length == 1) {
-                                        var $firstCheckbox = $sgSelects.eq(0);
-                                        if ($firstCheckbox.find('div .name').text() == 'default') {
-                                            $firstCheckbox.find('input:checkbox').click();
-                                        }
-                                    }
-
+                                    
                                     originalValues(formData);
                                     checkShowAddNetwork($newNetwork);
                                 }
@@ -1018,7 +1019,8 @@
                             var $input = $wizard.find('[wizard-field=' + field + ']').filter(function () {
                                 return ($(this).is(':selected') ||
                                     $(this).is(':checked') ||
-                                    $(this).attr('type') == 'hidden') &&
+                                    $(this).attr('type') == 'hidden' ||
+                                    $(this).attr('review') == 'yes') &&
                                     $(this).is(':not(:disabled)');
                             });
 
@@ -1042,6 +1044,8 @@
                                 });
                             } else if ($input.is('input[type=hidden]')) {
                                 fieldName = $input.val();
+                            } else if ($input.is('input[review=yes]')) {
+                                fieldName = $wizard.find('[wizard-field=' + field + ']').val();
                             }
 
                             if (fieldName) {

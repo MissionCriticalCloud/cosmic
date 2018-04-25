@@ -214,9 +214,14 @@
                                 var data = {
                                     name: args.data.name,
                                     zoneId: args.data.availabilityZone,
-                                    diskOfferingId: args.data.diskOffering,
-                                    diskController: args.data.diskController
+                                    diskOfferingId: args.data.diskOffering
                                 };
+
+                                if (args.data.diskController != "") {
+                                    $.extend(data, {
+                                        diskcontroller: args.data.diskController
+                                    });
+                                }
 
                                 if (selectedDiskOfferingObj.iscustomized == true) {
                                     $.extend(data, {

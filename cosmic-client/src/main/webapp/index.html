@@ -64,13 +64,20 @@
     <div class="multi-wizard instance-wizard">
         <div class="progress">
             <ul>
-                <li class="first"><span class="number">1</span><span><translate key="label.setup"/></span><span class="arrow"></span></li>
-                <li><span class="number">2</span><span class="multiline"><translate key="label.select.a.template"/></span><span class="arrow"></span></li>
-                <li><span class="number">3</span><span class="multiline"><translate key="label.compute.offering"/></span><span class="arrow"></span></li>
-                <li><span class="number">4</span><span class="multiline"><translate key="label.disk.offering"/></span><span class="arrow"></span></li>
-                <li><span class="number">5</span><span><translate key="label.affinity"/></span><span class="arrow"></span></li>
-                <li><span class="number">6</span><span><translate key="label.menu.network"/></span><span class="arrow"></span></li>
-                <li><span class="number">7</span><span><translate key="label.menu.sshkeypair"/></span><span class="arrow"></span></li>
+                <li class="first"><span class="number">1</span><span><translate key="label.setup"/></span><span
+                        class="arrow"></span></li>
+                <li><span class="number">2</span><span class="multiline"><translate
+                        key="label.select.a.template"/></span><span class="arrow"></span></li>
+                <li><span class="number">3</span><span class="multiline"><translate
+                        key="label.compute.offering"/></span><span class="arrow"></span></li>
+                <li><span class="number">4</span><span class="multiline"><translate
+                        key="label.disk.offering"/></span><span class="arrow"></span></li>
+                <li><span class="number">5</span><span><translate key="label.affinity"/></span><span
+                        class="arrow"></span></li>
+                <li><span class="number">6</span><span><translate key="label.menu.network"/></span><span
+                        class="arrow"></span></li>
+                <li><span class="number">7</span><span><translate key="label.menu.sshkeypair"/></span><span
+                        class="arrow"></span></li>
                 <li class="last"><span class="number">8</span><span><translate key="label.review"/></span></li>
             </ul>
         </div>
@@ -143,7 +150,8 @@
                             </ul>
 
                             <!-- Used for Select Template only -->
-                            <input type="hidden" wizard-field="hypervisor" name="hypervisor" value="" disabled="disabled"/>
+                            <input type="hidden" wizard-field="hypervisor" name="hypervisor" value=""
+                                   disabled="disabled"/>
 
                             <div id="instance-wizard-featured-templates">
                                 <div class="select-container">
@@ -167,7 +175,13 @@
                                 <label>
                                     <translate key="label.root.disk.size"/>
                                 </label>
-                                <input type="text" name="rootDiskSize"/>
+                                <input type="text" wizard-field="rootdisk-size" name="rootDiskSize" review="yes"/>
+                                <label>
+                                    <translate key="label.root.disk.controller"/>
+                                </label>
+                                <select name="rootdiskcontroller">
+                                </select>
+
                             </div>
                         </div>
                     </div>
@@ -392,7 +406,9 @@
                                                             <translate key="label.name"/>
                                                         </div>
                                                         <div class="value">
-                                                            <input type="text" class="required disallowSpecialCharacters" name="new-network-name"/>
+                                                            <input type="text"
+                                                                   class="required disallowSpecialCharacters"
+                                                                   name="new-network-name"/>
                                                         </div>
                                                     </div>
 
@@ -408,7 +424,8 @@
                                                     </div>
 
                                                     <div class="secondary-input hide-if-unselected">
-                                                        <input type="radio" name="defaultNetwork" value="new-network" wizard-field="default-network"/>
+                                                        <input type="radio" name="defaultNetwork" value="new-network"
+                                                               wizard-field="default-network"/>
                                                         <div class="name">
                                                             <translate key="label.default"/>
                                                         </div>
@@ -446,16 +463,19 @@
                             <!-- Name -->
                             <div class="select odd vm-instance-name">
                                 <div class="name">
-                                    <span><span><translate key="label.name"/></span> (<span><translate key="label.optional"/></span>)</span>
+                                    <span><span><translate key="label.name"/></span> (<span><translate
+                                            key="label.optional"/></span>)</span>
                                 </div>
                                 <div class="value">
                                     <input type="text" name="displayname" class="disallowSpecialCharacters"/>
                                 </div>
                             </div>
+
                             <!-- Add to group -->
                             <div class="select">
                                 <div class="name">
-                                    <span><span><translate key="label.add.to.group"/></span> (<span><translate key="label.optional"/></span>)</span>
+                                    <span><span><translate key="label.add.to.group"/></span> (<span><translate
+                                            key="label.optional"/></span>)</span>
                                 </div>
                                 <div class="value">
                                     <input type="text" name="groupname" class="disallowSpecialCharacters"/>
@@ -488,6 +508,7 @@
                                     </a>
                                 </div>
                             </div>
+
                             <!-- Hypervisor -->
                             <div class="select odd">
                                 <div class="name">
@@ -502,6 +523,7 @@
                                     </a>
                                 </div>
                             </div>
+
                             <!-- Template -->
                             <div class="select">
                                 <div class="name">
@@ -516,6 +538,7 @@
                                     </a>
                                 </div>
                             </div>
+
                             <!-- Service offering -->
                             <div class="select odd">
                                 <div class="name">
@@ -530,6 +553,7 @@
                                     </a>
                                 </div>
                             </div>
+
                             <!-- Disk offering -->
                             <div class="select">
                                 <div class="name">
@@ -545,8 +569,36 @@
                                 </div>
                             </div>
 
-                            <!-- Affinity -->
+                            <!-- Disk size/controller -->
+                            <div class="select odd">
+                                <div class="name">
+                                    <span><translate key="label.root.disk.size"/></span>
+                                </div>
+                                <div class="value">
+                                    <span wizard-field="rootdisk-size"></span>
+                                </div>
+                                <div class="edit">
+                                    <a href="2">
+                                        <translate key="label.edit"/>
+                                    </a>
+                                </div>
+                            </div>
                             <div class="select">
+                                <div class="name">
+                                    <span><translate key="label.root.disk.controller"/></span>
+                                </div>
+                                <div class="value">
+                                    <span wizard-field="rootdisk-controller"></span>
+                                </div>
+                                <div class="edit">
+                                    <a href="2">
+                                        <translate key="label.edit"/>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Affinity -->
+                            <div class="select odd">
                                 <div class="name">
                                     <span><translate key="label.affinity.groups"/></span>
                                 </div>
@@ -561,7 +613,7 @@
                             </div>
 
                             <!-- Primary network -->
-                            <div class="select odd">
+                            <div class="select">
                                 <div class="name">
                                     <span><translate key="label.network"/></span>
                                 </div>
@@ -589,11 +641,12 @@
                                     </a>
                                 </div>
                             </div>
-
+                            
                             <!-- userdata -->
                             <div class="select">
                                 <div class="name">
-                                    <span><span><translate key="label.add.userdata"/></span> (<span><translate key="label.optional"/></span>)</span>
+                                    <span><span><translate key="label.add.userdata"/></span> (<span><translate
+                                            key="label.optional"/></span>)</span>
                                 </div>
                                 <div class="value">
                                     <textarea name="userdata" class="disallowSpecialCharacters"></textarea>
@@ -658,22 +711,28 @@
             </div>
         </form>
         <div class="buttons">
-            <button class="cancel ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span><translate key="label.cancel"/></span></button>
-            <button class="next ok ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span><translate key="label.add"/></span></button>
+            <button class="cancel ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span><translate
+                    key="label.cancel"/></span></button>
+            <button class="next ok ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span><translate
+                    key="label.add"/></span></button>
         </div>
     </div>
     <!-- Zone wizard -->
     <div class="multi-wizard zone-wizard">
         <div class="progress">
             <ul>
-                <li class="first"><span class="number">1</span><span><translate key="label.zone.type"/></span><span class="arrow"></span></li>
-                <li><span class="number">2</span><span><translate key="label.setup.zone"/></span><span class="arrow"></span></li>
-                <li><span class="number">3</span><span><translate key="label.setup.network"/></span><span class="arrow"></span></li>
+                <li class="first"><span class="number">1</span><span><translate key="label.zone.type"/></span><span
+                        class="arrow"></span></li>
+                <li><span class="number">2</span><span><translate key="label.setup.zone"/></span><span
+                        class="arrow"></span></li>
+                <li><span class="number">3</span><span><translate key="label.setup.network"/></span><span
+                        class="arrow"></span></li>
                 <li style="display:none;"></li>
                 <li style="display:none;"></li>
                 <li style="display:none;"></li>
                 <li style="display:none;"></li>
-                <li><span class="number">4</span><span><translate key="label.add.resources"/></span><span class="arrow"></span></li>
+                <li><span class="number">4</span><span><translate key="label.add.resources"/></span><span
+                        class="arrow"></span></li>
                 <li style="display:none;"></li>
                 <li style="display:none;"></li>
                 <li style="display:none;"></li>
@@ -758,7 +817,8 @@
                 <div class="info-desc conditional basic">
                     <translate key="message.setup.physical.network.during.zone.creation.basic"/>
                 </div>
-                <div class="button add new-physical-network"><span class="icon">&nbsp;</span><span><translate key="label.add.physical.network"/></span></div>
+                <div class="button add new-physical-network"><span class="icon">&nbsp;</span><span><translate
+                        key="label.add.physical.network"/></span></div>
                 <!-- Traffic types drag area -->
                 <div class="traffic-types-drag-area">
                     <div class="header">
@@ -874,8 +934,10 @@
                     </li>
                 </ul>
                 <div class="info-desc" id="add_zone_public_traffic_desc">
-                    <span id="for_basic_zone" style="display:none"><translate key="message.public.traffic.in.basic.zone"/></span>
-                    <span id="for_advanced_zone" style="display:none"><translate key="message.public.traffic.in.advanced.zone"/></span>
+                    <span id="for_basic_zone" style="display:none"><translate
+                            key="message.public.traffic.in.basic.zone"/></span>
+                    <span id="for_advanced_zone" style="display:none"><translate
+                            key="message.public.traffic.in.advanced.zone"/></span>
                 </div>
                 <div ui-custom="publicTrafficIPRange"></div>
             </div>
@@ -923,8 +985,10 @@
                     </li>
                 </ul>
                 <div class="info-desc" id="add_zone_guest_traffic_desc">
-                    <span id="for_basic_zone" style="display:none"><translate key="message.guest.traffic.in.basic.zone"/></span>
-                    <span id="for_advanced_zone" style="display:none"><translate key="message.guest.traffic.in.advanced.zone"/></span>
+                    <span id="for_basic_zone" style="display:none"><translate
+                            key="message.guest.traffic.in.basic.zone"/></span>
+                    <span id="for_advanced_zone" style="display:none"><translate
+                            key="message.guest.traffic.in.advanced.zone"/></span>
                 </div>
                 <div class="content input-area">
                     <div class="select-container"></div>
@@ -1256,7 +1320,8 @@
             <div class="button refresh" id="refresh_button">
                 <span><translate key="label.refresh"/></span>
             </div>
-            <div id="update_ssl_button" class="button action main-action reduced-hide lock" title="Updates your SSL Certificate">
+            <div id="update_ssl_button" class="button action main-action reduced-hide lock"
+                 title="Updates your SSL Certificate">
                 <span class="icon">&nbsp;</span>
                 <span><translate key="label.update.ssl.cert"/></span>
             </div>
