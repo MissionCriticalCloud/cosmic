@@ -76,10 +76,10 @@ public class AgentShell {
     }
 
     public void loadProperties() throws ConfigurationException {
-        final File file = PropertiesUtil.findConfigFile(FILE_NAME_AGENT_PROPERTIES);
+        final File file = new File("/etc/cosmic/agent/agent.properties");
 
-        if (null == file) {
-            throw new ConfigurationException("Unable to find agent.properties.");
+        if (!file.exists()) {
+            throw new ConfigurationException("Unable to find /etc/cosmic/agent/agent.properties - please make sure it's there");
         }
 
         logger.info("Found {} at {}", FILE_NAME_AGENT_PROPERTIES, file.getAbsolutePath());
