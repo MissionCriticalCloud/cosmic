@@ -1596,11 +1596,14 @@
                                         isEditable: true
                                     }
                                 }, {
-                                    id: {
-                                        label: 'label.id'
+                                    diskcontroller: {
+                                        label: 'label.disk.controller'
                                     },
-                                    zonename: {
-                                        label: 'label.zone'
+                                    deviceid: {
+                                        label: 'label.device.id'
+                                    },
+                                    storage: {
+                                        label: 'label.storage'
                                     },
                                     state: {
                                         label: 'label.state',
@@ -1631,15 +1634,6 @@
                                     },
                                     type: {
                                         label: 'label.type'
-                                    },
-                                    storagetype: {
-                                        label: 'label.storage.type'
-                                    },
-                                    provisioningtype: {
-                                        label: 'label.disk.provisioningtype'
-                                    },
-                                    hypervisor: {
-                                        label: 'label.hypervisor'
                                     },
                                     size: {
                                         label: 'label.size',
@@ -1684,21 +1678,30 @@
                                     vmstate: {
                                         label: 'label.vm.state'
                                     },
-                                    deviceid: {
-                                        label: 'label.device.id'
-                                    },
-                                    storage: {
-                                        label: 'label.storage'
-                                    },
-                                    created: {
-                                        label: 'label.created',
-                                        converter: cloudStack.converters.toLocalDate
-                                    },
                                     domain: {
                                         label: 'label.domain'
                                     },
                                     account: {
                                         label: 'label.account'
+                                    },
+                                    storagetype: {
+                                        label: 'label.storage.type'
+                                    },
+                                    provisioningtype: {
+                                        label: 'label.disk.provisioningtype'
+                                    },
+                                    hypervisor: {
+                                        label: 'label.hypervisor'
+                                    },
+                                    id: {
+                                        label: 'label.id'
+                                    },
+                                    created: {
+                                        label: 'label.created',
+                                        converter: cloudStack.converters.toLocalDate
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
                                     }
                                 }],
 
