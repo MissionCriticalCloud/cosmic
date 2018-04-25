@@ -31,8 +31,11 @@
                         type: {
                             label: 'label.type'
                         },
-                        hypervisor: {
-                            label: 'label.hypervisor'
+                        diskcontroller: {
+                            label: 'label.disk.controller'
+                        },
+                        deviceid: {
+                            label: 'label.device.id'
                         },
                         state: {
                             label: 'label.state',

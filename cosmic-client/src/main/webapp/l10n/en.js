@@ -588,6 +588,7 @@ var dictionary = {
     "label.disk.allocated": "Disk Allocated",
     "label.disk.bytes.read.rate": "Disk Read Rate (BPS)",
     "label.disk.bytes.write.rate": "Disk Write Rate (BPS)",
+    "label.disk.controller": "Disk Controller",
     "label.disk.iops.max": "Max IOPS",
     "label.disk.iops.min": "Min IOPS",
     "label.disk.iops.read.rate": "Disk Read Rate (IOPS)",
