@@ -12,7 +12,6 @@ import com.cloud.utils.net.Proxy;
 
 public class DownloadCommand extends AbstractDownloadCommand implements InternalIdentity {
 
-    private boolean hvm;
     private String description;
     private String checksum;
     private PasswordAuth auth;
@@ -29,7 +28,6 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
 
     public DownloadCommand(final DownloadCommand that) {
         super(that);
-        hvm = that.hvm;
         checksum = that.checksum;
         id = that.id;
         description = that.description;
@@ -60,7 +58,6 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
         super(template.getName(), template.getOrigUrl(), template.getFormat(), template.getAccountId());
         _store = template.getDataStore();
         installPath = template.getPath();
-        hvm = template.isRequiresHvm();
         checksum = template.getChecksum();
         id = template.getId();
         description = template.getDescription();
@@ -83,14 +80,6 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
     @Override
     public long getId() {
         return id;
-    }
-
-    public boolean isHvm() {
-        return hvm;
-    }
-
-    public void setHvm(final boolean hvm) {
-        this.hvm = hvm;
     }
 
     public String getDescription() {

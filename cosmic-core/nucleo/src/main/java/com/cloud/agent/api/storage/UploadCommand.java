@@ -10,7 +10,6 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
     private TemplateTO template;
     private String url;
     private String installPath;
-    private boolean hvm;
     private String description;
     private String checksum;
     private PasswordAuth auth;
@@ -80,14 +79,6 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
     @Override
     public void setUrl(final String url) {
         this.url = url;
-    }
-
-    public boolean isHvm() {
-        return hvm;
-    }
-
-    public void setHvm(final boolean hvm) {
-        this.hvm = hvm;
     }
 
     public PasswordAuth getAuth() {

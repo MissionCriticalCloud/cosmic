@@ -13,7 +13,6 @@ public class TemplateProfile {
     Integer bits;
     Boolean passwordEnabled;
     Boolean sshKeyEnbaled;
-    Boolean requiresHvm;
     String url;
     Boolean isPublic;
     Boolean featured;
@@ -40,8 +39,7 @@ public class TemplateProfile {
         this.zoneId = zoneId;
     }
 
-    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final
-    Boolean requiresHvm, final String url,
+    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
                            final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId,
 
                            final HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
@@ -53,7 +51,6 @@ public class TemplateProfile {
                 displayText,
                 bits,
                 passwordEnabled,
-                requiresHvm,
                 url,
                 isPublic,
                 featured,
@@ -74,19 +71,16 @@ public class TemplateProfile {
         this.templateType = templateType;
     }
 
-    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final
-    Boolean requiresHvm, final String url,
+    public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
                            final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId, final
-                           HypervisorType hypervisorType,
-                           final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable, final Map details, final Boolean
-                                   sshKeyEnabled) {
+                           HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
+                           final Map details, final Boolean sshKeyEnabled) {
         this.templateId = templateId;
         this.userId = userId;
         this.name = name;
         this.displayText = displayText;
         this.bits = bits;
         this.passwordEnabled = passwordEnabled;
-        this.requiresHvm = requiresHvm;
         this.url = url;
         this.isPublic = isPublic;
         this.featured = featured;
@@ -150,14 +144,6 @@ public class TemplateProfile {
 
     public void setPasswordEnabled(final Boolean enabled) {
         this.passwordEnabled = enabled;
-    }
-
-    public Boolean getRequiresHVM() {
-        return requiresHvm;
-    }
-
-    public void setRequiresHVM(final Boolean hvm) {
-        this.requiresHvm = hvm;
     }
 
     public String getUrl() {

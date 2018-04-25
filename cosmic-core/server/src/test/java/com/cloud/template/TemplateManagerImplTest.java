@@ -354,7 +354,6 @@ public class TemplateManagerImplTest {
         when(mockCreateCmd.getTemplateName()).thenReturn("test");
         when(mockCreateCmd.getTemplateTag()).thenReturn(null);
         when(mockCreateCmd.getBits()).thenReturn(64);
-        when(mockCreateCmd.getRequiresHvm()).thenReturn(true);
         when(mockCreateCmd.isPasswordEnabled()).thenReturn(false);
         when(mockCreateCmd.isPublic()).thenReturn(false);
         when(mockCreateCmd.isFeatured()).thenReturn(false);

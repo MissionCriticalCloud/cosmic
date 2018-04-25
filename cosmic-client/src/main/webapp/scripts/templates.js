@@ -200,7 +200,6 @@
                                                     $form.find('.form-item[rel=rootDiskControllerType]').hide();
                                                     $form.find('.form-item[rel=nicAdapterType]').hide();
                                                     $form.find('.form-item[rel=keyboardType]').hide();
-                                                    $form.find('.form-item[rel=rootDiskControllerTypeKVM]').hide();
                                                     if (isAdmin())
                                                         $form.find('.form-item[rel=xenserverToolsVersion61plus]').css('display', 'inline-block');
                                                 } else {
@@ -208,7 +207,6 @@
                                                     $form.find('.form-item[rel=nicAdapterType]').hide();
                                                     $form.find('.form-item[rel=keyboardType]').hide();
                                                     $form.find('.form-item[rel=xenserverToolsVersion61plus]').hide();
-                                                    $form.find('.form-item[rel=rootDiskControllerTypeKVM]').css('display', 'inline-block');
                                                 }
                                             });
 
@@ -238,39 +236,6 @@
                                             return b;
                                         },
                                         isHidden: true
-                                    },
-
-
-                                    //fields for hypervisor == "KVM" (starts here)
-                                    rootDiskControllerTypeKVM: {
-                                        label: 'label.root.disk.controller',
-                                        isHidden: true,
-                                        select: function(args) {
-                                            var items = []
-                                            items.push({
-                                                id: "",
-                                                description: ""
-                                            });
-                                            items.push({
-                                                id: "ide",
-                                                description: "ide"
-                                            });
-                                            items.push({
-                                                id: "osdefault",
-                                                description: "osdefault"
-                                            });
-                                            items.push({
-                                                id: "scsi",
-                                                description: "virtio-scsi"
-                                            });
-                                            items.push({
-                                                id: "virtio",
-                                                description: "virtio"
-                                            });
-                                            args.response.success({
-                                                data: items
-                                            });
-                                        }
                                     },
 
                                     format: {
@@ -364,13 +329,6 @@
                                         docID: 'helpRegisterTemplateRouting',
                                         isBoolean: true,
                                         isHidden: true
-                                    },
-                                    requireshvm: {
-                                        label: 'label.hvm',
-                                        docID: 'helpRegisterTemplateHvm',
-                                        isBoolean: true,
-                                        isHidden: false,
-                                        isChecked: true
                                     }
                                 }
                             },
@@ -402,12 +360,6 @@
                                     });
                                 }
 
-                                if (args.$form.find('.form-item[rel=requireshvm]').css("display") != "none") {
-                                    $.extend(data, {
-                                        requireshvm: (args.data.requireshvm == "on")
-                                    });
-                                }
-
                                 if (args.$form.find('.form-item[rel=isFeatured]').css("display") != "none") {
                                     $.extend(data, {
                                         isfeatured: (args.data.isFeatured == "on")
@@ -420,20 +372,6 @@
                                     });
                                 }
 
-                                //XenServer only (starts here)
-                                if (args.$form.find('.form-item[rel=xenserverToolsVersion61plus]').css("display") != "none") {
-                                    $.extend(data, {
-                                        'details[0].hypervisortoolsversion': (args.data.xenserverToolsVersion61plus == "on") ? "xenserver61" : "xenserver56"
-                                    });
-                                }
-                                //XenServer only (ends here)
-
-                                // KVM only (starts here)
-                                if (args.$form.find('.form-item[rel=rootDiskControllerTypeKVM]').css("display") != "none" && args.data.rootDiskControllerTypeKVM != "") {
-                                    $.extend(data, {
-                                        'details[0].rootDiskController': args.data.rootDiskControllerTypeKVM
-                                    });
-                                }
                                 // KVM only (ends here)
 
                                 $.ajax({
@@ -489,12 +427,6 @@
                                         if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
                                             $.extend(data, {
                                                 ispublic: (args.data.isPublic == "on")
-                                            });
-                                        }
-
-                                        if (args.$form.find('.form-item[rel=requireshvm]').css("display") != "none") {
-                                            $.extend(data, {
-                                                requireshvm: (args.data.requireshvm == "on")
                                             });
                                         }
 
@@ -712,14 +644,6 @@
                                         docID: 'helpRegisterTemplateRouting',
                                         isBoolean: true,
                                         isHidden: true
-                                    },
-
-                                    requireshvm: {
-                                        label: 'label.hvm',
-                                        docID: 'helpRegisterTemplateHvm',
-                                        isBoolean: true,
-                                        isHidden: false,
-                                        isChecked: true
                                     }
                                 }
                             },

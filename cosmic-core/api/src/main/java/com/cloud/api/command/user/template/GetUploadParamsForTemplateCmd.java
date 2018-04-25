@@ -62,9 +62,6 @@ public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
     @Parameter(name = ApiConstants.PASSWORD_ENABLED, type = CommandType.BOOLEAN, description = "true if the template supports the password reset feature; default is false")
     private Boolean passwordEnabled;
 
-    @Parameter(name = ApiConstants.REQUIRES_HVM, type = CommandType.BOOLEAN, description = "true if this template requires HVM")
-    private Boolean requiresHvm;
-
     @Parameter(name = ApiConstants.SSHKEY_ENABLED, type = CommandType.BOOLEAN, description = "true if the template supports the sshkey upload feature; default is false")
     private Boolean sshKeyEnabled;
 
@@ -121,10 +118,6 @@ public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
 
     public Boolean isPasswordEnabled() {
         return passwordEnabled;
-    }
-
-    public Boolean getRequiresHvm() {
-        return requiresHvm;
     }
 
     public Boolean isSshKeyEnabled() {

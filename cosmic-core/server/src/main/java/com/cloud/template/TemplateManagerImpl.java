@@ -1323,12 +1323,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         // do some parameter defaulting
         final Integer bits = cmd.getBits();
-        final Boolean requiresHvm = cmd.getRequiresHvm();
         final Boolean passwordEnabled = cmd.isPasswordEnabled();
         Boolean isPublic = cmd.isPublic();
         Boolean featured = cmd.isFeatured();
         final int bitsValue = bits == null ? 64 : bits;
-        final boolean requiresHvmValue = requiresHvm == null || requiresHvm;
         final boolean passwordEnabledValue = passwordEnabled != null && passwordEnabled;
         if (isPublic == null) {
             isPublic = Boolean.FALSE;
@@ -1439,9 +1437,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             hyperType = HypervisorType.getType(cmd.getHypervisor());
         }
 
-        privateTemplate = new VMTemplateVO(nextTemplateId, name, ImageFormat.RAW, isPublic, featured, isExtractable,
-                TemplateType.USER, null, requiresHvmValue, bitsValue, templateOwner.getId(), null, description,
-                passwordEnabledValue, guestOS.getId(), true, hyperType, templateTag, cmd.getDetails(), false, isDynamicScalingEnabled);
+        privateTemplate = new VMTemplateVO(nextTemplateId, name, ImageFormat.RAW, isPublic, featured, isExtractable, TemplateType.USER, null, bitsValue, templateOwner.getId(),
+                null, description, passwordEnabledValue, guestOS.getId(), true, hyperType, templateTag, cmd.getDetails(), false,
+                isDynamicScalingEnabled);
 
         if (sourceTemplateId != null) {
             if (s_logger.isDebugEnabled()) {
@@ -1635,7 +1633,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final Boolean isDynamicallyScalable = cmd.isDynamicallyScalable();
         final Boolean isRoutingTemplate = cmd.isRoutingType();
         final Boolean bootable = cmd.getBootable();
-        final Boolean requiresHvm = cmd.getRequiresHvm();
         final Integer sortKey = cmd.getSortKey();
         final Map details = cmd.getDetails();
         final Account account = CallContext.current().getCallingAccount();
@@ -1667,7 +1664,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         guestOSId == null &&
                         passwordEnabled == null &&
                         bootable == null &&
-                        requiresHvm == null &&
                         sortKey == null &&
                         isDynamicallyScalable == null &&
                         isRoutingTemplate == null &&
@@ -1732,10 +1728,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         if (bootable != null) {
             template.setBootable(bootable);
-        }
-
-        if (requiresHvm != null) {
-            template.setRequiresHvm(requiresHvm);
         }
 
         if (isDynamicallyScalable != null) {

@@ -32,8 +32,6 @@ public interface VirtualMachineTemplate extends ControlledEntity, Identity, Inte
 
     ImageFormat getFormat();
 
-    boolean isRequiresHvm();
-
     String getDisplayText();
 
     boolean getEnablePassword();

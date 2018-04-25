@@ -110,7 +110,6 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
                 final String value = rs.getString(5);
                 final ImageFormat format = ImageFormat.valueOf(value);
                 final String tmpltType = rs.getString(6);
-                final boolean requiresHVM = rs.getBoolean(7);
                 final int bits = rs.getInt(8);
                 final String url = rs.getString(9);
                 final String createdTS = rs.getString(10);
@@ -132,7 +131,7 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
                     // templates only
                 }
                 final VMTemplateVO template =
-                        new VMTemplateVO(id, uniqueName, name, format, isPublic, featured, TemplateType.valueOf(tmpltType), url, createdDate, requiresHVM, bits,
+                        new VMTemplateVO(id, uniqueName, name, format, isPublic, featured, TemplateType.valueOf(tmpltType), url, createdDate, bits,
                                 templateAccountId, checksum, displayText, enablePassword, guestOSId, true, null);
                 permittedTemplates.add(template);
             }

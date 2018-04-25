@@ -289,19 +289,19 @@ VALUES (1, '4.0.0', '2017-07-20 20:45:33', 'Complete'), (2, '4.1.0', '2017-07-20
   (24, '5.3.2', '2017-07-20 18:46:07', 'Complete'), (25, '5.3.3', '2017-07-20 18:46:07', 'Complete'), (26, '5.3.4', '2017-07-20 18:46:07', 'Complete'),
   (27, '5.3.5', '2017-07-20 18:46:07', 'Complete'), (28, '5.3.6', '2017-07-20 18:46:07', 'Complete'), (29, '5.3.7', '2017-07-20 18:46:07', 'Complete');
 
-INSERT INTO `vm_template` (`id`, `unique_name`, `name`, `uuid`, `public`, `featured`, `type`, `hvm`, `bits`, `url`, `format`, `created`, `removed`, `account_id`, `checksum`, `display_text`, `enable_password`, `enable_sshkey`, `guest_os_id`, `bootable`, `prepopulate`, `cross_zones`, `extractable`, `hypervisor_type`, `source_template_id`, `template_tag`, `sort_key`, `size`, `state`, `update_count`, `updated`, `dynamically_scalable`)
-VALUES (1, 'routing-1', 'SystemVM Template (XenServer)', '9cc3c107-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64,
+INSERT INTO `vm_template` (`id`, `unique_name`, `name`, `uuid`, `public`, `featured`, `type`, `bits`, `url`, `format`, `created`, `removed`, `account_id`, `checksum`, `display_text`, `enable_password`, `enable_sshkey`, `guest_os_id`, `bootable`, `prepopulate`, `cross_zones`, `extractable`, `hypervisor_type`, `source_template_id`, `template_tag`, `sort_key`, `size`, `state`, `update_count`, `updated`, `dynamically_scalable`)
+VALUES (1, 'routing-1', 'SystemVM Template (XenServer)', '9cc3c107-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 64,
            'http://download.cloud.com/templates/4.3/systemvm64template-2014-01-14-master-xen.vhd.bz2', 'VHD', '2017-07-20 20:45:33', NULL, 1, '74b92f031cc5c2089ee89efb81344dcf',
                                                                                                               'SystemVM Template (XenServer)', 0, 0, 184, 1, 0, 1, 0, 'XenServer', NULL, NULL, 0, NULL,
                                                                                                                                                                 'Active', 0, NULL, 0),
-  (3, 'routing-3', 'SystemVM Template (KVM)', 'f327eecc-be53-4d80-9d43-adaf45467abd', 0, 0, 'SYSTEM', 0, 64, '', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, '85a1bed07bf43cbf022451cb2ecae4ff',
+  (3, 'routing-3', 'SystemVM Template (KVM)', 'f327eecc-be53-4d80-9d43-adaf45467abd', 0, 0, 'SYSTEM', 64, '', 'QCOW2', '2017-07-20 20:45:33', NULL, 1, '85a1bed07bf43cbf022451cb2ecae4ff',
                                                                                                                           'SystemVM Template (KVM)', 0, 0, 1000, 1, 0, 1, 0, 'KVM', NULL, NULL, 0, NULL,
                                                                                                                                                                        'Active', 0, NULL, 0),
-  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 1, 64, 'https://s3-eu-west-1.amazonaws.com/mccmacchina/macchinina-kvm.qcow2.bz2', 'QCOW2',
+  (4, 'tiny linux kvm', 'tiny linux kvm', '9cc3eac7-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 64, 'https://s3-eu-west-1.amazonaws.com/mccmacchina/macchinina-kvm.qcow2.bz2', 'QCOW2',
     '2017-07-20 20:45:33', NULL, 1, 'ed0e788280ff2912ea40f7f91ca7a249', 'tiny linux kvm', 0, 0, 140, 1, 0, 1, 1, 'KVM', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (5, 'tiny linux xen', 'tiny linux xen', '9cc3f888-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 0, 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2', 'VHD',
+  (5, 'tiny linux xen', 'tiny linux xen', '9cc3f888-6d7b-11e7-8f09-5254001daa61', 1, 1, 'BUILTIN', 64, 'http://dl.openvm.eu/cloudstack/macchinina/x86_64/macchinina-xen.vhd.bz2', 'VHD',
     '2017-07-20 20:45:33', NULL, 1, '905cec879afd9c9d22ecc8036131a180', 'tiny linux xen', 0, 0, 142, 1, 0, 1, 1, 'XenServer', NULL, NULL, 0, NULL, 'Active', 0, NULL, 0),
-  (12, 'routing-12', 'SystemVM Template (Ovm3)', 'b05dd2c9-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 0, 64, 'http://cloudstack.apt-get.eu/systemvm/4.6/systemvm64template-4.6.0-ovm.raw.bz2', 'RAW',
+  (12, 'routing-12', 'SystemVM Template (Ovm3)', 'b05dd2c9-6d7b-11e7-8f09-5254001daa61', 0, 0, 'SYSTEM', 64, 'http://cloudstack.apt-get.eu/systemvm/4.6/systemvm64template-4.6.0-ovm.raw.bz2', 'RAW',
     '2017-07-20 20:46:06', NULL, 1, 'c8577d27b2daafb2d9a4ed307ce2f00f', 'SystemVM Template (Ovm3)', 0, 0, 183, 1, 0, 1, 0, 'Ovm3', NULL, NULL, 0, NULL, 'Active', NULL, NULL, 0);
 
 INSERT INTO `network_offerings` (`id`, `name`, `uuid`, `unique_name`, `display_text`, `nw_rate`, `mc_rate`, `traffic_type`, `tags`, `system_only`, `specify_vlan`, `service_offering_id`, `conserve_mode`, `created`, `removed`, `default`, `availability`, `dedicated_lb_service`, `shared_source_nat_service`, `sort_key`, `redundant_router_service`, `state`, `guest_type`, `elastic_ip_service`, `eip_associate_public_ip`, `elastic_lb_service`, `specify_ip_ranges`, `inline`, `is_persistent`, `public_lb`, `egress_default_policy`, `concurrent_connections`, `keep_alive_enabled`, `supports_streched_l2`, `secondary_service_offering_id`)

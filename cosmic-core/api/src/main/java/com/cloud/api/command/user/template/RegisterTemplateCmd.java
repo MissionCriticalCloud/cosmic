@@ -85,8 +85,6 @@ public class RegisterTemplateCmd extends BaseCmd {
     private Boolean sshKeyEnabled;
     @Parameter(name = ApiConstants.IS_EXTRACTABLE, type = CommandType.BOOLEAN, description = "true if the template or its derivatives are extractable; default is false")
     private Boolean extractable;
-    @Parameter(name = ApiConstants.REQUIRES_HVM, type = CommandType.BOOLEAN, description = "true if this template requires HVM")
-    private Boolean requiresHvm;
     @Parameter(name = ApiConstants.URL,
             type = CommandType.STRING,
             required = true,
@@ -153,10 +151,6 @@ public class RegisterTemplateCmd extends BaseCmd {
 
     public Boolean isExtractable() {
         return extractable;
-    }
-
-    public Boolean getRequiresHvm() {
-        return requiresHvm;
     }
 
     public String getUrl() {

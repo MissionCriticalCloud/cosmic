@@ -42,7 +42,6 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
     private ExecutorService threadPool;
     private String parentDir;
     private StorageLayer _storage;
-    private boolean hvm;
 
     public static UploadVO.Status convertStatus(final Status tds) {
         switch (tds) {
@@ -155,7 +154,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             s_logger.error("Unable to download from URL: " + url);
             throw new CloudRuntimeException("Unable to download from URL: " + url);
         }
-        final UploadJob uj = new UploadJob(tu, jobId, id, name, format, hvm, accountId, descr, cksum, installPathPrefix);
+        final UploadJob uj = new UploadJob(tu, jobId, id, name, format, accountId, descr, cksum, installPathPrefix);
         jobs.put(jobId, uj);
         threadPool.execute(tu);
 
@@ -436,9 +435,9 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
     private static class UploadJob {
         private final TemplateUploader tu;
 
-        public UploadJob(final TemplateUploader tu, final String jobId, final long id, final String name, final ImageFormat format, final boolean hvm, final Long accountId,
-                         final String descr, final String cksum,
-                         final String installPathPrefix) {
+        public UploadJob(final TemplateUploader tu, final String jobId, final long id, final String name, final ImageFormat format, final Long accountId, final String descr,
+                         final String cksum, final String installPathPrefix
+        ) {
             super();
             this.tu = tu;
         }

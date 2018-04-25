@@ -16,7 +16,6 @@ public class TemplateObjectTO implements DataTO {
     private ImageFormat format;
     private long accountId;
     private String checksum;
-    private boolean hvm;
     private String displayText;
     private DataStoreTO imageDataStore;
     private String name;
@@ -35,7 +34,6 @@ public class TemplateObjectTO implements DataTO {
         this.origUrl = template.getUrl();
         this.displayText = template.getDisplayText();
         this.checksum = template.getChecksum();
-        this.hvm = template.isRequiresHvm();
         this.accountId = template.getAccountId();
         this.name = template.getUniqueName();
         this.format = template.getFormat();
@@ -49,7 +47,6 @@ public class TemplateObjectTO implements DataTO {
         this.origUrl = template.getUrl();
         this.displayText = template.getDisplayText();
         this.checksum = template.getChecksum();
-        this.hvm = template.isRequiresHvm();
         this.accountId = template.getAccountId();
         this.name = template.getUniqueName();
         this.format = template.getFormat();
@@ -89,14 +86,6 @@ public class TemplateObjectTO implements DataTO {
 
     public void setChecksum(final String checksum) {
         this.checksum = checksum;
-    }
-
-    public boolean isRequiresHvm() {
-        return hvm;
-    }
-
-    public void setRequiresHvm(final boolean hvm) {
-        this.hvm = hvm;
     }
 
     public String getDescription() {
