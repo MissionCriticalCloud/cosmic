@@ -425,7 +425,7 @@ public class LibvirtDiskDef {
             diskBuilder.append("</iotune>\n");
         }
 
-        if (bus == DiskControllerType.SCSI) {
+        if (bus == DiskControllerType.SCSI && getDeviceId() != null) {
             diskBuilder.append("<address type='drive' controller='0' bus='0' target='0' unit='" + getDeviceId().toString() + "'/>");
         }
         diskBuilder.append("</disk>\n");
