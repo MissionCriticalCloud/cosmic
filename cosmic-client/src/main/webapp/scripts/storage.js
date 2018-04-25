@@ -162,6 +162,33 @@
                                         isHidden: true
                                     },
 
+                                    diskController: {
+                                        label: 'label.disk.controller',
+                                        docID: 'helpDiskController',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: '',
+                                                description: _l('label.none')
+                                            });
+                                            items.push({
+                                                id: 'IDE',
+                                                description: 'IDE (Legacy)'
+                                            });
+                                            items.push({
+                                                id: 'VIRTIO',
+                                                description: 'VirtIO (virtio-blk)'
+                                            });
+                                            items.push({
+                                                id: 'SCSI',
+                                                description: 'VirtIO SCSI (virtio-scsi)'
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+
                                     minIops: {
                                         label: 'label.disk.iops.min',
                                         validation: {
@@ -187,10 +214,10 @@
                                 var data = {
                                     name: args.data.name,
                                     zoneId: args.data.availabilityZone,
-                                    diskOfferingId: args.data.diskOffering
+                                    diskOfferingId: args.data.diskOffering,
+                                    diskController: args.data.diskController
                                 };
 
-                                // if(thisDialog.find("#size_container").css("display") != "none") { //wait for Brian to include $form in args
                                 if (selectedDiskOfferingObj.iscustomized == true) {
                                     $.extend(data, {
                                         size: args.data.diskSize
