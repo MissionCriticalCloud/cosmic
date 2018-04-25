@@ -1,6 +1,7 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
@@ -61,6 +62,9 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     String cacheMode;
     @Column(name = "chain_info", length = 65535)
     String chainInfo;
+    @Column(name = "disk_controller")
+    @Enumerated(value = EnumType.STRING)
+    DiskControllerType diskController;
     @Id
     @Column(name = "id")
     private long id;
@@ -861,5 +865,9 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Override
     public Class<?> getEntityType() {
         return Volume.class;
+    }
+
+    public DiskControllerType getDiskController() {
+        return diskController;
     }
 }

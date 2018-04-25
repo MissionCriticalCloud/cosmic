@@ -103,6 +103,7 @@ import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.jobs.JobInfo;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -220,6 +221,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     static final ConfigKey<Integer> VmJobStateReportInterval = new ConfigKey<>("Advanced",
             Integer.class, "vm.job.report.interval", "60",
             "Interval to send application level pings to make sure the connection is still working", false);
+    static final ConfigKey<String> DefaultDiskControllerName = new ConfigKey<>("Advanced", String.class, "vm.default.disk.controller", "SCSI",
+            "Default disk controller type for routers, systemVMs and ", false);
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineManagerImpl.class);
     private static final String VM_SYNC_ALERT_SUBJECT = "VM state sync alert";
     @Inject
@@ -381,10 +384,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     @Override
     @DB
-    public void allocate(final String vmInstanceName, final VirtualMachineTemplate template, final ServiceOffering serviceOffering,
-                         final DiskOfferingInfo rootDiskOfferingInfo, final List<DiskOfferingInfo> dataDiskOfferings,
-                         final LinkedHashMap<? extends Network, List<? extends NicProfile>> auxiliaryNetworks, final DeploymentPlan plan, final HypervisorType hyperType)
-            throws InsufficientCapacityException {
+    public void allocate(final String vmInstanceName, final VirtualMachineTemplate template, final ServiceOffering serviceOffering, final DiskOfferingInfo rootDiskOfferingInfo,
+                         final List<DiskOfferingInfo> dataDiskOfferings, final LinkedHashMap<? extends Network, List<? extends NicProfile>> auxiliaryNetworks,
+                         final DeploymentPlan plan, final HypervisorType hyperType, final DiskControllerType diskControllerType
+    ) throws InsufficientCapacityException {
 
         final VMInstanceVO vm = _vmDao.findVMByInstanceName(vmInstanceName);
         final Account owner = _entityMgr.findById(Account.class, vm.getAccountId());
@@ -415,16 +418,16 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 if (template.getFormat() == ImageFormat.ISO) {
                     volumeMgr.allocateRawVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
                 } else {
                     volumeMgr.allocateTemplatedVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner, diskControllerType);
                 }
 
                 if (dataDiskOfferings != null) {
                     for (final DiskOfferingInfo dataDiskOfferingInfo : dataDiskOfferings) {
                         volumeMgr.allocateRawVolume(Type.DATADISK, "DATA-" + vmFinal.getId(), dataDiskOfferingInfo.getDiskOffering(), dataDiskOfferingInfo.getSize(),
-                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner);
+                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
                     }
                 }
             }
@@ -480,17 +483,28 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public void allocate(final String vmInstanceName, final VirtualMachineTemplate template, final ServiceOffering serviceOffering,
-                         final LinkedHashMap<? extends Network, List<? extends NicProfile>> networks, final DeploymentPlan plan, final HypervisorType hyperType) throws
-            InsufficientCapacityException {
-        allocate(vmInstanceName, template, serviceOffering, new DiskOfferingInfo(serviceOffering), new ArrayList<>(), networks, plan, hyperType);
+    public void allocate(final String vmInstanceName, final VirtualMachineTemplate template, final ServiceOffering serviceOffering, final LinkedHashMap<? extends Network,
+            List<? extends NicProfile>> networks, final DeploymentPlan plan, final HypervisorType hyperType
+    ) throws InsufficientCapacityException {
+        allocate(vmInstanceName, template, serviceOffering, new DiskOfferingInfo(serviceOffering), new ArrayList<>(), networks, plan, hyperType, getDiskControllerType());
+    }
+
+    private DiskControllerType getDiskControllerType() {
+        DiskControllerType diskControllerType = DiskControllerType.SCSI;
+
+        try {
+            diskControllerType = DiskControllerType.valueOf(DefaultDiskControllerName.value());
+        } catch (final Exception e) {
+            s_logger.debug("Unable to parse vm.default.controller value '" + DefaultDiskControllerName + "' due to ", e);
+        }
+        return diskControllerType;
     }
 
     private Map<Volume, StoragePool> getPoolListForVolumesForMigration(final VirtualMachineProfile profile, final Host host, final Map<Long, Long> volumeToPool) {
         final List<VolumeVO> allVolumes = _volsDao.findUsableVolumesForInstance(profile.getId());
         final Map<Volume, StoragePool> volumeToPoolObjectMap = new HashMap<>();
         for (final VolumeVO volume : allVolumes) {
-            final Long poolId = volumeToPool.get(Long.valueOf(volume.getId()));
+            final Long poolId = volumeToPool.get(volume.getId());
             final StoragePoolVO pool = _storagePoolDao.findById(poolId);
             final StoragePoolVO currentPool = _storagePoolDao.findById(volume.getPoolId());
             final DiskOfferingVO diskOffering = _diskOfferingDao.findById(volume.getDiskOfferingId());

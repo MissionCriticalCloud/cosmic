@@ -1,5 +1,6 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Volume;
 
 import java.util.Map;
@@ -24,9 +25,18 @@ public class DiskTO {
     private String path;
     private Volume.Type type;
     private Map<String, String> _details;
+    private DiskControllerType diskController;
 
     public DiskTO() {
 
+    }
+
+    public DiskTO(final DataTO data, final Long diskSeq, final String path, final Volume.Type type, final DiskControllerType diskController) {
+        this.data = data;
+        this.diskSeq = diskSeq;
+        this.path = path;
+        this.type = type;
+        this.diskController = diskController;
     }
 
     public DiskTO(final DataTO data, final Long diskSeq, final String path, final Volume.Type type) {
@@ -74,5 +84,13 @@ public class DiskTO {
 
     public void setDetails(final Map<String, String> details) {
         _details = details;
+    }
+
+    public DiskControllerType getDiskController() {
+        return diskController;
+    }
+
+    public void setDiskController(final DiskControllerType diskController) {
+        this.diskController = diskController;
     }
 }

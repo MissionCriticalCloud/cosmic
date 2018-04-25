@@ -4,6 +4,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
+import com.cloud.model.enumeration.DiskControllerType;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
     public void testDomainXMLParser() {
         final int vncPort = 5900;
 
-        final LibvirtDiskDef.DiskBus diskBus = LibvirtDiskDef.DiskBus.VIRTIO;
+        final DiskControllerType diskBus = DiskControllerType.SCSI;
         final LibvirtDiskDef.DiskType diskType = LibvirtDiskDef.DiskType.FILE;
         final LibvirtDiskDef.DeviceType deviceType = LibvirtDiskDef.DeviceType.DISK;
         final LibvirtDiskDef.DiskFmtType diskFormat = LibvirtDiskDef.DiskFmtType.QCOW2;

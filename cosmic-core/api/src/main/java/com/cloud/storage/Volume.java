@@ -4,6 +4,7 @@ import com.cloud.acl.ControlledEntity;
 import com.cloud.api.Displayable;
 import com.cloud.api.Identity;
 import com.cloud.api.InternalIdentity;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.template.BasedOn;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
@@ -61,6 +62,8 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, Ba
     Date getCreated();
 
     Long getDiskOfferingId();
+
+    DiskControllerType getDiskController();
 
     String getChainInfo();
 

@@ -44,10 +44,12 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
 import com.cloud.storage.DataStoreRole;
+import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Storage;
@@ -58,6 +60,7 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
+import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -157,6 +160,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     HostDao _hostDao;
     @Inject
     SnapshotService _snapshotSrv;
+    @Inject
+    GuestOSDao _guestOsDao;
 
     @Inject
     StorageStrategyFactory _storageStrategyFactory;
@@ -215,7 +220,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 oldVol.getSize(),
                 oldVol.getMinIops(),
                 oldVol.getMaxIops(),
-                oldVol.get_iScsiName());
+                oldVol.get_iScsiName(),
+                oldVol.getDiskController());
         if (templateId != null) {
             newVol.setTemplateId(templateId);
         } else {
@@ -558,7 +564,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
     @Override
     public DiskProfile allocateRawVolume(final Type type, final String name, final DiskOffering offering, Long size, Long minIops, Long maxIops, final VirtualMachine vm, final
-    VirtualMachineTemplate template, final Account owner) {
+    VirtualMachineTemplate template, final Account owner, final DiskControllerType diskControllerType) {
         if (size == null) {
             size = offering.getDiskSize();
         } else {
@@ -578,10 +584,13 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 size,
                 minIops,
                 maxIops,
-                null);
+                null,
+                diskControllerType);
         if (vm != null) {
             vol.setInstanceId(vm.getId());
         }
+
+        vm.getGuestOSId();
 
         if (type.equals(Type.ROOT)) {
             vol.setDeviceId(0l);
@@ -945,7 +954,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         for (final VolumeVO vol : vols) {
             final DataTO volTO = volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType());
+            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
             final VolumeInfo volumeInfo = volFactory.getVolume(vol.getId());
             final DataStore dataStore = dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 
@@ -1028,7 +1037,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 vol = result.first();
             }
             final DataTO volumeTO = volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType());
+            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
             final VolumeInfo volumeInfo = volFactory.getVolume(vol.getId());
             final DataStore dataStore = dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 
@@ -1268,7 +1277,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
     @Override
     public DiskProfile allocateTemplatedVolume(final Type type, final String name, final DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, final
-    VirtualMachineTemplate template, final VirtualMachine vm, final Account owner) {
+    VirtualMachineTemplate template, final VirtualMachine vm, final Account owner, DiskControllerType diskControllerType) {
         assert (template.getFormat() != ImageFormat.ISO) : "ISO is not a template really....";
 
         Long size = _tmpltMgr.getTemplateSize(template.getId(), vm.getDataCenterId());
@@ -1286,6 +1295,11 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         minIops = minIops != null ? minIops : offering.getMinIops();
         maxIops = maxIops != null ? maxIops : offering.getMaxIops();
 
+        if (diskControllerType == null) {
+            final GuestOS guestOs = _guestOsDao.findById(vm.getGuestOSId());
+            diskControllerType = getGuestDiskModel(guestOs.getDisplayName());
+        }
+
         VolumeVO vol = new VolumeVO(type,
                 name,
                 vm.getDataCenterId(),
@@ -1296,7 +1310,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 size,
                 minIops,
                 maxIops,
-                null);
+                null,
+                diskControllerType);
         vol.setFormat(getSupportedImageFormatForCluster(template.getHypervisorType()));
         if (vm != null) {
             vol.setInstanceId(vm.getId());
@@ -1332,6 +1347,16 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
         return toDiskProfile(vol, offering);
+    }
+
+    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
+        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
+            return DiskControllerType.IDE;
+        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
+            return DiskControllerType.SCSI;
+        } else {
+            return DiskControllerType.VIRTIO;
+        }
     }
 
     @Override
