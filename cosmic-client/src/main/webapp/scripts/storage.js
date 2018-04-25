@@ -169,7 +169,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: _l('label.none')
+                                                description: _l('label.default')
                                             });
                                             items.push({
                                                 id: 'IDE',
@@ -970,7 +970,7 @@
                                                 var items = [];
                                                 items.push({
                                                     id: '',
-                                                    description: _l('label.none')
+                                                    description: _l('label.default')
                                                 });
                                                 items.push({
                                                     id: 'IDE',

@@ -1079,6 +1079,7 @@ var dictionary = {
     "label.no.items": "No Available Items",
     "label.no.thanks": "No thanks",
     "label.none": "None",
+    "label.default": "Default",
     "label.not.found": "Not Found",
     "label.notifications": "Notifications",
     "label.num.cpu.cores": "# of CPU Cores",
