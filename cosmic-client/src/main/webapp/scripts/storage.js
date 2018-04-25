@@ -963,6 +963,32 @@
                                                 });
                                             }
                                         },
+                                        diskController: {
+                                            label: 'label.disk.controller',
+                                            docID: 'helpDiskController',
+                                            select: function (args) {
+                                                var items = [];
+                                                items.push({
+                                                    id: '',
+                                                    description: _l('label.none')
+                                                });
+                                                items.push({
+                                                    id: 'IDE',
+                                                    description: 'IDE (Legacy)'
+                                                });
+                                                items.push({
+                                                    id: 'VIRTIO',
+                                                    description: 'VirtIO (virtio-blk)'
+                                                });
+                                                items.push({
+                                                    id: 'SCSI',
+                                                    description: 'VirtIO SCSI (virtio-scsi)'
+                                                });
+                                                args.response.success({
+                                                    data: items
+                                                });
+                                            }
+                                        },
                                         deviceid: {
                                             label: 'label.device.id',
                                             validation: {
@@ -980,6 +1006,11 @@
                                     if (args.data.deviceid != "" && typeof parseInt(args.data.deviceid, 10) === 'number' && args.data.deviceid % 1 === 0) {
                                         $.extend(data, {
                                             deviceid: args.data.deviceid
+                                        });
+                                    }
+                                    if (args.data.diskController != "") {
+                                        $.extend(data, {
+                                            diskcontroller: args.data.diskController
                                         });
                                     }
                                     $.ajax({
