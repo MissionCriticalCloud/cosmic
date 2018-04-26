@@ -11,7 +11,7 @@ public abstract class BaseResponse implements ResponseObject {
     protected String jobId;
 
     @SerializedName(ApiConstants.JOB_STATUS)
-    @Param(description = "The current status of the latest async job acting on this object")
+    @Param(description = "The current status of the latest async job acting on this object, should be 0 for PENDING")
     private Integer jobStatus;
 
     private transient String responseName;

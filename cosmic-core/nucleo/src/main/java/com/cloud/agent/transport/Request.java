@@ -330,7 +330,7 @@ public class Request {
                 final StringReader reader = new StringReader(_content);
                 final JsonReader jsonReader = new JsonReader(reader);
                 jsonReader.setLenient(true);
-                _cmds = s_gson.fromJson(jsonReader, (Type) Command[].class);
+                _cmds = s_gson.fromJson(jsonReader, Command[].class);
             } catch (final RuntimeException | NoClassDefFoundError e) {
                 s_logger.error("Caught problem with " + _content, e);
                 throw e;
