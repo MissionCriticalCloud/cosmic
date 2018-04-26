@@ -902,7 +902,77 @@
                                     poll: pollAsyncJobResult
                                 }
                             },
+                            editDisk: {
+                                addRow: 'false',
+                                label: 'label.action.edit.disk',
+                                messages: {
+                                    confirm: function (args) {
+                                        return 'message.confirm.edit.volume';
+                                    },
+                                    notification: function (args) {
+                                        return 'label.action.edit.disk';
+                                    }
+                                },
+                                createForm: {
+                                    title: 'label.action.edit.disk',
+                                    desc: 'label.action.edit.disk',
+                                    fields: {
+                                        diskController: {
+                                            label: 'label.disk.controller',
+                                            docID: 'helpDiskController',
+                                            select: function (args) {
+                                                var items = [];
+                                                items.push({
+                                                    id: 'SCSI',
+                                                    description: 'VirtIO SCSI (virtio-scsi)'
+                                                });
+                                                items.push({
+                                                    id: 'VIRTIO',
+                                                    description: 'VirtIO (virtio-blk)',
+                                                    selected: true
+                                                });
+                                                items.push({
+                                                    id: 'IDE',
+                                                    description: 'IDE (Legacy)'
+                                                });
+                                                args.response.success({
+                                                    data: items
+                                                });
+                                            }
+                                        }
+                                    }
+                                },
+                                action: function (args) {
+                                    var data = {
+                                        id: args.context.volumes[0].id,
+                                        diskcontroller: args.data.diskController
+                                    };
 
+                                    $.ajax({
+                                        url: createURL("updateVolume"),
+                                        data: data,
+                                        dataType: "json",
+                                        async: true,
+                                        success: function (json) {
+                                            var jid = json.updatevolumeresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        return json.queryasyncjobresultresponse.jobresult.volume;
+                                                    },
+                                                    getActionFilter: function () {
+                                                        return volumeActionfilter;
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                }
+                            },
                             attachDisk: {
                                 addRow: 'false',
                                 label: 'label.action.attach.disk',
@@ -2593,6 +2663,7 @@
                         allowedActions.push("migrateToAnotherStorage");
                     }
                     allowedActions.push("attachDisk");
+                    allowedActions.push("editDisk");
                 }
             }
         }
