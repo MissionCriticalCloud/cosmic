@@ -134,9 +134,6 @@
     <bean id="eventJoinDaoImpl" class="com.cloud.event.dao.EventJoinDaoImpl" />
     <bean id="firewallRulesCidrsDaoImpl" class="com.cloud.network.dao.FirewallRulesCidrsDaoImpl" />
     <bean id="firewallRulesDaoImpl" class="com.cloud.network.dao.FirewallRulesDaoImpl" />
-    <bean id="guestOSCategoryDaoImpl" class="com.cloud.storage.dao.GuestOSCategoryDaoImpl" />
-    <bean id="guestOSDaoImpl" class="com.cloud.storage.dao.GuestOSDaoImpl" />
-    <bean id="guestOSHypervisorDaoImpl" class="com.cloud.storage.dao.GuestOSHypervisorDaoImpl" />
     <bean id="highAvailabilityDaoImpl" class="com.cloud.ha.dao.HighAvailabilityDaoImpl" />
     <bean id="hostDaoImpl" class="com.cloud.host.dao.HostDaoImpl" />
     <bean id="hostDetailsDaoImpl" class="com.cloud.host.dao.HostDetailsDaoImpl" />

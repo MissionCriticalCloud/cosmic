@@ -846,18 +846,6 @@
                             </xsl:if>
                         </tr>
                         <tr>
-                            <xsl:if test="name='listOsCategories'">
-                                <td>
-                                    <A HREF="resumepage.html">
-                                        <xsl:value-of select="name" />
-                                    </A>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description" />
-                                </td>
-                            </xsl:if>
-                        </tr>
-                        <tr>
                             <xsl:if test="name='createAccount'">
                                 <tr>
                                     <td>
