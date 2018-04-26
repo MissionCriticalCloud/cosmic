@@ -35,7 +35,6 @@ import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.projects.ProjectManager;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.StorageManager;
@@ -44,7 +43,6 @@ import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -135,9 +133,6 @@ public class TemplateManagerImplTest {
 
     @Inject
     ImageStoreDao imgStoreDao;
-
-    @Inject
-    GuestOSDao guestOSDao;
 
     @Inject
     VMTemplateDao tmpltDao;
@@ -360,7 +355,6 @@ public class TemplateManagerImplTest {
         when(mockCreateCmd.isDynamicallyScalable()).thenReturn(false);
         when(mockCreateCmd.getVolumeId()).thenReturn(null);
         when(mockCreateCmd.getSnapshotId()).thenReturn(1L);
-        when(mockCreateCmd.getOsTypeId()).thenReturn(1L);
         when(mockCreateCmd.getEventDescription()).thenReturn("test");
         when(mockCreateCmd.getDetails()).thenReturn(null);
 
@@ -375,9 +369,6 @@ public class TemplateManagerImplTest {
 
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.template));
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.secondary_storage), anyLong());
-
-        final GuestOSVO mockGuestOS = mock(GuestOSVO.class);
-        when(guestOSDao.findById(anyLong())).thenReturn(mockGuestOS);
 
         when(tmpltDao.getNextInSequence(eq(Long.class), eq("id"))).thenReturn(1L);
 
@@ -497,11 +488,6 @@ public class TemplateManagerImplTest {
         @Bean
         public DomainDao domainDao() {
             return Mockito.mock(DomainDao.class);
-        }
-
-        @Bean
-        public GuestOSDao guestOSDao() {
-            return Mockito.mock(GuestOSDao.class);
         }
 
         @Bean

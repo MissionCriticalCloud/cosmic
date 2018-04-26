@@ -504,30 +504,6 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.dynamicallyScalable = dynamicallyScalable;
     }
 
-    public long getGuestOSId() {
-        return guestOSId;
-    }
-
-    public void setGuestOSId(final long guestOSId) {
-        this.guestOSId = guestOSId;
-    }
-
-    public String getGuestOSUuid() {
-        return guestOSUuid;
-    }
-
-    public void setGuestOSUuid(final String guestOSUuid) {
-        this.guestOSUuid = guestOSUuid;
-    }
-
-    public String getGuestOSName() {
-        return guestOSName;
-    }
-
-    public void setGuestOSName(final String guestOSName) {
-        this.guestOSName = guestOSName;
-    }
-
     public boolean isBootable() {
         return bootable;
     }

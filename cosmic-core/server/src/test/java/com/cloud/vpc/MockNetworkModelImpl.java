@@ -747,7 +747,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public List<String[]> generateVmData(final String userData, final String serviceOffering, final String zoneName, final String vmName, final long vmId, final String
-            publicKey, final String password, final Boolean isWindows, final Network network) {
+            publicKey, final String password, final Network network) {
         return null;
     }
 }

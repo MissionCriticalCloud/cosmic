@@ -9,7 +9,6 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
-import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.TemplateResponse;
@@ -59,11 +58,6 @@ public class RegisterIsoCmd extends BaseCmd {
     private Boolean extractable;
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = true, description = "the name of the ISO")
     private String isoName;
-    @Parameter(name = ApiConstants.OS_TYPE_ID,
-            type = CommandType.UUID,
-            entityType = GuestOSResponse.class,
-            description = "the ID of the OS type that best represents the OS of this ISO. If the ISO is bootable this parameter needs to be passed")
-    private Long osTypeId;
     @Parameter(name = ApiConstants.URL, type = CommandType.STRING, required = true, length = 2048, description = "the URL to where the ISO is currently being hosted")
     private String url;
     @Parameter(name = ApiConstants.DOMAIN_ID,
@@ -106,10 +100,6 @@ public class RegisterIsoCmd extends BaseCmd {
 
     public String getIsoName() {
         return isoName;
-    }
-
-    public Long getOsTypeId() {
-        return osTypeId;
     }
 
     public String getUrl() {

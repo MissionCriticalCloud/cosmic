@@ -147,7 +147,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
                 userVmResponse.setVgpu(serviceOfferingDetail.getValue());
             }
         }
-        userVmResponse.setGuestOsId(userVm.getGuestOsUuid());
         if (details.contains(VMDetails.all) || details.contains(VMDetails.volume)) {
             userVmResponse.setRootDeviceId(userVm.getVolumeDeviceId());
             if (userVm.getVolumeType() != null) {
@@ -165,7 +164,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         userVmResponse.setPublicIpId(userVm.getPublicIpUuid());
         userVmResponse.setPublicIp(userVm.getPublicIpAddress());
         userVmResponse.setKeyPairName(userVm.getKeypairName());
-        userVmResponse.setOsTypeId(userVm.getGuestOsId());
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.stats)) {
             // stats calculation

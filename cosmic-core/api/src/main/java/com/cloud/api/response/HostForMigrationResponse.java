@@ -34,14 +34,6 @@ public class HostForMigrationResponse extends BaseResponse {
     @Param(description = "the host type")
     private Host.Type hostType;
 
-    @SerializedName("oscategoryid")
-    @Param(description = "the OS category ID of the host")
-    private String osCategoryId;
-
-    @SerializedName("oscategoryname")
-    @Param(description = "the OS category name of the host")
-    private String osCategoryName;
-
     @SerializedName(ApiConstants.IP_ADDRESS)
     @Param(description = "the IP address of the host")
     private String ipAddress;
@@ -242,14 +234,6 @@ public class HostForMigrationResponse extends BaseResponse {
 
     public void setHostType(final Host.Type hostType) {
         this.hostType = hostType;
-    }
-
-    public void setOsCategoryId(final String osCategoryId) {
-        this.osCategoryId = osCategoryId;
-    }
-
-    public void setOsCategoryName(final String osCategoryName) {
-        this.osCategoryName = osCategoryName;
     }
 
     public void setIpAddress(final String ipAddress) {

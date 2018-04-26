@@ -98,9 +98,6 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
 
         templateResponse.setHypervisor(template.getHypervisorType().toString());
 
-        templateResponse.setOsTypeId(template.getGuestOSUuid());
-        templateResponse.setOsTypeName(template.getGuestOSName());
-
         // populate owner.
         ApiResponseHelper.populateOwner(templateResponse, template);
 
@@ -198,9 +195,6 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         isoResponse.setPublic(iso.isPublicTemplate());
         isoResponse.setChecksum(iso.getChecksum());
 
-        isoResponse.setOsTypeId(iso.getGuestOSUuid());
-        isoResponse.setOsTypeName(iso.getGuestOSName());
-
         // populate owner.
         ApiResponseHelper.populateOwner(isoResponse, iso);
 
@@ -270,8 +264,6 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         response.setPublic(result.isPublicTemplate());
         response.setCreated(result.getCreated());
         response.setFormat(result.getFormat());
-        response.setOsTypeId(result.getGuestOSUuid());
-        response.setOsTypeName(result.getGuestOSName());
         response.setBootable(result.isBootable());
         response.setHypervisor(result.getHypervisorType().toString());
 

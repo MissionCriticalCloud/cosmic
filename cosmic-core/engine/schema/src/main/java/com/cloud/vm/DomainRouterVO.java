@@ -46,12 +46,10 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
     @Column(name = "vpc_id")
     private Long vpcId;
 
-    public DomainRouterVO(final long id, final long serviceOfferingId, final long elementId, final String name, final long templateId, final HypervisorType hypervisorType, final
-    long guestOSId, final long domainId,
-                          final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState, final boolean haEnabled, final boolean
-                                  stopPending,
-                          final Long vpcId) {
-        super(id, serviceOfferingId, name, name, Type.DomainRouter, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+    public DomainRouterVO(final long id, final long serviceOfferingId, final long elementId, final String name, final long templateId, final HypervisorType hypervisorType,
+                          final long domainId, final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState,
+                          final boolean haEnabled, final boolean stopPending, final Long vpcId) {
+        super(id, serviceOfferingId, name, name, Type.DomainRouter, templateId, hypervisorType, domainId, accountId, userId, haEnabled);
         this.elementId = elementId;
         this.isRedundantRouter = isRedundantRouter;
         this.redundantState = redundantState;
@@ -59,12 +57,10 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
         this.vpcId = vpcId;
     }
 
-    public DomainRouterVO(final long id, final long serviceOfferingId, final long elementId, final String name, final long templateId, final HypervisorType hypervisorType, final
-    long guestOSId, final long domainId,
-                          final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState, final boolean haEnabled, final boolean
-                                  stopPending,
-                          final Type vmType, final Long vpcId) {
-        super(id, serviceOfferingId, name, name, vmType, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+    public DomainRouterVO(final long id, final long serviceOfferingId, final long elementId, final String name, final long templateId, final HypervisorType hypervisorType,
+                          final long domainId, final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState,
+                          final boolean haEnabled, final boolean stopPending, final Type vmType, final Long vpcId) {
+        super(id, serviceOfferingId, name, name, vmType, templateId, hypervisorType, domainId, accountId, userId, haEnabled);
         this.elementId = elementId;
         this.isRedundantRouter = isRedundantRouter;
         this.redundantState = redundantState;

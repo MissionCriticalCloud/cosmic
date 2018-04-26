@@ -23,11 +23,7 @@ import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.GuestOSCategoryVO;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
@@ -61,10 +57,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     HostDetailsDao _hostDetailsDao = null;
     @Inject
     ConfigurationDao _configDao = null;
-    @Inject
-    GuestOSDao _guestOSDao = null;
-    @Inject
-    GuestOSCategoryDao _guestOSCategoryDao = null;
     @Inject
     VMInstanceDao _vmInstanceDao = null;
     @Inject
@@ -400,8 +392,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         }
 
         // Determine the guest OS category of the template
-        final String templateGuestOSCategory = getTemplateGuestOSCategory(template);
-
         final List<Host> prioritizedHosts = new ArrayList<>();
         final List<Host> noHvmHosts = new ArrayList<>();
 
@@ -415,30 +405,9 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
                 s_logger.debug("Not considering hosts: " + noHvmHosts + "  to deploy template: " + template + " as they are not HVM enabled");
             }
         }
-        // If a host is tagged with the same guest OS category as the template, move it to a high priority list
-        // If a host is tagged with a different guest OS category than the template, move it to a low priority list
-        final List<Host> highPriorityHosts = new ArrayList<>();
-        final List<Host> lowPriorityHosts = new ArrayList<>();
-        for (final Host host : hostsToCheck) {
-            final String hostGuestOSCategory = getHostGuestOSCategory(host);
-            if (hostGuestOSCategory == null) {
-                continue;
-            } else if (templateGuestOSCategory.equals(hostGuestOSCategory)) {
-                highPriorityHosts.add(host);
-            } else {
-                lowPriorityHosts.add(host);
-            }
-        }
-
-        hostsToCheck.removeAll(highPriorityHosts);
-        hostsToCheck.removeAll(lowPriorityHosts);
 
         // Prioritize the remaining hosts by HVM capability
         prioritizedHosts.addAll(hostsToCheck);
-
-        // Merge the lists
-        prioritizedHosts.addAll(0, highPriorityHosts);
-        prioritizedHosts.addAll(lowPriorityHosts);
 
         // if service offering is not GPU enabled then move all the GPU enabled hosts to the end of priority list.
         if (_serviceOfferingDetailsDao.findDetail(offering.getId(), GPU.Keys.vgpuType.toString()) == null) {
@@ -458,58 +427,6 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         }
         return prioritizedHosts;
     }
-
-    protected String getTemplateGuestOSCategory(final VMTemplateVO template) {
-        final long guestOSId = template.getGuestOSId();
-        final GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
-        final long guestOSCategoryId = guestOS.getCategoryId();
-        final GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
-        return guestOSCategory.getName();
-    }
-
-    protected boolean hostSupportsHVM(final Host host) {
-        if (!_checkHvm) {
-            return true;
-        }
-        // Determine host capabilities
-        final String caps = host.getCapabilities();
-
-        if (caps != null) {
-            final String[] tokens = caps.split(",");
-            for (final String token : tokens) {
-                if (token.contains("hvm")) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    protected String getHostGuestOSCategory(final Host host) {
-        final DetailVO hostDetail = _hostDetailsDao.findDetail(host.getId(), "guest.os.category.id");
-        if (hostDetail != null) {
-            final String guestOSCategoryIdString = hostDetail.getValue();
-            final long guestOSCategoryId;
-
-            try {
-                guestOSCategoryId = Long.parseLong(guestOSCategoryIdString);
-            } catch (final Exception e) {
-                return null;
-            }
-
-            final GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
-
-            if (guestOSCategory != null) {
-                return guestOSCategory.getName();
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         if (_configDao != null) {

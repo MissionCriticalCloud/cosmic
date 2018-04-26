@@ -45,7 +45,7 @@ public final class LibvirtPlugNicCommandWrapper
                 nicnum++;
             }
             final VifDriver vifDriver = libvirtComputingResource.getVifDriver(nic.getType());
-            final InterfaceDef interfaceDef = vifDriver.plug(nic, "Default - VirtIO capable OS (64-bit)", "");
+            final InterfaceDef interfaceDef = vifDriver.plug(nic, "Default - VirtIO capable OS (64-bit)");
             vm.attachDevice(interfaceDef.toString());
 
             return new PlugNicAnswer(command, true, "success");

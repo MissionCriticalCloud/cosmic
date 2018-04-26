@@ -64,8 +64,6 @@ import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -138,10 +136,6 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     protected ClusterDao _clusterDao;
     @Inject
     protected DedicatedResourceDao _dedicatedDao;
-    @Inject
-    protected GuestOSDao _guestOSDao = null;
-    @Inject
-    protected GuestOSCategoryDao _guestOSCategoryDao = null;
     @Inject
     protected DiskOfferingDao _diskOfferingDao;
     @Inject

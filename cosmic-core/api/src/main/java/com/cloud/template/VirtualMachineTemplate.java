@@ -42,8 +42,6 @@ public interface VirtualMachineTemplate extends ControlledEntity, Identity, Inte
 
     Date getCreated();
 
-    long getGuestOSId();
-
     boolean isBootable();
 
     TemplateType getTemplateType();

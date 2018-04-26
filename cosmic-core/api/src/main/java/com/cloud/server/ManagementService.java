@@ -4,13 +4,6 @@ import com.cloud.alert.Alert;
 import com.cloud.api.command.admin.cluster.ListClustersCmd;
 import com.cloud.api.command.admin.config.ListCfgsByCmd;
 import com.cloud.api.command.admin.domain.UpdateDomainCmd;
-import com.cloud.api.command.admin.guest.AddGuestOsCmd;
-import com.cloud.api.command.admin.guest.AddGuestOsMappingCmd;
-import com.cloud.api.command.admin.guest.ListGuestOsMappingCmd;
-import com.cloud.api.command.admin.guest.RemoveGuestOsCmd;
-import com.cloud.api.command.admin.guest.RemoveGuestOsMappingCmd;
-import com.cloud.api.command.admin.guest.UpdateGuestOsCmd;
-import com.cloud.api.command.admin.guest.UpdateGuestOsMappingCmd;
 import com.cloud.api.command.admin.host.ListHostsCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.api.command.admin.pod.ListPodsByCmd;
@@ -30,8 +23,6 @@ import com.cloud.api.command.user.address.ListPublicIpAddressesCmd;
 import com.cloud.api.command.user.config.ListCapabilitiesCmd;
 import com.cloud.api.command.user.event.ArchiveEventsCmd;
 import com.cloud.api.command.user.event.DeleteEventsCmd;
-import com.cloud.api.command.user.guest.ListGuestOsCategoriesCmd;
-import com.cloud.api.command.user.guest.ListGuestOsCmd;
 import com.cloud.api.command.user.ssh.CreateSSHKeyPairCmd;
 import com.cloud.api.command.user.ssh.DeleteSSHKeyPairCmd;
 import com.cloud.api.command.user.ssh.ListSSHKeyPairsCmd;
@@ -52,9 +43,6 @@ import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.network.IpAddress;
 import com.cloud.org.Cluster;
-import com.cloud.storage.GuestOS;
-import com.cloud.storage.GuestOSHypervisor;
-import com.cloud.storage.GuestOsCategory;
 import com.cloud.storage.StoragePool;
 import com.cloud.user.SSHKeyPair;
 import com.cloud.utils.Pair;
@@ -121,83 +109,6 @@ public interface ManagementService {
      * @return List of IPAddresses
      */
     Pair<List<? extends IpAddress>, Integer> searchForIPAddresses(ListPublicIpAddressesCmd cmd);
-
-    /**
-     * Obtains a list of all guest OS.
-     *
-     * @return list of GuestOS
-     */
-    Pair<List<? extends GuestOS>, Integer> listGuestOSByCriteria(ListGuestOsCmd cmd);
-
-    /**
-     * Obtains a list of all guest OS categories.
-     *
-     * @return list of GuestOSCategories
-     */
-    Pair<List<? extends GuestOsCategory>, Integer> listGuestOSCategoriesByCriteria(ListGuestOsCategoriesCmd cmd);
-
-    /**
-     * Obtains a list of all guest OS mappings
-     *
-     * @return list of GuestOSHypervisor
-     */
-    Pair<List<? extends GuestOSHypervisor>, Integer> listGuestOSMappingByCriteria(ListGuestOsMappingCmd cmd);
-
-    /**
-     * Adds a new guest OS mapping
-     *
-     * @return A VO containing the new mapping, with its hypervisor, hypervisor type, guest OS name, and the name of guest OS specific to hypervisor
-     */
-    GuestOSHypervisor addGuestOsMapping(AddGuestOsMappingCmd addGuestOsMappingCmd);
-
-    /**
-     * Find newly added guest OS mapping by ID
-     *
-     * @return A VO containing the guest OS mapping specified by ID, with its hypervisor, hypervisor type, guest OS name, and the name of guest OS specific to hypervisor
-     */
-    GuestOSHypervisor getAddedGuestOsMapping(Long guestOsHypervisorId);
-
-    /**
-     * Adds a new guest OS
-     *
-     * @return A VO containing the new guest OS, with its category ID, name and display name
-     */
-    GuestOS addGuestOs(AddGuestOsCmd addGuestOsCmd);
-
-    /**
-     * Find newly added guest OS by ID
-     *
-     * @return A VO containing the guest OS specified by ID, with its category ID, name and display name
-     */
-    GuestOS getAddedGuestOs(Long guestOsId);
-
-    /**
-     * Updates an existing guest OS
-     *
-     * @return A VO containing the updated display name
-     */
-    GuestOS updateGuestOs(UpdateGuestOsCmd updateGuestOsCmd);
-
-    /**
-     * Updates an existing guest OS mapping
-     *
-     * @return A VO containing the updated OS name for hypervisor
-     */
-    GuestOSHypervisor updateGuestOsMapping(UpdateGuestOsMappingCmd updateGuestOsMappingCmd);
-
-    /**
-     * Removes an existing guest OS
-     *
-     * @return True is successfully marked for delete, false otherwise
-     */
-    boolean removeGuestOs(RemoveGuestOsCmd removeGuestOsCmd);
-
-    /**
-     * Removes an existing guest OS mapping
-     *
-     * @return True is successfully marked for delete, false otherwise
-     */
-    boolean removeGuestOsMapping(RemoveGuestOsMappingCmd removeGuestOsMappingCmd);
 
     VirtualMachine stopSystemVM(StopSystemVmCmd cmd) throws ResourceUnavailableException, ConcurrentOperationException;
 

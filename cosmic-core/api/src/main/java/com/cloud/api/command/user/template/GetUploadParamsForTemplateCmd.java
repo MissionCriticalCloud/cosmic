@@ -8,7 +8,6 @@ import com.cloud.api.ApiErrorCode;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GetUploadParamsResponse;
-import com.cloud.api.response.GuestOSResponse;
 import com.cloud.context.CallContext;
 import com.cloud.exception.ResourceAllocationException;
 
@@ -32,10 +31,6 @@ public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
 
     @Parameter(name = ApiConstants.HYPERVISOR, type = CommandType.STRING, required = true, description = "the target hypervisor for the template")
     private String hypervisor;
-
-    @Parameter(name = ApiConstants.OS_TYPE_ID, type = CommandType.UUID, entityType = GuestOSResponse.class, required = true, description = "the ID of the OS Type that best " +
-            "represents the OS of this template.")
-    private Long osTypeId;
 
     @Parameter(name = ApiConstants.BITS, type = CommandType.INTEGER, description = "32 or 64 bits support. 64 by default")
     private Integer bits;
@@ -74,10 +69,6 @@ public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
 
     public String getHypervisor() {
         return hypervisor;
-    }
-
-    public Long getOsTypeId() {
-        return osTypeId;
     }
 
     public Integer getBits() {

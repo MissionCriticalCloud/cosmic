@@ -1273,7 +1273,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 for (final DiskTO disk : disks) {
                     if (disk.getType() == Volume.Type.ISO) {
                         final TemplateObjectTO iso = (TemplateObjectTO) disk.getData();
-                        final String osType = iso.getGuestOsType();
+                        final String osType = "Other PV (64 bit)";
                         if (osType != null) {
                             final String isoGuestOsName = getGuestOsType(osType, vmSpec.getPlatformEmulator(),
                                     vmSpec.getBootloader() == BootloaderType.CD);

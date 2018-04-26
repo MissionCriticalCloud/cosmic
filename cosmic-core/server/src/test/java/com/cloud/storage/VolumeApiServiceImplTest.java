@@ -139,7 +139,7 @@ public class VolumeApiServiceImplTest {
                     null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(1L)).thenReturn(volumeOfRunningVm);
 
-            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
+            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, false,
                     false, 1L, 1L, 1, 1L, null, "vm", null);
             runningVm.setState(State.Running);
             runningVm.setDataCenterId(1L);
@@ -151,7 +151,7 @@ public class VolumeApiServiceImplTest {
             volumeOfStoppedVm.setPoolId(1L);
             when(_svc._volsDao.findById(2L)).thenReturn(volumeOfStoppedVm);
 
-            final UserVmVO stoppedVm = new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
+            final UserVmVO stoppedVm = new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, false,
                     false, 1L, 1L, 1, 1L, null, "vm", null);
             stoppedVm.setState(State.Stopped);
             stoppedVm.setDataCenterId(1L);
@@ -203,7 +203,7 @@ public class VolumeApiServiceImplTest {
             when(_svc._volsDao.findById(7L)).thenReturn(managedVolume1);
 
             // vm having root volume
-            final UserVmVO vmHavingRootVolume = new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
+            final UserVmVO vmHavingRootVolume = new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer,false,
                     false, 1L, 1L, 1, 1L, null, "vm", null);
             vmHavingRootVolume.setState(State.Stopped);
             vmHavingRootVolume.setDataCenterId(1L);

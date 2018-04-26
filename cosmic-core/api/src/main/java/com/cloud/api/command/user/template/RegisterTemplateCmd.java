@@ -10,7 +10,6 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
-import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.TemplateResponse;
@@ -71,12 +70,6 @@ public class RegisterTemplateCmd extends BaseCmd {
     private Boolean publicTemplate;
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, required = true, description = "the name of the template")
     private String templateName;
-    @Parameter(name = ApiConstants.OS_TYPE_ID,
-            type = CommandType.UUID,
-            entityType = GuestOSResponse.class,
-            required = true,
-            description = "the ID of the OS Type that best represents the OS of this template.")
-    private Long osTypeId;
     @Parameter(name = ApiConstants.PASSWORD_ENABLED,
             type = CommandType.BOOLEAN,
             description = "true if the template supports the password reset feature; default is false")
@@ -135,10 +128,6 @@ public class RegisterTemplateCmd extends BaseCmd {
 
     public String getTemplateName() {
         return templateName;
-    }
-
-    public Long getOsTypeId() {
-        return osTypeId;
     }
 
     public Boolean isPasswordEnabled() {

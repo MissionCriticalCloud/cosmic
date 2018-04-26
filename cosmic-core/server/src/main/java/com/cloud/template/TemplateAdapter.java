@@ -38,11 +38,11 @@ public interface TemplateAdapter extends Adapter {
     boolean delete(TemplateProfile profile);
 
     TemplateProfile prepare(boolean isIso, Long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, String url, Boolean isPublic, Boolean featured,
-                            Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String accountName, Long domainId, String chksum,
+                            Boolean isExtractable, String format, Long zoneId, HypervisorType hypervisorType, String accountName, Long domainId, String chksum,
                             Boolean bootable, Map details) throws ResourceAllocationException;
 
     TemplateProfile prepare(boolean isIso, long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, String url, Boolean isPublic, Boolean featured,
-                            Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String chksum, Boolean bootable, String templateTag,
+                            Boolean isExtractable, String format, Long zoneId, HypervisorType hypervisorType, String chksum, Boolean bootable, String templateTag,
                             Account templateOwner, Map details, Boolean sshKeyEnabled, String imageStoreUuid, Boolean isDynamicallyScalable, TemplateType templateType
     ) throws ResourceAllocationException;
 

@@ -185,7 +185,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     public static final String BASH_SCRIPT_PATH = "/bin/bash";
 
     protected static final String DEFAULT_OVS_VIF_DRIVER_CLASS = "com.cloud.hypervisor.kvm.resource.OvsVifDriver";
-    protected static final String DEFAULT_BRIDGE_VIF_DRIVER_CLASS = "com.cloud.hypervisor.kvm.resource.BridgeVifDriver";
     protected static final HashMap<DomainState, PowerState> s_powerStatesTable;
     private static final Logger logger = LoggerFactory.getLogger(LibvirtComputingResource.class);
 
@@ -449,7 +448,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         final Domain vm = getDomain(conn, vmName);
-        vm.attachDevice(getVifDriver(nicTo.getType()).plug(nicTo, "Default - VirtIO capable OS (64-bit)", "").toString());
+        vm.attachDevice(getVifDriver(nicTo.getType()).plug(nicTo, "Default - VirtIO capable OS (64-bit)").toString());
     }
 
     public String networkUsage(final String privateIpAddress, final String option, final String vif) {
@@ -814,8 +813,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         LibvirtConnection.initialize(getHypervisorUri());
         final Connect conn = connectToHypervisor();
 
-        checkIsHvmEnabled(conn);
-
         hypervisorPath = getHypervisorPath(conn);
         try {
             hvVersion = conn.getVersion();
@@ -861,16 +858,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     private static String findScriptPath(final String baseDir, final String scriptName) throws ConfigurationException {
         return findScriptPath(baseDir, "", scriptName);
-    }
-
-    private void checkIsHvmEnabled(final Connect conn) throws ConfigurationException {
-        if (HypervisorType.KVM == getHypervisorType()) {
-            if (!isHvmEnabled(conn)) {
-                throw new ConfigurationException("NO HVM support on this machine, please make sure: "
-                        + "1. VT/SVM is supported by your CPU, or is enabled in BIOS. "
-                        + "2. kvm modules are loaded (kvm, kvm_amd|kvm_intel)");
-            }
-        }
     }
 
     private Connect connectToHypervisor() throws ConfigurationException {
@@ -923,22 +910,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         } catch (final IOException ex) {
             throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
         }
-    }
-
-    private boolean isHvmEnabled(final Connect conn) {
-        final LibvirtCapXmlParser parser = new LibvirtCapXmlParser();
-        try {
-            parser.parseCapabilitiesXml(conn.getCapabilities());
-            final ArrayList<String> osTypes = parser.getGuestOsType();
-            for (final String o : osTypes) {
-                if (o.equalsIgnoreCase("hvm")) {
-                    return true;
-                }
-            }
-        } catch (final LibvirtException e) {
-            logger.trace("Ignoring libvirt error.", e);
-        }
-        return false;
     }
 
     private String getHypervisorPath(final Connect conn) {
@@ -1054,16 +1025,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         // Load the default vif driver
         String defaultVifDriverName = (String) params.get(libvirtVifDriver);
-        if (defaultVifDriverName == null) {
-            if (getBridgeType() == OPENVSWITCH) {
-                logger.info("No libvirt.vif.driver specified. Defaults to OvsVifDriver.");
-                defaultVifDriverName = DEFAULT_OVS_VIF_DRIVER_CLASS;
-            } else {
-                logger.info("No libvirt.vif.driver specified. Defaults to BridgeVifDriver.");
-                defaultVifDriverName = DEFAULT_BRIDGE_VIF_DRIVER_CLASS;
-            }
-        }
-        defaultVifDriver = getVifDriverClass(defaultVifDriverName, params);
+        defaultVifDriver = getVifDriverClass(DEFAULT_OVS_VIF_DRIVER_CLASS, params);
 
         // Load any per-traffic-type vif drivers
         for (final Map.Entry<String, Object> entry : params.entrySet()) {
@@ -1592,7 +1554,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         vm.getDevices().addDevice(
-                getVifDriver(nic.getType()).plug(nic, vm.getPlatformEmulator().toString(), nicAdapter).toString());
+                getVifDriver(nic.getType()).plug(nic, nicAdapter).toString());
     }
 
     public String getVolumePath(final Connect conn, final DiskTO volume) throws LibvirtException, URISyntaxException {
@@ -2068,17 +2030,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
             cpus = hosts.cpus;
             ram = hosts.memory * 1024L;
-            final LibvirtCapXmlParser parser = new LibvirtCapXmlParser();
-            parser.parseCapabilitiesXml(conn.getCapabilities());
-            final ArrayList<String> oss = parser.getGuestOsType();
-            for (final String s : oss) {
-                /*
-                 * Even host supports guest os type more than hvm, we only report hvm to management server
-                 */
-                if (s.equalsIgnoreCase("hvm")) {
-                    cap = "hvm";
-                }
-            }
+            cap = "hvm";
         } catch (final LibvirtException e) {
             logger.trace("Ignoring libvirt error.", e);
         }

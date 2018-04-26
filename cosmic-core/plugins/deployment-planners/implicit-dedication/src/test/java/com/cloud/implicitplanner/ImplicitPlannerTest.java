@@ -33,8 +33,6 @@ import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -94,10 +92,6 @@ public class ImplicitPlannerTest {
     HostPodDao podDao;
     @Inject
     ClusterDao clusterDao;
-    @Inject
-    GuestOSDao guestOSDao;
-    @Inject
-    GuestOSCategoryDao guestOSCategoryDao;
     @Inject
     DiskOfferingDao diskOfferingDao;
     @Inject
@@ -471,16 +465,6 @@ public class ImplicitPlannerTest {
         @Bean
         public ClusterDao clusterDao() {
             return Mockito.mock(ClusterDao.class);
-        }
-
-        @Bean
-        public GuestOSDao guestOsDao() {
-            return Mockito.mock(GuestOSDao.class);
-        }
-
-        @Bean
-        public GuestOSCategoryDao guestOsCategoryDao() {
-            return Mockito.mock(GuestOSCategoryDao.class);
         }
 
         @Bean

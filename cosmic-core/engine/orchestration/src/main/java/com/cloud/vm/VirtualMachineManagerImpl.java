@@ -124,8 +124,6 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -254,10 +252,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     @Inject
     protected AlertManager _alertMgr;
     @Inject
-    protected GuestOSCategoryDao _guestOsCategoryDao;
-    @Inject
-    protected GuestOSDao _guestOsDao;
-    @Inject
     protected VolumeDao _volsDao;
     @Inject
     protected HighAvailabilityManager _haMgr;
@@ -285,10 +279,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     protected VGPUTypesDao _vgpuTypesDao;
     @Inject
     protected EntityManager _entityMgr;
-    @Inject
-    protected GuestOSCategoryDao _guestOSCategoryDao;
-    @Inject
-    protected GuestOSDao _guestOSDao = null;
     @Inject
     protected UserVmDetailsDao _vmDetailsDao;
     protected List<HostAllocator> hostAllocators;
@@ -664,11 +654,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
                     final String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()).getDisplayText();
                     final String zoneName = _dcDao.findById(vm.getDataCenterId()).getName();
-                    final boolean isWindows = _guestOSCategoryDao.findById(_guestOSDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
 
                     vmData = _networkModel.generateVmData(userVm.getUserData(), serviceOffering, zoneName, vm.getInstanceName(), vm.getId(),
                             (String) profile.getParameter(VirtualMachineProfile.Param.VmSshPubKey), (String) profile.getParameter(VirtualMachineProfile.Param.VmPassword),
-                            isWindows, network);
+                            network);
                     final String vmName = vm.getInstanceName();
                     final String configDriveIsoRootFolder = "/tmp";
                     final String isoFile = configDriveIsoRootFolder + "/" + vmName + "/configDrive/" + vmName + ".iso";
@@ -2144,8 +2133,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         boolean migrated = false;
         try {
-            final boolean isWindows = _guestOsCategoryDao.findById(_guestOsDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
-            final MigrateCommand mc = new MigrateCommand(vm.getInstanceName(), dest.getHost().getPrivateIpAddress(), isWindows, to, getExecuteInSequence(vm.getHypervisorType()));
+            final MigrateCommand mc = new MigrateCommand(vm.getInstanceName(), dest.getHost().getPrivateIpAddress(), to, getExecuteInSequence(vm.getHypervisorType()));
             mc.setHostGuid(dest.getHost().getGuid());
 
             try {
@@ -2448,8 +2436,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         boolean migrated = false;
         try {
-            final boolean isWindows = _guestOsCategoryDao.findById(_guestOsDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
-            final MigrateCommand mc = new MigrateCommand(vm.getInstanceName(), dest.getHost().getPrivateIpAddress(), isWindows, to, getExecuteInSequence(vm.getHypervisorType()));
+            final MigrateCommand mc = new MigrateCommand(vm.getInstanceName(), dest.getHost().getPrivateIpAddress(), to, getExecuteInSequence(vm.getHypervisorType()));
             mc.setHostGuid(dest.getHost().getGuid());
 
             try {

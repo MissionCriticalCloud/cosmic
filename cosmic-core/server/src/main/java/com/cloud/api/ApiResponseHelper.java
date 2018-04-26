@@ -44,8 +44,6 @@ import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GuestOSResponse;
-import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.HostResponse;
@@ -180,9 +178,6 @@ import com.cloud.server.ResourceTag;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.GuestOS;
-import com.cloud.storage.GuestOSCategoryVO;
-import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
@@ -2522,39 +2517,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setRemoved(result.getRemoved());
         response.setForDisplay(result.isDisplay());
         response.setObjectName("vpnconnection");
-        return response;
-    }
-
-    @Override
-    public GuestOSResponse createGuestOSResponse(final GuestOS guestOS) {
-        final GuestOSResponse response = new GuestOSResponse();
-        response.setDescription(guestOS.getDisplayName());
-        response.setId(guestOS.getUuid());
-        response.setIsUserDefined(Boolean.valueOf(guestOS.getIsUserDefined()).toString());
-        final GuestOSCategoryVO category = ApiDBUtils.findGuestOsCategoryById(guestOS.getCategoryId());
-        if (category != null) {
-            response.setOsCategoryId(category.getUuid());
-        }
-
-        response.setObjectName("ostype");
-        return response;
-    }
-
-    @Override
-    public GuestOsMappingResponse createGuestOSMappingResponse(final GuestOSHypervisor guestOSHypervisor) {
-        final GuestOsMappingResponse response = new GuestOsMappingResponse();
-        response.setId(guestOSHypervisor.getUuid());
-        response.setHypervisor(guestOSHypervisor.getHypervisorType());
-        response.setHypervisorVersion(guestOSHypervisor.getHypervisorVersion());
-        response.setOsNameForHypervisor(guestOSHypervisor.getGuestOsName());
-        response.setIsUserDefined(Boolean.valueOf(guestOSHypervisor.getIsUserDefined()).toString());
-        final GuestOS guestOs = ApiDBUtils.findGuestOSById(guestOSHypervisor.getGuestOsId());
-        if (guestOs != null) {
-            response.setOsStdName(guestOs.getDisplayName());
-            response.setOsTypeId(guestOs.getUuid());
-        }
-
-        response.setObjectName("guestosmapping");
         return response;
     }
 

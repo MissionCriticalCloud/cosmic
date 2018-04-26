@@ -19,7 +19,6 @@ public class TemplateObjectTO implements DataTO {
     private String displayText;
     private DataStoreTO imageDataStore;
     private String name;
-    private String guestOsType;
     private Long size;
     private Long physicalSize;
     private Hypervisor.HypervisorType hypervisorType;
@@ -158,14 +157,6 @@ public class TemplateObjectTO implements DataTO {
 
     public void setImageDataStore(final DataStoreTO imageDataStore) {
         this.imageDataStore = imageDataStore;
-    }
-
-    public String getGuestOsType() {
-        return guestOsType;
-    }
-
-    public void setGuestOsType(final String guestOsType) {
-        this.guestOsType = guestOsType;
     }
 
     public Long getSize() {

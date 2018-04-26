@@ -1037,7 +1037,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
                     (dataCenterId));
         }
         ConsoleProxyVO proxy =
-                new ConsoleProxyVO(id, serviceOffering.getId(), name, template.getId(), template.getHypervisorType(), template.getGuestOSId(), dataCenterId,
+                new ConsoleProxyVO(id, serviceOffering.getId(), name, template.getId(), template.getHypervisorType(), dataCenterId,
                         systemAcct.getDomainId(), systemAcct.getId(), _accountMgr.getSystemUser().getId(), 0, serviceOffering.getOfferHA());
         proxy.setDynamicallyScalable(template.isDynamicallyScalable());
         proxy = _consoleProxyDao.persist(proxy);

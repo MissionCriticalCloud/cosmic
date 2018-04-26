@@ -76,7 +76,6 @@ import com.cloud.resource.ResourceState;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.UnableDeleteHostException;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.DB;
@@ -153,8 +152,6 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
     protected VlanDao vlanDao;
     @Inject
     protected IpAddressManager ipAddrMgr;
-    @Inject
-    protected GuestOSDao guestOSDao;
 
     private static Map<Network.Service, Map<Network.Capability, String>> setCapabilities() {
         final Map<Network.Service, Map<Network.Capability, String>> capabilities = new HashMap<>();
@@ -324,7 +321,8 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         VirtualMachine virtualMachine = vm.getVirtualMachine();
         boolean macLearning = false;
         if (virtualMachine != null) {
-            macLearning = guestOSDao.listByGuestOSId(virtualMachine.getGuestOSId()).isMacLearning();
+//            @TODO reimplement
+//            macLearning = guestOSDao.listByGuestOSId(virtualMachine.getGuestOSId()).isMacLearning();
         }
         final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
                 context.getAccount().getAccountName(), nic.getName(), macLearning);

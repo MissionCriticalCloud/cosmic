@@ -42,7 +42,6 @@ public class UserVmData {
     private Long diskKbsWrite;
     private Long diskIORead;
     private Long diskIOWrite;
-    private Long guestOsId;
     private Long rootDeviceId;
     private String rootDeviceType;
     private String password;
@@ -364,14 +363,6 @@ public class UserVmData {
 
     public void setDiskIOWrite(final Long diskIOWrite) {
         this.diskIOWrite = diskIOWrite;
-    }
-
-    public Long getGuestOsId() {
-        return guestOsId;
-    }
-
-    public void setGuestOsId(final Long guestOsId) {
-        this.guestOsId = guestOsId;
     }
 
     public Long getRootDeviceId() {

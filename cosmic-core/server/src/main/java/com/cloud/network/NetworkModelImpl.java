@@ -1926,7 +1926,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public List<String[]> generateVmData(final String userData, final String serviceOffering, final String zoneName,
-                                         final String vmName, final long vmId, final String publicKey, final String password, final Boolean isWindows,
+                                         final String vmName, final long vmId, final String publicKey, final String password,
                                          final Network network) {
         final List<String[]> vmData = new ArrayList<>();
 
@@ -1958,23 +1958,20 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
             // Here we are calculating MD5 checksum to reduce the over head of calculating MD5 checksum
             // in windows VM in password reset script.
-
-            if (isWindows) {
-                final MessageDigest md5;
-                try {
-                    md5 = MessageDigest.getInstance("MD5");
-                } catch (final NoSuchAlgorithmException e) {
-                    s_logger.error("Unexpected exception " + e.getMessage(), e);
-                    throw new CloudRuntimeException("Unable to get MD5 MessageDigest", e);
-                }
-                md5.reset();
-                md5.update(password.getBytes(StringUtils.getPreferredCharset()));
-                final byte[] digest = md5.digest();
-                final BigInteger bigInt = new BigInteger(1, digest);
-                final String hashtext = bigInt.toString(16);
-
-                vmData.add(new String[]{"password", "vm-password-md5checksum", hashtext});
+            final MessageDigest md5;
+            try {
+                md5 = MessageDigest.getInstance("MD5");
+            } catch (final NoSuchAlgorithmException e) {
+                s_logger.error("Unexpected exception " + e.getMessage(), e);
+                throw new CloudRuntimeException("Unable to get MD5 MessageDigest", e);
             }
+            md5.reset();
+            md5.update(password.getBytes(StringUtils.getPreferredCharset()));
+            final byte[] digest = md5.digest();
+            final BigInteger bigInt = new BigInteger(1, digest);
+            final String hashtext = bigInt.toString(16);
+
+            vmData.add(new String[]{"password", "vm-password-md5checksum", hashtext});
 
             vmData.add(new String[]{"password", "vm-password", password});
         }

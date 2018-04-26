@@ -8,14 +8,12 @@ public class VMSnapshotBaseCommand extends Command {
     protected List<VolumeObjectTO> volumeTOs;
     protected VMSnapshotTO target;
     protected String vmName;
-    protected String guestOSType;
     protected String platformEmulator;
 
-    public VMSnapshotBaseCommand(final String vmName, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs, final String guestOSType) {
+    public VMSnapshotBaseCommand(final String vmName, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs) {
         this.vmName = vmName;
         target = snapshot;
         this.volumeTOs = volumeTOs;
-        this.guestOSType = guestOSType;
     }
 
     public List<VolumeObjectTO> getVolumeTOs() {
@@ -45,14 +43,6 @@ public class VMSnapshotBaseCommand extends Command {
     @Override
     public boolean executeInSequence() {
         return false;
-    }
-
-    public String getGuestOSType() {
-        return guestOSType;
-    }
-
-    public void setGuestOSType(final String guestOSType) {
-        this.guestOSType = guestOSType;
     }
 
     public String getPlatformEmulator() {

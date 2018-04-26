@@ -56,13 +56,6 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
     long getTemplateId();
 
     /**
-     * returns the guest OS ID
-     *
-     * @return guestOSId
-     */
-    long getGuestOSId();
-
-    /**
      * @return pod id.
      */
     Long getPodIdToDeployIn();

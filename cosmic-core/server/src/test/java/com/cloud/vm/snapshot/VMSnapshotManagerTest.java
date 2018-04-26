@@ -20,11 +20,9 @@ import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -78,8 +76,6 @@ public class VMSnapshotManagerTest {
     @Mock
     AccountManager _accountMgr;
     @Mock
-    GuestOSDao _guestOSDao;
-    @Mock
     PrimaryDataStoreDao _storagePoolDao;
     @Mock
     SnapshotDao _snapshotDao;
@@ -107,7 +103,6 @@ public class VMSnapshotManagerTest {
         _vmSnapshotMgr._volumeDao = _volumeDao;
         _vmSnapshotMgr._accountMgr = _accountMgr;
         _vmSnapshotMgr._snapshotDao = _snapshotDao;
-        _vmSnapshotMgr._guestOSDao = _guestOSDao;
         _vmSnapshotMgr._hypervisorCapabilitiesDao = _hypervisorCapabilitiesDao;
         _vmSnapshotMgr._serviceOfferingDetailsDao = _serviceOfferingDetailsDao;
 
@@ -129,7 +124,6 @@ public class VMSnapshotManagerTest {
         when(vmMock.getInstanceName()).thenReturn("i-3-VM-TEST");
         when(vmMock.getState()).thenReturn(State.Running);
         when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.XenServer);
-        when(_guestOSDao.findById(anyLong())).thenReturn(mock(GuestOSVO.class));
     }
 
     // vmId null case

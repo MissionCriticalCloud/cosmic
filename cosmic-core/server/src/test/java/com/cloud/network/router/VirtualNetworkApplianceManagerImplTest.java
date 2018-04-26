@@ -23,7 +23,6 @@ import com.cloud.network.dao.VpnUserDao;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.user.dao.UserDao;
@@ -51,9 +50,6 @@ public class VirtualNetworkApplianceManagerImplTest {
 
     @Mock
     private DataCenterDao _dcDao;
-
-    @Mock
-    private GuestOSDao _guestOSDao;
 
     @Mock
     private HostDao _hostDao;

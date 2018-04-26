@@ -17,14 +17,10 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
-import com.cloud.storage.GuestOSHypervisorVO;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.command.StorageSubSystemCommand;
-import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
@@ -47,10 +43,6 @@ public class XenServerGuru extends HypervisorGuruBase implements HypervisorGuru,
     static final ConfigKey<Integer> MaxNumberOfVCPUSPerVM = new ConfigKey<>("Advanced", Integer.class, "xen.vm.vcpu.max", "16",
             "Maximum number of VCPUs that VM can get in XenServer.", true, ConfigKey.Scope.Cluster);
     private final Logger LOGGER = LoggerFactory.getLogger(XenServerGuru.class);
-    @Inject
-    GuestOSDao _guestOsDao;
-    @Inject
-    GuestOSHypervisorDao _guestOsHypervisorDao;
     @Inject
     EndPointSelector endPointSelector;
     @Inject
@@ -163,18 +155,8 @@ public class XenServerGuru extends HypervisorGuruBase implements HypervisorGuru,
         to.setBootloader(bt);
 
         // Determine the VM's OS description
-        final GuestOSVO guestOS = _guestOsDao.findByIdIncludingRemoved(vm.getVirtualMachine().getGuestOSId());
-        to.setOs(guestOS.getDisplayName());
-        final HostVO host = hostDao.findById(vm.getVirtualMachine().getHostId());
-        GuestOSHypervisorVO guestOsMapping = null;
-        if (host != null) {
-            guestOsMapping = _guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), getHypervisorType().toString(), host.getHypervisorVersion());
-        }
-        if (guestOsMapping == null || host == null) {
-            to.setPlatformEmulator(null);
-        } else {
-            to.setPlatformEmulator(guestOsMapping.getGuestOsName());
-        }
+        to.setOs(null);
+        to.setPlatformEmulator(null);
 
         return to;
     }

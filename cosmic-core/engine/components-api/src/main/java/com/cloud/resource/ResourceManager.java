@@ -101,8 +101,6 @@ public interface ResourceManager extends ResourceService {
 
     HostStats getHostStatistics(long hostId);
 
-    Long getGuestOSCategoryId(long hostId);
-
     String getHostTags(long hostId);
 
     List<PodCluster> listByDataCenter(long dcId);

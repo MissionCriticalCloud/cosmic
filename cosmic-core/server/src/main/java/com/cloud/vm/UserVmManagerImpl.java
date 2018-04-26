@@ -101,7 +101,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
-import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
@@ -155,8 +154,6 @@ import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.GuestOSCategoryVO;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ImageFormat;
@@ -171,8 +168,6 @@ import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
@@ -314,8 +309,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Inject
     protected SnapshotDao _snapshotDao = null;
     @Inject
-    protected GuestOSDao _guestOSDao = null;
-    @Inject
     protected HighAvailabilityManager _haMgr = null;
     @Inject
     protected AlertManager _alertMgr = null;
@@ -367,8 +360,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     protected ResourceManager _resourceMgr;
     @Inject
     protected NetworkServiceMapDao _ntwkSrvcDao;
-    @Inject
-    protected GuestOSCategoryDao _guestOSCategoryDao;
     @Inject
     protected VMSnapshotDao _vmSnapshotDao;
     @Inject
@@ -988,7 +979,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @Override
-    public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
+    public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, String userData,
                                        Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName) throws
             ResourceUnavailableException, InsufficientCapacityException {
         final UserVmVO vm = _vmDao.findById(id);
@@ -1040,10 +1031,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             isDynamicallyScalable = vm.isDynamicallyScalable();
         }
 
-        if (osTypeId == null) {
-            osTypeId = vm.getGuestOSId();
-        }
-
         if (group != null) {
             addInstanceToGroup(id, group);
         }
@@ -1070,7 +1057,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             checkIfHostNameUniqueInNtwkDomain(hostName, vmNtwks);
         }
 
-        _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName);
+        _vmDao.updateVM(id, displayName, ha, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName);
 
         if (updateUserdata) {
             final boolean result = updateUserDataInternal(_vmDao.findById(id));
@@ -1613,7 +1600,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final Boolean ha = cmd.getHaEnable();
         final Boolean isDisplayVm = cmd.getDisplayVm();
         final Long id = cmd.getId();
-        final Long osTypeId = cmd.getOsTypeId();
         final String userData = cmd.getUserData();
         final Boolean isDynamicallyScalable = cmd.isDynamicallyScalable();
         final String hostName = cmd.getHostName();
@@ -1664,7 +1650,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _vmDao.saveDetails(vmInstance);
         }
 
-        return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable,
+        return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, userData, isDynamicallyScalable,
                 cmd.getHttpMethod(), cmd.getCustomId(), hostName, cmd.getInstanceName());
     }
 
@@ -3626,12 +3612,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 if (isISO) {
                     newVol = volumeMgr.allocateDuplicateVolume(root, null);
                     vm.setIsoId(newTemplateId);
-                    vm.setGuestOSId(template.getGuestOSId());
                     vm.setTemplateId(newTemplateId);
                     _vmDao.update(vmId, vm);
                 } else {
                     newVol = volumeMgr.allocateDuplicateVolume(root, newTemplateId);
-                    vm.setGuestOSId(template.getGuestOSId());
                     vm.setTemplateId(newTemplateId);
                     _vmDao.update(vmId, vm);
                 }
@@ -4162,7 +4146,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
-                final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(),
+                final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType,
                         offering.getOfferHA(), offering.getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(),
                         userData, hostName, diskOfferingId);
                 vm.setUuid(uuidName);
@@ -4214,11 +4198,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     vm.setDisplayVm(true);
                 }
 
-                final long guestOSId = template.getGuestOSId();
-                final GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
-                final long guestOSCategoryId = guestOS.getCategoryId();
-                final GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
-
                 _vmDao.persist(vm);
                 for (final String key : customParameters.keySet()) {
                     vm.setDetail(key, customParameters.get(key));
@@ -4236,7 +4215,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                 if (isIso) {
                     _orchSrvc.createVirtualMachineFromScratch(vm.getUuid(), Long.toString(owner.getAccountId()), vm.getIsoId().toString(), hostName, displayName,
-                            hypervisorType.name(), guestOSCategory.getName(), offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags,
+                            hypervisorType.name(), offering.getCpu(), offering.getRamSize(), diskSize, computeTags, rootDiskTags,
                             networkNicMap, plan, diskControllerType);
                 } else {
                     _orchSrvc.createVirtualMachine(vm.getUuid(), Long.toString(owner.getAccountId()), Long.toString(template.getId()), hostName, displayName, hypervisorType.name(),
@@ -4403,10 +4382,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
                 final String serviceOffering = _serviceOfferingDao.findByIdIncludingRemoved(vm.getId(), vm.getServiceOfferingId()).getDisplayText();
                 final String zoneName = zoneRepository.findOne(vm.getDataCenterId()).getName();
-                final boolean isWindows = _guestOSCategoryDao.findById(_guestOSDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
 
                 final List<String[]> vmData = _networkModel.generateVmData(vm.getUserData(), serviceOffering, zoneName, vm.getInstanceName(), vm.getId(),
-                        (String) profile.getParameter(VirtualMachineProfile.Param.VmSshPubKey), (String) profile.getParameter(VirtualMachineProfile.Param.VmPassword), isWindows,
+                        (String) profile.getParameter(VirtualMachineProfile.Param.VmSshPubKey), (String) profile.getParameter(VirtualMachineProfile.Param.VmPassword),
                         network);
                 final String vmName = vm.getInstanceName();
                 final String configDriveIsoRootFolder = "/tmp";
@@ -4635,25 +4613,23 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         long nicId;
         long vmId;
         String vmName;
-        boolean isWindows;
         Long hostId;
         String networkCidr;
 
         public VmIpAddrFetchThread() {
         }
 
-        VmIpAddrFetchThread(final long vmId, final long nicId, final String instanceName, final boolean windows, final Long hostId, final String networkCidr) {
+        VmIpAddrFetchThread(final long vmId, final long nicId, final String instanceName, final Long hostId, final String networkCidr) {
             this.vmId = vmId;
             this.nicId = nicId;
             vmName = instanceName;
-            isWindows = windows;
             this.hostId = hostId;
             this.networkCidr = networkCidr;
         }
 
         @Override
         protected void runInContext() {
-            final GetVmIpAddressCommand cmd = new GetVmIpAddressCommand(vmName, networkCidr, isWindows);
+            final GetVmIpAddressCommand cmd = new GetVmIpAddressCommand(vmName, networkCidr);
             boolean decrementCount = true;
 
             try {
@@ -4739,10 +4715,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
                             final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(userVm);
                             final VirtualMachine vm = vmProfile.getVirtualMachine();
-                            final boolean isWindows = _guestOSCategoryDao.findById(_guestOSDao.findById(vm.getGuestOSId()).getCategoryId()).getName().equalsIgnoreCase("Windows");
 
-                            _vmIpFetchThreadExecutor.execute(new VmIpAddrFetchThread(vmId, nicId, vmInstance.getInstanceName(),
-                                    isWindows, vm.getHostId(), network.getCidr()));
+                            _vmIpFetchThreadExecutor.execute(new VmIpAddrFetchThread(vmId, nicId, vmInstance.getInstanceName(), vm.getHostId(), network.getCidr()));
                         }
                     } catch (final Exception e) {
                         s_logger.error("Caught the Exception in VmIpFetchTask", e);

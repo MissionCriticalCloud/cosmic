@@ -11,7 +11,6 @@ import com.cloud.api.BaseCustomIdCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
-import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.exception.InsufficientCapacityException;
@@ -54,11 +53,6 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     @Parameter(name = ApiConstants.ID, type = CommandType.UUID, entityType = UserVmResponse.class,
             required = true, description = "The ID of the virtual machine")
     private Long id;
-    @Parameter(name = ApiConstants.OS_TYPE_ID,
-            type = CommandType.UUID,
-            entityType = GuestOSResponse.class,
-            description = "the ID of the OS type that best represents this VM.")
-    private Long osTypeId;
     @Parameter(name = ApiConstants.USER_DATA,
             type = CommandType.STRING,
             description = "an optional binary data that can be sent to the virtual machine upon a successful deployment. This binary data must be base64 encoded before adding it" +
@@ -127,10 +121,6 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
-
-    public Long getOsTypeId() {
-        return osTypeId;
-    }
 
     @Override
     public void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException {

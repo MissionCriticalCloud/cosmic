@@ -144,14 +144,14 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     private VMReservationVO vmReservation;
 
     public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
-            hypervisorType, final long guestOSId,
+            hypervisorType,
                       final long domainId, final long accountId, final boolean haEnabled, final boolean limitResourceUse) {
-        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, haEnabled, null);
+        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, domainId, accountId, haEnabled, null);
         limitCpuUse = limitResourceUse;
     }
 
     public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
-            hypervisorType, final long guestOSId,
+            hypervisorType,
                       final long domainId, final long accountId, final boolean haEnabled, final Long diskOfferingId) {
         this.id = id;
         hostName = name != null ? name : uuid;
@@ -160,7 +160,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
         }
         this.instanceName = instanceName;
         this.type = type;
-        this.guestOSId = guestOSId;
         this.haEnabled = haEnabled;
         vncPassword = Long.toHexString(new SecureRandom().nextLong());
         state = State.Stopped;
@@ -251,15 +250,6 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
 
     public void setTemplateId(final Long templateId) {
         this.templateId = templateId;
-    }
-
-    @Override
-    public long getGuestOSId() {
-        return guestOSId;
-    }
-
-    public void setGuestOSId(final long guestOSId) {
-        this.guestOSId = guestOSId;
     }
 
     @Override

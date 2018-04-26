@@ -17,11 +17,7 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.storage.GuestOSHypervisorVO;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.uservm.UserVm;
@@ -51,10 +47,6 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
     private static final Logger s_logger = LoggerFactory.getLogger(DefaultVMSnapshotStrategy.class);
     @Inject
     VMSnapshotHelper vmSnapshotHelper;
-    @Inject
-    GuestOSDao guestOSDao;
-    @Inject
-    GuestOSHypervisorDao guestOsHypervisorDao;
     @Inject
     UserVmDao userVmDao;
     @Inject
@@ -90,8 +82,6 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
         CreateVMSnapshotAnswer answer = null;
         boolean result = false;
         try {
-            final GuestOSVO guestOS = guestOSDao.findById(userVm.getGuestOSId());
-
             final List<VolumeObjectTO> volumeTOs = vmSnapshotHelper.getVolumeTOList(userVm.getId());
 
             VMSnapshotTO current = null;
@@ -112,16 +102,8 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
                 vmSnapshotVO.setParent(current.getId());
             }
 
-            final HostVO host = hostDao.findById(hostId);
-            final GuestOSHypervisorVO guestOsMapping = guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), host.getHypervisorType().toString(), host
-                    .getHypervisorVersion());
+            final CreateVMSnapshotCommand ccmd = new CreateVMSnapshotCommand(userVm.getInstanceName(), userVm.getUuid(), target, volumeTOs);
 
-            final CreateVMSnapshotCommand ccmd = new CreateVMSnapshotCommand(userVm.getInstanceName(), userVm.getUuid(), target, volumeTOs, guestOS.getDisplayName());
-            if (guestOsMapping == null) {
-                ccmd.setPlatformEmulator(null);
-            } else {
-                ccmd.setPlatformEmulator(guestOsMapping.getGuestOsName());
-            }
             ccmd.setWait(_wait);
 
             answer = (CreateVMSnapshotAnswer) agentMgr.send(hostId, ccmd);
@@ -177,8 +159,7 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
             final VMSnapshotTO vmSnapshotTO =
                     new VMSnapshotTO(vmSnapshot.getId(), vmSnapshot.getName(), vmSnapshot.getType(), vmSnapshot.getCreated().getTime(), vmSnapshot.getDescription(),
                             vmSnapshot.getCurrent(), parent, true);
-            final GuestOSVO guestOS = guestOSDao.findById(userVm.getGuestOSId());
-            final DeleteVMSnapshotCommand deleteSnapshotCommand = new DeleteVMSnapshotCommand(vmInstanceName, vmSnapshotTO, volumeTOs, guestOS.getDisplayName());
+            final DeleteVMSnapshotCommand deleteSnapshotCommand = new DeleteVMSnapshotCommand(vmInstanceName, vmSnapshotTO, volumeTOs);
 
             final Answer answer = agentMgr.send(hostId, deleteSnapshotCommand);
 
@@ -216,17 +197,8 @@ public class DefaultVMSnapshotStrategy extends ManagerBase implements VMSnapshot
                     new VMSnapshotTO(snapshot.getId(), snapshot.getName(), snapshot.getType(), snapshot.getCreated().getTime(), snapshot.getDescription(),
                             snapshot.getCurrent(), parent, true);
             final Long hostId = vmSnapshotHelper.pickRunningHost(vmSnapshot.getVmId());
-            final GuestOSVO guestOS = guestOSDao.findById(userVm.getGuestOSId());
-            final RevertToVMSnapshotCommand revertToSnapshotCommand = new RevertToVMSnapshotCommand(vmInstanceName, userVm.getUuid(), vmSnapshotTO, volumeTOs, guestOS
-                    .getDisplayName());
+            final RevertToVMSnapshotCommand revertToSnapshotCommand = new RevertToVMSnapshotCommand(vmInstanceName, userVm.getUuid(), vmSnapshotTO, volumeTOs);
             final HostVO host = hostDao.findById(hostId);
-            final GuestOSHypervisorVO guestOsMapping = guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), host.getHypervisorType().toString(), host
-                    .getHypervisorVersion());
-            if (guestOsMapping == null) {
-                revertToSnapshotCommand.setPlatformEmulator(null);
-            } else {
-                revertToSnapshotCommand.setPlatformEmulator(guestOsMapping.getGuestOsName());
-            }
 
             final RevertToVMSnapshotAnswer answer = (RevertToVMSnapshotAnswer) agentMgr.send(hostId, revertToSnapshotCommand);
             if (answer != null && answer.getResult()) {

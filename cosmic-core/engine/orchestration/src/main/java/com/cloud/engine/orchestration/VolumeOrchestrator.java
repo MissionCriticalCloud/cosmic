@@ -49,7 +49,6 @@ import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.org.Cluster;
 import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Storage;
@@ -60,7 +59,6 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -160,9 +158,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     HostDao _hostDao;
     @Inject
     SnapshotService _snapshotSrv;
-    @Inject
-    GuestOSDao _guestOsDao;
-
     @Inject
     StorageStrategyFactory _storageStrategyFactory;
 
@@ -589,8 +584,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         if (vm != null) {
             vol.setInstanceId(vm.getId());
         }
-
-        vm.getGuestOSId();
 
         if (type.equals(Type.ROOT)) {
             vol.setDeviceId(0l);
@@ -1296,8 +1289,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         maxIops = maxIops != null ? maxIops : offering.getMaxIops();
 
         if (diskControllerType == null) {
-            final GuestOS guestOs = _guestOsDao.findById(vm.getGuestOSId());
-            diskControllerType = getGuestDiskModel(guestOs.getDisplayName());
+            //@TODO read from global settings
         }
 
         VolumeVO vol = new VolumeVO(type,
@@ -1347,16 +1339,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
         return toDiskProfile(vol, offering);
-    }
-
-    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
-        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
-            return DiskControllerType.IDE;
-        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
-            return DiskControllerType.SCSI;
-        } else {
-            return DiskControllerType.VIRTIO;
-        }
     }
 
     @Override

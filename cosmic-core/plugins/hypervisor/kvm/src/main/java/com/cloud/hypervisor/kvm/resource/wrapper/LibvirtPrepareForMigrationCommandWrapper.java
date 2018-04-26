@@ -44,7 +44,7 @@ public final class LibvirtPrepareForMigrationCommandWrapper
 
             final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(vm.getName());
             for (final NicTO nic : nics) {
-                libvirtComputingResource.getVifDriver(nic.getType()).plug(nic, null, "");
+                libvirtComputingResource.getVifDriver(nic.getType()).plug(nic, null);
             }
 
       /* setup disks, e.g for iso */

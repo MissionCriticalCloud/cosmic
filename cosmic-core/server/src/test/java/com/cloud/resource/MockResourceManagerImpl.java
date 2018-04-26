@@ -436,15 +436,6 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#getGuestOSCategoryId(long)
-     */
-    @Override
-    public Long getGuestOSCategoryId(final long hostId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.resource.ResourceManager#getHostTags(long)
      */
     @Override

@@ -187,8 +187,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.GuestOS;
-import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
@@ -203,8 +201,6 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -283,8 +279,6 @@ public class ApiDBUtils {
     static DomainJoinDao s_domainJoinDao;
     static DomainRouterDao s_domainRouterDao;
     static DomainRouterJoinDao s_domainRouterJoinDao;
-    static GuestOSDao s_guestOSDao;
-    static GuestOSCategoryDao s_guestOSCategoryDao;
     static HostDao s_hostDao;
     static AccountGuestVlanMapDao s_accountGuestVlanMapDao;
     static IPAddressDao s_ipAddressDao;
@@ -403,10 +397,6 @@ public class ApiDBUtils {
     private DomainRouterDao domainRouterDao;
     @Inject
     private DomainRouterJoinDao domainRouterJoinDao;
-    @Inject
-    private GuestOSDao guestOSDao;
-    @Inject
-    private GuestOSCategoryDao guestOSCategoryDao;
     @Inject
     private HostDao hostDao;
     @Inject
@@ -743,24 +733,6 @@ public class ApiDBUtils {
         return s_domainRouterDao.findByIdIncludingRemoved(routerId);
     }
 
-    public static GuestOS findGuestOSById(final Long id) {
-        return s_guestOSDao.findByIdIncludingRemoved(id);
-    }
-
-    public static GuestOS findGuestOSByDisplayName(final String displayName) {
-        return s_guestOSDao.listByDisplayName(displayName);
-    }
-
-    public static GuestOSCategoryVO getHostGuestOSCategory(final long hostId) {
-        final Long guestOSCategoryID = s_resourceMgr.getGuestOSCategoryId(hostId);
-
-        if (guestOSCategoryID != null) {
-            return s_guestOSCategoryDao.findById(guestOSCategoryID);
-        } else {
-            return null;
-        }
-    }
-
     public static String getHostTags(final long hostId) {
         return s_resourceMgr.getHostTags(hostId);
     }
@@ -1084,10 +1056,6 @@ public class ApiDBUtils {
 
     public static UserVmDetailVO findPublicKeyByVmId(final long vmId) {
         return s_userVmDetailsDao.findDetail(vmId, "SSH.PublicKey");
-    }
-
-    public static GuestOSCategoryVO findGuestOsCategoryById(final long catId) {
-        return s_guestOSCategoryDao.findById(catId);
     }
 
     public static VpcVO findVpcById(final long vpcId) {
@@ -1596,8 +1564,6 @@ public class ApiDBUtils {
         s_domainJoinDao = domainJoinDao;
         s_domainRouterDao = domainRouterDao;
         s_domainRouterJoinDao = domainRouterJoinDao;
-        s_guestOSDao = guestOSDao;
-        s_guestOSCategoryDao = guestOSCategoryDao;
         s_hostDao = hostDao;
         s_ipAddressDao = ipAddressDao;
         s_loadBalancerDao = loadBalancerDao;

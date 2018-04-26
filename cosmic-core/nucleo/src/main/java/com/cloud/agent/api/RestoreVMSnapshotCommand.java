@@ -10,8 +10,8 @@ public class RestoreVMSnapshotCommand extends VMSnapshotBaseCommand {
     private List<VMSnapshotTO> snapshots;
     private Map<Long, VMSnapshotTO> snapshotAndParents;
 
-    public RestoreVMSnapshotCommand(final String vmName, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs, final String guestOSType) {
-        super(vmName, snapshot, volumeTOs, guestOSType);
+    public RestoreVMSnapshotCommand(final String vmName, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs) {
+        super(vmName, snapshot, volumeTOs);
     }
 
     public List<VMSnapshotTO> getSnapshots() {

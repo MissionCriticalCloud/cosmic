@@ -155,15 +155,15 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
     private boolean limitCpuUse;
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
-                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
+                        final HypervisorType hypervisorType, final long domainId, final long accountId, final long userId, final boolean haEnabled,
                         final boolean limitResourceUse, final Long diskOfferingId) {
-        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+        this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, domainId, accountId, userId, haEnabled);
         limitCpuUse = limitResourceUse;
         this.diskOfferingId = diskOfferingId;
     }
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
-                        final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
+                        final HypervisorType hypervisorType, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
         this.id = id;
         hostName = name != null ? name : uuid;
         if (vmTemplateId != null) {
@@ -171,7 +171,6 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
         }
         this.instanceName = instanceName;
         this.type = type;
-        this.guestOSId = guestOSId;
         this.haEnabled = haEnabled;
         state = State.Stopped;
         this.accountId = accountId;
@@ -373,15 +372,6 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State, Vi
 
     public void setTemplateId(final Long templateId) {
         this.templateId = templateId;
-    }
-
-    @Override
-    public long getGuestOSId() {
-        return guestOSId;
-    }
-
-    public void setGuestOSId(final long guestOSId) {
-        this.guestOSId = guestOSId;
     }
 
     @Override

@@ -33,8 +33,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.projects.Project;
 import com.cloud.server.ResourceTag;
-import com.cloud.storage.GuestOS;
-import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
@@ -679,12 +677,6 @@ public class EventTypes {
         entityEventDetails.put(EVENT_DEDICATED_GUEST_VLAN_RANGE_RELEASE, GuestVlan.class);
 
         //Guest OS
-        entityEventDetails.put(EVENT_GUEST_OS_ADD, GuestOS.class);
-        entityEventDetails.put(EVENT_GUEST_OS_REMOVE, GuestOS.class);
-        entityEventDetails.put(EVENT_GUEST_OS_UPDATE, GuestOS.class);
-        entityEventDetails.put(EVENT_GUEST_OS_MAPPING_ADD, GuestOSHypervisor.class);
-        entityEventDetails.put(EVENT_GUEST_OS_MAPPING_REMOVE, GuestOSHypervisor.class);
-        entityEventDetails.put(EVENT_GUEST_OS_MAPPING_UPDATE, GuestOSHypervisor.class);
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_ASSIGN, NicSecondaryIp.class);
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_UNASSIGN, NicSecondaryIp.class);
         entityEventDetails.put(EVENT_NIC_SECONDARY_IP_CONFIGURE, NicSecondaryIp.class);

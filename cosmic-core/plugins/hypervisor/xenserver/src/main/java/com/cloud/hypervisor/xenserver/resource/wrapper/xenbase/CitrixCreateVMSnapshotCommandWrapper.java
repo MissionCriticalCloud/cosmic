@@ -38,7 +38,6 @@ public final class CitrixCreateVMSnapshotCommandWrapper extends CommandWrapper<C
 
         VmPowerState vmState = VmPowerState.HALTED;
 
-        final String guestOSType = command.getGuestOSType();
         final String platformEmulator = command.getPlatformEmulator();
 
         final boolean snapshotMemory = command.getTarget().getType() == VMSnapshot.Type.DiskAndMemory;
@@ -82,7 +81,7 @@ public final class CitrixCreateVMSnapshotCommandWrapper extends CommandWrapper<C
                     vmState = vm.getPowerState(conn);
                 } catch (final Exception e) {
                     if (!snapshotMemory) {
-                        vm = citrixResourceBase.createWorkingVM(conn, vmName, guestOSType, platformEmulator, listVolumeTo);
+                        vm = citrixResourceBase.createWorkingVM(conn, vmName, "Other PV (64 bit)", platformEmulator, listVolumeTo);
                     }
                 }
 

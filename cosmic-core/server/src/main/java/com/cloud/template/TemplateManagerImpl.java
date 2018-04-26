@@ -78,7 +78,6 @@ import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.ImageStoreUploadMonitorImpl;
 import com.cloud.storage.LaunchPermissionVO;
 import com.cloud.storage.Snapshot;
@@ -104,7 +103,6 @@ import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -214,8 +212,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     private ConfigurationDao _configDao;
     @Inject
     private DomainDao _domainDao;
-    @Inject
-    private GuestOSDao _guestOSDao;
     @Inject
     private StorageManager _storageMgr;
     @Inject
@@ -894,14 +890,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 profile.setBootLoaderType(BootloaderType.CD);
             }
 
-            final GuestOSVO guestOS = _guestOSDao.findById(template.getGuestOSId());
-            String displayName = null;
-            if (guestOS != null) {
-                displayName = guestOS.getDisplayName();
-            }
-
             final TemplateObjectTO iso = (TemplateObjectTO) template.getTO();
-            iso.setGuestOsType(displayName);
             final DiskTO disk = new DiskTO(iso, 3L, null, Volume.Type.ISO);
             profile.addDisk(disk);
         } else {
@@ -1406,11 +1395,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         if (!isAdmin || featured == null) {
             featured = Boolean.FALSE;
         }
-        final Long guestOSId = cmd.getOsTypeId();
-        final GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
-        if (guestOS == null) {
-            throw new InvalidParameterValueException("GuestOS with ID: " + guestOSId + " does not exist.");
-        }
 
         final Long nextTemplateId = _tmpltDao.getNextInSequence(Long.class, "id");
         final String description = cmd.getDisplayText();
@@ -1438,7 +1422,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         privateTemplate = new VMTemplateVO(nextTemplateId, name, ImageFormat.RAW, isPublic, featured, isExtractable, TemplateType.USER, null, bitsValue, templateOwner.getId(),
-                null, description, passwordEnabledValue, guestOS.getId(), true, hyperType, templateTag, cmd.getDetails(), false,
+                null, description, passwordEnabledValue, true, hyperType, templateTag, cmd.getDetails(), false,
                 isDynamicScalingEnabled);
 
         if (sourceTemplateId != null) {
@@ -1628,7 +1612,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final String name = cmd.getTemplateName();
         final String displayText = cmd.getDisplayText();
         final String format = cmd.getFormat();
-        final Long guestOSId = cmd.getOsTypeId();
         final Boolean passwordEnabled = cmd.getPasswordEnabled();
         final Boolean isDynamicallyScalable = cmd.isDynamicallyScalable();
         final Boolean isRoutingTemplate = cmd.isRoutingType();
@@ -1661,7 +1644,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 !(name == null &&
                         displayText == null &&
                         format == null &&
-                        guestOSId == null &&
                         passwordEnabled == null &&
                         bootable == null &&
                         sortKey == null &&
@@ -1696,30 +1678,6 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             }
 
             template.setFormat(imageFormat);
-        }
-
-        if (guestOSId != null) {
-            final long oldGuestOSId = template.getGuestOSId();
-            final GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
-
-            if (guestOS == null) {
-                throw new InvalidParameterValueException("Please specify a valid guest OS ID.");
-            } else {
-                template.setGuestOSId(guestOSId);
-            }
-
-            if (guestOSId != oldGuestOSId) { // vm guest os type need to be updated if template guest os id changes.
-                final SearchCriteria<VMInstanceVO> sc = _vmInstanceDao.createSearchCriteria();
-                sc.addAnd("templateId", SearchCriteria.Op.EQ, id);
-                sc.addAnd("state", SearchCriteria.Op.NEQ, State.Expunging);
-                final List<VMInstanceVO> vms = _vmInstanceDao.search(sc, null);
-                if (vms != null && !vms.isEmpty()) {
-                    for (final VMInstanceVO vm : vms) {
-                        vm.setGuestOSId(guestOSId);
-                        _vmInstanceDao.update(vm.getId(), vm);
-                    }
-                }
-            }
         }
 
         if (passwordEnabled != null) {

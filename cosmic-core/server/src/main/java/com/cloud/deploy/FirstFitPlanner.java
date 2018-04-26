@@ -24,8 +24,6 @@ import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -56,10 +54,6 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     protected HostPodDao podDao;
     @Inject
     protected ClusterDao clusterDao;
-    @Inject
-    protected GuestOSDao guestOSDao;
-    @Inject
-    protected GuestOSCategoryDao guestOSCategoryDao;
     @Inject
     protected DiskOfferingDao diskOfferingDao;
     @Inject

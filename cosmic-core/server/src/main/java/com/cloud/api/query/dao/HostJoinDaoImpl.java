@@ -148,8 +148,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         }
         if (details.contains(HostDetails.all) || details.contains(HostDetails.capacity) || details.contains(HostDetails.stats) || details.contains(HostDetails.events)) {
 
-            hostResponse.setOsCategoryId(host.getOsCategoryUuid());
-            hostResponse.setOsCategoryName(host.getOsCategoryName());
             hostResponse.setZoneName(host.getZoneName());
             hostResponse.setPodName(host.getPodName());
             if (host.getClusterId() > 0) {
@@ -315,8 +313,6 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
 
         if (details.contains(HostDetails.all) || details.contains(HostDetails.capacity) || details.contains(HostDetails.stats) || details.contains(HostDetails.events)) {
 
-            hostResponse.setOsCategoryId(host.getOsCategoryUuid());
-            hostResponse.setOsCategoryName(host.getOsCategoryName());
             hostResponse.setZoneName(host.getZoneName());
             hostResponse.setPodName(host.getPodName());
             if (host.getClusterId() > 0) {

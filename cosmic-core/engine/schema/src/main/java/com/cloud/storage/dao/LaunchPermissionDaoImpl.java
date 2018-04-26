@@ -117,7 +117,6 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
                 final String checksum = rs.getString(12);
                 final String displayText = rs.getString(13);
                 final boolean enablePassword = rs.getBoolean(14);
-                final long guestOSId = rs.getLong(15);
                 final boolean featured = rs.getBoolean(16);
                 Date createdDate = null;
 
@@ -132,7 +131,7 @@ public class LaunchPermissionDaoImpl extends GenericDaoBase<LaunchPermissionVO, 
                 }
                 final VMTemplateVO template =
                         new VMTemplateVO(id, uniqueName, name, format, isPublic, featured, TemplateType.valueOf(tmpltType), url, createdDate, bits,
-                                templateAccountId, checksum, displayText, enablePassword, guestOSId, true, null);
+                                templateAccountId, checksum, displayText, enablePassword, true, null);
                 permittedTemplates.add(template);
             }
         } catch (final Exception e) {

@@ -96,15 +96,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
     @Column(name = "pod_name")
     private String podName;
 
-    @Column(name = "guest_os_category_id")
-    private long osCategoryId;
-
-    @Column(name = "guest_os_category_uuid")
-    private String osCategoryUuid;
-
-    @Column(name = "guest_os_category_name")
-    private String osCategoryName;
-
     @Column(name = "tag")
     private String tag;
 
@@ -245,18 +236,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
         this.podName = podName;
     }
 
-    public void setOsCategoryId(final long osCategoryId) {
-        this.osCategoryId = osCategoryId;
-    }
-
-    public void setOsCategoryUuid(final String osCategoryUuid) {
-        this.osCategoryUuid = osCategoryUuid;
-    }
-
-    public void setOsCategoryName(final String osCategoryName) {
-        this.osCategoryName = osCategoryName;
-    }
-
     public void setTag(final String tag) {
         this.tag = tag;
     }
@@ -393,18 +372,6 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
 
     public Cluster.ClusterType getClusterType() {
         return clusterType;
-    }
-
-    public long getOsCategoryId() {
-        return osCategoryId;
-    }
-
-    public String getOsCategoryUuid() {
-        return osCategoryUuid;
-    }
-
-    public String getOsCategoryName() {
-        return osCategoryName;
     }
 
     public Long getJobId() {

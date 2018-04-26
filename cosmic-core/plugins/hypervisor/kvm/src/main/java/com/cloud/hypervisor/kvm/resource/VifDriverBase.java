@@ -22,7 +22,7 @@ public abstract class VifDriverBase implements VifDriver {
     }
 
     @Override
-    public abstract LibvirtVmDef.InterfaceDef plug(NicTO nic, String guestOsType, String nicAdapter)
+    public abstract LibvirtVmDef.InterfaceDef plug(NicTO nic, String nicAdapter)
             throws InternalErrorException, LibvirtException;
 
     @Override

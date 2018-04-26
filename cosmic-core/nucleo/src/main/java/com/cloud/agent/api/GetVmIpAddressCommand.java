@@ -4,11 +4,9 @@ public class GetVmIpAddressCommand extends Command {
 
     String vmName;
     String vmNetworkCidr;
-    boolean windows = false;
 
-    public GetVmIpAddressCommand(final String vmName, final String vmNetworkCidr, final boolean windows) {
+    public GetVmIpAddressCommand(final String vmName, final String vmNetworkCidr) {
         this.vmName = vmName;
-        this.windows = windows;
         this.vmNetworkCidr = vmNetworkCidr;
     }
 
@@ -19,10 +17,6 @@ public class GetVmIpAddressCommand extends Command {
 
     public String getVmName() {
         return vmName;
-    }
-
-    public boolean isWindows() {
-        return windows;
     }
 
     public String getVmNetworkCidr() {

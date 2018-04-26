@@ -26,8 +26,6 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.dao.GuestOSCategoryDao;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.AccountManager;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
@@ -77,10 +75,6 @@ public class HighAvailabilityManagerImplTest {
     AlertManager _alertMgr;
     @Mock
     StorageManager _storageMgr;
-    @Mock
-    GuestOSDao _guestOSDao;
-    @Mock
-    GuestOSCategoryDao _guestOSCategoryDao;
     @Mock
     VirtualMachineManager _itMgr;
     @Mock

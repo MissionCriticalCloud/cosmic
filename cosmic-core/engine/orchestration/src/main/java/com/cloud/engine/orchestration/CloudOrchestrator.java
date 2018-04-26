@@ -152,7 +152,7 @@ public class CloudOrchestrator implements OrchestrationService {
 
     @Override
     public void createVirtualMachineFromScratch(final String id, final String owner, final String isoId, final String hostName, final String displayName, final
-    String hypervisor, final String os, final int cpu, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags, final Map<String,
+    String hypervisor, final int cpu, final long memory, final Long diskSize, final List<String> computeTags, final List<String> rootDiskTags, final Map<String,
             NicProfile> networkNicMap, final DeploymentPlan plan, DiskControllerType diskControllerType) throws InsufficientCapacityException {
 
         final VirtualMachineEntityImpl vmEntity = ComponentContext.inject(VirtualMachineEntityImpl.class);

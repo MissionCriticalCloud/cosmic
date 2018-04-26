@@ -16,7 +16,6 @@ public enum APICommandGroup {
     DomainService("Domain"),
     EventService("Event"),
     FirewallService("Firewall"),
-    GuestOSService("Guest OS"),
     HostService("Host"),
     HypervisorService("Hypervisor"),
     ImageStoreService("Image Store"),

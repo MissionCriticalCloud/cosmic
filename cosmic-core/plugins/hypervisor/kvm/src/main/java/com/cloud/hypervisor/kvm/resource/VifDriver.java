@@ -12,7 +12,7 @@ public interface VifDriver {
 
     public void configure(Map<String, Object> params) throws ConfigurationException;
 
-    public LibvirtVmDef.InterfaceDef plug(NicTO nic, String guestOsType, String nicAdapter)
+    public LibvirtVmDef.InterfaceDef plug(NicTO nic, String nicAdapter)
             throws InternalErrorException, LibvirtException;
 
     public void unplug(LibvirtVmDef.InterfaceDef iface);

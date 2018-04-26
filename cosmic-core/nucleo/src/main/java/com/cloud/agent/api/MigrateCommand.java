@@ -6,23 +6,17 @@ public class MigrateCommand extends Command {
     String vmName;
     String destIp;
     String hostGuid;
-    boolean isWindows;
     VirtualMachineTO vmTO;
     boolean executeInSequence = false;
 
     protected MigrateCommand() {
     }
 
-    public MigrateCommand(final String vmName, final String destIp, final boolean isWindows, final VirtualMachineTO vmTO, final boolean executeInSequence) {
+    public MigrateCommand(final String vmName, final String destIp, final VirtualMachineTO vmTO, final boolean executeInSequence) {
         this.vmName = vmName;
         this.destIp = destIp;
-        this.isWindows = isWindows;
         this.vmTO = vmTO;
         this.executeInSequence = executeInSequence;
-    }
-
-    public boolean isWindows() {
-        return isWindows;
     }
 
     public VirtualMachineTO getVirtualMachine() {

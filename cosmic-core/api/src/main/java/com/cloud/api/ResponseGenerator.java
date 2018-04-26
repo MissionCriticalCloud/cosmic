@@ -18,8 +18,6 @@ import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ExtractResponse;
 import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
-import com.cloud.api.response.GuestOSResponse;
-import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.HostResponse;
@@ -119,8 +117,6 @@ import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.region.Region;
 import com.cloud.server.ResourceTag;
-import com.cloud.storage.GuestOS;
-import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
@@ -293,10 +289,6 @@ public interface ResponseGenerator {
     Site2SiteCustomerGatewayResponse createSite2SiteCustomerGatewayResponse(Site2SiteCustomerGateway result);
 
     Site2SiteVpnConnectionResponse createSite2SiteVpnConnectionResponse(Site2SiteVpnConnection result);
-
-    GuestOSResponse createGuestOSResponse(GuestOS os);
-
-    GuestOsMappingResponse createGuestOSMappingResponse(GuestOSHypervisor osHypervisor);
 
     VMSnapshotResponse createVMSnapshotResponse(VMSnapshot vmSnapshot);
 

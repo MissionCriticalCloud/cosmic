@@ -304,7 +304,7 @@ public class CitrixRequestWrapperTest {
     @Test
     public void testMigrateCommand() {
         final VirtualMachineTO machineTO = Mockito.mock(VirtualMachineTO.class);
-        final MigrateCommand migrateCommand = new MigrateCommand("Test", "127.0.0.1", false, machineTO, false);
+        final MigrateCommand migrateCommand = new MigrateCommand("Test", "127.0.0.1", machineTO, false);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -925,7 +925,7 @@ public class CitrixRequestWrapperTest {
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
         final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
-        final CreateVMSnapshotCommand vmSnapshot = new CreateVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs, "Debian");
+        final CreateVMSnapshotCommand vmSnapshot = new CreateVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -946,7 +946,7 @@ public class CitrixRequestWrapperTest {
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
         final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
-        final DeleteVMSnapshotCommand vmSnapshot = new DeleteVMSnapshotCommand("Test", snapshotTO, volumeTOs, "Debian");
+        final DeleteVMSnapshotCommand vmSnapshot = new DeleteVMSnapshotCommand("Test", snapshotTO, volumeTOs);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -967,7 +967,7 @@ public class CitrixRequestWrapperTest {
         final VMSnapshotTO snapshotTO = Mockito.mock(VMSnapshotTO.class);
         final List<VolumeObjectTO> volumeTOs = new ArrayList<>();
 
-        final RevertToVMSnapshotCommand vmSnapshot = new RevertToVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs, "Debian");
+        final RevertToVMSnapshotCommand vmSnapshot = new RevertToVMSnapshotCommand("Test", "uuid", snapshotTO, volumeTOs);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
@@ -1242,7 +1242,7 @@ public class CitrixRequestWrapperTest {
         vmIpsMap.put("Test", "127.0.0.1");
         rec.networks = vmIpsMap;
 
-        final GetVmIpAddressCommand getVmIpAddrCmd = new GetVmIpAddressCommand("Test", "127.0.0.1/24", false);
+        final GetVmIpAddressCommand getVmIpAddrCmd = new GetVmIpAddressCommand("Test", "127.0.0.1/24");
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);

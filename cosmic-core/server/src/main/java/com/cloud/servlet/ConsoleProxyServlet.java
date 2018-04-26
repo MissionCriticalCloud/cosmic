@@ -5,7 +5,6 @@ import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.host.HostVO;
 import com.cloud.server.ManagementServer;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.User;
@@ -474,13 +473,6 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
 
         sb.append("/ajax?token=" + encryptor.encryptObject(ConsoleProxyClientParam.class, param));
-
-        // for console access, we need guest OS type to help implement keyboard
-        final long guestOs = vm.getGuestOSId();
-        final GuestOSVO guestOsVo = _ms.getGuestOs(guestOs);
-        if (guestOsVo.getCategoryId() == 6) {
-            sb.append("&guest=windows");
-        }
 
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Compose console url: " + sb.toString());

@@ -364,14 +364,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.instanceName = instanceName;
     }
 
-    public void setGuestOsId(final long guestOsId) {
-        this.guestOsId = guestOsId;
-    }
-
-    public void setGuestOsUuid(final String guestOsUuid) {
-        this.guestOsUuid = guestOsUuid;
-    }
-
     public void setHypervisorType(final HypervisorType hypervisorType) {
         this.hypervisorType = hypervisorType;
     }
@@ -824,14 +816,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         return instanceName;
     }
 
-    public long getGuestOSId() {
-        return guestOsId;
-    }
-
-    public String getGuestOsUuid() {
-        return guestOsUuid;
-    }
-
     public HypervisorType getHypervisorType() {
         return hypervisorType;
     }
@@ -1038,10 +1022,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public String getUserData() {
         return userData;
-    }
-
-    public long getGuestOsId() {
-        return guestOsId;
     }
 
     public long getProjectId() {

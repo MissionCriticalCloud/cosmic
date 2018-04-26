@@ -199,11 +199,6 @@ public class TemplateObject implements TemplateInfo {
     }
 
     @Override
-    public long getGuestOSId() {
-        return imageVO.getGuestOSId();
-    }
-
-    @Override
     public DataObjectType getType() {
         return DataObjectType.TEMPLATE;
     }

@@ -36,7 +36,7 @@ public class OvsVifDriver extends VifDriverBase {
     }
 
     @Override
-    public InterfaceDef plug(final NicTO nic, final String guestOsType, final String nicAdapter)
+    public InterfaceDef plug(final NicTO nic, final String nicAdapter)
             throws InternalErrorException, LibvirtException {
         logger.debug("plugging nic=" + nic);
 
@@ -62,11 +62,11 @@ public class OvsVifDriver extends VifDriverBase {
                     && !vlanId.equalsIgnoreCase("untagged")) {
                 if (trafficLabel != null && !trafficLabel.isEmpty()) {
                     logger.debug("creating a vlan dev and bridge for guest traffic per traffic label " + trafficLabel);
-                    intf.defBridgeNet(pifs.get(trafficLabel), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                    intf.defBridgeNet(pifs.get(trafficLabel), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                             networkRateKBps);
                     intf.setVlanTag(Integer.parseInt(vlanId));
                 } else {
-                    intf.defBridgeNet(pifs.get("private"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                    intf.defBridgeNet(pifs.get("private"), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                             networkRateKBps);
                     intf.setVlanTag(Integer.parseInt(vlanId));
                 }
@@ -75,48 +75,48 @@ public class OvsVifDriver extends VifDriverBase {
                 intf.setVirtualPortInterfaceId(nic.getUuid());
                 final String brName = trafficLabel != null && !trafficLabel.isEmpty() ? pifs.get(trafficLabel)
                         : pifs.get("private");
-                intf.defBridgeNet(brName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
+                intf.defBridgeNet(brName, null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO);
             } else if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vswitch) {
                 final String vnetId = Networks.BroadcastDomainType.getValue(nic.getBroadcastUri());
                 final String brName = "OVSTunnel" + vnetId;
                 logger.debug("nic " + nic + " needs to be connected to LogicalSwitch " + brName);
-                intf.defBridgeNet(brName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
+                intf.defBridgeNet(brName, null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO, networkRateKBps);
             } else if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vsp) {
                 intf.setVirtualPortInterfaceId(nic.getUuid());
                 final String brName = trafficLabel != null && !trafficLabel.isEmpty() ? pifs.get(trafficLabel)
                         : pifs.get("private");
-                intf.defBridgeNet(brName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
+                intf.defBridgeNet(brName, null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO, networkRateKBps);
             } else {
-                intf.defBridgeNet(bridges.get("guest"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                intf.defBridgeNet(bridges.get("guest"), null, nic.getMac(),LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                         networkRateKBps);
             }
         } else if (nic.getType() == Networks.TrafficType.Control) {
       /* Make sure the network is still there */
             createControlNetwork(bridges.get("linklocal"));
-            intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
+            intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO);
         } else if (nic.getType() == Networks.TrafficType.Public) {
             final Integer networkRateKBps = nic.getNetworkRateMbps() != null && nic.getNetworkRateMbps().intValue() != -1
                     ? nic.getNetworkRateMbps().intValue() * 128 : 0;
             if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && !vlanId.equalsIgnoreCase("untagged")) {
                 if (trafficLabel != null && !trafficLabel.isEmpty()) {
                     logger.debug("creating a vlan dev and bridge for public traffic per traffic label " + trafficLabel);
-                    intf.defBridgeNet(pifs.get(trafficLabel), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                    intf.defBridgeNet(pifs.get(trafficLabel), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                             networkRateKBps);
                     intf.setVlanTag(Integer.parseInt(vlanId));
                 } else {
-                    intf.defBridgeNet(pifs.get("public"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                    intf.defBridgeNet(pifs.get("public"), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                             networkRateKBps);
                     intf.setVlanTag(Integer.parseInt(vlanId));
                 }
             } else {
-                intf.defBridgeNet(bridges.get("public"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
+                intf.defBridgeNet(bridges.get("public"), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO,
                         networkRateKBps);
             }
         } else if (nic.getType() == Networks.TrafficType.Management) {
-            intf.defBridgeNet(bridges.get("private"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
+            intf.defBridgeNet(bridges.get("private"), null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO);
         } else if (nic.getType() == Networks.TrafficType.Storage) {
             final String storageBrName = nic.getName() == null ? bridges.get("private") : nic.getName();
-            intf.defBridgeNet(storageBrName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
+            intf.defBridgeNet(storageBrName, null, nic.getMac(), LibvirtVmDef.InterfaceDef.NicModel.VIRTIO);
         }
         return intf;
     }

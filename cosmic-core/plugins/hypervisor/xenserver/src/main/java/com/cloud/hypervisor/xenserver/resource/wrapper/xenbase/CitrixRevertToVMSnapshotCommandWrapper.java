@@ -50,7 +50,7 @@ public final class CitrixRevertToVMSnapshotCommandWrapper extends CommandWrapper
             try {
                 vm = citrixResourceBase.getVM(conn, vmName);
             } catch (final Exception e) {
-                vm = citrixResourceBase.createWorkingVM(conn, vmName, command.getGuestOSType(), command.getPlatformEmulator(), listVolumeTo);
+                vm = citrixResourceBase.createWorkingVM(conn, vmName, "Other PV (64 bit)", command.getPlatformEmulator(), listVolumeTo);
             }
 
             if (vm == null) {

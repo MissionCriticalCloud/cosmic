@@ -326,8 +326,6 @@ public class UserVmManagerTest {
         when(_templateDao.findById(anyLong())).thenReturn(_templateMock);
         doNothing().when(_accountMgr).checkAccess(_account, null, true, _templateMock);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, 14L)).thenReturn(_volumeMock);
-        when(_templateMock.getGuestOSId()).thenReturn(5L);
-        doNothing().when(_vmMock).setGuestOSId(anyLong());
         doNothing().when(_vmMock).setTemplateId(3L);
         when(_vmDao.update(314L, _vmMock)).thenReturn(true);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
@@ -372,8 +370,6 @@ public class UserVmManagerTest {
         doNothing().when(_accountMgr).checkAccess(_account, null, true, _templateMock);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
         doNothing().when(_vmMock).setIsoId(14L);
-        when(_templateMock.getGuestOSId()).thenReturn(5L);
-        doNothing().when(_vmMock).setGuestOSId(anyLong());
         doNothing().when(_vmMock).setTemplateId(3L);
         when(_vmDao.update(314L, _vmMock)).thenReturn(true);
         when(_storageMgr.allocateDuplicateVolume(_volumeMock, null)).thenReturn(_volumeMock);
@@ -636,7 +632,7 @@ public class UserVmManagerTest {
         final Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
         final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
-        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L);
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, false, false, 1L, 1L, 1, 5L, "test", "test", 1L);
         vm.setState(VirtualMachine.State.Stopped);
         when(_vmDao.findById(anyLong())).thenReturn(vm);
 

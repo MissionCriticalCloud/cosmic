@@ -16,8 +16,8 @@ public abstract class SystemVmVO extends VMInstanceVO {
     protected String publicNetmask;
 
     public SystemVmVO(final long id, final long serviceOfferingId, final String name, final long templateId,
-                      final Hypervisor.HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
-        super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+                      final Hypervisor.HypervisorType hypervisorType, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
+        super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, domainId, accountId, userId, haEnabled);
     }
 
     public SystemVmVO() {

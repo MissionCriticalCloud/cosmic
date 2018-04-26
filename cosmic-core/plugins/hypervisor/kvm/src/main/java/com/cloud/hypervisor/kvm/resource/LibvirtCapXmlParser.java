@@ -15,7 +15,6 @@ public class LibvirtCapXmlParser extends LibvirtXmlParser {
     private final Logger logger = LoggerFactory.getLogger(LibvirtCapXmlParser.class);
     private final StringBuffer emulator = new StringBuffer();
     private final StringBuffer capXml = new StringBuffer();
-    private final ArrayList<String> guestOsTypes = new ArrayList<>();
     private boolean host;
     private boolean guest;
     private boolean osType;
@@ -27,8 +26,6 @@ public class LibvirtCapXmlParser extends LibvirtXmlParser {
     public void characters(final char[] ch, final int start, final int length) throws SAXException {
         if (host) {
             capXml.append(ch, start, length);
-        } else if (osType) {
-            guestOsTypes.add(new String(ch, start, length));
         } else if (emulatorFlag) {
             logger.debug("Found " + new String(ch, start, length) + " as a suiteable emulator");
             emulator.append(ch, start, length);
@@ -101,10 +98,6 @@ public class LibvirtCapXmlParser extends LibvirtXmlParser {
             logger.error(ie.getMessage());
         }
         return null;
-    }
-
-    public ArrayList<String> getGuestOsType() {
-        return guestOsTypes;
     }
 
     public String getEmulator() {

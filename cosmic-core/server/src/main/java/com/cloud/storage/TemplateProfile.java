@@ -18,7 +18,6 @@ public class TemplateProfile {
     Boolean featured;
     Boolean isExtractable;
     ImageFormat format;
-    Long guestOsId;
     Long zoneId;
     HypervisorType hypervisorType;
     String accountName;
@@ -40,7 +39,7 @@ public class TemplateProfile {
     }
 
     public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
-                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId,
+                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long zoneId,
 
                            final HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
                            final String templateTag, final Map details,
@@ -56,7 +55,6 @@ public class TemplateProfile {
                 featured,
                 isExtractable,
                 format,
-                guestOsId,
                 zoneId,
                 hypervisorType,
                 accountName,
@@ -72,7 +70,7 @@ public class TemplateProfile {
     }
 
     public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
-                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId, final
+                           final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long zoneId, final
                            HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
                            final Map details, final Boolean sshKeyEnabled) {
         this.templateId = templateId;
@@ -86,7 +84,6 @@ public class TemplateProfile {
         this.featured = featured;
         this.isExtractable = isExtractable;
         this.format = format;
-        this.guestOsId = guestOsId;
         this.zoneId = zoneId;
         this.hypervisorType = hypervisorType;
         this.accountName = accountName;
@@ -184,14 +181,6 @@ public class TemplateProfile {
 
     public void setFormat(final ImageFormat format) {
         this.format = format;
-    }
-
-    public Long getGuestOsId() {
-        return guestOsId;
-    }
-
-    public void setGuestOsId(final Long id) {
-        this.guestOsId = id;
     }
 
     public Long getZoneId() {

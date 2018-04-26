@@ -144,9 +144,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName("diskiowrite")
     @Param(description = "the write (io) of disk on the vm")
     private Long diskIOWrite;
-    @SerializedName("guestosid")
-    @Param(description = "Os type ID of the virtual machine")
-    private String guestOsId;
     @SerializedName("rootdeviceid")
     @Param(description = "device ID of the root volume")
     private Long rootDeviceId;
@@ -556,14 +553,6 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setDiskIOWrite(final Long diskIOWrite) {
         this.diskIOWrite = diskIOWrite;
-    }
-
-    public String getGuestOsId() {
-        return guestOsId;
-    }
-
-    public void setGuestOsId(final String guestOsId) {
-        this.guestOsId = guestOsId;
     }
 
     public Long getRootDeviceId() {

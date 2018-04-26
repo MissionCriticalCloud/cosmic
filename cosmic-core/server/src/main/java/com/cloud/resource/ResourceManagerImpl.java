@@ -87,14 +87,12 @@ import com.cloud.org.Cluster;
 import com.cloud.org.Managed;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.StorageService;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -189,8 +187,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     private ConfigurationDao _configDao;
     @Inject
     private HostTagsDao _hostTagsDao;
-    @Inject
-    private GuestOSCategoryDao _guestOSCategoryDao;
     @Inject
     private PrimaryDataStoreDao _storagePoolDao;
     @Inject
@@ -807,22 +803,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
         return null;
-    }
-
-    @Override
-    public Long getGuestOSCategoryId(final long hostId) {
-        final HostVO host = _hostDao.findById(hostId);
-        if (host == null) {
-            return null;
-        } else {
-            _hostDao.loadDetails(host);
-            final DetailVO detail = _hostDetailsDao.findDetail(hostId, "guest.os.category.id");
-            if (detail == null) {
-                return null;
-            } else {
-                return Long.parseLong(detail.getValue());
-            }
-        }
     }
 
     @Override
@@ -1723,7 +1703,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     @Override
     public Host updateHost(final UpdateHostCmd cmd) throws NoTransitionException {
         final Long hostId = cmd.getId();
-        final Long guestOSCategoryId = cmd.getOsCategoryId();
 
         // Verify that the host exists
         final HostVO host = _hostDao.findById(hostId);
@@ -1738,33 +1717,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
 
             resourceStateTransitTo(host, resourceEvent, _nodeId);
-        }
-
-        if (guestOSCategoryId != null) {
-            // Verify that the guest OS Category exists
-            if (!(guestOSCategoryId > 0) || _guestOSCategoryDao.findById(guestOSCategoryId) == null) {
-                throw new InvalidParameterValueException("Please specify a valid guest OS category.");
-            }
-
-            final GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
-            final DetailVO guestOSDetail = _hostDetailsDao.findDetail(hostId, "guest.os.category.id");
-
-            if (guestOSCategory != null && !GuestOSCategoryVO.CATEGORY_NONE.equalsIgnoreCase(guestOSCategory.getName())) {
-                // Create/Update an entry for guest.os.category.id
-                if (guestOSDetail != null) {
-                    guestOSDetail.setValue(String.valueOf(guestOSCategory.getId()));
-                    _hostDetailsDao.update(guestOSDetail.getId(), guestOSDetail);
-                } else {
-                    final Map<String, String> detail = new HashMap<>();
-                    detail.put("guest.os.category.id", String.valueOf(guestOSCategory.getId()));
-                    _hostDetailsDao.persist(hostId, detail);
-                }
-            } else {
-                // Delete any existing entry for guest.os.category.id
-                if (guestOSDetail != null) {
-                    _hostDetailsDao.remove(guestOSDetail.getId());
-                }
-            }
         }
 
         final List<String> hostTags = cmd.getHostTags();

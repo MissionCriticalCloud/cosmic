@@ -1,7 +1,6 @@
 package com.cloud.api;
 
 import com.cloud.api.command.user.iso.UpdateIsoCmd;
-import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.TemplateResponse;
 
 import java.util.Collection;
@@ -29,11 +28,6 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
     private Long id;
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the image file")
     private String templateName;
-    @Parameter(name = ApiConstants.OS_TYPE_ID,
-            type = CommandType.UUID,
-            entityType = GuestOSResponse.class,
-            description = "the ID of the OS type that best represents the OS of this image.")
-    private Long osTypeId;
     @Parameter(name = ApiConstants.FORMAT, type = CommandType.STRING, description = "the format for the image")
     private String format;
     @Parameter(name = ApiConstants.PASSWORD_ENABLED, type = CommandType.BOOLEAN, description = "true if the image supports the password reset feature; default is false")
@@ -67,10 +61,6 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
 
     public String getTemplateName() {
         return templateName;
-    }
-
-    public Long getOsTypeId() {
-        return osTypeId;
     }
 
     public Boolean getPasswordEnabled() {

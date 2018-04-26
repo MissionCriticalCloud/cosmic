@@ -25,7 +25,5 @@ public enum ApiCommandJobType {
     LoadBalancerRule,
     AffinityGroup,
     DedicatedGuestVlanRange,
-    GuestOs,
-    GuestOsMapping,
     Network
 }

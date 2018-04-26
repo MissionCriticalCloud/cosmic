@@ -16,7 +16,7 @@ public interface OrchestrationService {
                               DiskControllerType diskControllerType
     ) throws InsufficientCapacityException;
 
-    void createVirtualMachineFromScratch(String id, String owner, String isoId, String hostName, String displayName, String hypervisor, String os, int cpu, long memory,
+    void createVirtualMachineFromScratch(String id, String owner, String isoId, String hostName, String displayName, String hypervisor, int cpu, long memory,
                                          Long diskSize, List<String> computeTags, List<String> rootDiskTags, Map<String, NicProfile> networkNicMap, DeploymentPlan plan,
                                          DiskControllerType diskControllerType
     ) throws InsufficientCapacityException;

@@ -4,29 +4,16 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.host.HostVO;
-import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.GuestOSHypervisorVO;
-import com.cloud.storage.GuestOSVO;
-import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.command.StorageSubSystemCommand;
 
-import javax.inject.Inject;
 import java.util.Map;
 
 public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
-    @Inject
-    GuestOSDao _guestOsDao;
-    @Inject
-    GuestOSHypervisorDao _guestOsHypervisorDao;
-    @Inject
-    HostDao _hostDao;
 
     protected KVMGuru() {
         super();
@@ -74,21 +61,8 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
     public VirtualMachineTO implement(final VirtualMachineProfile vm) {
         final VirtualMachineTO to = toVirtualMachineTO(vm);
 
-        // Determine the VM's OS description
-        final GuestOSVO guestOS = _guestOsDao.findByIdIncludingRemoved(vm.getVirtualMachine().getGuestOSId());
-        to.setOs(guestOS.getDisplayName());
-        to.setCpuflags(guestOS.getCpuflags());
-        to.setManufacturer(guestOS.getManufacturer());
-        final HostVO host = _hostDao.findById(vm.getVirtualMachine().getHostId());
-        GuestOSHypervisorVO guestOsMapping = null;
-        if (host != null) {
-            guestOsMapping = _guestOsHypervisorDao.findByOsIdAndHypervisor(guestOS.getId(), getHypervisorType().toString(), host.getHypervisorVersion());
-        }
-        if (guestOsMapping == null) {
-            to.setPlatformEmulator("Default - VirtIO capable OS (64-bit)");
-        } else {
-            to.setPlatformEmulator(guestOsMapping.getGuestOsName());
-        }
+        // @TODO: Fixme
+        to.setPlatformEmulator("Default - VirtIO capable OS (64-bit)");
 
         return to;
     }

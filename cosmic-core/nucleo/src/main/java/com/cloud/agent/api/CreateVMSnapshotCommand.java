@@ -7,8 +7,8 @@ import java.util.List;
 public class CreateVMSnapshotCommand extends VMSnapshotBaseCommand {
     private final String vmUuid;
 
-    public CreateVMSnapshotCommand(final String vmName, final String vmUuid, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs, final String guestOSType) {
-        super(vmName, snapshot, volumeTOs, guestOSType);
+    public CreateVMSnapshotCommand(final String vmName, final String vmUuid, final VMSnapshotTO snapshot, final List<VolumeObjectTO> volumeTOs) {
+        super(vmName, snapshot, volumeTOs);
         this.vmUuid = vmUuid;
     }
 

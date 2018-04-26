@@ -33,14 +33,12 @@ import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.to.VolumeObjectTO;
@@ -109,8 +107,6 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
     UserVmDao _userVMDao;
     @Inject
     AccountManager _accountMgr;
-    @Inject
-    GuestOSDao _guestOSDao;
     @Inject
     SnapshotDao _snapshotDao;
     @Inject
@@ -688,9 +684,8 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         // prepare RestoreVMSnapshotCommand
         final String vmInstanceName = userVm.getInstanceName();
         final List<VolumeObjectTO> volumeTOs = getVolumeTOList(userVm.getId());
-        final GuestOSVO guestOS = _guestOSDao.findById(userVm.getGuestOSId());
 
-        final RestoreVMSnapshotCommand restoreSnapshotCommand = new RestoreVMSnapshotCommand(vmInstanceName, null, volumeTOs, guestOS.getDisplayName());
+        final RestoreVMSnapshotCommand restoreSnapshotCommand = new RestoreVMSnapshotCommand(vmInstanceName, null, volumeTOs);
         restoreSnapshotCommand.setSnapshots(snapshots);
         restoreSnapshotCommand.setSnapshotAndParents(snapshotAndParents);
 
