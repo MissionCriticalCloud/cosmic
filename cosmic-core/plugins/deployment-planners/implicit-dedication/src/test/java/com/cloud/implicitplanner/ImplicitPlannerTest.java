@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -168,7 +169,7 @@ public class ImplicitPlannerTest {
         when(avoids.shouldAvoid(zone)).thenReturn(true);
         when(vmProfile.getVirtualMachine()).thenReturn(vm);
         when(vm.getDataCenterId()).thenReturn(1L);
-        when(zoneRepository.findOne(1L)).thenReturn(zone);
+        when(zoneRepository.findById(1L)).thenReturn(Optional.of(zone));
 
         final List<Long> clusterList = planner.orderClusters(vmProfile, plan, avoids);
         assertTrue("Cluster list should be null/empty if the dc is in avoid list", (clusterList == null || clusterList.isEmpty()));
@@ -224,7 +225,7 @@ public class ImplicitPlannerTest {
         when(userVm.getAccountId()).thenReturn(accountId);
 
         when(vm.getDataCenterId()).thenReturn(dataCenterId);
-        when(zoneRepository.findOne(1L)).thenReturn(zone);
+        when(zoneRepository.findById(1L)).thenReturn(Optional.of(zone));
         when(plan.getDataCenterId()).thenReturn(dataCenterId);
         when(plan.getClusterId()).thenReturn(null);
         when(plan.getPodId()).thenReturn(null);

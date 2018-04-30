@@ -627,7 +627,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             buf.append(" bootproto=dhcp");
         }
 
-        final Zone zone = zoneRepository.findOne(profile.getVirtualMachine().getDataCenterId());
+        final Zone zone = zoneRepository.findById(profile.getVirtualMachine().getDataCenterId()).orElse(null);
         buf.append(" internaldns1=").append(zone.getInternalDns1());
         if (zone.getInternalDns2() != null) {
             buf.append(" internaldns2=").append(zone.getInternalDns2());
@@ -1011,7 +1011,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
         final long id = _consoleProxyDao.getNextInSequence(Long.class, "id");
         final String name = VirtualMachineName.getConsoleProxyName(id, _instance);
-        final Zone zone = zoneRepository.findOne(dataCenterId);
+        final Zone zone = zoneRepository.findById(dataCenterId).orElse(null);
         final Account systemAcct = _accountMgr.getSystemAccount();
 
         final DataCenterDeployment plan = new DataCenterDeployment(dataCenterId);

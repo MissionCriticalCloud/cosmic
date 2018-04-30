@@ -24,6 +24,7 @@ import com.cloud.vm.dao.DomainRouterDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +82,7 @@ public class VpcVirtualRouterElementTest {
         when(_vpcRouterMgr.getVpcRouters(vpcId)).thenReturn(routers);
         when(_entityMgr.findById(Vpc.class, vpcId)).thenReturn(vpc);
         when(vpc.getZoneId()).thenReturn(zoneId);
-        when(zoneRepository.findOne(zoneId)).thenReturn(zone);
+        when(zoneRepository.findById(zoneId)).thenReturn(Optional.of(zone));
         when(networkTopologyContext.retrieveNetworkTopology(zone)).thenReturn(advancedNetworkTopology);
 
         try {
@@ -105,7 +106,7 @@ public class VpcVirtualRouterElementTest {
 
         verify(remoteAccessVpn, times(1)).getVpcId();
         verify(vpc, times(1)).getZoneId();
-        verify(zoneRepository, times(1)).findOne(zoneId);
+        verify(zoneRepository, times(1)).findById(zoneId);
         verify(networkTopologyContext, times(1)).retrieveNetworkTopology(zone);
     }
 

@@ -3785,7 +3785,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Validate the zone
-        final Zone zone = zoneRepository.findOne(zoneId);
+        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
         if (zone == null) {
             throw new InvalidParameterValueException("Please specify a valid zone.");
         }

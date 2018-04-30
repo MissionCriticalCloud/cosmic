@@ -16,6 +16,7 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.vm.ConsoleProxyVO;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -101,7 +102,7 @@ public class ConsoleProxyManagerTest {
         final Zone zone = mock(Zone.class);
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
 
-        when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(zone));
 
         final NetworkVO network = Mockito.mock(NetworkVO.class);
         final NetworkVO badNetwork = Mockito.mock(NetworkVO.class);

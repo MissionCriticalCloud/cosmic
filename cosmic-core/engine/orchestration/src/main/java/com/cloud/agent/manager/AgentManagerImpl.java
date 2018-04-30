@@ -475,7 +475,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                             return false;
                         }
                     } else if (currentStatus == Status.Up) {
-                        final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+                        final Zone zone = _zoneRepository.findById(host.getDataCenterId()).orElse(null);
                         final HostPodVO podVO = _podDao.findById(host.getPodId());
                         final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
                         if (host.getType() != Host.Type.SecondaryStorage && host.getType() != Host.Type.ConsoleProxy) {
@@ -486,7 +486,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                     }
                 } else {
                     // if we end up here we are in alert state, send an alert
-                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+                    final Zone zone = _zoneRepository.findById(host.getDataCenterId()).orElse(null);
                     final HostPodVO podVO = _podDao.findById(host.getPodId());
                     final String podName = podVO != null ? podVO.getName() : "NO POD";
                     final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podName;
@@ -1448,7 +1448,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                                 if (!gatewayAccessible) {
                                     // alert that host lost connection to
                                     // gateway (cannot ping the default route)
-                                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+                                    final Zone zone = _zoneRepository.findById(host.getDataCenterId()).orElse(null);
                                     final HostPodVO podVO = _podDao.findById(host.getPodId());
                                     final String hostDesc =
                                             "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: "
@@ -1536,7 +1536,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
 
             for (final HostVO host : hosts) {
                 if (_resourceMgr.checkAndMaintain(host.getId())) {
-                    final Zone zone = _zoneRepository.findOne(host.getDataCenterId());
+                    final Zone zone = _zoneRepository.findById(host.getDataCenterId()).orElse(null);
                     final HostPodVO podVO = _podDao.findById(host.getPodId());
                     final String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
                     _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, host.getDataCenterId(), host.getPodId(), "Migration Complete for host " + hostDesc, "Host ["

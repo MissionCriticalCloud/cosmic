@@ -48,6 +48,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +91,7 @@ public class NiciraNvpGuestNetworkGuruTest {
         final Zone zone = mock(Zone.class);
         when(zone.getNetworkType()).thenReturn(NetworkType.Advanced);
         when(zone.getGuestNetworkCidr()).thenReturn("10.1.1.1/24");
-        when(zoneRepository.findOne(anyLong())).thenReturn(zone);
+        when(zoneRepository.findById(anyLong())).thenReturn(Optional.of(zone));
     }
 
     @Test

@@ -229,7 +229,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -475,7 +474,10 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         snapshotResponse.setTags(tagResponses);
 
@@ -825,7 +827,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         ipResponse.setTags(tagResponses);
 
@@ -889,7 +893,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         lbResponse.setTags(tagResponses);
 
@@ -1194,7 +1200,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
 
@@ -1892,7 +1900,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
 
@@ -1994,7 +2004,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
 
@@ -2296,7 +2308,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
         response.setObjectName("vpc");
@@ -2364,7 +2378,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
 
@@ -2449,7 +2465,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<ResourceTagResponse> tagResponses = new ArrayList<>();
         for (final ResourceTag tag : tags) {
             final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
+            if (tagResponse != null) {
+                tagResponses.add(tagResponse);
+            }
         }
         response.setTags(tagResponses);
         response.setObjectName("staticroute");

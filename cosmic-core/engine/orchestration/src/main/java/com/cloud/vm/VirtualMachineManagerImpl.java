@@ -607,7 +607,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final HostVO destHost = _hostDao.findById(destHostId);
         final VirtualMachineGuru vmGuru = getVmGuru(vm);
 
-        final Zone zone = _zoneRepository.findOne(destHost.getDataCenterId());
+        final Zone zone = _zoneRepository.findById(destHost.getDataCenterId()).orElse(null);
         final HostPodVO pod = _podDao.findById(destHost.getPodId());
         final Cluster cluster = _clusterDao.findById(destHost.getClusterId());
         final DeployDestination destination = new DeployDestination(zone, pod, cluster, destHost);
@@ -2574,7 +2574,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             throw new CloudRuntimeException("Unable to reboot VM " + vm + " due to: " + vm.getInstanceName() + " has active VM snapshots tasks");
         }
 
-        final Zone zone = _zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = _zoneRepository.findById(vm.getDataCenterId()).orElse(null);
+        ;
         final Host host = _hostDao.findById(vm.getHostId());
         if (host == null) {
             // Should findById throw an Exception is the host is not found?
@@ -2671,7 +2672,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = _zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final Host host = _hostDao.findById(vm.getHostId());
         final DeployDestination dest = new DeployDestination(zone, null, null, host);
 
@@ -2843,7 +2844,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = _zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final Host host = _hostDao.findById(vm.getHostId());
         final DeployDestination dest = new DeployDestination(zone, null, null, host);
         final HypervisorGuru hvGuru = _hvGuruMgr.getGuru(vmProfile.getVirtualMachine().getHypervisorType());
@@ -2989,7 +2990,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vmVO, null, null, null, null);
 
-        final Zone zone = _zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = _zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final Host host = _hostDao.findById(vm.getHostId());
         final DeployDestination dest = new DeployDestination(zone, null, null, host);
         final HypervisorGuru hvGuru = _hvGuruMgr.getGuru(vmProfile.getVirtualMachine().getHypervisorType());

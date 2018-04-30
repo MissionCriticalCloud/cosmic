@@ -35,7 +35,7 @@ public class ConsoleProxyAlertAdapter extends AdapterBase implements AlertAdapte
             s_logger.debug("received console proxy alert");
         }
 
-        final Zone zone = zoneRepository.findOne(args.getZoneId());
+        final Zone zone = zoneRepository.findById(args.getZoneId()).orElse(null);
         ConsoleProxyVO proxy = args.getProxy();
         //FIXME - Proxy can be null in case of creation failure. Have a better fix than checking for != 0
         if (proxy == null && args.getProxyId() != 0) {

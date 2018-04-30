@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -140,7 +141,7 @@ public class HighAvailabilityManagerImplTest {
         Mockito.when(hostVO.getHypervisorType()).thenReturn(HypervisorType.KVM);
         Mockito.when(_instanceDao.listByHostId(42l)).thenReturn(Arrays.asList(Mockito.mock(VMInstanceVO.class)));
         Mockito.when(_podDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(HostPodVO.class));
-        Mockito.when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(Mockito.mock(Zone.class));
+        Mockito.when(zoneRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Mockito.mock(Zone.class)));
 
         highAvailabilityManager.scheduleRestartForVmsOnHost(hostVO, true);
     }
@@ -167,7 +168,7 @@ public class HighAvailabilityManagerImplTest {
         Mockito.when(_instanceDao.findByUuid(vm1.getUuid())).thenReturn(vm1);
         Mockito.when(_instanceDao.findByUuid(vm2.getUuid())).thenReturn(vm2);
         Mockito.when(_podDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(HostPodVO.class));
-        Mockito.when(zoneRepository.findOne(Mockito.anyLong())).thenReturn(Mockito.mock(Zone.class));
+        Mockito.when(zoneRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Mockito.mock(Zone.class)));
         Mockito.when(_haDao.findPreviousHA(Mockito.anyLong())).thenReturn(Arrays.asList(Mockito.mock(HaWorkVO.class)));
         Mockito.when(_haDao.persist((HaWorkVO) Mockito.anyObject())).thenReturn(Mockito.mock(HaWorkVO.class));
 

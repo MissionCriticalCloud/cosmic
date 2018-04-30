@@ -225,7 +225,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
         // call affinitygroup chain
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final long vmGroupCount = _affinityGroupVMMapDao.countAffinityGroupsForVm(vm.getId());
-        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
 
         if (vmGroupCount > 0) {
             for (final AffinityGroupProcessor processor : _affinityProcessors) {
@@ -627,7 +627,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
             final DiskProfile diskProfile = new DiskProfile(toBeCreated, diskOffering, vmProfile.getHypervisorType());
             boolean useLocalStorage = false;
             if (vmProfile.getType() != VirtualMachine.Type.User) {
-                final Zone zone = zoneRepository.findOne(plan.getDataCenterId());
+                final Zone zone = zoneRepository.findById(plan.getDataCenterId()).orElse(null);
                 assert (zone != null) : "Invalid zone in deployment plan";
                 final Boolean useLocalStorageForSystemVM = ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(zone.getId());
                 if (useLocalStorageForSystemVM != null) {
@@ -935,7 +935,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
     private boolean isEnabledForAllocation(final long zoneId, final Long podId, final Long clusterId) {
         // Check if the zone exists in the system
-        final Zone zone = zoneRepository.findOne(zoneId);
+        final Zone zone = zoneRepository.findById(zoneId).orElse(null);
         if (zone != null && AllocationState.Disabled == zone.getAllocationState()) {
             s_logger.info("Zone is currently disabled, cannot allocate to this zone: " + zoneId);
             return false;
