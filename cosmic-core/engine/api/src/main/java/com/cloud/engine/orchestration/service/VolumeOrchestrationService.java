@@ -13,6 +13,7 @@ import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
@@ -73,7 +74,7 @@ public interface VolumeOrchestrationService {
     void destroyVolume(Volume volume);
 
     DiskProfile allocateRawVolume(Type type, String name, DiskOffering offering, Long size, Long minIops, Long maxIops, VirtualMachine vm, VirtualMachineTemplate template,
-                                  Account owner);
+                                  Account owner, DiskControllerType diskControllerType);
 
     VolumeInfo createVolumeOnPrimaryStorage(VirtualMachine vm, VolumeInfo volume, HypervisorType rootDiskHyperType, StoragePool storagePool) throws NoTransitionException;
 
@@ -96,7 +97,7 @@ public interface VolumeOrchestrationService {
     boolean canVmRestartOnAnotherServer(long vmId);
 
     DiskProfile allocateTemplatedVolume(Type type, String name, DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, VirtualMachineTemplate template,
-                                        VirtualMachine vm, Account owner);
+                                        VirtualMachine vm, Account owner, DiskControllerType diskControllerType);
 
     String getVmNameFromVolumeId(long volumeId);
 

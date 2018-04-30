@@ -16,8 +16,6 @@ public class TemplateOrVolumePostUploadCommand {
 
     String localPath;
 
-    boolean requiresHvm;
-
     String imageFormat;
 
     String dataTo;
@@ -81,14 +79,6 @@ public class TemplateOrVolumePostUploadCommand {
 
     public void setLocalPath(final String localPath) {
         this.localPath = localPath;
-    }
-
-    public boolean getRequiresHvm() {
-        return requiresHvm;
-    }
-
-    public void setRequiresHvm(final boolean requiresHvm) {
-        this.requiresHvm = requiresHvm;
     }
 
     public String getImageFormat() {

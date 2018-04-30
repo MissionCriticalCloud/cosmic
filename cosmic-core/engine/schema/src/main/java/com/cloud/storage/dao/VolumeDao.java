@@ -1,6 +1,7 @@
 package com.cloud.storage.dao;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Volume;
@@ -42,7 +43,7 @@ public interface VolumeDao extends GenericDao<VolumeVO, Long>, StateDao<Volume.S
 
     void deleteVolumesByInstance(long instanceId);
 
-    void attachVolume(long volumeId, long vmId, long deviceId);
+    void attachVolume(long volumeId, long vmId, long deviceId, DiskControllerType diskController);
 
     void detachVolume(long volumeId);
 

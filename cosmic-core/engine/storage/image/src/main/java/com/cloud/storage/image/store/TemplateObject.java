@@ -149,11 +149,6 @@ public class TemplateObject implements TemplateInfo {
     }
 
     @Override
-    public boolean isRequiresHvm() {
-        return imageVO.isRequiresHvm();
-    }
-
-    @Override
     public String getUuid() {
         return imageVO.getUuid();
     }

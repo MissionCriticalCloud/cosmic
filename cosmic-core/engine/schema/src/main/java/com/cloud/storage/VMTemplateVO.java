@@ -52,8 +52,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     private Storage.TemplateType templateType;
     @Column(name = "url", length = 2048)
     private String url = null;
-    @Column(name = "hvm")
-    private boolean requiresHvm;
     @Column(name = "bits")
     private int bits;
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -104,8 +102,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     }
 
     public VMTemplateVO(final long id, final String name, final ImageFormat format, final boolean isPublic, final boolean featured, final boolean isExtractable, final
-    TemplateType type, final String url,
-                        final boolean requiresHvm, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
+    TemplateType type, final String url, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
                                 guestOSId, final boolean bootable,
                         final HypervisorType hyperType, final String templateTag, final Map<String, String> details, final boolean sshKeyEnabled, final boolean
                                 isDynamicallyScalable) {
@@ -117,7 +114,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
                 isExtractable,
                 type,
                 url,
-                requiresHvm,
                 bits,
                 accountId,
                 cksum,
@@ -136,8 +132,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
 
     //FIXME - Remove unwanted constructors.
     private VMTemplateVO(final long id, final String name, final ImageFormat format, final boolean isPublic, final boolean featured, final boolean isExtractable, final
-    TemplateType type, final String url,
-                         final boolean requiresHvm, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
+    TemplateType type, final String url, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
                                  guestOSId, final boolean bootable,
                          final HypervisorType hyperType, final Map<String, String> details) {
         this(id,
@@ -150,7 +145,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
                 type,
                 url,
                 null,
-                requiresHvm,
                 bits,
                 accountId,
                 cksum,
@@ -166,7 +160,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     //FIXME - Remove unwanted constructors. Made them private for now
     private VMTemplateVO(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean featured, final boolean
             isExtractable, final TemplateType type,
-                         final String url, final Date created, final boolean requiresHvm, final int bits, final long accountId, final String cksum, final String displayText,
+                         final String url, final Date created, final int bits, final long accountId, final String cksum, final String displayText,
                          final boolean enablePassword, final long guestOSId,
                          final boolean bootable, final HypervisorType hyperType, final Map<String, String> details) {
         this(id,
@@ -178,7 +172,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
                 type,
                 url,
                 created,
-                requiresHvm,
                 bits,
                 accountId,
                 cksum,
@@ -204,8 +197,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     }
 
     public VMTemplateVO(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean featured, final TemplateType
-            type, final String url, final Date created,
-                        final boolean requiresHvm, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
+            type, final String url, final Date created, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
                                 guestOSId, final boolean bootable,
                         final HypervisorType hyperType) {
         this.id = id;
@@ -214,7 +206,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
         this.featured = featured;
         templateType = type;
         this.url = url;
-        this.requiresHvm = requiresHvm;
         this.bits = bits;
         this.accountId = accountId;
         checksum = cksum;
@@ -232,12 +223,12 @@ public class VMTemplateVO implements VirtualMachineTemplate {
 
     public static VMTemplateVO createPreHostIso(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean
             featured, final TemplateType type,
-                                                final String url, final Date created, final boolean requiresHvm, final int bits, final long accountId, final String cksum, final
+                                                final String url, final Date created, final int bits, final long accountId, final String cksum, final
                                                 String displayText, final boolean
                                                         enablePassword, final long guestOSId,
                                                 final boolean bootable, final HypervisorType hyperType) {
         final VMTemplateVO template =
-                new VMTemplateVO(id, uniqueName, name, format, isPublic, featured, type, url, created, requiresHvm, bits, accountId, cksum, displayText, enablePassword,
+                new VMTemplateVO(id, uniqueName, name, format, isPublic, featured, type, url, created, bits, accountId, cksum, displayText, enablePassword,
                         guestOSId, bootable, hyperType);
         return template;
     }
@@ -282,15 +273,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
 
     public void setFormat(final ImageFormat format) {
         this.format = format;
-    }
-
-    @Override
-    public boolean isRequiresHvm() {
-        return requiresHvm;
-    }
-
-    public void setRequiresHvm(final boolean value) {
-        requiresHvm = value;
     }
 
     @Override
@@ -476,10 +458,6 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     @Override
     public long getId() {
         return id;
-    }
-
-    public boolean requiresHvm() {
-        return requiresHvm;
     }
 
     public Date getRemoved() {

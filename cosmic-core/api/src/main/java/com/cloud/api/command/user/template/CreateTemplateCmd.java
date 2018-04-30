@@ -91,8 +91,6 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
             type = CommandType.BOOLEAN,
             description = "true if the template supports the password reset feature; default is false")
     private Boolean passwordEnabled;
-    @Parameter(name = ApiConstants.REQUIRES_HVM, type = CommandType.BOOLEAN, description = "true if the template requres HVM, false otherwise")
-    private Boolean requiresHvm;
     @Deprecated
     @Parameter(name = ApiConstants.URL,
             type = CommandType.STRING,
@@ -135,10 +133,6 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
 
     public Boolean isPasswordEnabled() {
         return passwordEnabled;
-    }
-
-    public Boolean getRequiresHvm() {
-        return requiresHvm;
     }
 
     @Deprecated

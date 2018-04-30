@@ -17,7 +17,6 @@ public interface DownloadManager extends Manager {
      *
      * @param id                     unique id.
      * @param url                    the url from where to download from
-     * @param hvm                    whether the template is a hardware virtual machine
      * @param accountId              the accountId of the iso owner (null if public iso)
      * @param descr                  description of the template
      * @param user                   username used for authentication to the server
@@ -26,10 +25,8 @@ public interface DownloadManager extends Manager {
      * @param resourceType           signifying the type of resource like template, volume etc.
      * @return job-id that can be used to interrogate the status of the download.
      */
-    public String downloadPublicTemplate(long id, String url, String name, ImageFormat format, boolean hvm, Long accountId, String descr, String cksum,
-                                         String installPathPrefix, String templatePath, String userName, String passwd, long maxDownloadSizeInBytes, Proxy proxy, DownloadCommand
-                                                 .ResourceType
-                                                 resourceType);
+    public String downloadPublicTemplate(long id, String url, String name, ImageFormat format, Long accountId, String descr, String cksum, String installPathPrefix,
+                                         String templatePath, String userName, String passwd, long maxDownloadSizeInBytes, Proxy proxy, DownloadCommand.ResourceType resourceType);
 
     Map<String, Processor> getProcessors();
 

@@ -48,8 +48,6 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     private Storage.TemplateType templateType;
     @Column(name = "url")
     private String url = null;
-    @Column(name = "hvm")
-    private boolean requiresHvm;
     @Column(name = "bits")
     private int bits;
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -464,14 +462,6 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setUrl(final String url) {
         this.url = url;
-    }
-
-    public boolean isRequiresHvm() {
-        return requiresHvm;
-    }
-
-    public void setRequiresHvm(final boolean requiresHvm) {
-        this.requiresHvm = requiresHvm;
     }
 
     public int getBits() {

@@ -1,5 +1,6 @@
 (function ($, cloudStack) {
-    var zoneObjs, hypervisorObjs, featuredTemplateObjs, communityTemplateObjs, myTemplateObjs, sharedTemplateObjs, featuredIsoObjs, communityIsoObjs, myIsoObjs, sharedIsoObjs, serviceOfferingObjs,
+    var zoneObjs, hypervisorObjs, featuredTemplateObjs, communityTemplateObjs, myTemplateObjs, sharedTemplateObjs,
+        featuredIsoObjs, communityIsoObjs, myIsoObjs, sharedIsoObjs, serviceOfferingObjs,
         community, networkObjs;
     var selectedZoneObj, selectedTemplateObj, selectedHypervisor, selectedDiskOfferingObj;
     var selectedTemplateOrIso; //'select-template', 'select-iso'
@@ -209,8 +210,13 @@
                 }
                 //***** get templates/ISOs (end) *****
 
-
                 var templatesObj = {};
+                var controllerObjs = [
+                    {id: '', displaytext: 'Default'},
+                    {id: 'IDE', displaytext: 'IDE (Legacy)'},
+                    {id: 'VIRTIO', displaytext: 'VirtIO (virtio-blk)'},
+                    {id: 'SCSI', displaytext: 'VirtIO SCSI (virtio-scsi)'}
+                ];
                 if (selectedTemplateOrIso == 'select-template') {
                     templatesObj = {
                         featuredtemplates: featuredTemplateObjs,
@@ -233,7 +239,8 @@
                     },
                     data: {
                         templates: templatesObj,
-                        hypervisors: hypervisorObjs
+                        hypervisors: hypervisorObjs,
+                        rootDiskControllers: controllerObjs
                     },
                     customHidden: function (args) {
                         if (selectedTemplateOrIso == 'select-template') {
@@ -603,6 +610,14 @@
                 if (args.$wizard.find('input[name=rootDiskSize]').val().length > 0) {
                     $.extend(deployVmData, {
                         rootdisksize: args.$wizard.find('input[name=rootDiskSize]').val()
+                    });
+                }
+            }
+
+            if (args.$wizard.find('select[name=rootdiskcontroller]').parent().css('display') != 'none') {
+                if (args.$wizard.find('select[name=rootdiskcontroller]').val().length > 0) {
+                    $.extend(deployVmData, {
+                        diskcontroller: args.$wizard.find('select[name=rootdiskcontroller]').val()
                     });
                 }
             }

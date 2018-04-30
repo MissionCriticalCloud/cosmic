@@ -189,10 +189,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         if (dnld.getDescription() != null && dnld.getDescription().length() > 1) {
             scr.add("-d", dnld.getDescription());
         }
-        if (dnld.isHvm()) {
-            scr.add("-h");
-        }
-
         // add options common to ISO and template
         final String extension = dnld.getFormat().getFileExtension();
         String templateName = "";
@@ -307,11 +303,9 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     @Override
-    public String downloadPublicTemplate(final long id, final String url, final String name, final ImageFormat format, final boolean hvm, final Long accountId, final String
-            descr, final String cksum,
+    public String downloadPublicTemplate(final long id, final String url, final String name, final ImageFormat format, final Long accountId, final String descr, final String cksum,
                                          final String installPathPrefix, final String templatePath, final String user, final String password, final long maxTemplateSizeInBytes,
-                                         final Proxy proxy, final ResourceType
-                                                 resourceType) {
+                                         final Proxy proxy, final ResourceType resourceType) {
         final UUID uuid = UUID.randomUUID();
         final String jobId = uuid.toString();
         final String tmpDir = installPathPrefix;
@@ -366,7 +360,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             // including mount directory
             // on ssvm, while templatePath is the final relative path on
             // secondary storage.
-            final DownloadJob dj = new DownloadJob(td, jobId, id, name, format, hvm, accountId, descr, cksum, installPathPrefix, resourceType);
+            final DownloadJob dj = new DownloadJob(td, jobId, id, name, format, accountId, descr, cksum, installPathPrefix, resourceType);
             dj.setTmpltPath(templatePath);
             jobs.put(jobId, dj);
             threadPool.execute(td);
@@ -451,7 +445,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 cmd.getMaxDownloadSizeInBytes() == null ? TemplateDownloader.DEFAULT_MAX_TEMPLATE_SIZE_IN_BYTES : cmd.getMaxDownloadSizeInBytes();
         String jobId = null;
         jobId =
-                downloadPublicTemplate(cmd.getId(), cmd.getUrl(), cmd.getName(), cmd.getFormat(), cmd.isHvm(), cmd.getAccountId(), cmd.getDescription(),
+                downloadPublicTemplate(cmd.getId(), cmd.getUrl(), cmd.getName(), cmd.getFormat(), cmd.getAccountId(), cmd.getDescription(),
                         cmd.getChecksum(), installPathPrefix, cmd.getInstallPath(), user, password, maxDownloadSizeInBytes, cmd.getProxy(), resourceType);
         sleep();
         if (jobId == null) {
@@ -765,7 +759,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     private static class DownloadJob {
         private final TemplateDownloader td;
         private final String tmpltName;
-        private final boolean hvm;
         private final ImageFormat format;
         private final String description;
         private final String installPathPrefix;
@@ -776,14 +769,12 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         private long templatesize;
         private long templatePhysicalSize;
 
-        public DownloadJob(final TemplateDownloader td, final String jobId, final long id, final String tmpltName, final ImageFormat format, final boolean hvm, final Long
-                accountId, final String descr, final String cksum,
-                           final String installPathPrefix, final ResourceType resourceType) {
+        public DownloadJob(final TemplateDownloader td, final String jobId, final long id, final String tmpltName, final ImageFormat format, final Long  accountId,
+                           final String descr, final String cksum, final String installPathPrefix, final ResourceType resourceType) {
             super();
             this.td = td;
             this.tmpltName = tmpltName;
             this.format = format;
-            this.hvm = hvm;
             description = descr;
             checksum = cksum;
             this.installPathPrefix = installPathPrefix;
@@ -810,10 +801,6 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
         public ImageFormat getFormat() {
             return format;
-        }
-
-        public boolean isHvm() {
-            return hvm;
         }
 
         public long getId() {

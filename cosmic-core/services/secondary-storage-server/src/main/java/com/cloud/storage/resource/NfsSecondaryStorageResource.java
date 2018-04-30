@@ -1960,7 +1960,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                 final String dataStoreUrl = cmd.getDataTo();
                 final String installPathPrefix = getRootDir(dataStoreUrl) + File.separator + absolutePath;
                 uploadEntity.setInstallPathPrefix(installPathPrefix);
-                uploadEntity.setHvm(cmd.getRequiresHvm());
                 uploadEntity.setChksum(cmd.getChecksum());
                 uploadEntity.setMaxSizeInGB(maxSizeInGB);
                 uploadEntity.setDescription(cmd.getDescription());
@@ -2067,9 +2066,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         scr.add("-S", Long.toString(UploadEntity.s_maxTemplateSize));
         if (uploadEntity.getDescription() != null && uploadEntity.getDescription().length() > 1) {
             scr.add("-d", uploadEntity.getDescription());
-        }
-        if (uploadEntity.isHvm()) {
-            scr.add("-h");
         }
         final String checkSum = uploadEntity.getChksum();
         if (StringUtils.isNotBlank(checkSum)) {

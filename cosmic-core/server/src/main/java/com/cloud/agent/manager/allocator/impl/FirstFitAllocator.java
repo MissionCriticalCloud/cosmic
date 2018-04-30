@@ -407,17 +407,8 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
 
         // If a template requires HVM and a host doesn't support HVM, remove it from consideration
         final List<Host> hostsToCheck = new ArrayList<>();
-        if (template.isRequiresHvm()) {
-            for (final Host host : hosts) {
-                if (hostSupportsHVM(host)) {
-                    hostsToCheck.add(host);
-                } else {
-                    noHvmHosts.add(host);
-                }
-            }
-        } else {
-            hostsToCheck.addAll(hosts);
-        }
+
+        hostsToCheck.addAll(hosts);
 
         if (s_logger.isDebugEnabled()) {
             if (noHvmHosts.size() > 0) {
@@ -443,15 +434,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         hostsToCheck.removeAll(lowPriorityHosts);
 
         // Prioritize the remaining hosts by HVM capability
-        for (final Host host : hostsToCheck) {
-            if (!template.isRequiresHvm() && !hostSupportsHVM(host)) {
-                // Host and template both do not support hvm, put it as first consideration
-                prioritizedHosts.add(0, host);
-            } else {
-                // Template doesn't require hvm, but the machine supports it, make it last for consideration
-                prioritizedHosts.add(host);
-            }
-        }
+        prioritizedHosts.addAll(hostsToCheck);
 
         // Merge the lists
         prioritizedHosts.addAll(0, highPriorityHosts);

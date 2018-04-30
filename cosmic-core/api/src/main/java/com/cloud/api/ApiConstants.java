@@ -61,6 +61,7 @@ public class ApiConstants {
     public static final String DEVICE_ID = "deviceid";
     public static final String DISK_OFFERING_ID = "diskofferingid";
     public static final String DISK_SIZE = "disksize";
+    public static final String DISK_CONTROLLER = "diskcontroller";
     public static final String ROOT_DISK_SIZE = "rootdisksize";
     public static final String DISPLAY_NAME = "displayname";
     public static final String DISPLAY_NETWORK = "displaynetwork";
@@ -194,7 +195,6 @@ public class ApiConstants {
     public static final String PUBLIC_END_PORT = "publicendport";
     public static final String PUBLIC_ZONE = "publiczone";
     public static final String RECEIVED_BYTES = "receivedbytes";
-    public static final String REQUIRES_HVM = "requireshvm";
     public static final String RESOURCE_TYPE = "resourcetype";
     public static final String RESPONSE = "response";
     public static final String REVERTABLE = "revertable";

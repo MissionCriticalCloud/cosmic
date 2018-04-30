@@ -1,6 +1,7 @@
 package com.cloud.storage.dao;
 
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
@@ -289,7 +290,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     }
 
     @Override
-    public void attachVolume(final long volumeId, final long vmId, final long deviceId) {
+    public void attachVolume(final long volumeId, final long vmId, final long deviceId, final DiskControllerType diskController) {
         final VolumeVO volume = createForUpdate(volumeId);
         volume.setInstanceId(vmId);
         volume.setDeviceId(deviceId);
@@ -297,6 +298,9 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         volume.setAttached(new Date());
         if (deviceId == 0L) {
             volume.setVolumeType(Type.ROOT);
+        }
+        if (diskController != null) {
+            volume.setDiskController(diskController);
         }
         update(volumeId, volume);
     }
@@ -393,7 +397,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     @Override
     @DB
     public HypervisorType getHypervisorType(final long volumeId) {
-    /* lookup from cluster of pool */
+        /* lookup from cluster of pool */
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         String sql = null;

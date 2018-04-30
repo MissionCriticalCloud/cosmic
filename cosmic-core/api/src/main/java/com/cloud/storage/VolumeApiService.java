@@ -11,6 +11,7 @@ import com.cloud.api.command.user.volume.UploadVolumeCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.user.Account;
 
 import java.net.MalformedURLException;
@@ -65,7 +66,7 @@ public interface VolumeApiService {
 
     Snapshot allocSnapshot(Long volumeId, Long policyId, String snapshotName) throws ResourceAllocationException;
 
-    Volume updateVolume(long volumeId, String path, String state, Long storageId, Boolean displayVolume, String customId, long owner, String chainInfo);
+    Volume updateVolume(long volumeId, String path, String state, Long storageId, Boolean displayVolume, String customId, long owner, String chainInfo, DiskControllerType diskControllerType);
 
     /**
      * Extracts the volume to a particular location.

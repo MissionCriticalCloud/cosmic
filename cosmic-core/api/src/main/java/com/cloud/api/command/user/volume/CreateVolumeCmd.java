@@ -28,7 +28,8 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVolume", group = APICommandGroup.VolumeService, responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a" +
+@APICommand(name = "createVolume", group = APICommandGroup.VolumeService, responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must " +
+        "still be attached to a" +
         " virtual machine to make use of it.", responseView = ResponseView.Restricted, entityType = {
         Volume.class, VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
@@ -64,6 +65,12 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
             entityType = DiskOfferingResponse.class,
             description = "the ID of the disk offering. Either diskOfferingId or snapshotId must be passed in.")
     private Long diskOfferingId;
+
+    @Parameter(name = ApiConstants.DISK_CONTROLLER,
+            required = false,
+            type = CommandType.STRING,
+            description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
+    private String diskController;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the disk volume")
     private String volumeName;
@@ -230,5 +237,9 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
         } else {
             return displayVolume;
         }
+    }
+
+    public String getDiskController() {
+        return diskController;
     }
 }

@@ -492,7 +492,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         if (tmplt == null) {
             id = _tmpltDao.getNextInSequence(Long.class, "id");
             final VMTemplateVO template =
-                    VMTemplateVO.createPreHostIso(id, isoName, isoName, ImageFormat.ISO, true, true, TemplateType.PERHOST, null, null, true, 64, Account.ACCOUNT_ID_SYSTEM,
+                    VMTemplateVO.createPreHostIso(id, isoName, isoName, ImageFormat.ISO, true, true, TemplateType.PERHOST, null, null, 64, Account.ACCOUNT_ID_SYSTEM,
                             null, "xen-pv-drv-iso", false, 1, false, HypervisorType.XenServer);
             _tmpltDao.persist(template);
         } else {

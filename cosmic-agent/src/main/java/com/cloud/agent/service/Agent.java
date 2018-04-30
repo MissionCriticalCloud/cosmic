@@ -47,6 +47,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -432,6 +433,9 @@ public class Agent implements HandlerFactory, IAgentControl {
                 }
             }
             response = new Response(request, answers);
+        } catch (RuntimeException e) {
+            logger.error("Error while handling request: " + e.getMessage());
+            logger.error(ExceptionUtils.getRootCauseMessage(e));
         } finally {
             if (logger.isDebugEnabled()) {
                 final String responseMsg = response.toString();

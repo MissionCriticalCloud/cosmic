@@ -8,6 +8,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogAction;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogModel;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
+import com.cloud.model.enumeration.DiskControllerType;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,7 +74,7 @@ public class LibvirtDomainXmlParser {
                     }
 
                     def.defNetworkBasedDisk(diskPath, host, port, authUserName, poolUuid, diskLabel,
-                            LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()),
+                            DiskControllerType.valueOf(bus.toUpperCase()),
                             LibvirtDiskDef.DiskProtocol.valueOf(protocol.toUpperCase()), fmt);
                     def.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
                 } else {
@@ -92,13 +93,13 @@ public class LibvirtDomainXmlParser {
                             if (diskFmtType != null) {
                                 fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
                             }
-                            def.defFileBasedDisk(diskFile, diskLabel, LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()), fmt);
+                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), fmt);
                         } else if (device.equalsIgnoreCase("cdrom")) {
                             def.defIsoDisk(diskFile);
                         }
                     } else if (type.equalsIgnoreCase("block")) {
                         def.defBlockBasedDisk(diskDev, diskLabel,
-                                LibvirtDiskDef.DiskBus.valueOf(bus.toUpperCase()));
+                                DiskControllerType.valueOf(bus.toUpperCase()));
                     }
                     if (diskCacheMode != null) {
                         def.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));

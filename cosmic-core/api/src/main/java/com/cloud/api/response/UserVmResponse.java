@@ -5,6 +5,7 @@ import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
@@ -152,6 +153,9 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName("rootdevicetype")
     @Param(description = "device type of the root volume")
     private String rootDeviceType;
+    @SerializedName("rootdevicecontroller")
+    @Param(description = "controller type of the root volume")
+    private DiskControllerType rootDeviceController;
     @SerializedName(ApiConstants.PASSWORD)
     @Param(description = "the password (if exists) of the virtual machine", isSensitive = true)
     private String password;
@@ -692,5 +696,13 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setOsTypeId(final Long osTypeId) {
         this.osTypeId = osTypeId;
+    }
+
+    public DiskControllerType getRootDeviceController() {
+        return rootDeviceController;
+    }
+
+    public void setRootDeviceController(final DiskControllerType rootDeviceController) {
+        this.rootDeviceController = rootDeviceController;
     }
 }
