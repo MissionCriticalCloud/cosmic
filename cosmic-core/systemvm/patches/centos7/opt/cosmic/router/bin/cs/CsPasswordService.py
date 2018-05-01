@@ -1,12 +1,13 @@
 import logging
 import time
-
+import urllib
+import urllib2
 import CsHelper
 from CsProcess import CsProcess
 
 
 class CsPasswordServiceVMConfig:
-    TOKEN_FILE = "/tmp/passwdsrvrtoken"
+    TOKEN_FILE = "/var/cache/cloud/passwdsrvrtoken"
 
     def __init__(self, dbag):
         self.dbag = dbag
@@ -40,13 +41,17 @@ class CsPasswordServiceVMConfig:
                 while test_tries < max_tries:
                     logging.debug("Updating passwd server on %s" % ip)
                     if proc.find():
-                        update_command = 'curl --header "DomU_Request: save_password" "http://{SERVER_IP}:8080/" -F "ip=' \
-                                         '{VM_IP}" -F "password={PASSWORD}" -F "token={TOKEN}"' \
-                                         '>/dev/null 2>/dev/null &'.format(SERVER_IP=ip, VM_IP=vm_ip, PASSWORD=password,
-                                                                           TOKEN=token)
-                        result = CsHelper.execute(update_command)
-                        logging.debug("Update password server result ==> %s" % result)
-                        return result
+                        url = "http://{SERVER_IP}:8080/".format(SERVER_IP=ip)
+                        headers = {'DomU_Request': 'save_password'}
+                        params = {'ip': vm_ip, 'password': password, 'token': token}
+                        req = urllib2.Request(url, urllib.urlencode(params), headers=headers)
+                        try:
+                            res = urllib2.urlopen(req).read()
+                            if res.code == 200:
+                                logging.debug("Update password server result ==> %s" % res)
+                                return res
+                        except Exception as e:
+                            logging.debug("Error while querying password server ==> %s" % e.message)
 
                     test_tries += 1
                     logging.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
