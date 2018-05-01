@@ -479,7 +479,7 @@
                             },
                             complete: function (args) {
                                 if (args.password != null) {
-                                    return 'label.vm.password' + ' ' + args.password;
+                                    return _l('label.vm.password') + ' ' + args.password;
                                 }
 
                                 return false;
@@ -583,7 +583,7 @@
                             },
                             complete: function (args) {
                                 if (args.password != null) {
-                                    return 'label.vm.password' + ' ' + args.password;
+                                    return _l('label.vm.password') + ' ' + args.password;
                                 }
 
                                 return false;
