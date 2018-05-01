@@ -1,6 +1,6 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 
 public abstract class AbstractDownloadCommand extends SsCommand {
 

@@ -1,5 +1,6 @@
 package com.cloud.domain;
 
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

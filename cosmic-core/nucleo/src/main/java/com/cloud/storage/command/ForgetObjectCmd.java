@@ -1,6 +1,6 @@
 package com.cloud.storage.command;
 
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 
 public class ForgetObjectCmd extends StorageSubSystemCommand {
     private final DataTO dataTO;

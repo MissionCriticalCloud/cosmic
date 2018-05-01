@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataStoreTO;
 
 /**
  * This command encapsulates a primitive operation which enables coalescing the backed up VHD snapshots on the secondary server

@@ -4,7 +4,7 @@ import com.cloud.api.command.admin.account.UpdateAccountCmd;
 import com.cloud.api.command.admin.domain.UpdateDomainCmd;
 import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;

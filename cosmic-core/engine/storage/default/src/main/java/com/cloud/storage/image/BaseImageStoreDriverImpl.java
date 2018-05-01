@@ -2,8 +2,8 @@ package com.cloud.storage.image;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.CreateCmdResult;

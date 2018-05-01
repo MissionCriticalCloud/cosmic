@@ -1,5 +1,6 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -19,7 +20,7 @@ public interface KvmStoragePool {
 
     public boolean disconnectPhysicalDisk(String volumeUuid);
 
-    public boolean deletePhysicalDisk(String volumeUuid, Storage.ImageFormat format);
+    public boolean deletePhysicalDisk(String volumeUuid, ImageFormat format);
 
     public List<KvmPhysicalDisk> listPhysicalDisks();
 

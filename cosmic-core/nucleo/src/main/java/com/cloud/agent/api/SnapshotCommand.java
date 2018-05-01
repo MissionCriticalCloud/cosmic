@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.StorageFilerTO;
 
 /**
  * This currently assumes that both primary and secondary storage are mounted on

@@ -1,8 +1,6 @@
 package com.cloud.storage.image.store;
 
 import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
@@ -10,9 +8,11 @@ import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;

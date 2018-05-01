@@ -1,7 +1,7 @@
 package com.cloud.offerings.dao;
 
-import com.cloud.network.Network;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.NetworkOffering.Detail;
@@ -144,7 +144,7 @@ public class NetworkOfferingDaoImpl extends GenericDaoBase<NetworkOfferingVO, Lo
     }
 
     @Override
-    public List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(final NetworkOffering.State state, final TrafficType trafficType, final Network.GuestType type) {
+    public List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(final NetworkOffering.State state, final TrafficType trafficType, final GuestType type) {
         final SearchCriteria<NetworkOfferingVO> sc = AllFieldsSearch.create();
         sc.setParameters("trafficType", trafficType);
         sc.setParameters("guestType", type);

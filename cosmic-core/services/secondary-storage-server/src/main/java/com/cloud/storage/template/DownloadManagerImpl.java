@@ -1,11 +1,11 @@
 package com.cloud.storage.template;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;

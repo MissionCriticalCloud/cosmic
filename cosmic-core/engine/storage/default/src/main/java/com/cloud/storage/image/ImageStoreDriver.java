@@ -3,7 +3,7 @@ package com.cloud.storage.image;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Upload;
 
 public interface ImageStoreDriver extends DataStoreDriver {

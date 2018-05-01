@@ -54,12 +54,12 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.Volume;
@@ -619,7 +619,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
             final DiskOfferingVO diskOffering = _diskOfferingDao.findById(toBeCreated.getDiskOfferingId());
 
-            if (vmProfile.getTemplate().getFormat() == Storage.ImageFormat.ISO && vmProfile.getServiceOffering().getTagsArray().length != 0) {
+            if (vmProfile.getTemplate().getFormat() == ImageFormat.ISO && vmProfile.getServiceOffering().getTagsArray().length != 0) {
                 diskOffering.setTagsArray(Arrays.asList(vmProfile.getServiceOffering().getTagsArray()));
             }
 

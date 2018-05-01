@@ -20,6 +20,7 @@ import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
@@ -85,7 +86,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
         // This guru handles only Guest Isolated network that supports Source nat service
         if (networkType == NetworkType.Advanced &&
                 isMyTrafficType(offering.getTrafficType()) &&
-                offering.getGuestType() != Network.GuestType.Shared &&
+                offering.getGuestType() != GuestType.Shared &&
                 isMyIsolationMethod(physicalNetwork) &&
                 ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;

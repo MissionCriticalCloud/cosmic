@@ -2,11 +2,9 @@ package com.cloud.api.response;
 
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
-import com.cloud.ha.HaWork.Step;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork;
 import com.cloud.serializer.Param;
 import com.cloud.vm.VirtualMachine.State;
-import com.cloud.vm.VirtualMachine.Type;
 
 import java.util.Date;
 
@@ -20,7 +18,7 @@ public class HAWorkerResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.TYPE)
     @Param(description = "Type of the HA worker")
-    private WorkType type;
+    private HaWork.HaWorkType type;
 
     @SerializedName(ApiConstants.CREATED)
     @Param(description = "Date when the HA worker was created")
@@ -28,7 +26,7 @@ public class HAWorkerResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.STEP)
     @Param(description = "Current step the HA worker is at")
-    private Step step;
+    private HaWork.HaWorkStep step;
 
     @SerializedName(ApiConstants.TAKEN)
     @Param(description = "Date of the last step this HA worker has taken")
@@ -74,11 +72,11 @@ public class HAWorkerResponse extends BaseResponse {
         this.id = id;
     }
 
-    public WorkType getType() {
+    public HaWork.HaWorkType getType() {
         return type;
     }
 
-    public void setType(final WorkType type) {
+    public void setType(final HaWork.HaWorkType type) {
         this.type = type;
     }
 
@@ -90,11 +88,11 @@ public class HAWorkerResponse extends BaseResponse {
         this.created = created;
     }
 
-    public Step getStep() {
+    public HaWork.HaWorkStep getStep() {
         return step;
     }
 
-    public void setStep(final Step step) {
+    public void setStep(final HaWork.HaWorkStep step) {
         this.step = step;
     }
 

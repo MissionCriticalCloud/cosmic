@@ -2,7 +2,7 @@ package com.cloud.network.dao;
 
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;

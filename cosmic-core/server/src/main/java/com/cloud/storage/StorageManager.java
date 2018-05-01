@@ -15,8 +15,8 @@ import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.vm.VMInstanceVO;
 

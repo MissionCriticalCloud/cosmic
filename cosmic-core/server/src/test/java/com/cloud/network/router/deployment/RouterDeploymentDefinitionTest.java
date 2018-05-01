@@ -25,10 +25,11 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.NetworkVO;
@@ -716,7 +717,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testSetupAccountOwnerNotNetworkSystem() {
         // Prepare
         when(mockNetworkModel.isNetworkSystem(mockNw)).thenReturn(false);
-        when(mockNw.getGuestType()).thenReturn(Network.GuestType.Shared);
+        when(mockNw.getGuestType()).thenReturn(GuestType.Shared);
         final Account newAccountOwner = mock(Account.class);
         when(mockAccountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM)).thenReturn(newAccountOwner);
         //Execute
@@ -729,7 +730,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testSetupAccountOwnerNotSharedNeitherNetworkSystem() {
         // Prepare
         when(mockNetworkModel.isNetworkSystem(mockNw)).thenReturn(false);
-        when(mockNw.getGuestType()).thenReturn(Network.GuestType.Isolated);
+        when(mockNw.getGuestType()).thenReturn(GuestType.Isolated);
         when(mockAccountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM)).thenReturn(null);
         //Execute
         deployment.setupAccountOwner();

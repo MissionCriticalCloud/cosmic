@@ -2,6 +2,7 @@ package com.cloud.hypervisor.kvm.resource;
 
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Networks;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
@@ -97,7 +98,7 @@ public class BridgeVifDriver extends VifDriverBase {
                     ? nic.getNetworkRateMbps().intValue() * 128 : 0;
         }
 
-        if (nic.getType() == Networks.TrafficType.Guest) {
+        if (nic.getType() == TrafficType.Guest) {
             if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && netId != null && protocol != null
                     && !netId.equalsIgnoreCase("untagged")
                     || nic.getBroadcastType() == Networks.BroadcastDomainType.Vxlan) {
@@ -118,11 +119,11 @@ public class BridgeVifDriver extends VifDriverBase {
                 }
                 intf.defBridgeNet(brname, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Control) {
+        } else if (nic.getType() == TrafficType.Control) {
             /* Make sure the network is still there */
             createControlNetwork();
             intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Public) {
+        } else if (nic.getType() == TrafficType.Public) {
             if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && netId != null && protocol != null
                     && !netId.equalsIgnoreCase("untagged")
                     || nic.getBroadcastType() == Networks.BroadcastDomainType.Vxlan) {
@@ -138,9 +139,9 @@ public class BridgeVifDriver extends VifDriverBase {
                 intf.defBridgeNet(bridges.get("public"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
                         networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Management) {
+        } else if (nic.getType() == TrafficType.Management) {
             intf.defBridgeNet(bridges.get("private"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Storage) {
+        } else if (nic.getType() == TrafficType.Storage) {
             final String storageBrName = nic.getName() == null ? bridges.get("private") : nic.getName();
             intf.defBridgeNet(storageBrName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
         }

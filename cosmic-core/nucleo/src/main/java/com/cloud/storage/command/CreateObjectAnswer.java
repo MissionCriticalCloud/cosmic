@@ -1,7 +1,7 @@
 package com.cloud.storage.command;
 
 import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 
 public final class CreateObjectAnswer extends Answer {
     private DataTO data;

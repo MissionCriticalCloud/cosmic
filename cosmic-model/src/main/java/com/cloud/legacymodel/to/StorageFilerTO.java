@@ -1,4 +1,4 @@
-package com.cloud.agent.api.to;
+package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.model.enumeration.StoragePoolType;

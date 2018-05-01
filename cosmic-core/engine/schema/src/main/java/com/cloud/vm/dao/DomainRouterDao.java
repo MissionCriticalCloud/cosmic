@@ -1,5 +1,6 @@
 package com.cloud.vm.dao;
 
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
@@ -100,7 +101,7 @@ public interface DomainRouterDao extends GenericDao<DomainRouterVO, Long> {
      *
      * @return
      */
-    List<DomainRouterVO> listByStateAndNetworkType(State state, Network.GuestType type, long mgmtSrvrId);
+    List<DomainRouterVO> listByStateAndNetworkType(State state, GuestType type, long mgmtSrvrId);
 
     List<DomainRouterVO> listByStateAndManagementServer(State state, long mgmtSrvrId);
 

@@ -1,5 +1,6 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -38,7 +39,7 @@ public interface StorageAdaptor {
     // handled by your adaptor, return false if not. 2) clean up device, return true
     public boolean disconnectPhysicalDiskByPath(String localPath);
 
-    public boolean deletePhysicalDisk(String uuid, KvmStoragePool pool, Storage.ImageFormat format);
+    public boolean deletePhysicalDisk(String uuid, KvmStoragePool pool, ImageFormat format);
 
     public KvmPhysicalDisk createDiskFromTemplate(KvmPhysicalDisk template,
                                                   String name, PhysicalDiskFormat format, Storage.ProvisioningType provisioningType, long size,

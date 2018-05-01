@@ -2,11 +2,11 @@ package com.cloud.serializer;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.agent.transport.ArrayTypeAdaptor;
 import com.cloud.agent.transport.InterfaceTypeAdaptor;
 import com.cloud.agent.transport.LoggingExclusionStrategy;
+import com.cloud.legacymodel.to.DataStoreTO;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

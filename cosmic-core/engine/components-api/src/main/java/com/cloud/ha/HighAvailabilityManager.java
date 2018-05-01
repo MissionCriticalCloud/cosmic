@@ -1,7 +1,6 @@
 package com.cloud.ha;
 
 import com.cloud.deploy.DeploymentPlanner;
-import com.cloud.ha.HaWork.WorkType;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.utils.component.Manager;
@@ -61,15 +60,15 @@ public interface HighAvailabilityManager extends Manager {
      * Schedules a work item to stop a VM.  This method schedules a work
      * item to do one of three things.
      * <p>
-     * 1. Perform a regular stop of a VM: WorkType.Stop
-     * 2. Perform a force stop of a VM: WorkType.ForceStop
-     * 3. Check if a VM has been stopped: WorkType.CheckStop
+     * 1. Perform a regular stop of a VM: HaWorkType.Stop
+     * 2. Perform a force stop of a VM: HaWorkType.ForceStop
+     * 3. Check if a VM has been stopped: HaWorkType.CheckStop
      *
      * @param vm   virtual machine to stop.
      * @param host host the virtual machine is on.
      * @param type which type of stop is requested.
      */
-    void scheduleStop(VMInstanceVO vm, long hostId, WorkType type);
+    void scheduleStop(VMInstanceVO vm, long hostId, HaWork.HaWorkType type);
 
     void cancelScheduledMigrations(HostVO host);
 

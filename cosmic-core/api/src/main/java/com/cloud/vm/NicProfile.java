@@ -1,11 +1,11 @@
 package com.cloud.vm;
 
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.vm.Nic.ReservationStrategy;
 
 import java.io.Serializable;

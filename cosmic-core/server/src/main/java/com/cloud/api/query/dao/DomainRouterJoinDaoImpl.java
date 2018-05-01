@@ -7,7 +7,7 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;

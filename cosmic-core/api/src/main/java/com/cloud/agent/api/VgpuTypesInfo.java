@@ -12,8 +12,7 @@ public class VgpuTypesInfo {
     private Long remainingCapacity;
     private Long maxCapacity;
 
-    public VgpuTypesInfo(final String groupName, final String modelName, final Long videoRam, final Long maxHeads, final Long maxResolutionX, final Long maxResolutionY, final
-    Long maxVgpuPerGpu,
+    public VgpuTypesInfo(final String groupName, final String modelName, final Long videoRam, final Long maxHeads, final Long maxResolutionX, final Long maxResolutionY, final Long maxVgpuPerGpu,
                          final Long remainingCapacity, final Long maxCapacity) {
         this.groupName = groupName;
         this.modelName = modelName;

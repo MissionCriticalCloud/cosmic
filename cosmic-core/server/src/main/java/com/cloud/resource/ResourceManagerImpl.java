@@ -29,7 +29,6 @@ import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
-import com.cloud.capacity.CapacityState;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.cluster.ClusterManager;
@@ -62,7 +61,7 @@ import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
 import com.cloud.gpu.dao.VGPUTypesDao;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.DetailVO;
 import com.cloud.host.Host;
@@ -84,6 +83,7 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ManagedState;
 import com.cloud.model.enumeration.StoragePoolStatus;
@@ -1043,7 +1043,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         || _serviceOfferingDetailsDao.findDetail(vm.getServiceOfferingId(), GPU.Keys.vgpuType.toString()) != null) {
                     // Migration is not supported for VGPU Vms so stop them.
                     // for the last host in this cluster, stop all the VMs
-                    _haMgr.scheduleStop(vm, hostId, WorkType.ForceStop);
+                    _haMgr.scheduleStop(vm, hostId, HaWork.HaWorkType.ForceStop);
                 } else {
                     _haMgr.scheduleMigration(vm);
                 }

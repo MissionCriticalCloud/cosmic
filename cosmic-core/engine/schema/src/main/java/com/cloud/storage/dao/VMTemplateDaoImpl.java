@@ -7,9 +7,9 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateDetailVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
@@ -148,7 +148,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     public List<VMTemplateVO> listReadyTemplates() {
         final SearchCriteria<VMTemplateVO> sc = createSearchCriteria();
         sc.addAnd("ready", SearchCriteria.Op.EQ, true);
-        sc.addAnd("format", SearchCriteria.Op.NEQ, Storage.ImageFormat.ISO);
+        sc.addAnd("format", SearchCriteria.Op.NEQ, ImageFormat.ISO);
         return listIncludingRemovedBy(sc);
     }
 
@@ -292,7 +292,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
         sb = UserIsoSearch;
         final SearchCriteria<VMTemplateVO> sc = sb.create();
 
-        sc.setParameters("format", Storage.ImageFormat.ISO);
+        sc.setParameters("format", ImageFormat.ISO);
         sc.setParameters("type", TemplateType.USER.toString());
 
         if (!listRemoved) {

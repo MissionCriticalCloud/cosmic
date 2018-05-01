@@ -1,6 +1,6 @@
 package com.cloud.storage.command;
 
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 
 public final class DeleteCommand extends StorageSubSystemCommand {
     private DataTO data;

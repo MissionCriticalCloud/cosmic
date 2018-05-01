@@ -1,6 +1,6 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 
 public class CreateEntityDownloadURLCommand extends AbstractDownloadCommand {
 

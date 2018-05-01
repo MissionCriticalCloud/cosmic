@@ -2,6 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage;
@@ -39,7 +40,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "name")
     private String name;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "public")
     private boolean publicTemplate = true;
     @Column(name = "featured")
@@ -656,11 +657,11 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.createdOnStore = createdOnStore;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

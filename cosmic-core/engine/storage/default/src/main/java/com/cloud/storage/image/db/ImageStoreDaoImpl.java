@@ -1,7 +1,7 @@
 package com.cloud.storage.image.db;
 
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;

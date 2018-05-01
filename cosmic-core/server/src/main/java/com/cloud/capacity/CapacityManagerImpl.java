@@ -28,6 +28,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceListener;

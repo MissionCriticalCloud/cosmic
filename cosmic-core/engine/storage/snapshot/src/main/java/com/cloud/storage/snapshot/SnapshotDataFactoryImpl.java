@@ -7,7 +7,7 @@ import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;

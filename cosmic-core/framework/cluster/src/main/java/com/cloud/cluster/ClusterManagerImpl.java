@@ -5,6 +5,7 @@ import com.cloud.cluster.dao.ManagementServerHostPeerDao;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
+import com.cloud.legacymodel.exceptions.ActiveFencingException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;

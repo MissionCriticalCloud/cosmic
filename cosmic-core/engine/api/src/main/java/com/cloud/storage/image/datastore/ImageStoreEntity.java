@@ -5,8 +5,8 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.ImageStore;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Upload;
 
 import java.util.Set;

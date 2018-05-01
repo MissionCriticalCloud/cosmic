@@ -11,9 +11,10 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
@@ -141,7 +142,7 @@ public class BasicNetworkTopology implements NetworkTopology {
         // if it fails to deploy in original pod; so throwing exception with Pod
         // scope
         if (podId != null && profile.getVirtualMachine().getType() == VirtualMachine.Type.User && network.getTrafficType() == TrafficType.Guest
-                && network.getGuestType() == Network.GuestType.Shared) {
+                && network.getGuestType() == GuestType.Shared) {
             isPodLevelException = true;
         }
 
@@ -163,7 +164,7 @@ public class BasicNetworkTopology implements NetworkTopology {
         boolean isPodLevelException = false;
 
         if (podId != null && profile.getVirtualMachine().getType() == VirtualMachine.Type.User && network.getTrafficType() == TrafficType.Guest
-                && network.getGuestType() == Network.GuestType.Shared) {
+                && network.getGuestType() == GuestType.Shared) {
             isPodLevelException = true;
         }
 

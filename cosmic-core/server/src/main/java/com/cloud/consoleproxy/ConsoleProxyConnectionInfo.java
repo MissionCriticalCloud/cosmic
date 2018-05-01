@@ -1,4 +1,4 @@
-package com.cloud.info;
+package com.cloud.consoleproxy;
 
 public class ConsoleProxyConnectionInfo {
     public int id;

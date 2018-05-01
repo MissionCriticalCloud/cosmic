@@ -1,4 +1,4 @@
-package com.cloud.domain;
+package com.cloud.legacymodel.domain;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
@@ -6,12 +6,8 @@ import com.cloud.legacymodel.user.OwnedBy;
 
 import java.util.Date;
 
-/**
- * Domain defines the Domain object.
- */
-
 public interface Domain extends OwnedBy, Identity, InternalIdentity {
-    public static final long ROOT_DOMAIN = 1L;
+    long ROOT_DOMAIN = 1L;
 
     Long getParent();
 

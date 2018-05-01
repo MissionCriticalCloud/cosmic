@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.LaunchPermissionVO;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.DateUtil;

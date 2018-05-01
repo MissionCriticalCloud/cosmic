@@ -12,6 +12,7 @@ import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -141,7 +142,7 @@ public class FirewallManagerImpl extends ManagerBase implements FirewallService,
         final Account caller = CallContext.current().getCallingAccount();
 
         final Network network = _networkDao.findById(rule.getNetworkId());
-        if (network.getGuestType() == Network.GuestType.Shared) {
+        if (network.getGuestType() == GuestType.Shared) {
             throw new InvalidParameterValueException("Egress firewall rules are not supported for " + network.getGuestType() + "  networks");
         }
 

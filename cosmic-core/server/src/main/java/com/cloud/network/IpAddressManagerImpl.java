@@ -33,15 +33,15 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddress.State;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -395,7 +395,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
         final NetworkOfferingVO networkOffering = _networkOfferingDao.findById(networkOfferingId);
-        if ((networkOffering.getGuestType() == Network.GuestType.Shared)
+        if ((networkOffering.getGuestType() == GuestType.Shared)
                 && (_networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.SourceNat)
                 || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.StaticNat)
                 || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Firewall)
@@ -942,7 +942,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
             final DataCenter zone = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
             if (zone.getNetworkType() == NetworkType.Advanced) {
-                if (network.getGuestType() == Network.GuestType.Shared) {
+                if (network.getGuestType() == GuestType.Shared) {
                     if (isSharedNetworkOfferingWithServices(network.getNetworkOfferingId())) {
                         _accountMgr.checkAccess(CallContext.current().getCallingAccount(), AccessType.UseEntry, false,
                                 network);
@@ -985,7 +985,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         //     - if shared network in Advanced zone
         //     - and it belongs to the system
         if (network.getAccountId() != owner.getId()) {
-            if (zone.getNetworkType() != NetworkType.Basic && !(zone.getNetworkType() == NetworkType.Advanced && network.getGuestType() == Network.GuestType.Shared)) {
+            if (zone.getNetworkType() != NetworkType.Basic && !(zone.getNetworkType() == NetworkType.Advanced && network.getGuestType() == GuestType.Shared)) {
                 throw new InvalidParameterValueException("The owner of the network is not the same as owner of the IP");
             }
         }
@@ -1042,7 +1042,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     protected List<? extends Network> getIsolatedNetworksWithSourceNATOwnedByAccountInZone(final long zoneId, final Account owner) {
 
-        return _networksDao.listSourceNATEnabledNetworks(owner.getId(), zoneId, Network.GuestType.Isolated);
+        return _networksDao.listSourceNATEnabledNetworks(owner.getId(), zoneId, GuestType.Isolated);
     }
 
     @Override

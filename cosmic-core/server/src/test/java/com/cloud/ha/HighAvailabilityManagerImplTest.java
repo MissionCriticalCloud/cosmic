@@ -13,8 +13,8 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.ha.HaWork.Step;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork.HaWorkStep;
+import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.dao.HighAvailabilityDao;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
@@ -204,12 +204,12 @@ public class HighAvailabilityManagerImplTest {
 
     @Test
     public void processWorkWithRetryCountExceeded() {
-        processWorkWithRetryCount(5, Step.Done); // max retry count is 5
+        processWorkWithRetryCount(5, HaWorkStep.Done); // max retry count is 5
     }
 
-    private void processWorkWithRetryCount(final int count, final Step expectedStep) {
+    private void processWorkWithRetryCount(final int count, final HaWorkStep expectedStep) {
         assertNotNull(processWorkMethod);
-        final HaWorkVO work = new HaWorkVO(1l, VirtualMachine.Type.User, WorkType.Migration, Step.Scheduled, 1l, VirtualMachine.State.Running, count, 12345678l);
+        final HaWorkVO work = new HaWorkVO(1l, VirtualMachine.Type.User, HaWorkType.Migration, HaWork.HaWorkStep.Scheduled, 1l, VirtualMachine.State.Running, count, 12345678l);
         Mockito.doReturn(12345678l).when(highAvailabilityManagerSpy).migrate(work);
         try {
             processWorkMethod.invoke(highAvailabilityManagerSpy, work);
@@ -225,6 +225,6 @@ public class HighAvailabilityManagerImplTest {
 
     @Test
     public void processWorkWithRetryCountNotExceeded() {
-        processWorkWithRetryCount(3, Step.Scheduled);
+        processWorkWithRetryCount(3, HaWork.HaWorkStep.Scheduled);
     }
 }

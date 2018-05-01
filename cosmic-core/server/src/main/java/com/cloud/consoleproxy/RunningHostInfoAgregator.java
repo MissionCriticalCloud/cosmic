@@ -1,6 +1,7 @@
-package com.cloud.info;
+package com.cloud.consoleproxy;
 
 import com.cloud.host.Host;
+import com.cloud.info.RunningHostCountInfo;
 
 import java.util.HashMap;
 import java.util.Map;

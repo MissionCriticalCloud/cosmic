@@ -1,6 +1,6 @@
 package com.cloud.network.router;
 
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.vm.DomainRouterVO;

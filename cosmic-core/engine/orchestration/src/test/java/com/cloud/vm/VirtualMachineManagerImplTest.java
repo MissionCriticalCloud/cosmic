@@ -225,7 +225,7 @@ public class VirtualMachineManagerImplTest {
         doNothing().when(_work).setStep(ItWorkVO.Step.Done);
         when(_vmInstanceDao.findByUuid(any(String.class))).thenReturn(_vmMock);
         //doNothing().when(_volsDao).detachVolume(anyLong());
-        //when(_work.setStep(ItWorkVO.Step.Done)).thenReturn("1");
+        //when(_work.setStep(ItWorkVO.HaWorkStep.Done)).thenReturn("1");
 
     }
 

@@ -1,7 +1,7 @@
 package com.cloud.offerings;
 
-import com.cloud.network.Network;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.db.GenericDao;
 
@@ -60,7 +60,7 @@ public class NetworkOfferingVO implements NetworkOffering {
     private Date created;
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
-    private Network.GuestType guestType;
+    private GuestType guestType;
     @Column(name = "dedicated_lb_service")
     private boolean dedicatedLB;
     @Column(name = "shared_source_nat_service")
@@ -100,7 +100,7 @@ public class NetworkOfferingVO implements NetworkOffering {
 
     public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan,
                              final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
-                             final Network.GuestType guestType, final boolean conserveMode, final boolean dedicatedLb, final boolean sharedSourceNat, final boolean redundantRouter,
+                             final GuestType guestType, final boolean conserveMode, final boolean dedicatedLb, final boolean sharedSourceNat, final boolean redundantRouter,
                              final boolean elasticIp, final boolean elasticLb, final boolean specifyIpRanges, final boolean inline, final boolean isPersistent,
                              final boolean associatePublicIP, final boolean publicLb, final boolean egressdefaultpolicy,
                              final boolean supportsStrechedL2) {
@@ -134,7 +134,7 @@ public class NetworkOfferingVO implements NetworkOffering {
 
     public NetworkOfferingVO(final String name, final String displayText, final TrafficType trafficType, final boolean systemOnly, final boolean specifyVlan,
                              final Integer rateMbps, final Integer multicastRateMbps, final boolean isDefault, final Availability availability, final String tags,
-                             final Network.GuestType guestType, final boolean conserveMode, final boolean specifyIpRanges, final boolean isPersistent,
+                             final GuestType guestType, final boolean conserveMode, final boolean specifyIpRanges, final boolean isPersistent,
                              final boolean publicLb) {
         this.name = name;
         this.displayText = displayText;
@@ -177,7 +177,7 @@ public class NetworkOfferingVO implements NetworkOffering {
         this.state = State.Enabled;
     }
 
-    public NetworkOfferingVO(final String name, final Network.GuestType guestType, final boolean specifyVlan) {
+    public NetworkOfferingVO(final String name, final GuestType guestType, final boolean specifyVlan) {
         this(
                 name,
                 "System Offering for " + name,
@@ -273,7 +273,7 @@ public class NetworkOfferingVO implements NetworkOffering {
     }
 
     @Override
-    public Network.GuestType getGuestType() {
+    public GuestType getGuestType() {
         return guestType;
     }
 

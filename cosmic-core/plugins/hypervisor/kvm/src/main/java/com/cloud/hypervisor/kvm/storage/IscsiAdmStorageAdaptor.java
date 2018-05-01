@@ -2,6 +2,7 @@ package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ProvisioningType;
@@ -257,7 +258,7 @@ public class IscsiAdmStorageAdaptor implements StorageAdaptor {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String volumeUuid, final KvmStoragePool pool, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String volumeUuid, final KvmStoragePool pool, final ImageFormat format) {
         throw new UnsupportedOperationException("Deleting a physical disk is not supported.");
     }
 

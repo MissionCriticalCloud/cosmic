@@ -9,7 +9,6 @@ import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.server.ManagementServer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;

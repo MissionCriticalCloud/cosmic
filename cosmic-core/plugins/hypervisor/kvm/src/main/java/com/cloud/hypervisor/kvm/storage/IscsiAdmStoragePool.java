@@ -1,5 +1,6 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -61,7 +62,7 @@ public class IscsiAdmStoragePool implements KvmStoragePool {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String volumeUuid, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String volumeUuid, final ImageFormat format) {
         return storageAdaptor.deletePhysicalDisk(volumeUuid, this, format);
     }
 

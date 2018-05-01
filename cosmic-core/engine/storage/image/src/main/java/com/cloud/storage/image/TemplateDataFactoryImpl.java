@@ -5,7 +5,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;

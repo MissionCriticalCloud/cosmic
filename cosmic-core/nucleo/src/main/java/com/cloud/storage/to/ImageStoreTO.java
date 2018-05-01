@@ -1,7 +1,7 @@
 package com.cloud.storage.to;
 
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.image.datastore.ImageStoreInfo;
 
 public class ImageStoreTO implements DataStoreTO {

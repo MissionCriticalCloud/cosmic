@@ -1,6 +1,5 @@
 package com.cloud.storage.datastore;
 
-import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -14,7 +13,8 @@ import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.dao.SnapshotDao;

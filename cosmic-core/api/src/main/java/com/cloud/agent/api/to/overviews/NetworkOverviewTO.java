@@ -1,8 +1,8 @@
 package com.cloud.agent.api.to.overviews;
 
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.StringUtils;
 
 import java.util.Arrays;

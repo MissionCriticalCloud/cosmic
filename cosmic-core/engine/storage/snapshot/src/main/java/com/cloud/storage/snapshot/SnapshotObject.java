@@ -1,8 +1,7 @@
 package com.cloud.storage.snapshot;
 
 import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
@@ -14,8 +13,9 @@ import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VolumeVO;

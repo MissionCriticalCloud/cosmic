@@ -1,7 +1,7 @@
 package com.cloud.offerings.dao;
 
-import com.cloud.network.Network;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.NetworkOffering.Detail;
@@ -38,7 +38,7 @@ public interface NetworkOfferingDao extends GenericDao<NetworkOfferingVO, Long> 
 
     List<Long> getOfferingIdsToUpgradeFrom(NetworkOffering originalOffering);
 
-    List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(NetworkOffering.State state, TrafficType trafficType, Network.GuestType type);
+    List<NetworkOfferingVO> listByTrafficTypeGuestTypeAndState(NetworkOffering.State state, TrafficType trafficType, GuestType type);
 
     NetworkOfferingVO persist(NetworkOfferingVO off, Map<Detail, String> details);
 }

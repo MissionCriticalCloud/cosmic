@@ -1,8 +1,9 @@
 package com.cloud.network;
 
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 
 import java.net.URI;
 
@@ -26,7 +27,7 @@ public class NetworkProfile implements Network {
     private final String displayText;
     private final String reservationId;
     private final String networkDomain;
-    private final Network.GuestType guestType;
+    private final GuestType guestType;
     private final ACLType aclType;
     private final boolean restartRequired;
     private final boolean specifyIpRanges;
@@ -208,7 +209,7 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public Network.GuestType getGuestType() {
+    public GuestType getGuestType() {
         return guestType;
     }
 

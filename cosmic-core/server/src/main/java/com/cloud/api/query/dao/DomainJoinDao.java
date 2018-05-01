@@ -4,7 +4,7 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.DomainJoinVO;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ResourceLimitAndCountResponse;
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.utils.db.GenericDao;
 
 public interface DomainJoinDao extends GenericDao<DomainJoinVO, Long> {

@@ -2,6 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
@@ -122,7 +123,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "created_on_store")
     private Date createdOnStore;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "download_pct")
     private int downloadPercent;
     @Column(name = "download_state")
@@ -378,7 +379,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.createdOnStore = createdOnStore;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 
@@ -670,7 +671,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return createdOnStore;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 

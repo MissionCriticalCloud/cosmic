@@ -6,9 +6,9 @@ import com.cloud.agent.api.DeleteVMSnapshotCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Volume;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
@@ -21,7 +21,7 @@ import org.libvirt.LibvirtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ResourceWrapper(handles =  DeleteVMSnapshotCommand.class)
+@ResourceWrapper(handles = DeleteVMSnapshotCommand.class)
 public final class LibvirtDeleteVMSnapshotCommandWrapper extends CommandWrapper<DeleteVMSnapshotCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtDeleteVMSnapshotCommandWrapper.class);
@@ -49,7 +49,7 @@ public final class LibvirtDeleteVMSnapshotCommandWrapper extends CommandWrapper<
             if (dm == null) {
                 s_logger.debug("Can not find running vm: " + vmName + ", now we are trying to delete the vm snapshot using qemu-img if the format of root volume is QCOW2");
                 VolumeObjectTO rootVolume = null;
-                for (VolumeObjectTO volume: cmd.getVolumeTOs()) {
+                for (VolumeObjectTO volume : cmd.getVolumeTOs()) {
                     if (volume.getVolumeType() == Volume.Type.ROOT) {
                         rootVolume = volume;
                         break;
@@ -67,7 +67,7 @@ public final class LibvirtDeleteVMSnapshotCommandWrapper extends CommandWrapper<
                     int result = Script.runSimpleBashScriptForExitValue("qemu-img snapshot -d " + cmd.getTarget().getSnapshotName() + " " + rootDisk.getPath());
                     if (result != 0) {
                         return new DeleteVMSnapshotAnswer(cmd, false, "Delete VM Snapshot Failed due to can not remove snapshot from image file " +
-                                rootDisk.getPath()  + " : " + result);
+                                rootDisk.getPath() + " : " + result);
                     } else {
                         return new DeleteVMSnapshotAnswer(cmd, cmd.getVolumeTOs());
                     }

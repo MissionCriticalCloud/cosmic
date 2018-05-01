@@ -18,59 +18,6 @@ public class Storage {
         return nonSharedStoragePoolTypes;
     }
 
-    public enum ImageFormat {
-        QCOW2(true, true, false, "qcow2"),
-        RAW(false, false, false, "raw"),
-        VHD(true, true, true, "vhd"),
-        ISO(false, false, false, "iso"),
-        OVA(true, true, true, "ova"),
-        VHDX(true, true, true, "vhdx"),
-        VMDK(true, true, false, "vmdk"),
-        VDI(true, true, false, "vdi"),
-        TAR(false, false, false, "tar"),
-        DIR(false, false, false, "dir");
-
-        private final boolean supportThinProvisioning;
-        private final boolean supportSparse;
-        private final boolean supportSnapshot;
-        private final String fileExtension;
-
-        ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot) {
-            this.supportThinProvisioning = supportThinProvisioning;
-            this.supportSparse = supportSparse;
-            this.supportSnapshot = supportSnapshot;
-            fileExtension = null;
-        }
-
-        ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot, final String fileExtension) {
-            this.supportThinProvisioning = supportThinProvisioning;
-            this.supportSparse = supportSparse;
-            this.supportSnapshot = supportSnapshot;
-            this.fileExtension = fileExtension;
-        }
-
-        public boolean supportThinProvisioning() {
-            return supportThinProvisioning;
-        }
-
-        public boolean supportsSparse() {
-            return supportSparse;
-        }
-
-        public boolean supportSnapshot() {
-            return supportSnapshot;
-        }
-
-        public String getFileExtension() {
-            if (fileExtension == null) {
-                return toString().toLowerCase();
-            }
-
-            return fileExtension;
-        }
-
-    }
-
     public enum ProvisioningType {
         THIN("thin"),
         SPARSE("sparse"),
@@ -99,10 +46,6 @@ public class Storage {
         public String toString() {
             return provisionType;
         }
-    }
-
-    public enum FileSystem {
-        Unknown, ext3, ntfs, fat, fat32, ext2, ext4, cdfs, hpfs, ufs, hfs, hfsp
     }
 
     public enum TemplateType {

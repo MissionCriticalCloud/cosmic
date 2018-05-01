@@ -1,6 +1,6 @@
 package com.cloud.storage.template;
 
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.storage.template.Processor.FormatInfo;

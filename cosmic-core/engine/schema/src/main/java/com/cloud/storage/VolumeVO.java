@@ -1,6 +1,7 @@
 package com.cloud.storage;
 
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.utils.NumbersUtil;
@@ -114,7 +115,7 @@ public class VolumeVO implements Volume {
     @Enumerated(value = EnumType.STRING)
     private State state;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "provisioning_type")
     private Storage.ProvisioningType provisioningType;
     @Column(name = "iscsi_name")
@@ -396,11 +397,11 @@ public class VolumeVO implements Volume {
     }
 
     @Override
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

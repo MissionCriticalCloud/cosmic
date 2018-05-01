@@ -14,8 +14,7 @@ import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.ha.HaWork.Step;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork.HaWorkStep;
 import com.cloud.ha.Investigator.UnknownVM;
 import com.cloud.ha.dao.HighAvailabilityDao;
 import com.cloud.host.Host;
@@ -247,7 +246,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             hostId = vm.getLastHostId();
         }
 
-        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), WorkType.HA, investigate ? Step.Investigating : Step.Scheduled,
+        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), HaWork.HaWorkType.HA, investigate ? HaWorkStep.Investigating : HaWork.HaWorkStep.Scheduled,
                 hostId != null ? hostId : 0L, vm.getState(), timesTried, vm.getUpdated());
         _haDao.persist(work);
 
@@ -260,12 +259,12 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
     @Override
     public void cancelDestroy(final VMInstanceVO vm, final Long hostId) {
-        _haDao.delete(vm.getId(), WorkType.Destroy);
+        _haDao.delete(vm.getId(), HaWork.HaWorkType.Destroy);
     }
 
     @Override
     public void scheduleDestroy(final VMInstanceVO vm, final long hostId) {
-        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), WorkType.Destroy, Step.Scheduled, hostId, vm.getState(), 0, vm.getUpdated());
+        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), HaWork.HaWorkType.Destroy, HaWork.HaWorkStep.Scheduled, hostId, vm.getState(), 0, vm.getUpdated());
         _haDao.persist(work);
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Scheduled " + work.toString());
@@ -329,7 +328,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     @Override
     public boolean scheduleMigration(final VMInstanceVO vm) {
         if (vm.getHostId() != null) {
-            final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), WorkType.Migration, Step.Scheduled, vm.getHostId(), vm.getState(), 0, vm.getUpdated());
+            final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), HaWork.HaWorkType.Migration, HaWork.HaWorkStep.Scheduled, vm.getHostId(), vm.getState(), 0, vm.getUpdated());
             _haDao.persist(work);
             wakeupWorkers();
         }
@@ -338,7 +337,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
     @Override
     public List<VMInstanceVO> findTakenMigrationWork() {
-        final List<HaWorkVO> works = _haDao.findTakenWorkItems(WorkType.Migration);
+        final List<HaWorkVO> works = _haDao.findTakenWorkItems(HaWork.HaWorkType.Migration);
         final List<VMInstanceVO> vms = new ArrayList<>(works.size());
         for (final HaWorkVO work : works) {
             final VMInstanceVO vm = _instanceDao.findById(work.getInstanceId());
@@ -350,15 +349,15 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     }
 
     @Override
-    public void scheduleStop(final VMInstanceVO vm, final long hostId, final WorkType type) {
-        assert type == WorkType.CheckStop || type == WorkType.ForceStop || type == WorkType.Stop;
+    public void scheduleStop(final VMInstanceVO vm, final long hostId, final HaWork.HaWorkType type) {
+        assert type == HaWork.HaWorkType.CheckStop || type == HaWork.HaWorkType.ForceStop || type == HaWork.HaWorkType.Stop;
 
         if (_haDao.hasBeenScheduled(vm.getId(), type)) {
             s_logger.info("There's already a job scheduled to stop " + vm);
             return;
         }
 
-        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), type, Step.Scheduled, hostId, vm.getState(), 0, vm.getUpdated());
+        final HaWorkVO work = new HaWorkVO(vm.getId(), vm.getType(), type, HaWorkStep.Scheduled, hostId, vm.getState(), 0, vm.getUpdated());
         _haDao.persist(work);
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Scheduled " + work);
@@ -368,7 +367,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
     @Override
     public void cancelScheduledMigrations(final HostVO host) {
-        final WorkType type = host.getType() == HostVO.Type.Storage ? WorkType.Stop : WorkType.Migration;
+        final HaWork.HaWorkType type = host.getType() == HostVO.Type.Storage ? HaWork.HaWorkType.Stop : HaWork.HaWorkType.Migration;
 
         _haDao.deleteMigrationWorkItems(host.getId(), type, _serverId);
     }
@@ -396,16 +395,16 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     }
 
     private void processWork(final HaWorkVO work) {
-        final WorkType wt = work.getWorkType();
+        final HaWork.HaWorkType wt = work.getWorkType();
         try {
             final Long nextTime;
-            if (wt == WorkType.Migration) {
+            if (wt == HaWork.HaWorkType.Migration) {
                 nextTime = migrate(work);
-            } else if (wt == WorkType.HA) {
+            } else if (wt == HaWork.HaWorkType.HA) {
                 nextTime = restart(work);
-            } else if (wt == WorkType.Stop || wt == WorkType.CheckStop || wt == WorkType.ForceStop) {
+            } else if (wt == HaWork.HaWorkType.Stop || wt == HaWork.HaWorkType.CheckStop || wt == HaWork.HaWorkType.ForceStop) {
                 nextTime = stopVM(work);
-            } else if (wt == WorkType.Destroy) {
+            } else if (wt == HaWork.HaWorkType.Destroy) {
                 nextTime = destroyVM(work);
             } else {
                 assert false : "How did we get here with " + wt.toString();
@@ -414,7 +413,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
             if (nextTime == null) {
                 s_logger.info("Completed work " + work);
-                work.setStep(Step.Done);
+                work.setStep(HaWorkStep.Done);
             } else {
                 rescheduleWork(work, nextTime.longValue());
             }
@@ -430,9 +429,9 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             work.setUpdateTime(vm.getUpdated());
             work.setPreviousState(vm.getState());
         }
-        if (!Step.Done.equals(work.getStep()) && work.getTimesTried() >= _maxRetries) {
+        if (!HaWorkStep.Done.equals(work.getStep()) && work.getTimesTried() >= _maxRetries) {
             s_logger.warn("Giving up, retried max. times for work: " + work);
-            work.setStep(Step.Done);
+            work.setStep(HaWorkStep.Done);
         }
         _haDao.update(work.getId(), work);
     }
@@ -442,7 +441,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
         final long srcHostId = work.getHostId();
         try {
-            work.setStep(Step.Migrating);
+            work.setStep(HaWork.HaWorkStep.Migrating);
             _haDao.update(work.getId(), work);
 
             final VMInstanceVO vm = _instanceDao.findById(vmId);
@@ -521,7 +520,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         final String hostDesc = "name: " + host.getName() + "(id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
 
         Boolean alive = null;
-        if (work.getStep() == Step.Investigating) {
+        if (work.getStep() == HaWork.HaWorkStep.Investigating) {
             if (!isHostRemoved) {
                 if (vm.getHostId() == null || vm.getHostId() != work.getHostId()) {
                     s_logger.info("VM " + vm.toString() + " is now no longer on host " + work.getHostId());
@@ -585,7 +584,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
                     throw new CloudRuntimeException("Caught exception even though it should be handled.", e);
                 }
 
-                work.setStep(Step.Scheduled);
+                work.setStep(HaWorkStep.Scheduled);
                 _haDao.update(work.getId(), work);
             } else {
                 s_logger.debug("How come that HA step is Investigating and the host is removed? Calling forced Stop on Vm anyways");
@@ -626,8 +625,8 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             if (_haTag != null) {
                 params.put(VirtualMachineProfile.Param.HaTag, _haTag);
             }
-            final WorkType wt = work.getWorkType();
-            if (wt.equals(WorkType.HA)) {
+            final HaWork.HaWorkType wt = work.getWorkType();
+            if (wt.equals(HaWork.HaWorkType.HA)) {
                 params.put(VirtualMachineProfile.Param.HaOperation, true);
             }
 
@@ -675,16 +674,16 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         final VirtualMachine vm = _itMgr.findById(work.getInstanceId());
         if (vm == null) {
             s_logger.info("No longer can find VM " + work.getInstanceId() + ". Throwing away " + work);
-            work.setStep(Step.Done);
+            work.setStep(HaWork.HaWorkStep.Done);
             return null;
         }
         s_logger.info("Stopping " + vm);
         try {
-            if (work.getWorkType() == WorkType.Stop) {
+            if (work.getWorkType() == HaWork.HaWorkType.Stop) {
                 _itMgr.advanceStop(vm.getUuid(), false);
                 s_logger.info("Successfully stopped " + vm);
                 return null;
-            } else if (work.getWorkType() == WorkType.CheckStop) {
+            } else if (work.getWorkType() == HaWork.HaWorkType.CheckStop) {
                 if (vm.getState() != work.getPreviousState() || vm.getUpdated() != work.getUpdateTime() || vm.getHostId() == null ||
                         vm.getHostId().longValue() != work.getHostId()) {
                     s_logger.info(vm + " is different now.  Scheduled Host: " + work.getHostId() + " Current Host: " +
@@ -695,7 +694,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
                 _itMgr.advanceStop(vm.getUuid(), false);
                 s_logger.info("Stop for " + vm + " was successful");
                 return null;
-            } else if (work.getWorkType() == WorkType.ForceStop) {
+            } else if (work.getWorkType() == HaWork.HaWorkType.ForceStop) {
                 if (vm.getState() != work.getPreviousState() || vm.getUpdated() != work.getUpdateTime() || vm.getHostId() == null ||
                         vm.getHostId().longValue() != work.getHostId()) {
                     s_logger.info(vm + " is different now.  Scheduled Host: " + work.getHostId() + " Current Host: " +
@@ -756,7 +755,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         work.setDateTaken(null);
     }
 
-    private long getRescheduleTime(final WorkType workType) {
+    private long getRescheduleTime(final HaWork.HaWorkType workType) {
         switch (workType) {
             case Migration:
                 return (System.currentTimeMillis() >> 10) + _migrateRetryInterval;

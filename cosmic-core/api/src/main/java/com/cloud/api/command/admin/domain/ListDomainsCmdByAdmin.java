@@ -4,10 +4,11 @@ import com.cloud.api.APICommand;
 import com.cloud.api.APICommandGroup;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.DomainResponse;
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 
-@APICommand(name = "listDomains", group = APICommandGroup.DomainService, description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView =
-        ResponseView.Full, entityType = {Domain.class},
+@APICommand(name = "listDomains", group = APICommandGroup.DomainService, description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class,
+        responseView =
+                ResponseView.Full, entityType = {Domain.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainsCmdByAdmin extends ListDomainsCmd {
 }

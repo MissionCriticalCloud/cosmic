@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Type;
 import com.cloud.storage.SnapshotVO;

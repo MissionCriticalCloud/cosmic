@@ -3,6 +3,7 @@ package com.cloud.hypervisor.kvm.resource;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Networks;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.OutputInterpreter;
@@ -54,7 +55,7 @@ public class OvsVifDriver extends VifDriverBase {
             vlanId = NetUtils.getPrimaryPvlanFromUri(nic.getBroadcastUri());
         }
         final String trafficLabel = nic.getName();
-        if (nic.getType() == Networks.TrafficType.Guest) {
+        if (nic.getType() == TrafficType.Guest) {
             final Integer networkRateKBps = nic.getNetworkRateMbps() != null && nic.getNetworkRateMbps().intValue() != -1
                     ? nic.getNetworkRateMbps().intValue() * 128 : 0;
             if ((nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan
@@ -90,11 +91,11 @@ public class OvsVifDriver extends VifDriverBase {
                 intf.defBridgeNet(bridges.get("guest"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
                         networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Control) {
+        } else if (nic.getType() == TrafficType.Control) {
             /* Make sure the network is still there */
             createControlNetwork(bridges.get("linklocal"));
             intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Public) {
+        } else if (nic.getType() == TrafficType.Public) {
             final Integer networkRateKBps = nic.getNetworkRateMbps() != null && nic.getNetworkRateMbps().intValue() != -1
                     ? nic.getNetworkRateMbps().intValue() * 128 : 0;
             if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && !vlanId.equalsIgnoreCase("untagged")) {
@@ -112,9 +113,9 @@ public class OvsVifDriver extends VifDriverBase {
                 intf.defBridgeNet(bridges.get("public"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
                         networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Management) {
+        } else if (nic.getType() == TrafficType.Management) {
             intf.defBridgeNet(bridges.get("private"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Storage) {
+        } else if (nic.getType() == TrafficType.Storage) {
             final String storageBrName = nic.getName() == null ? bridges.get("private") : nic.getName();
             intf.defBridgeNet(storageBrName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
         }

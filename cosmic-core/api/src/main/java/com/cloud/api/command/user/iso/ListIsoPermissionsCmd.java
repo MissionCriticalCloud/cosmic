@@ -21,7 +21,7 @@ import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.TemplatePermissionsResponse;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
 
 import org.slf4j.Logger;

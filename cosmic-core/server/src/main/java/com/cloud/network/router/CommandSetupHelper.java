@@ -28,11 +28,12 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
@@ -670,7 +671,7 @@ public class CommandSetupHelper {
         final List<NicVO> routerNics = _nicDao.listByVmId(router.getId());
         for (final NicVO routerNic : routerNics) {
             final Network network = _networkModel.getNetwork(routerNic.getNetworkId());
-            if (TrafficType.Guest.equals(network.getTrafficType()) && !Network.GuestType.Sync.equals(network.getGuestType())) {
+            if (TrafficType.Guest.equals(network.getTrafficType()) && !GuestType.Sync.equals(network.getGuestType())) {
                 _userVmDao.listByNetworkIdAndStates(
                         network.getId(),
                         VirtualMachine.State.Starting,

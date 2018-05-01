@@ -1,6 +1,6 @@
-package com.cloud.agent.api.to;
+package com.cloud.legacymodel.to;
 
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 
 public class NfsTO implements DataStoreTO {
 

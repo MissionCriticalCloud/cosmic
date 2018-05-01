@@ -2,6 +2,7 @@ package com.cloud.vm.dao;
 
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
 import com.cloud.network.dao.RouterNetworkDao;
 import com.cloud.network.dao.RouterNetworkVO;
@@ -227,7 +228,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
         if (hostId != null) {
             sc.setParameters("host", hostId);
         }
-        sc.setJoinParameters("networkRouter", "type", Network.GuestType.Isolated);
+        sc.setJoinParameters("networkRouter", "type", GuestType.Isolated);
         final List<DomainRouterVO> routerIds = listBy(sc);
         final List<DomainRouterVO> routers = new ArrayList<>();
         for (final DomainRouterVO router : routerIds) {
@@ -273,7 +274,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     }
 
     @Override
-    public List<DomainRouterVO> listByStateAndNetworkType(final State state, final Network.GuestType type, final long mgmtSrvrId) {
+    public List<DomainRouterVO> listByStateAndNetworkType(final State state, final GuestType type, final long mgmtSrvrId) {
         final SearchCriteria<DomainRouterVO> sc = StateNetworkTypeSearch.create();
         sc.setParameters("state", state);
         sc.setJoinParameters("networkRouter", "type", type);
@@ -367,7 +368,7 @@ public class DomainRouterDaoImpl extends GenericDaoBase<DomainRouterVO, Long> im
     public void addRouterToGuestNetwork(final VirtualRouter router, final Network guestNetwork) {
         if (_routerNetworkDao.findByRouterAndNetwork(router.getId(), guestNetwork.getId()) == null) {
             final NetworkOffering off = _offDao.findById(guestNetwork.getNetworkOfferingId());
-            if (!Network.GuestType.Private.equals(off.getGuestType())) {
+            if (!GuestType.Private.equals(off.getGuestType())) {
                 final TransactionLegacy txn = TransactionLegacy.currentTxn();
                 txn.start();
                 //1) add router to network

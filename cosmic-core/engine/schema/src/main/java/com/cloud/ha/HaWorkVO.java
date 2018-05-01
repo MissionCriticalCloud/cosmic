@@ -42,12 +42,12 @@ public class HaWorkVO implements HaWork {
     private long timeToTry;
     @Column(name = "type", updatable = false, nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private WorkType workType;
+    private HaWorkType workType;
     @Column(name = "updated")
     private long updateTime;
     @Column(name = "step", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private Step step;
+    private HaWorkStep step;
     @Column(name = "vm_type", updatable = false, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private VirtualMachine.Type type;
@@ -57,7 +57,7 @@ public class HaWorkVO implements HaWork {
     protected HaWorkVO() {
     }
 
-    public HaWorkVO(final long instanceId, final VirtualMachine.Type type, final WorkType workType, final Step step, final long hostId, final State previousState,
+    public HaWorkVO(final long instanceId, final VirtualMachine.Type type, final HaWorkType workType, final HaWorkStep step, final long hostId, final State previousState,
                     final int timesTried, final long updated) {
         this.workType = workType;
         this.type = type;
@@ -83,7 +83,7 @@ public class HaWorkVO implements HaWork {
     }
 
     @Override
-    public WorkType getWorkType() {
+    public HaWorkType getWorkType() {
         return workType;
     }
 
@@ -107,11 +107,11 @@ public class HaWorkVO implements HaWork {
     }
 
     @Override
-    public Step getStep() {
+    public HaWorkStep getStep() {
         return step;
     }
 
-    public void setStep(final Step step) {
+    public void setStep(final HaWorkStep step) {
         this.step = step;
     }
 

@@ -4,12 +4,13 @@ import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.offering.NetworkOffering;
@@ -62,7 +63,7 @@ public interface NetworkModel {
 
     boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services);
 
-    List<? extends Network> listNetworksForAccount(long accountId, long zoneId, Network.GuestType type);
+    List<? extends Network> listNetworksForAccount(long accountId, long zoneId, GuestType type);
 
     String getStartIpAddress(long networkId);
 

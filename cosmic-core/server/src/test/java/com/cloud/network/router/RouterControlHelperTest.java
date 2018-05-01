@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.vm.DomainRouterVO;

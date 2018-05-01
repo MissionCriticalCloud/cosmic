@@ -10,7 +10,7 @@ import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.StorageConflictException;
 import com.cloud.legacymodel.storage.StoragePool;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;

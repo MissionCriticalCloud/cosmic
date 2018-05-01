@@ -1,8 +1,8 @@
 package com.cloud.vpc.dao;
 
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.dao.NetworkAccountVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;

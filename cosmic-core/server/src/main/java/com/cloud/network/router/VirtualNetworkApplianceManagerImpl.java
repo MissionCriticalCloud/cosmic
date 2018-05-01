@@ -65,14 +65,14 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteCustomerGateway;
@@ -1536,7 +1536,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     continue;
                 }
                 if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
-                        && network.getGuestType() == Network.GuestType.Isolated) {
+                        && network.getGuestType() == GuestType.Isolated) {
                     final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
                     final String routerType = router.getType().toString();
                     final UserStatisticsVO previousStats = _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), network.getId(),
@@ -1834,7 +1834,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                                 continue;
                             }
                             if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
-                                    && network.getGuestType() == Network.GuestType.Isolated) {
+                                    && network.getGuestType() == GuestType.Isolated) {
                                 final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
                                 final String routerType = router.getType().toString();
                                 final UserStatisticsVO previousStats = _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), network.getId(),

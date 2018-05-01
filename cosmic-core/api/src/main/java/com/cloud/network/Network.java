@@ -4,9 +4,10 @@ import com.cloud.api.Displayable;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
 
@@ -97,10 +98,6 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
     void setNetworkACLId(Long networkACLId);
 
     boolean isStrechedL2Network();
-
-    enum GuestType {
-        Shared, Isolated, Private, Sync
-    }
 
     enum Event {
         ImplementNetwork, DestroyNetwork, OperationSucceeded, OperationFailed

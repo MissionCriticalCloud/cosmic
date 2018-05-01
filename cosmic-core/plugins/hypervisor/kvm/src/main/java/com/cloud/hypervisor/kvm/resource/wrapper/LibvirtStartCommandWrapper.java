@@ -10,7 +10,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.vm.VirtualMachine;

@@ -8,7 +8,7 @@ import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.Upload;
 import com.cloud.storage.UploadVO;

@@ -12,6 +12,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeDef.VolumeFormat;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
@@ -737,7 +738,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String uuid, final KvmStoragePool pool, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String uuid, final KvmStoragePool pool, final ImageFormat format) {
 
         logger.info("Attempting to remove volume " + uuid + " from pool " + pool.getUuid());
 
@@ -785,7 +786,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
         try {
             final StorageVol vol = getVolume(libvirtPool.getPool(), uuid);
             logger.debug("Instructing libvirt to remove volume " + uuid + " from pool " + pool.getUuid());
-            if (Storage.ImageFormat.DIR.equals(format)) {
+            if (ImageFormat.DIR.equals(format)) {
                 deleteDirVol(libvirtPool, vol);
             } else {
                 deleteVol(libvirtPool, vol);

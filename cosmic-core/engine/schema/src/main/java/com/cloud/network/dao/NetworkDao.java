@@ -1,9 +1,9 @@
 package com.cloud.network.dao;
 
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.State;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.fsm.StateDao;
@@ -21,7 +21,7 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
 
     List<NetworkVO> listBy(long accountId, long dataCenterId, String cidr, boolean skipVpc);
 
-    List<NetworkVO> listByZoneAndGuestType(long accountId, long dataCenterId, Network.GuestType type, Boolean isSystem);
+    List<NetworkVO> listByZoneAndGuestType(long accountId, long dataCenterId, GuestType type, Boolean isSystem);
 
     NetworkVO persist(NetworkVO network, boolean gc, Map<String, String> serviceProviderMap);
 
@@ -63,7 +63,7 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
 
     List<NetworkVO> listByPhysicalNetworkTrafficType(long physicalNetworkId, TrafficType trafficType);
 
-    List<NetworkVO> listBy(long accountId, long dataCenterId, Network.GuestType type, TrafficType trafficType);
+    List<NetworkVO> listBy(long accountId, long dataCenterId, GuestType type, TrafficType trafficType);
 
     List<NetworkVO> listByPhysicalNetworkAndProvider(long physicalNetworkId, String providerName);
 
@@ -95,7 +95,7 @@ public interface NetworkDao extends GenericDao<NetworkVO, Long>, StateDao<State,
 
     long countVpcNetworks(long vpcId);
 
-    List<NetworkVO> listNetworksByAccount(long accountId, long zoneId, Network.GuestType type, boolean isSystem);
+    List<NetworkVO> listNetworksByAccount(long accountId, long zoneId, GuestType type, boolean isSystem);
 
     List<NetworkVO> listRedundantNetworks();
 

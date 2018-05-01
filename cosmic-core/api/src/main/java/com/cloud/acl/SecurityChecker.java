@@ -1,8 +1,8 @@
 package com.cloud.acl;
 
 import com.cloud.db.model.Zone;
-import com.cloud.domain.Domain;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;

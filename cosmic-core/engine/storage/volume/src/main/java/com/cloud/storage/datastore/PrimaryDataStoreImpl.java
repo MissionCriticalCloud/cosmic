@@ -1,7 +1,5 @@
 package com.cloud.storage.datastore;
 
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
@@ -18,10 +16,12 @@ import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;

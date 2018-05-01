@@ -22,14 +22,14 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -865,13 +865,13 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final Network.GuestType type) {
+    public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final GuestType type) {
         final List<NetworkVO> accountNetworks = new ArrayList<>();
         final List<NetworkVO> zoneNetworks = _networksDao.listByZone(zoneId);
 
         for (final NetworkVO network : zoneNetworks) {
             if (!isNetworkSystem(network)) {
-                if (network.getGuestType() == Network.GuestType.Shared || !_networksDao.listBy(accountId, network.getId()).isEmpty()) {
+                if (network.getGuestType() == GuestType.Shared || !_networksDao.listBy(accountId, network.getId()).isEmpty()) {
                     if (type == null || type == network.getGuestType()) {
                         accountNetworks.add(network);
                     }
@@ -1439,7 +1439,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             throw new CloudRuntimeException("cannot check permissions on (Network) <null>");
         }
         // Perform account permission check
-        if (network.getGuestType() != Network.GuestType.Shared || network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Account) {
+        if (network.getGuestType() != GuestType.Shared || network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Account) {
             final AccountVO networkOwner = _accountDao.findById(network.getAccountId());
             if (networkOwner == null) {
                 throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
@@ -1497,7 +1497,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public boolean isPrivateGateway(final long ntwkId) {
         final Network network = getNetwork(ntwkId);
         s_logger.debug("Network [" + network.getName() + "] is of type [" + network.getGuestType() + "].");
-        return Network.GuestType.Private.equals(network.getGuestType());
+        return GuestType.Private.equals(network.getGuestType());
     }
 
     @Override
@@ -1517,7 +1517,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public boolean isNetworkAvailableInDomain(final long networkId, final long domainId) {
         final Long networkDomainId;
         final Network network = getNetwork(networkId);
-        if (network.getGuestType() != Network.GuestType.Shared) {
+        if (network.getGuestType() != GuestType.Shared) {
             s_logger.trace("Network id=" + networkId + " is not shared");
             return false;
         }

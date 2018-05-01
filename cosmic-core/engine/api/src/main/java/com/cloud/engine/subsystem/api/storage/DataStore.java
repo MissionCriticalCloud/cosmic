@@ -1,7 +1,7 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.model.enumeration.DataStoreRole;
 
 public interface DataStore {
     DataStoreDriver getDriver();

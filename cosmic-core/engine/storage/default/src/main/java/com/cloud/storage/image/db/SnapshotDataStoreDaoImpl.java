@@ -4,7 +4,7 @@ import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.utils.db.DB;

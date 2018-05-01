@@ -1,4 +1,4 @@
-package com.cloud.host;
+package com.cloud.hypervisor.xenserver.discoverer;
 
 public final class HostInfo {
     public static final String HYPERVISOR_VERSION = "Hypervisor.Version"; //tricky since KVM has userspace version and kernel version

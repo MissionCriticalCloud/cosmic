@@ -1,5 +1,6 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Volume;
 

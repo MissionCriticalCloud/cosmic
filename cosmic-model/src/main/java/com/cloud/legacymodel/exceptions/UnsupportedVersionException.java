@@ -1,6 +1,4 @@
-package com.cloud.exception;
-
-import com.cloud.legacymodel.exceptions.CloudException;
+package com.cloud.legacymodel.exceptions;
 
 public class UnsupportedVersionException extends CloudException {
 

@@ -1,6 +1,6 @@
 package com.cloud.storage.template;
 
-import com.cloud.storage.Storage;
+import com.cloud.model.enumeration.ImageFormat;
 
 public class UploadEntity {
     public static long s_maxTemplateSize = 50L * 1024L * 1024L * 1024L;
@@ -9,7 +9,7 @@ public class UploadEntity {
     private String installPathPrefix;
     private String templatePath;
     private boolean isHvm;
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     private String uuid;
     private long entityId;
     private String chksum;
@@ -100,11 +100,11 @@ public class UploadEntity {
         this.isHvm = isHvm;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

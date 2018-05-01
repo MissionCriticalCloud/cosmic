@@ -3,7 +3,7 @@ package com.cloud.storage.image.datastore;
 import com.cloud.api.ApiConstants;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreDetailVO;

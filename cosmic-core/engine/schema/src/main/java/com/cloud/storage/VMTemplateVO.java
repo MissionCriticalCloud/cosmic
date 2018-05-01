@@ -1,7 +1,7 @@
 package com.cloud.storage;
 
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.db.GenericDao;
@@ -39,7 +39,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     @Column(name = "id", nullable = false)
     private long id;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "unique_name")
     private String uniqueName;
     @Column(name = "name")
@@ -267,7 +267,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     }
 
     @Override
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 

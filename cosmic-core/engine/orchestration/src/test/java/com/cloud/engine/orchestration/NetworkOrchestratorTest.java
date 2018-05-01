@@ -6,11 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NetworkVO;

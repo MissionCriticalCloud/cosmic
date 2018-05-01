@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.domain.PartOf;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.OwnedBy;

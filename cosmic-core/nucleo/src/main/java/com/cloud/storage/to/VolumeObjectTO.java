@@ -1,10 +1,11 @@
 package com.cloud.storage.to;
 
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Volume;
@@ -20,7 +21,7 @@ public class VolumeObjectTO implements DataTO {
     private String vmName;
     private long accountId;
     private String chainInfo;
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     private Storage.ProvisioningType provisioningType;
     private long id;
 
@@ -164,11 +165,11 @@ public class VolumeObjectTO implements DataTO {
         this.chainInfo = chainInfo;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

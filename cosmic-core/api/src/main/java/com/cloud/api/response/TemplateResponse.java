@@ -3,8 +3,8 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.serializer.Param;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
 
 import java.util.Date;

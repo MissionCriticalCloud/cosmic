@@ -5,6 +5,7 @@ import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
 
@@ -86,7 +87,7 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, St
      */
     void setReservationId(String reserv);
 
-    Storage.ImageFormat getFormat();
+    ImageFormat getFormat();
 
     Storage.ProvisioningType getProvisioningType();
 

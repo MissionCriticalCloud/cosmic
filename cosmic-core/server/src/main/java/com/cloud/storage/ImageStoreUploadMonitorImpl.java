@@ -21,6 +21,7 @@ import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Volume.Event;
 import com.cloud.storage.command.UploadStatusAnswer;
 import com.cloud.storage.command.UploadStatusAnswer.UploadStatus;

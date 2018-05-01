@@ -3,7 +3,7 @@ package com.cloud.storage.datastore.db;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.fsm.StateObject;
 

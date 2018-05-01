@@ -7,7 +7,7 @@ import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;

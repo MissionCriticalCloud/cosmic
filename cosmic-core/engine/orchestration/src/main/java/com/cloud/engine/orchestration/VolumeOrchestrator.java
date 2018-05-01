@@ -1,6 +1,5 @@
 package com.cloud.engine.orchestration;
 
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.allocator.PodAllocator;
@@ -47,18 +46,18 @@ import com.cloud.legacymodel.exceptions.InsufficientStorageCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
@@ -676,7 +675,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         StoragePool pool = null;
 
         DiskProfile dskCh = null;
-        if (volume.getVolumeType() == Type.ROOT && Storage.ImageFormat.ISO != template.getFormat()) {
+        if (volume.getVolumeType() == Type.ROOT && ImageFormat.ISO != template.getFormat()) {
             dskCh = createDiskCharacteristics(volume, template, dc, offering);
         } else {
             dskCh = createDiskCharacteristics(volume, template, dc, diskOffering);
@@ -750,14 +749,14 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     protected DiskProfile createDiskCharacteristics(final VolumeInfo volume, final VirtualMachineTemplate template, final DataCenter dc, final DiskOffering diskOffering) {
-        if (volume.getVolumeType() == Type.ROOT && Storage.ImageFormat.ISO != template.getFormat()) {
+        if (volume.getVolumeType() == Type.ROOT && ImageFormat.ISO != template.getFormat()) {
             final TemplateDataStoreVO ss = _vmTemplateStoreDao.findByTemplateZoneDownloadStatus(template.getId(), dc.getId(), VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
             if (ss == null) {
                 throw new CloudRuntimeException("Template " + template.getName() + " has not been completely downloaded to zone " + dc.getId());
             }
 
             return new DiskProfile(volume.getId(), volume.getVolumeType(), volume.getName(), diskOffering.getId(), ss.getSize(), diskOffering.getTagsArray(),
-                    diskOffering.getUseLocalStorage(), diskOffering.isRecreatable(), Storage.ImageFormat.ISO != template.getFormat() ? template.getId() : null);
+                    diskOffering.getUseLocalStorage(), diskOffering.isRecreatable(), ImageFormat.ISO != template.getFormat() ? template.getId() : null);
         } else {
             return new DiskProfile(volume.getId(), volume.getVolumeType(), volume.getName(), diskOffering.getId(), diskOffering.getDiskSize(), diskOffering.getTagsArray(),
                     diskOffering.getUseLocalStorage(), diskOffering.isRecreatable(), null);

@@ -2,8 +2,8 @@ package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.DeleteStoragePoolCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
+import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

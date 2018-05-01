@@ -5,7 +5,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;

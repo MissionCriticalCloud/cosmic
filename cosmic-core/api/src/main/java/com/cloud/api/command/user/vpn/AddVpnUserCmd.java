@@ -11,8 +11,8 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VpnUsersResponse;
 import com.cloud.context.CallContext;
-import com.cloud.domain.Domain;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.VpnUser;
 

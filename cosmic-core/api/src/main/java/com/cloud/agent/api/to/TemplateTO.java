@@ -1,7 +1,7 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
 
 public class TemplateTO implements InternalIdentity {

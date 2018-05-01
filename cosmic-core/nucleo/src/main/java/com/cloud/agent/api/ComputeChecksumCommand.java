@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.storage.SsCommand;
-import com.cloud.agent.api.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataStoreTO;
 
 public class ComputeChecksumCommand extends SsCommand {
     private DataStoreTO store;

@@ -1,6 +1,6 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataStoreTO;
 
 public class ListTemplateCommand extends StorageCommand {
     private DataStoreTO store;

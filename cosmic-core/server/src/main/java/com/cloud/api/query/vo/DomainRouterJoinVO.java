@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.utils.db.GenericDao;

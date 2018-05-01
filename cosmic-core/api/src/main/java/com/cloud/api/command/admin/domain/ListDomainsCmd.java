@@ -8,13 +8,14 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.domain.Domain;
+import com.cloud.legacymodel.domain.Domain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomains", group = APICommandGroup.DomainService, description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class, responseView =
-        ResponseView.Restricted, entityType = {Domain.class},
+@APICommand(name = "listDomains", group = APICommandGroup.DomainService, description = "Lists domains and provides detailed information for listed domains", responseObject = DomainResponse.class,
+        responseView =
+                ResponseView.Restricted, entityType = {Domain.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDomainsCmd.class.getName());

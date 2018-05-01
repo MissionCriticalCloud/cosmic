@@ -6,7 +6,7 @@ import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadCommand;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Upload.Status;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.utils.component.Manager;

@@ -2,7 +2,7 @@ package com.cloud.agent.api.storage;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 
 public class CreatePrivateTemplateAnswer extends Answer {
     private String _path;

@@ -20,7 +20,7 @@ import com.cloud.framework.async.AsyncCallbackDispatcher;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.command.CommandResult;

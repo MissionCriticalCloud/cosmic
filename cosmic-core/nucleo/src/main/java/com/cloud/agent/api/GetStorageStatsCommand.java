@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.LogLevel.Level;
-import com.cloud.agent.api.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.model.enumeration.StoragePoolType;
 
 @LogLevel(Level.Trace)

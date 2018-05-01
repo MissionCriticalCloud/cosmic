@@ -14,13 +14,14 @@ import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
@@ -322,7 +323,7 @@ public class RouterDeploymentDefinition {
     }
 
     protected void setupAccountOwner() {
-        if (networkModel.isNetworkSystem(guestNetwork) || guestNetwork.getGuestType() == Network.GuestType.Shared) {
+        if (networkModel.isNetworkSystem(guestNetwork) || guestNetwork.getGuestType() == GuestType.Shared) {
             owner = accountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM);
         }
     }

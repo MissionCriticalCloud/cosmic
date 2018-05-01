@@ -14,9 +14,9 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -230,8 +230,8 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             throw new InvalidParameterValueException("Network is not part of a VPC: " + network.getUuid());
         }
 
-        if (network.getTrafficType() != Networks.TrafficType.Guest) {
-            throw new InvalidParameterValueException("Network ACL can be created just for networks of type " + Networks.TrafficType.Guest);
+        if (network.getTrafficType() != TrafficType.Guest) {
+            throw new InvalidParameterValueException("Network ACL can be created just for networks of type " + TrafficType.Guest);
         }
 
         if (aclId != NetworkACL.DEFAULT_DENY && aclId != NetworkACL.DEFAULT_ALLOW) {

@@ -1,10 +1,10 @@
 package com.cloud.storage.to;
 
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 
 import java.util.ArrayList;

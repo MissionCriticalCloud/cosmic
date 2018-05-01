@@ -1,19 +1,18 @@
 package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase.SRType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.AttachPrimaryDataStoreAnswer;
@@ -690,7 +689,7 @@ public class XenServerStorageProcessor implements StorageProcessor {
             final TemplateObjectTO newTemplate = new TemplateObjectTO();
 
             newTemplate.setPath(destDir + "/" + templateFilename);
-            newTemplate.setFormat(Storage.ImageFormat.VHD);
+            newTemplate.setFormat(ImageFormat.VHD);
             newTemplate.setHypervisorType(HypervisorType.XenServer);
             newTemplate.setSize(virtualSize);
             newTemplate.setPhysicalSize(physicalSize);

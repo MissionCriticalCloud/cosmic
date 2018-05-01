@@ -26,11 +26,11 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network.State;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.guru.ControlNetworkGuru;
@@ -452,7 +452,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                     if (broadcastDomainType != null) {
                         final NetworkVO network =
                                 new NetworkVO(id, trafficType, mode, broadcastDomainType, networkOfferingId, domainId, accountId, related, null, null, networkDomain,
-                                        Network.GuestType.Shared, zoneId, null, null, specifyIpRanges, null, offering.getRedundantRouter(),
+                                        GuestType.Shared, zoneId, null, null, specifyIpRanges, null, offering.getRedundantRouter(),
                                         zone.getDns1(), zone.getDns2(), null);
                         network.setGuruName(guruNames.get(network.getTrafficType()));
                         network.setState(State.Implemented);

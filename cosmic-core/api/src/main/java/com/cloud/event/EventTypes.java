@@ -1,12 +1,12 @@
 package com.cloud.event;
 
 import com.cloud.config.Configuration;
-import com.cloud.domain.Domain;
 import com.cloud.host.Host;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.dc.StorageNetworkIpRange;
 import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;

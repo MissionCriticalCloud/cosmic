@@ -17,7 +17,6 @@ import com.cloud.agent.api.MigrateWithStorageSendCommand;
 import com.cloud.agent.api.SetupCommand;
 import com.cloud.agent.api.storage.MigrateVolumeCommand;
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.host.HostEnvironment;
@@ -25,8 +24,9 @@ import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 
 import java.util.ArrayList;

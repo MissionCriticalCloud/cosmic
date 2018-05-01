@@ -3,7 +3,6 @@ package com.cloud.engine.cloud.entity.api;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.engine.entity.api.CloudStackEntity;
 import com.cloud.legacymodel.exceptions.CloudException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
@@ -13,7 +12,8 @@ import com.cloud.vm.VirtualMachineProfile;
 import javax.ws.rs.BeanParam;
 import java.util.Map;
 
-public interface VirtualMachineEntity extends CloudStackEntity {
+public interface VirtualMachineEntity {
+    long getId();
 
     String reserve(DeploymentPlanner plannerToUse, @BeanParam DeploymentPlan plan, ExcludeList exclude, String caller) throws InsufficientCapacityException, ResourceUnavailableException;
 

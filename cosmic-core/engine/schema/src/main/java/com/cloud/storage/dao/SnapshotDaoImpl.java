@@ -1,7 +1,7 @@
 package com.cloud.storage.dao;
 
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
 import com.cloud.storage.Snapshot.State;

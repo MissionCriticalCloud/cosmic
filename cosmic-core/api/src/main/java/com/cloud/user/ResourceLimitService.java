@@ -1,9 +1,9 @@
 package com.cloud.user;
 
-import com.cloud.domain.Domain;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.configuration.ResourceCount;
 import com.cloud.legacymodel.configuration.ResourceLimit;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 

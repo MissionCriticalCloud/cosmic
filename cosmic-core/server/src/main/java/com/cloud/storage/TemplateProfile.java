@@ -1,7 +1,7 @@
 package com.cloud.storage;
 
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.Storage.ImageFormat;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 
 import java.util.Map;

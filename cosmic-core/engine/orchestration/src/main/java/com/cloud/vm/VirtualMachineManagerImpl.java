@@ -79,7 +79,8 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
 import com.cloud.gpu.dao.VGPUTypesDao;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork;
+import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
@@ -111,6 +112,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -124,7 +126,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
@@ -458,7 +459,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                     work.setStep(Step.Done);
                                     _workDao.update(work.getId(), work);
                                 } else if (work.getType() == State.Stopping) {
-                                    _haMgr.scheduleStop(vm, vm.getHostId(), WorkType.CheckStop);
+                                    _haMgr.scheduleStop(vm, vm.getHostId(), HaWork.HaWorkType.CheckStop);
                                     work.setManagementServerId(_nodeId);
                                     work.setStep(Step.Done);
                                     _workDao.update(work.getId(), work);
@@ -1920,7 +1921,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                             if (answer == null || !answer.getResult()) {
                                 s_logger.warn("Unable to stop " + vm + " due to " + (answer != null ? answer.getDetails() : "no answers"));
-                                _haMgr.scheduleStop(vm, destHostId, WorkType.ForceStop);
+                                _haMgr.scheduleStop(vm, destHostId, HaWork.HaWorkType.ForceStop);
                                 throw new ExecutionException("Unable to stop this VM, " + vm.getUuid() + " so we are unable to retry the start operation");
                             }
                             throw new ExecutionException("Unable to start  VM:" + vm.getUuid() + " due to error in finalizeStart, not retrying");
@@ -1933,7 +1934,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } catch (final OperationTimedoutException e) {
                     s_logger.debug("Unable to send the start command to host " + dest.getHost() + " failed to start VM: " + vm.getUuid());
                     if (e.isActive()) {
-                        _haMgr.scheduleStop(vm, destHostId, WorkType.CheckStop);
+                        _haMgr.scheduleStop(vm, destHostId, HaWork.HaWorkType.CheckStop);
                     }
                     canRetry = false;
                     throw new AgentUnavailableException("Unable to start " + vm.getHostName(), destHostId, e);
@@ -3404,7 +3405,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 for (final VMInstanceVO instance : instances) {
                     final State state = instance.getState();
                     if (state == State.Stopping) {
-                        _haMgr.scheduleStop(instance, instance.getHostId(), WorkType.CheckStop);
+                        _haMgr.scheduleStop(instance, instance.getHostId(), HaWorkType.CheckStop);
                     } else if (state == State.Starting) {
                         _haMgr.scheduleRestart(instance, true);
                     }

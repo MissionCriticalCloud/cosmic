@@ -1,8 +1,8 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;

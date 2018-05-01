@@ -10,7 +10,7 @@ public interface HaWork {
 
     long getInstanceId();
 
-    WorkType getWorkType();
+    HaWorkType getWorkType();
 
     Long getServerId();
 
@@ -18,7 +18,7 @@ public interface HaWork {
 
     Date getCreated();
 
-    Step getStep();
+    HaWorkStep getStep();
 
     VirtualMachine.State getPreviousState();
 
@@ -32,7 +32,7 @@ public interface HaWork {
 
     long getTimeToTry();
 
-    enum WorkType {
+    enum HaWorkType {
         Migration,  // Migrating VMs off of a host.
         Stop,       // Stops a VM for storage pool migration purposes.  This should be obsolete now.
         CheckStop,  // Checks if a VM has been stopped.
@@ -41,7 +41,15 @@ public interface HaWork {
         HA          // Restart a VM.
     }
 
-    enum Step {
-        Scheduled, Investigating, Fencing, Stopping, Restarting, Migrating, Cancelled, Done, Error
+    enum HaWorkStep {
+        Scheduled,
+        Investigating,
+        Fencing,
+        Stopping,
+        Restarting,
+        Migrating,
+        Cancelled,
+        Done,
+        Error
     }
 }

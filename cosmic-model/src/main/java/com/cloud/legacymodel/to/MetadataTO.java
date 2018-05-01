@@ -1,4 +1,4 @@
-package com.cloud.agent.api.to;
+package com.cloud.legacymodel.to;
 
 public class MetadataTO {
 

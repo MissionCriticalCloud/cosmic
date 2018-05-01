@@ -58,7 +58,6 @@ import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentClusterPlanner;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
@@ -77,6 +76,7 @@ import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
@@ -88,19 +88,19 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.GuestType;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
 import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -1795,7 +1795,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     network = _networkModel.getNetwork(networkId);
                 }
             } else if (network.getGuestType() == null ||
-                    network.getGuestType() == Network.GuestType.Isolated
+                    network.getGuestType() == GuestType.Isolated
                             && _ntwkOffServiceMapDao.areServicesSupportedByNetworkOffering(network.getNetworkOfferingId(), Service.SourceNat)) {
                 throw new InvalidParameterValueException("Can't create direct vlan for network id=" + networkId + " with type: " + network.getGuestType());
             }
@@ -2355,7 +2355,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         Integer networkRate = cmd.getNetworkRate();
         TrafficType trafficType = null;
         Availability availability = null;
-        Network.GuestType guestType = null;
+        GuestType guestType = null;
         final boolean specifyIpRanges = cmd.getSpecifyIpRanges();
         final boolean isPersistent = cmd.getIsPersistent();
         final Map<String, String> detailsStr = cmd.getDetails();
@@ -2380,7 +2380,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Verify offering type
-        for (final Network.GuestType offType : Network.GuestType.values()) {
+        for (final GuestType offType : GuestType.values()) {
             if (offType.name().equalsIgnoreCase(cmd.getGuestIpType())) {
                 guestType = offType;
                 break;
@@ -3568,7 +3568,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @DB
     public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan,
                                                    final Availability availability, final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap,
-                                                   final boolean isDefault, final Network.GuestType type, final boolean systemOnly, final Long serviceOfferingId,
+                                                   final boolean isDefault, final GuestType type, final boolean systemOnly, final Long serviceOfferingId,
                                                    final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service, Map<Capability, String>>
                                                            serviceCapabilityMap,
                                                    final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,

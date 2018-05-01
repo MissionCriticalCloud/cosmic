@@ -1,6 +1,7 @@
 package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -111,7 +112,7 @@ public class LibvirtStoragePool implements KvmStoragePool {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String uuid, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String uuid, final ImageFormat format) {
         return storageAdaptor.deletePhysicalDisk(uuid, this, format);
     }
 

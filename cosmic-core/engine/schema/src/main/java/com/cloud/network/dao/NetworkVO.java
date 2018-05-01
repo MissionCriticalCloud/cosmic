@@ -1,10 +1,11 @@
 package com.cloud.network.dao;
 
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;
@@ -98,7 +99,7 @@ public class NetworkVO implements Network {
     String uuid;
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
-    Network.GuestType guestType;
+    GuestType guestType;
     @Column(name = "acl_type")
     @Enumerated(value = EnumType.STRING)
     ControlledEntity.ACLType aclType;
@@ -423,7 +424,7 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public Network.GuestType getGuestType() {
+    public GuestType getGuestType() {
         return guestType;
     }
 

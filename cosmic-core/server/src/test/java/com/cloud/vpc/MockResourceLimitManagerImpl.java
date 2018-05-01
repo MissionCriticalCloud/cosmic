@@ -1,9 +1,9 @@
 package com.cloud.vpc;
 
-import com.cloud.domain.Domain;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.configuration.ResourceCount;
 import com.cloud.legacymodel.configuration.ResourceLimit;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.user.ResourceLimitService;
@@ -62,7 +62,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForDomain(com.cloud.domain.Domain, com.cloud.legacymodel.configuration.Resource.ResourceType)
+     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForDomain(com.cloud.legacymodel.domain.Domain, com.cloud.legacymodel.configuration.Resource.ResourceType)
      */
     @Override
     public long findCorrectResourceLimitForDomain(final Domain domain, final ResourceType type) {

@@ -2,11 +2,11 @@ package com.cloud.storage.resource;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.DiskTO;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Volume;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.CopyCommand;

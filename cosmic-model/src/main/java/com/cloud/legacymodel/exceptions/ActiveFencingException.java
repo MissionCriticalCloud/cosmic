@@ -1,4 +1,4 @@
-package com.cloud.cluster;
+package com.cloud.legacymodel.exceptions;
 
 public class ActiveFencingException extends Exception {
     public ActiveFencingException(final String message) {

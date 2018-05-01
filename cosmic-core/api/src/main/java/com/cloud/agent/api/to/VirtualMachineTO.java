@@ -1,5 +1,6 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.legacymodel.to.MetadataTO;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.Type;

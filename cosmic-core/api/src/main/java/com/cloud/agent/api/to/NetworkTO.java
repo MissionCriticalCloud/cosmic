@@ -1,7 +1,7 @@
 package com.cloud.agent.api.to;
 
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 
 import java.net.URI;
 

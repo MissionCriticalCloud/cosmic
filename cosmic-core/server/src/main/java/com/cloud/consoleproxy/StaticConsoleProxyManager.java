@@ -5,7 +5,6 @@ import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
-import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;

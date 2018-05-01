@@ -66,7 +66,6 @@ import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.DeploymentPlanningManager;
 import com.cloud.deploy.PlannerHostReservationVO;
 import com.cloud.deploy.dao.PlannerHostReservationDao;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.cloud.entity.api.VirtualMachineEntity;
@@ -97,6 +96,7 @@ import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.CloudException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -117,16 +117,19 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -161,13 +164,10 @@ import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.VMTemplateVO;
@@ -1149,7 +1149,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     private void loadVmDetailsInMapForExternalDhcpIp() {
 
-        final List<NetworkVO> networks = _networkDao.listByGuestType(Network.GuestType.Shared);
+        final List<NetworkVO> networks = _networkDao.listByGuestType(GuestType.Shared);
 
         for (final NetworkVO network : networks) {
             if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
@@ -1693,7 +1693,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Root admin may plug anything, Domain admin is allowed to plug into the public network
         if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
-            if (!(network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Domain)
+            if (!(network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Domain)
                     && !(network.getAclType() == ACLType.Account && network.getAccountId() == vmInstance.getAccountId())
                     && !(caller.getType() == Account.ACCOUNT_TYPE_DOMAIN_ADMIN && TrafficType.Public.equals(network.getTrafficType()))) {
                 throw new InvalidParameterValueException("only shared network or isolated network with the same account_id can be added to vmId: " + vmId);
@@ -2000,7 +2000,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (zone == null) {
             throw new InvalidParameterValueException("There is no dc with the nic");
         }
-        if (zone.getNetworkType() == NetworkType.Advanced && (network.getGuestType() == Network.GuestType.Isolated || network.getGuestType() == Network.GuestType.Private)) {
+        if (zone.getNetworkType() == NetworkType.Advanced && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Private)) {
             try {
                 ipaddr = _ipAddrMgr.allocateGuestIP(network, ipaddr);
             } catch (final InsufficientAddressCapacityException e) {
@@ -2043,7 +2043,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     throw e;
                 }
             }
-        } else if (zone.getNetworkType() == NetworkType.Basic || network.getGuestType() == Network.GuestType.Shared) {
+        } else if (zone.getNetworkType() == NetworkType.Basic || network.getGuestType() == GuestType.Shared) {
             //handle the basic networks here
             //for basic zone, need to provide the podId to ensure proper ip alloation
             Long podId = null;
@@ -2221,8 +2221,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (network == null) {
                 throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0));
             }
-            if (Network.GuestType.Private.equals(network.getGuestType())) {
-                throw new InvalidParameterValueException("Deploying VMs in a network of type " + Network.GuestType.Private + " is not possible.");
+            if (GuestType.Private.equals(network.getGuestType())) {
+                throw new InvalidParameterValueException("Deploying VMs in a network of type " + GuestType.Private + " is not possible.");
             }
             if (network.getVpcId() != null) {
                 // Only ISOs, XenServer, KVM and template types are
@@ -3127,7 +3127,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 }
                 if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
                     // get Virtual networks
-                    final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), Network.GuestType.Isolated);
+                    final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), GuestType.Isolated);
                     if (virtualNetworks.isEmpty()) {
                         final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
                                                                                                                                                               .getTrafficType
@@ -3877,7 +3877,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         ServiceOfferingVO offering = _serviceOfferingDao.findById(serviceOffering.getId());
 
         // check if account/domain is with in resource limits to create a new vm
-        final boolean isIso = Storage.ImageFormat.ISO == template.getFormat();
+        final boolean isIso = ImageFormat.ISO == template.getFormat();
         long size = 0;
 
         // custom root disk size, resizes base template to larger size
@@ -4025,7 +4025,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
             //relax the check if the caller is admin account
             if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
-                if (!(network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Domain)
+                if (!(network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Domain)
                         && !(network.getAclType() == ACLType.Account && network.getAccountId() == accountId)) {
                     throw new InvalidParameterValueException("only shared network or isolated network with the same account_id can be added to vm");
                 }

@@ -1,4 +1,4 @@
-package com.cloud.storage;
+package com.cloud.model.enumeration;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
@@ -29,6 +29,6 @@ public enum DataStoreRole {
     }
 
     public boolean isImageStore() {
-        return (role.equalsIgnoreCase("image") || role.equalsIgnoreCase("imagecache")) ? true : false;
+        return role.equalsIgnoreCase("image") || role.equalsIgnoreCase("imagecache");
     }
 }

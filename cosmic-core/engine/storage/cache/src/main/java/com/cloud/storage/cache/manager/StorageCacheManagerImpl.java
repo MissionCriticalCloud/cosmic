@@ -1,6 +1,5 @@
 package com.cloud.storage.cache.manager;
 
-import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.DataMotionService;
@@ -17,7 +16,8 @@ import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.cache.allocator.StorageCacheAllocator;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.ImageStoreVO;
