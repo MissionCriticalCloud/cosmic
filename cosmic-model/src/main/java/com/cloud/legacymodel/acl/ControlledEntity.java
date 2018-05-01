@@ -1,7 +1,7 @@
-package com.cloud.acl;
+package com.cloud.legacymodel.acl;
 
-import com.cloud.domain.PartOf;
-import com.cloud.user.OwnedBy;
+import com.cloud.legacymodel.domain.PartOf;
+import com.cloud.legacymodel.user.OwnedBy;
 
 /**
  * ControlledEntity defines an object for which the access from an
@@ -10,7 +10,7 @@ import com.cloud.user.OwnedBy;
 public interface ControlledEntity extends OwnedBy, PartOf {
     Class<?> getEntityType();
 
-    public enum ACLType {
+    enum ACLType {
         Account, Domain
     }
 }

@@ -1,8 +1,8 @@
 package com.cloud.network.dao;
 
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
 import com.cloud.network.IpAddress.State;
 import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.tags.dao.ResourceTagDao;

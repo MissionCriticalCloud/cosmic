@@ -9,7 +9,7 @@ import com.cloud.exception.ManagementServerException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.Pair;
 

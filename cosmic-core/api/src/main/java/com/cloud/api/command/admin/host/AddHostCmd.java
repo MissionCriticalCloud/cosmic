@@ -14,7 +14,7 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.host.Host;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;

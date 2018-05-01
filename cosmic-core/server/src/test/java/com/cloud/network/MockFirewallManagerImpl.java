@@ -3,6 +3,7 @@ package com.cloud.network;
 import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.rules.FirewallManager;
@@ -11,7 +12,6 @@ import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRule.TrafficType;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 

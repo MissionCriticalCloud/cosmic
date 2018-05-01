@@ -1,19 +1,18 @@
 package com.cloud.configuration.dao;
 
-import com.cloud.configuration.Resource;
-import com.cloud.configuration.Resource.ResourceOwnerType;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCountVO;
-import com.cloud.configuration.ResourceLimit;
-import com.cloud.domain.dao.DomainDao;
 import com.cloud.domain.DomainVO;
-
+import com.cloud.domain.dao.DomainDao;
 import com.cloud.exception.UnsupportedServiceException;
-import com.cloud.user.dao.AccountDao;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.configuration.Resource.ResourceOwnerType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.configuration.ResourceLimit;
 import com.cloud.user.AccountVO;
-import com.cloud.utils.db.JoinBuilder;
+import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
+import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;

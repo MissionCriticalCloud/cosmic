@@ -10,9 +10,9 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBStickinessResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
@@ -21,7 +21,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLBStickinessPolicies", group = APICommandGroup.LoadBalancerService, description = "Lists load balancer stickiness policies.", responseObject = LBStickinessResponse.class, since = "3.0.0",
+@APICommand(name = "listLBStickinessPolicies", group = APICommandGroup.LoadBalancerService, description = "Lists load balancer stickiness policies.", responseObject = LBStickinessResponse.class,
+        since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListLBStickinessPoliciesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListLBStickinessPoliciesCmd.class.getName());

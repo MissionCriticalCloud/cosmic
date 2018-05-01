@@ -7,7 +7,7 @@ import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.SSHKeyPairResponse;
-import com.cloud.user.SSHKeyPair;
+import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.utils.Pair;
 
 import java.util.ArrayList;

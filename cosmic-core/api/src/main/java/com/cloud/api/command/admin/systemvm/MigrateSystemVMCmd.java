@@ -18,14 +18,15 @@ import com.cloud.exception.ManagementServerException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.host.Host;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "migrateSystemVm", group = APICommandGroup.SystemVMService, description = "Attempts Migration of a system virtual machine to the host specified.", responseObject = SystemVmResponse.class, entityType
+@APICommand(name = "migrateSystemVm", group = APICommandGroup.SystemVMService, description = "Attempts Migration of a system virtual machine to the host specified.", responseObject =
+        SystemVmResponse.class, entityType
         = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class MigrateSystemVMCmd extends BaseAsyncCmd {

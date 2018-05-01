@@ -1,5 +1,6 @@
 package com.cloud.dc;
 
+import com.cloud.legacymodel.dc.DedicatedResources;
 import com.cloud.utils.NumbersUtil;
 
 import javax.persistence.Column;

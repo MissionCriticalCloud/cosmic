@@ -1,8 +1,8 @@
 package com.cloud.network.vpc;
 
 import com.cloud.api.Displayable;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 public interface NetworkACL extends InternalIdentity, Identity, Displayable {
     long DEFAULT_DENY = 1;

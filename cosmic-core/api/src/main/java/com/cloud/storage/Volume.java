@@ -1,18 +1,17 @@
 package com.cloud.storage;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.api.Displayable;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.template.BasedOn;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
 
 import java.util.Arrays;
 import java.util.Date;
 
-public interface Volume extends ControlledEntity, Identity, InternalIdentity, BasedOn, StateObject<Volume.State>, Displayable {
+public interface Volume extends ControlledEntity, Identity, InternalIdentity, StateObject<Volume.State>, Displayable {
     /**
      * @return the volume name
      */
@@ -28,6 +27,8 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, Ba
     Long getMaxIops();
 
     String get_iScsiName();
+
+    Long getTemplateId();
 
     /**
      * @return the vm instance id

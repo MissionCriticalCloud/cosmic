@@ -16,9 +16,9 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
@@ -28,8 +28,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createEgressFirewallRule", group = APICommandGroup.FirewallService, description = "Creates a egress firewall rule for a given network ", responseObject = FirewallResponse.class, entityType =
-        {FirewallRule.class},
+@APICommand(name = "createEgressFirewallRule", group = APICommandGroup.FirewallService, description = "Creates a egress firewall rule for a given network ", responseObject = FirewallResponse.class,
+        entityType =
+                {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateEgressFirewallRuleCmd extends BaseAsyncCreateCmd implements FirewallRule {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateEgressFirewallRuleCmd.class.getName());

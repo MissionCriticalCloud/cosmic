@@ -14,8 +14,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SnapshotResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.Snapshot;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

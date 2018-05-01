@@ -1,9 +1,9 @@
 package com.cloud.network.topology;
 
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;

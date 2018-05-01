@@ -12,8 +12,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -22,7 +22,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateAccount", group = APICommandGroup.AccountService, description = "Updates account information for the authenticated user", responseObject = AccountResponse.class, entityType = {Account.class},
+@APICommand(name = "updateAccount", group = APICommandGroup.AccountService, description = "Updates account information for the authenticated user", responseObject = AccountResponse.class,
+        entityType = {Account.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class UpdateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateAccountCmd.class.getName());

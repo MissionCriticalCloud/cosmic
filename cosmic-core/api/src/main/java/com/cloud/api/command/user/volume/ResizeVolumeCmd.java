@@ -17,15 +17,16 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Volume;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "resizeVolume", group = APICommandGroup.VolumeService, description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted, entityType = {Volume.class},
+@APICommand(name = "resizeVolume", group = APICommandGroup.VolumeService, description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted, entityType
+        = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ResizeVolumeCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ResizeVolumeCmd.class.getName());

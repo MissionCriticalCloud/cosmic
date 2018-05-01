@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.utils.db.GenericDao;

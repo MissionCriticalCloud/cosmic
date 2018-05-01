@@ -9,9 +9,9 @@ import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
 import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.framework.jobs.impl.SyncQueueItem;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.managed.threadlocal.ManagedThreadLocal;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

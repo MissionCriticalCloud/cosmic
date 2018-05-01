@@ -1,8 +1,9 @@
 package com.cloud.vpc;
 
-import com.cloud.dc.Vlan;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -24,7 +25,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.user.Account;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.Nic;
@@ -429,7 +429,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#checkNetworkPermissions(com.cloud.user.Account, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#checkNetworkPermissions(com.cloud.legacymodel.user.Account, com.cloud.network.Network)
      */
     @Override
     public void checkNetworkPermissions(final Account owner, final Network network) {
@@ -653,7 +653,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getSourceNatIpAddressForGuestNetwork(com.cloud.user.Account, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#getSourceNatIpAddressForGuestNetwork(com.cloud.legacymodel.user.Account, com.cloud.network.Network)
      */
     @Override
     public PublicIpAddress getSourceNatIpAddressForGuestNetwork(final Account owner, final Network guestNetwork) {

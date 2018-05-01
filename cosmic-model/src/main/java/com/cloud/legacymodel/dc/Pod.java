@@ -1,14 +1,13 @@
-package com.cloud.dc;
+package com.cloud.legacymodel.dc;
 
-import com.cloud.acl.InfrastructureEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.model.enumeration.AllocationState;
 
 /**
- * Represents one pod in the cloud stack.
+ * Represents one pod in the Cosmic.
  */
-public interface Pod extends InfrastructureEntity, Identity, InternalIdentity {
+public interface Pod extends Identity, InternalIdentity {
 
     String getCidrAddress();
 
@@ -23,8 +22,6 @@ public interface Pod extends InfrastructureEntity, Identity, InternalIdentity {
     String getName();
 
     AllocationState getAllocationState();
-
-    boolean getExternalDhcp();
 
     boolean belongsToDataCenter(final long dataCenterId);
 }

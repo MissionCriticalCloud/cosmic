@@ -1,6 +1,6 @@
 package com.cloud.exception;
 
-import com.cloud.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
 
 public class ResourceAllocationException extends ManagementServerException {
     private final ResourceType resourceType;

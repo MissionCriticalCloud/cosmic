@@ -1,11 +1,11 @@
 package com.cloud.vpc;
 
-import com.cloud.configuration.Resource.ResourceType;
-import com.cloud.configuration.ResourceCount;
-import com.cloud.configuration.ResourceLimit;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ResourceAllocationException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.configuration.ResourceCount;
+import com.cloud.legacymodel.configuration.ResourceLimit;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.component.ManagerBase;
 
@@ -47,7 +47,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForAccount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
+     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForAccount(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.configuration.Resource.ResourceType)
      */
     @Override
     public long findCorrectResourceLimitForAccount(final Account account, final ResourceType type) {
@@ -62,7 +62,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForDomain(com.cloud.domain.Domain, com.cloud.configuration.Resource.ResourceType)
+     * @see com.cloud.user.ResourceLimitService#findCorrectResourceLimitForDomain(com.cloud.domain.Domain, com.cloud.legacymodel.configuration.Resource.ResourceType)
      */
     @Override
     public long findCorrectResourceLimitForDomain(final Domain domain, final ResourceType type) {
@@ -71,7 +71,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#incrementResourceCount(long, com.cloud.configuration.Resource.ResourceType, java.lang.Long[])
+     * @see com.cloud.user.ResourceLimitService#incrementResourceCount(long, com.cloud.legacymodel.configuration.Resource.ResourceType, java.lang.Long[])
      */
     @Override
     public void incrementResourceCount(final long accountId, final ResourceType type, final Long... delta) {
@@ -80,7 +80,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#decrementResourceCount(long, com.cloud.configuration.Resource.ResourceType, java.lang.Long[])
+     * @see com.cloud.user.ResourceLimitService#decrementResourceCount(long, com.cloud.legacymodel.configuration.Resource.ResourceType, java.lang.Long[])
      */
     @Override
     public void decrementResourceCount(final long accountId, final ResourceType type, final Long... delta) {
@@ -89,7 +89,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#checkResourceLimit(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType, long[])
+     * @see com.cloud.user.ResourceLimitService#checkResourceLimit(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.configuration.Resource.ResourceType, long[])
      */
     @Override
     public void checkResourceLimit(final Account account, final ResourceType type, final long... count) throws ResourceAllocationException {
@@ -98,7 +98,7 @@ public class MockResourceLimitManagerImpl extends ManagerBase implements Resourc
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.user.ResourceLimitService#getResourceCount(com.cloud.user.Account, com.cloud.configuration.Resource.ResourceType)
+     * @see com.cloud.user.ResourceLimitService#getResourceCount(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.configuration.Resource.ResourceType)
      */
     @Override
     public long getResourceCount(final Account account, final ResourceType type) {

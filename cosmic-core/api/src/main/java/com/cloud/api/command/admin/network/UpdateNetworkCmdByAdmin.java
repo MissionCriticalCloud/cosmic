@@ -10,15 +10,16 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.context.CallContext;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.network.Network;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateNetwork", group = APICommandGroup.NetworkService, description = "Updates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Full, entityType = {Network.class},
+@APICommand(name = "updateNetwork", group = APICommandGroup.NetworkService, description = "Updates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Full, entityType =
+        {Network.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateNetworkCmdByAdmin extends UpdateNetworkCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateNetworkCmdByAdmin.class.getName());

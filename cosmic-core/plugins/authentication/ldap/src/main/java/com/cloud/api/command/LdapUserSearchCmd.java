@@ -9,7 +9,7 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

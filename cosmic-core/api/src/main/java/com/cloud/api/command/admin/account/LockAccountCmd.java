@@ -7,7 +7,7 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 
 import org.slf4j.Logger;

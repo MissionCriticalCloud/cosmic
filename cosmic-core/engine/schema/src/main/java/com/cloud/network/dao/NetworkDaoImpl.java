@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Event;
 import com.cloud.network.Network.GuestType;

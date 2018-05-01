@@ -13,8 +13,8 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.exception.InvalidParameterValueException;
 

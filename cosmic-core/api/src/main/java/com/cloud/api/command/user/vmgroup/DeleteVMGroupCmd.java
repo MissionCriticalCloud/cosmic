@@ -11,7 +11,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.InstanceGroupResponse;
 import com.cloud.api.response.SuccessResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.vm.InstanceGroup;
 
 import org.slf4j.Logger;

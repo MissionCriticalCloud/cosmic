@@ -14,9 +14,9 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.element.VirtualRouterElementService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 import java.util.List;

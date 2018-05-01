@@ -10,8 +10,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.PhysicalNetwork;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 
 import java.util.ArrayList;

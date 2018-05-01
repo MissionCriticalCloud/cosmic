@@ -128,7 +128,7 @@ public class Networks {
          * @throws URISyntaxException when the string can not be converted to URI
          */
         public static BroadcastDomainType getTypeOf(final String str) throws URISyntaxException {
-            if (com.cloud.dc.Vlan.UNTAGGED.equalsIgnoreCase(str)) {
+            if (com.cloud.legacymodel.dc.Vlan.UNTAGGED.equalsIgnoreCase(str)) {
                 return Native;
             }
             return getSchemeValue(new URI(str));
@@ -215,7 +215,7 @@ public class Networks {
                 Long.parseLong(candidate);
                 return Vlan.toUri(candidate);
             } catch (final NumberFormatException nfe) {
-                if (com.cloud.dc.Vlan.UNTAGGED.equalsIgnoreCase(candidate)) {
+                if (com.cloud.legacymodel.dc.Vlan.UNTAGGED.equalsIgnoreCase(candidate)) {
                     return Native.toUri(candidate);
                 }
                 try {

@@ -8,11 +8,11 @@ import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
-import com.cloud.user.Account;
 import com.cloud.utils.component.Adapter;
 
 import java.util.List;

@@ -6,12 +6,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * wrap exceptions that you know there's no point in dealing with.
  */
-public class CloudRuntimeException extends RuntimeException implements ErrorContext {
+public class CloudRuntimeException extends RuntimeException {
 
     // This holds a list of uuids and their descriptive names.
     transient protected ArrayList<ExceptionProxyObject> idList = new ArrayList<>();
@@ -53,15 +52,9 @@ public class CloudRuntimeException extends RuntimeException implements ErrorCont
         idList.add(proxy);
     }
 
-    @Override
     public CloudRuntimeException add(final Class<?> entity, final String uuid) {
         uuidList.add(new Pair<>(entity, uuid));
         return this;
-    }
-
-    @Override
-    public List<Pair<Class<?>, String>> getEntitiesInError() {
-        return uuidList;
     }
 
     public ArrayList<ExceptionProxyObject> getIdProxyList() {

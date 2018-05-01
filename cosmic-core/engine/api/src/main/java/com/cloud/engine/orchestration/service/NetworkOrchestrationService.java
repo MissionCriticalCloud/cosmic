@@ -1,6 +1,5 @@
 package com.cloud.engine.orchestration.service;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -12,6 +11,9 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.ConfigKey.Scope;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -25,8 +27,6 @@ import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 import com.cloud.utils.Pair;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;

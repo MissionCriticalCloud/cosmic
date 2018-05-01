@@ -1,11 +1,14 @@
 package com.cloud.user;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.RoleType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.admin.user.RegisterCmd;
 import com.cloud.domain.Domain;
 import com.cloud.exception.PermissionDeniedException;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 

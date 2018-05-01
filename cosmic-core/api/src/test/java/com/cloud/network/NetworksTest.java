@@ -1,6 +1,6 @@
 package com.cloud.network;
 
-import com.cloud.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.utils.exception.CloudRuntimeException;

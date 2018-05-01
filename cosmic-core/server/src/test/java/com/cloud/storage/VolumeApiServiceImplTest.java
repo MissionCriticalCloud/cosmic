@@ -6,7 +6,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.user.volume.CreateVolumeCmd;
 import com.cloud.api.command.user.volume.DetachVolumeCmd;
@@ -22,20 +21,21 @@ import com.cloud.framework.jobs.AsyncJobExecutionContext;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
+import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.user.dao.AccountDao;
-import com.cloud.user.ResourceLimitService;
-import com.cloud.configuration.Resource;
-import com.cloud.host.dao.HostDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
+import com.cloud.user.ResourceLimitService;
 import com.cloud.user.UserVO;
+import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.UserVmVO;
@@ -358,7 +358,8 @@ public class VolumeApiServiceImplTest {
     //The resource limit check for primary storage should not be skipped for Volume in 'Uploaded' state.
     @Test
     public void testResourceLimitCheckForUploadedVolume() throws NoSuchFieldException, IllegalAccessException, ResourceAllocationException {
-        doThrow(new ResourceAllocationException("primary storage resource limit check failed", Resource.ResourceType.primary_storage)).when(_svc._resourceLimitMgr).checkResourceLimit(any(AccountVO.class), any(Resource.ResourceType.class), any(Long.class));
+        doThrow(new ResourceAllocationException("primary storage resource limit check failed", Resource.ResourceType.primary_storage)).when(_svc._resourceLimitMgr).checkResourceLimit(any(AccountVO
+                .class), any(Resource.ResourceType.class), any(Long.class));
         UserVmVO vm = Mockito.mock(UserVmVO.class);
         VolumeInfo volumeToAttach = Mockito.mock(VolumeInfo.class);
         when(volumeToAttach.getId()).thenReturn(9L);

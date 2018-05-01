@@ -11,10 +11,10 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.UserResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
 
 import javax.inject.Inject;
 

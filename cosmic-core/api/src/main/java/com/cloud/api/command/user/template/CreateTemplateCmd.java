@@ -20,11 +20,11 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Collection;
@@ -34,7 +34,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createTemplate", group = APICommandGroup.TemplateService, responseObject = TemplateResponse.class, description = "Creates a template of a virtual machine. " + "The virtual machine must be in a " +
+@APICommand(name = "createTemplate", group = APICommandGroup.TemplateService, responseObject = TemplateResponse.class, description = "Creates a template of a virtual machine. " + "The virtual " +
+        "machine must be in a " +
         "STOPPED state. "
         + "A template created from this command is automatically designated as a private template visible to the account that created it.", responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

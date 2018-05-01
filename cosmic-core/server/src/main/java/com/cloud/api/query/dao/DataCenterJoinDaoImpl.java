@@ -7,7 +7,7 @@ import com.cloud.api.query.vo.DataCenterJoinVO;
 import com.cloud.api.query.vo.ResourceTagJoinVO;
 import com.cloud.api.response.ResourceTagResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.dc.DataCenter;
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;

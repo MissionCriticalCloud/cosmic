@@ -1,7 +1,7 @@
 package com.cloud.network.vpc;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 public interface VpcOffering extends InternalIdentity, Identity {
     public static final String defaultVPCOfferingName = "Default VPC offering";

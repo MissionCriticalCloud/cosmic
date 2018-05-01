@@ -1,8 +1,8 @@
 package com.cloud.affinity.dao;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.affinity.AffinityGroupDomainMapVO;
 import com.cloud.affinity.AffinityGroupVO;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder.JoinType;
 import com.cloud.utils.db.SearchBuilder;

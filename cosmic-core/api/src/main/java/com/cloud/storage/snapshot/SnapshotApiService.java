@@ -2,9 +2,9 @@ package com.cloud.storage.snapshot;
 
 import com.cloud.api.command.user.snapshot.ListSnapshotsCmd;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 
 import java.util.List;

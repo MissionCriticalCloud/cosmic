@@ -8,13 +8,13 @@ import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
-import com.cloud.dc.StorageNetworkIpRange;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.StorageNetworkIpRange;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,5 @@
 package com.cloud.affinity;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
@@ -18,7 +16,9 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.uservm.UserVm;

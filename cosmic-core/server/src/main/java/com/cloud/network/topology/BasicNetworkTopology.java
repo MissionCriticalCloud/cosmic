@@ -1,7 +1,5 @@
 package com.cloud.network.topology;
 
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.AgentUnavailableException;
@@ -9,6 +7,8 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;

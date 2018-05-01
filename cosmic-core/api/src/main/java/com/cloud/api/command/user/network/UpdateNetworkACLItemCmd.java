@@ -12,8 +12,8 @@ import com.cloud.api.response.NetworkACLItemResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.user.Account;
 
 import java.util.List;
 

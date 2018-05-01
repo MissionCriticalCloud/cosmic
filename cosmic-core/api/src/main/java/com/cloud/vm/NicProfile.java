@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.BroadcastDomainType;

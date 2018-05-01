@@ -22,7 +22,7 @@ import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.StorageUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.exception.ExecutionException;
 import com.cloud.vm.VirtualMachine;
@@ -30,7 +30,8 @@ import com.cloud.vm.VirtualMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "startVirtualMachine", group = APICommandGroup.VirtualMachineService, responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView = ResponseView.Restricted, entityType =
+@APICommand(name = "startVirtualMachine", group = APICommandGroup.VirtualMachineService, responseObject = UserVmResponse.class, description = "Starts a virtual machine.", responseView =
+        ResponseView.Restricted, entityType =
         {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class StartVMCmd extends BaseAsyncCmd {

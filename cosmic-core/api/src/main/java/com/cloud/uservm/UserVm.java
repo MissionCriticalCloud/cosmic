@@ -1,6 +1,6 @@
 package com.cloud.uservm;
 
-import com.cloud.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.vm.VirtualMachine;
 
 /**

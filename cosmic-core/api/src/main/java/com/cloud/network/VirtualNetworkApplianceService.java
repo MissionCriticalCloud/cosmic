@@ -5,8 +5,8 @@ import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.user.Account;
 
 import java.util.List;
 

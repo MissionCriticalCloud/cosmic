@@ -13,8 +13,8 @@ import com.cloud.api.response.VpnUsersResponse;
 import com.cloud.context.CallContext;
 import com.cloud.domain.Domain;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.VpnUser;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

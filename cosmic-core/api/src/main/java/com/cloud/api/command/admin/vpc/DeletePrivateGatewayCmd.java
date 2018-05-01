@@ -15,7 +15,6 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.network.vpc.VpcGateway;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;

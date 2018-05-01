@@ -1,10 +1,10 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
 import com.cloud.host.Host.Type;
 import com.cloud.host.Status;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceState;
 import com.cloud.utils.db.GenericDao;

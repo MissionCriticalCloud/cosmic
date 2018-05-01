@@ -9,7 +9,7 @@ import com.cloud.api.command.admin.router.UpgradeRouterCmd;
 import com.cloud.api.response.HypervisorResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;

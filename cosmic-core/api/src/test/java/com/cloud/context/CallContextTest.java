@@ -1,8 +1,8 @@
 package com.cloud.context;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.user.Account;
-import com.cloud.user.User;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 
 import java.util.UUID;
 

@@ -4,11 +4,11 @@ import com.cloud.ldap.LdapAuthenticator
 import com.cloud.ldap.LdapManager
 import com.cloud.ldap.LdapTrustMapVO
 import com.cloud.ldap.LdapUser
+import com.cloud.legacymodel.user.Account
+import com.cloud.legacymodel.user.User
+import com.cloud.legacymodel.user.UserAccount
 import com.cloud.server.auth.UserAuthenticator
-import com.cloud.user.Account
 import com.cloud.user.AccountManager
-import com.cloud.user.User
-import com.cloud.user.UserAccount
 import com.cloud.user.UserAccountVO
 import com.cloud.user.dao.UserAccountDao
 import com.cloud.utils.Pair

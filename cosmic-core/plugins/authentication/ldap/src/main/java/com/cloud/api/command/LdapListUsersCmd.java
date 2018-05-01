@@ -12,8 +12,8 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.query.QueryService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

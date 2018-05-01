@@ -25,7 +25,6 @@ import com.cloud.cluster.ManagementServerHost;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationManagerImpl;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
@@ -78,6 +77,8 @@ import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.resource.ResourceState;
@@ -113,7 +114,6 @@ import com.cloud.storage.listener.StoragePoolMonitor;
 import com.cloud.storage.listener.VolumeStateListener;
 import com.cloud.template.TemplateManager;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.UserDao;
@@ -332,11 +332,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                     }
                 }
             }
-      /*
-       * Can't find the vm where host resides on(vm is destroyed? or
-       * volume is detached from vm), randomly choose a host to send the
-       * cmd
-       */
+            /*
+             * Can't find the vm where host resides on(vm is destroyed? or
+             * volume is detached from vm), randomly choose a host to send the
+             * cmd
+             */
         }
         final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), Status.Up);
         Collections.shuffle(poolHosts);

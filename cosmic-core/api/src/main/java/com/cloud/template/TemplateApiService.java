@@ -17,7 +17,7 @@ import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.InternalErrorException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.net.MalformedURLException;

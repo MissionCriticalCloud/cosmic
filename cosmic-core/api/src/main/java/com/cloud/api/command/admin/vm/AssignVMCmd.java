@@ -11,7 +11,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 

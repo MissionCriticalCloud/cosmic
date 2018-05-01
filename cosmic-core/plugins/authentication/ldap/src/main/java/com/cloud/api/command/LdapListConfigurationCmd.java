@@ -8,7 +8,7 @@ import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.ldap.LdapManager;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.Pair;
 
 import javax.inject.Inject;
@@ -18,7 +18,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLdapConfigurations", group = APICommandGroup.AuthenticationService, responseObject = LdapConfigurationResponse.class, description = "Lists all LDAP configurations", since = "4.2.0",
+@APICommand(name = "listLdapConfigurations", group = APICommandGroup.AuthenticationService, responseObject = LdapConfigurationResponse.class, description = "Lists all LDAP configurations", since =
+        "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LdapListConfigurationCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LdapListConfigurationCmd.class.getName());

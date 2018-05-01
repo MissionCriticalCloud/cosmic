@@ -1,6 +1,6 @@
 package com.cloud.agent.api.to;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.utils.net.NetUtils;

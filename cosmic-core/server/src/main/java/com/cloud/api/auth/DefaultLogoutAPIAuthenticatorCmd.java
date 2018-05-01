@@ -7,7 +7,7 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ApiResponseSerializer;
 import com.cloud.api.response.LogoutCmdResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

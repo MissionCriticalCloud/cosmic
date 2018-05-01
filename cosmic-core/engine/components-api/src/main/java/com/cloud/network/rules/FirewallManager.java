@@ -2,11 +2,11 @@ package com.cloud.network.rules;
 
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.firewall.FirewallService;
 import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.user.Account;
 
 import java.util.List;
 

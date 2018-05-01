@@ -15,9 +15,9 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.storage.Volume;
-import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;

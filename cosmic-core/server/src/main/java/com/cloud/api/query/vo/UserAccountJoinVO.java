@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 

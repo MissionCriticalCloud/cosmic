@@ -1,6 +1,6 @@
 package com.cloud.server.auth;
 
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;

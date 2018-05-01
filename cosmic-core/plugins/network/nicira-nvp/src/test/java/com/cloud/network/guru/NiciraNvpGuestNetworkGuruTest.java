@@ -25,6 +25,7 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
@@ -41,7 +42,6 @@ import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.user.Account;
 import com.cloud.vm.ReservationContext;
 
 import java.net.URI;

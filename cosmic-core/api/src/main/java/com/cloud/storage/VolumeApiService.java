@@ -11,8 +11,8 @@ import com.cloud.api.command.user.volume.UploadVolumeCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.user.Account;
 
 import java.net.MalformedURLException;
 

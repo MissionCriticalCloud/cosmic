@@ -9,8 +9,8 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
-import com.cloud.user.Account;
-import com.cloud.user.SSHKeyPair;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.SSHKeyPair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

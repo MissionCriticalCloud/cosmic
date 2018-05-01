@@ -1,10 +1,11 @@
 package com.cloud.user;
 
-import com.cloud.configuration.Resource.ResourceType;
-import com.cloud.configuration.ResourceCount;
-import com.cloud.configuration.ResourceLimit;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.configuration.ResourceCount;
+import com.cloud.legacymodel.configuration.ResourceLimit;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.List;
 

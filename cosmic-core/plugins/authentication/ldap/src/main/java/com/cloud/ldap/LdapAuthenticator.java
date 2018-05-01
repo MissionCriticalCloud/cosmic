@@ -1,10 +1,10 @@
 package com.cloud.ldap;
 
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.server.auth.UserAuthenticator;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;

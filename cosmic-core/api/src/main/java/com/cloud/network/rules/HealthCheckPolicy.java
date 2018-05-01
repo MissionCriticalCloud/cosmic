@@ -1,8 +1,8 @@
 package com.cloud.network.rules;
 
 import com.cloud.api.Displayable;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 /**
  */

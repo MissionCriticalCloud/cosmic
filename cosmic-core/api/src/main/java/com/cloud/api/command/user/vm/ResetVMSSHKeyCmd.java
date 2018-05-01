@@ -18,7 +18,7 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 

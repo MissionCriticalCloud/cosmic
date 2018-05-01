@@ -13,7 +13,7 @@ import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

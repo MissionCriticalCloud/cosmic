@@ -31,6 +31,8 @@ import com.cloud.gpu.GPU;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSVO;
@@ -44,9 +46,7 @@ import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
@@ -283,7 +283,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("Creating VM snapshot failed due to VM:" + vmId + " is a system VM or does not exist");
         }
 
-        if (_snapshotDao.listByInstanceId(vmId, Snapshot.State.BackedUp).size() > 0 && ! HypervisorType.KVM.equals(userVmVo.getHypervisorType())) {
+        if (_snapshotDao.listByInstanceId(vmId, Snapshot.State.BackedUp).size() > 0 && !HypervisorType.KVM.equals(userVmVo.getHypervisorType())) {
             throw new InvalidParameterValueException("VM snapshot for this VM is not allowed. This VM has volumes attached which has snapshots, please remove all snapshots " +
                     "before taking VM snapshot");
         }
@@ -658,7 +658,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
     }
 
-     @Override
+    @Override
     public RestoreVMSnapshotCommand createRestoreCommand(final UserVmVO userVm, final List<VMSnapshotVO> vmSnapshotVOs) {
         if (!HypervisorType.KVM.equals(userVm.getHypervisorType())) {
             return null;
@@ -666,7 +666,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
 
         final List<VMSnapshotTO> snapshots = new ArrayList<>();
         final Map<Long, VMSnapshotTO> snapshotAndParents = new HashMap<>();
-        for (final VMSnapshotVO vmSnapshotVO: vmSnapshotVOs) {
+        for (final VMSnapshotVO vmSnapshotVO : vmSnapshotVOs) {
             if (vmSnapshotVO.getType() == VMSnapshot.Type.DiskAndMemory) {
                 final VMSnapshotVO snapshot = _vmSnapshotDao.findById(vmSnapshotVO.getId());
                 final VMSnapshotTO parent = getSnapshotWithParents(snapshot).getParent();

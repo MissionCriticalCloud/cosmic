@@ -1,11 +1,11 @@
 package com.cloud.deploy;
 
 import com.cloud.db.model.Zone;
-import com.cloud.dc.Pod;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Pod;
 import com.cloud.org.Cluster;
 import com.cloud.storage.StoragePool;
 import com.cloud.utils.component.Adapter;

@@ -1,8 +1,7 @@
 package com.cloud.offering;
 
-import com.cloud.acl.InfrastructureEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.storage.Storage.ProvisioningType;
 
 import java.util.Date;
@@ -11,7 +10,7 @@ import java.util.Date;
  * Represents a disk offering that specifies what the end user needs in
  * the disk offering.
  */
-public interface DiskOffering extends InfrastructureEntity, Identity, InternalIdentity {
+public interface DiskOffering extends Identity, InternalIdentity {
     State getState();
 
     String getUniqueName();

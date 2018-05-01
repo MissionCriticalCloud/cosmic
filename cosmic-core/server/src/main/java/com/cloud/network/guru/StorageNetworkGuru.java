@@ -1,11 +1,12 @@
 package com.cloud.network.guru;
 
-import com.cloud.dc.Pod;
 import com.cloud.dc.StorageNetworkIpAddressVO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.Networks.AddressFormat;
@@ -16,7 +17,6 @@ import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;

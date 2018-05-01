@@ -19,11 +19,11 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.user.AccountService;
 import com.cloud.user.DomainService;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;

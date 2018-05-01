@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.dc.Pod;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

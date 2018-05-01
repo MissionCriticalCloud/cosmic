@@ -1,4 +1,4 @@
-package com.cloud.api;
+package com.cloud.legacymodel;
 
 public interface Identity {
     String getUuid();

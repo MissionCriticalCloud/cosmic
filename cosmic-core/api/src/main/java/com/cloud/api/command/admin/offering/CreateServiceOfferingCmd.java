@@ -9,9 +9,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.Storage;
-import com.cloud.user.Account;
 
 import java.util.Collection;
 import java.util.HashMap;

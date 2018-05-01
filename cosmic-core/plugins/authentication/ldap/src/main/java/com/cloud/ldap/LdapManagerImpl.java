@@ -227,7 +227,7 @@ public class LdapManagerImpl implements LdapManager, LdapValidator {
         Validate.notNull(type, "type cannot be null. It should either be GROUP or OU");
         Validate.notNull(domainId, "domainId cannot be null.");
         Validate.notEmpty(name, "GROUP or OU name cannot be empty");
-        //Account type should be 0 or 2. check the constants in com.cloud.user.Account
+        //Account type should be 0 or 2. check the constants in com.cloud.legacymodel.user.Account
         Validate.isTrue(accountType == 0 || accountType == 2, "accountype should be either 0(normal user) or 2(domain admin)");
         final Domain domain = _domainManager.getDomain(domainId);
         final LinkType linkType = LdapManager.LinkType.valueOf(type.toUpperCase());
@@ -243,7 +243,7 @@ public class LdapManagerImpl implements LdapManager, LdapValidator {
         final Domain domain = _domainManager.getDomain(domainId);
         final LinkDomainToLdapResponse response;
 
-        if (! _ldapManager.isLdapEnabled()) {
+        if (!_ldapManager.isLdapEnabled()) {
             return new LinkDomainToLdapResponse(domain.getUuid());
         }
 

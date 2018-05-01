@@ -1,12 +1,15 @@
 package com.cloud.user;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.api.command.admin.account.UpdateAccountCmd;
 import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.query.vo.ControlledViewEntity;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;

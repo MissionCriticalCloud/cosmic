@@ -1,13 +1,14 @@
 package com.cloud.network.guru;
 
 import com.cloud.configuration.Config;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
@@ -17,7 +18,6 @@ import com.cloud.network.Networks.Mode;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.Nic;

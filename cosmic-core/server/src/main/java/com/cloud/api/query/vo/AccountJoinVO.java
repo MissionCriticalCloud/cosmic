@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.user.Account.State;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.user.Account.State;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

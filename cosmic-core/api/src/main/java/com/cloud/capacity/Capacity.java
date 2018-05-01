@@ -1,7 +1,7 @@
 package com.cloud.capacity;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 public interface Capacity extends InternalIdentity, Identity {
     public static final short CAPACITY_TYPE_MEMORY = 0;

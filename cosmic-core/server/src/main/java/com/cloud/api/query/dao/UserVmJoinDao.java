@@ -4,7 +4,7 @@ import com.cloud.api.ApiConstants.VMDetails;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.db.GenericDao;
 

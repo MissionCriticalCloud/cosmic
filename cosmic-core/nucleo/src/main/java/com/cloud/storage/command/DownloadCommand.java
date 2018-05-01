@@ -4,7 +4,7 @@ import com.cloud.agent.api.storage.AbstractDownloadCommand;
 import com.cloud.agent.api.storage.PasswordAuth;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.to.VolumeObjectTO;

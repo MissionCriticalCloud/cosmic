@@ -8,7 +8,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectAccountResponse;
 import com.cloud.api.response.ProjectResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

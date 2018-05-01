@@ -9,13 +9,14 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SSHKeyPairResponse;
 import com.cloud.context.CallContext;
-import com.cloud.user.SSHKeyPair;
+import com.cloud.legacymodel.user.SSHKeyPair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerSSHKeyPair", group = APICommandGroup.SSHService, description = "Register a public key in a keypair under a certain name", responseObject = SSHKeyPairResponse.class, entityType =
-        {SSHKeyPair.class},
+@APICommand(name = "registerSSHKeyPair", group = APICommandGroup.SSHService, description = "Register a public key in a keypair under a certain name", responseObject = SSHKeyPairResponse.class,
+        entityType =
+                {SSHKeyPair.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterSSHKeyPairCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RegisterSSHKeyPairCmd.class.getName());

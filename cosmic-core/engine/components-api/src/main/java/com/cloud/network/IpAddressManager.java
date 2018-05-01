@@ -1,8 +1,6 @@
 package com.cloud.network;
 
 import com.cloud.db.model.Zone;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -10,12 +8,14 @@ import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.user.Account;
 import com.cloud.utils.db.DB;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachineProfile;

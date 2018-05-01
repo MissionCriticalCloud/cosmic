@@ -4,11 +4,11 @@ import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.user.Account;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 

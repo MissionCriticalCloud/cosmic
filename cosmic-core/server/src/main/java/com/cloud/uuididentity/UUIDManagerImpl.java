@@ -4,7 +4,7 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.exception.PermissionDeniedException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;

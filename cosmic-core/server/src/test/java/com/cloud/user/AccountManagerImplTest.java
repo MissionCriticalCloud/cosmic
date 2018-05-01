@@ -1,6 +1,5 @@
 package com.cloud.user;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.dao.AffinityGroupDao;
@@ -19,6 +18,11 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.Account.State;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
@@ -37,7 +41,6 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.snapshot.SnapshotManager;
 import com.cloud.template.TemplateManager;
-import com.cloud.user.Account.State;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserAccountDao;
 import com.cloud.user.dao.UserDao;

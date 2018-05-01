@@ -1,6 +1,6 @@
 package com.cloud.offerings;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 

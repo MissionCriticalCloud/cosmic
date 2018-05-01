@@ -9,7 +9,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.CloudIdentifierResponse;
 import com.cloud.api.response.UserResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 

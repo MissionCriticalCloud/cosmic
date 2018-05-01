@@ -1,7 +1,7 @@
 package com.cloud.exception;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.List;

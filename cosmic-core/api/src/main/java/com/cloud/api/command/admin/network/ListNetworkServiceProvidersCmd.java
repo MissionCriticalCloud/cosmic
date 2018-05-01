@@ -8,8 +8,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.ProviderResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.PhysicalNetworkServiceProvider;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 
 import java.util.ArrayList;

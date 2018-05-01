@@ -2,9 +2,9 @@ package com.cloud.acl;
 
 import com.cloud.api.APICommand;
 import com.cloud.exception.PermissionDeniedException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.user.AccountService;
-import com.cloud.user.User;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.PluggableService;

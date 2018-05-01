@@ -11,7 +11,7 @@ import com.cloud.api.response.ApiDiscoveryResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.context.CallContext;
 import com.cloud.discovery.ApiDiscoveryService;
-import com.cloud.user.User;
+import com.cloud.legacymodel.user.User;
 
 import javax.inject.Inject;
 

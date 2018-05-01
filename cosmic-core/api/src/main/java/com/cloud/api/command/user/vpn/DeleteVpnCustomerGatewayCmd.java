@@ -12,8 +12,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Site2SiteCustomerGateway;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

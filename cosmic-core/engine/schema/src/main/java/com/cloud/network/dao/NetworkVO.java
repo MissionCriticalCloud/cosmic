@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;

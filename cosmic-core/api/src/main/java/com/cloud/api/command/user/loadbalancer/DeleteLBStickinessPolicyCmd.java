@@ -11,15 +11,16 @@ import com.cloud.api.response.LBStickinessResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteLBStickinessPolicy", group = APICommandGroup.LoadBalancerService, description = "Deletes a load balancer stickiness policy.", responseObject = SuccessResponse.class, since = "3.0.0",
+@APICommand(name = "deleteLBStickinessPolicy", group = APICommandGroup.LoadBalancerService, description = "Deletes a load balancer stickiness policy.", responseObject = SuccessResponse.class, since
+        = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteLBStickinessPolicyCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteLBStickinessPolicyCmd.class.getName());

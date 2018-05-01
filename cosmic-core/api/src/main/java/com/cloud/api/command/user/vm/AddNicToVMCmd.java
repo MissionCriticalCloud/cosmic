@@ -15,9 +15,9 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
+import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VirtualMachine;
 
@@ -27,8 +27,9 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addNicToVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class, responseView = ResponseView
-        .Restricted, entityType = {VirtualMachine.class},
+@APICommand(name = "addNicToVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class,
+        responseView = ResponseView
+                .Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class AddNicToVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddNicToVMCmd.class);
@@ -72,9 +73,9 @@ public class AddNicToVMCmd extends BaseAsyncCmd {
         if (macaddr == null) {
             return null;
         }
-        if(!NetUtils.isValidMac(macaddr)) {
+        if (!NetUtils.isValidMac(macaddr)) {
             throw new InvalidParameterValueException("MAC-Address is not valid: " + macaddr);
-        } else if(!NetUtils.isUnicastMac(macaddr)) {
+        } else if (!NetUtils.isUnicastMac(macaddr)) {
             throw new InvalidParameterValueException("MAC-Address is not unicast: " + macaddr);
         }
         return NetUtils.standardizeMacAddress(macaddr);

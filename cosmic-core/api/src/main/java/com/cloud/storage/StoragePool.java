@@ -1,8 +1,8 @@
 package com.cloud.storage;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
 import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.storage.Storage.StoragePoolType;
 
 import java.util.Date;

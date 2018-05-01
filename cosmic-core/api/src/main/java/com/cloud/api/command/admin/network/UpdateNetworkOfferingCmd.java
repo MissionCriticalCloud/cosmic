@@ -8,8 +8,8 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkOfferingResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

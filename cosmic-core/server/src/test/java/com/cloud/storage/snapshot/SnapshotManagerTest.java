@@ -6,9 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
@@ -21,6 +19,10 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ScopeType;
@@ -35,11 +37,9 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.InvalidParameterValueException;
@@ -274,7 +274,6 @@ public class SnapshotManagerTest {
         Assert.assertNotNull(snapshot);
     }
 
-
     // vm on Xenserver, expected exception
     @Test(expected = InvalidParameterValueException.class)
     public void testBackupSnapshotFromVmSnapshotF1() {
@@ -315,5 +314,4 @@ public class SnapshotManagerTest {
         Snapshot snapshot = _snapshotMgr.backupSnapshotFromVmSnapshot(TEST_SNAPSHOT_ID, TEST_VM_ID, TEST_VOLUME_ID, TEST_VM_SNAPSHOT_ID);
         Assert.assertNull(snapshot);
     }
-
 }

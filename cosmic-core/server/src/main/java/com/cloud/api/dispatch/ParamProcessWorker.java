@@ -2,8 +2,6 @@ package com.cloud.api.dispatch;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.acl.InfrastructureEntity;
 import com.cloud.acl.SecurityChecker;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ACL;
@@ -12,7 +10,6 @@ import com.cloud.api.BaseAsyncCreateCmd;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.BaseCmd.CommandType;
 import com.cloud.api.EntityReference;
-import com.cloud.api.InternalIdentity;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.resource.ArchiveAlertsCmd;
@@ -22,7 +19,9 @@ import com.cloud.api.command.user.event.DeleteEventsCmd;
 import com.cloud.api.command.user.event.ListEventsCmd;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -344,9 +343,6 @@ public class ParamProcessWorker implements DispatchWorker {
                 final Object entity = entry.getKey();
                 if (entity instanceof ControlledEntity) {
                     _accountMgr.checkAccess(caller, entry.getValue(), true, (ControlledEntity) entity);
-                } else if (entity instanceof InfrastructureEntity) {
-                    // FIXME: Move this code in adapter, remove code from
-                    // Account manager
                 }
             }
         }

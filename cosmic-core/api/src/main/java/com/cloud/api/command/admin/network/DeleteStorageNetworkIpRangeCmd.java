@@ -14,7 +14,7 @@ import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

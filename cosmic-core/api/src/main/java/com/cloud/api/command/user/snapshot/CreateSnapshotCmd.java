@@ -16,16 +16,17 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.PermissionDeniedException;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createSnapshot", group = APICommandGroup.SnapshotService, description = "Creates an instant snapshot of a volume.", responseObject = SnapshotResponse.class, entityType = {Snapshot.class},
+@APICommand(name = "createSnapshot", group = APICommandGroup.SnapshotService, description = "Creates an instant snapshot of a volume.", responseObject = SnapshotResponse.class, entityType =
+        {Snapshot.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateSnapshotCmd.class.getName());
@@ -39,7 +40,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     private String accountName;
 
     @Parameter(name = ApiConstants.DOMAIN_ID, type = CommandType.UUID, entityType = DomainResponse.class,
-               description = "The domain ID of the snapshot. If used with the account parameter, specifies a domain for the account associated with the disk volume.")
+            description = "The domain ID of the snapshot. If used with the account parameter, specifies a domain for the account associated with the disk volume.")
     private Long domainId;
 
     @Parameter(name = ApiConstants.VOLUME_ID, type = CommandType.UUID, entityType = VolumeResponse.class, required = true, description = "The ID of the disk volume")
@@ -134,7 +135,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     }
 
     public Long getPolicyId() {
-            return Snapshot.MANUAL_POLICY_ID;
+        return Snapshot.MANUAL_POLICY_ID;
     }
 
     public String getSnapshotName() {

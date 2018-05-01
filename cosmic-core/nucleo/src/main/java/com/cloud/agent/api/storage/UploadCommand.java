@@ -1,7 +1,7 @@
 package com.cloud.agent.api.storage;
 
 import com.cloud.agent.api.to.TemplateTO;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.storage.Upload.Type;
 import com.cloud.template.VirtualMachineTemplate;
 

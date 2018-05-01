@@ -1,12 +1,11 @@
 package com.cloud.offering;
 
-import com.cloud.acl.InfrastructureEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 import java.util.Date;
 
-public interface ServiceOffering extends DiskOffering, InfrastructureEntity, InternalIdentity, Identity {
+public interface ServiceOffering extends DiskOffering, InternalIdentity, Identity {
     String consoleProxyDefaultOffUniqueName = "Cloud.com-ConsoleProxy";
     String ssvmDefaultOffUniqueName = "Cloud.com-SecondaryStorage";
     String routerDefaultOffUniqueName = "Cloud.Com-SoftwareRouter";

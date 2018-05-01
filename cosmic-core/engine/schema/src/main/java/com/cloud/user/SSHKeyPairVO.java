@@ -1,5 +1,7 @@
 package com.cloud.user;
 
+import com.cloud.legacymodel.user.SSHKeyPair;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

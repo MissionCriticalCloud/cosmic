@@ -9,7 +9,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AlertResponse;
 import com.cloud.api.response.SuccessResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Date;

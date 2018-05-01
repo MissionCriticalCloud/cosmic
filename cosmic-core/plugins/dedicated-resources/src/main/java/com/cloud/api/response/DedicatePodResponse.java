@@ -2,7 +2,7 @@ package com.cloud.api.response;
 
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.dc.DedicatedResources;
+import com.cloud.legacymodel.dc.DedicatedResources;
 import com.cloud.serializer.Param;
 
 import com.google.gson.annotations.SerializedName;

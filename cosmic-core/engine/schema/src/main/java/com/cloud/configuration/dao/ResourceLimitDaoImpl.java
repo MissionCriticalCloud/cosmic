@@ -1,10 +1,10 @@
 package com.cloud.configuration.dao;
 
-import com.cloud.configuration.Resource;
-import com.cloud.configuration.Resource.ResourceOwnerType;
-import com.cloud.configuration.Resource.ResourceType;
-import com.cloud.configuration.ResourceCount;
 import com.cloud.configuration.ResourceLimitVO;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.configuration.Resource.ResourceOwnerType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.configuration.ResourceCount;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;

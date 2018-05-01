@@ -1,6 +1,6 @@
 package com.cloud.exception;
 
-import com.cloud.dc.Pod;
+import com.cloud.legacymodel.dc.Pod;
 
 public class InsufficientVirtualNetworkCapacityException extends InsufficientNetworkCapacityException {
     public InsufficientVirtualNetworkCapacityException(final String msg, final long podId) {

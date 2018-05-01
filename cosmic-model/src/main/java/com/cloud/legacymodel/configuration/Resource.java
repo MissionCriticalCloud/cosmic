@@ -1,8 +1,8 @@
-package com.cloud.configuration;
+package com.cloud.legacymodel.configuration;
 
 public interface Resource {
 
-    public static final short RESOURCE_UNLIMITED = -1;
+    short RESOURCE_UNLIMITED = -1;
 
     ResourceType getType();
 
@@ -10,7 +10,7 @@ public interface Resource {
 
     ResourceOwnerType getResourceOwnerType();
 
-    public enum ResourceType { // Primary and Secondary storage are allocated_storage and not the physical storage.
+    enum ResourceType { // Primary and Secondary storage are allocated_storage and not the physical storage.
         user_vm("user_vm", 0, ResourceOwnerType.Account, ResourceOwnerType.Domain),
         public_ip("public_ip", 1, ResourceOwnerType.Account, ResourceOwnerType.Domain),
         volume("volume", 2, ResourceOwnerType.Account, ResourceOwnerType.Domain),
@@ -63,7 +63,7 @@ public interface Resource {
         }
     }
 
-    public static class ResourceOwnerType {
+    class ResourceOwnerType {
 
         public static final ResourceOwnerType Account = new ResourceOwnerType("Account");
         public static final ResourceOwnerType Domain = new ResourceOwnerType("Domain");

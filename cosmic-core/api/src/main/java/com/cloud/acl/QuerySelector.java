@@ -1,6 +1,6 @@
 package com.cloud.acl;
 
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.component.Adapter;
 
 import java.util.List;

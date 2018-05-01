@@ -1,6 +1,6 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.projects.ProjectAccount.Role;
 
 import javax.persistence.Column;

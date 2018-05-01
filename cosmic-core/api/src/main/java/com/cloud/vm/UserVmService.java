@@ -28,12 +28,12 @@ import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.StoragePool;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.exception.ExecutionException;
 

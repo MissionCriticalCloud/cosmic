@@ -1,12 +1,8 @@
 package com.cloud.network.guru;
 
 import com.cloud.configuration.ZoneConfig;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
@@ -15,6 +11,10 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;

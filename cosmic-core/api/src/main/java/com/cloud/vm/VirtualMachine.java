@@ -1,10 +1,10 @@
 package com.cloud.vm;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.api.Displayable;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateMachine2.Transition;
 import com.cloud.utils.fsm.StateMachine2.Transition.Impact;

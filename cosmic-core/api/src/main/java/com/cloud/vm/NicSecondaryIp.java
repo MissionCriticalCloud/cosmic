@@ -1,8 +1,8 @@
 package com.cloud.vm;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 
 /**
  * Nic represents one nic on the VM.

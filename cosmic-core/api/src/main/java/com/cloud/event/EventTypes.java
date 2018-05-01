@@ -1,12 +1,14 @@
 package com.cloud.event;
 
 import com.cloud.config.Configuration;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
-import com.cloud.dc.StorageNetworkIpRange;
-import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.StorageNetworkIpRange;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.network.GuestVlan;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
@@ -39,8 +41,6 @@ import com.cloud.storage.Snapshot;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.VirtualMachine;

@@ -14,8 +14,8 @@ import com.cloud.api.command.user.region.ListRegionsCmd;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.UserAccount;
 
 import java.util.List;
 

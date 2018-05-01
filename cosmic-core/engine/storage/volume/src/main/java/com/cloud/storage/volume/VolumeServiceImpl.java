@@ -8,7 +8,6 @@ import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.CreateCmdResult;
@@ -38,6 +37,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.RegisterVolumePayload;
@@ -1404,14 +1405,14 @@ public class VolumeServiceImpl implements VolumeService {
                                 if (volInfo.getSize() > 0) {
                                     try {
                                         _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(volume.getAccountId()),
-                                                com.cloud.configuration.Resource.ResourceType.secondary_storage, volInfo.getSize() - volInfo.getPhysicalSize());
+                                                Resource.ResourceType.secondary_storage, volInfo.getSize() - volInfo.getPhysicalSize());
                                     } catch (final ResourceAllocationException e) {
                                         s_logger.warn(e.getMessage());
                                         _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_RESOURCE_LIMIT_EXCEEDED, volume.getDataCenterId(), volume.getPodId(), e.getMessage
                                                 (), e.getMessage());
                                     } finally {
                                         _resourceLimitMgr.recalculateResourceCount(volume.getAccountId(), volume.getDomainId(),
-                                                com.cloud.configuration.Resource.ResourceType.secondary_storage.getOrdinal());
+                                                Resource.ResourceType.secondary_storage.getOrdinal());
                                     }
                                 }
                             }

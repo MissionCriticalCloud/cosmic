@@ -8,8 +8,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.cloud.alert.dao.AlertDao;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.server.ManagementServerImpl;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 
 import java.util.Date;

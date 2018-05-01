@@ -15,15 +15,16 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.StorageUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "copyTemplate", group = APICommandGroup.TemplateService, description = "Copies a template from one zone to another.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "copyTemplate", group = APICommandGroup.TemplateService, description = "Copies a template from one zone to another.", responseObject = TemplateResponse.class, responseView =
+        ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CopyTemplateCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CopyTemplateCmd.class.getName());

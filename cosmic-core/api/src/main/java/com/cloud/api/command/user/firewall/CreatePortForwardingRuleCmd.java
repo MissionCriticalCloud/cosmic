@@ -20,10 +20,10 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
@@ -34,8 +34,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createPortForwardingRule", group = APICommandGroup.FirewallService, description = "Creates a port forwarding rule", responseObject = FirewallRuleResponse.class, entityType = {FirewallRule.class,
-        VirtualMachine.class, IpAddress.class},
+@APICommand(name = "createPortForwardingRule", group = APICommandGroup.FirewallService, description = "Creates a port forwarding rule", responseObject = FirewallRuleResponse.class, entityType =
+        {FirewallRule.class,
+                VirtualMachine.class, IpAddress.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements PortForwardingRule {
     public static final Logger s_logger = LoggerFactory.getLogger(CreatePortForwardingRuleCmd.class.getName());
@@ -382,7 +383,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
     }
 
     public Ip getVmSecondaryIp() {
-        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty() ) {
+        if (vmSecondaryIp == null || vmSecondaryIp.isEmpty()) {
             return null;
         }
         return new Ip(vmSecondaryIp);

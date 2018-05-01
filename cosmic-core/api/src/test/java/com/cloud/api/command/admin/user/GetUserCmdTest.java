@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import com.cloud.api.ResponseGenerator;
 import com.cloud.api.response.UserResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.user.AccountService;
-import com.cloud.user.UserAccount;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.junit.After;
@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class GetUserCmdTest {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUserCmdTest.class.getName());

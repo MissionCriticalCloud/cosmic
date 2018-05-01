@@ -7,9 +7,9 @@ import static org.mockito.Mockito.verify;
 import com.cloud.api.BaseAsyncCreateCmd;
 import com.cloud.context.CallContext;
 import com.cloud.exception.ResourceAllocationException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 
 import java.util.HashMap;

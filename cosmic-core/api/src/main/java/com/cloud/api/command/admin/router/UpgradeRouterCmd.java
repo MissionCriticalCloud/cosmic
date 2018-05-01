@@ -9,15 +9,16 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.router.VirtualRouter;
-import com.cloud.user.Account;
 import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "changeServiceForRouter", group = APICommandGroup.RouterService, description = "Upgrades domain router to a new service offering", responseObject = DomainRouterResponse.class, entityType =
-        {VirtualMachine.class},
+@APICommand(name = "changeServiceForRouter", group = APICommandGroup.RouterService, description = "Upgrades domain router to a new service offering", responseObject = DomainRouterResponse.class,
+        entityType =
+                {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpgradeRouterCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpgradeRouterCmd.class.getName());

@@ -1,6 +1,6 @@
 package com.cloud.affinity;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

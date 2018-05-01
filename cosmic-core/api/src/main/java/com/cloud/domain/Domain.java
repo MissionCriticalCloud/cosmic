@@ -1,8 +1,8 @@
 package com.cloud.domain;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.user.OwnedBy;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.user.OwnedBy;
 
 import java.util.Date;
 

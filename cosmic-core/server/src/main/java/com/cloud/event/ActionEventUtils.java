@@ -1,6 +1,5 @@
 package com.cloud.event;
 
-import com.cloud.api.Identity;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -8,12 +7,13 @@ import com.cloud.event.dao.EventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.projects.Project;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.server.ManagementService;
-import com.cloud.user.Account;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.ReflectUtil;

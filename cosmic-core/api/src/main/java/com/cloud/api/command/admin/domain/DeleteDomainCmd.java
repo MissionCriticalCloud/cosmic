@@ -12,8 +12,8 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.domain.Domain;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 

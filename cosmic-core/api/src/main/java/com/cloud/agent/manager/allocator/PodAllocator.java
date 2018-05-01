@@ -1,7 +1,7 @@
 package com.cloud.agent.manager.allocator;
 
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.Pair;

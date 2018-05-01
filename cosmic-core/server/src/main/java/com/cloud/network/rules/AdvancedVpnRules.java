@@ -1,7 +1,7 @@
 package com.cloud.network.rules;
 
-import com.cloud.dc.DataCenter;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VirtualRouter;

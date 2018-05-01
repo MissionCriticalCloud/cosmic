@@ -1,13 +1,10 @@
-package com.cloud.user;
+package com.cloud.legacymodel.user;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 
 import java.util.Date;
 
 public interface UserAccount extends InternalIdentity {
-    @Override
-    long getId();
-
     String getUsername();
 
     String getPassword();
@@ -46,9 +43,5 @@ public interface UserAccount extends InternalIdentity {
 
     int getLoginAttempts();
 
-    public User.Source getSource();
-
-    public String getExternalEntity();
-
-    public void setExternalEntity(String entity);
+    User.Source getSource();
 }

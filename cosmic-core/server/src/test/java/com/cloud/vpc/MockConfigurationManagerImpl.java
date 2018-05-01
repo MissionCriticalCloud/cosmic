@@ -25,16 +25,17 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationService;
 import com.cloud.db.model.Zone;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
-import com.cloud.dc.Vlan;
 import com.cloud.domain.Domain;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network.Capability;
@@ -48,7 +49,6 @@ import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDaoImpl;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.exception.InvalidParameterValueException;
@@ -348,7 +348,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationManager#deleteVlanAndPublicIpRange(long, long, com.cloud.user.Account)
+     * @see com.cloud.configuration.ConfigurationManager#deleteVlanAndPublicIpRange(long, long, com.cloud.legacymodel.user.Account)
      */
     @Override
     public boolean deleteVlanAndPublicIpRange(final long userId, final long vlanDbId, final Account caller) {
@@ -357,7 +357,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationManager#checkZoneAccess(com.cloud.user.Account, com.cloud.dc.DataCenter)
+     * @see com.cloud.configuration.ConfigurationManager#checkZoneAccess(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.dc.DataCenter)
      */
     @Override
     public void checkZoneAccess(final Account caller, final Zone zone) {
@@ -366,7 +366,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationManager#checkDiskOfferingAccess(com.cloud.user.Account, com.cloud.offering.DiskOffering)
+     * @see com.cloud.configuration.ConfigurationManager#checkDiskOfferingAccess(com.cloud.legacymodel.user.Account, com.cloud.offering.DiskOffering)
      */
     @Override
     public void checkDiskOfferingAccess(final Account caller, final DiskOffering dof) {
@@ -395,7 +395,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
 
     /* (non-Javadoc)
      * @see com.cloud.configuration.ConfigurationManager#createVlanAndPublicIpRange(long, long, long, boolean, java.lang.Long, java.lang.String, java.lang.String, java.lang
-     * .String, java.lang.String, java.lang.String, com.cloud.user.Account)
+     * .String, java.lang.String, java.lang.String, com.cloud.legacymodel.user.Account)
      */
     @Override
     public Vlan createVlanAndPublicIpRange(final long zoneId, final long networkId, final long physicalNetworkId, final boolean forVirtualNetwork, final Long podId, final String

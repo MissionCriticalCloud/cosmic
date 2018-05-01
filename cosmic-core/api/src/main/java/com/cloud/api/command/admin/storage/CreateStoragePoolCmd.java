@@ -13,8 +13,8 @@ import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.ResourceInUseException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.StoragePool;
-import com.cloud.user.Account;
 
 import java.net.UnknownHostException;
 import java.util.Map;

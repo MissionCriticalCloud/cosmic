@@ -4,7 +4,7 @@ import com.cloud.api.APICommand;
 import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.response.CapabilitiesResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.Map;
 

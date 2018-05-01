@@ -1,6 +1,5 @@
 package com.cloud.api.query;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroupDomainMapVO;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.affinity.AffinityGroupVMMapVO;
@@ -143,6 +142,8 @@ import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.network.Network;
 import com.cloud.network.dao.IPAddressDao;
@@ -178,7 +179,6 @@ import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.template.VirtualMachineTemplate.State;
 import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.dao.AccountDao;

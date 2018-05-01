@@ -9,9 +9,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.SuccessResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolStatus;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

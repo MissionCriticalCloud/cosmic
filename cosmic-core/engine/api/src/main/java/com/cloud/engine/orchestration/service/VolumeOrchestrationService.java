@@ -1,8 +1,6 @@
 package com.cloud.engine.orchestration.service;
 
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -13,6 +11,9 @@ import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.storage.Snapshot;
@@ -20,7 +21,6 @@ import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Type;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.vm.DiskProfile;

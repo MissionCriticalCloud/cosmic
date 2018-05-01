@@ -12,8 +12,8 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;

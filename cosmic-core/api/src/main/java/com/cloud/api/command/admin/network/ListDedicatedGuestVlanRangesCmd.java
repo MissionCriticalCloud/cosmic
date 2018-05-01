@@ -11,8 +11,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.GuestVlan;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 
 import java.util.ArrayList;

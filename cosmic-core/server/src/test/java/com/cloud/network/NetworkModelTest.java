@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
-import com.cloud.user.Account;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;

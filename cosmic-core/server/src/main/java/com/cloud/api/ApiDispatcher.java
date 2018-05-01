@@ -1,7 +1,5 @@
 package com.cloud.api;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.acl.InfrastructureEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.dispatch.DispatchChain;
 import com.cloud.api.dispatch.DispatchChainFactory;
@@ -15,8 +13,9 @@ import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 
 import javax.annotation.PostConstruct;
@@ -67,8 +66,6 @@ public class ApiDispatcher {
             for (final Object entity : entitiesToAccess.keySet()) {
                 if (entity instanceof ControlledEntity) {
                     _accountMgr.checkAccess(caller, entitiesToAccess.get(entity), false, apiName, (ControlledEntity) entity);
-                } else if (entity instanceof InfrastructureEntity) {
-                    //FIXME: Move this code in adapter, remove code from Account manager
                 }
             }
         }

@@ -13,7 +13,7 @@ import com.cloud.api.APICommand;
 import com.cloud.api.command.user.discovery.ListApisCmd;
 import com.cloud.api.response.ApiDiscoveryResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.user.User;
+import com.cloud.legacymodel.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.PluggableService;
 

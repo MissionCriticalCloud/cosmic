@@ -15,10 +15,10 @@ import com.cloud.domain.DomainVO;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.user.AccountService;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
@@ -30,8 +30,9 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "ldapCreateAccount", group = APICommandGroup.AuthenticationService, description = "Creates an account from an LDAP user", responseObject = AccountResponse.class, since = "4.2.0", requestHasSensitiveInfo =
-        false, responseHasSensitiveInfo = false)
+@APICommand(name = "ldapCreateAccount", group = APICommandGroup.AuthenticationService, description = "Creates an account from an LDAP user", responseObject = AccountResponse.class, since = "4.2.0",
+        requestHasSensitiveInfo =
+                false, responseHasSensitiveInfo = false)
 public class LdapCreateAccountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LdapCreateAccountCmd.class.getName());
     private static final String s_name = "createaccountresponse";

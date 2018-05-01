@@ -1,6 +1,6 @@
 package com.cloud.event;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 
 import java.util.Date;
 

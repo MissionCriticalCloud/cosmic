@@ -1,5 +1,6 @@
 package com.cloud.dc;
 
+import com.cloud.legacymodel.dc.Pod;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
@@ -124,11 +125,6 @@ public class HostPodVO implements Pod {
 
     public void setAllocationState(final AllocationState allocationState) {
         this.allocationState = allocationState;
-    }
-
-    @Override
-    public boolean getExternalDhcp() {
-        return externalDhcp;
     }
 
     public void setExternalDhcp(final boolean use) {

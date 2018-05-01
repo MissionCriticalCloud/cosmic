@@ -1,9 +1,9 @@
 package com.cloud.template;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.utils.fsm.StateMachine2;

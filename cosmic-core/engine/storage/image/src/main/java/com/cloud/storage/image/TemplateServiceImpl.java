@@ -33,6 +33,8 @@ import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
@@ -55,7 +57,6 @@ import com.cloud.storage.template.TemplateProp;
 import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.TemplateManager;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.UriUtils;
@@ -361,14 +362,14 @@ public class TemplateServiceImpl implements TemplateService {
                                         final long accountId = tmplt.getAccountId();
                                         try {
                                             _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(accountId),
-                                                    com.cloud.configuration.Resource.ResourceType.secondary_storage,
+                                                    Resource.ResourceType.secondary_storage,
                                                     tmpltInfo.getSize() - UriUtils.getRemoteSize(tmplt.getUrl()));
                                         } catch (final ResourceAllocationException e) {
                                             s_logger.warn(e.getMessage());
                                             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_RESOURCE_LIMIT_EXCEEDED, zoneId, null, e.getMessage(), e.getMessage());
                                         } finally {
                                             _resourceLimitMgr.recalculateResourceCount(accountId, _accountMgr.getAccount(accountId).getDomainId(),
-                                                    com.cloud.configuration.Resource.ResourceType.secondary_storage.getOrdinal());
+                                                    Resource.ResourceType.secondary_storage.getOrdinal());
                                         }
                                     }
                                 }

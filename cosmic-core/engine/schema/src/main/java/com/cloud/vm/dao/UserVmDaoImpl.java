@@ -1,8 +1,8 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.user.Account;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;

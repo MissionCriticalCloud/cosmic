@@ -13,8 +13,8 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.ResourceInUseException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.org.Cluster;
-import com.cloud.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;

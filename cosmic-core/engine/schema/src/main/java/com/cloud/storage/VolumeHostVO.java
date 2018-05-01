@@ -1,9 +1,9 @@
 package com.cloud.storage;
 
-import com.cloud.api.InternalIdentity;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.utils.db.GenericDaoBase;

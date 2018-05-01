@@ -17,7 +17,7 @@ import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.ldap.LdapConfiguration;
 import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.ldap.LdapManager;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.Pair;
 import com.cloud.utils.exception.InvalidParameterValueException;
 

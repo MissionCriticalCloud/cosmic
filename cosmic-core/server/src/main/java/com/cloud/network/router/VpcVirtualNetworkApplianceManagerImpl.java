@@ -13,10 +13,10 @@ import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
@@ -783,7 +783,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         return true;
     }
 
-    private  boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    private boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         final Commands cmds = new Commands(Command.OnError.Continue);
         final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
                 router,

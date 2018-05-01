@@ -1,15 +1,14 @@
 package com.cloud.offering;
 
-import com.cloud.acl.InfrastructureEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
 
 /**
  * Describes network offering
  */
-public interface NetworkOffering extends InfrastructureEntity, InternalIdentity, Identity {
+public interface NetworkOffering extends InternalIdentity, Identity {
 
     String SystemPublicNetwork = "System-Public-Network";
     String SystemControlNetwork = "System-Control-Network";

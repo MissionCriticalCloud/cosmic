@@ -16,9 +16,9 @@ import com.cloud.event.EventTypes;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceAllocationException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Map;
@@ -26,7 +26,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createLBStickinessPolicy", group = APICommandGroup.LoadBalancerService, description = "Creates a load balancer stickiness policy ", responseObject = LBStickinessResponse.class, since = "3.0.0",
+@APICommand(name = "createLBStickinessPolicy", group = APICommandGroup.LoadBalancerService, description = "Creates a load balancer stickiness policy ", responseObject = LBStickinessResponse.class,
+        since = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateLBStickinessPolicyCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateLBStickinessPolicyCmd.class.getName());

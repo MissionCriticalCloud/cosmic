@@ -8,8 +8,8 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ClusterResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.org.Cluster;
-import com.cloud.user.Account;
 import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;

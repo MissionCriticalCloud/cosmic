@@ -9,10 +9,10 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

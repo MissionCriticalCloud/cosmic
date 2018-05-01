@@ -8,7 +8,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.dc.Pod;
+import com.cloud.legacymodel.dc.Pod;
 import com.cloud.utils.Pair;
 
 import java.util.ArrayList;

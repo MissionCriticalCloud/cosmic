@@ -15,7 +15,7 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 
@@ -25,7 +25,8 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeNicFromVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView =
+@APICommand(name = "removeNicFromVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse
+        .class, responseView =
         ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RemoveNicFromVMCmd extends BaseAsyncCmd {

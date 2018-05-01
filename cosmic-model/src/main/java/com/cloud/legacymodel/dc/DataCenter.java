@@ -1,14 +1,13 @@
-package com.cloud.dc;
+package com.cloud.legacymodel.dc;
 
-import com.cloud.acl.InfrastructureEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 
 import java.util.Map;
 
-public interface DataCenter extends InfrastructureEntity, Identity, InternalIdentity {
+public interface DataCenter extends Identity, InternalIdentity {
 
     String getDns1();
 

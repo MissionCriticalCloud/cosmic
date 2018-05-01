@@ -2,7 +2,7 @@ package com.cloud.engine.cloud.entity.api;
 
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;

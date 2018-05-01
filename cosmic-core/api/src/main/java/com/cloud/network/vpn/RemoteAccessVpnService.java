@@ -4,9 +4,9 @@ import com.cloud.api.command.user.vpn.ListRemoteAccessVpnsCmd;
 import com.cloud.api.command.user.vpn.ListVpnUsersCmd;
 import com.cloud.exception.NetworkRuleConflictException;
 import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
-import com.cloud.user.Account;
 import com.cloud.utils.Pair;
 
 import java.util.List;

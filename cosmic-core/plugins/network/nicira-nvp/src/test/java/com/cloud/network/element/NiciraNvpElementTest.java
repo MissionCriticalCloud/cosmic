@@ -21,6 +21,7 @@ import com.cloud.exception.InsufficientCapacityException;
 import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
@@ -37,7 +38,6 @@ import com.cloud.network.dao.NiciraNvpDao;
 import com.cloud.network.dao.NiciraNvpRouterMappingDao;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.resource.ResourceManager;
-import com.cloud.user.Account;
 import com.cloud.utils.net.Ip;
 import com.cloud.vm.ReservationContext;
 
