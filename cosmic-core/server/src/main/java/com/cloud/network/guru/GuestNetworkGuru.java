@@ -280,7 +280,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             nic = new NicProfile(ReservationStrategy.Start, null, null, null, null);
         }
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
 
         if (nic.getIPv4Address() == null && !GuestType.Sync.equals(network.getGuestType())) {
             nic.setBroadcastUri(network.getBroadcastUri());
@@ -298,7 +298,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                         guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
                         break;
                     case DomainRouter:
-                        if ( _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway, Provider.VPCVirtualRouter)) {
+                        if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway, Provider.VPCVirtualRouter)) {
                             // Networks that support the Gateway service acquire the gateway ip on their nic
                             guestIp = network.getGateway();
                         } else {

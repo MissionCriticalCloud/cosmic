@@ -60,7 +60,7 @@ public class AlertGenerator {
                 new Event(ManagementService.Name, EventCategory.ALERT_EVENT.getName(), alertType, null, null);
 
         final Map<String, String> eventDescription = new HashMap<>();
-        final Zone zone = s_zoneRepository.findOne(dataCenterId);
+        final Zone zone = s_zoneRepository.findById(dataCenterId).orElse(null);
         final HostPodVO pod = s_podDao.findById(podId);
 
         eventDescription.put("event", alertType);

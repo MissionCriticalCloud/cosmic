@@ -542,7 +542,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
             verifyDetails();
 
-            final Zone zone = zoneRepository.findOne(zoneId);
+            final Zone zone = zoneRepository.findById(zoneId).orElse(null);
 
             if (zone == null) {
                 throw new InvalidParameterValueException("Unable to find zone by id=" + zoneId);

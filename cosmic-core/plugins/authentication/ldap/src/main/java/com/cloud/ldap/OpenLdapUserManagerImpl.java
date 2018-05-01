@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +166,7 @@ public class OpenLdapUserManagerImpl implements LdapUserManager {
     public List<LdapUser> getUsers(final String username, final LdapContext context) throws NamingException, IOException {
         final List<LdapUser> users = searchUsers(username, context);
 
-        if (CollectionUtils.isNotEmpty(users)) {
+        if (users.size() > 0) {
             Collections.sort(users);
         }
         return users;

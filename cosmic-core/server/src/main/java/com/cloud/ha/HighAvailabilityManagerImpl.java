@@ -283,7 +283,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         s_logger.warn("Scheduling restart for VMs on host " + host.getId() + "-" + host.getName());
 
         final List<VMInstanceVO> vms = _instanceDao.listByHostId(host.getId());
-        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
+        final Zone zone = zoneRepository.findById(host.getDataCenterId()).orElse(null);
 
         // send an email alert that the host is down
         StringBuilder sb = null;
@@ -516,7 +516,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             }
         }
 
-        final Zone zone = zoneRepository.findOne(host.getDataCenterId());
+        final Zone zone = zoneRepository.findById(host.getDataCenterId()).orElse(null);
         final HostPodVO podVO = _podDao.findById(host.getPodId());
         final String hostDesc = "name: " + host.getName() + "(id:" + host.getId() + "), availability zone: " + zone.getName() + ", pod: " + podVO.getName();
 

@@ -99,7 +99,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
     @Override
     public List<Long> orderClusters(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws InsufficientServerCapacityException {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
-        final Zone zone = zoneRepository.findOne(vm.getDataCenterId());
+        final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);
 
         //check if datacenter is in avoid set
         if (avoid.shouldAvoid(zone)) {

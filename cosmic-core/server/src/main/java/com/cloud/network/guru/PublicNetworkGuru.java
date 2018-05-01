@@ -88,7 +88,7 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
     public NicProfile allocate(final Network network, NicProfile nic, final VirtualMachineProfile vm) throws InsufficientVirtualNetworkCapacityException,
             InsufficientAddressCapacityException, ConcurrentOperationException {
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
 
         if (nic != null && nic.getRequestedIPv4() != null) {
             throw new CloudRuntimeException("Does not support custom ip allocation at this time: " + nic);

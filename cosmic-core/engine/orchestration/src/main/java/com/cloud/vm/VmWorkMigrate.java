@@ -48,7 +48,7 @@ public class VmWorkMigrate extends VmWork {
     }
 
     public DeployDestination getDeployDestination() {
-        final Zone zone = zoneId != null ? s_zoneRepository.findOne(zoneId) : null;
+        final Zone zone = zoneId != null ? s_zoneRepository.findById(zoneId).orElse(null) : null;
         final Pod pod = podId != null ? s_entityMgr.findById(Pod.class, podId) : null;
         final Cluster cluster = clusterId != null ? s_entityMgr.findById(Cluster.class, clusterId) : null;
         final Host host = hostId != null ? s_entityMgr.findById(Host.class, hostId) : null;

@@ -154,7 +154,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final Zone zone = zoneRepository.findOne(gateway.getZoneId());
+        final Zone zone = zoneRepository.findById(gateway.getZoneId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         boolean result = true;
@@ -207,7 +207,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
+        final Zone zone = zoneRepository.findById(vpc.getZoneId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         if (!networkTopology.applyStaticRoutes(routes, routers)) {
@@ -229,7 +229,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+        final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         final Network privateNetwork = _networkModel.getNetwork(gateway.getNetworkId());
@@ -255,7 +255,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return true;
         }
 
-        final Zone zone = zoneRepository.findOne(publicIp.getDataCenterId());
+        final Zone zone = zoneRepository.findById(publicIp.getDataCenterId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         final Network publicNetwork = _networkModel.getNetwork(publicIp.getNetworkId());
@@ -282,7 +282,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
                 return true;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {
@@ -603,7 +603,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
         }
 
         final Vpc vpc = _entityMgr.findById(Vpc.class, vpcId);
-        final Zone zone = zoneRepository.findOne(vpc.getZoneId());
+        final Zone zone = zoneRepository.findById(vpc.getZoneId()).orElse(null);
         final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
         String[] result;
@@ -675,7 +675,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
                 return false;
             }
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
             final NetworkTopology networkTopology = networkTopologyContext.retrieveNetworkTopology(zone);
 
             for (final DomainRouterVO domainRouterVO : routers) {

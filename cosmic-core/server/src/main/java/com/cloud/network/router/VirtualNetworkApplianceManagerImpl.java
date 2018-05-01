@@ -627,7 +627,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         // Check if all networks are implemented for the domR; if not -
         // implement them
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         HostPodVO pod = null;
         if (router.getPodIdToDeployIn() != null) {
             pod = _podDao.findById(router.getPodIdToDeployIn());
@@ -1080,7 +1080,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final long guestNetworkId = guestNic.getNetworkId();
         final NetworkVO guestNetwork = _networkDao.findById(guestNetworkId);
         String dhcpRange = null;
-        final Zone zone = zoneRepository.findOne(guestNetwork.getDataCenterId());
+        final Zone zone = zoneRepository.findById(guestNetwork.getDataCenterId()).orElse(null);
 
         final StringBuilder buf = new StringBuilder();
 
@@ -1155,7 +1155,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
     protected NicProfile getControlNic(final VirtualMachineProfile profile) {
         final DomainRouterVO router = _routerDao.findById(profile.getId());
-        final Zone zone = zoneRepository.findOne(router.getDataCenterId());
+        final Zone zone = zoneRepository.findById(router.getDataCenterId()).orElse(null);
         NicProfile controlNic = null;
         if (zone.getNetworkType() == NetworkType.Basic) {
             // for basic network mode, we will use the guest NIC for control NIC
@@ -1382,7 +1382,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         for (final Nic nic : routerNics) {
             final Network network = _networkModel.getNetwork(nic.getNetworkId());
 
-            final Zone zone = zoneRepository.findOne(network.getDataCenterId());
+            final Zone zone = zoneRepository.findById(network.getDataCenterId()).orElse(null);
 
             if (network.getTrafficType() == TrafficType.Guest) {
                 guestNetworks.add(network);

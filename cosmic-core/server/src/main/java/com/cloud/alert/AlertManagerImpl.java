@@ -375,7 +375,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 final double totalCapacity = capacity.get(0).getTotalCapacity();
                 final double usedCapacity = capacity.get(0).getUsedCapacity();
                 if (totalCapacity != 0 && usedCapacity / totalCapacity > _capacityTypeThresholdMap.get(capacityType)) {
-                    generateEmailAlert(zoneRepository.findOne(pod.getDataCenterId()), pod, null, totalCapacity, usedCapacity, capacityType);
+                    generateEmailAlert(zoneRepository.findById(pod.getDataCenterId()).orElse(null), pod, null, totalCapacity, usedCapacity, capacityType);
                 }
             }
         }
@@ -412,7 +412,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
                 final double totalCapacity = capacity.get(0).getTotalCapacity();
                 final double usedCapacity = capacity.get(0).getUsedCapacity() + capacity.get(0).getReservedCapacity();
                 if (totalCapacity != 0 && usedCapacity / totalCapacity > threshold) {
-                    generateEmailAlert(zoneRepository.findOne(cluster.getDataCenterId()), ApiDBUtils.findPodById(cluster.getPodId()), cluster, totalCapacity, usedCapacity,
+                    generateEmailAlert(zoneRepository.findById(cluster.getDataCenterId()).orElse(null), ApiDBUtils.findPodById(cluster.getPodId()), cluster, totalCapacity, usedCapacity,
                             capacityType);
                 }
             }
