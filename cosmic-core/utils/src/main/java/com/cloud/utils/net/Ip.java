@@ -1,17 +1,13 @@
 package com.cloud.utils.net;
 
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.SerialVersionUID;
 
 import java.io.Serializable;
 
 /**
  * Simple Ip implementation class that works with both ip4 and ip6.
  */
-public class Ip implements Serializable, Comparable<Ip> {
-
-    private static final long serialVersionUID = SerialVersionUID.Ip;
-
+public class Ip implements Comparable<Ip>, Serializable {
     long ip;
 
     public Ip(final long ip) {

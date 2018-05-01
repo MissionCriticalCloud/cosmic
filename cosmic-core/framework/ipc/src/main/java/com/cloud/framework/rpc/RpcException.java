@@ -1,8 +1,6 @@
 package com.cloud.framework.rpc;
 
 public class RpcException extends RuntimeException {
-    private static final long serialVersionUID = -3164514701087423787L;
-
     public RpcException() {
         super();
     }

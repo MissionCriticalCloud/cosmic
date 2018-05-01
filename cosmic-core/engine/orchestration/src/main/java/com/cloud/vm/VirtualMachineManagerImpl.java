@@ -63,7 +63,6 @@ import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.CloudException;
 import com.cloud.exception.ConcurrentOperationException;
@@ -775,12 +774,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         DeployDestination dest = null;
         while (true) {
 
-            try {
-                dest = _dpMgr.planDeployment(profile, plan, excludes, planner);
-            } catch (final AffinityConflictException e2) {
-                s_logger.warn("Unable to create deployment, affinity rules associted to the VM conflict", e2);
-                throw new CloudRuntimeException("Unable to create deployment, affinity rules associted to the VM conflict");
-            }
+            dest = _dpMgr.planDeployment(profile, plan, excludes, planner);
 
             if (dest != null) {
                 s_logger.debug("Found destination " + dest + " for migrating to.");
@@ -1800,13 +1794,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 final Account owner = _entityMgr.findById(Account.class, vm.getAccountId());
                 final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vm, template, offering, owner, params);
-                DeployDestination dest;
-                try {
-                    dest = _dpMgr.planDeployment(vmProfile, plan, avoids, planner);
-                } catch (final AffinityConflictException e2) {
-                    s_logger.warn("Unable to create deployment, affinity rules associted to the VM conflict", e2);
-                    throw new CloudRuntimeException("Unable to create deployment, affinity rules associted to the VM conflict");
-                }
+                DeployDestination dest = _dpMgr.planDeployment(vmProfile, plan, avoids, planner);
 
                 if (dest == null) {
                     if (planChangedByVolume) {
@@ -4061,14 +4049,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         excludes.addHost(vm.getHostId());
         vm.setServiceOfferingId(newSvcOfferingId); // Need to find the destination host based on new svc offering
 
-        DeployDestination dest = null;
-
-        try {
-            dest = _dpMgr.planDeployment(profile, plan, excludes, null);
-        } catch (final AffinityConflictException e2) {
-            s_logger.warn("Unable to create deployment, affinity rules associted to the VM conflict", e2);
-            throw new CloudRuntimeException("Unable to create deployment, affinity rules associted to the VM conflict");
-        }
+        DeployDestination dest = _dpMgr.planDeployment(profile, plan, excludes, null);
 
         if (dest != null) {
             s_logger.debug(" Found " + dest + " for scaling the vm to.");

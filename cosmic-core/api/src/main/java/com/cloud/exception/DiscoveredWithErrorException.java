@@ -1,11 +1,6 @@
 package com.cloud.exception;
 
-import com.cloud.utils.SerialVersionUID;
-
 public class DiscoveredWithErrorException extends DiscoveryException {
-
-    private static final long serialVersionUID = SerialVersionUID.DiscoveredWithErrorException;
-
     public DiscoveredWithErrorException(final String msg) {
         this(msg, null);
     }

@@ -3,8 +3,6 @@ package com.cloud.vm;
 import java.io.Serializable;
 
 public class VmWork implements Serializable {
-    private static final long serialVersionUID = -6946320465729853589L;
-
     long userId;
     long accountId;
     long vmId;

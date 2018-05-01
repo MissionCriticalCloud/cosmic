@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
  * the screen. It also notifies its subscribers when screen is repainted.
  */
 public class BufferedImageCanvas extends Canvas implements FrameBufferCanvas {
-    private static final long serialVersionUID = 1L;
     private static final Logger s_logger = LoggerFactory.getLogger(BufferedImageCanvas.class);
     private final PaintNotificationListener listener;
     // Offline screen buffer

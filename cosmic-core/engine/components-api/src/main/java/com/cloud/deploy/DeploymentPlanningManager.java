@@ -1,7 +1,6 @@
 package com.cloud.deploy;
 
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.VirtualMachineProfile;
@@ -17,15 +16,11 @@ public interface DeploymentPlanningManager extends Manager {
      * Lastly, Call Allocators - Given a cluster, allocators matches the
      * requirements to capabilities of the physical resource (host, storage
      * pool).
-     *
-     * @throws AffinityConflictException
      */
-    DeployDestination planDeployment(VirtualMachineProfile vmProfile, DeploymentPlan plan,
-                                     ExcludeList avoids, DeploymentPlanner planner) throws InsufficientServerCapacityException, AffinityConflictException;
+    DeployDestination planDeployment(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoids, DeploymentPlanner planner) throws InsufficientServerCapacityException;
 
-    String finalizeReservation(DeployDestination plannedDestination,
-                               VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoids, DeploymentPlanner planner)
-            throws InsufficientServerCapacityException, AffinityConflictException;
+    String finalizeReservation(DeployDestination plannedDestination, VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoids, DeploymentPlanner planner) throws
+            InsufficientServerCapacityException;
 
     void cleanupVMReservations();
 

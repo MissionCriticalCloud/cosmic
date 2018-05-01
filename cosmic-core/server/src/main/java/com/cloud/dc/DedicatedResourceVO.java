@@ -14,11 +14,6 @@ import java.util.UUID;
 @Table(name = "dedicated_resources")
 public class DedicatedResourceVO implements DedicatedResources {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6659510127145101917L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

@@ -5,8 +5,6 @@ import com.cloud.utils.events.EventArgs;
 import java.util.List;
 
 public class ClusterNodeLeftEventArgs extends EventArgs {
-    private static final long serialVersionUID = 7236743316223611935L;
-
     private final List<ManagementServerHostVO> leftNodes;
     private final Long self;
 

@@ -1,6 +1,5 @@
 package com.cloud.servlet;
 
-import com.cloud.utils.SerialVersionUID;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.TransactionLegacy;
 
@@ -16,7 +15,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class CloudStartupServlet extends HttpServlet {
     public static final Logger s_logger = LoggerFactory.getLogger(CloudStartupServlet.class.getName());
-    static final long serialVersionUID = SerialVersionUID.CloudStartupServlet;
 
     Timer _timer = new Timer();
 

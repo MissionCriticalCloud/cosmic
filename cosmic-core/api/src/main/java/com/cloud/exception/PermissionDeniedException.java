@@ -2,14 +2,11 @@ package com.cloud.exception;
 
 import com.cloud.acl.ControlledEntity;
 import com.cloud.user.Account;
-import com.cloud.utils.SerialVersionUID;
 import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.List;
 
 public class PermissionDeniedException extends CloudRuntimeException {
-
-    private static final long serialVersionUID = SerialVersionUID.PermissionDeniedException;
     List<? extends ControlledEntity> violations;
     Account account;
 

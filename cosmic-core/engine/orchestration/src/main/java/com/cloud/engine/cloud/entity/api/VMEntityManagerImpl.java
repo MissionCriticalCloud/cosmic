@@ -15,7 +15,6 @@ import com.cloud.engine.cloud.entity.api.db.VMReservationVO;
 import com.cloud.engine.cloud.entity.api.db.dao.VMEntityDao;
 import com.cloud.engine.cloud.entity.api.db.dao.VMReservationDao;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.exception.InsufficientCapacityException;
@@ -33,7 +32,6 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
@@ -157,12 +155,7 @@ public class VMEntityManagerImpl implements VMEntityManager {
         }
 
         while (true) {
-            DeployDestination dest = null;
-            try {
-                dest = _dpMgr.planDeployment(vmProfile, plan, exclude, plannerToUse);
-            } catch (final AffinityConflictException e) {
-                throw new CloudRuntimeException("Unable to create deployment, affinity rules associated to the VM conflict");
-            }
+            DeployDestination dest = _dpMgr.planDeployment(vmProfile, plan, exclude, plannerToUse);
 
             if (dest != null) {
                 final String reservationId = _dpMgr.finalizeReservation(dest, vmProfile, plan, exclude, plannerToUse);

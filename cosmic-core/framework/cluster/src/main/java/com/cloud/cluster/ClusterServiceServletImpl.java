@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ClusterServiceServletImpl implements ClusterService {
-    private static final long serialVersionUID = 4574025200012566153L;
     private static final Logger s_logger = LoggerFactory.getLogger(ClusterServiceServletImpl.class);
     protected static HttpClient s_client = null;
     private String _serviceUrl;

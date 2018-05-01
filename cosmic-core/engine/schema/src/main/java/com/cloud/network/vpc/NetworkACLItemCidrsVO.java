@@ -12,8 +12,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "network_acl_item_cidrs")
 public class NetworkACLItemCidrsVO implements InternalIdentity {
-    private static final long serialVersionUID = 7805284475485494754L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

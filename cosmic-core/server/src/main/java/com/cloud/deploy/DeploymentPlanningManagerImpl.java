@@ -39,7 +39,6 @@ import com.cloud.engine.cloud.entity.api.db.dao.VMReservationDao;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.exception.ConnectionException;
 import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -220,7 +219,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
     @Override
     public DeployDestination planDeployment(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoids, DeploymentPlanner planner)
-            throws InsufficientServerCapacityException, AffinityConflictException {
+            throws InsufficientServerCapacityException {
 
         // call affinitygroup chain
         final VirtualMachine vm = vmProfile.getVirtualMachine();
@@ -1093,7 +1092,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     @Override
     public String finalizeReservation(final DeployDestination plannedDestination, final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoids,
                                       final DeploymentPlanner planner)
-            throws InsufficientServerCapacityException, AffinityConflictException {
+            throws InsufficientServerCapacityException {
 
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final long vmGroupCount = _affinityGroupVMMapDao.countAffinityGroupsForVm(vm.getId());

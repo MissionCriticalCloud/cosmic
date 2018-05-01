@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class DeployDestination implements Serializable {
-    private static final long serialVersionUID = 7113840781939014695L;
 
     Zone _zone;
     Pod _pod;

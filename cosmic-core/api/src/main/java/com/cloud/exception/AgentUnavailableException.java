@@ -1,15 +1,8 @@
 package com.cloud.exception;
 
 import com.cloud.host.Host;
-import com.cloud.utils.SerialVersionUID;
 
-/**
- * command.
- */
 public class AgentUnavailableException extends ResourceUnavailableException {
-
-    private static final long serialVersionUID = SerialVersionUID.AgentUnavailableException;
-
     public AgentUnavailableException(final long agentId) {
         this("Unable to reach host.", agentId);
     }

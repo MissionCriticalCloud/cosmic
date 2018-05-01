@@ -3,7 +3,6 @@ package com.cloud.utils;
 import java.io.Serializable;
 
 public class Pair<T, U> implements Serializable {
-    private static final long serialVersionUID = 2L;
     T t;
     U u;
 

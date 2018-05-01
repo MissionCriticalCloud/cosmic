@@ -13,7 +13,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "storage_tag_view")
 public class StorageTagVO extends BaseViewVO implements InternalIdentity {
-    private static final long serialVersionUID = 1L;
     @Column(name = "pool_id")
     long poolId;
     @Id

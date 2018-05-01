@@ -13,7 +13,6 @@ public class ConsoleProxyAlertEventArgs extends EventArgs {
     public static final int PROXY_FIREWALL_ALERT = 6;
     public static final int PROXY_STORAGE_ALERT = 7;
     public static final int PROXY_REBOOTED = 8;
-    private static final long serialVersionUID = 23773987551479885L;
     private final int type;
     private final long zoneId;
     private final long proxyId;

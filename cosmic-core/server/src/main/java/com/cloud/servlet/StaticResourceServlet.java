@@ -33,7 +33,6 @@ public class StaticResourceServlet extends HttpServlet {
                     put("xml", "text/xml");
                 }
             });
-    private static final long serialVersionUID = -8833228931973461812L;
 
     @Override
     protected void doGet(final HttpServletRequest req,

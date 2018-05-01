@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VmWorkMigrate extends VmWork {
-    private static final long serialVersionUID = 1689203333114836522L;
     static private EntityManager s_entityMgr;
     static private ZoneRepository s_zoneRepository;
     private final Map<String, String> storage;

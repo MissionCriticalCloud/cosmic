@@ -53,7 +53,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @Component("consoleServlet")
 public class ConsoleProxyServlet extends HttpServlet {
     public static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyServlet.class.getName());
-    private static final long serialVersionUID = -5515382620323808168L;
     private static final int DEFAULT_THUMBNAIL_WIDTH = 144;
     private static final int DEFAULT_THUMBNAIL_HEIGHT = 110;
     static KeysManager s_keysMgr;
