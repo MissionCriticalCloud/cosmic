@@ -1,8 +1,6 @@
 package com.cloud.vm;
 
 public class VmWorkAddVmToNetwork extends VmWork {
-    private static final long serialVersionUID = 8861516006586736813L;
-
     Long networkId;
     NicProfile requstedNicProfile;
 

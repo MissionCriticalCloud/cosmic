@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VmWorkReboot extends VmWork {
-    private static final long serialVersionUID = 195907627459759933L;
-
     // use serialization friendly map
     private Map<String, String> rawParams;
 

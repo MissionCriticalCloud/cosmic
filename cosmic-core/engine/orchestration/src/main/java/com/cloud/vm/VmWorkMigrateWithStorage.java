@@ -3,8 +3,6 @@ package com.cloud.vm;
 import java.util.Map;
 
 public class VmWorkMigrateWithStorage extends VmWork {
-    private static final long serialVersionUID = -5626053872453569165L;
-
     long srcHostId;
     long destHostId;
     Map<Long, Long> volumeToPool;

@@ -50,8 +50,6 @@ public interface DeploymentPlanner extends Adapter {
     }
 
     class ExcludeList implements Serializable {
-        private static final long serialVersionUID = -482175549460148301L;
-
         private final Set<Long> zoneIds = new TreeSet<>();
         private final Set<Long> podIds = new TreeSet<>();
         private final Set<Long> clusterIds = new TreeSet<>();

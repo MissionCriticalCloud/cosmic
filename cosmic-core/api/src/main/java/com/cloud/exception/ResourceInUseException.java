@@ -1,8 +1,6 @@
 package com.cloud.exception;
 
 public class ResourceInUseException extends ManagementServerException {
-
-    private static final long serialVersionUID = 1383416910411639324L;
     private String resourceType;
     private String resourceName;
 

@@ -21,11 +21,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "network_acl_item")
 public class NetworkACLItemVO implements NetworkACLItem {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2790623532888742060L;
     @Column(name = "display", updatable = true, nullable = false)
     protected boolean display = true;
     @Id

@@ -1,10 +1,6 @@
 package com.cloud.exception;
 
-import com.cloud.utils.SerialVersionUID;
-
 public class InsufficientNetworkCapacityException extends InsufficientCapacityException {
-    private static final long serialVersionUID = SerialVersionUID.InsufficientAddressCapacityException;
-
     protected InsufficientNetworkCapacityException() {
         super();
     }

@@ -1,8 +1,6 @@
 package com.cloud.vm;
 
 public class VmWorkResizeVolume extends VmWork {
-    private static final long serialVersionUID = 6112366316907642498L;
-
     private final long volumeId;
     private final long currentSize;
     private final long newSize;

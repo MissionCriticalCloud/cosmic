@@ -1,8 +1,6 @@
 package com.cloud.vm;
 
 public class VmWorkMigrateVolume extends VmWork {
-    private static final long serialVersionUID = -565778516928408602L;
-
     private final long volumeId;
     private final long destPoolId;
     private final boolean liveMigrate;

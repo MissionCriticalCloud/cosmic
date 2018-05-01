@@ -3,9 +3,7 @@ package com.cloud.agent.manager.authn.impl;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.manager.authn.AgentAuthnException;
 import com.cloud.agent.manager.authn.AgentAuthorizer;
-import com.cloud.exception.ConnectionException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
 import com.cloud.utils.component.AdapterBase;
@@ -29,18 +27,14 @@ public class BasicAgentAuthManager extends AdapterBase implements AgentAuthorize
     AgentManager _agentManager = null;
 
     @Override
-    public boolean processInitialConnect(final StartupCommand[] cmd) throws ConnectionException {
-        try {
-            authorizeAgent(cmd);
-        } catch (final AgentAuthnException e) {
-            throw new ConnectionException(true, "Failed to authenticate/authorize", e);
-        }
+    public boolean processInitialConnect(final StartupCommand[] cmd) {
+        authorizeAgent(cmd);
         s_logger.debug("Authorized agent with guid " + cmd[0].getGuid());
         return false;//so that the next host creator can process it
     }
 
     @Override
-    public boolean authorizeAgent(final StartupCommand[] cmd) throws AgentAuthnException {
+    public boolean authorizeAgent(final StartupCommand[] cmd) {
         return true;
     }
 

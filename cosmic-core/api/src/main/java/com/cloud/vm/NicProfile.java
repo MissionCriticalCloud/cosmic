@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.net.URI;
 
 public class NicProfile implements InternalIdentity, Serializable {
-    private static final long serialVersionUID = 4997005771736090304L;
-
     long id;
     long networkId;
     long vmId;

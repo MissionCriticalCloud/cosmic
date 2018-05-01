@@ -1,7 +1,5 @@
 package com.cloud.exception;
 
-import com.cloud.utils.SerialVersionUID;
-
 /**
  * ConnectionException is thrown by Listeners while processing the startup
  * command.  There are two uses for this exception and they are distinguished
@@ -16,7 +14,6 @@ import com.cloud.utils.SerialVersionUID;
  */
 public class ConnectionException extends CloudException {
 
-    private static final long serialVersionUID = SerialVersionUID.ConnectionException;
     boolean _error;
 
     public ConnectionException(final boolean setupError, final String msg) {

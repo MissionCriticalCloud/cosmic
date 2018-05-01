@@ -5,8 +5,6 @@ import com.cloud.utils.events.EventArgs;
 import java.util.List;
 
 public class ClusterNodeJoinEventArgs extends EventArgs {
-    private static final long serialVersionUID = 6284545402661799476L;
-
     private final List<ManagementServerHostVO> joinedNodes;
     private final Long self;
 

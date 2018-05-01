@@ -1,7 +1,6 @@
 package com.cloud.utils.exception;
 
 import com.cloud.utils.Pair;
-import com.cloud.utils.SerialVersionUID;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,8 +12,6 @@ import java.util.List;
  * wrap exceptions that you know there's no point in dealing with.
  */
 public class CloudRuntimeException extends RuntimeException implements ErrorContext {
-
-    private static final long serialVersionUID = SerialVersionUID.CloudRuntimeException;
 
     // This holds a list of uuids and their descriptive names.
     transient protected ArrayList<ExceptionProxyObject> idList = new ArrayList<>();

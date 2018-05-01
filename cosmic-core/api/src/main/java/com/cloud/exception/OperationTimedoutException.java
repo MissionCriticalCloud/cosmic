@@ -1,14 +1,11 @@
 package com.cloud.exception;
 
 import com.cloud.agent.api.Command;
-import com.cloud.utils.SerialVersionUID;
 
 /**
  * wait timeout.
  */
 public class OperationTimedoutException extends CloudException {
-    private static final long serialVersionUID = SerialVersionUID.OperationTimedoutException;
-
     long _agentId;
     long _seqId;
     int _time;

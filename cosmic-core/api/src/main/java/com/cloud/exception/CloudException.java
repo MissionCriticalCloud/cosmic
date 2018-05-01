@@ -11,8 +11,6 @@ import java.util.ArrayList;
  */
 
 public class CloudException extends Exception {
-    private static final long serialVersionUID = 8784427323859682503L;
-
     // This holds a list of uuids and their names. Add uuid:fieldname pairs
     protected ArrayList<String> idList = new ArrayList<>();
 

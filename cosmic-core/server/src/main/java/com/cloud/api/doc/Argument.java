@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Argument implements Comparable<Object>, Serializable {
-    private static final long serialVersionUID = 2L;
     private String name;
     private String description;
     private Boolean required;

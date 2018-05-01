@@ -14,7 +14,6 @@ public class SecStorageVmAlertEventArgs extends EventArgs {
     public static final int SSVM_STORAGE_ALERT = 7;
     public static final int SSVM_REBOOTED = 8;
     public static final String ALERT_SUBJECT = "ssvm-alert";
-    private static final long serialVersionUID = 23773987551479885L;
     private final int type;
     private final long zoneId;
     private final long ssVmId;

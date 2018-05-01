@@ -1,12 +1,6 @@
 package com.cloud.utils.exception;
 
-import com.cloud.utils.SerialVersionUID;
-
-/**
- * a public method.
- */
 public class ExecutionException extends Exception {
-    private static final long serialVersionUID = SerialVersionUID.ExecutionException;
 
     protected int csErrorCode;
 

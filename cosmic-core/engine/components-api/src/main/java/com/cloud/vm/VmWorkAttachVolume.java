@@ -3,8 +3,6 @@ package com.cloud.vm;
 import com.cloud.model.enumeration.DiskControllerType;
 
 public class VmWorkAttachVolume extends VmWork {
-    private static final long serialVersionUID = 553291814854451740L;
-
     private final Long volumeId;
     private final Long deviceId;
     private final DiskControllerType diskController;

@@ -14,7 +14,6 @@ import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.utils.db.DB;
@@ -69,7 +68,7 @@ public class ExplicitDedicationProcessor extends AffinityProcessorBase implement
      * This IncludeList is then used to update the avoid list for a given data center.
      */
     @Override
-    public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, ExcludeList avoid) throws AffinityConflictException {
+    public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, ExcludeList avoid) {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final List<AffinityGroupVMMapVO> vmGroupMappings = _affinityGroupVMMapDao.findByVmIdType(vm.getId(), getType());
         final Zone zone = zoneRepository.findById(vm.getDataCenterId()).orElse(null);

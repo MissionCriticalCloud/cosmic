@@ -3,7 +3,6 @@ package com.cloud.affinity;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachineProfile;
 
@@ -12,7 +11,7 @@ public class AffinityProcessorBase extends AdapterBase implements AffinityGroupP
     protected String _type;
 
     @Override
-    public void process(final VirtualMachineProfile vm, final DeploymentPlan plan, final ExcludeList avoid) throws AffinityConflictException {
+    public void process(final VirtualMachineProfile vm, final DeploymentPlan plan, final ExcludeList avoid) {
 
     }
 
@@ -26,7 +25,7 @@ public class AffinityProcessorBase extends AdapterBase implements AffinityGroupP
     }
 
     @Override
-    public boolean check(final VirtualMachineProfile vm, final DeployDestination plannedDestination) throws AffinityConflictException {
+    public boolean check(final VirtualMachineProfile vm, final DeployDestination plannedDestination) {
         return true;
     }
 

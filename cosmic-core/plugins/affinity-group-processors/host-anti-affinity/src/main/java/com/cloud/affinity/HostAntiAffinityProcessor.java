@@ -8,7 +8,6 @@ import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.cloud.entity.api.db.VMReservationVO;
 import com.cloud.engine.cloud.entity.api.db.dao.VMReservationDao;
-import com.cloud.exception.AffinityConflictException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
@@ -44,7 +43,7 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
     private int _vmCapacityReleaseInterval;
 
     @Override
-    public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) throws AffinityConflictException {
+    public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) {
         final VirtualMachine vm = vmProfile.getVirtualMachine();
         final List<AffinityGroupVMMapVO> vmGroupMappings = _affinityGroupVMMapDao.findByVmIdType(vm.getId(), getType());
 
@@ -84,7 +83,7 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
     }
 
     @Override
-    public boolean check(final VirtualMachineProfile vmProfile, final DeployDestination plannedDestination) throws AffinityConflictException {
+    public boolean check(final VirtualMachineProfile vmProfile, final DeployDestination plannedDestination) {
 
         if (plannedDestination.getHost() == null) {
             return true;

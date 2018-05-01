@@ -13,7 +13,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "host_tags")
 public class HostTagVO extends BaseViewVO implements InternalIdentity {
-    private static final long serialVersionUID = 1L;
     @Column(name = "host_id")
     long hostId;
     @Id

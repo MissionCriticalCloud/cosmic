@@ -4,11 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Command implements Serializable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4318310162503004975L;
     private String name;
     private String description;
     private String usage;
