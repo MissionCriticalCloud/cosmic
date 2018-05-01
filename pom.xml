@@ -55,7 +55,7 @@
         <integration.tests.report>${coverage.reports.dir}/jacoco-it-merged.exec</integration.tests.report>
 
         <!-- Pinned older version than Spring 4 dependency management -->
-        <cs.gson.version>1.7.2</cs.gson.version>
+        <cs.gson.version>2.8.2</cs.gson.version>
 
         <!-- Dependency management properties -->
         <cs.amqp-client.version>3.5.4</cs.amqp-client.version>

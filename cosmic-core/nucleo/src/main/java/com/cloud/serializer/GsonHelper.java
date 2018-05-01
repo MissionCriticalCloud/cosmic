@@ -2,17 +2,11 @@ package com.cloud.serializer;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
-import com.cloud.agent.api.SecStorageFirewallCfgCommand.PortConfig;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.transport.ArrayTypeAdaptor;
 import com.cloud.agent.transport.InterfaceTypeAdaptor;
 import com.cloud.agent.transport.LoggingExclusionStrategy;
-import com.cloud.agent.transport.Request.NwGroupsCommandTypeAdaptor;
-import com.cloud.agent.transport.Request.PortConfigListTypeAdaptor;
-import com.cloud.utils.Pair;
-
-import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,32 +22,39 @@ public class GsonHelper {
     static {
         final GsonBuilder gsonBuilder = new GsonBuilder();
         s_gson = setDefaultGsonConfig(gsonBuilder);
+
         final GsonBuilder loggerBuilder = new GsonBuilder();
         loggerBuilder.disableHtmlEscaping();
         loggerBuilder.setExclusionStrategies(new LoggingExclusionStrategy(s_logger));
+
         s_gogger = setDefaultGsonConfig(loggerBuilder);
+
         s_logger.info("Default Builder inited.");
     }
 
     static Gson setDefaultGsonConfig(final GsonBuilder builder) {
-        builder.setVersion(1.5);
         final InterfaceTypeAdaptor<DataStoreTO> dsAdaptor = new InterfaceTypeAdaptor<>();
         builder.registerTypeAdapter(DataStoreTO.class, dsAdaptor);
+
         final InterfaceTypeAdaptor<DataTO> dtAdaptor = new InterfaceTypeAdaptor<>();
         builder.registerTypeAdapter(DataTO.class, dtAdaptor);
+
         final ArrayTypeAdaptor<Command> cmdAdaptor = new ArrayTypeAdaptor<>();
-        builder.registerTypeAdapter(Command[].class, cmdAdaptor);
+        builder.registerTypeAdapter(new TypeToken<Command[]>() {
+        }.getType(), cmdAdaptor);
+
         final ArrayTypeAdaptor<Answer> ansAdaptor = new ArrayTypeAdaptor<>();
-        builder.registerTypeAdapter(Answer[].class, ansAdaptor);
-        builder.registerTypeAdapter(new TypeToken<List<PortConfig>>() {
-        }.getType(), new PortConfigListTypeAdaptor());
-        builder.registerTypeAdapter(new TypeToken<Pair<Long, Long>>() {
-        }.getType(), new NwGroupsCommandTypeAdaptor());
+        builder.registerTypeAdapter(new TypeToken<Answer[]>() {
+        }.getType(), ansAdaptor);
+
         final Gson gson = builder.create();
+
         dsAdaptor.initGson(gson);
         dtAdaptor.initGson(gson);
+
         cmdAdaptor.initGson(gson);
         ansAdaptor.initGson(gson);
+
         return gson;
     }
 
