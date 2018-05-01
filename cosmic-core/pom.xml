@@ -19,7 +19,6 @@
         <module>apidoc</module>
         <module>cosmic-db</module>
         <module>cosmic-flyway</module>
-        <module>cosmic-model</module>
         <module>engine/api</module>
         <module>engine/components-api</module>
         <module>engine/orchestration</module>

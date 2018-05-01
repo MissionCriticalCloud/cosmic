@@ -6,9 +6,8 @@
 
     <parent>
         <groupId>cloud.cosmic</groupId>
-        <artifactId>cosmic-core</artifactId>
+        <artifactId>cosmic</artifactId>
         <version>6.0.16-SNAPSHOT</version>
-        <relativePath>../</relativePath>
     </parent>
 
 </project>
